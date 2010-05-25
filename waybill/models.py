@@ -17,7 +17,6 @@ class LTI(models.Model):
 	LTI_ID=models.CharField(max_length=25)
 	CODE=models.CharField(max_length=25)
 	LTI_DATE=models.DateTimeField()
-	CONTRACT_CODE=models.CharField(max_length=20)
 	EXPIRY_DATE=models.DateTimeField()
 	ORIGIN_TYPE=models.CharField(max_length=1)	
 	ORIGIN_LOCATION_CODE=models.CharField(max_length=10)
@@ -30,38 +29,18 @@ class LTI(models.Model):
 	REQUESTED_DISPATCH_DATE=models.DateTimeField()
 	INSPECTION_INDICATOR=models.CharField(max_length=1)
 	OFFICER_CODE=models.CharField(max_length=7)
-	PERSON2_OUC=models.CharField(max_length=13)
-	TITLE_OF_OFFICER=models.CharField(max_length=50)
 	ISSUING_CODE=models.CharField(max_length=7)
-	PERSON1_OUC=models.CharField(max_length=13)
 	TITLE_OF_ISSUING=models.CharField(max_length=50)
 	TRANSPORTER_CODE=models.CharField(max_length=4)
 	SUPPLIER_OUC=models.CharField(max_length=13)
-	TRANSPORT_RATE_TYPE=models.CharField(max_length=10)
-	TRANSPORT_CURRENCY=models.CharField(max_length=3)
-	TRANSPORT_RATE=models.DecimalField(max_digits=15, decimal_places=3)
-	FUEL_ENTITLEMENT=models.DecimalField( max_digits=15, decimal_places=3)
-	FUEL_RATE=models.DecimalField( max_digits=15, decimal_places=3)
-	FUEL_CURRENCY=models.CharField(max_length=3)
-	FOOD_RELEASE=models.CharField(max_length=6)
-	REMARKS	=models.CharField(max_length=250)
-	REMARKS_B=models.CharField(max_length=250)
-	OBSERVATIONS=models.CharField(max_length=250)
 	STATUS_INDICATOR=models.CharField(max_length=1)
 	ORG_UNIT_CODE=models.CharField(max_length=13)
-	PRINTED_INDICATOR=models.CharField(max_length=1)
-	OFFID=models.CharField(max_length=13)
-	SEND_PACK=models.DecimalField( max_digits=20, decimal_places=0)
-	RECV_PACK=models.DecimalField( max_digits=20, decimal_places=0)
-	LAST_MOD_USER=models.CharField(max_length=30)
-	LAST_MOD_DATE=models.DateTimeField()
 	
 	def  __unicode__(self):
 		return self.LTI_ID + ' - ' + self.DESTINATION_LOCATION_CODE
 	def mydesc(self):
 		return self.LTI_ID + ' - ' + self.DESTINATION_LOCATION_CODE
-class LTIAdmin(admin.ModelAdmin):
-	list_display = ('LTI_ID', 'DESTINATION_LOCATION_CODE')
+
 	
 	
 class LTIDetail(models.Model):
@@ -85,8 +64,7 @@ class LTIDetail(models.Model):
 		return self.OriginLTI.mydesc() + ' - ' + self.SI_RECORD_ID + ' - ' 
 	
 
-class LTIDetailAdmin(admin.ModelAdmin):
-	list_display = ('OriginLTI', 'SI_RECORD_ID')
+
 
 class Waybill(models.Model):
 	transaction_type_choice=(
@@ -154,8 +132,7 @@ class Waybill(models.Model):
 		return self.waybillNumber
 	def mydesc(self):
 		return self.waybillNumber
-class WaybillAdmin(admin.ModelAdmin):
-	list_display=('waybillNumber','ltiNumber')
+
 
 class LoadingDetail(models.Model):
 	wbNumber=models.ForeignKey(Waybill)
@@ -169,10 +146,29 @@ class LoadingDetail(models.Model):
 	unitsDamagedReason=models.TextField(blank=True)
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
-	
 
+
+class LTIDetailAdmin(admin.ModelAdmin):
+	list_display = ('OriginLTI', 'SI_RECORD_ID')
+
+
+class LTIDetailInline(admin.TabularInline):
+	model = LTIDetail
+
+class LTIAdmin(admin.ModelAdmin):
+	list_display = ('LTI_ID', 'DESTINATION_LOCATION_CODE')
+	inlines =[LTIDetailInline]
 	
 	
+class LoadingDetailInline(admin.TabularInline):
+    model = LoadingDetail
+
+class WaybillAdmin(admin.ModelAdmin):
+	list_display=('waybillNumber','ltiNumber')
+	inlines = [LoadingDetailInline]
+
+class LoadingDetailAdmin(admin.ModelAdmin):
+	list_display=('waybillNumber','siNo')
 	
 admin.site.register(Commodity,CommodityAdmin)
 admin.site.register(LTI,LTIAdmin)
