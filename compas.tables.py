@@ -1,177 +1,13 @@
+# This is an auto-generated Django model module.
+# You'll have to do the following manually to clean this up:
+#     * Rearrange models' order
+#     * Make sure each model has one field with primary_key=True
+# Feel free to rename the models, but don't rename db_table values or field names.
+#
+# Also note: You'll have to insert the output of 'django-admin.py sqlcustom [appname]'
+# into your database.
+
 from django.db import models
-from django.contrib import admin
-
-# Create your models here.
-class Commodity(models.Model):
-	commodityRef=models.TextField()
-	commodityName=models.TextField()
-	commodityType=models.TextField()
-	def __unicode__(self):
-		return self.commodityName
-	
-class CommodityAdmin(admin.ModelAdmin):
-	list_display = ('commodityRef', 'commodityName', 'commodityType')
-	
-	
-class LTI(models.Model): 
-	LTI_ID=models.CharField(max_length=25)
-	CODE=models.CharField(max_length=25)
-	LTI_DATE=models.DateTimeField()
-	EXPIRY_DATE=models.DateTimeField()
-	ORIGIN_TYPE=models.CharField(max_length=1)	
-	ORIGIN_LOCATION_CODE=models.CharField(max_length=10)
-	INTVYG_CODE=models.CharField(max_length=25)
-	INTDLV_CODE=models.DecimalField( max_digits=2, decimal_places=0)
-	ORIGIN_CODE=models.CharField(max_length=13)
-	ORIGIN_DESCR=models.CharField(max_length=50)
-	DESTINATION_LOCATION_CODE=models.CharField(max_length=10)
-	ORGANIZATION_ID	=models.CharField(max_length=12)
-	REQUESTED_DISPATCH_DATE=models.DateTimeField()
-	INSPECTION_INDICATOR=models.CharField(max_length=1)
-	OFFICER_CODE=models.CharField(max_length=7)
-	ISSUING_CODE=models.CharField(max_length=7)
-	TITLE_OF_ISSUING=models.CharField(max_length=50)
-	TRANSPORTER_CODE=models.CharField(max_length=4)
-	SUPPLIER_OUC=models.CharField(max_length=13)
-	STATUS_INDICATOR=models.CharField(max_length=1)
-	ORG_UNIT_CODE=models.CharField(max_length=13)
-	
-	def  __unicode__(self):
-		return self.LTI_ID + ' - ' + self.DESTINATION_LOCATION_CODE
-	def mydesc(self):
-		return self.LTI_ID + ' - ' + self.DESTINATION_LOCATION_CODE
-
-	
-	
-class LTIDetail(models.Model):
-	OriginLTI=models.ForeignKey(LTI)
-	SI_RECORD_ID=models.CharField(max_length=25)
-	COMM_CATEGORY_CODE=models.CharField(max_length=9)
-	COMMODITY_CODE=models.CharField(max_length=18)
-	QUANTITY_NET=models.DecimalField( max_digits=11, decimal_places=3)
-	QUANTITY_GROSS=models.DecimalField( max_digits=11, decimal_places=3)
-	NUMBER_OF_UNITS=models.DecimalField( max_digits=7, decimal_places=0)
-	UNIT_WEIGHT_NET=models.DecimalField( max_digits=8, decimal_places=3)
-	UNIT_WEIGHT_GROSS=models.DecimalField( max_digits=8, decimal_places=3)
-	OFFID=models.CharField(max_length=13)
-	SEND_PACK=models.DecimalField( max_digits=20, decimal_places=0)
-	RECV_PACK=models.DecimalField( max_digits=20, decimal_places=0)
-	LAST_MOD_USER=models.CharField(max_length=20)
-	LAST_MOD_DATE=models.DateTimeField()
-	def  __unicode__(self):
-		return self.OriginLTI.mydesc() + ' - ' + self.SI_RECORD_ID + ' - ' 
-	def mydesc(self):
-		return self.OriginLTI.mydesc() + ' - ' + self.SI_RECORD_ID + ' - ' 
-	
-
-
-
-class Waybill(models.Model):
-	transaction_type_choice=(
-			(u'INT', u'WFP Internal'),
-			(u'DIS', u'Distribution'),
-			(u'LON', u'Loan'),
-			(u'DSP', u'Disposal'),
-			(u'PUR', u'Purchase'),
-			(u'SHU',u'Shunting'),
-			(u'COS',u'Costal Transshipment'),
-			(u'DEL',u'Delivery'),
-			(u'SWA',u'Swap'),
-			(u'REP',u'Repayment'),
-			(u'SAL',u'Sale'),
-			(u'ADR',u'Air drop'),
-			(u'INL',u'Inland Shipment')
-		)
-	transport_type=(
-			(u'R',u'Rail'),
-			(u'T',u'Road'),
-			(u'A',u'Air'),
-			(u'I',u'Inland Waterways'),
-			(u'C',u'Costal Waterways'),
-			(u'M',u'Multi-mode'),
-			(u'O',u'Other Please Specify')
-		)
-	#general
-	ltiNumber=models.ForeignKey(LTI)
-	waybillNumber=models.CharField(max_length=20)
-	dateOfLoading=models.DateTimeField(null=True, blank=True)
-	dateOfDispach=models.DateTimeField(null=True, blank=True)
-	transactionType=models.CharField(max_length=10,choices=transaction_type_choice)
-	transportType=models.CharField(max_length=10,choices=transport_type)
-	#Dispatcher
-	dispatchRemarks=models.TextField(blank=True)
-	dispatcherName=models.TextField(blank=True)
-	dispatcherTitle=models.TextField(blank=True)
-	dispatcherSigned=models.BooleanField(blank=True)
-	#Transporter
-	transportContractor=models.TextField(blank=True)
-	transportSubContractor=models.TextField(blank=True)
-	transportDriverName=models.TextField(blank=True)
-	transportDriverLicenceID=models.TextField(blank=True)
-	transportVehicleRegistration=models.TextField(blank=True)
-	transportTrailerRegistration=models.TextField(blank=True)
-	containerOneSerialNumber=models.TextField(blank=True)
-	containerTwoSerialNumber=models.TextField(blank=True)
-	transportDispachSigned=models.BooleanField(blank=True)
-	transportDeliverySigned=models.BooleanField(blank=True)
-	#Reciver
-	recipientLocation=models.TextField(blank=True)
-	recipientConsingee=models.TextField(blank=True)
-	recipientName=models.TextField(blank=True)
-	recipientTitle=models.TextField(blank=True)
-	recipientArrivalDate=models.TextField(blank=True)
-	recipientStartDischargeDate=models.TextField(blank=True)
-	recipientEndDischargeDate=models.TextField(blank=True)
-	recipientDistance=models.TextField(blank=True)
-	recipientRemarks=models.TextField(blank=True)
-	recipientSigned=models.BooleanField(blank=True)
-	#Extra Fields
-	waybillValidated=models.BooleanField()
-	waybillProcessedForPayment=models.BooleanField()
-	def  __unicode__(self):
-		return self.waybillNumber
-	def mydesc(self):
-		return self.waybillNumber
-
-
-class LoadingDetail(models.Model):
-	wbNumber=models.ForeignKey(Waybill)
-	siNo=models.ForeignKey(LTIDetail)
-	commodity=models.ForeignKey(Commodity)
-	numberUnitsLoaded=models.IntegerField(blank=True)
-	numberUnitsGood=models.IntegerField(blank=True)
-	numberUnitsLost=models.IntegerField(blank=True)
-	numberUnitsDamaged=models.IntegerField(blank=True)
-	unitsLostReason=models.TextField(blank=True)
-	unitsDamagedReason=models.TextField(blank=True)
-	def  __unicode__(self):
-		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
-
-
-class LTIDetailAdmin(admin.ModelAdmin):
-	list_display = ('OriginLTI', 'SI_RECORD_ID')
-
-
-class LTIDetailInline(admin.TabularInline):
-	model = LTIDetail
-
-class LTIAdmin(admin.ModelAdmin):
-	list_display = ('LTI_ID', 'DESTINATION_LOCATION_CODE')
-	inlines =[LTIDetailInline]
-	
-	
-class LoadingDetailInline(admin.TabularInline):
-    model = LoadingDetail
-
-class WaybillAdmin(admin.ModelAdmin):
-	list_display=('waybillNumber','ltiNumber')
-	inlines = [LoadingDetailInline]
-
-class LoadingDetailAdmin(admin.ModelAdmin):
-	list_display=('waybillNumber','siNo')
-	
-	
-#### CPS DB
 
 class ActualBeneficiaries(models.Model):
     beneficiary_code = models.CharField(unique=True, max_length=2)
@@ -195,12 +31,12 @@ class AllocAreas(models.Model):
         db_table = u'alloc_areas'
 
 class BaseLabels(models.Model):
-    lbl_record_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    lbl_record_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     lbl_type = models.CharField(unique=True, max_length=3)
     lbl_text = models.CharField(unique=True, max_length=200)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -328,8 +164,8 @@ class CodeTables(models.Model):
     field7_dsc = models.CharField(max_length=70, blank=True)
     field8_dsc = models.CharField(max_length=70, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'code_tables'
 
@@ -380,8 +216,8 @@ class CommcifBasecost(models.Model):
     ad_exchange_rate_date = models.DateField(null=True, blank=True)
     delete_indicator = models.CharField(max_length=1, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -441,14 +277,14 @@ class CommPacked(models.Model):
         db_table = u'comm_packed'
 
 class CompasJob(models.Model):
-    job = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    job = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     last_date = models.DateField(null=True, blank=True)
     last_sec = models.CharField(max_length=8, blank=True)
     next_date = models.DateField(null=True, blank=True)
     next_sec = models.CharField(max_length=8, blank=True)
-    total_time = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    total_time = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     broken = models.CharField(max_length=1, blank=True)
-    failures = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    failures = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -459,7 +295,7 @@ class CompasJob(models.Model):
 
 class CompasMessages(models.Model):
     message_type = models.CharField(unique=True, max_length=3)
-    message_number = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    message_number = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     message_title = models.CharField(max_length=30, blank=True)
     message_text = models.CharField(max_length=80)
     message_hint = models.CharField(max_length=80, blank=True)
@@ -529,12 +365,12 @@ class CustomizedFormItems(models.Model):
     table_name = models.CharField(unique=True, max_length=30)
     item_label = models.CharField(unique=True, max_length=30)
     item_type = models.CharField(max_length=1)
-    item_length = models.DecimalField(max_digits=127, decimal_places=127)
+    item_length = models.DecimalField(max_digits=0, decimal_places=-127)
     item_default_value = models.CharField(max_length=2000, blank=True)
     item_ouc = models.CharField(max_length=13)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -571,11 +407,11 @@ class CustomizedPrvData(models.Model):
         db_table = u'customized_prv_data'
 
 class CPrjTypes(models.Model):
-    code = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    code = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     type = models.CharField(max_length=30, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -597,8 +433,8 @@ class DispatchDetails(models.Model):
     unit_weight_net = models.DecimalField(null=True, max_digits=8, decimal_places=3, blank=True)
     unit_weight_gross = models.DecimalField(null=True, max_digits=8, decimal_places=3, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -613,8 +449,8 @@ class DispatchFormItems(models.Model):
     document_code = models.CharField(unique=True, max_length=2)
     item_value = models.CharField(max_length=2000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -683,8 +519,8 @@ class DistanceRates(models.Model):
     transport_rate_type = models.CharField(max_length=10)
     transport_type = models.CharField(max_length=1)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -702,8 +538,8 @@ class DistanceRatesBck(models.Model):
     transport_rate_type = models.CharField(max_length=10)
     transport_type = models.CharField(max_length=1)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -711,7 +547,7 @@ class DistanceRatesBck(models.Model):
 
 class DistributionDetails(models.Model):
     dst_record_id = models.CharField(unique=True, max_length=25)
-    dst_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    dst_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     si_record_id = models.CharField(max_length=25, blank=True)
     wbs_element = models.CharField(max_length=25, blank=True)
     activity_code = models.CharField(max_length=6, blank=True)
@@ -783,8 +619,8 @@ class DspcstTrntypes(models.Model):
     stock_maintained = models.CharField(max_length=1, blank=True)
     tran_type_code = models.CharField(max_length=4, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -793,7 +629,7 @@ class DspcstTrntypes(models.Model):
 class DstActualBeneficiaries(models.Model):
     dst_record_id = models.CharField(unique=True, max_length=25)
     beneficiary_code = models.CharField(unique=True, max_length=2)
-    beneficiary_number = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    beneficiary_number = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -1099,9 +935,9 @@ class Eul4BrRuns(models.Model):
     brr_run_number = models.BigIntegerField(unique=True)
     brr_state = models.IntegerField()
     brr_run_date = models.DateField(null=True, blank=True)
-    brr_svr_err_code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    brr_svr_err_code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     brr_svr_err_text = models.CharField(max_length=240, blank=True)
-    brr_act_elap_time = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    brr_act_elap_time = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     brr_element_state = models.IntegerField()
     brr_created_by = models.CharField(max_length=64)
     brr_created_date = models.DateField()
@@ -1223,8 +1059,8 @@ class Eul4Expressions(models.Model):
     it_obj_id = models.IntegerField(null=True, blank=True)
     it_doc_id = models.IntegerField(unique=True, null=True, blank=True)
     it_format_mask = models.CharField(max_length=100, blank=True)
-    it_max_data_width = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    it_max_disp_width = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    it_max_data_width = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    it_max_disp_width = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     it_alignment = models.IntegerField(null=True, blank=True)
     it_word_wrap = models.IntegerField(null=True, blank=True)
     it_disp_null_val = models.CharField(max_length=100, blank=True)
@@ -1561,13 +1397,40 @@ class Eul4ObjJoinUsgs(models.Model):
     class Meta:
         db_table = u'eul4_obj_join_usgs'
 
+class Eul4PlanTable(models.Model):
+    statement_id = models.CharField(max_length=30, blank=True)
+    timestamp = models.DateField(null=True, blank=True)
+    remarks = models.CharField(max_length=80, blank=True)
+    operation = models.CharField(max_length=30, blank=True)
+    options = models.CharField(max_length=30, blank=True)
+    object_node = models.CharField(max_length=128, blank=True)
+    object_owner = models.CharField(max_length=30, blank=True)
+    object_name = models.CharField(max_length=30, blank=True)
+    object_instance = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    object_type = models.CharField(max_length=30, blank=True)
+    optimizer = models.CharField(max_length=255, blank=True)
+    search_columns = models.BigIntegerField(null=True, blank=True)
+    id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    parent_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    position = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    cost = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    cardinality = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    bytes = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    other_tag = models.CharField(max_length=255, blank=True)
+    partition_start = models.CharField(max_length=255, blank=True)
+    partition_stop = models.CharField(max_length=255, blank=True)
+    partition_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    other = models.TextField(blank=True) # This field type is a guess.
+    distribution = models.CharField(max_length=30, blank=True)
+    class Meta:
+        db_table = u'eul4_plan_table'
 
 class Eul4QppStats(models.Model):
     qs_id = models.IntegerField(unique=True)
-    qs_cost = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    qs_act_cpu_time = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    qs_act_elap_time = models.DecimalField(max_digits=127, decimal_places=127)
-    qs_est_elap_time = models.DecimalField(max_digits=127, decimal_places=127)
+    qs_cost = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    qs_act_cpu_time = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    qs_act_elap_time = models.DecimalField(max_digits=0, decimal_places=-127)
+    qs_est_elap_time = models.DecimalField(max_digits=0, decimal_places=-127)
     qs_object_use_key = models.CharField(max_length=240)
     qs_summary_fit = models.IntegerField(null=True, blank=True)
     qs_state = models.IntegerField(null=True, blank=True)
@@ -1798,8 +1661,8 @@ class ExchangeRates(models.Model):
     end_date = models.DateField(null=True, blank=True)
     value = models.DecimalField(max_digits=18, decimal_places=6)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -1813,8 +1676,8 @@ class ExchangeRatesBck(models.Model):
     end_date = models.DateField(null=True, blank=True)
     value = models.DecimalField(max_digits=18, decimal_places=6)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -1823,20 +1686,20 @@ class ExchangeRatesBck(models.Model):
 class Frm50Bindvar(models.Model):
     owner = models.CharField(max_length=32, blank=True)
     modid = models.IntegerField(null=True, blank=True)
-    itemid = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    nextbpos = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    plsqlbv_ep = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    total_bindvar = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    itemid = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    nextbpos = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    plsqlbv_ep = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    total_bindvar = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'frm50__bindvar'
 
 class Frm50Buffer(models.Model):
     owner = models.CharField(max_length=32, blank=True)
     modid = models.IntegerField(null=True, blank=True)
-    startaddr = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    startref = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    datatype = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    longid = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    startaddr = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    startref = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    datatype = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    longid = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'frm50__buffer'
 
@@ -1845,21 +1708,21 @@ class Frm50Grp(models.Model):
     modid = models.IntegerField(unique=True, null=True, blank=True)
     itemid = models.IntegerField(unique=True, null=True, blank=True)
     grpname = models.CharField(max_length=30, blank=True)
-    grpflag = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    grpflag = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'frm50__grp'
 
 class Frm50Object(models.Model):
     owner = models.CharField(max_length=32, blank=True)
     modid = models.IntegerField(null=True, blank=True)
-    itemid = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    itemid = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     name = models.CharField(max_length=32, blank=True)
-    objecttype = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    sequence = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rawlen = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    textlen = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    chunkno = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    scopeid = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    objecttype = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    sequence = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rawlen = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    textlen = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    chunkno = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    scopeid = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     scope1 = models.CharField(max_length=32, blank=True)
     scope2 = models.CharField(max_length=32, blank=True)
     scope3 = models.CharField(max_length=32, blank=True)
@@ -1868,7 +1731,7 @@ class Frm50Object(models.Model):
     textdata2 = models.CharField(max_length=2000, blank=True)
     textdata3 = models.CharField(max_length=2000, blank=True)
     textdata4 = models.CharField(max_length=2000, blank=True)
-    programunitid = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    programunitid = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'frm50__object'
 
@@ -1901,8 +1764,8 @@ class Help2Forms(models.Model):
     topicname = models.CharField(unique=True, max_length=100, blank=True)
     nodename = models.CharField(unique=True, max_length=100, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -1910,7 +1773,7 @@ class Help2Forms(models.Model):
 
 class HstCnfdspdtl(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     code = models.CharField(unique=True, max_length=25)
     document_code = models.CharField(unique=True, max_length=2)
     org_unit_code = models.CharField(unique=True, max_length=13)
@@ -1934,7 +1797,7 @@ class HstCnfdspdtl(models.Model):
 
 class HstCnfdspdtlBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     code = models.CharField(max_length=25)
     document_code = models.CharField(max_length=2)
     org_unit_code = models.CharField(max_length=13)
@@ -1958,7 +1821,7 @@ class HstCnfdspdtlBck(models.Model):
 
 class HstCnfdspmst(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     code = models.CharField(unique=True, max_length=25)
     document_code = models.CharField(unique=True, max_length=2)
     org_unit_code = models.CharField(unique=True, max_length=13)
@@ -1981,7 +1844,7 @@ class HstCnfdspmst(models.Model):
 
 class HstCnfdspmstBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     code = models.CharField(max_length=25)
     document_code = models.CharField(max_length=2)
     org_unit_code = models.CharField(max_length=13)
@@ -2004,7 +1867,7 @@ class HstCnfdspmstBck(models.Model):
 
 class HstDspdtl(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     code = models.CharField(unique=True, max_length=25)
     document_code = models.CharField(unique=True, max_length=2)
     si_record_id = models.CharField(unique=True, max_length=25, blank=True)
@@ -2025,14 +1888,14 @@ class HstDspdtl(models.Model):
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'hst_dspdtl'
 
 class HstDspdtlBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     code = models.CharField(max_length=25)
     document_code = models.CharField(max_length=2)
     si_record_id = models.CharField(max_length=25, blank=True)
@@ -2053,14 +1916,14 @@ class HstDspdtlBck(models.Model):
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'hst_dspdtl_bck'
 
 class HstDspmst(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     code = models.CharField(unique=True, max_length=25)
     document_code = models.CharField(unique=True, max_length=2)
     dispatch_date = models.DateField()
@@ -2113,7 +1976,7 @@ class HstDspmst(models.Model):
 
 class HstDspmstBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     code = models.CharField(max_length=25)
     document_code = models.CharField(max_length=2)
     dispatch_date = models.DateField()
@@ -2166,7 +2029,7 @@ class HstDspmstBck(models.Model):
 
 class HstLtidtl(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     lti_id = models.CharField(unique=True, max_length=25)
     si_record_id = models.CharField(unique=True, max_length=25)
     comm_category_code = models.CharField(max_length=9)
@@ -2186,7 +2049,7 @@ class HstLtidtl(models.Model):
 
 class HstLtidtlBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     lti_id = models.CharField(max_length=25)
     si_record_id = models.CharField(max_length=25)
     comm_category_code = models.CharField(max_length=9)
@@ -2206,7 +2069,7 @@ class HstLtidtlBck(models.Model):
 
 class HstLtimst(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
-    invoice_line_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     lti_id = models.CharField(unique=True, max_length=25)
     code = models.CharField(max_length=25)
     lti_date = models.DateField()
@@ -2253,7 +2116,7 @@ class HstLtimst(models.Model):
 
 class HstLtimstBck(models.Model):
     invoice_id = models.CharField(max_length=25)
-    invoice_line_id = models.DecimalField(max_digits=127, decimal_places=127)
+    invoice_line_id = models.DecimalField(max_digits=0, decimal_places=-127)
     lti_id = models.CharField(max_length=25)
     code = models.CharField(max_length=25)
     lti_date = models.DateField()
@@ -2305,8 +2168,8 @@ class InstallationStatus(models.Model):
     max_extent = models.CharField(max_length=1, blank=True)
     installation_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2347,7 +2210,7 @@ class InternalAdjustments(models.Model):
 class InterConsignments(models.Model):
     intvyg_code = models.CharField(unique=True, max_length=25)
     intdlv_code = models.IntegerField(unique=True)
-    intcns_code = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    intcns_code = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     si_record_id = models.CharField(max_length=25)
     comm_category_code = models.CharField(max_length=9)
     commodity_code = models.CharField(max_length=18)
@@ -2376,7 +2239,7 @@ class InterConsignments(models.Model):
 class InterConsignmentsBck1(models.Model):
     intvyg_code = models.CharField(max_length=25)
     intdlv_code = models.IntegerField()
-    intcns_code = models.DecimalField(max_digits=127, decimal_places=127)
+    intcns_code = models.DecimalField(max_digits=0, decimal_places=-127)
     si_record_id = models.CharField(max_length=25)
     comm_category_code = models.CharField(max_length=9)
     commodity_code = models.CharField(max_length=18)
@@ -2485,8 +2348,8 @@ class InvmstFormItems(models.Model):
     invoice_id = models.CharField(unique=True, max_length=25)
     item_value = models.CharField(max_length=2000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2497,8 +2360,8 @@ class InvmstFormItemsBck(models.Model):
     invoice_id = models.CharField(max_length=25)
     item_value = models.CharField(max_length=2000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2513,11 +2376,11 @@ class InvoiceDetails(models.Model):
     cif_value = models.DecimalField(null=True, max_digits=11, decimal_places=2, blank=True)
     calculation_type = models.CharField(max_length=1, blank=True)
     tpo_id = models.CharField(max_length=25, blank=True)
-    tpo_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tpo_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     delete_by = models.CharField(max_length=30, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2532,11 +2395,11 @@ class InvoiceDetailsBck(models.Model):
     cif_value = models.DecimalField(null=True, max_digits=11, decimal_places=2, blank=True)
     calculation_type = models.CharField(max_length=1, blank=True)
     tpo_id = models.CharField(max_length=25, blank=True)
-    tpo_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tpo_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     delete_by = models.CharField(max_length=30, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2554,10 +2417,10 @@ class InvoiceMasters(models.Model):
     invoice_status = models.CharField(max_length=1, blank=True)
     paid = models.CharField(max_length=1, blank=True)
     tpo_id = models.CharField(max_length=25, blank=True)
-    tpo_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tpo_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -2575,27 +2438,27 @@ class InvoiceMastersBck(models.Model):
     invoice_status = models.CharField(max_length=1, blank=True)
     paid = models.CharField(max_length=1, blank=True)
     tpo_id = models.CharField(max_length=25, blank=True)
-    tpo_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tpo_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'invoice_masters_bck'
 
-class KSS2Snapshots(models.Model):
+class K$$2Snapshots(models.Model):
     t_name = models.CharField(unique=True, max_length=50)
     updatable = models.CharField(max_length=1)
     down = models.CharField(max_length=1)
     w_clause = models.CharField(max_length=2000, blank=True)
-    sorting = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    sorting = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$$2_snapshots'
 
-class KSSPacklog(models.Model):
+class K$$Packlog(models.Model):
     s_off = models.CharField(max_length=13)
     d_off = models.CharField(max_length=13, blank=True)
     pack = models.BigIntegerField(null=True, blank=True)
@@ -2604,15 +2467,15 @@ class KSSPacklog(models.Model):
     class Meta:
         db_table = u'k$$_packlog'
 
-class KSSRepLog(models.Model):
-    job_n = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+class K$$RepLog(models.Model):
+    job_n = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     d_off = models.CharField(max_length=13, blank=True)
     text = models.CharField(max_length=2000, blank=True)
     class Meta:
         db_table = u'k$$_rep_log'
 
-class KSSRepRunning(models.Model):
-    job_n = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+class K$$RepRunning(models.Model):
+    job_n = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     d_off = models.CharField(unique=True, max_length=13)
     s_date = models.DateField(null=True, blank=True)
     name_file = models.CharField(max_length=2000, blank=True)
@@ -2623,7 +2486,7 @@ class KSSRepRunning(models.Model):
     class Meta:
         db_table = u'k$$_rep_running'
 
-class KSActualBeneficiaries(models.Model):
+class K$ActualBeneficiaries(models.Model):
     beneficiary_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2633,17 +2496,17 @@ class KSActualBeneficiaries(models.Model):
     class Meta:
         db_table = u'k$_actual_beneficiaries'
 
-class KSBaseLabels(models.Model):
-    lbl_record_id = models.DecimalField(max_digits=127, decimal_places=127)
+class K$BaseLabels(models.Model):
+    lbl_record_id = models.DecimalField(max_digits=0, decimal_places=-127)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_base_labels'
 
-class KSCnfdspDetails(models.Model):
+class K$CnfdspDetails(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -2662,7 +2525,7 @@ class KSCnfdspDetails(models.Model):
     class Meta:
         db_table = u'k$_cnfdsp_details'
 
-class KSCnfdspDetailsBck(models.Model):
+class K$CnfdspDetailsBck(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -2681,7 +2544,7 @@ class KSCnfdspDetailsBck(models.Model):
     class Meta:
         db_table = u'k$_cnfdsp_details_bck'
 
-class KSCnfdspMasters(models.Model):
+class K$CnfdspMasters(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -2693,16 +2556,16 @@ class KSCnfdspMasters(models.Model):
     class Meta:
         db_table = u'k$_cnfdsp_masters'
 
-class KSCodeTables(models.Model):
+class K$CodeTables(models.Model):
     table_type_cde = models.CharField(max_length=3, blank=True)
     table_cde = models.CharField(max_length=8, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'k$_code_tables'
 
-class KSCoiToSis(models.Model):
+class K$CoiToSis(models.Model):
     si_record_id = models.CharField(max_length=25)
     origin_id = models.CharField(max_length=23)
     offid = models.CharField(max_length=13, blank=True)
@@ -2713,17 +2576,17 @@ class KSCoiToSis(models.Model):
     class Meta:
         db_table = u'k$_coi_to_sis'
 
-class KSCommcifBasecost(models.Model):
+class K$CommcifBasecost(models.Model):
     record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_commcif_basecost'
 
-class KSCommodities(models.Model):
+class K$Commodities(models.Model):
     comm_category_code = models.CharField(max_length=9, blank=True)
     code = models.CharField(max_length=18, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -2734,7 +2597,7 @@ class KSCommodities(models.Model):
     class Meta:
         db_table = u'k$_commodities'
 
-class KSCommodityOrigins(models.Model):
+class K$CommodityOrigins(models.Model):
     origin_id = models.CharField(max_length=23, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2744,7 +2607,7 @@ class KSCommodityOrigins(models.Model):
     class Meta:
         db_table = u'k$_commodity_origins'
 
-class KSCommCategories(models.Model):
+class K$CommCategories(models.Model):
     code = models.CharField(max_length=9, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2754,7 +2617,7 @@ class KSCommCategories(models.Model):
     class Meta:
         db_table = u'k$_comm_categories'
 
-class KSCommPacked(models.Model):
+class K$CommPacked(models.Model):
     comm_category_code = models.CharField(max_length=9, blank=True)
     commodity_code = models.CharField(max_length=18, blank=True)
     package_code = models.CharField(max_length=17, blank=True)
@@ -2766,8 +2629,8 @@ class KSCommPacked(models.Model):
     class Meta:
         db_table = u'k$_comm_packed'
 
-class KSCompasJob(models.Model):
-    job = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+class K$CompasJob(models.Model):
+    job = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -2776,7 +2639,7 @@ class KSCompasJob(models.Model):
     class Meta:
         db_table = u'k$_compas_job'
 
-class KSCompasMenu(models.Model):
+class K$CompasMenu(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     code_menu = models.CharField(max_length=30, blank=True)
     code_role = models.BigIntegerField(null=True, blank=True)
@@ -2788,7 +2651,7 @@ class KSCompasMenu(models.Model):
     class Meta:
         db_table = u'k$_compas_menu'
 
-class KSCompasMessages(models.Model):
+class K$CompasMessages(models.Model):
     message_type = models.CharField(max_length=3, blank=True)
     message_number = models.BigIntegerField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -2799,7 +2662,7 @@ class KSCompasMessages(models.Model):
     class Meta:
         db_table = u'k$_compas_messages'
 
-class KSCompasUsers(models.Model):
+class K$CompasUsers(models.Model):
     compas_user_id = models.CharField(max_length=25, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -2810,7 +2673,7 @@ class KSCompasUsers(models.Model):
     class Meta:
         db_table = u'k$_compas_users'
 
-class KSCountries(models.Model):
+class K$Countries(models.Model):
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2820,7 +2683,7 @@ class KSCountries(models.Model):
     class Meta:
         db_table = u'k$_countries'
 
-class KSCurrencies(models.Model):
+class K$Currencies(models.Model):
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2830,7 +2693,7 @@ class KSCurrencies(models.Model):
     class Meta:
         db_table = u'k$_currencies'
 
-class KSCustomizedFormItems(models.Model):
+class K$CustomizedFormItems(models.Model):
     record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2840,7 +2703,7 @@ class KSCustomizedFormItems(models.Model):
     class Meta:
         db_table = u'k$_customized_form_items'
 
-class KSCustomizedPrivileges(models.Model):
+class K$CustomizedPrivileges(models.Model):
     compas_user_id = models.CharField(max_length=25, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
     menu_record_id = models.CharField(max_length=25, blank=True)
@@ -2853,7 +2716,7 @@ class KSCustomizedPrivileges(models.Model):
     class Meta:
         db_table = u'k$_customized_privileges'
 
-class KSCustomizedPrvData(models.Model):
+class K$CustomizedPrvData(models.Model):
     compas_user_id = models.CharField(max_length=25, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
     menu_record_id = models.CharField(max_length=25, blank=True)
@@ -2867,17 +2730,17 @@ class KSCustomizedPrvData(models.Model):
     class Meta:
         db_table = u'k$_customized_prv_data'
 
-class KSCPrjTypes(models.Model):
-    code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+class K$CPrjTypes(models.Model):
+    code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_c_prj_types'
 
-class KSDispatchDetails(models.Model):
+class K$DispatchDetails(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     origin_id = models.CharField(max_length=23, blank=True)
@@ -2894,19 +2757,19 @@ class KSDispatchDetails(models.Model):
     class Meta:
         db_table = u'k$_dispatch_details'
 
-class KSDispatchFormItems(models.Model):
+class K$DispatchFormItems(models.Model):
     item_record_id = models.CharField(max_length=25, blank=True)
     dispatch_code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_dispatch_form_items'
 
-class KSDispatchMasters(models.Model):
+class K$DispatchMasters(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -2917,23 +2780,23 @@ class KSDispatchMasters(models.Model):
     class Meta:
         db_table = u'k$_dispatch_masters'
 
-class KSDistanceRates(models.Model):
+class K$DistanceRates(models.Model):
     org_unit_code = models.CharField(max_length=13)
     origin_warehouse_code = models.CharField(max_length=13)
     destination_warehouse_code = models.CharField(max_length=13)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_distance_rates'
 
-class KSDistributionDetails(models.Model):
+class K$DistributionDetails(models.Model):
     dst_record_id = models.CharField(max_length=25, blank=True)
-    dst_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    dst_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -2942,7 +2805,7 @@ class KSDistributionDetails(models.Model):
     class Meta:
         db_table = u'k$_distribution_details'
 
-class KSDistributionMasters(models.Model):
+class K$DistributionMasters(models.Model):
     dst_record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2952,7 +2815,7 @@ class KSDistributionMasters(models.Model):
     class Meta:
         db_table = u'k$_distribution_masters'
 
-class KSDocumentTypes(models.Model):
+class K$DocumentTypes(models.Model):
     code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -2962,17 +2825,17 @@ class KSDocumentTypes(models.Model):
     class Meta:
         db_table = u'k$_document_types'
 
-class KSDspcstTrntypes(models.Model):
+class K$DspcstTrntypes(models.Model):
     record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_dspcst_trntypes'
 
-class KSDstActualBeneficiaries(models.Model):
+class K$DstActualBeneficiaries(models.Model):
     dst_record_id = models.CharField(max_length=25, blank=True)
     beneficiary_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -2983,20 +2846,20 @@ class KSDstActualBeneficiaries(models.Model):
     class Meta:
         db_table = u'k$_dst_actual_beneficiaries'
 
-class KSExchangeRates(models.Model):
+class K$ExchangeRates(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     currency_code = models.CharField(max_length=3, blank=True)
     currency_code_referred_to = models.CharField(max_length=3, blank=True)
     start_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_exchange_rates'
 
-class KSGeoPoints(models.Model):
+class K$GeoPoints(models.Model):
     code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3006,7 +2869,7 @@ class KSGeoPoints(models.Model):
     class Meta:
         db_table = u'k$_geo_points'
 
-class KSHelp2Forms(models.Model):
+class K$Help2Forms(models.Model):
     canvasname = models.CharField(max_length=100, blank=True)
     tabpagename = models.CharField(max_length=100, blank=True)
     formname = models.CharField(max_length=100, blank=True)
@@ -3014,16 +2877,16 @@ class KSHelp2Forms(models.Model):
     topicname = models.CharField(max_length=100, blank=True)
     nodename = models.CharField(max_length=100, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_help2forms'
 
-class KSHstCnfdspdtl(models.Model):
+class K$HstCnfdspdtl(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -3042,9 +2905,9 @@ class KSHstCnfdspdtl(models.Model):
     class Meta:
         db_table = u'k$_hst_cnfdspdtl'
 
-class KSHstCnfdspmst(models.Model):
+class K$HstCnfdspmst(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -3056,9 +2919,9 @@ class KSHstCnfdspmst(models.Model):
     class Meta:
         db_table = u'k$_hst_cnfdspmst'
 
-class KSHstDspdtl(models.Model):
+class K$HstDspdtl(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     si_record_id = models.CharField(max_length=25, blank=True)
@@ -3076,9 +2939,9 @@ class KSHstDspdtl(models.Model):
     class Meta:
         db_table = u'k$_hst_dspdtl'
 
-class KSHstDspmst(models.Model):
+class K$HstDspmst(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3089,9 +2952,9 @@ class KSHstDspmst(models.Model):
     class Meta:
         db_table = u'k$_hst_dspmst'
 
-class KSHstLtidtl(models.Model):
+class K$HstLtidtl(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     lti_id = models.CharField(max_length=25, blank=True)
     si_record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3102,9 +2965,9 @@ class KSHstLtidtl(models.Model):
     class Meta:
         db_table = u'k$_hst_ltidtl'
 
-class KSHstLtimst(models.Model):
+class K$HstLtimst(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
-    invoice_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    invoice_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     lti_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3114,15 +2977,15 @@ class KSHstLtimst(models.Model):
     class Meta:
         db_table = u'k$_hst_ltimst'
 
-class KSInstallationStatus(models.Model):
+class K$InstallationStatus(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'k$_installation_status'
 
-class KSInternalAdjustments(models.Model):
+class K$InternalAdjustments(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     adjustment_date = models.DateField(null=True, blank=True)
     adjustment_id = models.IntegerField(null=True, blank=True)
@@ -3134,10 +2997,10 @@ class KSInternalAdjustments(models.Model):
     class Meta:
         db_table = u'k$_internal_adjustments'
 
-class KSInterConsignments(models.Model):
+class K$InterConsignments(models.Model):
     intvyg_code = models.CharField(max_length=25, blank=True)
     intdlv_code = models.IntegerField(null=True, blank=True)
-    intcns_code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    intcns_code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3146,7 +3009,7 @@ class KSInterConsignments(models.Model):
     class Meta:
         db_table = u'k$_inter_consignments'
 
-class KSInterDeliveries(models.Model):
+class K$InterDeliveries(models.Model):
     intvyg_code = models.CharField(max_length=25, blank=True)
     intdlv_code = models.IntegerField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3157,7 +3020,7 @@ class KSInterDeliveries(models.Model):
     class Meta:
         db_table = u'k$_inter_deliveries'
 
-class KSInterVoyages(models.Model):
+class K$InterVoyages(models.Model):
     intvyg_code = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3167,41 +3030,41 @@ class KSInterVoyages(models.Model):
     class Meta:
         db_table = u'k$_inter_voyages'
 
-class KSInvmstFormItems(models.Model):
+class K$InvmstFormItems(models.Model):
     item_record_id = models.CharField(max_length=25, blank=True)
     invoice_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_invmst_form_items'
 
-class KSInvoiceDetails(models.Model):
+class K$InvoiceDetails(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
     invoice_line_id = models.BigIntegerField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_invoice_details'
 
-class KSInvoiceMasters(models.Model):
+class K$InvoiceMasters(models.Model):
     invoice_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_invoice_masters'
 
-class KSLoanDetails(models.Model):
+class K$LoanDetails(models.Model):
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3210,7 +3073,7 @@ class KSLoanDetails(models.Model):
     class Meta:
         db_table = u'k$_loan_details'
 
-class KSLoanMasters(models.Model):
+class K$LoanMasters(models.Model):
     lonmst_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3220,20 +3083,20 @@ class KSLoanMasters(models.Model):
     class Meta:
         db_table = u'k$_loan_masters'
 
-class KSLocalCurrency(models.Model):
+class K$LocalCurrency(models.Model):
     org_unit_code = models.CharField(max_length=13)
     currency = models.CharField(max_length=3)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_local_currency'
 
-class KSLossDamageCauses(models.Model):
+class K$LossDamageCauses(models.Model):
     name_record_id = models.CharField(max_length=25)
-    record_id = models.DecimalField(max_digits=127, decimal_places=127)
+    record_id = models.DecimalField(max_digits=0, decimal_places=-127)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3242,7 +3105,7 @@ class KSLossDamageCauses(models.Model):
     class Meta:
         db_table = u'k$_loss_damage_causes'
 
-class KSLossDamageNames(models.Model):
+class K$LossDamageNames(models.Model):
     record_id = models.CharField(max_length=25)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3252,7 +3115,7 @@ class KSLossDamageNames(models.Model):
     class Meta:
         db_table = u'k$_loss_damage_names'
 
-class KSLtiDetails(models.Model):
+class K$LtiDetails(models.Model):
     lti_id = models.CharField(max_length=25, blank=True)
     si_record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3263,18 +3126,18 @@ class KSLtiDetails(models.Model):
     class Meta:
         db_table = u'k$_lti_details'
 
-class KSLtiFormItems(models.Model):
+class K$LtiFormItems(models.Model):
     item_record_id = models.CharField(max_length=25, blank=True)
     lti_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_lti_form_items'
 
-class KSLtiMasters(models.Model):
+class K$LtiMasters(models.Model):
     lti_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3284,7 +3147,7 @@ class KSLtiMasters(models.Model):
     class Meta:
         db_table = u'k$_lti_masters'
 
-class KSMemoInvoices(models.Model):
+class K$MemoInvoices(models.Model):
     memo_number = models.CharField(max_length=25, blank=True)
     memo_date = models.DateField(null=True, blank=True)
     invoice_id = models.CharField(max_length=25, blank=True)
@@ -3296,7 +3159,7 @@ class KSMemoInvoices(models.Model):
     class Meta:
         db_table = u'k$_memo_invoices'
 
-class KSMenuItems(models.Model):
+class K$MenuItems(models.Model):
     menu_record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3306,19 +3169,19 @@ class KSMenuItems(models.Model):
     class Meta:
         db_table = u'k$_menu_items'
 
-class KSModules(models.Model):
+class K$Modules(models.Model):
     module_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_modules'
 
-class KSNotifications(models.Model):
+class K$Notifications(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
-    notify_number = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    notify_number = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     notify_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3328,7 +3191,8 @@ class KSNotifications(models.Model):
     class Meta:
         db_table = u'k$_notifications'
 
-class KSOrganizations(models.Model):
+class K$Organizations(models.Model):
+    id = models.CharField(max_length=12, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3337,7 +3201,7 @@ class KSOrganizations(models.Model):
     class Meta:
         db_table = u'k$_organizations'
 
-class KSOrgUnits(models.Model):
+class K$OrgUnits(models.Model):
     code = models.CharField(max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3347,7 +3211,7 @@ class KSOrgUnits(models.Model):
     class Meta:
         db_table = u'k$_org_units'
 
-class KSOrgUnitTypes(models.Model):
+class K$OrgUnitTypes(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3358,19 +3222,19 @@ class KSOrgUnitTypes(models.Model):
     class Meta:
         db_table = u'k$_org_unit_types'
 
-class KSOtsOverview(models.Model):
+class K$OtsOverview(models.Model):
     record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_ots_overview'
 
-class KSOverlandArrDetails(models.Model):
+class K$OverlandArrDetails(models.Model):
     code = models.CharField(max_length=25, blank=True)
-    lndarrd_code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    lndarrd_code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3379,7 +3243,7 @@ class KSOverlandArrDetails(models.Model):
     class Meta:
         db_table = u'k$_overland_arr_details'
 
-class KSOverlandArrMasters(models.Model):
+class K$OverlandArrMasters(models.Model):
     code = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3389,7 +3253,7 @@ class KSOverlandArrMasters(models.Model):
     class Meta:
         db_table = u'k$_overland_arr_masters'
 
-class KSPackageTypes(models.Model):
+class K$PackageTypes(models.Model):
     code = models.CharField(max_length=17, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3399,17 +3263,17 @@ class KSPackageTypes(models.Model):
     class Meta:
         db_table = u'k$_package_types'
 
-class KSPaMaster(models.Model):
+class K$PaMaster(models.Model):
     wis_code = models.CharField(max_length=8, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=13, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_pa_master'
 
-class KSPersons(models.Model):
+class K$Persons(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     code = models.CharField(max_length=7, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3420,7 +3284,7 @@ class KSPersons(models.Model):
     class Meta:
         db_table = u'k$_persons'
 
-class KSPhysicalInventory(models.Model):
+class K$PhysicalInventory(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     storage_code = models.CharField(max_length=13, blank=True)
     si_record_id = models.CharField(max_length=25, blank=True)
@@ -3437,7 +3301,7 @@ class KSPhysicalInventory(models.Model):
     class Meta:
         db_table = u'k$_physical_inventory'
 
-class KSPrjOrgUnits(models.Model):
+class K$PrjOrgUnits(models.Model):
     project_code = models.CharField(max_length=8, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3448,7 +3312,7 @@ class KSPrjOrgUnits(models.Model):
     class Meta:
         db_table = u'k$_prj_org_units'
 
-class KSProgramName(models.Model):
+class K$ProgramName(models.Model):
     program_name = models.CharField(max_length=10)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3458,7 +3322,7 @@ class KSProgramName(models.Model):
     class Meta:
         db_table = u'k$_program_name'
 
-class KSProjects(models.Model):
+class K$Projects(models.Model):
     code = models.CharField(max_length=8, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3468,7 +3332,7 @@ class KSProjects(models.Model):
     class Meta:
         db_table = u'k$_projects'
 
-class KSProActivities(models.Model):
+class K$ProActivities(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     code = models.CharField(max_length=6, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3479,7 +3343,7 @@ class KSProActivities(models.Model):
     class Meta:
         db_table = u'k$_pro_activities'
 
-class KSRateTypes(models.Model):
+class K$RateTypes(models.Model):
     rate_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3489,18 +3353,18 @@ class KSRateTypes(models.Model):
     class Meta:
         db_table = u'k$_rate_types'
 
-class KSRcvcstTrntypes(models.Model):
+class K$RcvcstTrntypes(models.Model):
     dsp_record_id = models.CharField(max_length=25, blank=True)
     tran_type_code = models.CharField(max_length=4, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_rcvcst_trntypes'
 
-class KSReceiptDetails(models.Model):
+class K$ReceiptDetails(models.Model):
     code = models.CharField(max_length=25)
     document_code = models.CharField(max_length=2)
     org_unit_code = models.CharField(max_length=13)
@@ -3518,20 +3382,20 @@ class KSReceiptDetails(models.Model):
     class Meta:
         db_table = u'k$_receipt_details'
 
-class KSReceiptFormItems(models.Model):
+class K$ReceiptFormItems(models.Model):
     item_record_id = models.CharField(max_length=25, blank=True)
     receipt_code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_receipt_form_items'
 
-class KSReceiptMasters(models.Model):
+class K$ReceiptMasters(models.Model):
     code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -3543,7 +3407,7 @@ class KSReceiptMasters(models.Model):
     class Meta:
         db_table = u'k$_receipt_masters'
 
-class KSReconstitutions(models.Model):
+class K$Reconstitutions(models.Model):
     org_unit_code = models.CharField(max_length=13)
     origin_id = models.CharField(max_length=23)
     comm_category_code = models.CharField(max_length=9)
@@ -3561,7 +3425,7 @@ class KSReconstitutions(models.Model):
     class Meta:
         db_table = u'k$_reconstitutions'
 
-class KSRepackings(models.Model):
+class K$Repackings(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     origin_id = models.CharField(max_length=23, blank=True)
     comm_category_code = models.CharField(max_length=9, blank=True)
@@ -3579,10 +3443,10 @@ class KSRepackings(models.Model):
     class Meta:
         db_table = u'k$_repackings'
 
-class KSRepayDetails(models.Model):
+class K$RepayDetails(models.Model):
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -3591,7 +3455,7 @@ class KSRepayDetails(models.Model):
     class Meta:
         db_table = u'k$_repay_details'
 
-class KSSapBlDetails(models.Model):
+class K$SapBlDetails(models.Model):
     shipment_number = models.CharField(max_length=10, blank=True)
     delivery_number = models.CharField(max_length=10, blank=True)
     load_point_code = models.CharField(max_length=10, blank=True)
@@ -3599,139 +3463,139 @@ class KSSapBlDetails(models.Model):
     bl_date = models.DateField(null=True, blank=True)
     bl_code = models.CharField(max_length=30, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_bl_details'
 
-class KSSapDeliveries(models.Model):
+class K$SapDeliveries(models.Model):
     delivery_number = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_deliveries'
 
-class KSSapGoodReceipts(models.Model):
+class K$SapGoodReceipts(models.Model):
     po_number = models.CharField(max_length=10, blank=True)
     po_line_number = models.CharField(max_length=5, blank=True)
     document_date = models.DateField(null=True, blank=True)
     document_number = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=7, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_good_receipts'
 
-class KSSapLtshRates(models.Model):
+class K$SapLtshRates(models.Model):
     rate_seqnum = models.CharField(max_length=10)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_ltsh_rates'
 
-class KSSapPrRates(models.Model):
+class K$SapPrRates(models.Model):
     pr_number = models.CharField(max_length=10)
     pr_line_number = models.CharField(max_length=5)
     rate_seqnum = models.CharField(max_length=3)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_pr_rates'
 
-class KSSapPurchaseOrders(models.Model):
+class K$SapPurchaseOrders(models.Model):
     po_number = models.CharField(max_length=10, blank=True)
     po_line_number = models.CharField(max_length=5, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_purchase_orders'
 
-class KSSapPurchaseRequisitions(models.Model):
+class K$SapPurchaseRequisitions(models.Model):
     pr_number = models.CharField(max_length=10, blank=True)
     pr_line_number = models.CharField(max_length=5, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_purchase_requisitions'
 
-class KSSapResourceRequests(models.Model):
+class K$SapResourceRequests(models.Model):
     rr_number = models.CharField(max_length=10, blank=True)
     rr_line_number = models.CharField(max_length=5, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_resource_requests'
 
-class KSSapShipments(models.Model):
+class K$SapShipments(models.Model):
     shipment_number = models.CharField(max_length=10)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_shipments'
 
-class KSSapShpdates(models.Model):
+class K$SapShpdates(models.Model):
     shipment_number = models.CharField(max_length=10, blank=True)
     load_point_code = models.CharField(max_length=10, blank=True)
     discharge_point_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_shpdates'
 
-class KSSapStages(models.Model):
+class K$SapStages(models.Model):
     shipment_number = models.CharField(max_length=10, blank=True)
     delivery_number = models.CharField(max_length=10, blank=True)
     load_point_code = models.CharField(max_length=10, blank=True)
     discharge_point_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_stages'
 
-class KSSapTodTdd(models.Model):
+class K$SapTodTdd(models.Model):
     fund_number = models.CharField(max_length=10, blank=True)
     donor_code = models.CharField(max_length=10, blank=True)
     applctn = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_sap_tod_tdd'
 
-class KSSectors(models.Model):
+class K$Sectors(models.Model):
     country_code = models.CharField(max_length=3, blank=True)
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3742,17 +3606,17 @@ class KSSectors(models.Model):
     class Meta:
         db_table = u'k$_sectors'
 
-class KSSiDetails(models.Model):
+class K$SiDetails(models.Model):
     si_record_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_si_details'
 
-class KSSiToProjects(models.Model):
+class K$SiToProjects(models.Model):
     si_record_id = models.CharField(max_length=25, blank=True)
     start_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3763,7 +3627,7 @@ class KSSiToProjects(models.Model):
     class Meta:
         db_table = u'k$_si_to_projects'
 
-class KSSiToProjectsMt(models.Model):
+class K$SiToProjectsMt(models.Model):
     si_record_id = models.CharField(max_length=25, blank=True)
     start_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3774,30 +3638,30 @@ class KSSiToProjectsMt(models.Model):
     class Meta:
         db_table = u'k$_si_to_projects_mt'
 
-class KSStandardPrivileges(models.Model):
+class K$StandardPrivileges(models.Model):
     menu_record_id = models.CharField(max_length=25, blank=True)
     standard_role_code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_standard_privileges'
 
-class KSStandardRoles(models.Model):
+class K$StandardRoles(models.Model):
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_standard_roles'
 
-class KSStockTrans(models.Model):
+class K$StockTrans(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
-    record_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    record_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     creation_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3807,7 +3671,7 @@ class KSStockTrans(models.Model):
     class Meta:
         db_table = u'k$_stock_trans'
 
-class KSStoredCommodities(models.Model):
+class K$StoredCommodities(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     origin_id = models.CharField(max_length=23, blank=True)
     package_code = models.CharField(max_length=17, blank=True)
@@ -3823,7 +3687,7 @@ class KSStoredCommodities(models.Model):
     class Meta:
         db_table = u'k$_stored_commodities'
 
-class KSSubSectors(models.Model):
+class K$SubSectors(models.Model):
     country_code = models.CharField(max_length=3, blank=True)
     sector_code = models.CharField(max_length=3, blank=True)
     code = models.CharField(max_length=3, blank=True)
@@ -3835,10 +3699,10 @@ class KSSubSectors(models.Model):
     class Meta:
         db_table = u'k$_sub_sectors'
 
-class KSSuperintendentDetails(models.Model):
+class K$SuperintendentDetails(models.Model):
     intvyg_code = models.CharField(max_length=25, blank=True)
     intdlv_code = models.IntegerField(null=True, blank=True)
-    intcns_code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    intcns_code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     quantity_type = models.CharField(max_length=1, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -3848,7 +3712,7 @@ class KSSuperintendentDetails(models.Model):
     class Meta:
         db_table = u'k$_superintendent_details'
 
-class KSSuppliers(models.Model):
+class K$Suppliers(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     code = models.CharField(max_length=4, blank=True)
     offid = models.CharField(max_length=13, blank=True)
@@ -3859,7 +3723,7 @@ class KSSuppliers(models.Model):
     class Meta:
         db_table = u'k$_suppliers'
 
-class KSSupplierTypes(models.Model):
+class K$SupplierTypes(models.Model):
     supplier_ouc = models.CharField(max_length=13, blank=True)
     code = models.CharField(max_length=4, blank=True)
     type = models.CharField(max_length=3, blank=True)
@@ -3871,165 +3735,165 @@ class KSSupplierTypes(models.Model):
     class Meta:
         db_table = u'k$_supplier_types'
 
-class KSSCommodities(models.Model):
+class K$SCommodities(models.Model):
     sap_code = models.CharField(max_length=18, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_commodities'
 
-class KSSCommCategories(models.Model):
+class K$SCommCategories(models.Model):
     sap_code = models.CharField(max_length=18, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_comm_categories'
 
-class KSSCountries(models.Model):
+class K$SCountries(models.Model):
     compas_code = models.CharField(max_length=3, blank=True)
     sap_code_pk = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_countries'
 
-class KSSGeoPoints(models.Model):
+class K$SGeoPoints(models.Model):
     sap_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_geo_points'
 
-class KSSOrganizations(models.Model):
+class K$SOrganizations(models.Model):
     sap_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_organizations'
 
-class KSSPackageCodes(models.Model):
+class K$SPackageCodes(models.Model):
     sap_code = models.CharField(max_length=17, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_package_codes'
 
-class KSSPrjtypeCountries(models.Model):
+class K$SPrjtypeCountries(models.Model):
     sap_prj_type_code = models.CharField(max_length=2, blank=True)
     sap_countries_code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_prjtype_countries'
 
-class KSSPrjTypes(models.Model):
+class K$SPrjTypes(models.Model):
     sap_prj_type_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_prj_types'
 
-class KSSProjects(models.Model):
+class K$SProjects(models.Model):
     sap_code = models.CharField(max_length=7, blank=True)
     sap_wbs_element = models.CharField(max_length=24, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_projects'
 
-class KSSRbs(models.Model):
+class K$SRbs(models.Model):
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_rbs'
 
-class KSSRrNumbers(models.Model):
+class K$SRrNumbers(models.Model):
     rr_number = models.CharField(max_length=10, blank=True)
     rr_line_number = models.CharField(max_length=5, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_rr_numbers'
 
-class KSSSiNumbers(models.Model):
+class K$SSiNumbers(models.Model):
     new_si_number = models.CharField(max_length=8, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_si_numbers'
 
-class KSSSuppliers(models.Model):
+class K$SSuppliers(models.Model):
     sap_code = models.CharField(max_length=10, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u'k$_s_suppliers'
 
-class KSSSupplierTypes(models.Model):
+class K$SSupplierTypes(models.Model):
     sap_code = models.CharField(max_length=10, blank=True)
     sap_supplier_type = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u'k$_s_supplier_types'
 
-class KSSVoyageNumbers(models.Model):
+class K$SVoyageNumbers(models.Model):
     shipment_number = models.CharField(max_length=10, blank=True)
     voyage_number = models.CharField(max_length=7, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_s_voyage_numbers'
 
-class KSTpoDetails(models.Model):
+class K$TpoDetails(models.Model):
     tpo_id = models.CharField(max_length=25, blank=True)
-    tpo_line_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tpo_line_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -4038,7 +3902,7 @@ class KSTpoDetails(models.Model):
     class Meta:
         db_table = u'k$_tpo_details'
 
-class KSTpoMasters(models.Model):
+class K$TpoMasters(models.Model):
     tpo_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4048,15 +3912,15 @@ class KSTpoMasters(models.Model):
     class Meta:
         db_table = u'k$_tpo_masters'
 
-class KSTrailerDetails(models.Model):
+class K$TrailerDetails(models.Model):
     nmbtrl_id = models.CharField(max_length=20, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'k$_trailer_details'
 
-class KSTransaTypes(models.Model):
+class K$TransaTypes(models.Model):
     code = models.CharField(max_length=4, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4066,7 +3930,7 @@ class KSTransaTypes(models.Model):
     class Meta:
         db_table = u'k$_transa_types'
 
-class KSTransformations(models.Model):
+class K$Transformations(models.Model):
     trnsfr_id = models.CharField(max_length=25)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4076,18 +3940,18 @@ class KSTransformations(models.Model):
     class Meta:
         db_table = u'k$_transformations'
 
-class KSTranslatedLabels(models.Model):
-    lbl_record_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+class K$TranslatedLabels(models.Model):
+    lbl_record_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     language_code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_translated_labels'
 
-class KSTransportModes(models.Model):
+class K$TransportModes(models.Model):
     code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4097,7 +3961,7 @@ class KSTransportModes(models.Model):
     class Meta:
         db_table = u'k$_transport_modes'
 
-class KSTransDamages(models.Model):
+class K$TransDamages(models.Model):
     receipt_code = models.CharField(max_length=25, blank=True)
     document_code = models.CharField(max_length=2, blank=True)
     org_unit_code = models.CharField(max_length=13, blank=True)
@@ -4109,7 +3973,7 @@ class KSTransDamages(models.Model):
     quality = models.CharField(max_length=1, blank=True)
     damage_code = models.CharField(max_length=25, blank=True)
     damage_record_id = models.CharField(max_length=25, blank=True)
-    damage_cause_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    damage_cause_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     damage_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4119,7 +3983,7 @@ class KSTransDamages(models.Model):
     class Meta:
         db_table = u'k$_trans_damages'
 
-class KSTransLosses(models.Model):
+class K$TransLosses(models.Model):
     trnloss_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4129,69 +3993,69 @@ class KSTransLosses(models.Model):
     class Meta:
         db_table = u'k$_trans_losses'
 
-class KSTPurchaseTypes(models.Model):
+class K$TPurchaseTypes(models.Model):
     compas_code = models.CharField(max_length=1, blank=True)
     sap_code = models.CharField(max_length=4)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_purchase_types'
 
-class KSTReleaseCodes(models.Model):
+class K$TReleaseCodes(models.Model):
     release_type = models.CharField(max_length=2, blank=True)
     code = models.CharField(max_length=3, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_release_codes'
 
-class KSTShipmentStatus(models.Model):
+class K$TShipmentStatus(models.Model):
     code = models.CharField(max_length=1, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_shipment_status'
 
-class KSTShippingAreas(models.Model):
+class K$TShippingAreas(models.Model):
     code = models.CharField(max_length=8)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_shipping_areas'
 
-class KSTShippingTypes(models.Model):
+class K$TShippingTypes(models.Model):
     code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_shipping_types'
 
-class KSTSupplierTypes(models.Model):
+class K$TSupplierTypes(models.Model):
     sap_code = models.CharField(max_length=2, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_t_supplier_types'
 
-class KSUpstreamAss(models.Model):
+class K$UpstreamAss(models.Model):
     upsass_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4201,17 +4065,17 @@ class KSUpstreamAss(models.Model):
     class Meta:
         db_table = u'k$_upstream_ass'
 
-class KSVehicleDetails(models.Model):
+class K$VehicleDetails(models.Model):
     nmbplt_id = models.CharField(max_length=20, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'k$_vehicle_details'
 
-class KSVesselDischarges(models.Model):
+class K$VesselDischarges(models.Model):
     discharge_id = models.CharField(max_length=25, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4221,7 +4085,7 @@ class KSVesselDischarges(models.Model):
     class Meta:
         db_table = u'k$_vessel_discharges'
 
-class KSVWbsStructure(models.Model):
+class K$VWbsStructure(models.Model):
     pr_pa_num = models.CharField(max_length=7, blank=True)
     cp_pa_num = models.CharField(max_length=7, blank=True)
     sap_num = models.CharField(max_length=7, blank=True)
@@ -4233,7 +4097,7 @@ class KSVWbsStructure(models.Model):
     class Meta:
         db_table = u'k$_v_wbs_structure'
 
-class KSWarehouseDamages(models.Model):
+class K$WarehouseDamages(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     origin_id = models.CharField(max_length=23, blank=True)
     comm_category_code = models.CharField(max_length=9, blank=True)
@@ -4243,7 +4107,7 @@ class KSWarehouseDamages(models.Model):
     quality = models.CharField(max_length=1, blank=True)
     damage_code = models.CharField(max_length=25, blank=True)
     damage_record_id = models.CharField(max_length=25, blank=True)
-    damage_cause_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    damage_cause_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     damage_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4253,7 +4117,7 @@ class KSWarehouseDamages(models.Model):
     class Meta:
         db_table = u'k$_warehouse_damages'
 
-class KSWarehouseLosses(models.Model):
+class K$WarehouseLosses(models.Model):
     org_unit_code = models.CharField(max_length=13, blank=True)
     origin_id = models.CharField(max_length=23, blank=True)
     comm_category_code = models.CharField(max_length=9, blank=True)
@@ -4263,7 +4127,7 @@ class KSWarehouseLosses(models.Model):
     quality = models.CharField(max_length=1, blank=True)
     loss_code = models.CharField(max_length=25, blank=True)
     loss_record_id = models.CharField(max_length=25, blank=True)
-    loss_cause_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    loss_cause_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     loss_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -4273,7 +4137,7 @@ class KSWarehouseLosses(models.Model):
     class Meta:
         db_table = u'k$_warehouse_losses'
 
-class KSWisBooking2(models.Model):
+class K$WisBooking2(models.Model):
     voyage_id = models.CharField(max_length=7, blank=True)
     si_num = models.CharField(max_length=7, blank=True)
     load_pnt_cde = models.CharField(max_length=3, blank=True)
@@ -4288,7 +4152,7 @@ class KSWisBooking2(models.Model):
 
 class LoanDetails(models.Model):
     lonmst_id = models.CharField(unique=True, max_length=25)
-    londtl_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    londtl_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     sending_gp_code = models.CharField(unique=True, max_length=10)
     sending_wh_code = models.CharField(unique=True, max_length=13, blank=True)
     si_record_id = models.CharField(unique=True, max_length=25)
@@ -4302,8 +4166,8 @@ class LoanDetails(models.Model):
     delete_user_id = models.CharField(unique=True, max_length=25, blank=True)
     delete_ouc = models.CharField(unique=True, max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4325,8 +4189,8 @@ class LoanMasters(models.Model):
     terms_and_conditions = models.CharField(max_length=250, blank=True)
     remarks = models.CharField(max_length=250, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4336,8 +4200,8 @@ class LocalCurrency(models.Model):
     org_unit_code = models.CharField(unique=True, max_length=13)
     currency = models.CharField(unique=True, max_length=3)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4345,7 +4209,7 @@ class LocalCurrency(models.Model):
 
 class LossDamageCauses(models.Model):
     name_record_id = models.CharField(unique=True, max_length=25)
-    record_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    record_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     code = models.CharField(unique=True, max_length=4)
     cause = models.CharField(unique=True, max_length=100)
     offid = models.CharField(max_length=13, blank=True)
@@ -4392,8 +4256,8 @@ class LtiFormItems(models.Model):
     lti_id = models.CharField(unique=True, max_length=25)
     item_value = models.CharField(max_length=2000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4474,8 +4338,8 @@ class MenuItems(models.Model):
     role_create_name = models.CharField(max_length=10)
     role_edit_name = models.CharField(max_length=10)
     role_view_name = models.CharField(max_length=10)
-    menu_parent = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    display_order = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    menu_parent = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    display_order = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     prgname_create = models.CharField(max_length=80, blank=True)
     prgtitle_create = models.CharField(max_length=200, blank=True)
     prgmode_create = models.CharField(max_length=1, blank=True)
@@ -4499,8 +4363,8 @@ class MenuItems(models.Model):
     recv_pack = models.BigIntegerField(null=True, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
-    menu_state = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    menu_child = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    menu_state = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    menu_child = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'menu_items'
 
@@ -4510,8 +4374,8 @@ class Modules(models.Model):
     module_program = models.CharField(max_length=15)
     file_name = models.CharField(max_length=8)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4522,16 +4386,16 @@ class MvLtiStatus(models.Model):
     si_record_id = models.CharField(max_length=25)
     comm_category_code = models.CharField(max_length=9, blank=True)
     commodity_code = models.CharField(max_length=18, blank=True)
-    lti_qty_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    lti_qty_gross = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    dsp_qty_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    dsp_qty_gross = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvg_qty_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvg_qty_gross = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvd_qty_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvd_qty_gross = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvl_qty_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvl_qty_gross = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    lti_qty_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    lti_qty_gross = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    dsp_qty_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    dsp_qty_gross = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvg_qty_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvg_qty_gross = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvd_qty_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvd_qty_gross = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvl_qty_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvl_qty_gross = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_refresh = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'mv_lti_status'
@@ -4550,9 +4414,9 @@ class MvSiqtyarr(models.Model):
     dsc_point_name = models.CharField(max_length=30, blank=True)
     delivery_number = models.CharField(max_length=10, blank=True)
     si_record_id = models.CharField(max_length=25, blank=True)
-    tot_arr_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    tot_lossdsc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    tot_dsc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tot_arr_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    tot_lossdsc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    tot_dsc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     label1 = models.CharField(max_length=10, blank=True)
     ata_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4567,10 +4431,10 @@ class MvSiqtymov(models.Model):
     allocation_destination_code = models.CharField(max_length=10, blank=True)
     allocation_name = models.CharField(max_length=50, blank=True)
     transaction_type = models.CharField(max_length=25, blank=True)
-    tot_dsp_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    tot_rcv_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    tot_dmg_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    tot_loss_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    tot_dsp_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    tot_rcv_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    tot_dmg_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    tot_loss_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'mv_siqtymov'
 
@@ -4580,18 +4444,18 @@ class MvSiqtystock(models.Model):
     code = models.CharField(max_length=10, blank=True)
     location_name = models.CharField(max_length=30, blank=True)
     location_code = models.CharField(max_length=10, blank=True)
-    intstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rcvstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    dspstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    ingdstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    indmstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    inspstc_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    intstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rcvstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    dspstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    ingdstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    indmstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    inspstc_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'mv_siqtystock'
 
 class Notifications(models.Model):
     org_unit_code = models.CharField(unique=True, max_length=13)
-    notify_number = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    notify_number = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     notify_date = models.DateField(unique=True)
     notify_type = models.CharField(max_length=3)
     notify_priority = models.CharField(max_length=1, blank=True)
@@ -4607,7 +4471,7 @@ class Notifications(models.Model):
 
 class NotifyStatus(models.Model):
     org_unit_code = models.CharField(unique=True, max_length=13)
-    notify_number = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    notify_number = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     notify_date = models.DateField(unique=True)
     compas_username = models.CharField(unique=True, max_length=30)
     last_mod_user = models.CharField(max_length=30, blank=True)
@@ -4616,6 +4480,7 @@ class NotifyStatus(models.Model):
         db_table = u'notify_status'
 
 class Organizations(models.Model):
+    id = models.CharField(unique=True, max_length=12)
     short_name = models.CharField(max_length=12, blank=True)
     name = models.CharField(max_length=80)
     type = models.CharField(max_length=3)
@@ -4708,14 +4573,14 @@ class OtsOverview(models.Model):
     shipment_number = models.CharField(max_length=10, blank=True)
     vessel_name = models.CharField(max_length=20, blank=True)
     vessel_flag = models.CharField(max_length=10, blank=True)
-    net_bl_qty = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    net_bl_qty = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     gross_bl_qty = models.DecimalField(null=True, max_digits=15, decimal_places=3, blank=True)
     bl_date = models.DateField(null=True, blank=True)
     bl_code = models.CharField(max_length=30, blank=True)
     container_flag = models.CharField(max_length=3, blank=True)
-    ttl_frt_usd = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    frt_mtn = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    ttl_rate_usd = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    ttl_frt_usd = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    frt_mtn = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    ttl_rate_usd = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     new_indicator = models.CharField(max_length=5, blank=True)
     load_point_code = models.CharField(max_length=10, blank=True)
     load_point_name = models.CharField(max_length=15, blank=True)
@@ -4728,13 +4593,13 @@ class OtsOverview(models.Model):
     ata = models.DateField(null=True, blank=True)
     document_date = models.DateField(null=True, blank=True)
     cts_ata = models.DateField(null=True, blank=True)
-    ata_overdue = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    ata_overdue = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     lp_sa_code = models.CharField(max_length=3, blank=True)
     dp_sa_code = models.CharField(max_length=3, blank=True)
     po_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -4742,7 +4607,7 @@ class OtsOverview(models.Model):
 
 class OverlandArrDetails(models.Model):
     code = models.CharField(unique=True, max_length=25)
-    lndarrd_code = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    lndarrd_code = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     si_record_id = models.CharField(unique=True, max_length=25)
     delivery_number = models.CharField(unique=True, max_length=10, blank=True)
     load_point_code = models.CharField(max_length=10, blank=True)
@@ -4800,10 +4665,10 @@ class PaMaster(models.Model):
     short_title = models.CharField(max_length=25, blank=True)
     pa_prj_type = models.CharField(max_length=12, blank=True)
     rcpnt_cntry_cde = models.CharField(max_length=3, blank=True)
-    gg_duration = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    gg_duration = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'pa_master'
 
@@ -4863,6 +4728,25 @@ class PhysicalInventory(models.Model):
     class Meta:
         db_table = u'physical_inventory'
 
+class PlanTable(models.Model):
+    statement_id = models.CharField(max_length=30, blank=True)
+    timestamp = models.DateField(null=True, blank=True)
+    remarks = models.CharField(max_length=80, blank=True)
+    operation = models.CharField(max_length=30, blank=True)
+    options = models.CharField(max_length=30, blank=True)
+    object_node = models.CharField(max_length=128, blank=True)
+    object_owner = models.CharField(max_length=30, blank=True)
+    object_name = models.CharField(max_length=30, blank=True)
+    object_instance = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    object_type = models.CharField(max_length=30, blank=True)
+    optimizer = models.CharField(max_length=255, blank=True)
+    search_columns = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    parent_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    position = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    other = models.TextField(blank=True) # This field type is a guess.
+    class Meta:
+        db_table = u'plan_table'
 
 class PrjOrgUnits(models.Model):
     project_code = models.CharField(unique=True, max_length=8)
@@ -5039,8 +4923,8 @@ class RcvcstTrntypes(models.Model):
     dsp_record_id = models.CharField(unique=True, max_length=25)
     tran_type_code = models.CharField(unique=True, max_length=4)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5062,8 +4946,8 @@ class ReceiptDetails(models.Model):
     unit_weight_net = models.DecimalField(null=True, max_digits=8, decimal_places=3, blank=True)
     unit_weight_gross = models.DecimalField(null=True, max_digits=8, decimal_places=3, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
     recv_pack = models.BigIntegerField(null=True, blank=True)
@@ -5079,8 +4963,8 @@ class ReceiptFormItems(models.Model):
     org_unit_code = models.CharField(unique=True, max_length=13)
     item_value = models.CharField(max_length=2000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5209,8 +5093,8 @@ class Repackings(models.Model):
 
 class RepayDetails(models.Model):
     lonmst_id = models.CharField(max_length=25)
-    londtl_id = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
-    rpydtl_id = models.DecimalField(max_digits=127, decimal_places=127)
+    londtl_id = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
+    rpydtl_id = models.DecimalField(max_digits=0, decimal_places=-127)
     sending_gp_code = models.CharField(unique=True, max_length=10)
     sending_wh_code = models.CharField(unique=True, max_length=13, blank=True)
     si_record_id = models.CharField(unique=True, max_length=25)
@@ -5220,8 +5104,8 @@ class RepayDetails(models.Model):
     delete_user_id = models.CharField(unique=True, max_length=25, blank=True)
     delete_ouc = models.CharField(unique=True, max_length=13, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5245,8 +5129,8 @@ class SapBlDetails(models.Model):
     delete_indicator = models.CharField(max_length=1, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5265,8 +5149,8 @@ class SapDeliveries(models.Model):
     gross_weight_qty = models.DecimalField(null=True, max_digits=19, decimal_places=3, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5277,10 +5161,10 @@ class SapGoodReceipts(models.Model):
     po_line_number = models.CharField(unique=True, max_length=5)
     document_date = models.DateField(unique=True)
     document_number = models.CharField(unique=True, max_length=10)
-    quantity_net = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    quantity_net = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     offid = models.CharField(max_length=7, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5302,8 +5186,8 @@ class SapLtshRates(models.Model):
     odoc_released = models.DecimalField(null=True, max_digits=14, decimal_places=3, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5324,8 +5208,8 @@ class SapPrRates(models.Model):
     odoc_er_amount = models.DecimalField(null=True, max_digits=14, decimal_places=3, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5359,8 +5243,8 @@ class SapPurchaseOrders(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     local_indicator = models.CharField(max_length=1, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5388,8 +5272,8 @@ class SapPurchaseRequisitions(models.Model):
     delete_indicator = models.CharField(max_length=240, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5409,8 +5293,8 @@ class SapResourceRequests(models.Model):
     delete_indicator = models.CharField(max_length=1, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5428,8 +5312,8 @@ class SapShipments(models.Model):
     eta_date = models.DateField(null=True, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5445,8 +5329,8 @@ class SapShpdates(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     ata_date_from_cts = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5459,8 +5343,8 @@ class SapStages(models.Model):
     discharge_point_code = models.CharField(max_length=10)
     last_load_date = models.CharField(max_length=240, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5476,8 +5360,8 @@ class SapTodTdd(models.Model):
     tdd_dsf = models.CharField(max_length=1, blank=True)
     last_load_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5527,8 +5411,8 @@ class SiDetails(models.Model):
     delivery_term_descr = models.CharField(max_length=28, blank=True)
     delete_indicator = models.CharField(max_length=1, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5560,6 +5444,34 @@ class SiToProjectsMt(models.Model):
     class Meta:
         db_table = u'si_to_projects_mt'
 
+class SqlnExplainPlan(models.Model):
+    statement_id = models.CharField(max_length=30, blank=True)
+    timestamp = models.DateField(null=True, blank=True)
+    remarks = models.CharField(max_length=80, blank=True)
+    operation = models.CharField(max_length=30, blank=True)
+    options = models.CharField(max_length=30, blank=True)
+    object_node = models.CharField(max_length=128, blank=True)
+    object_owner = models.CharField(max_length=30, blank=True)
+    object_name = models.CharField(max_length=30, blank=True)
+    object_instance = models.BigIntegerField(null=True, blank=True)
+    object_type = models.CharField(max_length=30, blank=True)
+    optimizer = models.CharField(max_length=255, blank=True)
+    search_columns = models.BigIntegerField(null=True, blank=True)
+    id = models.BigIntegerField(null=True, blank=True)
+    parent_id = models.BigIntegerField(null=True, blank=True)
+    position = models.BigIntegerField(null=True, blank=True)
+    cost = models.BigIntegerField(null=True, blank=True)
+    cardinality = models.BigIntegerField(null=True, blank=True)
+    bytes = models.BigIntegerField(null=True, blank=True)
+    other_tag = models.CharField(max_length=255, blank=True)
+    partition_start = models.CharField(max_length=255, blank=True)
+    partition_stop = models.CharField(max_length=255, blank=True)
+    partition_id = models.BigIntegerField(null=True, blank=True)
+    other = models.TextField(blank=True) # This field type is a guess.
+    distribution = models.CharField(max_length=30, blank=True)
+    class Meta:
+        db_table = u'sqln_explain_plan'
+
 class StandardPrivileges(models.Model):
     menu_record_id = models.CharField(unique=True, max_length=25)
     standard_role_code = models.CharField(unique=True, max_length=3)
@@ -5567,8 +5479,8 @@ class StandardPrivileges(models.Model):
     flag_edit = models.CharField(max_length=1)
     flag_view = models.CharField(max_length=1)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5579,8 +5491,8 @@ class StandardRoles(models.Model):
     description = models.CharField(max_length=100, blank=True)
     module_code = models.CharField(max_length=2)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5588,7 +5500,7 @@ class StandardRoles(models.Model):
 
 class StockTrans(models.Model):
     org_unit_code = models.CharField(max_length=13, primary_key=True)
-    record_id = models.DecimalField(max_digits=127, decimal_places=127, primary_key=True)
+    record_id = models.DecimalField(max_digits=0, decimal_places=-127, primary_key=True)
     creation_date = models.DateField(primary_key=True)
     creation_type = models.CharField(max_length=2)
     creation_mode = models.CharField(max_length=1)
@@ -5678,7 +5590,7 @@ class SubSectors(models.Model):
 class SuperintendentDetails(models.Model):
     intvyg_code = models.CharField(unique=True, max_length=25)
     intdlv_code = models.IntegerField(unique=True)
-    intcns_code = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    intcns_code = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     quantity_type = models.CharField(unique=True, max_length=1)
     quantity_net = models.DecimalField(max_digits=11, decimal_places=3)
     quantity_gross = models.DecimalField(max_digits=11, decimal_places=3)
@@ -5736,8 +5648,8 @@ class SCommodities(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_commodities'
@@ -5749,8 +5661,8 @@ class SCommCategories(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_comm_categories'
@@ -5765,8 +5677,8 @@ class SCountries(models.Model):
     last_load_date = models.DateField()
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_countries'
@@ -5780,8 +5692,8 @@ class SGeoPoints(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_geo_points'
@@ -5804,8 +5716,8 @@ class SOrganizations(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_organizations'
@@ -5817,8 +5729,8 @@ class SPackageCodes(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_package_codes'
@@ -5828,8 +5740,8 @@ class SPrjtypeCountries(models.Model):
     sap_prj_type_desc = models.CharField(max_length=40, blank=True)
     sap_country_code = models.CharField(unique=True, max_length=3)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5839,8 +5751,8 @@ class SPrjTypes(models.Model):
     sap_prj_type_code = models.CharField(max_length=2, primary_key=True)
     sap_prj_type_desc = models.CharField(max_length=40, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5859,8 +5771,8 @@ class SProjects(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_projects'
@@ -5869,8 +5781,8 @@ class SRbs(models.Model):
     code = models.CharField(max_length=4, primary_key=True)
     descr = models.CharField(max_length=50, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5882,8 +5794,8 @@ class SRrNumbers(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     rr_line_number = models.CharField(max_length=5, primary_key=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5893,8 +5805,8 @@ class SSiNumbers(models.Model):
     new_si_number = models.CharField(max_length=8, primary_key=True)
     old_si_number = models.CharField(max_length=7, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5920,8 +5832,8 @@ class SSuppliers(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_suppliers'
@@ -5932,8 +5844,8 @@ class SSupplierTypes(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u's_supplier_types'
@@ -5942,8 +5854,8 @@ class SVoyageNumbers(models.Model):
     shipment_number = models.CharField(unique=True, max_length=10, blank=True)
     voyage_number = models.CharField(unique=True, max_length=7, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -5951,10 +5863,10 @@ class SVoyageNumbers(models.Model):
 
 class TpoDetails(models.Model):
     tpo_id = models.CharField(max_length=25, primary_key=True)
-    tpo_line_id = models.DecimalField(max_digits=127, decimal_places=127, primary_key=True)
+    tpo_line_id = models.DecimalField(max_digits=0, decimal_places=-127, primary_key=True)
     mandt = models.CharField(unique=True, max_length=3)
     po_number = models.CharField(unique=True, max_length=10)
-    po_line_number = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    po_line_number = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     net_price = models.DecimalField(null=True, max_digits=11, decimal_places=2, blank=True)
     delivery_number = models.CharField(max_length=10, blank=True)
     final_invoice = models.CharField(max_length=1, blank=True)
@@ -6003,8 +5915,8 @@ class TrailerDetails(models.Model):
     plate_number = models.CharField(max_length=20)
     fleet_number = models.CharField(max_length=20, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6061,12 +5973,12 @@ class Transformations(models.Model):
         db_table = u'transformations'
 
 class TranslatedLabels(models.Model):
-    lbl_record_id = models.DecimalField(max_digits=127, decimal_places=127, primary_key=True)
+    lbl_record_id = models.DecimalField(max_digits=0, decimal_places=-127, primary_key=True)
     language_code = models.CharField(max_length=3, primary_key=True)
     translate_text = models.CharField(max_length=200)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6095,7 +6007,7 @@ class TransDamages(models.Model):
     quality = models.CharField(unique=True, max_length=1)
     damage_code = models.CharField(unique=True, max_length=25)
     damage_record_id = models.CharField(unique=True, max_length=25, blank=True)
-    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     damage_date = models.DateField(unique=True)
     quantity_net = models.DecimalField(null=True, max_digits=11, decimal_places=3, blank=True)
     quantity_gross = models.DecimalField(null=True, max_digits=11, decimal_places=3, blank=True)
@@ -6109,8 +6021,8 @@ class TransDamages(models.Model):
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'trans_damages'
 
@@ -6118,7 +6030,7 @@ class TransLosses(models.Model):
     trnloss_id = models.CharField(max_length=25, primary_key=True)
     intvyg_code = models.CharField(unique=True, max_length=25, blank=True)
     intdlv_code = models.IntegerField(unique=True, null=True, blank=True)
-    intcns_code = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    intcns_code = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     receipt_code = models.CharField(unique=True, max_length=25, blank=True)
     document_code = models.CharField(unique=True, max_length=2, blank=True)
     org_unit_code = models.CharField(unique=True, max_length=13, blank=True)
@@ -6130,7 +6042,7 @@ class TransLosses(models.Model):
     quality = models.CharField(unique=True, max_length=1, blank=True)
     loss_code = models.CharField(unique=True, max_length=25)
     loss_record_id = models.CharField(unique=True, max_length=25, blank=True)
-    loss_cause_id = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    loss_cause_id = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     loss_date = models.DateField(unique=True)
     loss_type = models.CharField(max_length=5)
     quantity_net = models.DecimalField(max_digits=11, decimal_places=3)
@@ -6145,8 +6057,8 @@ class TransLosses(models.Model):
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     lonmst_id = models.CharField(max_length=25, blank=True)
-    londtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    rpydtl_id = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    londtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    rpydtl_id = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     class Meta:
         db_table = u'trans_losses'
 
@@ -6154,8 +6066,8 @@ class TPurchaseTypes(models.Model):
     compas_code = models.CharField(max_length=1, primary_key=True)
     sap_code = models.CharField(max_length=4, primary_key=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6166,8 +6078,8 @@ class TReleaseCodes(models.Model):
     code = models.CharField(max_length=3, primary_key=True)
     description = models.CharField(max_length=100)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6177,8 +6089,8 @@ class TShipmentStatus(models.Model):
     code = models.CharField(max_length=1, primary_key=True)
     description = models.CharField(max_length=100)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6188,8 +6100,8 @@ class TShippingAreas(models.Model):
     code = models.CharField(max_length=8, primary_key=True)
     name = models.CharField(max_length=30, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6199,8 +6111,8 @@ class TShippingTypes(models.Model):
     code = models.CharField(max_length=2, primary_key=True)
     description = models.CharField(max_length=100)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6212,8 +6124,8 @@ class TSupplierTypes(models.Model):
     last_load_date = models.DateField(null=True, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     class Meta:
         db_table = u't_supplier_types'
@@ -6222,9 +6134,9 @@ class UpstreamAss(models.Model):
     upsass_id = models.CharField(max_length=25, primary_key=True)
     intvyg_code = models.CharField(unique=True, max_length=25, blank=True)
     intdlv_code = models.IntegerField(unique=True, null=True, blank=True)
-    intcns_code = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    intcns_code = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     lndarrm_code = models.CharField(unique=True, max_length=25, blank=True)
-    lndarrd_code = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    lndarrd_code = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     allocation_code = models.CharField(unique=True, max_length=10)
     quantity_net = models.DecimalField(max_digits=11, decimal_places=3)
     org_unit_code = models.CharField(max_length=13)
@@ -6263,8 +6175,8 @@ class VehicleDetails(models.Model):
     vehicle_registration = models.CharField(max_length=20)
     fleet_number = models.CharField(max_length=20)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6274,7 +6186,7 @@ class VesselDischarges(models.Model):
     discharge_id = models.CharField(max_length=25, primary_key=True)
     intvyg_code = models.CharField(unique=True, max_length=25)
     intdlv_code = models.IntegerField(unique=True)
-    intcns_code = models.DecimalField(unique=True, max_digits=127, decimal_places=127)
+    intcns_code = models.DecimalField(unique=True, max_digits=0, decimal_places=-127)
     allocation_code = models.CharField(unique=True, max_length=10)
     discharge_date = models.DateField(unique=True)
     quality = models.CharField(unique=True, max_length=1)
@@ -6289,7 +6201,7 @@ class VesselDischarges(models.Model):
     supplier_ouc1 = models.CharField(unique=True, max_length=13, blank=True)
     damage_code = models.CharField(unique=True, max_length=25, blank=True)
     damage_record_id = models.CharField(unique=True, max_length=25, blank=True)
-    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     org_unit_code = models.CharField(max_length=13)
     offid = models.CharField(max_length=13, blank=True)
     send_pack = models.BigIntegerField(null=True, blank=True)
@@ -6310,8 +6222,8 @@ class VWbsStructure(models.Model):
     wbs_description = models.CharField(max_length=40, blank=True)
     bdgt_item = models.CharField(max_length=4000, blank=True)
     offid = models.CharField(max_length=13, blank=True)
-    send_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
-    recv_pack = models.DecimalField(null=True, max_digits=127, decimal_places=127, blank=True)
+    send_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
+    recv_pack = models.DecimalField(null=True, max_digits=0, decimal_places=-127, blank=True)
     last_mod_user = models.CharField(max_length=30, blank=True)
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
@@ -6327,7 +6239,7 @@ class WarehouseDamages(models.Model):
     quality = models.CharField(unique=True, max_length=1)
     damage_code = models.CharField(unique=True, max_length=25, blank=True)
     damage_record_id = models.CharField(unique=True, max_length=25, blank=True)
-    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    damage_cause_id = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     damage_date = models.DateField(unique=True)
     quantity_net = models.DecimalField(max_digits=11, decimal_places=3)
     quantity_gross = models.DecimalField(max_digits=11, decimal_places=3)
@@ -6353,7 +6265,7 @@ class WarehouseLosses(models.Model):
     quality = models.CharField(unique=True, max_length=1)
     loss_code = models.CharField(unique=True, max_length=25)
     loss_record_id = models.CharField(unique=True, max_length=25, blank=True)
-    loss_cause_id = models.DecimalField(unique=True, null=True, max_digits=127, decimal_places=127, blank=True)
+    loss_cause_id = models.DecimalField(unique=True, null=True, max_digits=0, decimal_places=-127, blank=True)
     loss_date = models.DateField(unique=True)
     loss_type = models.CharField(max_length=5)
     quantity_net = models.DecimalField(max_digits=11, decimal_places=3)
@@ -6468,12 +6380,4 @@ class WisVoyageMast(models.Model):
     last_mod_date = models.DateField(null=True, blank=True)
     class Meta:
         db_table = u'wis_voyage_mast'
-
-###
-	
-admin.site.register(Commodity,CommodityAdmin)
-admin.site.register(LTI,LTIAdmin)
-admin.site.register(Waybill,WaybillAdmin)
-admin.site.register(LoadingDetail)
-admin.site.register(LTIDetail,LTIDetailAdmin)
 
