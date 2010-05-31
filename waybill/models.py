@@ -1,5 +1,6 @@
-from django.db import models
+from django.db import models, connection
 from django.contrib import admin
+
 
 # Create your models here.
 class Commodity(models.Model):
@@ -209,9 +210,24 @@ class WaybillAdmin(admin.ModelAdmin):
 
 class LoadingDetailAdmin(admin.ModelAdmin):
 	list_display=('waybillNumber','siNo')
+
+class ltioriginalAdmin(admin.ModelAdmin):
+	list_display=('CODE','SI_CODE')
 	
 	
 #### CPS DB
+
+class ltioriginalManager(models.Manager):
+	def warehouses(self):
+		cursor = connection.cursor()
+		cursor.execute("""
+		    SELECT DISTINCT ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME
+		    FROM epic_lti
+		    """)
+		wh = cursor.fetchall()
+		return wh
+		
+
 class ltioriginal(models.Model):
 	LTI_PK				=models.CharField(max_length=50, primary_key=True)
 	LTI_ID				=models.CharField(max_length=40)
@@ -227,7 +243,7 @@ class ltioriginal(models.Model):
 	DESTINATION_LOC_NAME		=models.CharField(max_length=30)
 	CONSEGNEE_CODE			=models.CharField(max_length=12)
 	CONSEGNEE_NAME			=models.CharField(max_length=80)
-	REQUESTED_DISPATCH_DATE		=models.DateField()
+	REQUESTED_DISPATCH_DATE		=models.DateField(blank=True,null=True)
 	PROJECT_WBS_ELEMENT		=models.CharField(max_length=24,blank=True)
 	SI_RECORD_ID			=models.CharField(max_length=25,blank=True)
 	SI_CODE				=models.CharField(max_length=8)
@@ -237,10 +253,13 @@ class ltioriginal(models.Model):
 	QUANTITY_NET			=models.DecimalField(max_digits=11, decimal_places=3)
 	QUANTITY_GROSS			=models.DecimalField(max_digits=11, decimal_places=3)
 	NUMBER_OF_UNITS			=models.DecimalField(max_digits=7, decimal_places=0)
-	UNIT_WEIGHT_NET			=models.DecimalField(max_digits=8, decimal_places=3,blank=True)
-	UNIT_WEIGHT_GROSS		=models.DecimalField(max_digits=8, decimal_places=3,blank=True)
+	UNIT_WEIGHT_NET			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
+	UNIT_WEIGHT_GROSS		=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
+	
+	objects = ltioriginalManager()
 	class Meta:
 		db_table = u'epic_lti'
+
 ####
 admin.site.register(EPIC_LTI,EPIC_LTIAdmin)	
 admin.site.register(Commodity,CommodityAdmin)

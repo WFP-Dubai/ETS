@@ -1,0 +1,8 @@
+{% extends "base_template.html"%}
+{%block title %}{{detailed.0.CODE}}{%endblock%}
+{%block content %}
+{{lti_id}}<br>
+{%for lti in detailed%}
+    {{lti.SI_CODE}} - {{lti.CODE}}<br>
+{%endfor%}
+{%endblock%}
