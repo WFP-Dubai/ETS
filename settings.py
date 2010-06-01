@@ -95,6 +95,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'ets.waybill',
+    'dojango',
  #   'debug_toolbar',
 )
 INTERNAL_IPS = ('127.0.0.1',)

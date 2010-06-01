@@ -1,12 +1,11 @@
 {% extends "base_template.html"%}
 {%block title %}{%endblock%}
 {%block content %}
-{%if user.is_authenticated%}hello {%endif%}
 Select an action:
 <ul>
-    <li><a href='waybill/dispatch'>Create Waybill</a></li>
-    <li><a href=''>Create Waybill</a></li>
-    <li><a href=''>Create Waybill</a></li>
-    <li><a href=''>Create Waybill</a></li>
+    <li><a href='waybill/dispatch'>Create & Dispatch Waybill</a></li>
+    <li><a href='waybill/receive'>Recieve Waybill</a></li>
+    <li><a href='waybill/validate'>Validate Waybill</a></li>
+    <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit"</form>
 </ul>
 {%endblock%}

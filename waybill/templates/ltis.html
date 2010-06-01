@@ -1,15 +1,37 @@
 {% extends "base_template.html"%}
 {%block content %}
-<form action='../info' method=get>    <select name='lti_id'>
+<form action='../info' method=get>
+    <select name='lti_id'>
 {% for lti in ltis%}
-    <option value='{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}
+        <option value='{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}
 {% endfor%}
-  <select>
-    <input type="submit"/>
+    </select>
+    <input name='select' value='Select LTI' type="submit"/>
 </form>
-<ul>
+
+    <table>
+        <tr><th>LTI</th><th>SI</th><th>Destination</th><th>Date</th><th>select</th></tr>
 {% for lti in ltis%}
-    <li><a href='../info/{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}</a>
+    <tr>
+        <td>
+            {{lti.CODE}}
+        </td>
+        <td>
+            {{lti.SI_CODE}}
+        </td>
+        <td>
+            {{lti.DESTINATION_LOC_NAME}}
+        </td>
+        <td>
+            
+        </td>
+        <td>
+            {{lti.LTI_DATE}}
+        </td>
+        <td>
+        <a href='../info/{{lti.LTI_ID}}'>select</a>
+        </td>
+    </tr>
 {% endfor%}
-<ul>
+    </table>
 {%endblock%}

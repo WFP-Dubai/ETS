@@ -3,14 +3,15 @@
 <form action='list' method=get>
     <select name='dispatch_point'>  
 {% for wh in dispatch_list%}
-  <option value='{{wh.0}}'> {{wh.2}}
+  <option value='{{wh.0}}'> {{wh.0}}
 {% endfor%}    
     </select> 
     <input type="submit"/>
 </form>
 <ul>
     {% for wh in dispatch_list%}
-  <li><a href='list/{{wh.0}}'> {{wh.1}} {{wh.2}}</a></li>
+  <li><a href='list/{{wh.0}}'> {{wh.0}}</a></li>
     {% endfor%}
 </ul>
+    
 {%endblock%}
