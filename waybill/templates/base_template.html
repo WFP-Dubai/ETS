@@ -7,17 +7,18 @@
 </head>
 <body>
 <h1>Electronic Tracking System - "eWaybill"</h1>
+
+<br />
+{%block content %}
+{%endblock%}
+
 <div>
+<a href=/>home</a>
 {% if user.is_authenticated %}
     Logged in as:{{ user.username }}. <a href='/accounts/logout/?next=/'>Logout</a>
 {% else %}
    Please log in. <a href='/ets/loginHere?next=/'>login</a>
 {% endif %}
 </div>
-<br />
-{%block content %}
-{%endblock%}
-
-
 </body>
 </html>

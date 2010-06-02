@@ -1,6 +1,9 @@
 from django.db import models, connection
 from django.contrib import admin
-from django.forms import ModelForm
+from django.forms import ModelForm, ModelChoiceField
+
+from django.forms.models import inlineformset_factory
+
 
 # Create your models here.
 class Commodity(models.Model):
@@ -18,27 +21,27 @@ class CommodityAdmin(admin.ModelAdmin):
 class Waybill(models.Model):
 	transaction_type_choice=(
 			(u'INT', u'WFP Internal'),
-			(u'DIS', u'Distribution'),
-			(u'LON', u'Loan'),
-			(u'DSP', u'Disposal'),
-			(u'PUR', u'Purchase'),
-			(u'SHU',u'Shunting'),
-			(u'COS',u'Costal Transshipment'),
+#			(u'DIS', u'Distribution'),
+#			(u'LON', u'Loan'),
+#			(u'DSP', u'Disposal'),
+#			(u'PUR', u'Purchase'),
+#			(u'SHU',u'Shunting'),
+#			(u'COS',u'Costal Transshipment'),
 			(u'DEL',u'Delivery'),
-			(u'SWA',u'Swap'),
-			(u'REP',u'Repayment'),
-			(u'SAL',u'Sale'),
-			(u'ADR',u'Air drop'),
-			(u'INL',u'Inland Shipment')
+#			(u'SWA',u'Swap'),
+#			(u'REP',u'Repayment'),
+#			(u'SAL',u'Sale'),
+#			(u'ADR',u'Air drop'),
+#			(u'INL',u'Inland Shipment')
 		)
 	transport_type=(
-			(u'R',u'Rail'),
+#			(u'R',u'Rail'),
 			(u'T',u'Road'),
-			(u'A',u'Air'),
-			(u'I',u'Inland Waterways'),
-			(u'C',u'Costal Waterways'),
-			(u'M',u'Multi-mode'),
-			(u'O',u'Other Please Specify')
+#			(u'A',u'Air'),
+#			(u'I',u'Inland Waterways'),
+#			(u'C',u'Costal Waterways'),
+#			(u'M',u'Multi-mode'),
+#			(u'O',u'Other Please Specify')
 		)
 	#general
 	ltiNumber				=models.CharField(max_length=20)
@@ -92,7 +95,6 @@ class Waybill(models.Model):
 	def mydesc(self):
 		return self.waybillNumber
 
-	
 #### CPS DB
 
 class ltioriginalManager(models.Manager):
@@ -104,6 +106,7 @@ class ltioriginalManager(models.Manager):
 		    """)
 		wh = cursor.fetchall()
 		return wh
+		
 	def ltiCodes(self):
 		cursor = connection.cursor()
 		cursor.execute("""
@@ -113,6 +116,19 @@ class ltioriginalManager(models.Manager):
 		lti_code = cursor.fetchall()
 		return lti_code
 		
+	def ltiCodesByWH(self,wh):
+		cursor = connection.cursor()
+		cursor.execute('SELECT DISTINCT CODE FROM epic_lti  WHERE ORIGIN_LOCATION_CODE = %s order by LTI_ID',[wh])
+		lti_code = cursor.fetchall()
+		return lti_code
+	
+	def si_for_lti(self,lti_code):
+		cursor = connection.cursor()
+		cursor.execute("SELECT DISTINCT SI_CODE FROM epic_lti where CODE = %s",[lti_code])
+		si_list = cursor.fetchall()
+		return si_list
+
+	
 
 class ltioriginal(models.Model):
 	LTI_PK				=models.CharField(max_length=50, primary_key=True)
@@ -166,7 +182,8 @@ class LoadingDetail(models.Model):
 	unitsDamagedReason		=models.TextField(blank=True)
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
-		
+
+	
 class LoadingDetailInline(admin.TabularInline):
 	model = LoadingDetail
 
@@ -179,10 +196,6 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 
 class ltioriginalAdmin(admin.ModelAdmin):
 	list_display=('CODE','SI_CODE')
-	
-class WaybillForm(ModelForm):
-     class Meta:
-         model = Waybill
 
 admin.site.register(Commodity,CommodityAdmin)
 admin.site.register(Waybill,WaybillAdmin)

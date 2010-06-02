@@ -75,7 +75,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'ets.urls'
@@ -96,7 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'ets.waybill',
     'dojango',
- #   'debug_toolbar',
+    'debug_toolbar',
 )
 INTERNAL_IPS = ('127.0.0.1',)
 

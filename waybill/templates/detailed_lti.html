@@ -6,7 +6,10 @@ Origin: {{detailed.0.ORIGIN_LOC_NAME}}<br>
 Allocation Destination: {{detailed.0.DESTINATION_LOC_NAME}}<br/>
 Project Number:{{detailed.0.PROJECT_WBS_ELEMENT}}<br/>
 
+<a href='../testform/{{detailed.0.CODE}}'>create wb</a><br>
+<table>
 {%for lti in detailed%}
-    {{lti.SI_CODE}} - {{lti.CMMNAME}} - {{lti.NUMBER_OF_UNITS}}<a href='../create/{{lti.LTI_PK}}'>select</a><br>
+    <tr><td>{{lti.SI_CODE}}</td><td>{{lti.CMMNAME}}</td><td>{{lti.NUMBER_OF_UNITS}} </td><td><a href='../create/{{lti.LTI_PK}}'>select</a></td><td>
 {%endfor%}
+</table>
 {%endblock%}

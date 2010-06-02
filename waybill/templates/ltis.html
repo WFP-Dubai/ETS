@@ -3,7 +3,7 @@
 <form action='../info' method=get>
     <select name='lti_id'>
 {% for lti in ltis%}
-        <option value='{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}
+        <option value='{{lti.0}}'>{{lti.0}}
 {% endfor%}
     </select>
     <input name='select' value='Select LTI' type="submit"/>
@@ -14,24 +14,16 @@
 {% for lti in ltis%}
     <tr>
         <td>
-            {{lti.CODE}}
+            {{lti.0}}
         </td>
         <td>
-            {{lti.SI_CODE}}
+        <a href='../info/{{lti.0}}'>select</a>
         </td>
         <td>
-            {{lti.DESTINATION_LOC_NAME}}
-        </td>
-        <td>
-            
-        </td>
-        <td>
-            {{lti.LTI_DATE}}
-        </td>
-        <td>
-        <a href='../info/{{lti.LTI_ID}}'>select</a>
+        <a href='../lti/{{lti.0}}'>select</a>
         </td>
     </tr>
 {% endfor%}
+
     </table>
 {%endblock%}

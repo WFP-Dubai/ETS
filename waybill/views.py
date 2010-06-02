@@ -6,7 +6,11 @@ from django.shortcuts import render_to_response
 import datetime
 from django.contrib.auth.views import login,logout
 from django.contrib.auth.decorators import login_required
+from ets.waybill.forms import *
 
+from django.forms.models import inlineformset_factory
+
+lti_code = ''
 def prep_req(request):
     return{'user': request.user}
     
@@ -29,7 +33,7 @@ def selectAction(request):
                               context_instance=RequestContext(request))
 
 def listOfLtis(request,origin):
-    ltis = ltioriginal.objects.filter(ORIGIN_LOCATION_CODE=origin)#.order_by('SI_CODE','CODE')
+    ltis = ltioriginal.objects.ltiCodesByWH(origin)
     return render_to_response('ltis.html',
                               {'ltis':ltis},
                               context_instance=RequestContext(request))
@@ -60,12 +64,16 @@ def lti_detail(request):
     return HttpResponseRedirect('info/' + lti_id)
     #return lti_detail_url(request,lti_id)
 
-def lti_detail_url(request,lti_id):
-    detailed_lti = ltioriginal.objects.filter(LTI_ID=lti_id)
+def lti_detail_url(request,lti_code):
+    detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
     return render_to_response('detailed_lti.html',
-                              {'detailed':detailed_lti,'lti_id':lti_id},
+                              {'detailed':detailed_lti,'lti_id':lti_code},
                               context_instance=RequestContext(request))
-  
+def single_lti_extra(request,lti_code):
+	si_list = ltioriginal.objects.si_for_lti(lti_code)
+	return render_to_response('lti_si.html',
+                              {'lti_code':lti_code,'si_list':si_list},
+                              context_instance=RequestContext(request))
 
 def dispatch(request):
     dispatch_list = ltioriginal.objects.warehouses()
@@ -110,18 +118,22 @@ def waybillSearchResult(request):
                               {'status':'selectAction not yet implemented'},
                               context_instance=RequestContext(request))
 
-def waybill_validate_list(request):
-    return render_to_response('status.html',
-                              {'status':'to be implemented'},
-                              context_instance=RequestContext(request))
-def testform(request):	
+
+
+def testform(request,lti_code):
+	# get the LTI info
+	current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm)
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
+		formset = LDFormSet(request.POST)
 		if form.is_valid():
-			return HttpResponseRedirect('/thanks/')
+			form.save()
 	else:
-		form = WaybillForm()
-	return render_to_response('form.html', {'form': form,}, context_instance=RequestContext(request))
+		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
+		formset = LDFormSet()
+	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
     
 def custom_show_toolbar(request):
     return True
