@@ -5,7 +5,7 @@
 	<key>EmbeddedEditorHidden:carlander</key>
 	<false/>
 	<key>ExpandedEditorWidth:carlander:displays([(0, 0), (1280, 1024)])</key>
-	<integer>640</integer>
+	<integer>641</integer>
 	<key>ExpandedItems:carlander</key>
 	<array>
 		<string>981C6FE3-C7C3-4FF5-BD26-B9D17065FF43</string>
@@ -62,6 +62,103 @@
 		<dict>
 			<key>AliasData</key>
 			<data>
+			AAAAAAHSAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnURZGV0YWlsZWRfbHRpLmh0bWwAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3o8
+			C8gn/qpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIJ8ZqAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFJNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmRldGFpbGVkX2x0aS5odG1sAA4AJAAR
+			AGQAZQB0AGEAaQBsAGUAZABfAGwAdABpAC4AaAB0AG0AbAAPABoA
+			DABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAEVVc2Vycy9jYXJs
+			YW5kZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC90ZW1wbGF0
+			ZXMvZGV0YWlsZWRfbHRpLmh0bWwAABMAAS8AABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/detailed_lti.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/detailed_lti.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEIdmlld3MucHkAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3o1
+			Dsgn1rpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCeeegAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAD9NYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			dmlld3MucHkAAA4AEgAIAHYAaQBlAHcAcwAuAHAAeQAPABoADABN
+			AGEAYwBpAG4AdABvAHMAaAAgAEgARAASADJVc2Vycy9jYXJsYW5k
+			ZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC92aWV3cy5weQAT
+			AAEvAAAVAAIAEP//AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/views.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/views.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGYAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEJbW9kZWxzLnB5AAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3oj
+			dMgn1rpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCeeegAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAEBNYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			bW9kZWxzLnB5AA4AFAAJAG0AbwBkAGUAbABzAC4AcAB5AA8AGgAM
+			AE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIAM1VzZXJzL2Nhcmxh
+			bmRlci9wcm9qZWN0cy9lcGljL2V0cy93YXliaWxsL21vZGVscy5w
+			eQAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/models.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/models.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGQAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEHdXJscy5weQAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3nQ
+			Asgn1rpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCeeegAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAD5NYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			dXJscy5weQAOABAABwB1AHIAbABzAC4AcAB5AA8AGgAMAE0AYQBj
+			AGkAbgB0AG8AcwBoACAASABEABIAMVVzZXJzL2NhcmxhbmRlci9w
+			cm9qZWN0cy9lcGljL2V0cy93YXliaWxsL3VybHMucHkAABMAAS8A
+			ABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/urls.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/urls.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
 			AAAAAAHAAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN4MMwKbG9naW4uaHRtbAAAAAAAAAAAAAAAAAAAAAAA
 			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3gw
@@ -115,8 +212,8 @@
 			<data>
 			AAAAAAF4AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PdoHdXJscy5weQAAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3c+
-			uMgn1rsAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3oQ
+			Z8gn1rtURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0
 			cwAAEAAIAADFs5B4AAAAEQAIAADIJ557AAAAAQAUA3c92gNtaqUA
 			CzIoAAqMqgAAfQ0AAgA2TWFjaW50b3NoIEhEOlVzZXJzOmNhcmxh
 			bmRlcjpwcm9qZWN0czplcGljOmV0czp1cmxzLnB5AA4AEAAHAHUA
@@ -141,7 +238,7 @@
 	<key>ToolbarVisible:carlander</key>
 	<true/>
 	<key>ViewSplitterPosition:carlander</key>
-	<real>0.26011559367179871</real>
+	<real>0.25895953178405762</real>
 	<key>WindowFrame:carlander:displays([(0, 0), (1280, 1024)])</key>
 	<string>rect(44,0,1020,865)</string>
 </dict>

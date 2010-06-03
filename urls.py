@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from ets.waybill.views import hello, homepage
+from ets.waybill.views import *
 
 from django.contrib.auth.views import login,logout
 # Uncomment the next two lines to enable the admin:
@@ -9,7 +9,6 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ets/', include('ets.waybill.urls')),
-    (r'^hello/$',hello),
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),
     (r'^$',homepage),

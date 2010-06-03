@@ -1,21 +1,36 @@
 # Create your views here.
-from django.template import Template, RequestContext
-from django.http import HttpResponse, HttpResponseRedirect
-from ets.waybill.models import *
-from django.shortcuts import render_to_response
 import datetime
 from django.contrib.auth.views import login,logout
 from django.contrib.auth.decorators import login_required
+from django.forms.models import inlineformset_factory
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render_to_response
+from django.template import Template, RequestContext
+from ets.waybill.models import *
 from ets.waybill.forms import *
 
-from django.forms.models import inlineformset_factory
 
-lti_code = ''
+
+
+def restant_si(lti_code):
+	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
+	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
+	listOfSI = []
+	for lti in detailed_lti:
+		listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
+		
+	for wb in listOfWaybills:
+		for loading in wb.loadingdetail_set.select_related():
+			for si in listOfSI:
+				if si.SINumber == loading.siNo.SI_CODE:
+					si.reduceCurrent(loading.numberUnitsLoaded)
+					print 'x'
+
+	return listOfSI
+	
+
 def prep_req(request):
     return{'user': request.user}
-    
-def hello(request):
-    return HttpResponse("Hello World")
 
 def homepage(request):
     return render_to_response('homepage.html',
@@ -66,8 +81,11 @@ def lti_detail(request):
 
 def lti_detail_url(request,lti_code):
     detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
+    listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
+    listOfSI_withDeduction = restant_si(lti_code)
+    
     return render_to_response('detailed_lti.html',
-                              {'detailed':detailed_lti,'lti_id':lti_code},
+                              {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction},
                               context_instance=RequestContext(request))
 def single_lti_extra(request,lti_code):
 	si_list = ltioriginal.objects.si_for_lti(lti_code)
@@ -123,16 +141,30 @@ def waybillSearchResult(request):
 def testform(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm)
+	lti_code_global = lti_code
+	class LoadingDetailDispatchForm(ModelForm):
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		
+		class Meta:
+			model = LoadingDetail
+			fields = ('siNo','numberUnitsLoaded','wbNumber')
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
 		formset = LDFormSet(request.POST)
-		if form.is_valid():
-			form.save()
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save(commit=False)
+			for subform in instances:
+				subform.wbNumber = wb_new
+				subform.save()
+			wb_new.save()
+			
 	else:
 		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
 		formset = LDFormSet()
+		
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
     
 def custom_show_toolbar(request):

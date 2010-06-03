@@ -10,11 +10,20 @@
     {% endfor %}
     </ol>
 {% endif %}
-<table>
+
 <form action="" method=POST>
-{{form}}{{formset}}
-<tr><td><input type="submit"> {% csrf_token %}</td></tr>
+<table>
+{{form}}
+<tr><td></td></tr></table>
+    {{ formset.management_form }}
+        <table><tr><th>Commodity</th><th>Number of units</th>
+    {% for sform in formset.forms %}
+        {{ sform.id }}
+        <tr><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
+    {% endfor %}
+    </table>
+<input type="submit"> {% csrf_token %}
 </form>
 
-</table>
+
 {%endblock%}

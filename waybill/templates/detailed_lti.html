@@ -7,9 +7,26 @@ Allocation Destination: {{detailed.0.DESTINATION_LOC_NAME}}<br/>
 Project Number:{{detailed.0.PROJECT_WBS_ELEMENT}}<br/>
 
 <a href='../testform/{{detailed.0.CODE}}'>create wb</a><br>
+Waybills:<br>
 <table>
-{%for lti in detailed%}
-    <tr><td>{{lti.SI_CODE}}</td><td>{{lti.CMMNAME}}</td><td>{{lti.NUMBER_OF_UNITS}} </td><td><a href='../create/{{lti.LTI_PK}}'>select</a></td><td>
+{%for wb in listOfWaybills%}
+	{%for loading in wb.loadingdetail_set.select_related %}
+		<tr>
+		<td>{{wb}}:{{loading.siNo.SI_CODE}}</td>
+		<td>{{loading.siNo.CMMNAME}} </td>
+		<td>{{loading.numberUnitsLoaded}} </td>
+</tr>
+	{%endfor%}
 {%endfor%}
+
+
+</table>Items in LTI:
+
+<table>
+	<tr><th>Commodity</th><th>SI</th><th>SI Ammount</th><th>Not Dispaced</th></tr>
+	{%for si in listOfSI_withDeduction%}
+	 <tr><td>{{si.CommodityName}}</td><td>{{si.SINumber}}</td><td>{{si.StartAmount}}</td><td>{{si.CurrentAmount}}</td></tr>
+	{%endfor%}
 </table>
+
 {%endblock%}

@@ -166,7 +166,7 @@ class ltioriginal(models.Model):
 	class Meta:
 		db_table = u'epic_lti'
 	def  __unicode__(self):
-		return self.CODE +' - '+ self.SI_CODE
+		return self.SI_CODE + ' ' + self.CMMNAME
 
 ####
 
@@ -174,14 +174,32 @@ class ltioriginal(models.Model):
 class LoadingDetail(models.Model):
 	wbNumber				=models.ForeignKey(Waybill)
 	siNo					=models.ForeignKey(ltioriginal)
-	numberUnitsLoaded		=models.IntegerField(blank=True)
-	numberUnitsGood			=models.IntegerField(blank=True)
-	numberUnitsLost			=models.IntegerField(blank=True)
-	numberUnitsDamaged		=models.IntegerField(blank=True)
+	numberUnitsLoaded		=models.IntegerField(blank=True,null=True)
+	numberUnitsGood			=models.IntegerField(blank=True,null=True)
+	numberUnitsLost			=models.IntegerField(blank=True,null=True)
+	numberUnitsDamaged		=models.IntegerField(blank=True,null=True)
 	unitsLostReason			=models.TextField(blank=True)
 	unitsDamagedReason		=models.TextField(blank=True)
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
+
+class SIWithRestant:
+	SINumber = ''
+	StartAmount = 0
+	CurrentAmount = 0
+	CommodityName = ''
+	def __init__(self,SINumber,StartAmount,CommodityName):
+		self.SINumber = SINumber
+		self.StartAmount = StartAmount
+		self.CurrentAmount = StartAmount
+		self.CommodityName = CommodityName
+	
+	def reduceCurrent(self,reduce):
+		self.CurrentAmount = int(self.CurrentAmount) - reduce
+	def getCurrentAmount(self):
+		return self.CurrentAmount
+	def getStartAmount(self):
+		return StartAmount
 
 	
 class LoadingDetailInline(admin.TabularInline):
