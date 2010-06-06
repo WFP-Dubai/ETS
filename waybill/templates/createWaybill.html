@@ -1,4 +1,29 @@
 {% extends "base_template.html"%}
-{%block title %}{%endblock%}
+{%block title %}Welcome to EPIC eTS{%endblock%}
 {%block content %}
+
+{{lti_list.0.CODE}}
+{% if form.subject.errors %}
+    <ol>
+    {% for error in form.subject.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    </ol>
+{% endif %}
+
+<form action="" method=POST>
+<table>
+{{form}}
+<tr><td></td></tr></table>
+    {{ formset.management_form }}
+        <table><tr><th>Commodity</th><th>Number of units</th>
+    {% for sform in formset.forms %}
+        {{ sform.id }}
+        <tr><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
+    {% endfor %}
+    </table>
+	<input type="submit"> {% csrf_token %}
+</form>
+
+
 {%endblock%}

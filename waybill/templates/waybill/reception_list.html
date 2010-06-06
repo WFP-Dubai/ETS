@@ -1,7 +1,7 @@
 {% extends "base_template.html"%}
 {%block content %}
 {% for waybill in object_list%}
-    <li><a href='validate/{{waybill.id}}'>{{waybill.ltiNumber}} -{{waybill.waybillNumber}}</a>
+    <li><a href='receive/{{waybill.id}}'>{{waybill.ltiNumber}} -{{waybill.waybillNumber}}</a>
 {% endfor%}
 <ul>
 {%endblock%}

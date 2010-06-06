@@ -111,3 +111,6 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
 )
+AUTH_PROFILE_MODULE='waybill.UserProfile'
+
+COMPAS_STATION_CODE=''

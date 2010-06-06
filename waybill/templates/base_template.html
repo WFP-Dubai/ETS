@@ -3,15 +3,13 @@
     >
 <html lang="en">
 <head>
-    <title>{%block title%}eTs - eWaybill -{{section.title}}{%endblock%}</title>
+    <title>{%block title%}eTs - eWaybill - {{section.title}}{%endblock%}</title>
 </head>
 <body>
 <h1>Electronic Tracking System - "eWaybill"</h1>
-
 <br />
 {%block content %}
 {%endblock%}
-
 <div>
 <a href=/>home</a>
 {% if user.is_authenticated %}

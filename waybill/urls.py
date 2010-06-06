@@ -15,6 +15,10 @@ info_dict_waybill = {
 #    'template_name': "ltioriginal_list.html"
 }
 
+info_dict_waybill_reception= {
+	'queryset': Waybill.objects.all(),
+	'template_name': 'waybill/reception_list.html'
+}
 
 
 urlpatterns = patterns('',
@@ -24,9 +28,10 @@ urlpatterns = patterns('',
     (r'^waybill/list/(.*)$',listOfLtis),
     (r'^waybill/list$',ltis_redirect_wh),
     (r'^waybill/import$',import_ltis),
-    (r'^waybill/create/(?P<lti_code>.*)$',waybill_create),
+    (r'^waybill/create/(.*)$',waybillCreate),
     (r'^waybill/edit$',waybill_edit),
-    (r'^waybill/receive$',waybill_reception),
+    (r'^waybill/receive$','django.views.generic.list_detail.object_list', info_dict_waybill_reception),
+    (r'^waybill/receive/(.*)$',waybill_reception),
     (r'^waybill/findwb$',waybill_search),
     (r'^waybill/validate$','django.views.generic.list_detail.object_list', info_dict_waybill),
     (r'^waybill/validate/(?P<object_id>.*)$','django.views.generic.list_detail.object_detail', info_dict_waybill),
@@ -34,6 +39,6 @@ urlpatterns = patterns('',
     (r'^waybill/info/(.*)$',lti_detail_url),
     (r'^waybill/dispatch$',dispatch),
     (r'^waybill/ltis_codes$',ltis_codes),
-    (r'^waybill/testform/(.*)$',testform),
+    (r'^waybill/testform/(.*)$',waybillCreate),
     (r'^waybill/test$','django.views.generic.list_detail.object_list', info_dict_lti),
 )

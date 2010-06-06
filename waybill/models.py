@@ -1,15 +1,16 @@
 from django.db import models, connection
 from django.contrib import admin
 from django.forms import ModelForm, ModelChoiceField
+from django.contrib.auth.models import User
 
 from django.forms.models import inlineformset_factory
 
 
 # Create your models here.
 class Commodity(models.Model):
-	commodityRef=models.CharField(max_length=18)
-	commodityName=models.CharField(max_length=100)
-	commodityType=models.CharField(max_length=9)
+	commodityRef		=models.CharField(max_length=18)
+	commodityName		=models.CharField(max_length=100)
+	commodityType		=models.CharField(max_length=9)
 	def __unicode__(self):
 		return self.commodityRef +' - ' + self.commodityName
 	
@@ -47,7 +48,7 @@ class Waybill(models.Model):
 	ltiNumber				=models.CharField(max_length=20)
 	waybillNumber			=models.CharField(max_length=20)
 	dateOfLoading			=models.DateField(null=True, blank=True)
-	dateOfDispach			=models.DateField(null=True, blank=True)
+	dateOfDispatch			=models.DateField(null=True, blank=True)
 	transactionType			=models.CharField(max_length=10,choices=transaction_type_choice)
 	transportType			=models.CharField(max_length=10,choices=transport_type)
 	#Dispatcher
@@ -70,8 +71,8 @@ class Waybill(models.Model):
 	#Container	
 	containerOneNumber		=models.CharField(max_length=40,blank=True)
 	containerTwoNumber		=models.CharField(max_length=40,blank=True)
-	containerOneSealNumber		=models.CharField(max_length=40,blank=True)
-	containerTwoSealNumber		=models.CharField(max_length=40,blank=True)
+	containerOneSealNumber	=models.CharField(max_length=40,blank=True)
+	containerTwoSealNumber	=models.CharField(max_length=40,blank=True)
 
 
 	#Reciver
@@ -133,42 +134,102 @@ class ltioriginalManager(models.Manager):
 class ltioriginal(models.Model):
 	LTI_PK				=models.CharField(max_length=50, primary_key=True)
 	LTI_ID				=models.CharField(max_length=40)
-	CODE            		=models.CharField(max_length=40)
+	CODE            	=models.CharField(max_length=40)
 	LTI_DATE			=models.DateField()
 	EXPIRY_DATE			=models.DateField(blank=True,null=True)
-	TRANSPORT_CODE			=models.CharField(max_length=4)
-	TRANSPORT_OUC			=models.CharField(max_length=13)
-	TRANSPORT_NAME			=models.CharField(max_length=30)
+	TRANSPORT_CODE		=models.CharField(max_length=4)
+	TRANSPORT_OUC		=models.CharField(max_length=13)
+	TRANSPORT_NAME		=models.CharField(max_length=30)
 	ORIGIN_TYPE			=models.CharField(max_length=1)
-	ORIGINTYPE_DESC         	=models.CharField(max_length=12,blank=True)
-	ORIGIN_LOCATION_CODE		=models.CharField(max_length=10)
-	ORIGIN_LOC_NAME			=models.CharField(max_length=30)
-	ORIGIN_WH_CODE			=models.CharField(max_length=13,blank=True)
-	ORIGIN_WH_NAME			=models.CharField(max_length=50,blank=True)
+	ORIGINTYPE_DESC     =models.CharField(max_length=12,blank=True)
+	ORIGIN_LOCATION_CODE=models.CharField(max_length=10)
+	ORIGIN_LOC_NAME		=models.CharField(max_length=30)
+	ORIGIN_WH_CODE		=models.CharField(max_length=13,blank=True)
+	ORIGIN_WH_NAME		=models.CharField(max_length=50,blank=True)
 	DESTINATION_LOCATION_CODE	=models.CharField(max_length=10)
-	DESTINATION_LOC_NAME		=models.CharField(max_length=30)
-	CONSEGNEE_CODE			=models.CharField(max_length=12)
-	CONSEGNEE_NAME			=models.CharField(max_length=80)
+	DESTINATION_LOC_NAME=models.CharField(max_length=30)
+	CONSEGNEE_CODE		=models.CharField(max_length=12)
+	CONSEGNEE_NAME		=models.CharField(max_length=80)
 	REQUESTED_DISPATCH_DATE		=models.DateField(blank=True,null=True)
-	PROJECT_WBS_ELEMENT		=models.CharField(max_length=24,blank=True)
-	SI_RECORD_ID			=models.CharField(max_length=25,blank=True)
+	PROJECT_WBS_ELEMENT	=models.CharField(max_length=24,blank=True)
+	SI_RECORD_ID		=models.CharField(max_length=25,blank=True)
 	SI_CODE				=models.CharField(max_length=8)
-	COMM_CATEGORY_CODE		=models.CharField(max_length=9)
-	COMMODITY_CODE			=models.CharField(max_length=18)
+	COMM_CATEGORY_CODE	=models.CharField(max_length=9)
+	COMMODITY_CODE		=models.CharField(max_length=18)
 	CMMNAME				=models.CharField(max_length=100,blank=True)
-	QUANTITY_NET			=models.DecimalField(max_digits=11, decimal_places=3)
-	QUANTITY_GROSS			=models.DecimalField(max_digits=11, decimal_places=3)
-	NUMBER_OF_UNITS			=models.DecimalField(max_digits=7, decimal_places=0)
-	UNIT_WEIGHT_NET			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
-	UNIT_WEIGHT_GROSS		=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
+	QUANTITY_NET		=models.DecimalField(max_digits=11, decimal_places=3)
+	QUANTITY_GROSS		=models.DecimalField(max_digits=11, decimal_places=3)
+	NUMBER_OF_UNITS		=models.DecimalField(max_digits=7, decimal_places=0)
+	UNIT_WEIGHT_NET		=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
+	UNIT_WEIGHT_GROSS	=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 	
 	objects = ltioriginalManager()
 	class Meta:
 		db_table = u'epic_lti'
 	def  __unicode__(self):
 		return self.SI_CODE + ' ' + self.CMMNAME
+	def mydesc(self):
+		return self.CODE
 
 ####
+
+
+### People Table
+
+class EpicPerson(models.Model):
+    person_pk 				= models.CharField(max_length=20, blank=True, primary_key=True)
+    org_unit_code 			= models.CharField(max_length=13)
+    code 					= models.CharField(max_length=7)
+    type_of_document 		= models.CharField(max_length=2, blank=True)
+    organization_id 		= models.CharField(max_length=12)
+    last_name 				= models.CharField(max_length=30)
+    first_name 				= models.CharField(max_length=25)
+    title 					= models.CharField(max_length=50, blank=True)
+    document_number 		= models.CharField(max_length=25, blank=True)
+    e_mail_address 			= models.CharField(max_length=100, blank=True)
+    mobile_phone_number 	= models.CharField(max_length=20, blank=True)
+    official_tel_number 	= models.CharField(max_length=20, blank=True)
+    fax_number 				= models.CharField(max_length=20, blank=True)
+    effective_date 			= models.DateField(null=True, blank=True)
+    expiry_date 			= models.DateField(null=True, blank=True)
+    location_code 			= models.CharField(max_length=10)
+    class Meta:
+        db_table = u'epic_persons'
+    def  __unicode__(self):
+    	return self.last_name + ', ' + self.first_name
+    	
+class EpicPersonsAdmin(admin.ModelAdmin):
+	list_display = ('last_name','first_name','title' , 'location_code')
+	list_filter = ( 'location_code','organization_id')
+
+
+class EpicStock(models.Model):
+    wh_pk = models.CharField(max_length=90, blank=True, primary_key=True)
+    wh_regional = models.CharField(max_length=4, blank=True)
+    wh_country = models.CharField(max_length=15)
+    wh_location = models.CharField(max_length=30)
+    wh_code = models.CharField(max_length=13)
+    wh_name = models.CharField(max_length=50, blank=True)
+    project_wbs_element = models.CharField(max_length=24, blank=True)
+    si_record_id = models.CharField(max_length=25)
+    si_code = models.CharField(max_length=8)
+    origin_id = models.CharField(max_length=23)
+    comm_category_code = models.CharField(max_length=9)
+    commodity_code = models.CharField(max_length=18)
+    cmmname = models.CharField(max_length=100, blank=True)
+    package_code = models.CharField(max_length=17)
+    packagename = models.CharField(max_length=50, blank=True)
+    qualitycode = models.CharField(max_length=1)
+    qualitydescr = models.CharField(max_length=11, blank=True)
+    quantity_net = models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
+    quantity_gross = models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
+    number_of_units = models.IntegerField()
+    allocation_code = models.CharField(max_length=10)
+    class Meta:
+        db_table = u'epic_stock'
+
+### Stock ??
+
 
 
 class LoadingDetail(models.Model):
@@ -180,8 +241,41 @@ class LoadingDetail(models.Model):
 	numberUnitsDamaged		=models.IntegerField(blank=True,null=True)
 	unitsLostReason			=models.TextField(blank=True)
 	unitsDamagedReason		=models.TextField(blank=True)
+	
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
+
+
+class DispachPoint(models.Model):
+	ORIGIN_LOC_NAME			=models.CharField(max_length=11, blank=True)
+	ORIGIN_LOCATION_CODE	=models.CharField(max_length=11, blank=True)
+	ORIGIN_WH_CODE			=models.CharField(max_length=11, blank=True)
+	ORIGIN_WH_NAME			=models.CharField(max_length=11, blank=True)
+	
+	def  __unicode__(self):
+		return self.ORIGIN_WH_NAME
+	
+class ETSRole(models.Model):
+	roleName				=models.CharField(max_length=50, blank=True)
+	isCompas				=models.BooleanField()
+	isDispatcher			=models.BooleanField()
+	isReciever				=models.BooleanField()
+	
+	def __unicode__(self):
+		return self.roleName
+	
+class UserProfile(models.Model):
+	user					=models.OneToOneField(User, primary_key=True)
+	warehouses				=models.ManyToManyField(DispachPoint)
+	userRole				=models.ManyToManyField(ETSRole)
+	compasUser				=models.OneToOneField(EpicPerson)
+	
+	def __unicode__(self):
+		return self.user.get_full_name()
+		
+class UserProfileAdmin(admin.ModelAdmin):
+	list_display=('user','warehouses')
+	
 
 class SIWithRestant:
 	SINumber = ''
@@ -215,8 +309,13 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 class ltioriginalAdmin(admin.ModelAdmin):
 	list_display=('CODE','SI_CODE')
 
+
+
 admin.site.register(Commodity,CommodityAdmin)
 admin.site.register(Waybill,WaybillAdmin)
 admin.site.register(LoadingDetail)
 admin.site.register(ltioriginal,ltioriginalAdmin)
-
+admin.site.register(UserProfile)
+admin.site.register(ETSRole)
+admin.site.register(DispachPoint)
+admin.site.register(EpicPerson,EpicPersonsAdmin)

@@ -8,6 +8,7 @@ from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from ets.waybill.models import *
 from ets.waybill.forms import *
+from django.contrib.auth.models import User
 
 
 
@@ -24,7 +25,6 @@ def restant_si(lti_code):
 			for si in listOfSI:
 				if si.SINumber == loading.siNo.SI_CODE:
 					si.reduceCurrent(loading.numberUnitsLoaded)
-					print 'x'
 
 	return listOfSI
 	
@@ -43,8 +43,10 @@ def loginWaybillSystem(request):
                               context_instance=RequestContext(request))
     
 def selectAction(request):
-    return render_to_response('selectAction.html',
-                              {'status':' selectAction not yet implemented'},
+	profile=request.user.get_profile()
+	wh= profile.warehouses.all()
+	return render_to_response('selectAction.html',
+                              {'status':wh[0]},
                               context_instance=RequestContext(request))
 
 def listOfLtis(request,origin):
@@ -58,15 +60,24 @@ def ltis(request,origin):
     return render_to_response('ltis.html',
                               {'ltis':ltis},
                               context_instance=RequestContext(request))
-    
+
 def ltis_redirect_wh(request):
     wh_code = request.GET['dispatch_point']
     return HttpResponseRedirect('list/' + wh_code)
 
 
 def import_ltis(request):
+    #copy LTIs
     original = ltioriginal.objects.filter(LTI_DATE__year=2010).using('compas')
     for myrecord in original:
+        myrecord.save(using='default')
+    #Copy Persons
+    originalPerson = EpicPerson.objects.using('compas')
+    for myrecord in originalPerson:
+        myrecord.save(using='default')    
+    #Copy Stock
+    originalStock = EpicStock.objects.using('compas')    
+    for myrecord in originalStock:
         myrecord.save(using='default')
     status = 'done'
     return render_to_response('status.html',
@@ -87,6 +98,7 @@ def lti_detail_url(request,lti_code):
     return render_to_response('detailed_lti.html',
                               {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction},
                               context_instance=RequestContext(request))
+
 def single_lti_extra(request,lti_code):
 	si_list = ltioriginal.objects.si_for_lti(lti_code)
 	return render_to_response('lti_si.html',
@@ -122,10 +134,45 @@ def waybill_edit(request):
                               {'status':'to be implemented'},
                               context_instance=RequestContext(request))
 
-def waybill_reception(request):
+def waybill_reception(request,wb_code):
+	# get the LTI info
+	current_wb = Waybill.objects.get(id=wb_code)
+	current_lti = current_wb.ltiNumber
+	class LoadingDetailDispatchForm(ModelForm):
+		#siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		
+		class Meta:
+			model = LoadingDetail
+			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason',)
+
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=1)
+	if request.method == 'POST':
+		formset = LDFormSet(request.POST)
+	
+		form = WaybillRecieptForm(request.POST)
+		
+		
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save(commit=False)
+			for subform in instances:
+				subform.wbNumber = wb_new
+				subform.save()
+			wb_new.save()
+		
+	else:
+		form = WaybillRecieptForm(instance=current_wb)
+		formset = LDFormSet(instance=current_wb)
+	return render_to_response('recieveWaybill.html', 
+			{'form': form,'lti_list':current_lti,'formset':formset},
+			context_instance=RequestContext(request))
+#    return render_to_response('recieveWaybill.html',                          {'status':'to be implemented'},                              context_instance=RequestContext(request))
+
+def waybill_reception_list(request):
     return render_to_response('status.html',
                               {'status':'to be implemented'},
                               context_instance=RequestContext(request))
+
 def waybill_search(request):
     return render_to_response('status.html',
                               {'status':'to be implemented'},
@@ -135,6 +182,44 @@ def waybillSearchResult(request):
     return render_to_response('status.html',
                               {'status':'selectAction not yet implemented'},
                               context_instance=RequestContext(request))
+
+
+def waybillCreate(request,lti_code):
+	# get the LTI info
+	current_lti = ltioriginal.objects.filter(CODE = lti_code)
+
+	lti_code_global = lti_code
+	class LoadingDetailDispatchForm(ModelForm):
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		
+		class Meta:
+			model = LoadingDetail
+			fields = ('siNo','numberUnitsLoaded','wbNumber')
+
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+
+	if request.method == 'POST':
+		form = WaybillForm(request.POST)
+		formset = LDFormSet(request.POST)
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save(commit=False)
+			for subform in instances:
+				subform.wbNumber = wb_new
+				subform.save()
+			wb_new.save()
+	else:
+		form = WaybillForm(
+			initial={
+					'ltiNumber': current_lti[0].CODE,
+					'dateOfLoading':datetime.date.today(),
+					'dateOfDispatch':datetime.date.today(),
+					'dispatcherName': request.user.get_full_name()
+				}
+		)
+		formset = LDFormSet()
+	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
 
 
 
@@ -148,6 +233,7 @@ def testform(request,lti_code):
 		class Meta:
 			model = LoadingDetail
 			fields = ('siNo','numberUnitsLoaded','wbNumber')
+
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
 	if request.method == 'POST':
@@ -160,11 +246,9 @@ def testform(request,lti_code):
 				subform.wbNumber = wb_new
 				subform.save()
 			wb_new.save()
-			
 	else:
 		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
 		formset = LDFormSet()
-		
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
     
 def custom_show_toolbar(request):

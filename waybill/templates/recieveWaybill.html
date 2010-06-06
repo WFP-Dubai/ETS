@@ -1,0 +1,36 @@
+{% extends "base_template.html"%}
+{%block title %}Welcome to EPIC eTS{%endblock%}
+{%block content %}
+
+{% if form.subject.errors %}
+    <ol>
+    {% for error in form.subject.errors %}
+        <li><strong>{{ error|escape }}</strong></li>
+    {% endfor %}
+    </ol>
+{% endif %}
+<form action="" method=POST>
+<table>
+
+{{form}}
+
+<tr><td></td></tr></table>
+    {{ formset.management_form }}
+        <table><tr><th>Commodity</th><th>Number of units</th><th>Number of units Good</th><th>Number of units Damaged</th><th>Number of units Lost</th>
+    {% for sform in formset.forms %}
+        {{ sform.id }}
+        <tr>
+        	<td>{{ sform.siNo }}</td>
+        	<td>{{ sform.numberUnitsLoaded }}</td>
+        	<td>{{ sform.numberUnitsGood }}</td>
+        	<td>{{ sform.numberUnitsDamaged }}{{ sform.unitsDamagedReason }}</td>
+        	<td>{{ sform.numberUnitsLost }}{{ sform.unitsLostReason }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+<input type="submit"> {% csrf_token %}
+</form>
+
+
+{%endblock%}
+','','numberUnitsDamaged','unitsLostReason','unitsDamagedReason'
