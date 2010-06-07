@@ -1,26 +1,14 @@
 {% extends "base_template.html"%}
 {%block content %}
-<form action='../info' method=get>
-    <select name='lti_id'>
-{% for lti in ltis%}
-        <option value='{{lti.0}}'>{{lti.0}}
-{% endfor%}
-    </select>
-    <input name='select' value='Select LTI' type="submit"/>
-</form>
-
     <table>
-        <tr><th>LTI</th><th>SI</th><th>Destination</th><th>Date</th><th>select</th></tr>
+        <tr><th>LTI</th><th>SI</th><th>Destination</th></tr>
 {% for lti in ltis%}
     <tr>
         <td>
-            {{lti.0}}
+            {{lti.0}} - {{lti.1}}
         </td>
         <td>
         <a href='../info/{{lti.0}}'>select</a>
-        </td>
-        <td>
-        <a href='../lti/{{lti.0}}'>select</a>
         </td>
     </tr>
 {% endfor%}

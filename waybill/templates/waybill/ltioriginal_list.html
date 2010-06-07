@@ -1,13 +1,5 @@
 {% extends "base_template.html"%}
 {%block content %}
-<form action='../info' method=get>
-    <select name='lti_id'>
-{% for lti in object_list%}
-    <option value='{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}
-{% endfor%}
-  <select>
-    <input type="submit"/>
-</form>
 <ul>
 {% for lti in object_list%}
     <li><a href='../info/{{lti.LTI_ID}}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}</a>

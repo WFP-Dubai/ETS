@@ -111,7 +111,7 @@ class ltioriginalManager(models.Manager):
 	def ltiCodes(self):
 		cursor = connection.cursor()
 		cursor.execute("""
-		    SELECT DISTINCT CODE
+		    SELECT DISTINCT CODE,ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME,ORIGIN_WH_NAME
 		    FROM epic_lti order by LTI_ID
 		    """)
 		lti_code = cursor.fetchall()
