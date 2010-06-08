@@ -14,6 +14,10 @@ info_dict_waybill = {
     'queryset': Waybill.objects.all()#,
 #    'template_name': "ltioriginal_list.html"
 }
+info_dict_waybill_view = {
+    'queryset': Waybill.objects.all(),
+    'template_name': "waybill/waybill_detail_view.html"
+}
 
 info_dict_waybill_reception= {
 	'queryset': Waybill.objects.all(),
@@ -35,6 +39,7 @@ urlpatterns = patterns('',
     (r'^waybill/findwb$',waybill_search),
     (r'^waybill/validate$','django.views.generic.list_detail.object_list', info_dict_waybill),
     (r'^waybill/validate/(?P<object_id>.*)$','django.views.generic.list_detail.object_detail', info_dict_waybill),
+    (r'^waybill/viewwb/(.*)$',waybill_view),
     (r'^waybill/info$',lti_detail),
     (r'^waybill/info/(.*)$',lti_detail_url),
     (r'^waybill/dispatch$',dispatch),

@@ -29,7 +29,6 @@ def restant_si(lti_code):
 
 	return listOfSI
 	
-
 def prep_req(request):
     return{'user': request.user}
 
@@ -140,6 +139,14 @@ def waybill_edit(request):
 	return render_to_response('status.html',
                               {'status':'to be implemented'},
                               context_instance=RequestContext(request))
+                              
+def waybill_view(request,wb_id):
+	waybill_instance = Waybill.objects.get(id=wb_id)
+	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+	return render_to_response('waybill/waybill_detail_view.html',
+                              {'object':waybill_instance,
+                              'ltioriginal':lti_detail_items},
+                              context_instance=RequestContext(request))
 
 def waybill_reception(request,wb_code):
 	# get the LTI info
@@ -194,11 +201,9 @@ def waybillSearchResult(request):
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-
 	lti_code_global = lti_code
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
-		
 		class Meta:
 			model = LoadingDetail
 			fields = ('siNo','numberUnitsLoaded','wbNumber')
@@ -215,13 +220,15 @@ def waybillCreate(request,lti_code):
 				subform.wbNumber = wb_new
 				subform.save()
 			wb_new.save()
+			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
 	else:
 		form = WaybillForm(
 			initial={
-					'ltiNumber': current_lti[0].CODE,
-					'dateOfLoading':datetime.date.today(),
-					'dateOfDispatch':datetime.date.today(),
-					'dispatcherName': request.user.get_full_name()
+					'ltiNumber':         current_lti[0].CODE,
+					'dateOfLoading':     datetime.date.today(),
+					'dateOfDispatch':    datetime.date.today(),
+					'dispatcherName':    request.user.get_full_name(),
+					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME
 				}
 		)
 		formset = LDFormSet()
@@ -253,6 +260,7 @@ def testform(request,lti_code):
 				subform.wbNumber = wb_new
 				subform.save()
 			wb_new.save()
+			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) # Redirect after POST
 	else:
 		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
 		formset = LDFormSet()

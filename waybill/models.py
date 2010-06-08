@@ -2,7 +2,6 @@ from django.db import models, connection
 from django.contrib import admin
 from django.forms import ModelForm, ModelChoiceField
 from django.contrib.auth.models import User
-
 from django.forms.models import inlineformset_factory
 
 
@@ -52,14 +51,14 @@ class Waybill(models.Model):
 	transactionType			=models.CharField(max_length=10,choices=transaction_type_choice)
 	transportType			=models.CharField(max_length=10,choices=transport_type)
 	#Dispatcher
-	dispatchRemarks			=models.TextField(blank=True)
+	dispatchRemarks			=models.TextField(blank=True,null=True)
 	dispatcherName			=models.TextField(blank=True)
 	dispatcherTitle			=models.TextField(blank=True)
 	dispatcherSigned		=models.BooleanField(blank=True)
 	#Transporter
-	transportContractor		=models.TextField(blank=True)
+	transportContractor			=models.TextField(blank=True)
 	transportSubContractor		=models.TextField(blank=True)
-	transportDriverName		=models.TextField(blank=True)
+	transportDriverName			=models.TextField(blank=True)
 	transportDriverLicenceID	=models.TextField(blank=True)
 	transportVehicleRegistration	=models.TextField(blank=True)
 	transportTrailerRegistration	=models.TextField(blank=True)
@@ -73,6 +72,11 @@ class Waybill(models.Model):
 	containerTwoNumber		=models.CharField(max_length=40,blank=True)
 	containerOneSealNumber	=models.CharField(max_length=40,blank=True)
 	containerTwoSealNumber	=models.CharField(max_length=40,blank=True)
+	containerOneRemarksDispatch	=models.CharField(max_length=40,blank=True)
+	containerTwoRemarksDispatch	=models.CharField(max_length=40,blank=True)
+	containerOneRemarksReciept	=models.CharField(max_length=40,blank=True)
+	containerTwoRemarksReciept	=models.CharField(max_length=40,blank=True)
+	
 
 
 	#Reciver
@@ -166,8 +170,12 @@ class ltioriginal(models.Model):
 	objects = ltioriginalManager()
 	class Meta:
 		db_table = u'epic_lti'
+		
+
 	def  __unicode__(self):
-		return self.SI_CODE + ' ' + self.CMMNAME
+		resting= ''
+		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
+		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.NUMBER_OF_UNITS)
 	def mydesc(self):
 		return self.CODE
 
@@ -225,6 +233,7 @@ class EpicStock(models.Model):
     quantity_gross = models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
     number_of_units = models.IntegerField()
     allocation_code = models.CharField(max_length=10)
+    reference_number= models.CharField(max_length=50)
     class Meta:
         db_table = u'epic_stock'
 
@@ -241,6 +250,15 @@ class LoadingDetail(models.Model):
 	numberUnitsDamaged		=models.IntegerField(blank=True,null=True)
 	unitsLostReason			=models.TextField(blank=True)
 	unitsDamagedReason		=models.TextField(blank=True)
+	
+	
+	def calcTotalNet(self):
+		totalNet =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_NET)/1000
+		return totalNet
+	def calcTotalGross(self):
+		totalGross =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_GROSS)/1000
+		return totalGross
+		
 	
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()

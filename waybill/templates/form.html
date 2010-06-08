@@ -1,19 +1,19 @@
 {% extends "base_template.html"%}
 {%block title %}Waybill Creation{%endblock%}
 {%block content %}
-{% if form.subject.errors %}
+<form action="" method=POST>
+{%for item in form%}
+{% if item.errors %}
     <ol>
-    {% for error in form.subject.errors %}
-        <li><strong>{{ error|escape }}</strong></li>
+    {% for error in item.errors %}
+        <li>{{item.label}}<strong>{{ error|escape }}</strong></li>
     {% endfor %}
     </ol>
 {% endif %}
-<form action="" method=POST>
-
-
+  {% endfor %}
 <div class="form">
 	<div>
-		<span>LTI: {{lti_list.0.CODE}}</span>
+		<span>LTI: {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
 	</div>
 	<div>
 		<span>Waybill Nr: {{form.waybillNumber}}</span>
@@ -45,10 +45,8 @@ recipient location:autofill        	{{form.recipientLocation}}
         	{{form.transportTrailerRegistration}}
         	{{form.transportDispachSigned}}</div>
         	
-Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}}
-Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}}
-
-
+Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}}Dispatch Remarks {{form.containerOneRemarksDispatch}}
+Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}}Dispatch Remarks {{form.containerOneRemarksDispatch}}
 
 </div>
 

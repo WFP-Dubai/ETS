@@ -11,10 +11,12 @@ class WaybillForm(ModelForm):
 	dateOfDispatch = forms.DateField(widget=SelectDateWidget())
 	#dispatchRemarks= forms.CharField(
 	#transportType = forms.CharField(widget=forms.RadioSelect())
-	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	ltiNumber = forms.CharField(widget=forms.HiddenInput())
 	class Meta:
 		model = Waybill
 		fields = [
+			'ltiNumber',
         	'waybillNumber',
         	'dateOfLoading',
          	'dateOfDispatch',
@@ -33,7 +35,9 @@ class WaybillForm(ModelForm):
         	'containerTwoNumber',
         	'containerOneSealNumber',
         	'containerTwoSealNumber',
-        	'recipientLocation' 	
+        	'containerOneRemarksDispatch',
+        	'containerTwoRemarksDispatch',
+        	'recipientLocation'
         	]
 
 class WaybillRecieptForm(ModelForm):
