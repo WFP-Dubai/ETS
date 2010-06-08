@@ -1,16 +1,13 @@
 {% extends "base_template.html"%}
 {%block content %}
-<form action='list' method=get>
-    <select name='dispatch_point'>  
-{% for wh in dispatch_list%}
-  <option value='{{wh.0}}'> {{wh.2}}
-{% endfor%}    
-    </select> 
-    <input type="submit"/>
-</form>
 <ul>
     {% for wh in dispatch_list%}
-  <li><a href='list/{{wh.0}}'> {{wh.1}} {{wh.2}}</a></li>
+    	<li><a href='list/{{wh.3}}'> {{wh.2}}</a>
+    	{%if wh.3 in profile.warehouses.all.ORIGIN_WH_CODE%}x{%endif%}</li>
     {% endfor%}
 </ul>
+ {% for wh in profile.warehouses.all%}
+{{wh.ORIGIN_WH_CODE}}
+{% endfor%}
+{{profile.warehouses.all.ORIGIN_WH_CODE.list}}
 {%endblock%}

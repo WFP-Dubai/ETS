@@ -3,11 +3,10 @@
 {%block content %}
 Select an action:
 <ul>
-    <li><a href='waybill/dispatch'>Create & Dispatch Waybill</a></li>
-    <li><a href='waybill/receive'>Recieve Waybill</a></li>
-    <li><a href='waybill/validate'>Validate Waybill</a></li>
-    <li><a href='waybill/import'>Update DB </a>
+{%if profile.isDispatcher%}<li><a href='waybill/dispatch'>Create & Dispatch Waybill</a></li>{%endif%}
+{%if profile.isReciever%}<li><a href='waybill/receive'>Recieve Waybill</a></li>{%endif%}
+{%if profile.isCompasUser%}<li><a href='waybill/validate'>Validate Waybill</a></li>{%endif%}
+    <li><a href='waybill/import'>Update DB</a>
     <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit"</form>
 </ul>
-{{status.warehouses.0}}
 {%endblock%}

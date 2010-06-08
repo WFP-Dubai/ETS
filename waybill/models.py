@@ -99,10 +99,10 @@ class Waybill(models.Model):
 #### CPS DB
 
 class ltioriginalManager(models.Manager):
-	def warehouses(self):
+	def warehouses(self):		
 		cursor = connection.cursor()
 		cursor.execute("""
-		    SELECT DISTINCT ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME,ORIGIN_WH_NAME
+		    SELECT DISTINCT ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME,ORIGIN_WH_NAME,ORIGIN_WH_CODE
 		    FROM epic_lti
 		    """)
 		wh = cursor.fetchall()
@@ -119,7 +119,7 @@ class ltioriginalManager(models.Manager):
 		
 	def ltiCodesByWH(self,wh):
 		cursor = connection.cursor()
-		cursor.execute('SELECT DISTINCT CODE FROM epic_lti  WHERE ORIGIN_LOCATION_CODE = %s order by LTI_ID',[wh])
+		cursor.execute('SELECT DISTINCT CODE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s order by LTI_ID',[wh])
 		lti_code = cursor.fetchall()
 		return lti_code
 	
@@ -128,7 +128,7 @@ class ltioriginalManager(models.Manager):
 		cursor.execute("SELECT DISTINCT SI_CODE FROM epic_lti where CODE = %s",[lti_code])
 		si_list = cursor.fetchall()
 		return si_list
-
+	
 	
 
 class ltioriginal(models.Model):
@@ -253,7 +253,7 @@ class DispachPoint(models.Model):
 	ORIGIN_WH_NAME			=models.CharField(max_length=11, blank=True)
 	
 	def  __unicode__(self):
-		return self.ORIGIN_WH_NAME
+		return self.ORIGIN_WH_CODE
 	
 class ETSRole(models.Model):
 	roleName				=models.CharField(max_length=50, blank=True)
@@ -267,7 +267,9 @@ class ETSRole(models.Model):
 class UserProfile(models.Model):
 	user					=models.OneToOneField(User, primary_key=True)
 	warehouses				=models.ManyToManyField(DispachPoint)
-	userRole				=models.ManyToManyField(ETSRole)
+	isCompasUser			=models.BooleanField()
+	isDispatcher			=models.BooleanField()
+	isReciever				=models.BooleanField()
 	compasUser				=models.OneToOneField(EpicPerson)
 	
 	def __unicode__(self):

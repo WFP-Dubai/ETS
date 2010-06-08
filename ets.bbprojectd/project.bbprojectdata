@@ -6,11 +6,11 @@
 	<array>
 		<string>210DC253-4D65-476D-9C1C-380995E1A12C</string>
 		<string>80799E26-02C6-4C03-A5BF-1347526D5AAA</string>
-		<string>A8995DCC-41A0-4C00-AF8E-005FAF7EF48C</string>
 		<string>2080C4EC-AD6F-496F-99AF-22E836923582</string>
 		<string>8635DFA9-1B32-49EF-83CE-BD809AD2CCCB</string>
 		<string>8B3A65FF-F12D-4A7B-8935-5DE42E8785D8</string>
 		<string>9574E8B9-10F9-428D-8B4E-47D0C1A3CB51</string>
+		<string>441DFF97-2290-45EB-ADBC-F2B0780496C2</string>
 	</array>
 	<key>ProjectItems</key>
 	<dict>
@@ -79,6 +79,39 @@
 			<string>__init__.py</string>
 			<key>ItemType</key>
 			<string>FileReference</string>
+		</dict>
+		<key>441DFF97-2290-45EB-ADBC-F2B0780496C2</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFwAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADFs8i4SCsAAAN3PdoFbWVkaWEAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAA3sLX8gybX0AAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
+				s5B4AAAAEQAIAADIMjU9AAAAAQAUA3c92gNtaqUACzIo
+				AAqMqgAAfQ0AAgA0TWFjaW50b3NoIEhEOlVzZXJzOmNh
+				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czptZWRpYQAO
+				AAwABQBtAGUAZABpAGEADwAaAAwATQBhAGMAaQBuAHQA
+				bwBzAGgAIABIAEQAEgAnVXNlcnMvY2FybGFuZGVyL3By
+				b2plY3RzL2VwaWMvZXRzL21lZGlhAAATAAEvAAAVAAIA
+				EP//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/carlander/projects/epic/ets/media/</string>
+				<key>RelativePath</key>
+				<string>./media</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>media</string>
+			<key>ItemType</key>
+			<string>FolderReference</string>
 		</dict>
 		<key>80799E26-02C6-4C03-A5BF-1347526D5AAA</key>
 		<dict>
@@ -210,38 +243,6 @@
 			</dict>
 			<key>ItemName</key>
 			<string>waybill</string>
-			<key>ItemType</key>
-			<string>FolderReference</string>
-		</dict>
-		<key>A8995DCC-41A0-4C00-AF8E-005FAF7EF48C</key>
-		<dict>
-			<key>ItemData</key>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAFeAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADGOwZESCsAAABosfYCZGIAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAGiyJMgIKZoAAAAAAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
-				Os4EAAAAEQAIAADIB/FaAAAAAQAUAGix9gBmKV4ADUCw
-				AAqbxgAAhe0AAgAuTWFjaW50b3NoIEhEOlVzZXJzOnRv
-				Ymlhczpwcm9qZWN0czplcGljOmV0czpkYgAOAAYAAgBk
-				AGIADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQA
-				EgAhVXNlcnMvdG9iaWFzL3Byb2plY3RzL2VwaWMvZXRz
-				L2RiAAATAAEvAAAVAAIADf//AAA=
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/tobias/projects/epic/ets/db/</string>
-				<key>RelativePath</key>
-				<string>./db</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<key>ItemName</key>
-			<string>db</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
 		</dict>

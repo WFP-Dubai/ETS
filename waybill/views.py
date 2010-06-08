@@ -9,6 +9,7 @@ from django.template import Template, RequestContext
 from ets.waybill.models import *
 from ets.waybill.forms import *
 from django.contrib.auth.models import User
+from django.core import serializers
 
 
 
@@ -44,19 +45,24 @@ def loginWaybillSystem(request):
     
 def selectAction(request):
 	profile=request.user.get_profile()
-	wh= profile.warehouses.all()
 	return render_to_response('selectAction.html',
-                              {'status':wh[0]},
+                              {'profile':profile},
                               context_instance=RequestContext(request))
 
 def listOfLtis(request,origin):
     ltis = ltioriginal.objects.ltiCodesByWH(origin)
+    profile=request.user.get_profile()
+    wh_list =[]
+    for wh in profile.warehouses.all():
+    	wh_list += wh.ORIGIN_WH_CODE
+    	
+    print wh_list
     return render_to_response('ltis.html',
-                              {'ltis':ltis},
+                              {'ltis':ltis,'profile':profile},
                               context_instance=RequestContext(request))
 
 def ltis(request,origin):
-    ltis = ltioriginal.objects.filter(ORIGIN_LOCATION_CODE=origin).filter(EXPIRY_DATE__gt=datetime.date(2010, 4, 1))
+    ltis = ltioriginal.objects.filter(ORIGIN_WH_CODE=origin).filter(EXPIRY_DATE__gt=datetime.date(2010, 4, 1))
     return render_to_response('ltis.html',
                               {'ltis':ltis},
                               context_instance=RequestContext(request))
@@ -107,8 +113,9 @@ def single_lti_extra(request,lti_code):
 
 def dispatch(request):
     dispatch_list = ltioriginal.objects.warehouses()
+    profile=request.user.get_profile()
     return render_to_response('dispatch_list.html',
-                              {'dispatch_list':dispatch_list},
+                              {'dispatch_list':dispatch_list,'profile':profile},
                               context_instance=RequestContext(request))
 def ltis_codes(request):
 	lti_codes = ltioriginal.objects.ltiCodes()
@@ -251,6 +258,14 @@ def testform(request,lti_code):
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
     
+
+def serialize(request,wb_code):
+	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
+	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
+	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
+	return render_to_response('status.html',{'status':data},
+                              context_instance=RequestContext(request))
+
 def custom_show_toolbar(request):
     return True
 

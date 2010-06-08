@@ -8,6 +8,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     # Example:
+    (r'^ets/media/(?P<path>.*)$', 'django.views.static.serve',
+        {'document_root': '/Users/carlander/projects/epic/ets/media'}),
     (r'^ets/', include('ets.waybill.urls')),
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),
@@ -18,4 +20,5 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
     (r'^dojango/', include('dojango.urls')),
+    
 )
