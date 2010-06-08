@@ -1,7 +1,6 @@
 {% extends "base_template.html"%}
-{%block title %}Welcome to EPIC eTS{%endblock%}
+{%block title %}Waybill Creation{%endblock%}
 {%block content %}
-{{lti_list.0.CODE}}
 {% if form.subject.errors %}
     <ol>
     {% for error in form.subject.errors %}
@@ -9,20 +8,51 @@
     {% endfor %}
     </ol>
 {% endif %}
-
 <form action="" method=POST>
+
+
+<div class="form">
+	<div>
+		<span>LTI: {{lti_list.0.CODE}}</span>
+	</div>
+	<div>
+		<span>Waybill Nr: {{form.waybillNumber}}</span>
+	</div>
+	<div>
+		<span>Date of Loading: {{form.dateOfLoading}}</span>
+		<span>Date of Dispatch: {{form.dateOfDispatch}}</span>
+	</div>
+	<div>
+		<span>Transaction Type: {{form.transactionType}}</span>
+		<span>Transport Type {{form.transportType}}</span>
+	</div>
+recipient location:autofill        	{{form.recipientLocation}}
+
+{{ formset.management_form }}
 <table>
-{{form}}
-<tr><td></td></tr></table>
-    {{ formset.management_form }}
-        <table><tr><th>Commodity</th><th>Number of units</th>
-    {% for sform in formset.forms %}
-        {{ sform.id }}
-        <tr><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
-    {% endfor %}
-    </table>
+	<tr><th>Line</th><th>Commodity</th><th>Number of units</th>
+{% for sform in formset.forms %}
+	{{ sform.id }}<tr><td>{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
+{% endfor %}
+ </table>
+<div style="text-align:top;">Dispatch Remarks: {{form.dispatchRemarks}}</div>
+<div>Dispatcher Name:{{form.dispatcherName}}(autofill)</div>
+<div>Transport Contractor:{{form.transportContractor}}
+        	Transport Subcontractor:{{form.transportSubContractor}}
+        	{{form.transportDriverName}}
+        	{{form.transportDriverLicenceID}}
+        	{{form.transportVehicleRegistration}}
+        	{{form.transportTrailerRegistration}}
+        	{{form.transportDispachSigned}}</div>
+        	
+Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}}
+Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}}
+
+
+
+</div>
+
 <input type="submit"> {% csrf_token %}
 </form>
-
-
 {%endblock%}
+

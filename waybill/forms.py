@@ -2,14 +2,19 @@ from django.forms import ModelForm
 from django.http import HttpResponse, HttpResponseRedirect
 from ets.waybill.views import *
 from ets.waybill.models import *
-
+from django import forms
+from django.forms.extras.widgets import SelectDateWidget
 
 class WaybillForm(ModelForm):
 
-     class Meta:
-        model = Waybill
-        fields = [
-        	
+	dateOfLoading = forms.DateField(widget=SelectDateWidget())
+	dateOfDispatch = forms.DateField(widget=SelectDateWidget())
+	#dispatchRemarks= forms.CharField(
+	#transportType = forms.CharField(widget=forms.RadioSelect())
+	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}))
+	class Meta:
+		model = Waybill
+		fields = [
         	'waybillNumber',
         	'dateOfLoading',
          	'dateOfDispatch',
@@ -27,18 +32,31 @@ class WaybillForm(ModelForm):
         	'containerOneNumber',
         	'containerTwoNumber',
         	'containerOneSealNumber',
-        	'containerTwoSealNumber','recipientLocation' 	
+        	'containerTwoSealNumber',
+        	'recipientLocation' 	
         	]
 
 class WaybillRecieptForm(ModelForm):
+	recipientArrivalDate = forms.DateField(widget=SelectDateWidget())
+	recipientStartDischargeDate = forms.DateField(widget=SelectDateWidget())
+	recipientEndDischargeDate = forms.DateField(widget=SelectDateWidget())
 	
-     class Meta:
-        model = Waybill
-        fields = ('waybillNumber',
-'recipientLocation','recipientConsingee','recipientName',
-'recipientTitle','recipientArrivalDate','recipientStartDischargeDate','recipientEndDischargeDate',
-'recipientDistance','recipientRemarks','recipientSigned','recipientSignedTimestamp'
-        	)
+	class Meta:
+		model = Waybill
+		fields = [
+				'waybillNumber',
+				'recipientLocation',
+				'recipientConsingee',
+				'recipientName',
+				'recipientTitle',
+				'recipientArrivalDate',
+				'recipientStartDischargeDate',
+				'recipientEndDischargeDate',
+				'recipientDistance',
+				'recipientRemarks',
+				'recipientSigned',
+				'recipientSignedTimestamp'
+			]
 
 
 		
