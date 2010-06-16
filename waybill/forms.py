@@ -9,10 +9,18 @@ class WaybillForm(ModelForm):
 
 	dateOfLoading = forms.DateField(widget=SelectDateWidget())
 	dateOfDispatch = forms.DateField(widget=SelectDateWidget())
-	#dispatchRemarks= forms.CharField(
-	#transportType = forms.CharField(widget=forms.RadioSelect())
+	transportType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
+	transactionType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
 	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	ltiNumber = forms.CharField(widget=forms.HiddenInput())
+	transportContractor = forms.CharField(widget=forms.HiddenInput())
+	transportSubContractor=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportDriverName=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportDriverLicenceID=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportVehicleRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	dispatcherName = forms.CharField(widget=forms.HiddenInput(),required=False)
+	dispatcherTitle= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportTrailerRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	class Meta:
 		model = Waybill
 		fields = [
@@ -24,6 +32,7 @@ class WaybillForm(ModelForm):
         	'transportType',
         	'dispatchRemarks',
         	'dispatcherName',
+        	'dispatcherTitle',
         	'transportContractor',
         	'transportSubContractor',
         	'transportDriverName',
@@ -44,6 +53,7 @@ class WaybillRecieptForm(ModelForm):
 	recipientArrivalDate = forms.DateField(widget=SelectDateWidget())
 	recipientStartDischargeDate = forms.DateField(widget=SelectDateWidget())
 	recipientEndDischargeDate = forms.DateField(widget=SelectDateWidget())
+	
 	
 	class Meta:
 		model = Waybill

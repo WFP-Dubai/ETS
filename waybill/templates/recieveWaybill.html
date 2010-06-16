@@ -16,15 +16,19 @@
 
 <tr><td></td></tr></table>
     {{ formset.management_form }}
-        <table><tr><th>Commodity</th><th>Number of units</th><th>Number of units Good</th><th>Number of units Damaged</th><th>Number of units Lost</th>
+ <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr><th>Item</th><th>Number<br> of units Loaded</th><th>Number of units Good</th><th>Number of units Damaged</th><th>Number of units Lost</th>
+        </thead>
+
     {% for sform in formset.forms %}
         {{ sform.id }}
         <tr>
-        	<td>{{ sform.siNo }}</td>
-        	<td>{{ sform.numberUnitsLoaded }}</td>
-        	<td>{{ sform.numberUnitsGood }}</td>
-        	<td>{{ sform.numberUnitsDamaged }}{{ sform.unitsDamagedReason }}</td>
-        	<td>{{ sform.numberUnitsLost }}{{ sform.unitsLostReason }}</td>
+        	<td>{{ sform.siNo }}{{ sform.instance.siNo}}</td>
+        	<td>{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
+        	<td>No:{{ sform.numberUnitsGood }}</td>
+        	<td>No:{{ sform.numberUnitsDamaged }}<br>Reason:{{ sform.unitsDamagedReason }}</td>
+        	<td>No:{{ sform.numberUnitsLost }}<br>Reason:{{ sform.unitsLostReason }}</td>
         </tr>
     {% endfor %}
     </table>
@@ -33,4 +37,16 @@
 
 
 {%endblock%}
-','','numberUnitsDamaged','unitsLostReason','unitsDamagedReason'
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+} );
+</script>
+{%endblock extra-header%}

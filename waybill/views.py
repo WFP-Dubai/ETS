@@ -14,6 +14,7 @@ from django.core import serializers
 
 
 
+
 def restant_si(lti_code):
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
 	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
@@ -51,11 +52,6 @@ def selectAction(request):
 def listOfLtis(request,origin):
     ltis = ltioriginal.objects.ltiCodesByWH(origin)
     profile=request.user.get_profile()
-    wh_list =[]
-    for wh in profile.warehouses.all():
-    	wh_list += wh.ORIGIN_WH_CODE
-    	
-    print wh_list
     return render_to_response('ltis.html',
                               {'ltis':ltis,'profile':profile},
                               context_instance=RequestContext(request))
@@ -72,14 +68,15 @@ def ltis_redirect_wh(request):
 
 
 def import_ltis(request):
-    #copy LTIs
-    original = ltioriginal.objects.filter(LTI_DATE__year=2010).using('compas')
-    for myrecord in original:
-        myrecord.save(using='default')
     #Copy Persons
     originalPerson = EpicPerson.objects.using('compas')
     for myrecord in originalPerson:
         myrecord.save(using='default')    
+
+    #copy LTIs
+    original = ltioriginal.objects.using('compas')
+    for myrecord in original:
+        myrecord.save(using='default')
     #Copy Stock
     originalStock = EpicStock.objects.using('compas')    
     for myrecord in originalStock:
@@ -143,6 +140,7 @@ def waybill_edit(request):
 def waybill_view(request,wb_id):
 	waybill_instance = Waybill.objects.get(id=wb_id)
 	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+	
 	return render_to_response('waybill/waybill_detail_view.html',
                               {'object':waybill_instance,
                               'ltioriginal':lti_detail_items},
@@ -152,19 +150,24 @@ def waybill_reception(request,wb_code):
 	# get the LTI info
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
-	class LoadingDetailDispatchForm(ModelForm):
-		#siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+	class LoadingDetailRecForm(ModelForm):
+		#siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='CommodityX',)
+		siNo= forms.CharField(widget=forms.HiddenInput())
+		numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
+		unitsLostReason= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+		unitsDamagedReason=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
+		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
+		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
 		
 		class Meta:
 			model = LoadingDetail
 			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason',)
 
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=1)
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
-		formset = LDFormSet(request.POST)
-	
-		form = WaybillRecieptForm(request.POST)
-		
+		form = WaybillRecieptForm(request.POST,instance=current_wb)
+		formset = LDFormSet(request.POST,instance=current_wb)
 		
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
@@ -175,7 +178,16 @@ def waybill_reception(request,wb_code):
 			wb_new.save()
 		
 	else:
-		form = WaybillRecieptForm(instance=current_wb)
+		if current_wb.recipientArrivalDate:
+			form = WaybillRecieptForm(instance=current_wb)
+		else:
+			form = WaybillRecieptForm(instance=current_wb,
+			initial={
+				'recipientArrivalDate':datetime.date.today(),
+				'recipientStartDischargeDate':datetime.date.today(),
+				'recipientEndDischargeDate':datetime.date.today(),
+			}
+		)
 		formset = LDFormSet(instance=current_wb)
 	return render_to_response('recieveWaybill.html', 
 			{'form': form,'lti_list':current_lti,'formset':formset},
@@ -183,8 +195,10 @@ def waybill_reception(request,wb_code):
 #    return render_to_response('recieveWaybill.html',                          {'status':'to be implemented'},                              context_instance=RequestContext(request))
 
 def waybill_reception_list(request):
-    return render_to_response('status.html',
-                              {'status':'to be implemented'},
+	waybills = Waybill.objects.all()
+	profile=request.user.get_profile()
+	return render_to_response('waybill/reception_list.html',
+                              {'object_list':waybills,'profile':profile},
                               context_instance=RequestContext(request))
 
 def waybill_search(request):
@@ -202,6 +216,7 @@ def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
 	lti_code_global = lti_code
+	profile=request.user.get_profile()
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
@@ -212,6 +227,7 @@ def waybillCreate(request,lti_code):
 
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
+
 		formset = LDFormSet(request.POST)
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
@@ -224,11 +240,13 @@ def waybillCreate(request,lti_code):
 	else:
 		form = WaybillForm(
 			initial={
+					'dispatcherName': 	 profile.compasUser.last_name + ', ' +profile.compasUser.first_name, 	
+					'dispatcherTitle': 	 profile.compasUser.title,
 					'ltiNumber':         current_lti[0].CODE,
 					'dateOfLoading':     datetime.date.today(),
 					'dateOfDispatch':    datetime.date.today(),
-					'dispatcherName':    request.user.get_full_name(),
-					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME
+					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME,
+					'transportContractor': current_lti[0].TRANSPORT_NAME
 				}
 		)
 		formset = LDFormSet()

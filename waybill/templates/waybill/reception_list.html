@@ -1,7 +1,33 @@
 {% extends "base_template.html"%}
 {%block content %}
+ <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Consingee</th><th>Delivery Location</th><th></th></tr>
+        </thead>
 {% for waybill in object_list%}
-    <li><a href='receive/{{waybill.id}}'>{{waybill.ltiNumber}} -{{waybill.waybillNumber}}</a>
-{% endfor%}
-<ul>
+	{% for rp in profile.receptionPoints.all%}
+    	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == rp.CONSEGNEE_CODE  and rp.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE %}
+   <tr>
+ 			<td>{{waybill.ltiNumber}}</td>
+ 			<td>{{waybill.waybillNumber}}</td>
+ 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
+ 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td><a href='receive/{{waybill.id}}'>Select</a></td>
+    </tr>
+    {%endif%} 
+{% endfor%}{% endfor%}
+</table>
 {%endblock%}
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+} );
+</script>
+{%endblock extra-header%}

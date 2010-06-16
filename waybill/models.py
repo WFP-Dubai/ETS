@@ -3,6 +3,8 @@ from django.contrib import admin
 from django.forms import ModelForm, ModelChoiceField
 from django.contrib.auth.models import User
 from django.forms.models import inlineformset_factory
+import datetime
+from django.template.defaultfilters import stringfilter
 
 
 # Create your models here.
@@ -43,6 +45,7 @@ class Waybill(models.Model):
 #			(u'M',u'Multi-mode'),
 #			(u'O',u'Other Please Specify')
 		)
+		
 	#general
 	ltiNumber				=models.CharField(max_length=20)
 	waybillNumber			=models.CharField(max_length=20)
@@ -52,7 +55,7 @@ class Waybill(models.Model):
 	transportType			=models.CharField(max_length=10,choices=transport_type)
 	#Dispatcher
 	dispatchRemarks			=models.TextField(blank=True,null=True)
-	dispatcherName			=models.TextField(blank=True)
+	dispatcherName			=models.TextField(blank=True,null=True)
 	dispatcherTitle			=models.TextField(blank=True)
 	dispatcherSigned		=models.BooleanField(blank=True)
 	#Transporter
@@ -110,6 +113,7 @@ class ltioriginalManager(models.Manager):
 		    FROM epic_lti
 		    """)
 		wh = cursor.fetchall()
+		
 		return wh
 		
 	def ltiCodes(self):
@@ -123,7 +127,7 @@ class ltioriginalManager(models.Manager):
 		
 	def ltiCodesByWH(self,wh):
 		cursor = connection.cursor()
-		cursor.execute('SELECT DISTINCT CODE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s order by LTI_ID',[wh])
+		cursor.execute('SELECT DISTINCT CODE,SI_CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) ',[wh,datetime.date(2010, 5, 1)])
 		lti_code = cursor.fetchall()
 		return lti_code
 	
@@ -178,6 +182,8 @@ class ltioriginal(models.Model):
 		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.NUMBER_OF_UNITS)
 	def mydesc(self):
 		return self.CODE
+	def commodity(self):
+		return self.CMMNAME 
 
 ####
 
@@ -251,6 +257,10 @@ class LoadingDetail(models.Model):
 	unitsLostReason			=models.TextField(blank=True)
 	unitsDamagedReason		=models.TextField(blank=True)
 	
+	def getStockItem(self):
+		stockItem = EpicStock.objects.filter(si_code = self.siNo.SI_CODE).filter(commodity_code = self.siNo.COMMODITY_CODE)
+		return stockItem[0].packagename
+		
 	
 	def calcTotalNet(self):
 		totalNet =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_NET)/1000
@@ -264,14 +274,25 @@ class LoadingDetail(models.Model):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
 
 
-class DispachPoint(models.Model):
-	ORIGIN_LOC_NAME			=models.CharField(max_length=11, blank=True)
-	ORIGIN_LOCATION_CODE	=models.CharField(max_length=11, blank=True)
-	ORIGIN_WH_CODE			=models.CharField(max_length=11, blank=True)
-	ORIGIN_WH_NAME			=models.CharField(max_length=11, blank=True)
+class DispatchPoint(models.Model):
+	ORIGIN_LOC_NAME			=models.CharField(max_length=20, blank=True)
+	ORIGIN_LOCATION_CODE	=models.CharField(max_length=20, blank=True)
+	ORIGIN_WH_CODE			=models.CharField(max_length=20, blank=True)
+	ORIGIN_WH_NAME			=models.CharField(max_length=20, blank=True)
+	DESC_NAME				=models.CharField(max_length=20, blank=True)
 	
 	def  __unicode__(self):
-		return self.ORIGIN_WH_CODE
+		return self.ORIGIN_WH_CODE + ' - ' + self.ORIGIN_LOC_NAME
+	
+class ReceptionPoint(models.Model):
+	LOC_NAME		=models.CharField(max_length=20, blank=True)
+	LOCATION_CODE	=models.CharField(max_length=20, blank=True)
+	CONSEGNEE_CODE	=models.CharField(max_length=20, blank=True)
+	CONSEGNEE_NAME	=models.CharField(max_length=80, blank=True)
+	def  __unicode__(self):
+		return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
+
+	
 	
 class ETSRole(models.Model):
 	roleName				=models.CharField(max_length=50, blank=True)
@@ -284,7 +305,8 @@ class ETSRole(models.Model):
 	
 class UserProfile(models.Model):
 	user					=models.OneToOneField(User, primary_key=True)
-	warehouses				=models.ManyToManyField(DispachPoint)
+	warehouses				=models.ManyToManyField(DispatchPoint, blank=True)
+	receptionPoints			=models.ManyToManyField(ReceptionPoint, blank=True)
 	isCompasUser			=models.BooleanField()
 	isDispatcher			=models.BooleanField()
 	isReciever				=models.BooleanField()
@@ -332,10 +354,11 @@ class ltioriginalAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Commodity,CommodityAdmin)
-admin.site.register(Waybill,WaybillAdmin)
-admin.site.register(LoadingDetail)
-admin.site.register(ltioriginal,ltioriginalAdmin)
+#admin.site.register(Waybill,WaybillAdmin)
+#admin.site.register(LoadingDetail)
+#admin.site.register(ltioriginal,ltioriginalAdmin)
 admin.site.register(UserProfile)
-admin.site.register(ETSRole)
-admin.site.register(DispachPoint)
+#admin.site.register(ETSRole)
+admin.site.register(DispatchPoint)
+admin.site.register(ReceptionPoint)
 admin.site.register(EpicPerson,EpicPersonsAdmin)

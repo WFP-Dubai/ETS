@@ -9,7 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ets/media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': '/Users/carlander/projects/epic/ets/media'}),
+        {'document_root': '/Users/tobias/projects/epic/ets/media'}),
     (r'^ets/', include('ets.waybill.urls')),
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),

@@ -86,21 +86,20 @@
 			<dict>
 				<key>AliasData</key>
 				<data>
-				AAAAAAFwAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADFs8i4SCsAAAN3PdoFbWVkaWEAAAAAAAAAAAAA
+				AAAAAAFqAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADGOwZESCsAAABosfYFbWVkaWEAAAAAAAAAAAAA
 				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAA3sLX8gybX0AAAAAAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
-				s5B4AAAAEQAIAADIMjU9AAAAAQAUA3c92gNtaqUACzIo
-				AAqMqgAAfQ0AAgA0TWFjaW50b3NoIEhEOlVzZXJzOmNh
-				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czptZWRpYQAO
-				AAwABQBtAGUAZABpAGEADwAaAAwATQBhAGMAaQBuAHQA
-				bwBzAGgAIABIAEQAEgAnVXNlcnMvY2FybGFuZGVyL3By
-				b2plY3RzL2VwaWMvZXRzL21lZGlhAAATAAEvAAAVAAIA
-				EP//AAA=
+				AAAAAAAAAAAAAAAAAAAAAHC+5sgx9YoAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
+				Os4EAAAAEQAIAADIMb1KAAAAAQAUAGix9gBmKV4ADUCw
+				AAqbxgAAhe0AAgAxTWFjaW50b3NoIEhEOlVzZXJzOnRv
+				Ymlhczpwcm9qZWN0czplcGljOmV0czptZWRpYQAADgAM
+				AAUAbQBlAGQAaQBhAA8AGgAMAE0AYQBjAGkAbgB0AG8A
+				cwBoACAASABEABIAJFVzZXJzL3RvYmlhcy9wcm9qZWN0
+				cy9lcGljL2V0cy9tZWRpYQATAAEvAAAVAAIADf//AAA=
 				</data>
 				<key>FileURL</key>
-				<string>file://localhost/Users/carlander/projects/epic/ets/media/</string>
+				<string>file://localhost/Users/tobias/projects/epic/ets/media/</string>
 				<key>RelativePath</key>
 				<string>./media</string>
 				<key>TypeID</key>
@@ -245,6 +244,42 @@
 			<string>waybill</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
+		</dict>
+		<key>B56661A7-ECA0-4FE9-9E75-D5A2694E52FF</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAHUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADGOuokSCsAAABosjUTcmVjaWV2ZVdheWJpbGwu
+				aHRtbAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAHMqycgxqEdURVhUAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAACXRlbXBsYXRlcwAA
+				EAAIAADGOs4EAAAAEQAIAADIMYwnAAAAAQAcAGiyNQBo
+				sisAaLH2AGYpXgANQLAACpvGAACF7QACAFFNYWNpbnRv
+				c2ggSEQ6VXNlcnM6dG9iaWFzOnByb2plY3RzOmVwaWM6
+				ZXRzOndheWJpbGw6dGVtcGxhdGVzOnJlY2lldmVXYXli
+				aWxsLmh0bWwAAA4AKAATAHIAZQBjAGkAZQB2AGUAVwBh
+				AHkAYgBpAGwAbAAuAGgAdABtAGwADwAaAAwATQBhAGMA
+				aQBuAHQAbwBzAGgAIABIAEQAEgBEVXNlcnMvdG9iaWFz
+				L3Byb2plY3RzL2VwaWMvZXRzL3dheWJpbGwvdGVtcGxh
+				dGVzL3JlY2lldmVXYXliaWxsLmh0bWwAEwABLwAAFQAC
+				AA3//wAA
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/tobias/projects/epic/ets/waybill/templates/recieveWaybill.html</string>
+				<key>RelativePath</key>
+				<string>./waybill/templates/recieveWaybill.html</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>recieveWaybill.html</string>
+			<key>ItemType</key>
+			<string>FileReference</string>
 		</dict>
 	</dict>
 	<key>com.barebones.DocumentFormatVersion</key>

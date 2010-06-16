@@ -14,10 +14,7 @@ info_dict_waybill = {
     'queryset': Waybill.objects.all()#,
 #    'template_name': "ltioriginal_list.html"
 }
-info_dict_waybill_view = {
-    'queryset': Waybill.objects.all(),
-    'template_name': "waybill/waybill_detail_view.html"
-}
+
 
 info_dict_waybill_reception= {
 	'queryset': Waybill.objects.all(),
@@ -34,7 +31,7 @@ urlpatterns = patterns('',
     (r'^waybill/import$',import_ltis),
     (r'^waybill/create/(.*)$',waybillCreate),
     (r'^waybill/edit$',waybill_edit),
-    (r'^waybill/receive$','django.views.generic.list_detail.object_list', info_dict_waybill_reception),
+    (r'^waybill/receive$',waybill_reception_list),
     (r'^waybill/receive/(.*)$',waybill_reception),
     (r'^waybill/findwb$',waybill_search),
     (r'^waybill/validate$','django.views.generic.list_detail.object_list', info_dict_waybill),

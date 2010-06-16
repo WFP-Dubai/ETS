@@ -1,6 +1,10 @@
 {% extends "base_template.html"%}
 {%block title %}Waybill Creation{%endblock%}
 {%block content %}
+<style type="text/css">
+.ul-inline ul, .ul-inline ul li{border-width: 1px; display: inline; padding: 0px;}
+.ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
+</style>
 <form action="" method=POST>
 {%for item in form%}
 {% if item.errors %}
@@ -23,34 +27,46 @@
 		<span>Date of Dispatch: {{form.dateOfDispatch}}</span>
 	</div>
 	<div>
-		<span>Transaction Type: {{form.transactionType}}</span>
-		<span>Transport Type {{form.transportType}}</span>
+		<span  class='ul-inline'>Transaction Type: {{form.transactionType}}</span>&nbsp;
+		<span class='ul-inline'>Transport Type: {{form.transportType}}</span>
 	</div>
-recipient location:autofill        	{{form.recipientLocation}}
-
+recipient location:        	{{form.recipientLocation}}
 {{ formset.management_form }}
-<table>
-	<tr><th>Line</th><th>Commodity</th><th>Number of units</th>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+	<tr><th>Line</th><th>Commodity</th><th>Number of units</th></tr>
+	 </thead>
 {% for sform in formset.forms %}
 	{{ sform.id }}<tr><td>{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
 {% endfor %}
  </table>
 <div style="text-align:top;">Dispatch Remarks: {{form.dispatchRemarks}}</div>
-<div>Dispatcher Name:{{form.dispatcherName}}(autofill)</div>
-<div>Transport Contractor:{{form.transportContractor}}
-        	Transport Subcontractor:{{form.transportSubContractor}}
-        	{{form.transportDriverName}}
-        	{{form.transportDriverLicenceID}}
-        	{{form.transportVehicleRegistration}}
-        	{{form.transportTrailerRegistration}}
-        	{{form.transportDispachSigned}}</div>
-        	
-Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}}Dispatch Remarks {{form.containerOneRemarksDispatch}}
-Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}}Dispatch Remarks {{form.containerOneRemarksDispatch}}
+<div>Dispatcher Name:{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
+<div>Transport Contractor:{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}<br>
+Transport Subcontractor:{{form.transportSubContractor}}<br>
+Driver's Name:        	{{form.transportDriverName}}<br>
+Driver's Licens No:     {{form.transportDriverLicenceID}}<br>
+Vehicle Registration No: {{form.transportVehicleRegistration}}<br>
+Trailer Registration No: {{form.transportTrailerRegistration}}<br>
+Transporter Signed:        	{{form.transportDispachSigned}}</div>
+Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}} Remarks: {{form.containerOneRemarksDispatch}}<br>
+Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksDispatch}}
 
 </div>
 
 <input type="submit"> {% csrf_token %}
 </form>
 {%endblock%}
-
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+} );
+</script>
+{%endblock extra-header%}

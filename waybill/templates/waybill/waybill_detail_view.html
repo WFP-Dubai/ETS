@@ -74,7 +74,7 @@ img{position: relative; left: 20px; text-align: right;}
 					<tr>
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
-						<td></td>
+						<td>{{lineitem.getStockItem}}</td>
 						<td>{{lineitem.numberUnitsLoaded}}</td>
 						<td>{{lineitem.siNo.UNIT_WEIGHT_NET}}</td>
 						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS}}</td>
@@ -83,7 +83,14 @@ img{position: relative; left: 20px; text-align: right;}
 					</tr>
 					{%endfor%}
 					<tr>
-						<td colspan="8"><sup>Dispatch Remarks</sup>{{object.dispatchRemarks}}</td>
+						<td colspan="8"><sup>Dispatch Remarks</sup>{{object.dispatchRemarks}}
+						{%if object.containerOneRemarksDispatch%}
+						<br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
+						{%endif%}
+						{%if object.containerTwoRemarksDispatch%}
+						<br>Container 2 Remarks:{{object.containerTwoRemarksDispatch}}
+						{%endif%}
+						</td>
 					</tr>
 				</table>
 			</td>

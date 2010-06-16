@@ -1,13 +1,28 @@
 {% extends "base_template.html"%}
 {%block content %}
-<ul>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr><th>Warehouse</th></tr>
+        </thead>
     {% for wh in dispatch_list%}
-    	<li><a href='list/{{wh.3}}'> {{wh.2}}</a>
-    	{%if wh.3 in profile.warehouses.all.ORIGIN_WH_CODE%}x{%endif%}</li>
+    	{% for whdp in profile.warehouses.all%}
+			{%if wh.3 == whdp.ORIGIN_WH_CODE%}
+<tr><td><a href='list/{{wh.3}}'> {{wh.2}}</a></td></tr>
+			{%endif%}
+		{% endfor%}
     {% endfor%}
-</ul>
- {% for wh in profile.warehouses.all%}
-{{wh.ORIGIN_WH_CODE}}
-{% endfor%}
-{{profile.warehouses.all.ORIGIN_WH_CODE.list}}
+</table>
 {%endblock%}
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+} );
+</script>
+{%endblock extra-header%}
