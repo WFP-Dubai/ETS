@@ -250,10 +250,10 @@ class EpicStock(models.Model):
 class LoadingDetail(models.Model):
 	wbNumber				=models.ForeignKey(Waybill)
 	siNo					=models.ForeignKey(ltioriginal)
-	numberUnitsLoaded		=models.IntegerField(blank=True,null=True)
-	numberUnitsGood			=models.IntegerField(blank=True,null=True)
-	numberUnitsLost			=models.IntegerField(blank=True,null=True)
-	numberUnitsDamaged		=models.IntegerField(blank=True,null=True)
+	numberUnitsLoaded		=models.IntegerField(default=0, blank=True,null=True)
+	numberUnitsGood			=models.IntegerField(default=0,blank=True,null=True)
+	numberUnitsLost			=models.IntegerField(default=0,blank=True,null=True)
+	numberUnitsDamaged		=models.IntegerField(default=0,blank=True,null=True)
 	unitsLostReason			=models.TextField(blank=True)
 	unitsDamagedReason		=models.TextField(blank=True)
 	

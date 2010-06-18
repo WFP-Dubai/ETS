@@ -17,38 +17,46 @@
   {% endfor %}
 <div class="form">
 	<div>
-		<span>LTI: {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
+		<span><strong>LTI:</strong> {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
 	</div>
 	<div>
-		<span>Waybill Nr: {{form.waybillNumber}}</span>
+		<span><strong>Waybill Nr:</strong> {{form.waybillNumber}}</span>
 	</div>
 	<div>
-		<span>Date of Loading: {{form.dateOfLoading}}</span>
-		<span>Date of Dispatch: {{form.dateOfDispatch}}</span>
+		<span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
+		<span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
 	</div>
-	<div>
-		<span  class='ul-inline'>Transaction Type: {{form.transactionType}}</span>&nbsp;
-		<span class='ul-inline'>Transport Type: {{form.transportType}}</span>
-	</div>
-recipient location:        	{{form.recipientLocation}}
+<table>
+		<tr>
+			<th>Transaction Type:</th>
+			<td> {{form.transactionType}}</td>
+			<td>&nbsp;</td>
+			<th>Transport Type:</th>
+			<td> {{form.transportType}}</td>
+		</tr>
+	</table>
+<strong>Recipient Location:</strong>x    {{form.recipientLocation}}    	{{lti_list.0.DESTINATION_LOC_NAME}}
 {{ formset.management_form }}
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-	<tr><th>Line</th><th>Commodity</th><th>Number of units</th></tr>
+	<tr><th></th><th>Commodity</th><th>Number of units</th></tr>
 	 </thead>
 {% for sform in formset.forms %}
 	{{ sform.id }}<tr><td>{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
 {% endfor %}
  </table>
-<div style="text-align:top;">Dispatch Remarks: {{form.dispatchRemarks}}</div>
-<div>Dispatcher Name:{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
-<div>Transport Contractor:{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}<br>
-Transport Subcontractor:{{form.transportSubContractor}}<br>
-Driver's Name:        	{{form.transportDriverName}}<br>
-Driver's Licens No:     {{form.transportDriverLicenceID}}<br>
-Vehicle Registration No: {{form.transportVehicleRegistration}}<br>
-Trailer Registration No: {{form.transportTrailerRegistration}}<br>
-Transporter Signed:        	{{form.transportDispachSigned}}</div>
+<div>
+<div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
+<div><strong>Dispatcher Name:</strong>{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
+<div>
+<strong>Transport Contractor:</strong>{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}<br>
+<strong>Transport Subcontractor:</strong>{{form.transportSubContractor}}<br>
+<strong>Driver's Name:</strong>{{form.transportDriverName}}<br>
+<strong>Driver's Licens No:</strong>{{form.transportDriverLicenceID}}<br>
+<strong>Vehicle Registration No:</strong> {{form.transportVehicleRegistration}}<br>
+<strong>Trailer Registration No:</strong> {{form.transportTrailerRegistration}}<br>
+<strong>Transporter Signed:<strong>{{form.transportDispachSigned}}</div>
+</div>
 Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}} Remarks: {{form.containerOneRemarksDispatch}}<br>
 Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksDispatch}}
 
@@ -60,13 +68,17 @@ Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNum
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
+				$('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
+				$('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });				
 				$('#example').dataTable( {
-		"bPaginate": false,
-		"bLengthChange": false,
-		"bFilter": false,
-		"bSort": false,
-		"bInfo": false,
-		"bAutoWidth": false });
+					"bPaginate": false,
+					"bLengthChange": false,
+					"bFilter": false,
+					"bSort": false,
+					"bInfo": false,
+					"bAutoWidth": false 
+				});
 } );
+
 </script>
 {%endblock extra-header%}

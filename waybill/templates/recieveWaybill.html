@@ -9,13 +9,27 @@
     {% endfor %}
     </ol>
 {% endif %}
+{%if formset.errors%}
+{%for error in formset.errors%}
+	{{error}}
+{%endfor%}
+{%endif%}
+
 <form action="" method=POST>
-<table>
 
-{{form}}
+<div>
+<span>Waybill Number: {{form.waybillNumber}} {{form.instance.waybillNumber}}</span><br/>
+<span>Recipient Location {{form.recipientLocation}}{{form.instance.recipientLocation}}</span>
+<span>Recipient Name: {{form.recipientName}}{{form.instance.recipientName}}</span>
+<span>Recipient Name: {{form.recipientTitle}}{{form.instance.recipientTitle}}</span><br/>
+<span>Arrival Date: {{form.recipientArrivalDate}}</span><br/>
+<span>Start DIscharge: {{form.recipientStartDischargeDate}}</span>
+<span>End DIscharge: {{form.recipientEndDischargeDate}}</span><br/>
+<span>Distance: {{form.recipientDistance}}</span>
+<span>Recipient Remarks: {{form.recipientDistance}}</span><br/>
+</div>
 
-<tr><td></td></tr></table>
-    {{ formset.management_form }}
+ {{ formset.management_form }}
  <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
         <tr><th>Item</th><th>Number<br> of units Loaded</th><th>Number of units Good</th><th>Number of units Damaged</th><th>Number of units Lost</th>
@@ -24,7 +38,7 @@
     {% for sform in formset.forms %}
         {{ sform.id }}
         <tr>
-        	<td>{{ sform.siNo }}{{ sform.instance.siNo}}</td>
+        	<td>{{sform.siNo}} {{ sform.instance.siNo}}</td>
         	<td>{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
         	<td>No:{{ sform.numberUnitsGood }}</td>
         	<td>No:{{ sform.numberUnitsDamaged }}<br>Reason:{{ sform.unitsDamagedReason }}</td>
@@ -32,6 +46,14 @@
         </tr>
     {% endfor %}
     </table>
+<div>
+
+<span>Recieption Signed: Recepient: {{form.recipientSigned}} Transporter:{{form.transportDeliverySigned }}</span>
+<span>Container 1: {{form.instance.containerOneNumber}} Seal: {{form.instance.containerOneSealNumber}} Remarks: {{form.containerOneRemarksReciept}}<br>
+Container 2: Number:{{form.instance.containerTwoNumber}} Seal: {{form.instance.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksReciept}}
+</span>
+</div>
+
 <input type="submit"> {% csrf_token %}
 </form>
 
@@ -40,6 +62,9 @@
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
+				$('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
+				$('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
+				$('#id_recipientEndDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
 				$('#example').dataTable( {
 		"bPaginate": false,
 		"bLengthChange": false,

@@ -7,8 +7,8 @@ from django.forms.extras.widgets import SelectDateWidget
 
 class WaybillForm(ModelForm):
 
-	dateOfLoading = forms.DateField(widget=SelectDateWidget())
-	dateOfDispatch = forms.DateField(widget=SelectDateWidget())
+	dateOfLoading = forms.DateField()
+	dateOfDispatch = forms.DateField()
 	transportType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
 	transactionType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
 	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
@@ -21,6 +21,10 @@ class WaybillForm(ModelForm):
 	dispatcherName = forms.CharField(widget=forms.HiddenInput(),required=False)
 	dispatcherTitle= forms.CharField(widget=forms.HiddenInput(),required=False)
 	transportTrailerRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	#recipientLocation = forms.CharField(widget=forms.HiddenInput())
+	#recipientConsingee = forms.CharField(widget=forms.HiddenInput())
+	
+	
 	class Meta:
 		model = Waybill
 		fields = [
@@ -46,14 +50,16 @@ class WaybillForm(ModelForm):
         	'containerTwoSealNumber',
         	'containerOneRemarksDispatch',
         	'containerTwoRemarksDispatch',
-        	'recipientLocation'
+        	'recipientLocation',
+			'recipientConsingee',
         	]
 
 class WaybillRecieptForm(ModelForm):
-	recipientArrivalDate = forms.DateField(widget=SelectDateWidget())
-	recipientStartDischargeDate = forms.DateField(widget=SelectDateWidget())
-	recipientEndDischargeDate = forms.DateField(widget=SelectDateWidget())
-	
+	recipientArrivalDate = forms.DateField()
+	recipientStartDischargeDate = forms.DateField()
+	recipientEndDischargeDate = forms.DateField()
+	waybillNumber = forms.CharField(widget=forms.HiddenInput())
+	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	
 	class Meta:
 		model = Waybill
@@ -69,7 +75,10 @@ class WaybillRecieptForm(ModelForm):
 				'recipientDistance',
 				'recipientRemarks',
 				'recipientSigned',
-				'recipientSignedTimestamp'
+				'recipientSignedTimestamp',
+				'transportDeliverySigned',
+				'containerOneRemarksReciept',
+				'containerTwoRemarksReciept'
 			]
 
 

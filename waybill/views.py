@@ -151,8 +151,8 @@ def waybill_reception(request,wb_code):
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
 	class LoadingDetailRecForm(ModelForm):
-		#siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='CommodityX',)
-		siNo= forms.CharField(widget=forms.HiddenInput())
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
+		#siNo= forms.CharField(widget=forms.HiddenInput())
 		numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
 		unitsLostReason= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 		unitsDamagedReason=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
@@ -171,10 +171,10 @@ def waybill_reception(request,wb_code):
 		
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
-			instances =formset.save(commit=False)
-			for subform in instances:
-				subform.wbNumber = wb_new
-				subform.save()
+			instances =formset.save()
+#			for subform in instances:
+				#subform.wbNumber = wb_new
+				#subform.save()
 			wb_new.save()
 		
 	else:
@@ -246,6 +246,7 @@ def waybillCreate(request,lti_code):
 					'dateOfLoading':     datetime.date.today(),
 					'dateOfDispatch':    datetime.date.today(),
 					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME,
+					'recipientConsingee':current_lti[0].CONSEGNEE_NAME,
 					'transportContractor': current_lti[0].TRANSPORT_NAME
 				}
 		)
@@ -289,7 +290,7 @@ def serialize(request,wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
 	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
-	return render_to_response('status.html',{'status':data},
+	return render_to_response('blank.html',{'status':data},
                               context_instance=RequestContext(request))
 
 def custom_show_toolbar(request):
