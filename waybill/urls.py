@@ -43,5 +43,6 @@ urlpatterns = patterns('',
     (r'^waybill/ltis_codes$',ltis_codes),
     (r'^waybill/testform/(.*)$',waybillCreate),
     (r'^waybill/test$','django.views.generic.list_detail.object_list', info_dict_lti),
-    (r'^waybill/serialize/(.*)$',serialize),
+    (r'^waybill/serialize/(.*)$',serialize),     
+    (r'^waybill/deserialize/$',deserialize),
 )

@@ -289,6 +289,7 @@ class ReceptionPoint(models.Model):
 	LOCATION_CODE	=models.CharField(max_length=20, blank=True)
 	CONSEGNEE_CODE	=models.CharField(max_length=20, blank=True)
 	CONSEGNEE_NAME	=models.CharField(max_length=80, blank=True)
+	#DESC_NAME				=models.CharField(max_length=80, blank=True)
 	def  __unicode__(self):
 		return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 

@@ -1,1 +1,5 @@
-{{status}}
+<form action='../deserialize/' method=post>
+<textarea name="wbdata">{{status}}</textarea>
+<input type=submit> {% csrf_token %}
+</form>
+

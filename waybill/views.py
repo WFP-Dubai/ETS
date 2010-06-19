@@ -113,6 +113,7 @@ def dispatch(request):
     return render_to_response('dispatch_list.html',
                               {'dispatch_list':dispatch_list,'profile':profile},
                               context_instance=RequestContext(request))
+                              
 def ltis_codes(request):
 	lti_codes = ltioriginal.objects.ltiCodes()
 	return render_to_response('lti_list.html',
@@ -290,9 +291,20 @@ def serialize(request,wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
 	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
+	
 	return render_to_response('blank.html',{'status':data},
                               context_instance=RequestContext(request))
 
+
+def deserialize(request):
+	waybillnumber=''
+	for obj in serializers.deserialize("json", request.POST['wbdata']):
+		if type(obj.object) is Waybill:
+			waybillnumber= obj.object.id
+	print waybillnumber
+	return HttpResponseRedirect('../receive/'+ str(waybillnumber)) 
+	
+	
 def custom_show_toolbar(request):
     return True
 
