@@ -259,8 +259,10 @@ class LoadingDetail(models.Model):
 	
 	def getStockItem(self):
 		stockItem = EpicStock.objects.filter(si_code = self.siNo.SI_CODE).filter(commodity_code = self.siNo.COMMODITY_CODE)
-		return stockItem[0].packagename
-		
+		if stockItem:
+			return stockItem[0].packagename
+		else:
+			return 'N/A'
 	
 	def calcTotalNet(self):
 		totalNet =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_NET)/1000
@@ -306,6 +308,7 @@ class ETSRole(models.Model):
 	
 class UserProfile(models.Model):
 	user					=models.OneToOneField(User, primary_key=True)
+	#user = models.ForeignKey(User, unique=True, edit_inline=admin.TabularInline)
 	warehouses				=models.ManyToManyField(DispatchPoint, blank=True)
 	receptionPoints			=models.ManyToManyField(ReceptionPoint, blank=True)
 	isCompasUser			=models.BooleanField()
@@ -314,7 +317,8 @@ class UserProfile(models.Model):
 	compasUser				=models.OneToOneField(EpicPerson)
 	
 	def __unicode__(self):
-		return self.user.get_full_name()
+		          return "%s's profile" % self.user 
+
 		
 class UserProfileAdmin(admin.ModelAdmin):
 	list_display=('user','warehouses')

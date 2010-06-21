@@ -1,31 +1,60 @@
 {% extends "base_template.html"%}
 {%block title %}{{detailed.0.CODE}}{%endblock%}
 {%block content %}
-LTI No:{{detailed.0.CODE}}<br>
-Origin: {{detailed.0.ORIGIN_LOC_NAME}}<br>
-Allocation Destination: {{detailed.0.DESTINATION_LOC_NAME}}<br/>
-Project Number:{{detailed.0.PROJECT_WBS_ELEMENT}}<br/>
+<table>
+<tr><td>LTI Number: {{detailed.0.CODE}}</td><td>Date: {{detailed.0.LTI_DATE}}</td></tr>
+<tr><td>Requested Dispatch Date: {{detailed.0.REQUESTED_DISPATCH_DATE}}</td><td>Expiery Date: {{detailed.0.EXPIRY_DATE}}</td></tr>
+<tr><td>Origin: {{detailed.0.ORIGIN_LOC_NAME}}</td><td>Allocation Destination: {{detailed.0.DESTINATION_LOC_NAME}}</td></tr>
 
-<a href='../testform/{{detailed.0.CODE}}'>create wb</a><br>
+<tr><td>Project Number:{{detailed.0.PROJECT_WBS_ELEMENT}}</td><td>Date: {{detailed.0.TRANSPORT_NAME}}</td></tr>
+
+
+			
+
+	
+	
+	
+</table><pre>
+	TRANSPORT_CODE				:{{detailed.0.TRANSPORT_CODE}}
+	TRANSPORT_OUC				:{{detailed.0.TRANSPORT_OUC	}}
+	ORIGIN_TYPE				:{{detailed.0.ORIGIN_TYPE	}}	
+	ORIGINTYPE_DESC				:{{detailed.0.ORIGINTYPE_DESC }}
+	ORIGIN_LOCATION_CODE			:{{detailed.0.ORIGIN_LOCATION_CODE}}
+	ORIGIN_LOC_NAME				:{{detailed.0.ORIGIN_LOC_NAME}}
+	ORIGIN_WH_CODE				:{{detailed.0.ORIGIN_WH_CODE}}
+	ORIGIN_WH_NAME				:{{detailed.0.ORIGIN_WH_NAME}}
+	DESTINATION_LOCATION_CODE		:{{detailed.0.DESTINATION_LOCATION_CODE}}
+	DESTINATION_LOC_NAME			:{{detailed.0.DESTINATION_LOC_NAME}}
+	CONSEGNEE_CODE				:{{detailed.0.CONSEGNEE_CODE}}
+	CONSEGNEE_NAME				:{{detailed.0.CONSEGNEE_NAME}}</pre>
+	
+<a href='../testform/{{detailed.0.CODE}}'>Create New Waybill</a><br>
+
 Waybills:<br>
+
 <table>
 {%for wb in listOfWaybills%}
+	<tr><td colspan="3">WB:{{wb}} </td><td><a href='../viewwb/{{wb.id}}?viewonly=true'> View Waybill</a></td></tr>
+	<tr><td>Loaded</td><td>SI</td><td>Commodity</td><td>Units loaded</td></tr>
 	{%for loading in wb.loadingdetail_set.select_related %}
 		<tr>
-		<td>{{wb}}:{{loading.siNo.SI_CODE}}</td>
+		<td>&nbsp;</td>
+		<td>{{loading.siNo.SI_CODE}}</td>
 		<td>{{loading.siNo.CMMNAME}} </td>
 		<td>{{loading.numberUnitsLoaded}} </td>
-</tr>
+
+		</tr>
 	{%endfor%}
 {%endfor%}
 
 
-</table>Items in LTI:
+</table>
 
+Items in LTI:
 <table>
 	<tr><th>Commodity</th><th>SI</th><th>SI Amount</th><th>Not Dispatched</th></tr>
 	{%for si in listOfSI_withDeduction%}
-	 <tr><td>{{si.CommodityName}}</td><td>{{si.SINumber}}</td><td>{{si.StartAmount}}</td><td>{{si.CurrentAmount}}</td></tr>
+		 <tr><td>{{si.CommodityName}}</td><td>{{si.SINumber}}</td><td>{{si.StartAmount}}</td><td>{{si.CurrentAmount}}</td></tr>
 	{%endfor%}
 </table>
 

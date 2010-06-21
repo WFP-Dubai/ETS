@@ -69,16 +69,15 @@ def ltis_redirect_wh(request):
 
 def import_ltis(request):
     #Copy Persons
-    originalPerson = EpicPerson.objects.using('compas')
+    originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
     for myrecord in originalPerson:
         myrecord.save(using='default')    
-
     #copy LTIs
-    original = ltioriginal.objects.using('compas')
+    original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-05-01')
     for myrecord in original:
         myrecord.save(using='default')
     #Copy Stock
-    originalStock = EpicStock.objects.using('compas')    
+    originalStock = EpicStock.objects.using('compas')
     for myrecord in originalStock:
         myrecord.save(using='default')
     status = 'done'
@@ -203,8 +202,10 @@ def waybill_reception_list(request):
                               context_instance=RequestContext(request))
 
 def waybill_search(request):
-    return render_to_response('status.html',
-                              {'status':'to be implemented'},
+	search_string =  request.GET['wbnumber']
+	found_wb = Waybill.objects.filter(waybillNumber__icontains=search_string)
+	return render_to_response('list_waybills.html',
+                              {'waybill_list':found_wb},
                               context_instance=RequestContext(request))
 
 def waybillSearchResult(request):
@@ -310,3 +311,12 @@ def custom_show_toolbar(request):
 
 def printlistitem(list,index):
     print list(1)
+    
+#def get_or_create_profile(user):
+ #   try:
+ #       profile = user.get_profile()
+ #       except ObjectDoesNotExist:
+ #       #create profile - CUSTOMIZE THIS LINE TO OYUR MODEL:
+ #       profile = UserProfile(karma='1', url='http://example.org', user=user)
+ #       profile.save()
+ #   return profile

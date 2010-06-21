@@ -5,9 +5,9 @@
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
-	max-width: 800px;
-	min-width: 800px;
-	width: 800px;
+	max-width: 850px;
+	min-width: 850px;
+	width: 850px;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -21,38 +21,54 @@ img{position: relative; left: 20px; text-align: right;}
 				<span><img height="75px" src="/ets/media/images/logo_small.gif"/></span>
 				<span  valign="top" class='centric'><h1 >Waybill</h1>
 				<p> Conditions of carriage as indicated overleaf are applicable</p></span>
-				<span class="right">Waybill Number:{{object.waybillNumber}}</span>
+				<!--<span class="right"><img src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br>Waybill Number:{{object.waybillNumber}}</span>-->
+				<span class="right" style="font-size:x-large;">Waybill No:{{object.waybillNumber}}</span>
 			</td>
 		</tr>
 		<tr>
 			<td>
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head">
-						<th colspan="5">Transaction Details</th>
+						<th colspan="5" bgcolor='black' color='white'>Transaction Details</th>
 					</thead>
 					<tr>
 						<td><sup>Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
 						<td><sup>Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
 						<td><sup>Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
+						<td rowspan=5><span ><img style='left:0px;' src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br></span></td>
+					
+					</tr>
+					<tr>
 						<td><sup>Project no.</sup><br>{{ltioriginal.0.PROJECT_WBS_ELEMENT}}</td>
 						<td><sup>Date of Loading:</sup><br>{{object.dateOfLoading}}</td>
+						<td><sup>Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
 					</tr>
 					<tr>
 						<td><sup>Destination(warehouse):</sup><br>{{ltioriginal.0.DESTINATION_WH_NAME}}</td>
-						<td><sup>Allocation Destination:</sup></td><td><sup>Consingee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
-						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td><td><sup>Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
+						<td><sup>Allocation Destination:</sup></td>
+						<td><sup>Consingee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
+						
 					</tr>
+
 					<tr>
-						<td colspan="2"><sup>Type of Transaction:</sup>
+						<td><sup>Type of Transaction:</sup>
 						 {%if object.transactionType == 'INT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
-						<td colspan="3"><sup>Transport Type:</sup> Road</td>
+						<td><sup>Transport Type:</sup> Road</td>
+						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td>
 					</tr>
+					<tr><td colspan=3 valign="top"><sup>Dispatch Remarks:</sup><br>{{object.dispatchRemarks}}
+						{%if object.containerOneRemarksDispatch%}
+						<br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
+						{%endif%}
+						{%if object.containerTwoRemarksDispatch%}
+						<br>Container 2 Remarks:{{object.containerTwoRemarksDispatch}}
+						{%endif%}</td></tr>
 				</table>
 			</td>
 		</tr>
 		<tr>
 			<td>
-				<table cellpadding="0" cellspacing="0" border="1px">
+				<table cellpadding="0" cellspacing="0" border="1px" style=''>
 					<thead class="wb_head">
 						<th colspan="8">Loading Details</th>
 					</thead>
@@ -83,13 +99,7 @@ img{position: relative; left: 20px; text-align: right;}
 					</tr>
 					{%endfor%}
 					<tr>
-						<td colspan="8"><sup>Dispatch Remarks</sup>{{object.dispatchRemarks}}
-						{%if object.containerOneRemarksDispatch%}
-						<br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
-						{%endif%}
-						{%if object.containerTwoRemarksDispatch%}
-						<br>Container 2 Remarks:{{object.containerTwoRemarksDispatch}}
-						{%endif%}
+						<td colspan="8">
 						</td>
 					</tr>
 				</table>
@@ -102,10 +112,10 @@ img{position: relative; left: 20px; text-align: right;}
 						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup>Transport Contractor</sup><br>{{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
 						<tr><td><sup>Name:</sup>{{object.dispatcherName}}</td><td colspan="2"><sup>Transport Subcontractor</sup>{{object.transportSubContractor}}</td></tr>
 						<tr><td><sup>Title:</sup>{{object.dispatcherTitle}}</td><td colspan="2"><sup>Driver's Name:</sup>{{object.transportDriverName}}</td></tr>
-						<tr><td rowspan="4"><p style="font-size: small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
+						<tr><td rowspan="4"><p style="font-size: x-small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
 Name, signature and stamp:</p></td><td colspan="2"><sup>Driver's Licence/ID:</sup>{{object.transportDriverLicenceID}}</td></tr>
 						<tr><td><sup>Vehicle registration:</sup>{{object.transportVehicleRegistration}}<br>{{object.transportTrailerRegistration}}</td><td><sup>Container no:</sup>{{object.containerOneNumber}}<br>{{object.containerTwoNumber}}</td></tr>
-						<tr><td rowspan="2" colspan="2"><p style="font-size: small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
+						<tr><td rowspan="2" colspan="2"><p style="font-size: x-small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
 Name, signature and stamp:</p></td></tr>
 				</table>
 			</td>
@@ -176,11 +186,11 @@ Name, signature and stamp:</p></td></tr>
 				</table>
 			</td>
 		</tr>
-		<tr><td><table cellpadding="0" cellspacing="0" border="1px"><tr><td>On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.<br><br><br>
-Name, signature and stamp
-Endorse this section with an official stamp</td><td>On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.
-Name, signature and stamp<br><br><br>
-Endorse this section with an official stamp</td></tr></table></td></tr>
+		<tr><td><table cellpadding="0" cellspacing="0" border="1px"><tr><td> <p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.</p>
+<p style="font-size: x-small">Name, signature and stamp
+Endorse this section with an official stamp</p></td><td><p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.</p>
+<p style="font-size: x-small">Name, signature and stamp<br><br><br>
+Endorse this section with an official stamp</p></td></tr></table></td></tr>
 	</table>
 	
 </body>
