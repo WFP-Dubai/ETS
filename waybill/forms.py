@@ -37,6 +37,7 @@ class WaybillForm(ModelForm):
         	'dispatchRemarks',
         	'dispatcherName',
         	'dispatcherTitle',
+        	'destinationWarehouse',
         	'transportContractor',
         	'transportSubContractor',
         	'transportDriverName',

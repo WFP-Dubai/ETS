@@ -42,7 +42,7 @@ def loginWaybillSystem(request):
     return render_to_response('status.html',
                               {'status':'login not yet implemented'},
                               context_instance=RequestContext(request))
-    
+@login_required    
 def selectAction(request):
 	profile=request.user.get_profile()
 	return render_to_response('selectAction.html',

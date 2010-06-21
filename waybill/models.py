@@ -94,6 +94,7 @@ class Waybill(models.Model):
 	recipientRemarks		=models.TextField(blank=True)
 	recipientSigned			=models.BooleanField(blank=True)
 	recipientSignedTimestamp	=models.DateTimeField(null=True, blank=True)
+	destinationWarehouse =models.CharField(max_length=100,blank=True)
 	
 	#Extra Fields
 	waybillValidated		=models.BooleanField()
@@ -127,7 +128,7 @@ class ltioriginalManager(models.Manager):
 		
 	def ltiCodesByWH(self,wh):
 		cursor = connection.cursor()
-		cursor.execute('SELECT DISTINCT CODE,SI_CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) ',[wh,datetime.date(2010, 5, 1)])
+		cursor.execute('SELECT DISTINCT CODE,SI_CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) ',[wh,datetime.date(2010, 5, 1)])
 		lti_code = cursor.fetchall()
 		return lti_code
 	

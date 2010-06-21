@@ -48,14 +48,15 @@
 <div>
 <div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
 <div><strong>Dispatcher Name:</strong>{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
-<div>
-<strong>Transport Contractor:</strong>{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}<br>
-<strong>Transport Subcontractor:</strong>{{form.transportSubContractor}}<br>
-<strong>Driver's Name:</strong>{{form.transportDriverName}}<br>
-<strong>Driver's Licens No:</strong>{{form.transportDriverLicenceID}}<br>
-<strong>Vehicle Registration No:</strong> {{form.transportVehicleRegistration}}<br>
-<strong>Trailer Registration No:</strong> {{form.transportTrailerRegistration}}<br>
-<strong>Transporter Signed:<strong>{{form.transportDispachSigned}}</div>
+<div><table>
+<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}</td></tr>
+<tr><td><strong>Transport Subcontractor:</strong></td><td>{{form.transportSubContractor}}</td></tr>
+<tr><td><strong>Driver's Name:</strong></td><td>{{form.transportDriverName}}</td></tr>
+<tr><td><strong>Driver's Licens No:</strong></td><td>{{form.transportDriverLicenceID}}</td></tr>
+<tr><td><strong>Vehicle Registration No:</strong></td><td>{{form.transportVehicleRegistration}}</td></tr>
+<tr><td><strong>Trailer Registration No:</strong></td><td>{{form.transportTrailerRegistration}}</td></tr>
+</table>
+<strong>Transporter Signed:<strong></td><td>{{form.transportDispachSigned}}</div>
 </div>
 Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}} Remarks: {{form.containerOneRemarksDispatch}}<br>
 Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksDispatch}}
