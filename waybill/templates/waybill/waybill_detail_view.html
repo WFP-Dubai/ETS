@@ -46,14 +46,14 @@ img{position: relative; left: 20px; text-align: right;}
 					<tr>
 						<td><sup>Destination(warehouse):</sup><br>{{ltioriginal.0.DESTINATION_WH_NAME}}</td>
 						<td><sup>Allocation Destination:</sup></td>
-						<td><sup>Consingee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
+						<td><sup>Consignee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
 						
 					</tr>
 
 					<tr>
-						<td><sup>Type of Transaction:</sup>
+						<td><sup>Type of Transaction:</sup><br>
 						 {%if object.transactionType == 'INT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
-						<td><sup>Transport Type:</sup> Road</td>
+						<td><sup>Transport Type:</sup><br>Road</td>
 						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td>
 					</tr>
 					<tr><td colspan=3 valign="top"><sup>Dispatch Remarks:</sup><br>{{object.dispatchRemarks}}
@@ -110,11 +110,13 @@ img{position: relative; left: 20px; text-align: right;}
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head"><th colspan="3">Certification of Commodities Loaded</td></th></thead>
 						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup>Transport Contractor</sup><br>{{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
-						<tr><td><sup>Name:</sup>{{object.dispatcherName}}</td><td colspan="2"><sup>Transport Subcontractor</sup>{{object.transportSubContractor}}</td></tr>
-						<tr><td><sup>Title:</sup>{{object.dispatcherTitle}}</td><td colspan="2"><sup>Driver's Name:</sup>{{object.transportDriverName}}</td></tr>
+						<tr><td><small>Name:</small>{{object.dispatcherName}}</td><td colspan="2"><small>Transport Subcontractor</small>{{object.transportSubContractor}}</td></tr>
+						<tr><td><small>Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small>Driver's Name:</small>{{object.transportDriverName}}</td></tr>
 						<tr><td rowspan="4"><p style="font-size: x-small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
-Name, signature and stamp:</p></td><td colspan="2"><sup>Driver's Licence/ID:</sup>{{object.transportDriverLicenceID}}</td></tr>
-						<tr><td><sup>Vehicle registration:</sup>{{object.transportVehicleRegistration}}<br>{{object.transportTrailerRegistration}}</td><td><sup>Container no:</sup>{{object.containerOneNumber}}<br>{{object.containerTwoNumber}}</td></tr>
+Name, signature and stamp:</p></td><td colspan="2"><small>Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+						<tr><td><small>Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
+						<td><small>Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSeal}}
+						<br><small>Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSeal}} </td></tr>
 						<tr><td rowspan="2" colspan="2"><p style="font-size: x-small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
 Name, signature and stamp:</p></td></tr>
 				</table>
@@ -129,7 +131,7 @@ Name, signature and stamp:</p></td></tr>
 						<td ><sup>Arrival Date:</sup></td>
 					</tr>
 					<tr>
-						<td><sup>Consingee:</sup></td>
+						<td><sup>Consignee:</sup></td>
 						<td ><sup>Start Discherge Date</sup></td>
 					</tr>
 					<tr>
@@ -169,7 +171,7 @@ Name, signature and stamp:</p></td></tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
-						<td>&nbsp;</td>
+						<td> {{lineitem.numberUnitsGood}}</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>

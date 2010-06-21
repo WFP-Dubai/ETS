@@ -35,9 +35,10 @@
 			<td> {{form.transportType}}</td>
 		</tr>
 	</table>
-<strong>Recipient Location:</strong>x    {{form.recipientLocation}}    	{{lti_list.0.DESTINATION_LOC_NAME}}
+<strong>Recipient Location:</strong>    {{form.recipientLocation}}    	{{lti_list.0.DESTINATION_LOC_NAME}}
 {{ formset.management_form }}
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+<br><br>
+<table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
     <thead>
 	<tr><th></th><th>Commodity</th><th>Number of units</th></tr>
 	 </thead>
@@ -45,9 +46,12 @@
 	{{ sform.id }}<tr><td>{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
 {% endfor %}
  </table>
+ 
+ <br>
 <div>
 <div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
 <div><strong>Dispatcher Name:</strong>{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
+<br>
 <div><table>
 <tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}</td></tr>
 <tr><td><strong>Transport Subcontractor:</strong></td><td>{{form.transportSubContractor}}</td></tr>
@@ -56,10 +60,10 @@
 <tr><td><strong>Vehicle Registration No:</strong></td><td>{{form.transportVehicleRegistration}}</td></tr>
 <tr><td><strong>Trailer Registration No:</strong></td><td>{{form.transportTrailerRegistration}}</td></tr>
 </table>
-<strong>Transporter Signed:<strong></td><td>{{form.transportDispachSigned}}</div>
 </div>
-Container 1: Number:{{form.containerOneNumber}} Seal: {{form.containerOneSealNumber}} Remarks: {{form.containerOneRemarksDispatch}}<br>
-Container 2: Number:{{form.containerTwoNumber}} Seal: {{form.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksDispatch}}
+<br>
+<strong>Container 1: Number:</strong>{{form.containerOneNumber}}<strong> Seal:</strong>{{form.containerOneSealNumber}}<strong> Remarks:</strong>{{form.containerOneRemarksDispatch}}<br>
+<strong>Container 2: Number:</strong>{{form.containerTwoNumber}}<strong> Seal:</strong>{{form.containerTwoSealNumber}}<strong> Remarks:</strong>{{form.containerTwoRemarksDispatch}}
 
 </div>
 
@@ -77,7 +81,7 @@ $(document).ready(function() {
 					"bFilter": false,
 					"bSort": false,
 					"bInfo": false,
-					"bAutoWidth": false 
+					"bAutoWidth": true 
 				});
 } );
 
