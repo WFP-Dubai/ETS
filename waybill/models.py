@@ -266,11 +266,43 @@ class LoadingDetail(models.Model):
 			return 'N/A'
 	
 	def calcTotalNet(self):
-		totalNet =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_NET)/1000
+		totalNet =( self.numberUnitsLoaded * self.siNo.UNIT_WEIGHT_NET)/1000
 		return totalNet
 	def calcTotalGross(self):
-		totalGross =( self.numberUnitsLoaded + self.siNo.UNIT_WEIGHT_GROSS)/1000
+		totalGross =( self.numberUnitsLoaded * self.siNo.UNIT_WEIGHT_GROSS)/1000
 		return totalGross
+		
+	def calcNetRecievedGood(self):
+		totalNet =( self.numberUnitsGood * self.siNo.UNIT_WEIGHT_NET)/1000
+		return totalNet
+	def calcGrossRecievedGood(self):
+		totalGross =( self.numberUnitsGood * self.siNo.UNIT_WEIGHT_GROSS)/1000
+		return totalGross
+
+	def calcNetRecievedDamaged(self):
+		totalNet =( self.numberUnitsDamaged * self.siNo.UNIT_WEIGHT_NET)/1000
+		return totalNet
+	def calcGrossRecievedDamaged(self):
+		totalGross =( self.numberUnitsDamaged * self.siNo.UNIT_WEIGHT_GROSS)/1000
+		return totalGross
+
+	def calcNetRecievedLost(self):
+		totalNet =( self.numberUnitsLost * self.siNo.UNIT_WEIGHT_NET)/1000
+		return totalNet
+	def calcGrossRecievedLost(self):
+		totalGross =( self.numberUnitsLost * self.siNo.UNIT_WEIGHT_GROSS)/1000
+		return totalGross
+	def calcTotalReceivedUnits(self):
+		total = self.numberUnitsGood + self.numberUnitsDamaged 
+		return total
+	def calcTotalReceivedNet(self):
+		total = self.calcNetRecievedGood() + self.calcNetRecievedDamaged() 
+		return total
+		
+	
+		
+	
+	
 		
 	
 	def  __unicode__(self):

@@ -158,6 +158,17 @@ def waybill_view(request,wb_id):
                               'ltioriginal':lti_detail_items},
                               context_instance=RequestContext(request))
 
+
+
+def waybill_view_reception(request,wb_id):
+	waybill_instance = Waybill.objects.get(id=wb_id)
+	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+	
+	return render_to_response('waybill/waybill_detail_view_reception.html',
+                              {'object':waybill_instance,
+                              'ltioriginal':lti_detail_items},
+                              context_instance=RequestContext(request))
+
 def waybill_reception(request,wb_code):
 	# get the LTI info
 	current_wb = Waybill.objects.get(id=wb_code)
@@ -188,6 +199,7 @@ def waybill_reception(request,wb_code):
 				#subform.wbNumber = wb_new
 				#subform.save()
 			wb_new.save()
+		return HttpResponseRedirect('../viewwb_reception/'+ str(wb_new.id)) #
 		
 	else:
 		if current_wb.recipientArrivalDate:

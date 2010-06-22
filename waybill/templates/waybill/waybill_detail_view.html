@@ -12,15 +12,47 @@ table {
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility: hide;
+}
+</style>
+<style media="print" type="text/css">
+.wb_head{color:white;background-color:black;}
+.centric h1{ font-weight: bold; text-align: center;}
+.centric p{font-size: small; text-align: center;}
+table {
+	max-width: 850px;
+	min-width: 850px;
+	width: 850px;
+}
+img{position: relative; left: 20px; text-align: right;}
+.right{ position: absolute; right: 20px; text-align: right;}
+.centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility: hide;
+}
+.hidden_print{
+	display: none;
+	visibility: hide;
+}
 </style>
 </head>
-<body>
+<body><span class="hidden_print">
+<form>
+<button onclick="javascript:original_lable.className='';print();Print2.disabled=false;this.disabled=true; return false;" name="Print Me" id='Print1'>Me Print</button>
+<button onclick="javascript:print(); return false;" name="Print Me2" id='Print2' disabled="true">2 Print</button>
+</form>
+You cant see me on print</span>
 	<table cellpadding="0" cellspacing="0" border="0px">
 		<tr>
 			<td valign="top">
 				<span><img height="75px" src="/ets/media/images/logo_small.gif"/></span>
 				<span  valign="top" class='centric'><h1 >Waybill</h1>
-				<p> Conditions of carriage as indicated overleaf are applicable</p></span>
+				<p> Conditions of carriage as indicated overleaf are applicable</p>
+				<span id='original_lable' class="hidden"><h1>ORIGINAL</h1></span>
+				</span>
 				<!--<span class="right"><img src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br>Waybill Number:{{object.waybillNumber}}</span>-->
 				<span class="right" style="font-size:x-large;">Waybill No:{{object.waybillNumber}}</span>
 			</td>
@@ -171,7 +203,7 @@ Name, signature and stamp:</p></td></tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
-						<td> {{lineitem.numberUnitsGood}}</td>
+						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
