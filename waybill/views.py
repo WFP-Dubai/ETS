@@ -198,8 +198,8 @@ def waybill_reception(request,wb_code):
 #			for subform in instances:
 				#subform.wbNumber = wb_new
 				#subform.save()
-			wb_new.save()
-		return HttpResponseRedirect('../viewwb_reception/'+ str(wb_new.id)) #
+			#wb_new.save()
+			return HttpResponseRedirect('../viewwb_reception/'+ str(current_wb.id)) #
 		
 	else:
 		if current_wb.recipientArrivalDate:
@@ -264,6 +264,7 @@ def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
 	lti_code_global = lti_code
+	
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -279,7 +280,6 @@ def waybillCreate(request,lti_code):
 
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
-
 		formset = LDFormSet(request.POST)
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()

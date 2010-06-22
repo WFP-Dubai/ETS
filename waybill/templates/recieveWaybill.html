@@ -2,19 +2,16 @@
 {%block title %}Welcome to EPIC eTS{%endblock%}
 {%block content %}
 
-{% if form.subject.errors %}
+
+{%for item in form%}
+{% if item.errors %}
     <ol>
-    {% for error in form.subject.errors %}
-        <li><strong>{{ error|escape }}</strong></li>
+    {% for error in item.errors %}
+        <li>{{item.label}}<strong>{{ error|escape }}</strong></li>
     {% endfor %}
     </ol>
 {% endif %}
-{%if formset.errors%}
-{%for error in formset.errors%}
-	{{error}}
-{%endfor%}
-{%endif%}
-
+  {% endfor %}
 <form action="" method=POST>
 
 <div>
@@ -26,7 +23,7 @@
 <span>Start DIscharge: {{form.recipientStartDischargeDate}}</span>
 <span>End DIscharge: {{form.recipientEndDischargeDate}}</span><br/>
 <span>Distance: {{form.recipientDistance}}</span>
-<span>Recipient Remarks: {{form.recipientDistance}}</span><br/>
+<span>Recipient Remarks: {{form.recipientRemarks}}</span><br/>
 </div>
 
  {{ formset.management_form }}
