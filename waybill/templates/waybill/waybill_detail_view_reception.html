@@ -1,0 +1,255 @@
+<html>
+<head>
+<style type="text/css">
+.wb_head{color:white;background-color:black;}
+.centric h1{ font-weight: bold; text-align: center;}
+.centric p{font-size: small; text-align: center;}
+table {
+	max-width: 850px;
+	min-width: 850px;
+	width: 850px;
+}
+img{position: relative; left: 20px; text-align: right;}
+.right{ position: absolute; right: 20px; text-align: right;}
+.centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility: hide;
+}
+</style>
+<style media="print" type="text/css">
+.wb_head{color:white;background-color:black;}
+.centric h1{ font-weight: bold; text-align: center;}
+.centric p{font-size: small; text-align: center;}
+table {
+	max-width: 850px;
+	min-width: 850px;
+	width: 850px;
+}
+img{position: relative; left: 20px; text-align: right;}
+.right{ position: absolute; right: 20px; text-align: right;}
+.centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility: hide;
+}
+.hidden_print{
+	display: none;
+	visibility: hide;
+}
+</style>
+</head>
+<body><span class="hidden_print">
+<form>
+<button onclick="javascript:original_lable.className='';print();Print2.disabled=false;this.disabled=true; return false;" name="Print Me" id='Print1'>Me Print</button>
+<button onclick="javascript:print(); return false;" name="Print Me2" id='Print2' disabled="true">2 Print</button>
+</form>
+You cant see me on print</span>
+	<table cellpadding="0" cellspacing="0" border="0px">
+		<tr>
+			<td valign="top">
+				<span><img height="75px" src="/ets/media/images/logo_small.gif"/></span>
+				<span  valign="top" class='centric'><h1 >Waybill</h1>
+				<p> Conditions of carriage as indicated overleaf are applicable</p>
+				<span id='original_lable' class="hidden"><h1>ORIGINAL</h1></span>
+				</span>
+				<!--<span class="right"><img src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br>Waybill Number:{{object.waybillNumber}}</span>-->
+				<span class="right" style="font-size:x-large;">Waybill No:{{object.waybillNumber}}</span>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0" border="1px">
+					<thead class="wb_head">
+						<th colspan="5" bgcolor='black' color='white'>Transaction Details</th>
+					</thead>
+					<tr>
+						<td><sup>Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
+						<td><sup>Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
+						<td><sup>Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
+						<td rowspan=5><span ><img style='left:0px;' src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br></span></td>
+					
+					</tr>
+					<tr>
+						<td><sup>Project no.</sup><br>{{ltioriginal.0.PROJECT_WBS_ELEMENT}}</td>
+						<td><sup>Date of Loading:</sup><br>{{object.dateOfLoading}}</td>
+						<td><sup>Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
+					</tr>
+					<tr>
+						<td><sup>Destination(warehouse):</sup><br>{{ltioriginal.0.DESTINATION_WH_NAME}}</td>
+						<td><sup>Allocation Destination:</sup></td>
+						<td><sup>Consignee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
+						
+					</tr>
+
+					<tr>
+						<td><sup>Type of Transaction:</sup><br>
+						 {%if object.transactionType == 'INT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
+						<td><sup>Transport Type:</sup><br>Road</td>
+						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td>
+					</tr>
+					<tr><td colspan=3 valign="top"><sup>Dispatch Remarks:</sup><br>{{object.dispatchRemarks}}
+						{%if object.containerOneRemarksDispatch%}
+						<br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
+						{%endif%}
+						{%if object.containerTwoRemarksDispatch%}
+						<br>Container 2 Remarks:{{object.containerTwoRemarksDispatch}}
+						{%endif%}</td></tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0" border="1px" style=''>
+					<thead class="wb_head">
+						<th colspan="8">Loading Details</th>
+					</thead>
+					<tr>
+						<td rowspan="2"><sup>SI No</sup></td>
+						<td rowspan="2"><sup>Commodity</sup></td>
+						<td rowspan="2"><sup>Packing</sup></td>
+						<td rowspan="2"><sup>Number of Units</sup></td>
+						<td colspan="2"><sup>Unit Weight (kg)</sup></td>
+						<td colspan="2"><sup>Tonnage</sup></td>
+					</tr>
+					<tr>
+						<td><sup>Net</sup></td>
+						<td><sup>Gross</sup></td>
+						<td><sup>Net</sup></td>
+						<td><sup>Gross</sup></td>
+					</tr>
+					{%for lineitem in object.loadingdetail_set.select_related%}
+					<tr>
+						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+						<td>{{lineitem.siNo.CMMNAME}}</td>
+						<td>{{lineitem.getStockItem}}</td>
+						<td>{{lineitem.numberUnitsLoaded}}</td>
+						<td>{{lineitem.siNo.UNIT_WEIGHT_NET}}</td>
+						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS}}</td>
+						<td>{{lineitem.calcTotalNet}}</td>
+						<td>{{lineitem.calcTotalGross}}</td>
+					</tr>
+					{%endfor%}
+					<tr>
+						<td colspan="8">
+						</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0" border="1px">
+					<thead class="wb_head"><th colspan="3">Certification of Commodities Loaded</td></th></thead>
+						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup>Transport Contractor</sup><br>{{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
+						<tr><td><small>Name:</small>{{object.dispatcherName}}</td><td colspan="2"><small>Transport Subcontractor</small>{{object.transportSubContractor}}</td></tr>
+						<tr><td><small>Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small>Driver's Name:</small>{{object.transportDriverName}}</td></tr>
+						<tr><td rowspan="4"><p style="font-size: x-small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
+Name, signature and stamp:</p></td><td colspan="2"><small>Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+						<tr><td><small>Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
+						<td><small>Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSealNumber}}
+						<br><small>Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSealNumber}} </td></tr>
+						<tr><td rowspan="2" colspan="2"><p style="font-size: x-small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
+Name, signature and stamp:</p></td></tr>
+				</table>
+			</td>
+		</tr>
+	!!{{object.recipientConsingee}}!!
+
+
+
+
+	
+
+	{{object.recipientRemarks}}
+	{{object.recipientSigned}}
+	{{object.recipientSignedTimestamp}}
+	{{object.destinationWarehouse}}
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0" border="1px">
+					<thead class="wb_head"><th colspan="2">Certification of Commodities Received</td></th></thead>
+					<tr>
+						<td><small>Location:</small>{{object.recipientLocation}}</td>
+						<td ><samll>Arrival Date:	</small>{{object.recipientArrivalDate}}</td>
+					</tr>
+					<tr>
+						<td><small>Consignee:</small>	{{object.recipientConsingee}}</td>
+						<td ><small>Start Discharge Date:</small>	{{object.recipientStartDischargeDate}}</td>
+					</tr>
+					<tr>
+						<td><small>Name:	</small>{{object.recipientName}}</td>
+						<td ><small>End Discharge Date</small>{{object.recipientEndDischargeDate}}</td>
+					</tr>
+					<tr>
+						<td><small>Title: 	</small>{{object.recipientTitle}}</td>
+						<td ><small>Distance in KM</small>	{{object.recipientDistance}}</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<table cellpadding="0" cellspacing="0" border="1px">
+					<thead class="wb_head">
+						<th colspan="11">Observations</th>
+					</thead>
+					<tr>
+						<td><sup>Receipt Condition</sup></td>
+						<td colspan="2"><sup>Good</sup></td>
+						<td colspan="6"><sup>Lost or Damaged cargo</sup></td>
+						
+						<td colspan="2"><sup>Total received</sup></td>
+					</tr>
+					<tr>
+<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Pre or Post</td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
+					</tr>
+					{%for lineitem in object.loadingdetail_set.select_related%}
+					<tr>
+<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+<td>{{lineitem.numberUnitsGood}}</td>
+<td>{{lineitem.calcNetRecievedGood}}</td>
+<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}
+	D:{{lineitem.numberUnitsDamaged}}
+	{%endifnotequal%}
+	{%ifnotequal lineitem.numberUnitsLost 0%}
+	{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}
+	L:{{lineitem.numberUnitsLost}}
+	{%endifnotequal%}
+</td>
+<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}
+	D:{{lineitem.calcNetRecievedDamaged}}
+	{%endifnotequal%}
+	
+	{%ifnotequal lineitem.numberUnitsLost 0%}
+	{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}
+	L{{lineitem.calcNetRecievedLost}}
+	{%endifnotequal%}</td>
+	
+<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}Damaged{%endifnotequal%} {%ifnotequal lineitem.numberUnitsLost 0%}{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%} Lost{%endifnotequal%}</td>
+
+<td><!-- type-->{%ifnotequal lineitem.numberUnitsDamaged 0%}Damaged:{{lineitem.unitsDamagedReason}} {%endifnotequal%} {%ifnotequal lineitem.numberUnitsLost 0%}{%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%} Lost:{{lineitem.unitsLostReason}}{%endifnotequal%}
+</td>
+<td><!-- pre or post--></td>
+<td><!--reason--></td>
+<td>{{lineitem.calcTotalReceivedUnits}}</td>
+<td>{{lineitem.calcTotalReceivedNet}}</td>	
+						
+					</tr>
+					{%endfor%}
+					<tr>
+						<td colspan="9"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr><td><table cellpadding="0" cellspacing="0" border="1px"><tr><td> <p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.</p>
+<p style="font-size: x-small">Name, signature and stamp
+Endorse this section with an official stamp</p></td><td><p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.</p>
+<p style="font-size: x-small">Name, signature and stamp<br><br><br>
+Endorse this section with an official stamp</p></td></tr></table></td></tr>
+	</table>
+	
+</body>
+
+</html>
