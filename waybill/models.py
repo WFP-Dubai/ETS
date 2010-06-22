@@ -310,8 +310,8 @@ class ETSRole(models.Model):
 class UserProfile(models.Model):
 	user					=models.OneToOneField(User, primary_key=True)
 	#user = models.ForeignKey(User, unique=True, edit_inline=admin.TabularInline)
-	warehouses				=models.ManyToManyField(DispatchPoint, blank=True)
-	receptionPoints			=models.ManyToManyField(ReceptionPoint, blank=True)
+	warehouses				=models.ForeignKey(DispatchPoint, blank=True,null=True)
+	receptionPoints			=models.ForeignKey(ReceptionPoint, blank=True,null=True)
 	isCompasUser			=models.BooleanField()
 	isDispatcher			=models.BooleanField()
 	isReciever				=models.BooleanField()

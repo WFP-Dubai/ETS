@@ -5,11 +5,9 @@
         <tr><th>Warehouse</th></tr>
         </thead>
     {% for wh in dispatch_list%}
-    	{% for whdp in profile.warehouses.all%}
-			{%if wh.3 == whdp.ORIGIN_WH_CODE%}
+			{%if wh.3 == profile.warehouses.ORIGIN_WH_CODE%}
 <tr><td><a href='list/{{wh.3}}'> {{wh.2}}</a></td></tr>
 			{%endif%}
-		{% endfor%}
     {% endfor%}
 </table>
 {%endblock%}
