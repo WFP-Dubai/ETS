@@ -54,9 +54,13 @@ def selectAction(request):
                               context_instance=RequestContext(request))
 
 def listOfLtis(request,origin):
-    ltis = ltioriginal.objects.ltiCodesByWH(origin)
-    profile=request.user.get_profile()
-    return render_to_response('ltis.html',
+	ltis = ltioriginal.objects.ltiCodesByWH(origin)
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	return render_to_response('ltis.html',
                               {'ltis':ltis,'profile':profile},
                               context_instance=RequestContext(request))
 
@@ -111,9 +115,13 @@ def single_lti_extra(request,lti_code):
                               context_instance=RequestContext(request))
 
 def dispatch(request):
-    dispatch_list = ltioriginal.objects.warehouses()
-    profile=request.user.get_profile()
-    return render_to_response('dispatch_list.html',
+	dispatch_list = ltioriginal.objects.warehouses()
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	return render_to_response('dispatch_list.html',
                               {'dispatch_list':dispatch_list,'profile':profile},
                               context_instance=RequestContext(request))
                               
@@ -200,13 +208,21 @@ def waybill_reception(request,wb_code):
 
 def waybill_reception_list(request):
 	waybills = Waybill.objects.all()
-	profile=request.user.get_profile()
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
 	return render_to_response('waybill/reception_list.html',
                               {'object_list':waybills,'profile':profile},
                               context_instance=RequestContext(request))
 
 def waybill_search(request):
-	profile=request.user.get_profile()
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
 	search_string =  request.GET['wbnumber']
 	found_wb=''
 	
@@ -235,7 +251,11 @@ def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
 	lti_code_global = lti_code
-	profile=request.user.get_profile()
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
