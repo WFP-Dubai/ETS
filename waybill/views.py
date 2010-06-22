@@ -44,7 +44,7 @@ def loginWaybillSystem(request):
                               context_instance=RequestContext(request))
 @login_required    
 def selectAction(request):
-profile = ''
+	profile = ''
 	try:
 		profile=request.user.get_profile()
 	except:
