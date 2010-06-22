@@ -16,6 +16,10 @@ img{position: relative; left: 20px; text-align: right;}
 	display: none;
 	visibility: hide;
 }
+.shown{
+	display:inherit;
+	visibility: visible;
+}
 </style>
 <style media="print" type="text/css">
 .wb_head{color:white;background-color:black;}
@@ -37,14 +41,22 @@ img{position: relative; left: 20px; text-align: right;}
 	display: none;
 	visibility: hide;
 }
+
+.shown{
+	display:inherit;
+	visibility: visible;
+}
 </style>
 </head>
 <body><span class="hidden_print">
-<form>
-<button onclick="javascript:original_lable.className='';print();Print2.disabled=false;this.disabled=true; return false;" name="Print Me" id='Print1'>Me Print</button>
-<button onclick="javascript:print(); return false;" name="Print Me2" id='Print2' disabled="true">2 Print</button>
-</form>
-You cant see me on print</span>
+<form method="get" action="/ets/waybill/edit/{{object.id}}">
+<button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" name="Print Copy" id='PrintCopy'>Print Copy</button>
+{%if not object.dispatcherSigned and not object.transportDispachSigned%}<button name="Edit" id='Edit'>Edit</button>{%endif%}</form>
+{%if not object.dispatcherSigned and not object.transportDispachSigned%}
+<form name="printoriginal" id="printoriginal" method="get" action="/ets/waybill/print_original/{{object.id}}">
+<input type="submit" onclick="javascript:original_lable.className='shown';copy_lable.className='hidden'; Edit.disabled=true;this.disabled=true;copy_lable.className='shown';original_lable.className='hidden';printoriginal.submit()" name="Print Original" id='Print1' value='Print Original'></form>
+{%endif%}<a href="/ets/waybill/dispatch">Back to Dispatch</a>
+</span>
 	<table cellpadding="0" cellspacing="0" border="0px">
 		<tr>
 			<td valign="top">
@@ -52,6 +64,7 @@ You cant see me on print</span>
 				<span  valign="top" class='centric'><h1 >Waybill</h1>
 				<p> Conditions of carriage as indicated overleaf are applicable</p>
 				<span id='original_lable' class="hidden"><h1>ORIGINAL</h1></span>
+				<span id='copy_lable' class="shown"><h1>COPY</h1></span>				
 				</span>
 				<!--<span class="right"><img src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br>Waybill Number:{{object.waybillNumber}}</span>-->
 				<span class="right" style="font-size:x-large;">Waybill No:{{object.waybillNumber}}</span>
@@ -128,6 +141,7 @@ You cant see me on print</span>
 						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS}}</td>
 						<td>{{lineitem.calcTotalNet}}</td>
 						<td>{{lineitem.calcTotalGross}}</td>
+
 					</tr>
 					{%endfor%}
 					<tr>

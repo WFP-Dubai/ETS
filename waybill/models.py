@@ -128,7 +128,7 @@ class ltioriginalManager(models.Manager):
 		
 	def ltiCodesByWH(self,wh):
 		cursor = connection.cursor()
-		cursor.execute('SELECT DISTINCT CODE,SI_CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) ',[wh,datetime.date(2010, 5, 1)])
+		cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh,datetime.date(2010, 5, 1)])
 		lti_code = cursor.fetchall()
 		return lti_code
 	
@@ -180,11 +180,16 @@ class ltioriginal(models.Model):
 	def  __unicode__(self):
 		resting= ''
 		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.NUMBER_OF_UNITS)
+		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.restant()) + self.NUMBER_OF_UNITS
 	def mydesc(self):
 		return self.CODE
 	def commodity(self):
 		return self.CMMNAME 
+	def restant(self):
+		return SiTracker.objects.get(LTI=self).number_units_left
+	def reducesi(self,units):
+		SiTracker.objects.get(LTI=self).updateUnits(units)
+		return self.restant()
 
 ####
 
@@ -218,6 +223,8 @@ class EpicPersonsAdmin(admin.ModelAdmin):
 	list_filter = ( 'location_code','organization_id')
 
 
+
+
 class EpicStock(models.Model):
     wh_pk = models.CharField(max_length=90, blank=True, primary_key=True)
     wh_regional = models.CharField(max_length=4, blank=True)
@@ -249,14 +256,14 @@ class EpicStock(models.Model):
 
 
 class LoadingDetail(models.Model):
-	wbNumber				=models.ForeignKey(Waybill)
-	siNo					=models.ForeignKey(ltioriginal)
-	numberUnitsLoaded		=models.IntegerField(default=0, blank=True,null=True)
-	numberUnitsGood			=models.IntegerField(default=0,blank=True,null=True)
-	numberUnitsLost			=models.IntegerField(default=0,blank=True,null=True)
-	numberUnitsDamaged		=models.IntegerField(default=0,blank=True,null=True)
+	wbNumber					=models.ForeignKey(Waybill)
+	siNo								=models.ForeignKey(ltioriginal)
+	numberUnitsLoaded		=models.DecimalField(default=0, blank=True,null=True,max_digits=7, decimal_places=3)
+	numberUnitsGood			=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
+	numberUnitsLost			=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
+	numberUnitsDamaged	=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
 	unitsLostReason			=models.TextField(blank=True)
-	unitsDamagedReason		=models.TextField(blank=True)
+	unitsDamagedReason	=models.TextField(blank=True)
 	
 	def getStockItem(self):
 		stockItem = EpicStock.objects.filter(si_code = self.siNo.SI_CODE).filter(commodity_code = self.siNo.COMMODITY_CODE)
@@ -298,12 +305,6 @@ class LoadingDetail(models.Model):
 	def calcTotalReceivedNet(self):
 		total = self.calcNetRecievedGood() + self.calcNetRecievedDamaged() 
 		return total
-		
-	
-		
-	
-	
-		
 	
 	def  __unicode__(self):
 		return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
@@ -356,6 +357,15 @@ class UserProfile(models.Model):
 class UserProfileAdmin(admin.ModelAdmin):
 	list_display=('user','warehouses')
 	
+class SiTracker(models.Model):
+	LTI = models.ForeignKey(ltioriginal)
+	number_units_left = models.DecimalField(decimal_places=3,max_digits=10)
+		
+	def updateUnits(self,ammount):
+		self.number_units_left -=ammount
+		self.save()
+	def  __unicode__(self):
+		return self.number_units_left
 
 class SIWithRestant:
 	SINumber = ''
@@ -388,6 +398,7 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 
 class ltioriginalAdmin(admin.ModelAdmin):
 	list_display=('CODE','SI_CODE')
+
 
 
 

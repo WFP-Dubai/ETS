@@ -84,10 +84,15 @@ def import_ltis(request):
     original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-05-01')
     for myrecord in original:
         myrecord.save(using='default')
+        mysist = SiTracker()
+        mysist.LTI=myrecord
+        mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+        mysist.save(using='default')
     #Copy Stock
     originalStock = EpicStock.objects.using('compas')
     for myrecord in originalStock:
         myrecord.save(using='default')
+     
     status = 'done'
     return render_to_response('status.html',
                               {'status':status},
@@ -143,12 +148,56 @@ def waybill_create(request,lti_pk):
     return render_to_response('detailed_waybill.html',
                               {'detailed':detailed_lti,'lti_id':lti_pk},
                               context_instance=RequestContext(request))
-
-def waybill_edit(request):
-	return render_to_response('status.html',
-                              {'status':'to be implemented'},
-                              context_instance=RequestContext(request))
                               
+                              
+def waybill_finalize_dispatch(request,wb_id):
+	current_wb =  Waybill.objects.get(id=wb_id)
+	current_wb.transportDispachSigned=True
+	current_wb.transportDispachSignedTimestamp=datetime.datetime.now()
+	current_wb.dispatcherSigned=True
+	for lineitem in current_wb.loadingdetail_set.select_related():
+		print lineitem.numberUnitsLoaded
+		print lineitem.siNo.restant()
+		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
+	current_wb.save()
+	return HttpResponseRedirect('/ets/waybill/dispatch') #
+	
+
+
+def waybill_edit(request,wb_id):
+	current_wb =  Waybill.objects.get(id=wb_id)
+	lti_code = current_wb.ltiNumber
+	current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	class LoadingDetailDispatchForm(ModelForm):
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		class Meta:
+			model = LoadingDetail
+			fields = ('siNo','numberUnitsLoaded','wbNumber')
+
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+
+	if request.method == 'POST':
+		form = WaybillForm(request.POST,instance=current_wb)
+		formset = LDFormSet(request.POST,instance=current_wb)
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save()
+#			for subform in instances:
+#				subform.wbNumber = wb_new
+#				subform.save()
+#			wb_new.save()
+			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
+	else:			
+		form = WaybillForm(instance=current_wb)
+		formset = LDFormSet(instance=current_wb)
+		
+	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+ 
 def waybill_view(request,wb_id):
 	waybill_instance = Waybill.objects.get(id=wb_id)
 	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
@@ -296,6 +345,7 @@ def waybillCreate(request,lti_code):
 			wb_new.save()
 			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
 	else:
+		
 		form = WaybillForm(
 			initial={
 					'dispatcherName': 	 profile.compasUser.last_name + ', ' +profile.compasUser.first_name, 	
