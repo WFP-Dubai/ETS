@@ -44,7 +44,10 @@ def loginWaybillSystem(request):
                               context_instance=RequestContext(request))
 @login_required    
 def selectAction(request):
-	profile=request.user.get_profile()
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
 	return render_to_response('selectAction.html',
                               {'profile':profile},
                               context_instance=RequestContext(request))
