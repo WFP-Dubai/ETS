@@ -162,6 +162,15 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.save()
 	return HttpResponseRedirect('/ets/waybill/dispatch') #
 	
+	
+def	waybill_finalize_reciept(request,wb_id):
+	current_wb =  Waybill.objects.get(id=wb_id)
+	current_wb.recipientSigned=True
+	current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
+	current_wb.recipientSignedTimestamp=datetime.datetime.now()	
+	current_wb.transportDeliverySigned=True
+	current_wb.save()
+	return HttpResponseRedirect('/ets/waybill/dispatch') #
 
 
 def waybill_edit(request,wb_id):
