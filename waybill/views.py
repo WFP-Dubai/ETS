@@ -228,14 +228,15 @@ def waybill_search(request):
 	
 	found_wb = Waybill.objects.filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
-	for waybill in found_wb:
-		if waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE == profile.warehouses.ORIGIN_WH_CODE:
-			print waybill
-			my_valid_wb.append(waybill.id)
-		elif waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
-			my_valid_wb.append(waybill.id)
-		elif profile.isCompasUser:
-			my_valid_wb.append(waybill.id)
+	if profile != '':
+		for waybill in found_wb:
+			if waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE == profile.warehouses.ORIGIN_WH_CODE:
+				print waybill
+				my_valid_wb.append(waybill.id)
+			elif waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
+				my_valid_wb.append(waybill.id)
+			elif profile.isCompasUser:
+				my_valid_wb.append(waybill.id)
 	
 	return render_to_response('list_waybills.html',
                               {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
