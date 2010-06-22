@@ -171,6 +171,11 @@ def waybill_view_reception(request,wb_id):
 
 def waybill_reception(request,wb_code):
 	# get the LTI info
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
 	class LoadingDetailRecForm(ModelForm):
@@ -191,7 +196,8 @@ def waybill_reception(request,wb_code):
 	if request.method == 'POST':
 		form = WaybillRecieptForm(request.POST,instance=current_wb)
 		formset = LDFormSet(request.POST,instance=current_wb)
-		
+		form.recipientTitle =  profile.compasUser.title
+		form.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
@@ -204,6 +210,7 @@ def waybill_reception(request,wb_code):
 	else:
 		if current_wb.recipientArrivalDate:
 			form = WaybillRecieptForm(instance=current_wb)
+
 		else:
 			form = WaybillRecieptForm(instance=current_wb,
 			initial={
@@ -214,7 +221,7 @@ def waybill_reception(request,wb_code):
 		)
 		formset = LDFormSet(instance=current_wb)
 	return render_to_response('recieveWaybill.html', 
-			{'form': form,'lti_list':current_lti,'formset':formset},
+			{'form': form,'lti_list':current_lti,'formset':formset,'profile':profile},
 			context_instance=RequestContext(request))
 #    return render_to_response('recieveWaybill.html',                          {'status':'to be implemented'},                              context_instance=RequestContext(request))
 
@@ -240,16 +247,16 @@ def waybill_search(request):
 	
 	found_wb = Waybill.objects.filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
-	if profile != '':
+	my_wh=''
+	if profile != '':	
 		for waybill in found_wb:
-			if waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE == profile.warehouses.ORIGIN_WH_CODE:
-				print waybill
+			if profile.isCompasUser:
 				my_valid_wb.append(waybill.id)
-			elif waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
+			elif profile.warehouses and waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE  == profile.warehouses.ORIGIN_WH_CODE:
 				my_valid_wb.append(waybill.id)
-			elif profile.isCompasUser:
+			elif profile.receptionPoints and  waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
 				my_valid_wb.append(waybill.id)
-	
+
 	return render_to_response('list_waybills.html',
                               {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
                               context_instance=RequestContext(request))

@@ -17,8 +17,9 @@
 <div>
 <span>Waybill Number: {{form.waybillNumber}} {{form.instance.waybillNumber}}</span><br/>
 <span>Recipient Location {{form.recipientLocation}}{{form.instance.recipientLocation}}</span>
-<span>Recipient Name: {{form.recipientName}}{{form.instance.recipientName}}</span>
-<span>Recipient Name: {{form.recipientTitle}}{{form.instance.recipientTitle}}</span><br/>
+<span>Recipient Name:{{profile.compasUser.last_name}}, {{profile.compasUser.first_name}}</span>
+<span>Recipient Title: {{profile.compasUser.title}}{{form.instance.recipientTitle}}</span><br/>
+<span> consignee:{{form.recipientConsingee}}{{form.instance.recipientConsingee}}<span>
 <span>Arrival Date: {{form.recipientArrivalDate}}</span><br/>
 <span>Start DIscharge: {{form.recipientStartDischargeDate}}</span>
 <span>End DIscharge: {{form.recipientEndDischargeDate}}</span><br/>
@@ -45,7 +46,7 @@
     </table>
 <div>
 
-<span>Recieption Signed: Recepient: {{form.recipientSigned}} Transporter:{{form.transportDeliverySigned }}</span>
+<span>Recieption Signed: Recepient: {{form.recipientSigned}} Transporter:{{form.transportDeliverySigned }}</span><br>
 <span>Container 1: {{form.instance.containerOneNumber}} Seal: {{form.instance.containerOneSealNumber}} Remarks: {{form.containerOneRemarksReciept}}<br>
 Container 2: Number:{{form.instance.containerTwoNumber}} Seal: {{form.instance.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksReciept}}
 </span>

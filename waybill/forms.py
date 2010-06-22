@@ -62,14 +62,14 @@ class WaybillRecieptForm(ModelForm):
 	waybillNumber = forms.CharField(widget=forms.HiddenInput())
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-
+	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	
 	class Meta:
 		model = Waybill
 		fields = [
 				'waybillNumber',
-#				'recipientLocation',
-#				'recipientConsingee',
+				'recipientLocation',
+				'recipientConsingee',
 				'recipientName',
 				'recipientTitle',
 				'recipientArrivalDate',
