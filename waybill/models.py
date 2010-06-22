@@ -180,7 +180,7 @@ class ltioriginal(models.Model):
 	def  __unicode__(self):
 		resting= ''
 		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.restant()) + self.NUMBER_OF_UNITS
+		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.restant()) 
 	def mydesc(self):
 		return self.CODE
 	def commodity(self):
