@@ -252,9 +252,9 @@ def waybill_search(request):
 		for waybill in found_wb:
 			if profile.isCompasUser:
 				my_valid_wb.append(waybill.id)
-			elif profile.warehouses and waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE  == profile.warehouses.ORIGIN_WH_CODE:
+			if profile.warehouses and waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE  == profile.warehouses.ORIGIN_WH_CODE:
 				my_valid_wb.append(waybill.id)
-			elif profile.receptionPoints and  waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
+			if profile.receptionPoints and  waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
 				my_valid_wb.append(waybill.id)
 
 	return render_to_response('list_waybills.html',
