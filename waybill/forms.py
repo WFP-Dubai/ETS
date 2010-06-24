@@ -23,6 +23,7 @@ class WaybillForm(ModelForm):
 	transportTrailerRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
+	waybillNumber = forms.CharField(widget=forms.HiddenInput())
 	
 	
 	class Meta:

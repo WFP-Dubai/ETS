@@ -420,6 +420,7 @@ def waybillCreate(request,lti_code):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save(commit=False)
+			wb_new.waybillNumber = 'ETS' + str(wb_new.id)
 			for subform in instances:
 				subform.wbNumber = wb_new
 				subform.save()
@@ -436,11 +437,23 @@ def waybillCreate(request,lti_code):
 					'dateOfDispatch':    datetime.date.today(),
 					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME,
 					'recipientConsingee':current_lti[0].CONSEGNEE_NAME,
-					'transportContractor': current_lti[0].TRANSPORT_NAME
+					'transportContractor': current_lti[0].TRANSPORT_NAME,
+					'waybillNumber':'N/A'
 				}
 		)
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
+
+def waybill_validateSelect(request):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	return render_to_response('selectValidateAction.html',
+                              {'profile':profile},
+                              context_instance=RequestContext(request))
 
 
 def waybill_validate_form(request):
@@ -454,11 +467,33 @@ def waybill_validate_form(request):
 			formset.save()
 		
 	else:
-		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False))
+		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False).filter(dispatcherSigned=True))
 		
 	
 	return render_to_response('validateForm.html', {'formset':formset}, context_instance=RequestContext(request))
 	
+
+
+
+
+def waybill_validate_receipt_form(request):
+
+	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
+	
+	
+	if request.method == 'POST':
+		formset = ValidateFormset(request.POST)
+		if  formset.is_valid():
+			formset.save()
+		
+	else:
+		formset = ValidateFormset(queryset=Waybill.objects.filter( waybillReceiptValidated = False).filter(recipientSigned=True))
+		
+	
+	return render_to_response('validateReceiptForm.html', {'formset':formset}, context_instance=RequestContext(request))
+	
+
+
 
 def testform(request,lti_code):
 	# get the LTI info

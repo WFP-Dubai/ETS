@@ -105,6 +105,8 @@ class Waybill(models.Model):
 	
 	#Extra Fields
 	waybillValidated		=models.BooleanField()
+	waybillReceiptValidated =models.BooleanField()
+	
 	waybillProcessedForPayment	=models.BooleanField()
 	def  __unicode__(self):
 		return self.waybillNumber
@@ -187,7 +189,7 @@ class ltioriginal(models.Model):
 
 	def  __unicode__(self):
 		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-		return self.SI_CODE + ' ' + self.CMMNAME + '  %.0f'  %  self.restant() + self.coi_code()
+		return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant() 
 	def mydesc(self):
 		return self.CODE
 	def commodity(self):
@@ -205,7 +207,7 @@ class ltioriginal(models.Model):
 			item = stock[0]
 			return str(item[0][7:])
 		except:
-			return '-'
+			return 'No Stock '
 
 ####
 
