@@ -137,7 +137,7 @@ class ltioriginalManager(models.Manager):
 				
 		def ltiCodesByWH(self,wh):
 				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s and EXPIRY_DATE > %s and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh,datetime.date(2010, 5, 1)])
+				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
 				lti_code = cursor.fetchall()
 				return lti_code
 		
