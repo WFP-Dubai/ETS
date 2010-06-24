@@ -12,7 +12,7 @@
 <form class="the_forms" method="get" action="/ets/waybill/receive/{{object.id}}">
 <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" name="Print Copy" id='PrintCopy'>Print Copy</button>
 {%if not object.recipientSigned and not object.transportDeliverySigned%}
-<button name="Edit" id='Edit'>Edit</button>
+<input type="submit" value="Edit" name="Edit" id='Edit'/>
 {%endif%}
 </form>
 {%if not object.recipientSigned and not object.transportDeliverySigned%}
