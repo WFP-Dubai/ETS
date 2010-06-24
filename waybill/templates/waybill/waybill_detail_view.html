@@ -1,6 +1,11 @@
 <html>
 <head>
 <style type="text/css">
+body{
+
+	font-size: 9px;
+
+}
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
@@ -34,6 +39,11 @@ img{position: relative; left: 20px; text-align: right;}
 }
 </style>
 <style media="print" type="text/css">
+body{
+
+	font-size: 9px;
+
+}
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
@@ -64,8 +74,6 @@ img{position: relative; left: 20px; text-align: right;}
 	display: inline;
 	height: 0px;
 }
-#id{
-}
 </style>
 </head>
 <body><span class="hidden_print">
@@ -78,7 +86,8 @@ img{position: relative; left: 20px; text-align: right;}
 {%endif%}<a href="/ets/waybill/dispatch">Back to Dispatch</a>
 </span>
 	<table cellpadding="0" cellspacing="0" border="0px">
-		<tr><td>	<table cellpadding="0" cellspacing="0" border="0px">
+		<tr>
+			<td>	<table cellpadding="0" cellspacing="0" border="0px">
 		<tr>
 		<td><span><img height="75px" src="/ets/media/images/logo_small.gif"/></span></td>
 			<td valign="top">
@@ -157,7 +166,7 @@ img{position: relative; left: 20px; text-align: right;}
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
-						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
 						<td>{{lineitem.getStockItem}}</td>
 						<td>{{lineitem.numberUnitsLoaded}}</td>
@@ -240,7 +249,7 @@ Name, signature and stamp:</p></td></tr>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
-						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
