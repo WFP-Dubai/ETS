@@ -6,7 +6,6 @@ body{
 	font-size: 9px;
 
 }
-
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
@@ -14,7 +13,6 @@ table {
 	max-width: 850px;
 	min-width: 850px;
 	width: 850px;
-	font-size: 12px;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -27,22 +25,27 @@ img{position: relative; left: 20px; text-align: right;}
 	display:inherit;
 	visibility: visible;
 }
+.the_forms{
+	display: inline;
+}
 </style>
-<style media="print" type="text/css">
-body{
+<style type="text/css">
+#original_lable, #copy_lable{
 
-	font-size: 9px;
+	font-weight: bold;
+
+	font-size: x-large;
 
 }
+</style>
+<style media="print" type="text/css">
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
-	border-collapse: collapse;
-	max-width: 850px;
-	min-width: 850px;
-	width: 850px;
-	font-size: 12px;
+	max-width: 800px;
+	min-width: 800px;
+	width: 800px;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -50,17 +53,24 @@ img{position: relative; left: 20px; text-align: right;}
 .hidden{
 	display: none;
 	visibility: hide;
+	height: 0px;
 }
 .hidden_print{
 	display: none;
 	visibility: hide;
+	height: 0px;
 }
 
 .shown{
 	display:inherit;
 	visibility: visible;
 }
+.the_forms{
+	display: inline;
+	height: 0px;
+}
 </style>
+
 </head>
 <body>
 <span class="hidden_print">
@@ -74,15 +84,20 @@ img{position: relative; left: 20px; text-align: right;}
 </span>
 	<table cellpadding="0" cellspacing="0" border="0px">
 		<tr>
+			<td>	<table cellpadding="0" cellspacing="0" border="0px">
+		<tr>
+		<td><span><img height="75px" src="/ets/media/images/logo_small.gif"/></span></td>
 			<td valign="top">
-				<span><img height="75px" src="/ets/media/images/logo_small.gif"/></span>
 				<span  valign="top" class='centric'><h1 >Waybill</h1>
 				<p> Conditions of carriage as indicated overleaf are applicable</p>
-				<span id='original_lable' class="hidden"><h1>ORIGINAL</h1></span>
-				<span id='copy_lable' class="shown"><h1>COPY</h1></span>
+				<span id='original_lable' class="hidden">ORIGINAL</span>
+				<span id='copy_lable' class="shown">COPY</span>				
 				</span>
 				<!--<span class="right"><img src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br>Waybill Number:{{object.waybillNumber}}</span>-->
-				<span class="right" style="font-size:x-large;">Waybill No:{{object.waybillNumber}}</span>
+				
+			</td>
+			<td align="right"><span valign=top style="font-size:x-large;">No:{{object.waybillNumber}}</span></td>
+			</tr></table>
 			</td>
 		</tr>
 		<tr>
