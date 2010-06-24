@@ -1,0 +1,44 @@
+{% extends "base_template.html"%}
+{%block content %}
+<form method="post" action="">
+    {{ formset.management_form }}
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Origin Warehouse</th><th>Consignee</th><th>Delivery Location</th><th>Dispatched</th><th>Received</th><th>Validated</th><th>Processed For Payment</th><th></th></tr>
+        </thead>
+    {% for form in formset.forms %}
+    
+    {{form.id}}
+    <tr>
+ 			<td>{{form.instance.ltiNumber}}</td>
+ 			<td>{{form.instance.waybillNumber}}</td>
+ 			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
+ 			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
+ 			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td>{%if form.instance.dispatcherSigned%}Yes{%else%}No{%endif%} </td>
+ 			<td>{%if form.instance.recipientSigned%}Yes{%else%}No{%endif%} </td>
+ 			<td>{{ form.waybillValidated }} </td>
+  			<td>{%if form.instance.waybillProcessedForPayment%}Yes{%else%}No{%endif%} </td>
+ 			<td><a href='viewwb/{{form.instance.id}}'>Select</a></td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+<input type="submit" value="Validate Waybills"> {% csrf_token %}
+</form>
+{%endblock%}
+
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+} );
+</script>
+{%endblock extra-header%}
