@@ -163,7 +163,7 @@ img{position: relative; left: 20px; text-align: right;}
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
-						<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
 						<td>{{lineitem.getStockItem}}</td>
 						<td>{{lineitem.numberUnitsLoaded}}</td>
@@ -238,7 +238,7 @@ Name, signature and stamp:</p></td></tr>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
-<td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
+<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 <td>{{lineitem.numberUnitsGood}}</td>
 <td>{{lineitem.calcNetRecievedGood}}</td>
 <td>{%ifnotequal lineitem.numberUnitsLost 0%}
