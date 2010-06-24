@@ -82,7 +82,7 @@ def import_ltis(request):
 	for myrecord in originalPerson:
 		myrecord.save(using='default')	
 	#copy LTIs
-	original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-05-01')
+	original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-06-20')
 	for myrecord in original:
 		myrecord.save(using='default')
 #		mysist = SiTracker()
