@@ -15,44 +15,50 @@
 <form action="" method=POST>
 
 <div>
-<span>Waybill Number: {{form.waybillNumber}} {{form.instance.waybillNumber}}</span><br/>
-<span>Recipient Location {{form.recipientLocation}}{{form.instance.recipientLocation}}</span>
-<span>Recipient Name:{{profile.compasUser.last_name}}, {{profile.compasUser.first_name}}</span>
-<span>Recipient Title: {{profile.compasUser.title}}{{form.instance.recipientTitle}}</span><br/>
-<span> consignee:{{form.recipientConsingee}}{{form.instance.recipientConsingee}}<span>
-<span>Arrival Date: {{form.recipientArrivalDate}}</span><br/>
-<span>Start DIscharge: {{form.recipientStartDischargeDate}}</span>
-<span>End DIscharge: {{form.recipientEndDischargeDate}}</span><br/>
-<span>Distance: {{form.recipientDistance}}</span>
-<span>Recipient Remarks: {{form.recipientRemarks}}</span><br/>
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td>Waybill Number:</td><td> {{form.waybillNumber}} {{form.instance.waybillNumber}}</td></tr>
+<tr><td>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
+<tr><td>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
+<tr><td>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
+<tr><td>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>
+<tr><td>Distance: </td><td>{{form.recipientDistance}}</td></tr>
+</table>
 </div>
+<br>
 
  {{ formset.management_form }}
- <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+ <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>Item</th><th>Number<br> of units Loaded</th><th>Number of units Good</th><th>Number of units Damaged</th><th>Number of units Lost</th>
+        <tr><th>Item</th><th>Dispatched</th><th>Good</th><th>Damaged</th><th>Lost</th>
         </thead>
 
     {% for sform in formset.forms %}
         {{ sform.id }}
         <tr>
-        	<td>{{sform.siNo}} {{ sform.instance.siNo}}</td>
-        	<td>{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
-        	<td>No:{{ sform.numberUnitsGood }}</td>
-        	<td>No:{{ sform.numberUnitsDamaged }}<br>Reason:{{ sform.unitsDamagedReason }}</td>
-        	<td>No:{{ sform.numberUnitsLost }}<br>Reason:{{ sform.unitsLostReason }}</td>
+        	<td>{{sform.siNo}}</td>
+        	<td align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
+        	<td>{{ sform.numberUnitsGood }}</td>
+        	<td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
+        	<td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
         </tr>
     {% endfor %}
     </table>
 <div>
+<br>
 
-<span>Recieption Signed: Recepient: {{form.recipientSigned}} Transporter:{{form.transportDeliverySigned }}</span><br>
-<span>Container 1: {{form.instance.containerOneNumber}} Seal: {{form.instance.containerOneSealNumber}} Remarks: {{form.containerOneRemarksReciept}}<br>
-Container 2: Number:{{form.instance.containerTwoNumber}} Seal: {{form.instance.containerTwoSealNumber}} Remarks: {{form.containerTwoRemarksReciept}}
-</span>
+<table>
+<tr><td colspan="3">Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
+
+<tr><td>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
+<tr><td>Container 2:</td><td>{{form.instance.containerTwoNumber}}</td><td> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
+
+</table>
+
 </div>
 
-<input type="submit"> {% csrf_token %}
+<input type="submit" value="Save & Print"> {% csrf_token %}
 </form>
 
 

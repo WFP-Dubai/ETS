@@ -3,7 +3,7 @@
     >
 <html lang="en">
 <head>
-    <title>eTs - eWaybill - {%block title%}{{section.title}}{%endblock%}</title>
+    <title>ETS oPt  {%block title%}{{section.title}}{%endblock%}</title>
 	<style type="text/css" title="currentStyle">
 		@import "/ets/media/css/demo_page.css";
 		@import "/ets/media/css/demo_table.css";
@@ -25,17 +25,18 @@
 		li{ list-style-type: none; }
    //	table{font-family: monospace;}
    .dataTables_wrapper{min-height:0px}
-   
+   .display thead tr th{text-align: left;}
     </style>
 </head>
 <body>
 <div class="header">
 <span style="font-weight:bold">Electronic Tracking System -  eWaybill {{section.title}}</span>
 </div>
-<div class="menu"><a href='/'>home</a> {% if user.is_authenticated %} {%if user.get_profile.isDispatcher%} <a href='/ets/waybill/dispatch'>Create & Dispatch</a>{%endif%}
-{%if user.get_profile.isReciever%} <a href='/ets/waybill/receive'>Recieve Waybill</a>{%endif%}
-{%if user.get_profile.isCompasUser%} <a href='/ets/waybill/validate'>Validate Waybill</a> {%endif%}<a href='/accounts/logout/?next=/'>Logout</a>{% else %}Please log in. <a href='/ets/loginHere?next=/'>login</a>
+<div class="menu"><a href='/ets/select-action'>home</a> {% if user.is_authenticated %} {%if user.get_profile.isDispatcher%} <a href='/ets/waybill/dispatch'>Create & Dispatch</a>{%endif%}
+{%if user.get_profile.isReciever%} <a href='/ets/waybill/receive'>Receive Waybill</a>{%endif%}
+{%if user.get_profile.isCompasUser%} <a href='/ets/waybill/validate_form'>Validate Waybill</a> {%endif%}<a href='/accounts/logout/?next=/'>Logout</a>{% else %}Please log in. <a href='/ets/loginHere?next=/'>login</a>
 {% endif %}</div>
+<br>
 <div class="content">
 {%block content %}
 <table>
@@ -57,6 +58,7 @@
 
 {%endblock%}
 </div>
+<br>
 <div class='footer'>
 {% if user.is_authenticated %}
     Logged in as:<span class="highlight"> {{ user.username }}</span>.

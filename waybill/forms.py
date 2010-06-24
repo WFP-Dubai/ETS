@@ -84,6 +84,35 @@ class WaybillRecieptForm(ModelForm):
 				'containerTwoRemarksReciept'
 			]
 
+class WaybillFullForm(ModelForm):
+	
+	dateOfDispatch = forms.DateField()
+	dateOfLoading = forms.DateField()
+	dispatcherName = forms.CharField(widget=forms.HiddenInput(),required=False)
+	dispatcherTitle= forms.CharField(widget=forms.HiddenInput(),required=False)
+	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	ltiNumber = forms.CharField(widget=forms.HiddenInput())
+	recipientArrivalDate = forms.DateField()
+	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
+	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
+	recipientEndDischargeDate = forms.DateField()
+	recipientLocation = forms.CharField(widget=forms.HiddenInput())
+	recipientLocation = forms.CharField(widget=forms.HiddenInput())
+	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	recipientStartDischargeDate = forms.DateField()
+	transactionType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
+	transportContractor = forms.CharField(widget=forms.HiddenInput())
+	transportDriverLicenceID=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportDriverName=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportSubContractor=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportTrailerRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
+	transportVehicleRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	waybillNumber = forms.CharField(widget=forms.HiddenInput())
+	
+
+	class Meta:
+		model=Waybill
 
 		
 class MyModelChoiceField(ModelChoiceField):

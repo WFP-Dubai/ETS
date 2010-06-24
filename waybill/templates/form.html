@@ -5,7 +5,7 @@
 .ul-inline ul, .ul-inline ul li{border-width: 1px; display: inline; padding: 0px;}
 .ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
 </style>
-<form action="" method=POST>
+<form action="" method=POST id="delform">
 {%for item in form%}
 {% if item.errors %}
     <ol>
@@ -67,11 +67,13 @@
 
 </div>
 
-<input type="submit"> {% csrf_token %}
+<input type="submit" value="Save & Print"> {% csrf_token %}
 </form>
 {%endblock%}
 {%block extra-header%}
-<script charset="utf-8">
+<script charset="utf-8" type="text/javascript">
+
+
 $(document).ready(function() {
 				$('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
 				$('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });				

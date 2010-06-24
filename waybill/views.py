@@ -2,7 +2,8 @@
 import datetime
 from django.contrib.auth.views import login,logout
 from django.contrib.auth.decorators import login_required
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory,modelformset_factory
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
@@ -87,7 +88,22 @@ def import_ltis(request):
         mysist = SiTracker()
         mysist.LTI=myrecord
         mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-        mysist.save(using='default')
+        try:
+        	mysist.save(using='default')
+        except:
+        	pass
+    #UPDATE GEO
+#    try:
+#    my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
+#    for the_geo in my_geo:
+#    		if the_geo.COUNTRY_CODE == '275':
+#   			the_geo.save(using='default')
+#    except:
+#    	pass
+   # my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='376')
+   # for the_geo in my_geo:
+   # 	the.geo.save(using='default')
+    
     #Copy Stock
     originalStock = EpicStock.objects.using('compas')
     for myrecord in originalStock:
@@ -170,7 +186,12 @@ def	waybill_finalize_reciept(request,wb_id):
 	current_wb.recipientSignedTimestamp=datetime.datetime.now()	
 	current_wb.transportDeliverySigned=True
 	current_wb.save()
-	return HttpResponseRedirect('/ets/waybill/dispatch') #
+	print 	current_wb.transportDeliverySigned
+	return HttpResponseRedirect('/ets/waybill/viewwb_reception/' + str(current_wb.id)) #
+
+
+
+
 
 
 def waybill_edit(request,wb_id):
@@ -196,16 +217,49 @@ def waybill_edit(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-#			for subform in instances:
-#				subform.wbNumber = wb_new
-#				subform.save()
-#			wb_new.save()
 			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
 	else:			
 		form = WaybillForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
 		
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
+def waybill_validate_form_update(request,wb_id):
+	current_wb =  Waybill.objects.get(id=wb_id)
+	lti_code = current_wb.ltiNumber
+	current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	class LoadingDetailDispatchForm(ModelForm):
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.all())
+		numberUnitsLoaded=forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		
+		class Meta:
+			model = LoadingDetail
+			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
+
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=0)
+
+	if request.method == 'POST':
+		form = WaybillFullForm(request.POST,instance=current_wb)
+		formset = LDFormSet(request.POST,instance=current_wb)
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save()
+			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
+	else:			
+		form = WaybillFullForm(instance=current_wb)
+		formset = LDFormSet(instance=current_wb)
+		
+	return render_to_response('waybill/waybill_detail.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
+
  
 def waybill_view(request,wb_id):
 	waybill_instance = Waybill.objects.get(id=wb_id)
@@ -240,41 +294,41 @@ def waybill_reception(request,wb_code):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
 		#siNo= forms.CharField(widget=forms.HiddenInput())
 		numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
-		unitsLostReason= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-		unitsDamagedReason=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
-		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
-		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'6'}),required=False)
+		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
+		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		
 		class Meta:
 			model = LoadingDetail
-			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason',)
+			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
 		form = WaybillRecieptForm(request.POST,instance=current_wb)
 		formset = LDFormSet(request.POST,instance=current_wb)
-		form.recipientTitle =  profile.compasUser.title
-		form.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
 		if form.is_valid() and formset.is_valid():
+			form.recipientTitle =  profile.compasUser.title
+			form.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
 			wb_new = form.save()
+			wb_new.recipientTitle =  profile.compasUser.title
+			wb_new.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
+			wb_new.save()
 			instances =formset.save()
-#			for subform in instances:
-				#subform.wbNumber = wb_new
-				#subform.save()
-			#wb_new.save()
 			return HttpResponseRedirect('../viewwb_reception/'+ str(current_wb.id)) #
 		
 	else:
 		if current_wb.recipientArrivalDate:
 			form = WaybillRecieptForm(instance=current_wb)
-
+			form.recipientTitle =  profile.compasUser.title
+			form.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
 		else:
 			form = WaybillRecieptForm(instance=current_wb,
 			initial={
 				'recipientArrivalDate':datetime.date.today(),
 				'recipientStartDischargeDate':datetime.date.today(),
 				'recipientEndDischargeDate':datetime.date.today(),
+				'recipientName': 	 profile.compasUser.last_name + ', ' +profile.compasUser.first_name, 	
+				'recipientTitle': 	 profile.compasUser.title,
 			}
 		)
 		formset = LDFormSet(instance=current_wb)
@@ -283,8 +337,10 @@ def waybill_reception(request,wb_code):
 			context_instance=RequestContext(request))
 #    return render_to_response('recieveWaybill.html',                          {'status':'to be implemented'},                              context_instance=RequestContext(request))
 
+
+
 def waybill_reception_list(request):
-	waybills = Waybill.objects.all()
+	waybills = Waybill.objects.filter(recipientSigned = False)
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -327,7 +383,6 @@ def waybillSearchResult(request):
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	lti_code_global = lti_code
 	
 	profile = ''
 	try:
@@ -336,9 +391,25 @@ def waybillCreate(request,lti_code):
 		pass
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		overload =  forms.BooleanField(required=False)
 		class Meta:
 			model = LoadingDetail
-			fields = ('siNo','numberUnitsLoaded','wbNumber')
+			fields = ('siNo','numberUnitsLoaded','wbNumber','overload')
+		
+#		def clean(self):
+#			cleaned_data = self.cleaned_data
+#			siNo = cleaned_data.get("siNo")
+#			units = cleaned_data.get("numberUnitsLoaded")
+#			overloaded = cleaned_data.get('overload')
+#			theSI = ltioriginal.objects.get(id=siNo)
+#			max_items = theSI.restant()
+#			if units > max_items and not overloaded:
+#				pass
+#				
+#			return cleaned_data
+				
+			
+
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
@@ -371,12 +442,27 @@ def waybillCreate(request,lti_code):
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 
+def waybill_validate_form(request):
 
+	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillValidated',),extra=0)
+	
+	
+	if request.method == 'POST':
+		formset = ValidateFormset(request.POST)
+		if  formset.is_valid():
+			formset.save()
+		
+	else:
+		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False))
+		
+	
+	return render_to_response('validateForm.html', {'formset':formset}, context_instance=RequestContext(request))
+	
 
 def testform(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	lti_code_global = lti_code
+
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		

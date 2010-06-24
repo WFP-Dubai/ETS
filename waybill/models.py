@@ -8,6 +8,17 @@ from django.template.defaultfilters import stringfilter
 
 
 # Create your models here.
+
+#class places(models.Model):
+#	ORG_CODE 	=models.CharField(max_length=7, primary_key=True)
+#	NAME			=models.CharField(max_length=100)
+#	GEO_POINT_CODE =models.CharField(max_length=4)
+#	GEO_NAME	=models.CharField(max_length=100)
+#	COUNTRY_CODE	=models.CharField(max_length=3)
+#	REPORTING_CODE =models.CharField(max_length=7)
+#	ORGANIZATION_ID =models.CharField(max_length=20)
+#	class Meta:
+#		db_table = u'epic_geo'
 class Commodity(models.Model):
 	commodityRef		=models.CharField(max_length=18)
 	commodityName		=models.CharField(max_length=100)
@@ -15,10 +26,6 @@ class Commodity(models.Model):
 	def __unicode__(self):
 		return self.commodityRef +' - ' + self.commodityName
 	
-class CommodityAdmin(admin.ModelAdmin):
-	list_display = ('commodityRef', 'commodityName', 'commodityType')
-
-
 
 class Waybill(models.Model):
 	transaction_type_choice=(
@@ -94,7 +101,7 @@ class Waybill(models.Model):
 	recipientRemarks		=models.TextField(blank=True)
 	recipientSigned			=models.BooleanField(blank=True)
 	recipientSignedTimestamp	=models.DateTimeField(null=True, blank=True)
-	destinationWarehouse =models.CharField(max_length=100,blank=True)
+	#destinationWarehouse =models.CharField(max_length=100,blank=True)
 	
 	#Extra Fields
 	waybillValidated		=models.BooleanField()
@@ -180,7 +187,7 @@ class ltioriginal(models.Model):
 	def  __unicode__(self):
 		resting= ''
 		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-		return self.SI_CODE + ' ' + self.CMMNAME + ' ' + str(self.restant()) 
+		return self.SI_CODE + ' ' + self.CMMNAME + '  %.0f'  %  self.restant()
 	def mydesc(self):
 		return self.CODE
 	def commodity(self):
@@ -251,7 +258,22 @@ class EpicStock(models.Model):
     class Meta:
         db_table = u'epic_stock'
 
-### Stock ??
+class LossesDamagesReason(models.Model):
+	compasCode = models.CharField(max_length=20)
+	description  = models.CharField(max_length=20)
+	
+	def  __unicode__(self):
+		return self.description
+
+class LossesDamagesReasonAdmin(admin.ModelAdmin):
+	list_display = ('compasCode','description')
+	list_filter = ('compasCode','description') 
+	
+class LossesDamagesType(models.Model):
+	description = models.CharField(max_length=20)
+	
+	def  __unicode__(self):
+		return self.description
 
 
 
@@ -262,8 +284,12 @@ class LoadingDetail(models.Model):
 	numberUnitsGood			=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
 	numberUnitsLost			=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
 	numberUnitsDamaged	=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
-	unitsLostReason			=models.TextField(blank=True)
-	unitsDamagedReason	=models.TextField(blank=True)
+	unitsLostReason			=models.ForeignKey(LossesDamagesReason,related_name='LD_LostReason',blank=True,null=True)
+	unitsDamagedReason	=models.ForeignKey(LossesDamagesReason,related_name='LD_DamagedReason',blank=True,null=True)
+	unitsDamagedType 		=models.ForeignKey(LossesDamagesType,related_name='LD_DamagedType',blank=True,null=True)
+	unitsLostType 				=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
+	overloadedUnits			=models.BooleanField()
+	
 	
 	def getStockItem(self):
 		stockItem = EpicStock.objects.filter(si_code = self.siNo.SI_CODE).filter(commodity_code = self.siNo.COMMODITY_CODE)
@@ -330,16 +356,7 @@ class ReceptionPoint(models.Model):
 		return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 
 	
-	
-class ETSRole(models.Model):
-	roleName				=models.CharField(max_length=50, blank=True)
-	isCompas				=models.BooleanField()
-	isDispatcher			=models.BooleanField()
-	isReciever				=models.BooleanField()
-	
-	def __unicode__(self):
-		return self.roleName
-	
+		
 class UserProfile(models.Model):
 	user					=models.OneToOneField(User, primary_key=True)
 	#user = models.ForeignKey(User, unique=True, edit_inline=admin.TabularInline)
@@ -386,28 +403,15 @@ class SIWithRestant:
 		return StartAmount
 
 	
-class LoadingDetailInline(admin.TabularInline):
-	model = LoadingDetail
-
-class WaybillAdmin(admin.ModelAdmin):
-	list_display=('waybillNumber','ltiNumber')
-	inlines = [LoadingDetailInline]
-
 class LoadingDetailAdmin(admin.ModelAdmin):
 	list_display=('waybillNumber','siNo')
 
-class ltioriginalAdmin(admin.ModelAdmin):
-	list_display=('CODE','SI_CODE')
 
 
 
-
-admin.site.register(Commodity,CommodityAdmin)
-#admin.site.register(Waybill,WaybillAdmin)
-#admin.site.register(LoadingDetail)
-#admin.site.register(ltioriginal,ltioriginalAdmin)
 admin.site.register(UserProfile)
-#admin.site.register(ETSRole)
 admin.site.register(DispatchPoint)
 admin.site.register(ReceptionPoint)
 admin.site.register(EpicPerson,EpicPersonsAdmin)
+admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
+admin.site.register(LossesDamagesType)

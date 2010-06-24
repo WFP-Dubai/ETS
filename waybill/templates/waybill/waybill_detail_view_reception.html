@@ -1,6 +1,12 @@
 <html>
 <head>
 <style type="text/css">
+body{
+
+	font-size: 9px;
+
+}
+
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
@@ -8,6 +14,7 @@ table {
 	max-width: 850px;
 	min-width: 850px;
 	width: 850px;
+	font-size: 12px;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -22,13 +29,20 @@ img{position: relative; left: 20px; text-align: right;}
 }
 </style>
 <style media="print" type="text/css">
+body{
+
+	font-size: 9px;
+
+}
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
+	border-collapse: collapse;
 	max-width: 850px;
 	min-width: 850px;
 	width: 850px;
+	font-size: 12px;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -56,7 +70,7 @@ img{position: relative; left: 20px; text-align: right;}
 {%if not object.recipientSigned and not object.transportDeliverySigned%}
 <form name="printoriginal" id="printoriginal" method="get" action="/ets/waybill/print_original_reciept/{{object.id}}">
 <input type="submit" onclick="javascript: original_lable.className='shown'; copy_lable.className='hidden'; print();Edit.disabled=true; this.disabled=true;copy_lable.className='shown'; original_lable.className='hidden'; printoriginal.submit()" name="Print Original" id='Print1' value='Print Original'></form>
-{%endif%}<a href="/ets/waybill/dispatch">Back to Dispatch</a>
+{%endif%}<a href="/ets/waybill/receive">Back to Receipt</a>
 </span>
 	<table cellpadding="0" cellspacing="0" border="0px">
 		<tr>
@@ -200,48 +214,58 @@ Name, signature and stamp:</p></td></tr>
 					<tr>
 						<td><sup>Receipt Condition</sup></td>
 						<td colspan="2"><sup>Good</sup></td>
-						<td colspan="6"><sup>Lost or Damaged cargo</sup></td>
+						<td colspan="5"><sup>Lost or Damaged cargo</sup></td>
 						
 						<td colspan="2"><sup>Total received</sup></td>
 					</tr>
 					<tr>
-<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Pre or Post</td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
+<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
 <td>ID {{forloop.counter}}. {{lineitem.siNo.SI_CODE}}</td>
 <td>{{lineitem.numberUnitsGood}}</td>
 <td>{{lineitem.calcNetRecievedGood}}</td>
-<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}
-	D:{{lineitem.numberUnitsDamaged}}
-	{%endifnotequal%}
-	{%ifnotequal lineitem.numberUnitsLost 0%}
-	{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}
+<td>{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.numberUnitsLost}}
 	{%endifnotequal%}
+	{%ifnotequal lineitem.numberUnitsDamaged 0%}
+	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
+	D:{{lineitem.numberUnitsDamaged}}
+	{%endifnotequal%}
+	
 </td>
-<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}
+<td>
+	{%ifnotequal lineitem.numberUnitsLost 0%}
+	L:{{lineitem.calcNetRecievedLost}}
+	{%endifnotequal%}
+	{%ifnotequal lineitem.numberUnitsDamaged 0%}
+	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
 	D:{{lineitem.calcNetRecievedDamaged}}
 	{%endifnotequal%}
 	
-	{%ifnotequal lineitem.numberUnitsLost 0%}
-	{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}
-	L{{lineitem.calcNetRecievedLost}}
-	{%endifnotequal%}</td>
+	</td>
 	
-<td>{%ifnotequal lineitem.numberUnitsDamaged 0%}Damaged{%endifnotequal%} {%ifnotequal lineitem.numberUnitsLost 0%}{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%} Lost{%endifnotequal%}</td>
+<td>{%ifnotequal lineitem.numberUnitsLost 0%}L{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}{%endifnotequal%} {%ifnotequal lineitem.numberUnitsDamaged 0%}D{%endifnotequal%}</td>
 
-<td><!-- type-->{%ifnotequal lineitem.numberUnitsDamaged 0%}Damaged:{{lineitem.unitsDamagedReason}} {%endifnotequal%} {%ifnotequal lineitem.numberUnitsLost 0%}{%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%} Lost:{{lineitem.unitsLostReason}}{%endifnotequal%}
+<td><!-- type-->
+{%ifnotequal lineitem.numberUnitsLost 0%}L:{{lineitem.unitsLostType}} {%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%}{%endifnotequal%} 
+{%ifnotequal lineitem.numberUnitsDamaged 0%}D:{{lineitem.unitsDamagedType}} {%endifnotequal%}
 </td>
-<td><!-- pre or post--></td>
-<td><!--reason--></td>
+<td><!--reason-->
+{%ifnotequal lineitem.numberUnitsLost 0%}L:{{lineitem.unitsLostReason}} {%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%}{%endifnotequal%} 
+{%ifnotequal lineitem.numberUnitsDamaged 0%}D:{{lineitem.unitsDamagedReason}} {%endifnotequal%}
+
+</td>
+
+
 <td>{{lineitem.calcTotalReceivedUnits}}</td>
 <td>{{lineitem.calcTotalReceivedNet}}</td>	
 						
 					</tr>
 					{%endfor%}
 					<tr>
-						<td colspan="9"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
+						<td colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
 					</tr>
 				</table>
 			</td>
