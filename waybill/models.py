@@ -19,13 +19,13 @@ from django.template.defaultfilters import stringfilter
 #		ORGANIZATION_ID =models.CharField(max_length=20)
 #		class Meta:
 #				db_table = u'epic_geo'
-class Commodity(models.Model):
-		commodityRef				=models.CharField(max_length=18)
-		commodityName				=models.CharField(max_length=100)
-		commodityType				=models.CharField(max_length=9)
-		def __unicode__(self):
-				return self.commodityRef +' - ' + self.commodityName
-		
+#class Commodity(models.Model):
+#		commodityRef				=models.CharField(max_length=18)
+#		commodityName				=models.CharField(max_length=100)
+#		commodityType				=models.CharField(max_length=9)
+#		def __unicode__(self):
+#				return self.commodityRef +' - ' + self.commodityName
+#		
 
 class Waybill(models.Model):
 		transaction_type_choice=(
@@ -195,9 +195,9 @@ class ltioriginal(models.Model):
 		def commodity(self):
 				return self.CMMNAME 
 		def restant(self):
-				return SiTracker.objects.get(LTI=self).number_units_left
+				return 0#SiTracker.objects.get(LTI=self).number_units_left
 		def reducesi(self,units):
-				SiTracker.objects.get(LTI=self).updateUnits(units)
+				#SiTracker.objects.get(LTI=self).updateUnits(units)
 				return self.restant()
 		def coi_code(self):
 				try:
@@ -289,17 +289,17 @@ class LossesDamagesType(models.Model):
 
 
 class LoadingDetail(models.Model):
-		wbNumber										=models.ForeignKey(Waybill)
-		siNo																=models.ForeignKey(ltioriginal)
-		numberUnitsLoaded				=models.DecimalField(default=0, blank=True,null=True,max_digits=7, decimal_places=3)
-		numberUnitsGood						=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
-		numberUnitsLost						=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
+		wbNumber						=models.ForeignKey(Waybill)
+		siNo									=models.ForeignKey(ltioriginal)
+		numberUnitsLoaded			=models.DecimalField(default=0, blank=True,null=True,max_digits=7, decimal_places=3)
+		numberUnitsGood				=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
+		numberUnitsLost				=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
 		numberUnitsDamaged		=models.DecimalField(default=0,blank=True,null=True,max_digits=7, decimal_places=3)
-		unitsLostReason						=models.ForeignKey(LossesDamagesReason,related_name='LD_LostReason',blank=True,null=True)
+		unitsLostReason				=models.ForeignKey(LossesDamagesReason,related_name='LD_LostReason',blank=True,null=True)
 		unitsDamagedReason		=models.ForeignKey(LossesDamagesReason,related_name='LD_DamagedReason',blank=True,null=True)
-		unitsDamagedType 				=models.ForeignKey(LossesDamagesType,related_name='LD_DamagedType',blank=True,null=True)
-		unitsLostType 								=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
-		overloadedUnits						=models.BooleanField()
+		unitsDamagedType 			=models.ForeignKey(LossesDamagesType,related_name='LD_DamagedType',blank=True,null=True)
+		unitsLostType 					=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
+		overloadedUnits				=models.BooleanField()
 		
 		
 		def getStockItem(self):

@@ -85,13 +85,13 @@ def import_ltis(request):
 	original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-05-01')
 	for myrecord in original:
 		myrecord.save(using='default')
-		mysist = SiTracker()
-		mysist.LTI=myrecord
-		mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-		try:
-			mysist.save(using='default')
-		except:
-			pass
+#		mysist = SiTracker()
+#		mysist.LTI=myrecord
+#		mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+#		try:
+#			mysist.save(using='default')
+#		except:
+#			pass
 	#UPDATE GEO
 #	try:
 #	my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
