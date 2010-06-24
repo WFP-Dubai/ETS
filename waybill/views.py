@@ -391,6 +391,7 @@ def waybillCreate(request,lti_code):
 		pass
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		#siNo= ModelChoiceField(queryset=ltioriginal.objects.raw("Select * from ltioriginal where CODE = '%s ",[lti_code]),label='Commodity')
 		overload =  forms.BooleanField(required=False)
 		class Meta:
 			model = LoadingDetail

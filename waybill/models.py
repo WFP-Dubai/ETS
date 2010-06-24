@@ -101,7 +101,7 @@ class Waybill(models.Model):
 	recipientRemarks		=models.TextField(blank=True)
 	recipientSigned			=models.BooleanField(blank=True)
 	recipientSignedTimestamp	=models.DateTimeField(null=True, blank=True)
-	#destinationWarehouse =models.CharField(max_length=100,blank=True)
+	destinationWarehouse =models.CharField(max_length=100,blank=True)
 	
 	#Extra Fields
 	waybillValidated		=models.BooleanField()
@@ -144,6 +144,7 @@ class ltioriginalManager(models.Manager):
 		cursor.execute("SELECT DISTINCT SI_CODE FROM epic_lti where CODE = %s",[lti_code])
 		si_list = cursor.fetchall()
 		return si_list
+		
 	
 	
 
@@ -185,9 +186,8 @@ class ltioriginal(models.Model):
 		
 
 	def  __unicode__(self):
-		resting= ''
 		#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-		return self.SI_CODE + ' ' + self.CMMNAME + '  %.0f'  %  self.restant()
+		return self.SI_CODE + ' ' + self.CMMNAME + '  %.0f'  %  self.restant() + self.coi_code()
 	def mydesc(self):
 		return self.CODE
 	def commodity(self):
@@ -197,6 +197,15 @@ class ltioriginal(models.Model):
 	def reducesi(self,units):
 		SiTracker.objects.get(LTI=self).updateUnits(units)
 		return self.restant()
+	def coi_code(self):
+		try:
+			cursor = connection.cursor()
+			cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and SI_CODE=%s and commodity_code=%s )",[self.ORIGIN_WH_CODE,self.SI_CODE,self.COMMODITY_CODE])
+			stock = cursor.fetchall()
+			item = stock[0]
+			return str(item[0][7:])
+		except:
+			return '-'
 
 ####
 
