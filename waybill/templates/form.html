@@ -43,7 +43,7 @@
 	<tr><th></th><th>Commodity</th><th>Number of units</th></tr>
 	 </thead>
 {% for sform in formset.forms %}
-	{{ sform.id }}<tr><td>{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
+<tr><td>	{{ sform.id }}{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
 {% endfor %}
  </table>
  
