@@ -8,9 +8,9 @@
         </thead>
     {% for form in formset.forms %}
     
-    {{form.id}}
+
     <tr>
- 			<td>{{form.instance.ltiNumber}}</td>
+ 			<td>    {{form.id}}{{form.instance.ltiNumber}}</td>
  			<td>{{form.instance.waybillNumber}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
