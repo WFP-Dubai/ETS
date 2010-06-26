@@ -11,8 +11,8 @@ from ets.waybill.models import *
 from ets.waybill.forms import *
 from django.contrib.auth.models import User
 from django.core import serializers
-
-
+from django.conf import settings
+import os
 
 
 
@@ -45,6 +45,8 @@ def loginWaybillSystem(request):
 							  context_instance=RequestContext(request))
 @login_required	
 def selectAction(request):
+	print settings.COMPAS_STATION
+	print os.path.dirname(os.path.abspath(__file__))
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -56,6 +58,8 @@ def selectAction(request):
 
 def listOfLtis(request,origin):
 	ltis = ltioriginal.objects.ltiCodesByWH(origin)
+	#ltis_qs =ltioriginal.objects.filter().filter().values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
+	
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -82,34 +86,46 @@ def import_ltis(request):
 	for myrecord in originalPerson:
 		myrecord.save(using='default')	
 	#copy LTIs
-	original = ltioriginal.objects.using('compas').filter(LTI_DATE__gt='2010-06-20')
-	for myrecord in original:
-		myrecord.save(using='default')
-#		mysist = SiTracker()
-#		mysist.LTI=myrecord
-#		mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-#		try:
-#			mysist.save(using='default')
-#		except:
-#			pass
-	#UPDATE GEO
-#	try:
-#	my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
-#	for the_geo in my_geo:
-#			if the_geo.COUNTRY_CODE == '275':
-#   			the_geo.save(using='default')
-#	except:
-#		pass
-   # my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='376')
-   # for the_geo in my_geo:
-   # 	the.geo.save(using='default')
 	
+	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-01')
+	for myrecord in original:
+		
+#		listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
+#		if True #myrecord.CONSEGNEE_CODE in  listRecepients[0]['CONSEGNEE_CODE']:
+			myrecord.save(using='default')
+			# Tracker #test if exists
+			try:
+				mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+				if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
+					try:
+						change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
+						mysist.number_units_left =	mysist.number_units_left + change	
+						mysist.save(using='default')	
+					except:
+						pass
+			except:
+					print 'no sit exists'
+					mysist = SiTracker()
+					mysist.LTI=myrecord
+					mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+					mysist.number_units_start = myrecord.NUMBER_OF_UNITS
+					mysist.save(using='default')
+#UPDATE GEO
+	try:
+		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass	
 	#Copy Stock
+	
+	EpicStock.objects.all().delete()
 	originalStock = EpicStock.objects.using('compas')
 	for myrecord in originalStock:
 		myrecord.save(using='default')
 	 
 	status = 'done'
+
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
@@ -147,7 +163,7 @@ def dispatch(request):
 							  context_instance=RequestContext(request))
 							  
 def ltis_codes(request):
-	lti_codes = ltioriginal.objects.ltiCodes()
+	lti_codes = ltioriginal.objects.values('CODE','ORIGIN_LOCATION_CODE','ORIGIN_LOC_NAME','ORIGIN_WH_NAME').distinct()
 	return render_to_response('lti_list.html',
 							  {'dispatch_list':lti_codes},
 							  context_instance=RequestContext(request))
@@ -176,7 +192,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect('/ets/waybill/dispatch') #
+	return HttpResponseRedirect('/ets/waybill/list/'+request.get_profile().warehouses.ORIGIN_WH_CODE) #
 	
 	
 def	waybill_finalize_reciept(request,wb_id):
@@ -207,7 +223,7 @@ def waybill_edit(request,wb_id):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
 			model = LoadingDetail
-			fields = ('siNo','numberUnitsLoaded','wbNumber')
+			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
@@ -447,6 +463,7 @@ def waybillCreate(request,lti_code):
 					'waybillNumber':'N/A'
 				}
 		)
+		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
@@ -471,7 +488,7 @@ def waybill_validate_form(request):
 		formset = ValidateFormset(request.POST)
 		if  formset.is_valid():
 			formset.save()
-		
+			
 	else:
 		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False).filter(dispatcherSigned=True))
 		

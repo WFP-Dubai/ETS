@@ -9,16 +9,21 @@ from django.template.defaultfilters import stringfilter
 
 # Create your models here.
 
-#class places(models.Model):
-#		ORG_CODE 		=models.CharField(max_length=7, primary_key=True)
-#		NAME						=models.CharField(max_length=100)
-#		GEO_POINT_CODE =models.CharField(max_length=4)
-#		GEO_NAME		=models.CharField(max_length=100)
-#		COUNTRY_CODE		=models.CharField(max_length=3)
-#		REPORTING_CODE =models.CharField(max_length=7)
-#		ORGANIZATION_ID =models.CharField(max_length=20)
-#		class Meta:
-#				db_table = u'epic_geo'
+class places(models.Model):
+		ORG_CODE 		=models.CharField(max_length=7, primary_key=True)
+		NAME						=models.CharField(max_length=100)
+		GEO_POINT_CODE =models.CharField(max_length=4)
+		GEO_NAME		=models.CharField(max_length=100)
+		COUNTRY_CODE		=models.CharField(max_length=3)
+		REPORTING_CODE =models.CharField(max_length=7)
+		ORGANIZATION_ID =models.CharField(max_length=20)
+		def __unicode__(self):
+				return self.NAME
+
+		class Meta:
+				db_table = u'epic_geo'
+
+
 #class Commodity(models.Model):
 #		commodityRef				=models.CharField(max_length=18)
 #		commodityName				=models.CharField(max_length=100)
@@ -29,7 +34,7 @@ from django.template.defaultfilters import stringfilter
 
 class Waybill(models.Model):
 		transaction_type_choice=(
-						(u'INT', u'WFP Internal'),
+						(u'WIT', u'WFP Internal'),
 #						(u'DIS', u'Distribution'),
 #						(u'LON', u'Loan'),
 #						(u'DSP', u'Disposal'),
@@ -44,14 +49,15 @@ class Waybill(models.Model):
 #						(u'INL',u'Inland Shipment')
 				)
 		transport_type=(
-#						(u'R',u'Rail'),
-						(u'T',u'Road'),
-#						(u'A',u'Air'),
-#						(u'I',u'Inland Waterways'),
-#						(u'C',u'Costal Waterways'),
-#						(u'M',u'Multi-mode'),
-#						(u'O',u'Other Please Specify')
+#						(u'01',u'Rail'),
+						(u'02',u'Road'),
+#						(u'04',u'Air'),
+#						//(u'I',u'Inland Waterways'),
+#						//(u'C',u'Costal Waterways'),
+#						(u'07',u'Multi-mode'),
+#						//(u'O',u'Other Please Specify')
 				)
+		
 				
 		#general
 		ltiNumber								=models.CharField(max_length=20)
@@ -101,7 +107,7 @@ class Waybill(models.Model):
 		recipientRemarks				=models.TextField(blank=True)
 		recipientSigned						=models.BooleanField(blank=True)
 		recipientSignedTimestamp		=models.DateTimeField(null=True, blank=True)
-		destinationWarehouse =models.CharField(max_length=100,blank=True)
+		destinationWarehouse =models.ForeignKey(places,blank=True)
 		
 		#Extra Fields
 		waybillValidated				=models.BooleanField()
@@ -195,9 +201,9 @@ class ltioriginal(models.Model):
 		def commodity(self):
 				return self.CMMNAME 
 		def restant(self):
-				return 0#SiTracker.objects.get(LTI=self).number_units_left
+				return self.sitracker.number_units_left
 		def reducesi(self,units):
-				#SiTracker.objects.get(LTI=self).updateUnits(units)
+				self.sitracker.updateUnits(units)
 				return self.restant()
 		def coi_code(self):
 				try:
@@ -388,8 +394,9 @@ class UserProfileAdmin(admin.ModelAdmin):
 		list_display=('user','warehouses')
 		
 class SiTracker(models.Model):
-		LTI = models.ForeignKey(ltioriginal)
+		LTI = models.OneToOneField(ltioriginal,primary_key=True)
 		number_units_left = models.DecimalField(decimal_places=3,max_digits=10)
+		number_units_start = models.DecimalField(decimal_places=3,max_digits=10)
 				
 		def updateUnits(self,ammount):
 				self.number_units_left -=ammount

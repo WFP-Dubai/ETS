@@ -24,8 +24,10 @@ class WaybillForm(ModelForm):
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	waybillNumber = forms.CharField(widget=forms.HiddenInput())
+	destinationWarehouse= ModelChoiceField(queryset=places.objects.all())	
 	
 	
+        
 	class Meta:
 		model = Waybill
 		fields = [
@@ -38,7 +40,7 @@ class WaybillForm(ModelForm):
         	'dispatchRemarks',
         	'dispatcherName',
         	'dispatcherTitle',
-        	#'destinationWarehouse',
+        	'destinationWarehouse',
         	'transportContractor',
         	'transportSubContractor',
         	'transportDriverName',
@@ -55,6 +57,7 @@ class WaybillForm(ModelForm):
         	'recipientLocation',
 			'recipientConsingee',
         	]
+        	
 
 class WaybillRecieptForm(ModelForm):
 	recipientArrivalDate = forms.DateField()
