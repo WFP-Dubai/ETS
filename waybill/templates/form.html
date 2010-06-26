@@ -18,10 +18,10 @@
 <div class="form">
 	<div>
 		<span><strong>LTI:</strong> {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
-	</div>
+	</div>{%if form.instance.waybillNumber%}
 	<div>
-		<span><strong>Waybill Nr:</strong> {{form.waybillNumber}}</span>
-	</div>
+		<span><strong>Waybill Nr:</strong> {{form.instance.waybillNumber}}</span>
+	</div>{%endif%} {{form.waybillNumber}}
 	<div>
 		<span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
 		<span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
@@ -36,6 +36,9 @@
 		</tr>
 	</table>
 <strong>Recipient Location:</strong>    {{form.recipientLocation}} {{form.recipientConsingee}}    	{{lti_list.0.DESTINATION_LOC_NAME}}
+<br><strong>Consignee :</strong> {{lti_list.0.CONSEGNEE_NAME}}
+<br>
+<strong>Destination Warehouse:<strong> {{form.destinationWarehouse}}
 {{ formset.management_form }}
 <br><br>
 <table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">

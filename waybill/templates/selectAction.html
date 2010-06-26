@@ -3,7 +3,7 @@
 {%block content %}
 Select an action:
 <ul>
-{%if profile.isDispatcher%}<li><a href='waybill/dispatch'>Create & Dispatch Waybill</a></li>{%endif%}
+{%if profile.isDispatcher%}<li><a href='waybill/list/{{profile.warehouses.ORIGIN_WH_CODE}}'>Create & Dispatch Waybill</a></li>{%endif%}
 {%if profile.isReciever%}<li><a href='waybill/receive'>Recieve Waybill</a></li>{%endif%}
 {%if profile.isCompasUser%}<li><a href='waybill/validate'>Validate Waybill</a></li>
     <li><a href='waybill/import'>Update DB</a>{%endif%}

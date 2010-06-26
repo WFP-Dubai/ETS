@@ -2,11 +2,9 @@
 <textarea name="wbdata">{{status}}</textarea>
 <input type=submit> {% csrf_token %}
 </form>
-<form action='http://chart.apis.google.com/chart' method=post>
+
+<form action='http://chart.apis.google.com/chart?cht=qr&chs=300x300' method=post>
 <textarea name="chl">{{status}}</textarea>
-<input type="hidden" name="cht" value="qr"> 
-<input type="hidden" name="chs" value="300x300">
-<input type="hidden" name="chld=" value="H|1">
 <input type=submit> 
 </form>
 

@@ -2,7 +2,8 @@
 {%block content %}
 <ul>
     {% for wh in dispatch_list%}
-  <li><a href='list/{{wh.0}}'> {{wh.0}}</a></li>
+  ','ORIGIN_WH_NAME
+  <li><a href='list/{{wh}}'>  {{wh.ORIGIN_WH_NAME}} {{wh.ORIGIN_LOC_NAME}}</a></li>
     {% endfor%}
 </ul>
     
