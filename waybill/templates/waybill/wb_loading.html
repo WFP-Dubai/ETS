@@ -8,7 +8,7 @@
 						<td><sup>Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
 						<td><sup>Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
 						<td><sup>Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td rowspan=5><span ><img style='left:0px;' src="/ets/media/images/bc-dummy.png" alt="barcode" height=250><br></span></td>
+						<td rowspan=5><span ><img style='left:0px;' src="/ets/media/images/bc-dummy.png" alt="barcode" height=175><br></span></td>
 					
 					</tr>
 					<tr>
@@ -17,15 +17,15 @@
 						<td><sup>Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
 					</tr>
 					<tr>
-						<td><sup>Destination(warehouse):</sup><br>{{ltioriginal.0.DESTINATION_WH_NAME}}</td>
-						<td><sup>Allocation Destination:</sup></td>
+						<td><sup>Destination(warehouse):</sup><br>{{object.destinationWarehouse}}</td>
+						<td><sup>Allocation Destination:</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
 						<td><sup>Consignee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
 						
 					</tr>
 
 					<tr>
 						<td><sup>Type of Transaction:</sup><br>
-						 {%if object.transactionType == 'INT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
+						 {%if object.transactionType == 'WIT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
 						<td><sup>Transport Type:</sup><br>Road</td>
 						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td>
 					</tr>
@@ -64,14 +64,17 @@
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
 						<td>{{lineitem.getStockItem}}</td>
-						<td>{{lineitem.numberUnitsLoaded}}</td>
-						<td>{{lineitem.siNo.UNIT_WEIGHT_NET}}</td>
-						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS}}</td>
-						<td>{{lineitem.calcTotalNet}}</td>
-						<td>{{lineitem.calcTotalGross}}</td>
+						<td>{{lineitem.numberUnitsLoaded|floatformat:1}}</td>
+						<td>{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:2}}</td>
+						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:2}}</td>
+						<td>{{lineitem.calcTotalNet|floatformat:3}}</td>
+						<td>{{lineitem.calcTotalGross|floatformat:3}}</td>
 
 					</tr>
 					{%endfor%}
+					{%if object.loadingdetail_set.select_related.all.len < 5%}
+					
+					{%endif%}
 					<tr>
 						<td colspan="8">
 						</td>
