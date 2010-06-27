@@ -17,8 +17,10 @@
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td>Waybill Number:</td><td> {{form.waybillNumber}} {{form.instance.waybillNumber}}</td></tr>
+<tr><td>Dispatch Location</td><td>{{formset.forms.0.instance.siNo.ORIGIN_LOC_NAME}}</td></tr>
 <tr><td>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
 <tr><td>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
+
 <tr><td>&nbsp;</td><td></td></tr>
 <tr><td>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
 <tr><td>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
@@ -31,17 +33,17 @@
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>Item</th><th>Dispatched</th><th>Good</th><th>Damaged</th><th>Lost</th>
+        <tr><th>Items</th><th>Dispatched</th><th>Good<br>Units</th><th>Damaged<br>Units</th><th>Lost<br>Units</th>
         </thead>
 
     {% for sform in formset.forms %}
        
         <tr>
-        	<td> {{ sform.id }}{{sform.siNo}}</td>
-        	<td align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
-        	<td>{{ sform.numberUnitsGood }}</td>
-        	<td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
-        	<td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
+        	<td  valign=top> {{ sform.id }}{{sform.siNo}}</td>
+        	<td  valign=top  align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded|floatformat}}</td>
+        	<td valign=top>{{ sform.numberUnitsGood }}</td>
+        	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsDamaged}} </td></tr><tr><td>Type:</td><td> {{ sform.unitsDamagedType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsDamagedReason }}</td></tr></table></td>
+        	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsLost }} </td></tr><tr><td>Type:</td><td>{{ sform.unitsLostType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsLostReason }}</td></tr></table></td>
         </tr>
     {% endfor %}
     </table>

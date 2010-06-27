@@ -63,7 +63,7 @@
 					<tr>
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
-						<td>{{lineitem.getStockItem}}</td>
+						<td>{{lineitem.getStockItem.packagingDescrShort}}{{lineitem.getStockItem.packagename}}</td>
 						<td>{{lineitem.numberUnitsLoaded|floatformat:1}}</td>
 						<td>{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:2}}</td>
 						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:2}}</td>

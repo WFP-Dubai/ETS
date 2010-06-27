@@ -7,6 +7,7 @@ import datetime
 from django.template.defaultfilters import stringfilter
 
 
+
 # Create your models here.
 
 class places(models.Model):
@@ -22,15 +23,6 @@ class places(models.Model):
 
 		class Meta:
 				db_table = u'epic_geo'
-
-
-#class Commodity(models.Model):
-#		commodityRef				=models.CharField(max_length=18)
-#		commodityName				=models.CharField(max_length=100)
-#		commodityType				=models.CharField(max_length=9)
-#		def __unicode__(self):
-#				return self.commodityRef +' - ' + self.commodityName
-#		
 
 class Waybill(models.Model):
 		transaction_type_choice=(
@@ -67,7 +59,7 @@ class Waybill(models.Model):
 		transactionType						=models.CharField(max_length=10,choices=transaction_type_choice)
 		transportType						=models.CharField(max_length=10,choices=transport_type)
 		#Dispatcher
-		dispatchRemarks						=models.TextField(blank=True,null=True)
+		dispatchRemarks						=models.CharField(max_length=200)
 		dispatcherName						=models.TextField(blank=True,null=True)
 		dispatcherTitle						=models.TextField(blank=True)
 		dispatcherSigned				=models.BooleanField(blank=True)
@@ -112,6 +104,10 @@ class Waybill(models.Model):
 		#Extra Fields
 		waybillValidated				=models.BooleanField()
 		waybillReceiptValidated =models.BooleanField()
+		waybillSentToCompas =models.BooleanField()
+		waybillRecSentToCompas =models.BooleanField()
+		
+		
 		
 		waybillProcessedForPayment		=models.BooleanField()
 		def  __unicode__(self):
@@ -143,7 +139,7 @@ class ltioriginalManager(models.Manager):
 				
 		def ltiCodesByWH(self,wh):
 				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,LTI_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
+				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
 				lti_code = cursor.fetchall()
 				return lti_code
 		
@@ -153,9 +149,6 @@ class ltioriginalManager(models.Manager):
 				si_list = cursor.fetchall()
 				return si_list
 				
-		
-		
-
 class ltioriginal(models.Model):
 		LTI_PK								=models.CharField(max_length=50, primary_key=True)
 		LTI_ID								=models.CharField(max_length=40)
@@ -247,8 +240,6 @@ class EpicPersonsAdmin(admin.ModelAdmin):
 		list_filter = ( 'location_code','organization_id')
 
 
-
-
 class EpicStock(models.Model):
 		wh_pk = models.CharField(max_length=90, blank=True, primary_key=True)
 		wh_regional = models.CharField(max_length=4, blank=True)
@@ -274,7 +265,12 @@ class EpicStock(models.Model):
 		reference_number= models.CharField(max_length=50)
 		class Meta:
 				db_table = u'epic_stock'
-
+		
+		def packagingDescrShort(self):
+			pck= PackagingDescriptonShort.objects.get(pk=self.package_code)
+			#print pck
+			return pck.packageShortName
+			
 class LossesDamagesReason(models.Model):
 		compasCode = models.CharField(max_length=20)
 		description  = models.CharField(max_length=20)
@@ -293,7 +289,6 @@ class LossesDamagesType(models.Model):
 				return self.description
 
 
-
 class LoadingDetail(models.Model):
 		wbNumber						=models.ForeignKey(Waybill)
 		siNo									=models.ForeignKey(ltioriginal)
@@ -306,12 +301,13 @@ class LoadingDetail(models.Model):
 		unitsDamagedType 			=models.ForeignKey(LossesDamagesType,related_name='LD_DamagedType',blank=True,null=True)
 		unitsLostType 					=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
 		overloadedUnits				=models.BooleanField()
+		loadingDetailSentToCompas =models.BooleanField()
 		
 		
 		def getStockItem(self):
 				stockItem = EpicStock.objects.filter(si_code = self.siNo.SI_CODE).filter(commodity_code = self.siNo.COMMODITY_CODE)
 				if stockItem:
-						return stockItem[0].packagename
+						return stockItem[0]
 				else:
 						return 'N/A'
 		
@@ -352,13 +348,12 @@ class LoadingDetail(models.Model):
 		def  __unicode__(self):
 				return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
 
-
 class DispatchPoint(models.Model):
 		ORIGIN_LOC_NAME						=models.CharField(max_length=20, blank=True)
 		ORIGIN_LOCATION_CODE		=models.CharField(max_length=20, blank=True)
 		ORIGIN_WH_CODE						=models.CharField(max_length=20, blank=True)
-		ORIGIN_WH_NAME						=models.CharField(max_length=20, blank=True)
-		DESC_NAME								=models.CharField(max_length=20, blank=True)
+		ORIGIN_WH_NAME						=models.CharField(max_length=30, blank=True)
+		DESC_NAME								=models.CharField(max_length=20, blank=True,null=True)
 		
 		def  __unicode__(self):
 				return self.ORIGIN_WH_CODE + ' - ' + self.ORIGIN_LOC_NAME
@@ -381,7 +376,7 @@ class UserProfile(models.Model):
 		isCompasUser		=models.BooleanField()
 		isDispatcher			=models.BooleanField()
 		isReciever				=models.BooleanField()
-		compasUser			=models.OneToOneField(EpicPerson, blank=True,null=True)
+		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True)
 		superUser				=models.BooleanField()
 		
 		def __unicode__(self):
@@ -403,6 +398,12 @@ class SiTracker(models.Model):
 				self.save()
 		def  __unicode__(self):
 				return self.number_units_left
+
+class PackagingDescriptonShort(models.Model):
+		packageCode = models.CharField(primary_key=True,max_length=5)
+		packageShortName = models.CharField(max_length=10)
+		
+
 
 class SIWithRestant:
 		SINumber = ''
@@ -435,3 +436,4 @@ admin.site.register(ReceptionPoint)
 admin.site.register(EpicPerson,EpicPersonsAdmin)
 admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
 admin.site.register(LossesDamagesType)
+admin.site.register(PackagingDescriptonShort)

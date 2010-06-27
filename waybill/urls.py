@@ -48,7 +48,6 @@ urlpatterns = patterns('',
     (r'^waybill/validate/$',waybill_validateSelect),
     (r'^waybill/validate_form$',waybill_validate_form),
     (r'^waybill/validate_receipt_form$',waybill_validate_receipt_form),
-    
     (r'^waybill/validate/(.*)$',waybill_validate_form_update),
     (r'^waybill/viewwb_reception/(.*)$',waybill_view_reception),
     (r'^waybill/viewwb/(.*)$',waybill_view),

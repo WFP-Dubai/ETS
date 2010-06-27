@@ -39,18 +39,16 @@ border-color: black;
 <br>
 Items in LTI:
 <table class='bordered' >
-	<tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>Units</th><th class='bordered'>Not Dispatched</th><th>Stock in {{detailed.0.ORIGIN_WH_NAME}}</th></tr>
+	<tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>Units</th><th class='bordered'>Not Dispatched</th></tr>
 	{%for si in listOfSI_withDeduction%}
-		 <tr  class='bordered'><td  class='bordered'>{{si.CommodityName}}&nbsp;</td><td  class='bordered'>&nbsp;{{si.SINumber}}&nbsp;</td><td  class='bordered' align="right">{{si.StartAmount}}</td><td  class='bordered' align="right">{{si.CurrentAmount|floatformat:2}}</td><td>
-		 {% for si_here in detailed%}{%if si_here.SI_CODE == si.SINumber%}
-		 {{si_here.restant|floatformat:2}}{%endif%}{%endfor%}
-		 </td></tr>
+		 <tr  class='bordered'><td  class='bordered'>{{si.CommodityName}}&nbsp;</td><td  class='bordered'>&nbsp;{{si.SINumber}}&nbsp;</td><td  class='bordered' align="right">{{si.StartAmount}}</td><td  class='bordered' align="right">{{si.CurrentAmount|floatformat:2}}</td></tr>
 	{%endfor%}
 </table>
 
 
 
 <br>
+{%if listOfWaybills.count > 0%}
 Current Waybills:<br>
 <table class='bordered' >
 {%for wb in listOfWaybills%}
@@ -66,7 +64,7 @@ Current Waybills:<br>
 		</tr>
 	{%endfor%}
 {%endfor%}
-
+{%endif%}
 
 </table>
 
