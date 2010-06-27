@@ -23,7 +23,17 @@
 			Waybill Number:{{form.waybillNumber}} {{form.instance.waybillNumber}}
 
 	</div>
-	<div>
+	<div>			
+		
+		
+		
+<br>
+	<span><strong>Dispatch Signed: {{form.dispatcherSigned}}<br>
+	Dispatch Validated: {{form.waybillValidated}}<br>
+	<span>Receipt Signed: {{form.recipientSigned}}<br>
+	Receipt Validated: {{form.waybillReceiptValidated}}<br></strong>
+	<br>
+	</span>
 		<span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
 		<span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
 	</div>
@@ -77,33 +87,30 @@
 <strong>Container 2: Number:</strong>{{form.containerTwoNumber}}<strong> Seal:</strong>{{form.containerTwoSealNumber}}<strong> Remarks:</strong>{{form.containerTwoRemarksDispatch}}
 
 </div>
+<BR>	
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
-<tr><td>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
-<tr><td>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
-<tr><td>&nbsp;</td><td></td></tr>
-<tr><td>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
-<tr><td>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
-<tr><td>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>
-<tr><td>Distance: </td><td>{{form.recipientDistance}}</td></tr>
+<tr><td><strong>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
+<tr><td><strong>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
+<tr><td>&nbsp;</td><td>{{form.destinationWarehouse}}</td></tr>
+<tr><td><strong>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
+<tr><td><strong>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
+<tr><td><strong>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>
+<tr><td><strong>Distance: </td><td>{{form.recipientDistance}}</td></tr>
 </table>
 </div>
-<br>
-
-<br>
-
 <table>
-<tr><td colspan="3">Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
+<tr><td colspan="3"><strong>Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
 
-<tr><td>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
-<tr><td>Container 2:</td><td>{{form.instance.containerTwoNumber}}</td><td> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
+<tr><td><strong>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td><strong> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
+<tr><td><strong>Container 2:</td><td>{{form.instance.containerTwoNumber}}</td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
 
 </table>
 
 </div>
 
 
-<input type="submit" value="Save & Print"> {% csrf_token %}
+<input type="submit" value="Save & Exit"> {% csrf_token %}
 </form>
 {%endblock%}
 {%block extra-header%}

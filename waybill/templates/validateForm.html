@@ -27,12 +27,44 @@
 
 <input type="submit" value="Validate Waybills"> {% csrf_token %}
 </form>
+<br>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
+    <thead>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Origin Warehouse</th><th>Consignee</th><th>Delivery Location</th><th>Dispatched</th><th>Received</th><th>Validated</th></tr>
+        </thead>
+<form method="post" action="commit_to_compas_dispatch/">
+    {% for wb in validatedWB %}
+    
+
+    <tr>
+ 			<td>    {{wb.ltiNumber}}</td>
+ 			<td>{{wb.waybillNumber}}</td>
+ 			<td>{{wb.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
+ 			<td>{{wb.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
+ 			<td>{{wb.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td>{%if wb.dispatcherSigned%}Yes{%else%}No{%endif%} </td>
+ 			<td>{%if wb.recipientSigned%}Yes{%else%}No{%endif%} </td>
+ 			<td>{%if wb.waybillValidated%}Yes{%else%}No{%endif%} </td>
+    </tr>
+
+    {% endfor %}
+</table>
+
+<input type="submit" value="Update Compas"> {% csrf_token %}
+</form>
 {%endblock%}
 
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
 				$('#example').dataTable( {
+		"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false });
+		$('#example2').dataTable( {
 		"bPaginate": false,
 		"bLengthChange": false,
 		"bFilter": false,

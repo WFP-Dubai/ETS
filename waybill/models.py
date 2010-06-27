@@ -106,9 +106,6 @@ class Waybill(models.Model):
 		waybillReceiptValidated =models.BooleanField()
 		waybillSentToCompas =models.BooleanField()
 		waybillRecSentToCompas =models.BooleanField()
-		
-		
-		
 		waybillProcessedForPayment		=models.BooleanField()
 		def  __unicode__(self):
 				return self.waybillNumber

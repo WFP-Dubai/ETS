@@ -7,6 +7,9 @@ Select an action:
 {%if profile.isReciever%}<li><a href='waybill/receive'>Recieve Waybill</a></li>{%endif%}
 {%if profile.isCompasUser%}<li><a href='waybill/validate'>Validate Waybill</a></li>
     <li><a href='waybill/import'>Update DB</a>{%endif%}
+{%if profile.superUser%}
+    <li><a href='waybill/reset_waybill/'>Reset waybills</a>
+{%endif%}
     <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
 </ul>
 {%endblock%}

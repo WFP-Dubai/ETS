@@ -4,6 +4,7 @@ from ets.waybill.forms import *
 from ets.waybill.views import *
 from django.db import models
 from django.db import connections
+from django.conf import settings
 
 class compas_write:
 	ErrorMessages = ''
@@ -17,8 +18,7 @@ class compas_write:
    		self.__cursor.close()
 		self.__db.close()
 
-	def write_receipt_waybill_compass(self,waybill_id)
-		pass
+	def write_receipt_waybill_compas(self,waybill_id):
 		db = cx_Oracle.Connection("TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001")
 		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = ''
@@ -60,7 +60,7 @@ class compas_write:
 				lostUnits
 				))
 				
-			if(	Response_Code.getvalue() = 'S'):
+			if(	Response_Code.getvalue() == 'S'):
 				pass
 			else:
 				all_ok =False			
@@ -71,6 +71,7 @@ class compas_write:
 			db.rollback()
 		else:
 			db.commit()
+
 			
 		cursor.close()
 		db.close()
@@ -148,42 +149,42 @@ class compas_write:
 			Full_coi= TheStockItems[0].origin_id
 
 
-#  			print [CODE,
-#  				DISPATCH_DATE,
-#  				ORIGIN_TYPE,
-#  				ORIGIN_LOCATION_CODE,
-#  				ORIGIN_CODE,
-#  				ORIGIN_DESCR,
-#  				DESTINATION_LOCATION_CODE,
-#  				DESTINATION_CODE,
-#  				LTI_ID,
-#  				LOADING_DATE,
-#  				ORGANIZATION_ID,
-#  				TRAN_TYPE_CODE,
-#  				VEHICLE_REGISTRATION,
-#  				MODETRANS_CODE,
-#  				COMMENTS,
-#  				PERSON_CODE,
-#  				PERSON_OUC,
-#  				CERTIFING_TITLE,
-#  				TRANS_CONTRACTOR_CODE,
-#  				SUPPLIER1_OUC,
-#  				DRIVER_NAME,
-#  				LICENSE,
-#  				CONTAINER_NUMBER,
-#  				settings.COMPAS_STATION,
-#  				Full_coi,
-#  				COMM_CATEGORY_CODE,
-#  				COMM_CODE,
-#  				PCKKCODE,
-#  				ALLCODE,
-#  				QUALITY,
-#  				strNetTotal,
-#  				strGrossTotal,
-#  				UnitsLoaded,
-#  				UnitNet,
-#  				UnitGross,
-#  ]
+ 			print [CODE,
+ 				DISPATCH_DATE,
+ 				ORIGIN_TYPE,
+ 				ORIGIN_LOCATION_CODE,
+ 				ORIGIN_CODE,
+ 				ORIGIN_DESCR,
+ 				DESTINATION_LOCATION_CODE,
+ 				DESTINATION_CODE,
+ 				LTI_ID,
+ 				LOADING_DATE,
+ 				ORGANIZATION_ID,
+ 				TRAN_TYPE_CODE,
+ 				VEHICLE_REGISTRATION,
+ 				MODETRANS_CODE,
+ 				COMMENTS,
+ 				PERSON_CODE,
+ 				PERSON_OUC,
+ 				CERTIFING_TITLE,
+ 				TRANS_CONTRACTOR_CODE,
+ 				SUPPLIER1_OUC,
+ 				DRIVER_NAME,
+ 				LICENSE,
+ 				CONTAINER_NUMBER,
+ 				settings.COMPAS_STATION,
+ 				Full_coi,
+ 				COMM_CATEGORY_CODE,
+ 				COMM_CODE,
+ 				PCKKCODE,
+ 				ALLCODE,
+ 				QUALITY,
+ 				strNetTotal,
+ 				strGrossTotal,
+ 				UnitsLoaded,
+ 				UnitNet,
+ 				UnitGross,
+ ]
 
 			cursor.callproc('write_waybill.dispatch',(
 				Response_Message,
@@ -227,12 +228,15 @@ class compas_write:
 				)
 				)
 				
-			if(	Response_Code.getvalue() = 'S'):
+			if(	Response_Code.getvalue() == 'S'):
 				pass
 			else:
 				all_ok =False			
 				self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
 				self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
+			
+			print Response_Message.getvalue()
+			print Response_Code.getvalue()
 			
 		if not all_ok:
 			db.rollback()

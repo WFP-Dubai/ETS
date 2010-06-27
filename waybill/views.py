@@ -221,15 +221,15 @@ def dispatchToCompas(request):
 	error_codes = ''
 	for waybill in list_waybills:
 		# call compas and read return
-		status_wb = the_compas.the_compas.write_dispatch_waybill_compass(waybill.id)
-		if  status_wb
+		status_wb = the_compas.write_dispatch_waybill_compass(waybill.id)
+		if  status_wb:
 			#aok
 			waybill.waybillSentToCompas=True
-			waybill.save
+			waybill.save()
 		else:
 			# error here
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
-			error_codes +=waybill.waybillNumber +'-'+ the_compas.Error_Codes
+			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 			
 		
 	return render_to_response('list_waybills_compas.html',
@@ -249,15 +249,15 @@ def receiptToCompas(request):
 	error_codes = ''
 	for waybill in list_waybills:
 		# call compas and read return
-		status_wb = the_compas.the_compas.write_receipt_waybill_compass(waybill.id)
-		if  status_wb
+		status_wb = the_compas.write_receipt_waybill_compass(waybill.id)
+		if  status_wb:
 			#aok
-			waybill.waybillSentToCompas=True
-			waybill.save
+			waybill.waybillRecSentToCompas=True
+			waybill.save()
 		else:
 			# error here
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
-			error_codes +=waybill.waybillNumber +'-'+ the_compas.Error_Codes
+			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 			
 		
 	return render_to_response('list_waybills_compas_received.html',
@@ -325,7 +325,7 @@ def waybill_validate_form_update(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
+			return HttpResponseRedirect('../reset_waybill') #
 	else:			
 		form = WaybillFullForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
@@ -345,6 +345,25 @@ def waybill_view(request,wb_id):
 							  'disp_person':disp_person_object},
 							  context_instance=RequestContext(request))
 
+def reset_waybill(request):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+		
+	if profile.superUser:
+		waybills = Waybill.objects.filter(waybillSentToCompas = False)
+		
+		return render_to_response('edit_wb_list.html',
+							  {'profile':profile,'waybill_list':waybills},
+							  context_instance=RequestContext(request))
+
+	else:
+		return render_to_response('selectAction.html',
+							  {'profile':profile},
+							  context_instance=RequestContext(request))
+	
 
 
 def waybill_view_reception(request,wb_id):
@@ -536,32 +555,36 @@ def waybill_validateSelect(request):
 							  context_instance=RequestContext(request))
 
 
-def waybill_validate_form(request):
+def waybill_validate_dispatch_form(request):
 
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillValidated',),extra=0)
-	
+	validatedWB = Waybill.objects.filter(waybillValidated= True).filter(waybillSentToCompas=False)
 	
 	if request.method == 'POST':
 		formset = ValidateFormset(request.POST)
 		if  formset.is_valid():
 			formset.save()
-			
+		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False).filter(dispatcherSigned=True))
 	else:
 		formset = ValidateFormset(queryset=Waybill.objects.filter(waybillValidated= False).filter(dispatcherSigned=True))
 		
 	
-	return render_to_response('validateForm.html', {'formset':formset}, context_instance=RequestContext(request))
+	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 	
 
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
+
+	validatedWB = Waybill.objects.filter(waybillReceiptValidated= True).filter(waybillRecSentToCompas=False)
+
 	if request.method == 'POST':
 		formset = ValidateFormset(request.POST)
 		if  formset.is_valid():
 			formset.save()
+		formset = ValidateFormset(queryset=Waybill.objects.filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
 	else:
 		formset = ValidateFormset(queryset=Waybill.objects.filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
-	return render_to_response('validateReceiptForm.html', {'formset':formset}, context_instance=RequestContext(request))
+	return render_to_response('validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
 def testform(request,lti_code):
 	# get the LTI info
