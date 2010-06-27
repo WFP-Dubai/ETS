@@ -35,9 +35,11 @@ def prep_req(request):
 	return{'user': request.user}
 
 def homepage(request):
-	return render_to_response('homepage.html',
-							  {'status':'',},
-							  context_instance=RequestContext(request))
+	return HttpResponseRedirect('/ets/select-action')
+
+	#return render_to_response('homepage.html',
+	#						  {'status':'',},
+	#						  context_instance=RequestContext(request))
 
 def loginWaybillSystem(request):
 	return render_to_response('status.html',
@@ -45,8 +47,6 @@ def loginWaybillSystem(request):
 							  context_instance=RequestContext(request))
 @login_required	
 def selectAction(request):
-	print settings.COMPAS_STATION
-	print os.path.dirname(os.path.abspath(__file__))
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -155,12 +155,9 @@ def dispatch(request):
 	dispatch_list = ltioriginal.objects.warehouses()
 	profile = ''
 	try:
-		profile=request.user.get_profile()
+		return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) 
 	except:
-		pass
-	return render_to_response('dispatch_list.html',
-							  {'dispatch_list':dispatch_list,'profile':profile},
-							  context_instance=RequestContext(request))
+		return HttpResponseRedirect('/') 
 							  
 def ltis_codes(request):
 	lti_codes = ltioriginal.objects.values('CODE','ORIGIN_LOCATION_CODE','ORIGIN_LOC_NAME','ORIGIN_WH_NAME').distinct()
@@ -192,7 +189,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect('/ets/waybill/list/'+request.get_profile().warehouses.ORIGIN_WH_CODE) #
+	return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) #
 	
 	
 def	waybill_finalize_reciept(request,wb_id):
@@ -442,7 +439,7 @@ def waybillCreate(request,lti_code):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save(commit=False)
-			wb_new.waybillNumber = 'ETS' + str(wb_new.id)
+			wb_new.waybillNumber = 'ETS' + '%05d' % wb_new.id
 			for subform in instances:
 				subform.wbNumber = wb_new
 				subform.save()
