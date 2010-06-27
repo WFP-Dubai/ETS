@@ -39,7 +39,7 @@ border-color: black;
 <br>
 Items in LTI:
 <table class='bordered' >
-	<tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>Units</th><th class='bordered'>Not Dispatched</th></tr>
+	<tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>Units</th><th class='bordered'>To Be Dispatched</th></tr>
 	{%for si in listOfSI_withDeduction%}
 		 <tr  class='bordered'><td  class='bordered'>{{si.CommodityName}}&nbsp;</td><td  class='bordered'>&nbsp;{{si.SINumber}}&nbsp;</td><td  class='bordered' align="right">{{si.StartAmount}}</td><td  class='bordered' align="right">{{si.CurrentAmount|floatformat:2}}</td></tr>
 	{%endfor%}
