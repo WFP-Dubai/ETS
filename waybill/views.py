@@ -3,12 +3,13 @@ import datetime
 from django.contrib.auth.views import login,logout
 from django.contrib.auth.decorators import login_required
 from django.forms.models import inlineformset_factory,modelformset_factory
-
+from django.forms.formsets import BaseFormSet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext
 from ets.waybill.models import *
 from ets.waybill.forms import *
+from ets.waybill.compas import *
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.conf import settings
@@ -45,6 +46,7 @@ def loginWaybillSystem(request):
 	return render_to_response('status.html',
 							  {'status':'login not yet implemented'},
 							  context_instance=RequestContext(request))
+							  
 @login_required	
 def selectAction(request):
 	profile = ''
@@ -82,34 +84,39 @@ def ltis_redirect_wh(request):
 
 def import_ltis(request):
 	#Copy Persons
-	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
-	for myrecord in originalPerson:
-		myrecord.save(using='default')	
-	#copy LTIs
 	
+	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
+	for my_person in originalPerson:
+		my_person.save(using='default')	
+	
+	#copy LTIs
+	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
+	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
+	print listDispatchers
+
 	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-01')
-	for myrecord in original:
-		
-#		listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
-#		if True #myrecord.CONSEGNEE_CODE in  listRecepients[0]['CONSEGNEE_CODE']:
-			myrecord.save(using='default')
-			# Tracker #test if exists
-			try:
-				mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
-				if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
-					try:
-						change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
-						mysist.number_units_left =	mysist.number_units_left + change	
-						mysist.save(using='default')	
-					except:
-						pass
-			except:
-					print 'no sit exists'
-					mysist = SiTracker()
-					mysist.LTI=myrecord
-					mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-					mysist.number_units_start = myrecord.NUMBER_OF_UNITS
-					mysist.save(using='default')
+	for myrecord in original:		
+#		print myrecord.ORIGIN_WH_CODE
+#		if myrecord.CONSEGNEE_CODE in  listRecepients['CONSEGNEE_CODE']:
+#			if myrecord.ORIGIN_WH_CODE in listDispatchers[0]['ORIGIN_WH_CODE']:
+				myrecord.save(using='default')
+				# Tracker #test if exists
+				try:
+					mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+					if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
+						try:
+							change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
+							mysist.number_units_left =	mysist.number_units_left + change	
+							mysist.save(using='default')	
+						except:
+							pass
+				except:
+						print 'no sit exists'
+						mysist = SiTracker()
+						mysist.LTI=myrecord
+						mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+						mysist.number_units_start = myrecord.NUMBER_OF_UNITS
+						mysist.save(using='default')
 #UPDATE GEO
 	try:
 		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
@@ -124,8 +131,7 @@ def import_ltis(request):
 	for myrecord in originalStock:
 		myrecord.save(using='default')
 	 
-	status = 'done'
-
+	status = 'Import Finished'
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
@@ -202,7 +208,61 @@ def	waybill_finalize_reciept(request,wb_id):
 	print 	current_wb.transportDeliverySigned
 	return HttpResponseRedirect('/ets/waybill/viewwb_reception/' + str(current_wb.id)) #
 
+def dispatchToCompas(request):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+		
+	list_waybills = Waybill.objects.filter(waybillValidated = True).filter(	waybillSentToCompas = False)
+	the_compas = compas_write()
+	error_message = ''
+	error_codes = ''
+	for waybill in list_waybills:
+		# call compas and read return
+		status_wb = the_compas.the_compas.write_dispatch_waybill_compass(waybill.id)
+		if  status_wb
+			#aok
+			waybill.waybillSentToCompas=True
+			waybill.save
+		else:
+			# error here
+			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
+			error_codes +=waybill.waybillNumber +'-'+ the_compas.Error_Codes
+			
+		
+	return render_to_response('list_waybills_compas.html',
+							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
+							  context_instance=RequestContext(request))
 
+def receiptToCompas(request):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+		
+	list_waybills = Waybill.objects.filter(waybillReceiptValidated = True).filter(waybillRecSentToCompas = False).filter(waybillSentToCompas=True)
+	the_compas = compas_write()
+	error_message = ''
+	error_codes = ''
+	for waybill in list_waybills:
+		# call compas and read return
+		status_wb = the_compas.the_compas.write_receipt_waybill_compass(waybill.id)
+		if  status_wb
+			#aok
+			waybill.waybillSentToCompas=True
+			waybill.save
+		else:
+			# error here
+			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
+			error_codes +=waybill.waybillNumber +'-'+ the_compas.Error_Codes
+			
+		
+	return render_to_response('list_waybills_compas_received.html',
+							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
+							  context_instance=RequestContext(request))
 
 
 
@@ -312,14 +372,14 @@ def waybill_reception(request,wb_code):
 	class LoadingDetailRecForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
 		#siNo= forms.CharField(widget=forms.HiddenInput())
-		numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
+		#numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
 		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		
 		class Meta:
 			model = LoadingDetail
-			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
+			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
@@ -354,7 +414,7 @@ def waybill_reception(request,wb_code):
 	return render_to_response('recieveWaybill.html', 
 			{'form': form,'lti_list':current_lti,'formset':formset,'profile':profile},
 			context_instance=RequestContext(request))
-#	return render_to_response('recieveWaybill.html',						  {'status':'to be implemented'},							  context_instance=RequestContext(request))
+	#return render_to_response('recieveWaybill.html',						  {'status':'to be implemented'},							  context_instance=RequestContext(request))
 
 
 
@@ -398,7 +458,7 @@ def waybillSearchResult(request):
 							  {'status':'selectAction not yet implemented'},
 							  context_instance=RequestContext(request))
 
-
+### Create Waybill 
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
@@ -427,15 +487,15 @@ def waybillCreate(request,lti_code):
 #				pass
 #				
 #			return cleaned_data
-				
-			
 
 
+	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
 		formset = LDFormSet(request.POST)
+
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save(commit=False)
@@ -493,9 +553,6 @@ def waybill_validate_form(request):
 	return render_to_response('validateForm.html', {'formset':formset}, context_instance=RequestContext(request))
 	
 
-
-
-
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
 	if request.method == 'POST':
@@ -551,7 +608,22 @@ def deserialize(request):
 	print waybillnumber
 	return HttpResponseRedirect('../receive/'+ str(waybillnumber)) 
 	
+
+def fixtures_serialize():
+	# serialise each of the fixtures 
+	# 	DispatchPoint	
+	dispatchPointsData = DispatchPoint.objects.all()
+	receptionPointData = ReceptionPoint.objects.all()
+	packagingDescriptonShort = PackagingDescriptonShort.objects.all()
+	lossesDamagesReason = LossesDamagesReason.objects.all()
+	lossesDamagesType = LossesDamagesType.objects.all()
 	
+	serialized_data = serializers.serialize('json',list(dispatchPointsData)+list(receptionPointData)+list(packagingDescriptonShort)+list(lossesDamagesReason)+list(lossesDamagesType))
+	
+	init_file = open('waybill/fixtures/initial_data.json','w')
+	init_file.writelines(serialized_data)
+	init_file.close()
+
 def custom_show_toolbar(request):
 	return True
 
