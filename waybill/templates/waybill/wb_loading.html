@@ -63,12 +63,12 @@
 					<tr  style="font-size:small;">
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
-						<td>{{lineitem.getStockItem.packagingDescrShort}}{{lineitem.getStockItem.packagename}}</td>
-						<td>{{lineitem.numberUnitsLoaded|floatformat}}</td>
-						<td>{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:1}}</td>
-						<td>{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:1}}</td>
-						<td>{{lineitem.calcTotalNet|floatformat:1}}</td>
-						<td>{{lineitem.calcTotalGross|floatformat:1}}</td>
+						<td>{%if lineitem.getStockItem.packagingDescrShort != ''%}{{lineitem.getStockItem.packagingDescrShort}} {%else%} {{lineitem.getStockItem.packagename}}{%endif%}</td>
+						<td style="text-align:right;">{{lineitem.numberUnitsLoaded|floatformat}}</td>
+						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:1}}</td>
+						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:1}}</td>
+						<td style="text-align:right;">{{lineitem.calcTotalNet|floatformat:1}}</td>
+						<td style="text-align:right;">{{lineitem.calcTotalGross|floatformat:1}}</td>
 
 					</tr>
 					{%endfor%}
