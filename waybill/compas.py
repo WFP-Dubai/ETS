@@ -52,11 +52,21 @@ class compas_write:
 			lostUnits =lineItem.numberUnitsLost
 			lossReason = lineItem.unitsLostReason.compasCode
 			
+			COI_CODE = unicode(lineItem.siNo.coi_code())			
+			TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+			Full_coi= TheStockItems[0].origin_id
+
+			COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
+			COMM_CODE = lineItem.siNo.COMMODITY_CODE
+			#get stock
+			PCKKCODE = TheStockItems[0].package_code
+			ALLCODE = TheStockItems[0].allocation_code
+			QUALITY = TheStockItems[0].qualitycode #'G'
+			
 			Response_Message = cursor.var(cx_Oracle.STRING)
 			Response_Message.setvalue(0,u' '*200)
 			Response_Code = cursor.var(cx_Oracle.STRING)
 			Response_Code.setvalue(0,u' '*2)
-			Full_coi= TheStockItems[0].origin_id
 
 			cursor.callproc(u'write_waybill.receipt',(
 				Response_Message,
@@ -69,7 +79,13 @@ class compas_write:
 				damadgedReason,
 				damadgedUnits,
 				lossReason,
-				lostUnits
+				lostUnits,
+				Full_coi,
+				COMM_CATEGORY_CODE,
+				COMM_CODE,
+				PCKKCODE,
+				ALLCODE,
+				QUALITY
 				))
 				
 			if(	Response_Code.getvalue() == 'S'):
