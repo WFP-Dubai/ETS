@@ -369,8 +369,14 @@ def reset_waybill(request):
 def waybill_view_reception(request,wb_id):
 	waybill_instance = Waybill.objects.get(id=wb_id)
 	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
-	disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
-	rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
+	rec_person_object = ''
+	disp_person_object =''
+	try:
+		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
+	except:
+		print waybill_instance.recipientName
+		pass
 	
 	return render_to_response('waybill/waybill_detail_view_reception.html',
 							  {'object':waybill_instance,

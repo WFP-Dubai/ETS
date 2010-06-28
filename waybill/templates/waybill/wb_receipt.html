@@ -39,7 +39,7 @@
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr>
-<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
+<td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
 <td>{{lineitem.numberUnitsGood}}</td>
 <td>{{lineitem.calcNetRecievedGood}}</td>
 <td>{%ifnotequal lineitem.numberUnitsLost 0%}
@@ -81,7 +81,14 @@
 					</tr>
 					{%endfor%}
 					<tr>
-						<td colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
+						<td colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}
+						{%if object.containerOneRemarksReciept%}
+						<br>Container 1 Remarks:{{object.containerOneRemarksReciept}}
+						{%endif%}
+						{%if object.containerTwoRemarksReciept%}
+						<br>Container 2 Remarks:{{object.containerTwoRemarksReciept}}
+						{%endif%}
+						<br><br></td>
 					</tr>
 				</table>
 			</td>

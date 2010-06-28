@@ -60,7 +60,7 @@
 						<td><sup>Gross</sup></td>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
-					<tr>
+					<tr  style="font-size:small;">
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.siNo.CMMNAME}}</td>
 						<td>{{lineitem.getStockItem.packagingDescrShort}}{{lineitem.getStockItem.packagename}}</td>

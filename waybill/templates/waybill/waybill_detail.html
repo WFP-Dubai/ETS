@@ -58,9 +58,9 @@
         </thead>
 
     {% for sform in formset.forms %}
-        {{ sform.id }}
+
         <tr>
-        	<td>{{sform.siNo}}</td>
+        	<td>{{ sform.id }}{{sform.siNo}}</td>
         	<td align="right">{{ sform.numberUnitsLoaded }}</td>
         	<td>{{ sform.numberUnitsGood }}</td>
         	<td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
