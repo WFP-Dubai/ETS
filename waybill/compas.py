@@ -5,6 +5,7 @@ from ets.waybill.views import *
 from django.db import models
 from django.db import connections
 from django.conf import settings
+import datetime
 
 class compas_write:
 	ErrorMessages = ''
