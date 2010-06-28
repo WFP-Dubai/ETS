@@ -38,7 +38,21 @@
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
-				$('#example').dataTable( {});
+				$('#example').dataTable( {
+				"aoColumns": [ 
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			{ "bSearchable": false},
+		]
+				});
 } );
 </script>
 {%endblock extra-header%}

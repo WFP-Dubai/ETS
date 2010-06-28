@@ -32,9 +32,20 @@ class compas_write:
 		recPersonCode = receiverPerson.code
 		arrival_date = the_waybill.recipientArrivalDate
 		all_ok = True
+		## check if containers = 2 & lines = 2
+		twoCont = False
+		if lineItems.count() == 2:
+			if len(the_waybill.containerTwoNumber) > 0:
+				twoCont = True
+		codeLetter = u'A'
 		db.begin()
 	
 		for lineItem in lineItems:
+			CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +WB_CODE)
+			if twoCont:
+				CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + WB_CODE)
+				codeLetter = u'B'
+		
 			goodUnits = lineItem.numberUnitsGood
 			damadgedUnits =lineItem.numberUnitsDamaged
 			damadgedReason = lineItem.unitsDamagedReason.compasCode
@@ -47,10 +58,10 @@ class compas_write:
 			Response_Code.setvalue(0,u' '*2)
 			Full_coi= TheStockItems[0].origin_id
 
-			cursor.callproc('write_waybill.dispatch',(
+			cursor.callproc(u'write_waybill.receipt',(
 				Response_Message,
 				Response_Code,
-				WB_CODE,
+				CURR_CODE,
 				recPersonOUC,
 				recPersonCode,
 				arrival_date,
@@ -79,9 +90,9 @@ class compas_write:
 
 		
 
-	def write_dispatch_waybill_compass(self,waybill_id):
-		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
-		cursor =  db.cursor()#connections['compas'].cursor()		
+	def write_dispatch_waybill_compas(self,waybill_id):
+#		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
+#		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = u''
 		self.ErrorCodes = u''
 		
@@ -92,7 +103,7 @@ class compas_write:
 		dispatch_person = EpicPerson.objects.get(person_pk = the_waybill.dispatcherName)
 		# make dispatch remarks::::
 		dispatch_remarks = the_waybill.dispatchRemarks
-		CODE = the_waybill.waybillNumber
+		CODE =  the_waybill.waybillNumber
 		DOCUMENT_CODE = u'wb'
 		DISPATCH_DATE=unicode(the_waybill.dateOfDispatch.strftime("%Y%m%d"))
 		ORIGIN_TYPE=LTI.ORIGIN_TYPE
@@ -123,9 +134,23 @@ class compas_write:
 		CONTAINER_NUMBER=the_waybill.containerOneNumber			
 		## For each lineItems
 		all_ok = True
+		## check if containers = 2 & lines = 2
+		twoCont = False
+		if lineItems.count() == 2:
+			if len(the_waybill.containerTwoNumber) > 0:
+				twoCont = True
+		codeLetter = u'A'
 		db.begin()
 	
 		for lineItem in lineItems:
+			CURR_CONTAINER_NUMBER=CONTAINER_NUMBER
+			CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +CODE)
+			if twoCont:
+				CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + CODE)
+				codeLetter = u'B'
+				CONTAINER_NUMBER=unicode(the_waybill.containerTwoNumber)		
+				
+				
 			COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
 			COMM_CODE = lineItem.siNo.COMMODITY_CODE
 			COI_CODE = unicode(lineItem.siNo.coi_code())			
@@ -150,15 +175,15 @@ class compas_write:
 			Full_coi= TheStockItems[0].origin_id
 			empty = u''
 
-# 			print [CODE,
+# 			print [CURR_CODE,
 # 				DISPATCH_DATE,
- #				ORIGIN_TYPE,
- #				ORIGIN_LOCATION_CODE,
- #				ORIGIN_CODE,
- #				ORIGIN_DESCR,
+#  				ORIGIN_TYPE,
+#  				ORIGIN_LOCATION_CODE,
+#  				ORIGIN_CODE,
+#  				ORIGIN_DESCR,
 # 				DESTINATION_LOCATION_CODE,
 # 				DESTINATION_CODE,
- #				LTI_ID,
+#  				LTI_ID,
 # 				LOADING_DATE,
 # 				ORGANIZATION_ID,
 # 				TRAN_TYPE_CODE,
@@ -172,7 +197,7 @@ class compas_write:
 # 				SUPPLIER1_OUC,
 # 				DRIVER_NAME,
 # 				LICENSE,
-# 				CONTAINER_NUMBER,
+# 				CURR_CONTAINER_NUMBER,
 # 				settings.COMPAS_STATION,
 # 				Full_coi,
 # 				COMM_CATEGORY_CODE,
@@ -190,7 +215,7 @@ class compas_write:
 			cursor.callproc(u'write_waybill.dispatch',(
 				Response_Message,
 				Response_Code,
-				CODE,
+				CURR_CODE,
 				DISPATCH_DATE,
 				ORIGIN_TYPE,
 				ORIGIN_LOCATION_CODE,
@@ -212,7 +237,7 @@ class compas_write:
 				SUPPLIER1_OUC,
 				DRIVER_NAME,
 				LICENSE,
-				CONTAINER_NUMBER,
+				CURR_CONTAINER_NUMBER,
 				settings.COMPAS_STATION,
 				Full_coi,
 				COMM_CATEGORY_CODE,

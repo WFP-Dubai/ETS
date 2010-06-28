@@ -71,7 +71,14 @@ $(document).ready(function() {
 				$('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
 				$('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
 				$('#id_recipientEndDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
-				$('#example').dataTable( {});
+				$('#example').dataTable( {
+				"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": true,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false 
+				});
 } );
 </script>
 {%endblock extra-header%}

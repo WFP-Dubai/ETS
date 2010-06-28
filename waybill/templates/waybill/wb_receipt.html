@@ -1,4 +1,14 @@
-		<tr>
+<html>
+<head>
+<style type="text/css">
+
+.number {
+	text-align: center;
+}
+
+</style>
+</head>
+</html>		<tr>
 			<td>
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
@@ -27,22 +37,22 @@
 					<thead class="wb_head">
 						<tr><th colspan="9">Observations</th></tr>
 					</thead>
-					<tr>
+					<tr   style="font-size:x-small;">
 						<td><sup>Receipt Condition</sup></td>
 						<td colspan="2"><sup>Good</sup></td>
 						<td colspan="5"><sup>Lost or Damaged cargo</sup></td>
 						
 						<td colspan="2"><sup>Total received</sup></td>
 					</tr>
-					<tr>
-<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
+					<tr  style="font-size:x-small;">
+<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup >(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
-					<tr>
-<td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
-<td>{{lineitem.numberUnitsGood}}</td>
+					<tr style="font-size:small; text-align:right;">
+<td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
+<td>{{lineitem.numberUnitsGood|floatformat}}</td>
 <td>{{lineitem.calcNetRecievedGood|floatformat}}</td>
-<td>{%ifnotequal lineitem.numberUnitsLost 0%}
+<td style="text-align:center;">{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.numberUnitsLost|floatformat}}
 	{%endifnotequal%}
 	{%ifnotequal lineitem.numberUnitsDamaged 0%}
@@ -51,7 +61,7 @@
 	{%endifnotequal%}
 	
 </td>
-<td>
+<td style="text-align:center;">
 	{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.calcNetRecievedLost|floatformat}}
 	{%endifnotequal%}
@@ -62,13 +72,13 @@
 	
 	</td>
 	
-<td>{%ifnotequal lineitem.numberUnitsLost 0%}L{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}{%endifnotequal%} {%ifnotequal lineitem.numberUnitsDamaged 0%}D{%endifnotequal%}</td>
+<td style="text-align:center;">{%ifnotequal lineitem.numberUnitsLost 0%}L{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}{%endifnotequal%} {%ifnotequal lineitem.numberUnitsDamaged 0%}D{%endifnotequal%}</td>
 
-<td><!-- type-->
+<td style="text-align:left;"><!-- type-->
 {%ifnotequal lineitem.numberUnitsLost 0%}L:{{lineitem.unitsLostType}} {%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%}{%endifnotequal%} 
 {%ifnotequal lineitem.numberUnitsDamaged 0%}D:{{lineitem.unitsDamagedType}} {%endifnotequal%}
 </td>
-<td><!--reason-->
+<td style="text-align:left;"><!--reason-->
 {%ifnotequal lineitem.numberUnitsLost 0%}L:{{lineitem.unitsLostReason}} {%ifnotequal lineitem.numberUnitsDamaged 0%}<br>{%endifnotequal%}{%endifnotequal%} 
 {%ifnotequal lineitem.numberUnitsDamaged 0%}D:{{lineitem.unitsDamagedReason}} {%endifnotequal%}
 

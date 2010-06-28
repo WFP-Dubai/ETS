@@ -28,13 +28,13 @@
 					<thead class="wb_head">
 						<tr><th colspan="9">Observations</th></tr>
 					</thead>
-					<tr>
+					<tr   style="font-size:x-small;">
 						<td><sup>Receipt Condition</sup></td>
 						<td colspan="2"><sup>Good</sup></td>
 						<td colspan="4"><sup>Lost or Damaged cargo</sup></td>
 						<td colspan="2"><sup>Total received</sup></td>
 					</tr>
-					<tr>
+					<tr style="font-size:x-small;">
 						<td><sup>SI No</sup></td>
 						<td><sup>Units</sup></td>
 						<td><sup>Net MT</sup></td>
@@ -46,7 +46,7 @@
 						<td><sup>Net MT</sup></td>
 					</tr>
 					{%for lineitem in object.loadingdetail_set.select_related%}
-					<tr>
+					<tr style="font-size:x-small;">
 						<td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
