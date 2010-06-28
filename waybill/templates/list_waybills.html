@@ -21,6 +21,7 @@
  			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='../viewwb/{{waybill.id}}'>View Dispatch</a>{%endif%}
  					{%if profile.isReciever or profile.isCompasUser%} <a href='../viewwb_reception/{{waybill.id}}'>View Reciept</a>{%endif%}
  					{%if profile.isCompasUser%} <a href='../viewwb_reception_edit/{{waybill.id}}'>View Full</a>{%endif%}
+ 					 {%if profile.superUser%} <a href='../validate/{{waybill.id}}'>Edit Full</a>{%endif%}
  			</td>
     </tr>
 {%endif%}
