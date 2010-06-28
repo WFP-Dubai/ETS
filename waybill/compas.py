@@ -30,7 +30,7 @@ class compas_write:
 		receiverPerson  = EpicPerson.objects.get(person_pk = the_waybill.recipientName)
 		recPersonOUC = receiverPerson.org_unit_code
 		recPersonCode = receiverPerson.code
-		arrival_date = the_waybill.recipientArrivalDate
+		arrival_date = unicode(the_waybill.recipientArrivalDate.strftime("%Y%m%d"))
 		all_ok = True
 		## check if containers = 2 & lines = 2
 		twoCont = False
@@ -45,13 +45,21 @@ class compas_write:
 			if twoCont:
 				CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + WB_CODE)
 				codeLetter = u'B'
-		
-			goodUnits = lineItem.numberUnitsGood
-			damadgedUnits =lineItem.numberUnitsDamaged
-			damadgedReason = lineItem.unitsDamagedReason.compasCode
-			lostUnits =lineItem.numberUnitsLost
-			lossReason = lineItem.unitsLostReason.compasCode
 			
+			goodUnits = unicode(lineItem.numberUnitsGood)
+			if lineItem.numberUnitsDamaged > 0:
+				damadgedUnits =unicode(lineItem.numberUnitsDamaged)
+				damadgedReason = unicode(lineItem.unitsDamagedReason.compasCode)
+			else:
+				damadgedReason = u''
+				damadgedUnits = u''
+			if lineItem.numberUnitsLost:
+				lostUnits =unicode(lineItem.numberUnitsLost)
+				lossReason = unicode(lineItem.unitsLostReason.compasCode)
+			else:
+				lossReason = u''
+				lostUnits = u''
+
 			COI_CODE = unicode(lineItem.siNo.coi_code())			
 			TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
 			Full_coi= TheStockItems[0].origin_id
@@ -67,6 +75,23 @@ class compas_write:
 			Response_Message.setvalue(0,u' '*200)
 			Response_Code = cursor.var(cx_Oracle.STRING)
 			Response_Code.setvalue(0,u' '*2)
+#			print [Response_Message,
+#				Response_Code,
+#				CURR_CODE,
+#				recPersonOUC,
+#				recPersonCode,
+#				arrival_date,
+#				goodUnits,
+#				damadgedReason,
+#				damadgedUnits,
+#				lossReason,
+#				lostUnits,
+#				Full_coi,
+#				COMM_CATEGORY_CODE,
+#				COMM_CODE,
+#				PCKKCODE,
+#				ALLCODE,
+#				QUALITY]
 
 			cursor.callproc(u'write_waybill.receipt',(
 				Response_Message,
@@ -103,12 +128,13 @@ class compas_write:
 			
 		cursor.close()
 		db.close()
+		return all_ok
 
 		
 
 	def write_dispatch_waybill_compas(self,waybill_id):
-#		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
-#		cursor =  db.cursor()#connections['compas'].cursor()		
+		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
+		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = u''
 		self.ErrorCodes = u''
 		
