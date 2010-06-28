@@ -19,7 +19,7 @@ class compas_write:
 		self.__db.close()
 
 	def write_receipt_waybill_compas(self,waybill_id):
-		db = cx_Oracle.Connection("TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001")
+		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
 		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = ''
 		self.ErrorCodes = ''
@@ -41,9 +41,9 @@ class compas_write:
 			lossReason = lineItem.unitsLostReason.compasCode
 			
 			Response_Message = cursor.var(cx_Oracle.STRING)
-			Response_Message.setvalue(0,' '*200)
+			Response_Message.setvalue(0,u' '*200)
 			Response_Code = cursor.var(cx_Oracle.STRING)
-			Response_Code.setvalue(0,' '*2)
+			Response_Code.setvalue(0,u' '*2)
 			Full_coi= TheStockItems[0].origin_id
 
 			cursor.callproc('write_waybill.dispatch',(
@@ -79,10 +79,10 @@ class compas_write:
 		
 
 	def write_dispatch_waybill_compass(self,waybill_id):
-		db = cx_Oracle.Connection("TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001")
+		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
 		cursor =  db.cursor()#connections['compas'].cursor()		
-		self.ErrorMessages = ''
-		self.ErrorCodes = ''
+		self.ErrorMessages = u''
+		self.ErrorCodes = u''
 		
 		# gather wb info
 		the_waybill = Waybill.objects.get(id=waybill_id)
@@ -92,19 +92,19 @@ class compas_write:
 		# make dispatch remarks::::
 		dispatch_remarks = the_waybill.dispatchRemarks
 		CODE = the_waybill.waybillNumber
-		DOCUMENT_CODE = 'wb'
-		DISPATCH_DATE=the_waybill.dateOfDispatch.strftime("%Y%m%d")
+		DOCUMENT_CODE = u'wb'
+		DISPATCH_DATE=unicode(the_waybill.dateOfDispatch.strftime("%Y%m%d"))
 		ORIGIN_TYPE=LTI.ORIGIN_TYPE
 		ORIGIN_LOCATION_CODE=LTI.ORIGIN_LOCATION_CODE
 		ORIGIN_CODE=LTI.ORIGIN_WH_CODE
-		ORIGIN_DESCR=''
+		ORIGIN_DESCR=u''
 		DESTINATION_LOCATION_CODE=LTI.DESTINATION_LOCATION_CODE
-		DESTINATION_CODE=str(the_waybill.destinationWarehouse.ORG_CODE)
-		PRO_ACTIVITY_CODE=""
-		ACTIVITY_OUC=""
-		LNDARRM_CODE=""
+		DESTINATION_CODE=unicode(the_waybill.destinationWarehouse.ORG_CODE)
+		PRO_ACTIVITY_CODE=u""
+		ACTIVITY_OUC=u""
+		LNDARRM_CODE=u""
 		LTI_ID=LTI.LTI_ID
-		LOADING_DATE=the_waybill.dateOfLoading.strftime("%Y%m%d")
+		LOADING_DATE=unicode(the_waybill.dateOfLoading.strftime("%Y%m%d"))
 		ORGANIZATION_ID=LTI.CONSEGNEE_CODE
 		TRAN_TYPE_CODE=the_waybill.transactionType
 		TRAN_TYPE_DESCR=the_waybill.transportVehicleRegistration
@@ -127,7 +127,7 @@ class compas_write:
 		for lineItem in lineItems:
 			COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
 			COMM_CODE = lineItem.siNo.COMMODITY_CODE
-			COI_CODE = lineItem.siNo.coi_code()			
+			COI_CODE = unicode(lineItem.siNo.coi_code())			
 			#get stock
 			TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
 			PCKKCODE = TheStockItems[0].package_code
@@ -138,55 +138,55 @@ class compas_write:
 			UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
 			
 			NetTotal =(UnitNet * UnitsLoaded) / 1000
-			strNetTotal = "%.3f" % NetTotal
+			strNetTotal = u'%.3f' % NetTotal
 			GrossTotal = (UnitGross * UnitsLoaded) / 1000
-			strGrossTotal = "%.3f" % GrossTotal
+			strGrossTotal = u'%.3f' % GrossTotal
 
 			Response_Message = cursor.var(cx_Oracle.STRING)
-			Response_Message.setvalue(0,' '*200)
+			Response_Message.setvalue(0,u' '*200)
 			Response_Code = cursor.var(cx_Oracle.STRING)
-			Response_Code.setvalue(0,' '*2)
+			Response_Code.setvalue(0,u' '*2)
 			Full_coi= TheStockItems[0].origin_id
+			empty = u''
 
+# 			print [CODE,
+# 				DISPATCH_DATE,
+ #				ORIGIN_TYPE,
+ #				ORIGIN_LOCATION_CODE,
+ #				ORIGIN_CODE,
+ #				ORIGIN_DESCR,
+# 				DESTINATION_LOCATION_CODE,
+# 				DESTINATION_CODE,
+ #				LTI_ID,
+# 				LOADING_DATE,
+# 				ORGANIZATION_ID,
+# 				TRAN_TYPE_CODE,
+# 				VEHICLE_REGISTRATION,
+# 				MODETRANS_CODE,
+# 				COMMENTS,
+# 				PERSON_CODE,
+# 				PERSON_OUC,
+# 				CERTIFING_TITLE,
+# 				TRANS_CONTRACTOR_CODE,
+# 				SUPPLIER1_OUC,
+# 				DRIVER_NAME,
+# 				LICENSE,
+# 				CONTAINER_NUMBER,
+# 				settings.COMPAS_STATION,
+# 				Full_coi,
+# 				COMM_CATEGORY_CODE,
+# 				COMM_CODE,
+# 				PCKKCODE,
+# 				ALLCODE,
+# 				QUALITY,
+# 				strNetTotal,
+# 				strGrossTotal,
+# 				UnitsLoaded,
+# 				UnitNet,
+# 				UnitGross,
+# ]
 
- 			print [CODE,
- 				DISPATCH_DATE,
- 				ORIGIN_TYPE,
- 				ORIGIN_LOCATION_CODE,
- 				ORIGIN_CODE,
- 				ORIGIN_DESCR,
- 				DESTINATION_LOCATION_CODE,
- 				DESTINATION_CODE,
- 				LTI_ID,
- 				LOADING_DATE,
- 				ORGANIZATION_ID,
- 				TRAN_TYPE_CODE,
- 				VEHICLE_REGISTRATION,
- 				MODETRANS_CODE,
- 				COMMENTS,
- 				PERSON_CODE,
- 				PERSON_OUC,
- 				CERTIFING_TITLE,
- 				TRANS_CONTRACTOR_CODE,
- 				SUPPLIER1_OUC,
- 				DRIVER_NAME,
- 				LICENSE,
- 				CONTAINER_NUMBER,
- 				settings.COMPAS_STATION,
- 				Full_coi,
- 				COMM_CATEGORY_CODE,
- 				COMM_CODE,
- 				PCKKCODE,
- 				ALLCODE,
- 				QUALITY,
- 				strNetTotal,
- 				strGrossTotal,
- 				UnitsLoaded,
- 				UnitNet,
- 				UnitGross,
- ]
-
-			cursor.callproc('write_waybill.dispatch',(
+			cursor.callproc(u'write_waybill.dispatch',(
 				Response_Message,
 				Response_Code,
 				CODE,
@@ -224,7 +224,7 @@ class compas_write:
 				UnitsLoaded,
 				UnitNet,
 				UnitGross,
-				''
+				empty
 				)
 				)
 				
