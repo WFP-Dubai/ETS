@@ -20,7 +20,7 @@
 		<span><strong>LTI:</strong> {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
 	</div>
 	<div>
-			Waybill Number:{{form.waybillNumber}} {{form.instance.waybillNumber}}
+			<strong>Waybill Number:</strong>{{form.waybillNumber}} {{form.instance.waybillNumber}}
 
 	</div>
 	<div>			
@@ -46,7 +46,8 @@
 			<td> {{form.transportType}}</td>
 		</tr>
 	</table>
-<strong>Recipient Location:</strong>    {{form.recipientLocation}} {{form.recipientConsingee}}    
+<strong>Recipient Location:</strong>   {{form.instance.recipientLocation}}  <br>
+<strong>Destination Warehouse<strong> {{form.destinationWarehouse}}
 {{ formset.management_form }}
 <br><br>
 
@@ -92,7 +93,7 @@
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td><strong>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
 <tr><td><strong>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
-<tr><td>&nbsp;</td><td>{{form.destinationWarehouse}}</td></tr>
+
 <tr><td><strong>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
 <tr><td><strong>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
 <tr><td><strong>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>
