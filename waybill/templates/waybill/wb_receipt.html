@@ -13,20 +13,20 @@
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
 					<tr>
-						<td><small>Location:</small>{{object.recipientLocation}}</td>
-						<td ><samll>Arrival Date:	</small>{{object.recipientArrivalDate}}</td>
+						<td><small  style="font-size:x-small;">Location:</small>{{object.recipientLocation}}</td>
+						<td ><small style="font-size:x-small;">Arrival Date:	</small>{{object.recipientArrivalDate}}</td>
 					</tr>
 					<tr>
-						<td><small>Consignee:</small>	{{object.recipientConsingee}}</td>
-						<td ><small>Start Discharge Date:</small>	{{object.recipientStartDischargeDate}}</td>
+						<td><small style="font-size:x-small;">Consignee:</small>	{{object.recipientConsingee}}</td>
+						<td ><small style="font-size:x-small;">Start Discharge Date:</small>	{{object.recipientStartDischargeDate}}</td>
 					</tr>
 					<tr>
-						<td><small>Name:	</small>{{rec_person}}</td>
-						<td ><small>End Discharge Date</small>{{object.recipientEndDischargeDate}}</td>
+						<td><small style="font-size:x-small;">Name:	</small>{{rec_person}}</td>
+						<td ><small style="font-size:x-small;">End Discharge Date:</small>{{object.recipientEndDischargeDate}}</td>
 					</tr>
 					<tr>
-						<td><small>Title: 	</small>{{object.recipientTitle}}</td>
-						<td ><small>Distance in KM</small>	{{object.recipientDistance}}</td>
+						<td><small style="font-size:x-small;">Title: 	</small>{{object.recipientTitle}}</td>
+						<td ><small style="font-size:x-small;">Distance in KM:</small>	{{object.recipientDistance|floatformat}}</td>
 					</tr>
 				</table>
 			</td>
@@ -35,7 +35,7 @@
 			<td>
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head">
-						<tr><th colspan="9">Observations</th></tr>
+						<tr><th colspan="11">Observations</th></tr>
 					</thead>
 					<tr   style="font-size:x-small;">
 						<td><sup>Receipt Condition</sup></td>
@@ -61,6 +61,7 @@
 	{%endifnotequal%}
 	
 </td>
+
 <td style="text-align:center;">
 	{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.calcNetRecievedLost|floatformat}}
@@ -90,6 +91,23 @@
 						
 					</tr>
 					{%endfor%}
+										{%for lineitem in extra_lines%}
+
+					<tr  style="font-size:small;">
+						<td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						
+					</tr>
+					{%endfor%}
+
 					<tr>
 						<td colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}
 						{%if object.containerOneRemarksReciept%}

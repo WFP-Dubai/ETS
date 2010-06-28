@@ -20,7 +20,7 @@
 <input type="submit" onclick="javascript: original_lable.className='shown'; copy_lable.className='hidden'; print();Edit.disabled=true; this.disabled=true;copy_lable.className='shown'; original_lable.className='hidden'; printoriginal.submit()" name="Print Original" id='Print1' value='Print Original'></form>
 {%endif%}<a href="/ets/waybill/receive">Back to Receipt</a>
 </span>
-	<table cellpadding="0" cellspacing="0" border="0px">
+	<table cellpadding="0" cellspacing="0" border="0px" width="1000px">
 		{% include 'waybill/wb_header.html'%}
 		{% include 'waybill/wb_loading.html'%}
 		{% include 'waybill/wb_receipt.html'%}	

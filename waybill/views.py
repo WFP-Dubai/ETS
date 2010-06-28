@@ -221,7 +221,7 @@ def dispatchToCompas(request):
 	error_codes = ''
 	for waybill in list_waybills:
 		# call compas and read return
-		status_wb = the_compas.write_dispatch_waybill_compass(waybill.id)
+		status_wb = the_compas.write_dispatch_waybill_compas(waybill.id)
 		if  status_wb:
 			#aok
 			waybill.waybillSentToCompas=True
@@ -249,7 +249,7 @@ def receiptToCompas(request):
 	error_codes = ''
 	for waybill in list_waybills:
 		# call compas and read return
-		status_wb = the_compas.write_receipt_waybill_compass(waybill.id)
+		status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 		if  status_wb:
 			#aok
 			waybill.waybillRecSentToCompas=True
@@ -306,6 +306,7 @@ def waybill_validate_form_update(request,wb_id):
 		profile=request.user.get_profile()
 	except:
 		pass
+
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.all())
 		numberUnitsLoaded=forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -338,11 +339,13 @@ def waybill_view(request,wb_id):
 	waybill_instance = Waybill.objects.get(id=wb_id)
 	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
 	disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
-	
+	number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+	extra_lines = 5 - number_of_lines
+	my_empty = ['']*extra_lines
 	return render_to_response('waybill/waybill_detail_view.html',
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
-							  'disp_person':disp_person_object},
+							  'disp_person':disp_person_object,'extra_lines':my_empty},
 							  context_instance=RequestContext(request))
 
 def reset_waybill(request):
@@ -371,6 +374,10 @@ def waybill_view_reception(request,wb_id):
 	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
 	rec_person_object = ''
 	disp_person_object =''
+	number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+	extra_lines = 5 - number_of_lines
+	my_empty = ['']*extra_lines
+
 	try:
 		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
@@ -382,7 +389,7 @@ def waybill_view_reception(request,wb_id):
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
 							  'disp_person':disp_person_object,
-							  'rec_person':rec_person_object},
+							  'rec_person':rec_person_object,'extra_lines':my_empty},
 							  context_instance=RequestContext(request))
 
 def waybill_reception(request,wb_code):
@@ -501,17 +508,17 @@ def waybillCreate(request,lti_code):
 			model = LoadingDetail
 			fields = ('siNo','numberUnitsLoaded','wbNumber','overload')
 		
-#		def clean(self):
-#			cleaned_data = self.cleaned_data
-#			siNo = cleaned_data.get("siNo")
-#			units = cleaned_data.get("numberUnitsLoaded")
-#			overloaded = cleaned_data.get('overload')
-#			theSI = ltioriginal.objects.get(id=siNo)
-#			max_items = theSI.restant()
-#			if units > max_items and not overloaded:
-#				pass
-#				
-#			return cleaned_data
+# 		def clean(self):
+# 			cleaned_data = self.cleaned_data
+# 			siNo = cleaned_data.get("siNo")
+# 			units = cleaned_data.get("numberUnitsLoaded")
+# 			overloaded = cleaned_data.get('overload')
+# 			theSI = ltioriginal.objects.get(id=siNo)
+# 			max_items = theSI.restant()
+# 			if units > max_items and not overloaded:
+# 				pass
+# 				
+# 			return cleaned_data
 
 
 	

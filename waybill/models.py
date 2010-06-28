@@ -399,6 +399,12 @@ class SiTracker(models.Model):
 class PackagingDescriptonShort(models.Model):
 		packageCode = models.CharField(primary_key=True,max_length=5)
 		packageShortName = models.CharField(max_length=10)
+		def  __unicode__(self):
+				return self.packageCode+' - '+ self.packageShortName
+				
+class PackagingDescriptonShortAdmin(admin.ModelAdmin):
+		list_display=('packageCode','packageShortName')
+		list_filter = ('packageCode','packageShortName') 
 		
 
 
@@ -433,4 +439,4 @@ admin.site.register(ReceptionPoint)
 admin.site.register(EpicPerson,EpicPersonsAdmin)
 admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
 admin.site.register(LossesDamagesType)
-admin.site.register(PackagingDescriptonShort)
+admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)

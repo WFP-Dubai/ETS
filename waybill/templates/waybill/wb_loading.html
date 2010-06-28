@@ -5,31 +5,31 @@
 						<tr><th colspan="5" bgcolor='black' color='white'>Transaction Details</th></tr>
 					</thead>
 					<tr>
-						<td><sup>Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
-						<td><sup>Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
-						<td><sup>Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td rowspan=5><span ><img style='left:0px;' src="/ets/media/images/bc-dummy.png" alt="barcode" height=175><br></span></td>
+						<td><sup style="font-size:x-small;">Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
+						<td><sup style="font-size:x-small;" >Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
+						<td><sup style="font-size:x-small;">Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
+						<td rowspan=5><span ><img  src="/ets/media/images/bc-dummy.png" alt="barcode" height=175pt ></span></td>
 					
 					</tr>
 					<tr>
-						<td><sup>Project no.</sup><br>{{ltioriginal.0.PROJECT_WBS_ELEMENT}}</td>
-						<td><sup>Date of Loading:</sup><br>{{object.dateOfLoading}}</td>
-						<td><sup>Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
+						<td><sup style="font-size:x-small;">Project no.</sup><br>{{ltioriginal.0.PROJECT_WBS_ELEMENT}}</td>
+						<td><sup style="font-size:x-small;">Date of Loading:</sup><br>{{object.dateOfLoading}}</td>
+						<td><sup style="font-size:x-small;">Date of Dispatch:</sup><br>{{object.dateOfDispatch}}</td>
 					</tr>
 					<tr>
-						<td><sup>Destination(warehouse):</sup><br>{{object.destinationWarehouse}}</td>
-						<td><sup>Allocation Destination:</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td><sup>Consignee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
+						<td><sup style="font-size:x-small;">Destination(warehouse):</sup><br>{{object.destinationWarehouse}}</td>
+						<td><sup style="font-size:x-small;">Allocation Destination:</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
+						<td><sup style="font-size:x-small;">Consignee</sup><br>{{ltioriginal.0.CONSEGNEE_NAME}}</td>
 						
 					</tr>
 
 					<tr>
-						<td><sup>Type of Transaction:</sup><br>
+						<td><sup style="font-size:x-small;">Type of Transaction:</sup><br>
 						 {%if object.transactionType == 'WIT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
-						<td><sup>Transport Type:</sup><br>Road</td>
-						<td><sup>LTI no</sup><br>{{object.ltiNumber}}</td>
+						<td><sup style="font-size:x-small;">Transport Type:</sup><br>Road</td>
+						<td><sup style="font-size:x-small;">LTI no</sup><br>{{object.ltiNumber}}</td>
 					</tr>
-					<tr ><td colspan=3 valign="top"><sup>Dispatch Remarks:</sup><br>{{object.dispatchRemarks}}
+					<tr ><td colspan=3 valign="top"><sup style="font-size:x-small;">Dispatch Remarks:</sup><br>{{object.dispatchRemarks}}
 						{%if object.containerOneRemarksDispatch%}
 						<br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
 						{%endif%}
@@ -41,7 +41,7 @@
 		</tr>
 		<tr>
 			<td>
-				<table cellpadding="0" cellspacing="0" border="1px" style=''>
+				<table cellpadding="0" cellspacing="0" border="1px" style='border-collapse: separate;'>
 					<thead class="wb_head">
 						<tr><th colspan="8">Loading Details</th></tr>
 					</thead>
@@ -72,9 +72,21 @@
 
 					</tr>
 					{%endfor%}
-					{%if object.loadingdetail_set.select_related.all.len < 5%}
 					
-					{%endif%}
+					{%for lineitem in extra_lines%}
+
+					<tr  style="font-size:small;border-collapse: separate;">
+						<td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td style="text-align:right;">&nbsp; </td>
+						<td style="text-align:right;">&nbsp; </td>
+						<td style="text-align:right;">&nbsp; </td>
+						<td style="text-align:right;">&nbsp; </td>
+						<td style="text-align:right;">&nbsp; </td>
+
+					</tr>
+					{%endfor%}
 					<tr>
 						<td colspan="8">
 						</td>
@@ -86,14 +98,14 @@
 			<td>
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head"><tr><th colspan="3">Certification of Commodities Loaded</th></tr></thead>
-						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup>Transport Contractor:</sup><br> {{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
-						<tr><td><small>Name:</small>{{disp_person}}</td><td colspan="2"><small>Transport Subcontractor:</small> {{object.transportSubContractor}}</td></tr>
-						<tr><td><small>Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small>Driver's Name:</small> {{object.transportDriverName}}</td></tr>
+						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup style="font-size:x-small;">Transport Contractor:</sup><br> {{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
+						<tr><td><small style="font-size:x-small;">Name:</small>{{disp_person}}</td><td colspan="2"><small style="font-size:x-small;">Transport Subcontractor:</small> {{object.transportSubContractor}}</td></tr>
+						<tr><td><small style="font-size:x-small;">Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small style="font-size:x-small;">Driver's Name:</small> {{object.transportDriverName}}</td></tr>
 						<tr><td rowspan="4"><p style="font-size: x-small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
-Name, signature and stamp:</p></td><td colspan="2"><small>Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
-						<tr><td><small>Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
-						<td><small>Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSealNumber}}
-						<br><small>Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSealNumber}} </td></tr>
+Name, signature and stamp:</p></td><td colspan="2"><small style="font-size:x-small;">Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+						<tr><td><small style="font-size:x-small;">Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
+						<td><small style="font-size:x-small;">Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSealNumber}}
+						<br><small style="font-size:x-small;">Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSealNumber}} </td></tr>
 						<tr><td rowspan="2" colspan="2"><p style="font-size: x-small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
 Name, signature and stamp:</p></td></tr>
 				</table>

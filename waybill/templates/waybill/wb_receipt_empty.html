@@ -4,47 +4,42 @@
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
 					<tr>
-						<td><sup>Location:</sup></td>
-						<td ><sup>Arrival Date:</sup></td>
+						<td><sup style="font-size:x-small;">Location:</sup>&nbsp;</td>
+						<td ><sup style="font-size:x-small;">Arrival Date:</sup>&nbsp;</td>
 					</tr>
 					<tr>
-						<td><sup>Consignee:</sup></td>
-						<td ><sup>Start Discherge Date</sup></td>
+						<td><sup style="font-size:x-small;">Consignee:</sup>&nbsp;</td>
+						<td ><sup style="font-size:x-small;">Start Discherge Date:</sup>&nbsp;</td>
 					</tr>
 					<tr>
-						<td><sup>Name:</sup></td>
-						<td ><sup>End Discharge Date</sup></td>
+						<td><sup style="font-size:x-small;">Name:</sup>&nbsp;</td>
+						<td ><sup style="font-size:x-small;">End Discharge Date:</sup>&nbsp;</td>
 					</tr>
 					<tr>
-						<td><p>Title</p></td>
-						<td ><sup>Distance in KM</sup></td>
+						<td><p style="font-size:x-small;">Title:</p>&nbsp;</td>
+						<td ><p style="font-size:x-small;">Distance in KM:</p>&nbsp;</td>
 					</tr>
 				</table>
 			</td>
 		</tr>
 		<tr>
 			<td>
+				
 				<table cellpadding="0" cellspacing="0" border="1px">
 					<thead class="wb_head">
-						<tr><th colspan="9">Observations</th></tr>
+						<tr><th colspan="10">Observations</th></tr>
 					</thead>
 					<tr   style="font-size:x-small;">
 						<td><sup>Receipt Condition</sup></td>
 						<td colspan="2"><sup>Good</sup></td>
-						<td colspan="4"><sup>Lost or Damaged cargo</sup></td>
+						<td colspan="5"><sup>Lost or Damaged cargo</sup></td>
+						
 						<td colspan="2"><sup>Total received</sup></td>
 					</tr>
-					<tr style="font-size:x-small;">
-						<td><sup>SI No</sup></td>
-						<td><sup>Units</sup></td>
-						<td><sup>Net MT</sup></td>
-						<td><sup>Units</sup></td>
-						<td><sup>Net MT</sup></td>
-						<td><sup>(L)oss or (D)amage</sup></td>
-						<td><sup>Type (specify)</sup></td>
-						<td><sup>Units</sup></td>
-						<td><sup>Net MT</sup></td>
+					<tr  style="font-size:x-small;">
+<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup >(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
 					</tr>
+	
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr style="font-size:x-small;">
 						<td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
@@ -56,11 +51,29 @@
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
 						<td>&nbsp;</td>
+						<td>&nbsp;</td>
 						
 					</tr>
 					{%endfor%}
+					{%for lineitem in extra_lines%}
+
+					<tr  style="font-size:small;">
+						<td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						<td>&nbsp;</td>
+						
+					</tr>
+					{%endfor%}
+					
 					<tr>
-						<td colspan="9"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
+						<td colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
 					</tr>
 				</table>
 			</td>
