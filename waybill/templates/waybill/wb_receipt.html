@@ -41,23 +41,23 @@
 					<tr>
 <td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
 <td>{{lineitem.numberUnitsGood}}</td>
-<td>{{lineitem.calcNetRecievedGood}}</td>
+<td>{{lineitem.calcNetRecievedGood|floatformat}}</td>
 <td>{%ifnotequal lineitem.numberUnitsLost 0%}
-	L:{{lineitem.numberUnitsLost}}
+	L:{{lineitem.numberUnitsLost|floatformat}}
 	{%endifnotequal%}
 	{%ifnotequal lineitem.numberUnitsDamaged 0%}
 	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
-	D:{{lineitem.numberUnitsDamaged}}
+	D:{{lineitem.numberUnitsDamaged|floatformat}}
 	{%endifnotequal%}
 	
 </td>
 <td>
 	{%ifnotequal lineitem.numberUnitsLost 0%}
-	L:{{lineitem.calcNetRecievedLost}}
+	L:{{lineitem.calcNetRecievedLost|floatformat}}
 	{%endifnotequal%}
 	{%ifnotequal lineitem.numberUnitsDamaged 0%}
 	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
-	D:{{lineitem.calcNetRecievedDamaged}}
+	D:{{lineitem.calcNetRecievedDamaged|floatformat}}
 	{%endifnotequal%}
 	
 	</td>
@@ -75,8 +75,8 @@
 </td>
 
 
-<td>{{lineitem.calcTotalReceivedUnits}}</td>
-<td>{{lineitem.calcTotalReceivedNet}}</td>	
+<td>{{lineitem.calcTotalReceivedUnits|floatformat}}</td>
+<td>{{lineitem.calcTotalReceivedNet|floatformat:1}}</td>	
 						
 					</tr>
 					{%endfor%}
