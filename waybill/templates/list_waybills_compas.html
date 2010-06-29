@@ -26,9 +26,11 @@
 {% endfor%}
 </table>
 {%if error_message %}
-<span>{{error_message}}
-</span><br>
-<span>{{error_message}}</span>
+<pre>
+<div>{{error_message}}
+</div><br>
+<div>{{error_message}}</div>
+
 {%endif%}
 <br>
 {%endblock%}

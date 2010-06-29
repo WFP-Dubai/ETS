@@ -268,6 +268,13 @@ class EpicStock(models.Model):
 			#print pck
 			return pck.packageShortName
 			
+class EpicLossReason(models.Model):
+		REASON_CODE =models.CharField(max_length=5)
+		REASON =models.CharField(max_length=80)
+		class Meta:
+				db_table = u'EPIC_LOSSREASON'
+		
+
 class LossesDamagesReason(models.Model):
 		compasCode = models.CharField(max_length=30)
 		description  = models.CharField(max_length=20)

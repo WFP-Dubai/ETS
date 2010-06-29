@@ -115,29 +115,30 @@ def import_ltis(request):
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
 	
 	## Fix filter to import only relevant LTIs beloning to Dispatch And Reciept points
-	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-01')
+	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
+	recIn = False
+	dispIn = False
 	for myrecord in original:		
-#		print myrecord.ORIGIN_WH_CODE
-#		if myrecord.CONSEGNEE_CODE in  listRecepients['CONSEGNEE_CODE']:
-#			if myrecord.ORIGIN_WH_CODE in listDispatchers[0]['ORIGIN_WH_CODE']:
-				myrecord.save(using='default')
-				# Tracker #test if exists
-				try:
-					mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
-					if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
+		for rec in listRecepients:
+			if myrecord.CONSEGNEE_CODE in  rec['CONSEGNEE_CODE']:
+				for disp in listDispatchers:
+					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE']:
+						myrecord.save(using='default')
 						try:
-							change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
-							mysist.number_units_left =	mysist.number_units_left + change	
-							mysist.save(using='default')	
+							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+							if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
+								try:
+									change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
+									mysist.number_units_left =	mysist.number_units_left + change	
+									mysist.save(using='default')	
+								except:
+									pass
 						except:
-							pass
-				except:
-						print 'no sit exists'
-						mysist = SiTracker()
-						mysist.LTI=myrecord
-						mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-						mysist.number_units_start = myrecord.NUMBER_OF_UNITS
-						mysist.save(using='default')
+							mysist = SiTracker()
+							mysist.LTI=myrecord
+							mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+							mysist.number_units_start = myrecord.NUMBER_OF_UNITS
+							mysist.save(using='default')
 #UPDATE GEO
 	try:
 		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
@@ -282,7 +283,7 @@ def receiptToCompas(request):
 	try:
 		profile=request.user.get_profile()
 	except:
-		pass
+		print 'no person'
 		
 	list_waybills = Waybill.objects.filter(waybillReceiptValidated = True).filter(waybillRecSentToCompas = False).filter(waybillSentToCompas=True)
 	the_compas = compas_write()
@@ -292,11 +293,11 @@ def receiptToCompas(request):
 		# call compas and read return
 		status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 		if  status_wb:
-			#aok
+			print "ok"
 			waybill.waybillRecSentToCompas=True
 			waybill.save()
 		else:
-			# error here
+			print 'error'
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 			
@@ -383,12 +384,13 @@ def waybill_validate_form_update(request,wb_id):
 def waybill_view(request,wb_id):
 	try:
 		waybill_instance = Waybill.objects.get(id=wb_id)
+		zippedWB = wb_compress(wb_id)
 		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
-		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
 		extra_lines = 5 - number_of_lines
 		my_empty = ['']*extra_lines
-		zippedWB = wb_compress(wb_id)
+		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+
 	except:
 		return HttpResponseRedirect('/')
 	return render_to_response('waybill/waybill_detail_view.html',
@@ -425,18 +427,22 @@ def reset_waybill(request):
 def waybill_view_reception(request,wb_id):
 	rec_person_object = ''
 	disp_person_object =''
+	zippedWB=''
+	
 	try:
 		waybill_instance = Waybill.objects.get(id=wb_id)
 		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
 		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
 		extra_lines = 5 - number_of_lines
 		my_empty = ['']*extra_lines
+		zippedWB = wb_compress(wb_id)	
+	except:
+			return HttpResponseRedirect('/')
+	try:
 		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
-		my_empty = ['']*extra_lines
-		zippedWB = wb_compress(wb_id)
 	except:
-		print waybill_instance.recipientName
+		pass
 	
 	return render_to_response('waybill/waybill_detail_view_reception.html',
 							  {'object':waybill_instance,
@@ -725,7 +731,6 @@ def fixtures_serialize():
 	init_file.writelines(serialized_data)
 	init_file.close()
 
-@login_required
 def custom_show_toolbar(request):
 	return True
 
@@ -765,6 +770,5 @@ def restant_si(lti_code):
 			for si in listOfSI:
 				if si.SINumber == loading.siNo.SI_CODE:
 					si.reduceCurrent(loading.numberUnitsLoaded)
-
 	return listOfSI
 	
