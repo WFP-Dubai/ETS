@@ -8,7 +8,9 @@
 						<td><sup style="font-size:x-small;">Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
 						<td><sup style="font-size:x-small;" >Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
 						<td><sup style="font-size:x-small;">Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td rowspan=5>{%if zippedWB%}<img height=175px' src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&chl={{zippedWB}}'>{%else%}<img  src="/ets/media/images/bc-dummy.png" alt="barcode" >{%endif%}</td>
+						<td  rowspan=5>{%if zippedWB%}<img style="left:0px;right"0px height=175px' src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&chl={{zippedWB}}'>
+						{%else%}<img  src="/ets/media/images/bc-dummy.png" alt="barcode" >{%endif%}
+						</td>
 					
 					</tr>
 					<tr>
