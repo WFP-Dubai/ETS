@@ -531,7 +531,7 @@ def waybillCreate(request,lti_code):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save(commit=False)
-			wb_new.waybillNumber = 'ETS' + '%05d' % wb_new.id
+			wb_new.waybillNumber = 'E' + '%04d' % wb_new.id
 			for subform in instances:
 				subform.wbNumber = wb_new
 				subform.save()

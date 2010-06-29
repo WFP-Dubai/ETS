@@ -1,7 +1,6 @@
 import os
 import sys
-
-sys.path.append('c:/epic/ets/')
+sys.path.append('c:\\epic')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'ets.settings'
 
 import django.core.handlers.wsgi

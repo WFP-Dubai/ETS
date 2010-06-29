@@ -12,7 +12,7 @@ class compas_write:
 	ErrorCodes = ''
 
 	def __enter__(self):
-		self.__db = cx_Oracle.Connection("TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001")
+		self.__db = cx_Oracle.Connection("TEST2JERX001/TEST2JERX001@//10.11.216.4:1521/JERX001")
 		self.__cursor = self.__db.cursor()
 		return self 
 	def __exit__(self, type, value, traceback):
@@ -20,7 +20,7 @@ class compas_write:
 		self.__db.close()
 
 	def write_receipt_waybill_compas(self,waybill_id):
-		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
+		db = cx_Oracle.Connection(u'TEST2JERX001/TEST2JERX001@//10.11.216.4:1521/JERX001')
 		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = ''
 		self.ErrorCodes = ''
@@ -133,7 +133,7 @@ class compas_write:
 		
 
 	def write_dispatch_waybill_compas(self,waybill_id):
-		db = cx_Oracle.Connection(u'TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001')
+		db = cx_Oracle.Connection(u'TEST2JERX001/TEST2JERX001@//10.11.216.4:1521/JERX001')
 		cursor =  db.cursor()#connections['compas'].cursor()		
 		self.ErrorMessages = u''
 		self.ErrorCodes = u''
@@ -217,42 +217,42 @@ class compas_write:
 			Full_coi= TheStockItems[0].origin_id
 			empty = u''
 
-# 			print [CURR_CODE,
-# 				DISPATCH_DATE,
-#  				ORIGIN_TYPE,
-#  				ORIGIN_LOCATION_CODE,
-#  				ORIGIN_CODE,
-#  				ORIGIN_DESCR,
-# 				DESTINATION_LOCATION_CODE,
-# 				DESTINATION_CODE,
-#  				LTI_ID,
-# 				LOADING_DATE,
-# 				ORGANIZATION_ID,
-# 				TRAN_TYPE_CODE,
-# 				VEHICLE_REGISTRATION,
-# 				MODETRANS_CODE,
-# 				COMMENTS,
-# 				PERSON_CODE,
-# 				PERSON_OUC,
-# 				CERTIFING_TITLE,
-# 				TRANS_CONTRACTOR_CODE,
-# 				SUPPLIER1_OUC,
-# 				DRIVER_NAME,
-# 				LICENSE,
-# 				CURR_CONTAINER_NUMBER,
-# 				settings.COMPAS_STATION,
-# 				Full_coi,
-# 				COMM_CATEGORY_CODE,
-# 				COMM_CODE,
-# 				PCKKCODE,
-# 				ALLCODE,
-# 				QUALITY,
-# 				strNetTotal,
-# 				strGrossTotal,
-# 				UnitsLoaded,
-# 				UnitNet,
-# 				UnitGross,
-# ]
+ 			print [CURR_CODE,
+ 				DISPATCH_DATE,
+  				ORIGIN_TYPE,
+  				ORIGIN_LOCATION_CODE,
+  				ORIGIN_CODE,
+  				ORIGIN_DESCR,
+ 				DESTINATION_LOCATION_CODE,
+ 				DESTINATION_CODE,
+  				LTI_ID,
+ 				LOADING_DATE,
+ 				ORGANIZATION_ID,
+ 				TRAN_TYPE_CODE,
+ 				VEHICLE_REGISTRATION,
+ 				MODETRANS_CODE,
+ 				COMMENTS,
+ 				PERSON_CODE,
+ 				PERSON_OUC,
+ 				CERTIFING_TITLE,
+ 				TRANS_CONTRACTOR_CODE,
+ 				SUPPLIER1_OUC,
+ 				DRIVER_NAME,
+ 				LICENSE,
+ 				CURR_CONTAINER_NUMBER,
+ 				settings.COMPAS_STATION,
+ 				Full_coi,
+ 				COMM_CATEGORY_CODE,
+ 				COMM_CODE,
+ 				PCKKCODE,
+ 				ALLCODE,
+ 				QUALITY,
+ 				strNetTotal,
+ 				strGrossTotal,
+ 				UnitsLoaded,
+ 				UnitNet,
+ 				UnitGross,
+ ]
 
 			cursor.callproc(u'write_waybill.dispatch',(
 				Response_Message,

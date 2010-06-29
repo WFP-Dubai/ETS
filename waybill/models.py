@@ -269,7 +269,7 @@ class EpicStock(models.Model):
 			return pck.packageShortName
 			
 class LossesDamagesReason(models.Model):
-		compasCode = models.CharField(max_length=20)
+		compasCode = models.CharField(max_length=30)
 		description  = models.CharField(max_length=20)
 		
 		def  __unicode__(self):
