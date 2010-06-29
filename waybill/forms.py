@@ -74,8 +74,6 @@ class WaybillRecieptForm(ModelForm):
 				'waybillNumber',
 				'recipientLocation',
 				'recipientConsingee',
-				'recipientName',
-				'recipientTitle',
 				'recipientArrivalDate',
 				'recipientStartDischargeDate',
 				'recipientEndDischargeDate',
@@ -92,15 +90,11 @@ class WaybillFullForm(ModelForm):
 	
 	dateOfDispatch = forms.DateField(required=False)
 	dateOfLoading = forms.DateField(required=False)
-	dispatcherName = forms.CharField(widget=forms.HiddenInput(),required=False)
-	dispatcherTitle= forms.CharField(widget=forms.HiddenInput(),required=False)
 	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	ltiNumber = forms.CharField(widget=forms.HiddenInput())
 	recipientArrivalDate = forms.DateField(required=False)
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
-	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	recipientEndDischargeDate = forms.DateField(required=False)
-	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientStartDischargeDate = forms.DateField(required=False)

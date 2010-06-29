@@ -3,9 +3,11 @@
 <input type=submit> {% csrf_token %}
 </form>
 
-<form action='http://chart.apis.google.com/chart?cht=qr&chs=300x300' method=post>
-<textarea name="chl">{{status}}</textarea>
+<form action='http://chart.apis.google.com/chart?cht=qr&chs=200x200&chld=L|2&choe=ISO-8859-1' method=post>
+<textarea name="chl">{{ziped}}</textarea>
 <input type=submit> 
+
 </form>
+<img height='250px' src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&choe=ISO-8859-1&chl={{ziped}}'>
 
 

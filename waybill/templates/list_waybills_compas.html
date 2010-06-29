@@ -6,7 +6,6 @@
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th><th>Validated</th><th>Received</th><th>Validated</th><th>Compas Updated</th><th></th></tr>
         </thead>
 {% for waybill in waybill_list%}
-{%if waybill.id in my_wb%}
 
 <tr>
  			<td>{{waybill.ltiNumber}}</td>
@@ -24,7 +23,6 @@
  					{%if profile.isCompasUser%} <a href='../viewwb_reception_edit/{{waybill.id}}'>View Full</a>{%endif%}
  			</td>
     </tr>
-{%endif%}
 {% endfor%}
 </table>
 {%if error_message %}

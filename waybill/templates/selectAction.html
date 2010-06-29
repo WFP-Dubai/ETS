@@ -11,5 +11,7 @@ Select an action:
     <li><a href='waybill/reset_waybill/'>Reset waybills</a>
 {%endif%}
     <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
+    <li>&nbsp;
+{%if profile.isReciever%}<li>Scan Waybill --><form method='POST' action='waybill/deserialize/'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill"></li>{%endif%}
 </ul>
 {%endblock%}

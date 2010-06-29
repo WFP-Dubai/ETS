@@ -13,42 +13,30 @@ from ets.waybill.compas import *
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.conf import settings
-import os
+import os,StringIO, zlib,base64,string
 
 
-
-def restant_si(lti_code):
-	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
-	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
-	listOfSI = []
-	for lti in detailed_lti:
-		listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
-		
-	for wb in listOfWaybills:
-		for loading in wb.loadingdetail_set.select_related():
-			for si in listOfSI:
-				if si.SINumber == loading.siNo.SI_CODE:
-					si.reduceCurrent(loading.numberUnitsLoaded)
-
-	return listOfSI
-	
 def prep_req(request):
 	return{'user': request.user}
 
+
 def homepage(request):
+	""" 
+	View:
+	homepage /
+	redirects you to the selectAction page
+	"""
 	return HttpResponseRedirect('/ets/select-action')
-
-	#return render_to_response('homepage.html',
-	#						  {'status':'',},
-	#						  context_instance=RequestContext(request))
-
-def loginWaybillSystem(request):
-	return render_to_response('status.html',
-							  {'status':'login not yet implemented'},
-							  context_instance=RequestContext(request))
 							  
 @login_required	
 def selectAction(request):
+	"""
+	View:
+	selectAction /ets/select-action
+	Gives the loggedin user a choise of possible actions sepending on roles
+	template:
+	/ets/waybill/templates/selectAction.html
+	"""
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -58,7 +46,16 @@ def selectAction(request):
 							  {'profile':profile},
 							  context_instance=RequestContext(request))
 
+@login_required	
 def listOfLtis(request,origin):
+	"""
+	View:
+	listOfLtis waybill/list/{{warehouse}}
+	Shows the LTIs that are in a specific warehouse
+	template:
+	/ets/waybill/templates/ltis.html
+	"""
+	# still to do: filter  out finished ltis
 	ltis = ltioriginal.objects.ltiCodesByWH(origin)
 	#ltis_qs =ltioriginal.objects.filter().filter().values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
 	
@@ -71,20 +68,44 @@ def listOfLtis(request,origin):
 							  {'ltis':ltis,'profile':profile},
 							  context_instance=RequestContext(request))
 
+## NOT IN USE
 def ltis(request,origin):
+	"""
+	View:
+	listOfLtis waybill/list/{{warehouse}}
+	Shows the LTIs that are in a specific warehouse
+	template:
+	/ets/waybill/templates/ltis.html
+	"""
 	ltis = ltioriginal.objects.filter(ORIGIN_WH_CODE=origin).filter(EXPIRY_DATE__gt=datetime.date(2010, 4, 1))
 	return render_to_response('ltis.html',
 							  {'ltis':ltis},
 							  context_instance=RequestContext(request))
+## ^ NOT IN USE
+
 
 def ltis_redirect_wh(request):
+	"""
+	View:
+	ltis_redirect_wh waybill/list/
+	automatically redirects user to his dispatch point wh to listOfLtis
+	template:
+	None
+	"""
 	wh_code = request.GET['dispatch_point']
 	return HttpResponseRedirect('list/' + wh_code)
 
 
 def import_ltis(request):
+	"""
+	View:
+	import_ltis ets/waybill/import
+	Executes Imports of LTIs Persons Stock and updates SiTracker
+	template:
+	/ets/waybill/templates/status.html
+	"""
+	## Shoudl be split into separate functions and call them
 	#Copy Persons
-	
 	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
 	for my_person in originalPerson:
 		my_person.save(using='default')	
@@ -92,8 +113,8 @@ def import_ltis(request):
 	#copy LTIs
 	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
-	print listDispatchers
-
+	
+	## Fix filter to import only relevant LTIs beloning to Dispatch And Reciept points
 	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-01')
 	for myrecord in original:		
 #		print myrecord.ORIGIN_WH_CODE
@@ -124,6 +145,12 @@ def import_ltis(request):
 				the_geo.save(using='default')
 	except:
 		pass	
+	try:
+		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='376')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass	
 	#Copy Stock
 	
 	EpicStock.objects.all().delete()
@@ -150,13 +177,13 @@ def lti_detail_url(request,lti_code):
 	return render_to_response('detailed_lti.html',
 							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction},
 							  context_instance=RequestContext(request))
-
+@login_required
 def single_lti_extra(request,lti_code):
 	si_list = ltioriginal.objects.si_for_lti(lti_code)
 	return render_to_response('lti_si.html',
 							  {'lti_code':lti_code,'si_list':si_list},
 							  context_instance=RequestContext(request))
-
+@login_required
 def dispatch(request):
 	dispatch_list = ltioriginal.objects.warehouses()
 	profile = ''
@@ -164,27 +191,35 @@ def dispatch(request):
 		return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) 
 	except:
 		return HttpResponseRedirect('/') 
-							  
+
+
+
 def ltis_codes(request):
 	lti_codes = ltioriginal.objects.values('CODE','ORIGIN_LOCATION_CODE','ORIGIN_LOC_NAME','ORIGIN_WH_NAME').distinct()
 	return render_to_response('lti_list.html',
 							  {'dispatch_list':lti_codes},
 							  context_instance=RequestContext(request))
-	
-#### Waybill Views
 
+
+#### Waybill Views
+@login_required
 def waybill_info(request):
 		return render_to_response('status.html',
 							  {'status':'to be implemented'},
 							  context_instance=RequestContext(request))
 
+@login_required
 def waybill_create(request,lti_pk):
-	detailed_lti = ltioriginal.objects.get(LTI_PK=lti_pk)
+	try:
+		detailed_lti = ltioriginal.objects.get(LTI_PK=lti_pk)
+	except:
+		detailed_lti = ''
+	
 	return render_to_response('detailed_waybill.html',
 							  {'detailed':detailed_lti,'lti_id':lti_pk},
 							  context_instance=RequestContext(request))
 							  
-							  
+@login_required							  
 def waybill_finalize_dispatch(request,wb_id):
 	current_wb =  Waybill.objects.get(id=wb_id)
 	current_wb.transportDispachSigned=True
@@ -197,17 +232,22 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.save()
 	return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) #
 	
-	
+@login_required	
 def	waybill_finalize_reciept(request,wb_id):
-	current_wb =  Waybill.objects.get(id=wb_id)
-	current_wb.recipientSigned=True
-	current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
-	current_wb.recipientSignedTimestamp=datetime.datetime.now()	
-	current_wb.transportDeliverySigned=True
-	current_wb.save()
-	print 	current_wb.transportDeliverySigned
-	return HttpResponseRedirect('/ets/waybill/viewwb_reception/' + str(current_wb.id)) #
+	try:
+		current_wb =  Waybill.objects.get(id=wb_id)
+		current_wb.recipientSigned=True
+		current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
+		current_wb.recipientSignedTimestamp=datetime.datetime.now()	
+		current_wb.transportDeliverySigned=True
+		current_wb.save()
+	except:
+		 return HttpResponseRedirect('/ets/waybill/' ) 
+	
+	return HttpResponseRedirect('/ets/waybill/viewwb_reception/' + str(current_wb.id)) 
 
+
+@login_required
 def dispatchToCompas(request):
 	profile = ''
 	try:
@@ -236,6 +276,7 @@ def dispatchToCompas(request):
 							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
 
+@login_required
 def receiptToCompas(request):
 	profile = ''
 	try:
@@ -266,11 +307,14 @@ def receiptToCompas(request):
 
 
 
-
+@login_required
 def waybill_edit(request,wb_id):
-	current_wb =  Waybill.objects.get(id=wb_id)
-	lti_code = current_wb.ltiNumber
-	current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	try:
+		current_wb =  Waybill.objects.get(id=wb_id)
+		lti_code = current_wb.ltiNumber
+		current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	except:
+		currnet_wb =''
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -297,6 +341,7 @@ def waybill_edit(request,wb_id):
 		
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
+@login_required
 def waybill_validate_form_update(request,wb_id):
 	current_wb =  Waybill.objects.get(id=wb_id)
 	lti_code = current_wb.ltiNumber
@@ -334,20 +379,28 @@ def waybill_validate_form_update(request,wb_id):
 	return render_to_response('waybill/waybill_detail.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 
- 
+@login_required
 def waybill_view(request,wb_id):
-	waybill_instance = Waybill.objects.get(id=wb_id)
-	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
-	disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
-	number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
-	extra_lines = 5 - number_of_lines
-	my_empty = ['']*extra_lines
+	try:
+		waybill_instance = Waybill.objects.get(id=wb_id)
+		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+		extra_lines = 5 - number_of_lines
+		my_empty = ['']*extra_lines
+		zippedWB = wb_compress(wb_id)
+	except:
+		return HttpResponseRedirect('/')
 	return render_to_response('waybill/waybill_detail_view.html',
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
-							  'disp_person':disp_person_object,'extra_lines':my_empty},
+							  'disp_person':disp_person_object,
+							  'extra_lines':my_empty,
+							  'zippedWB':zippedWB,
+							  },
 							  context_instance=RequestContext(request))
 
+@login_required
 def reset_waybill(request):
 	profile = ''
 	try:
@@ -368,30 +421,32 @@ def reset_waybill(request):
 							  context_instance=RequestContext(request))
 	
 
-
+@login_required
 def waybill_view_reception(request,wb_id):
-	waybill_instance = Waybill.objects.get(id=wb_id)
-	lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
 	rec_person_object = ''
 	disp_person_object =''
-	number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
-	extra_lines = 5 - number_of_lines
-	my_empty = ['']*extra_lines
-
 	try:
+		waybill_instance = Waybill.objects.get(id=wb_id)
+		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+		extra_lines = 5 - number_of_lines
+		my_empty = ['']*extra_lines
 		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
+		my_empty = ['']*extra_lines
+		zippedWB = wb_compress(wb_id)
 	except:
 		print waybill_instance.recipientName
-		pass
 	
 	return render_to_response('waybill/waybill_detail_view_reception.html',
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
 							  'disp_person':disp_person_object,
-							  'rec_person':rec_person_object,'extra_lines':my_empty},
+							  'rec_person':rec_person_object,'extra_lines':my_empty,
+							  'zippedWB':zippedWB},
 							  context_instance=RequestContext(request))
 
+@login_required
 def waybill_reception(request,wb_code):
 	# get the LTI info
 	profile = ''
@@ -403,8 +458,6 @@ def waybill_reception(request,wb_code):
 	current_lti = current_wb.ltiNumber
 	class LoadingDetailRecForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
-		#siNo= forms.CharField(widget=forms.HiddenInput())
-		#numberUnitsLoaded= forms.CharField(widget=forms.HiddenInput())
 		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		numberUnitsLost= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -449,7 +502,7 @@ def waybill_reception(request,wb_code):
 	#return render_to_response('recieveWaybill.html',						  {'status':'to be implemented'},							  context_instance=RequestContext(request))
 
 
-
+@login_required
 def waybill_reception_list(request):
 	waybills = Waybill.objects.filter(recipientSigned = False)
 	profile = ''
@@ -461,12 +514,14 @@ def waybill_reception_list(request):
 							  {'object_list':waybills,'profile':profile},
 							  context_instance=RequestContext(request))
 
+
 def waybill_search(request):
 	profile = ''
 	try:
 		profile=request.user.get_profile()
 	except:
 		pass
+		
 	search_string =  request.GET['wbnumber']
 	found_wb=''
 	
@@ -485,12 +540,10 @@ def waybill_search(request):
 							  {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
 							  context_instance=RequestContext(request))
 
-def waybillSearchResult(request):
-	return render_to_response('status.html',
-							  {'status':'selectAction not yet implemented'},
-							  context_instance=RequestContext(request))
+
 
 ### Create Waybill 
+@login_required
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
@@ -556,7 +609,7 @@ def waybillCreate(request,lti_code):
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
-
+@login_required
 def waybill_validateSelect(request):
 	profile = ''
 	try:
@@ -568,6 +621,7 @@ def waybill_validateSelect(request):
 							  context_instance=RequestContext(request))
 
 
+@login_required
 def waybill_validate_dispatch_form(request):
 
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillValidated',),extra=0)
@@ -584,7 +638,7 @@ def waybill_validate_dispatch_form(request):
 	
 	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 	
-
+@login_required
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
 
@@ -599,6 +653,8 @@ def waybill_validate_receipt_form(request):
 		formset = ValidateFormset(queryset=Waybill.objects.filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
 	return render_to_response('validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
+
+@login_required
 def testform(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
@@ -625,26 +681,36 @@ def testform(request,lti_code):
 		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
-	
 
+# Shows a page with the Serialized Waybill in comressed & uncompressed format
+@login_required
 def serialize(request,wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
-	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
-	
-	return render_to_response('blank.html',{'status':data},
+	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))	
+	zippedWB = wb_compress(wb_code)
+	return render_to_response('blank.html',{'status':data,'ziped':zippedWB},
 							  context_instance=RequestContext(request))
 
 
+
+## recives a POST with the comressed or uncompressed WB and sends you to the Reveive WB 
+@login_required
 def deserialize(request):
 	waybillnumber=''
-	for obj in serializers.deserialize("json", request.POST['wbdata']):
+	wb_data = request.POST['wbdata']
+	wb_serialized = ''
+	if wb_data[0] == '[':
+		wb_serialized = wb_data
+	else:
+		wb_serialized = un64unZip(wb_data)
+	for obj in serializers.deserialize("json", wb_serialized):
 		if type(obj.object) is Waybill:
 			waybillnumber= obj.object.id
-	print waybillnumber
 	return HttpResponseRedirect('../receive/'+ str(waybillnumber)) 
-	
 
+
+## Serialization of fixtures	
 def fixtures_serialize():
 	# serialise each of the fixtures 
 	# 	DispatchPoint	
@@ -652,28 +718,53 @@ def fixtures_serialize():
 	receptionPointData = ReceptionPoint.objects.all()
 	packagingDescriptonShort = PackagingDescriptonShort.objects.all()
 	lossesDamagesReason = LossesDamagesReason.objects.all()
-	lossesDamagesType = LossesDamagesType.objects.all()
-	
+	lossesDamagesType = LossesDamagesType.objects.all()	
 	serialized_data = serializers.serialize('json',list(dispatchPointsData)+list(receptionPointData)+list(packagingDescriptonShort)+list(lossesDamagesReason)+list(lossesDamagesType))
 	
 	init_file = open('waybill/fixtures/initial_data.json','w')
 	init_file.writelines(serialized_data)
 	init_file.close()
 
+@login_required
 def custom_show_toolbar(request):
 	return True
 
+#prints a list item....
 def printlistitem(list,index):
 	print list(1)
 
+# takes compressed base64 Data and uncompresses it
+def un64unZip(data):
+	data= string.replace(data,' ','+')
+	zippedData = base64.b64decode(data)
+	uncompressed = zlib.decompress(zippedData)	
+	return uncompressed
 
+# takes a wb id and returns a zipped base64 string of the serialized object
+def wb_compress(wb_code):
+	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
+	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
+	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
+	zippedData =	zipBase64(data)
+	return zippedData
 
+def zipBase64(data):
+	zippedData = zlib.compress(data)
+	base64Data = base64.b64encode(zippedData)
+	return base64Data
+	
+def restant_si(lti_code):
+	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
+	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
+	listOfSI = []
+	for lti in detailed_lti:
+		listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
+		
+	for wb in listOfWaybills:
+		for loading in wb.loadingdetail_set.select_related():
+			for si in listOfSI:
+				if si.SINumber == loading.siNo.SI_CODE:
+					si.reduceCurrent(loading.numberUnitsLoaded)
 
-#def get_or_create_profile(user):
- #   try:
- #	   profile = user.get_profile()
- #	   except ObjectDoesNotExist:
- #	   #create profile - CUSTOMIZE THIS LINE TO OYUR MODEL:
- #	   profile = UserProfile(karma='1', url='http://example.org', user=user)
- #	   profile.save()
- #   return profile
+	return listOfSI
+	

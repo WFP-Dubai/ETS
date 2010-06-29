@@ -8,7 +8,7 @@
 						<td><sup style="font-size:x-small;">Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
 						<td><sup style="font-size:x-small;" >Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
 						<td><sup style="font-size:x-small;">Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td rowspan=5><span ><img  src="/ets/media/images/bc-dummy.png" alt="barcode" height=175pt ></span></td>
+						<td rowspan=5><span >{%if zippedWB%}<img height='200px' src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&chl={{zippedWB}}'>{%else%}<img  src="/ets/media/images/bc-dummy.png" alt="barcode" >{%endif%}</span></td>
 					
 					</tr>
 					<tr>
@@ -65,10 +65,10 @@
 						<td>{{lineitem.siNo.CMMNAME}}</td>
 						<td>{%if lineitem.getStockItem.packagingDescrShort != ''%}{{lineitem.getStockItem.packagingDescrShort}} {%else%} {{lineitem.getStockItem.packagename}}{%endif%}</td>
 						<td style="text-align:right;">{{lineitem.numberUnitsLoaded|floatformat}}</td>
-						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:1}}</td>
-						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:1}}</td>
-						<td style="text-align:right;">{{lineitem.calcTotalNet|floatformat:1}}</td>
-						<td style="text-align:right;">{{lineitem.calcTotalGross|floatformat:1}}</td>
+						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:3}}</td>
+						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:3}}</td>
+						<td style="text-align:right;">{{lineitem.calcTotalNet|floatformat:3}}</td>
+						<td style="text-align:right;">{{lineitem.calcTotalGross|floatformat:3}}</td>
 
 					</tr>
 					{%endfor%}
