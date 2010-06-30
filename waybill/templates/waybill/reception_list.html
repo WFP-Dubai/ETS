@@ -13,7 +13,7 @@
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td><a href='receive/{{waybill.id}}'>Select</a></td>
+ 			<td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
     </tr>
     {%endif%}{% endfor%}
 </table>

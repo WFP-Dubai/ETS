@@ -18,12 +18,12 @@
 {%if not object.recipientSigned and not object.transportDeliverySigned%}
 <form class="the_forms" name="printoriginal" id="printoriginal" method="get" action="/ets/waybill/print_original_reciept/{{object.id}}">
 <input type="submit" onclick="javascript: original_lable.className='shown'; copy_lable.className='hidden'; print()" name="Print Original" id='Print1' value='Print Original'></form>
-{%endif%}<a href="/ets/waybill/receive">Back to Receipt</a>
+{%endif%}<a href="{%url ets.waybill.views.waybill_reception_list%}">Back to Receipt</a>
 </span>
 	<table cellpadding="0" cellspacing="0" border="0px" width="100%">
-		{% include 'waybill/wb_header.html'%}
-		{% include 'waybill/wb_loading.html'%}
-		{% include 'waybill/wb_receipt.html'%}	
+		{% include 'waybill/print/wb_header.html'%}
+		{% include 'waybill/print/wb_loading.html'%}
+		{% include 'waybill/print/wb_receipt.html'%}	
 </body>
 
 </html>

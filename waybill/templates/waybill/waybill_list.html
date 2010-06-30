@@ -14,7 +14,7 @@
  			<td>{%if waybill.recipientSigned%}X{%else%}N{%endif%} </td>
  			<td>{%if waybill.waybillValidated%}X{%else%}N{%endif%}  </td>
   			<td>{%if waybill.waybillProcessedForPayment%}X{%else%}N{%endif%} </td>
- 			<td><a href='validate/{{waybill.id}}'>Select</a></td>
+ 			<td><a href=''{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Select</a></td>
     </tr>
 
 {% endfor%}

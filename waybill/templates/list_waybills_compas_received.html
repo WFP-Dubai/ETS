@@ -18,7 +18,7 @@
  			<td>{%if waybill.recipientSigned%}Y{%else%}N{%endif%} </td>
  			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
   			<td>{%if waybill.waybillRecSentToCompas%}Y{%else%}N{%endif%} </td>
- 			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='../viewwb/{{waybill.id}}'>View Dispatch</a>{%endif%}
+ 			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}
  					{%if profile.isReciever or profile.isCompasUser%} <a href='../viewwb_reception/{{waybill.id}}'>View Reciept</a>{%endif%}
  					{%if profile.isCompasUser%} <a href='../viewwb_reception_edit/{{waybill.id}}'>View Full</a>{%endif%}
  			</td>
