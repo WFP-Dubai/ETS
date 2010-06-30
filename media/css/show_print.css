@@ -8,9 +8,9 @@ body{
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
-	max-width: 850px;
-	min-width: 850px;
-	width: 850px;
+	max-width: 100%;
+	min-width: 100%;
+	width: 100%;
 }
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
