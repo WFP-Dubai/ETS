@@ -14,6 +14,7 @@ from django.contrib.auth.models import User
 from django.core import serializers
 from django.conf import settings
 import os,StringIO, zlib,base64,string
+from django.core.urlresolvers import reverse
 
 
 def prep_req(request):
@@ -26,7 +27,7 @@ def homepage(request):
 	homepage /
 	redirects you to the selectAction page
 	"""
-	return HttpResponseRedirect('/ets/select-action')
+	return HttpResponseRedirect(reverse(selectAction))
 							  
 @login_required	
 def selectAction(request):
@@ -93,7 +94,7 @@ def ltis_redirect_wh(request):
 	None
 	"""
 	wh_code = request.GET['dispatch_point']
-	return HttpResponseRedirect('list/' + wh_code)
+	return HttpResponseRedirect(revers(listOfLtis ,[wh_code]))
 
 
 def import_ltis(request):
@@ -167,7 +168,7 @@ def import_ltis(request):
 def lti_detail(request):
 	lti_id=request.GET['lti_id']
 	#option here to redirect///
-	return HttpResponseRedirect('info/' + lti_id)
+	return HttpResponseRedirect(revers(lti_detail_url,[lti_id]))
 	#return lti_detail_url(request,lti_id)
 
 def lti_detail_url(request,lti_code):
@@ -184,14 +185,15 @@ def single_lti_extra(request,lti_code):
 	return render_to_response('lti_si.html',
 							  {'lti_code':lti_code,'si_list':si_list},
 							  context_instance=RequestContext(request))
+							  
 @login_required
 def dispatch(request):
 	dispatch_list = ltioriginal.objects.warehouses()
 	profile = ''
 	try:
-		return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) 
+		return HttpResponseRedirect(revers(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE])) 
 	except:
-		return HttpResponseRedirect('/') 
+		return HttpResponseRedirect(reverse(selectAction))
 
 
 
@@ -231,7 +233,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect('/ets/waybill/list/'+request.user.get_profile().warehouses.ORIGIN_WH_CODE) #
+	return HttpResponseRedirect(revers(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
 	
 @login_required	
 def	waybill_finalize_reciept(request,wb_id):
@@ -243,9 +245,9 @@ def	waybill_finalize_reciept(request,wb_id):
 		current_wb.transportDeliverySigned=True
 		current_wb.save()
 	except:
-		 return HttpResponseRedirect('/ets/waybill/' ) 
+		 return HttpResponseRedirect(reverse(selectAction))
 	
-	return HttpResponseRedirect('/ets/waybill/viewwb_reception/' + str(current_wb.id)) 
+	return HttpResponseRedirect(reverse(waybill_view_reception,[current_wb.id])) 
 
 
 @login_required
@@ -335,7 +337,7 @@ def waybill_edit(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
+			return HttpResponseRedirect(revers(waybill_view,[wb_new.id])) 
 	else:			
 		form = WaybillForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
@@ -372,7 +374,7 @@ def waybill_validate_form_update(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect('../reset_waybill') #
+			return HttpResponseRedirect(revers(reset_waybill))
 	else:			
 		form = WaybillFullForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
@@ -392,8 +394,8 @@ def waybill_view(request,wb_id):
 		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 
 	except:
-		return HttpResponseRedirect('/')
-	return render_to_response('waybill/waybill_detail_view.html',
+		return HttpResponseRedirect(reverse(selectAction))
+	return render_to_response('waybill/print/waybill_detail_view.html',
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
 							  'disp_person':disp_person_object,
@@ -437,14 +439,14 @@ def waybill_view_reception(request,wb_id):
 		my_empty = ['']*extra_lines
 		zippedWB = wb_compress(wb_id)	
 	except:
-			return HttpResponseRedirect('/')
+			return HttpResponseRedirect(reverse(selectAction))
 	try:
 		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
 	except:
 		pass
 	
-	return render_to_response('waybill/waybill_detail_view_reception.html',
+	return render_to_response('waybill/print/waybill_detail_view_reception.html',
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
 							  'disp_person':disp_person_object,

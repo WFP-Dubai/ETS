@@ -269,22 +269,25 @@ class EpicStock(models.Model):
 			return pck.packageShortName
 			
 class EpicLossReason(models.Model):
-		REASON_CODE =models.CharField(max_length=5)
+		REASON_CODE =models.CharField(max_length=5,primary_key=True)
 		REASON =models.CharField(max_length=80)
 		class Meta:
-				db_table = u'EPIC_LOSSREASON'
+				db_table = u'epic_lossreason'
+		def  __unicode__(self):
+				return self.REASON		
 		
 
 class LossesDamagesReason(models.Model):
-		compasCode = models.CharField(max_length=30)
+		compasRC = models.ForeignKey(EpicLossReason)
+		compasCode= models.CharField(max_length=20)
 		description  = models.CharField(max_length=20)
 		
 		def  __unicode__(self):
 				return self.description
 
 class LossesDamagesReasonAdmin(admin.ModelAdmin):
-		list_display = ('compasCode','description')
-		list_filter = ('compasCode','description') 
+		list_display = ('compasCode','description','compasRC')
+		list_filter = ('compasRC',) 
 		
 class LossesDamagesType(models.Model):
 		description = models.CharField(max_length=20)
@@ -447,3 +450,4 @@ admin.site.register(EpicPerson,EpicPersonsAdmin)
 admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
 admin.site.register(LossesDamagesType)
 admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)
+admin.site.register(EpicLossReason)
