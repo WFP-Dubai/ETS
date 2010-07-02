@@ -2,7 +2,7 @@
 {%block content %}
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th><th>Validated</th><th>Received</th><th>Validated</th><th>Processed For Payment</th><th></th></tr>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th><th>Date</th><th>Received</th><th>Date</th><th>Processed For Payment</th><th></th></tr>
         </thead>
 {% for waybill in waybill_list%}
 {%if waybill.id in my_wb%}
@@ -13,10 +13,12 @@
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if waybill.dispatcherSigned%}Y{%else%}N{%endif%} </td>
- 			<td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
- 			<td>{%if waybill.recipientSigned%}Y{%else%}N{%endif%} </td>
- 			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
+			<td>{%if waybill.dispatcherSigned%}Y{%else%}N{%endif%} </td> 
+ 			<td>{{waybill.transportDispachSignedTimestamp|date:"d/m/Y"}}</td>
+ <!--  			<td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>-->
+ 			<td>{%if waybill.recipientSigned%}Y{%else%}N{%endif%} </td> 
+ 			<td>{{waybill.recipientSignedTimestamp|date:"d/m/Y"}}</td>
+<!-- 			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td> -->
   			<td>{%if waybill.waybillProcessedForPayment%}Y{%else%}N{%endif%} </td>
  			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}
  					{%if profile.isReciever or profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Reciept</a>{%endif%}
