@@ -1,20 +1,22 @@
 #print
 
 body{
-
-	border-style: solid;
-	border-width: 1px;
+	height: 100%;
+	border-width: 0px;
 	padding: 0px;
 	margin: 0px;
-	font-size: 9px;
+	font-size: 12pt;
 }
 .wb_head{color:white;background-color:black;}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
+	margin: 0px;
+	padding: 0px;
 	max-width: 100%;
 	min-width: 100%;
 	width: 100%;
+	height: 100%;
 }
 img{position: relative; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
@@ -23,11 +25,17 @@ img{position: relative; text-align: right;}
 	display: none;
 	visibility: hide;
 	height: 0px;
+	margin: 0px;
+	padding: 0px;
+
 }
 .hidden_print{
 	display: none;
 	visibility: hide;
 	height: 0px;
+	margin: 0px;
+	padding: 0px;
+
 }
 
 .shown{

@@ -9,16 +9,14 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ets/media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': 'C:/epic/ets/media'}),
+        {'document_root': '/Users/tobias/projects/epic/ets/media'}),
     (r'^ets/', include('ets.waybill.urls')),
-    (r'^accounts/login/$',login),
-    (r'^accounts/logout/$',logout),
     (r'^$',homepage),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^dojango/', include('dojango.urls')),
+ #   (r'^dojango/', include('dojango.urls')),
     
 )

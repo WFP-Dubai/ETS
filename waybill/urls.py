@@ -23,6 +23,8 @@ info_dict_waybill_reception= {
 
 
 urlpatterns = patterns('',
+    (r'^accounts/login/$',login),
+    (r'^accounts/logout/$',logout),
     (r'^loginHere$',login),
     (r'^select-action$',selectAction),
     (r'^waybill/create/(.*)$',waybillCreate),
