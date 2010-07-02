@@ -94,7 +94,7 @@ def ltis_redirect_wh(request):
 	None
 	"""
 	wh_code = request.GET['dispatch_point']
-	return HttpResponseRedirect(revers(listOfLtis ,[wh_code]))
+	return HttpResponseRedirect(reverse(listOfLtis ,[wh_code]))
 
 
 def import_ltis(request):
@@ -168,7 +168,7 @@ def import_ltis(request):
 def lti_detail(request):
 	lti_id=request.GET['lti_id']
 	#option here to redirect///
-	return HttpResponseRedirect(revers(lti_detail_url,[lti_id]))
+	return HttpResponseRedirect(reverse(lti_detail_url,[lti_id]))
 	#return lti_detail_url(request,lti_id)
 
 def lti_detail_url(request,lti_code):
@@ -191,7 +191,7 @@ def dispatch(request):
 	dispatch_list = ltioriginal.objects.warehouses()
 	profile = ''
 	try:
-		return HttpResponseRedirect(revers(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE])) 
+		return HttpResponseRedirect(reverse(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE])) 
 	except:
 		return HttpResponseRedirect(reverse(selectAction))
 
@@ -233,7 +233,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect(revers(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
+	return HttpResponseRedirect(reverse(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
 	
 @login_required	
 def	waybill_finalize_reciept(request,wb_id):
@@ -337,7 +337,7 @@ def waybill_edit(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect(revers(waybill_view,[wb_new.id])) 
+			return HttpResponseRedirect(reverse(waybill_view,[wb_new.id])) 
 	else:			
 		form = WaybillForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
@@ -374,7 +374,7 @@ def waybill_validate_form_update(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect(revers(reset_waybill))
+			return HttpResponseRedirect(reverse(reset_waybill))
 	else:			
 		form = WaybillFullForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
