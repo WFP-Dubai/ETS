@@ -14,8 +14,6 @@
 		<string>FEAE95AB-FF01-4F8E-8D04-3CA2FB732F4C</string>
 		<string>E7976B9F-418D-4C7B-BEEE-1F34D7C0BA81</string>
 		<string>17A5E6B1-0794-4868-B985-5539DA9EA180</string>
-		<string>70A3B5AB-94F2-4242-BE6D-B9386A90C682</string>
-		<string>B40B817B-E3AB-4708-AAB4-B5DD67B2C28C</string>
 	</array>
 	<key>ProjectItems</key>
 	<dict>
@@ -150,39 +148,6 @@
 			<key>ItemType</key>
 			<string>FolderReference</string>
 		</dict>
-		<key>70A3B5AB-94F2-4242-BE6D-B9386A90C682</key>
-		<dict>
-			<key>ItemData</key>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAF+AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADGOvg0SCsAAABosfYKdGVzdHNldC5weQAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAHxoHshKSp9URVhUAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
-				Os4EAAAAEQAIAADISiBvAAAAAQAUAGix9gBmKV4ADUCw
-				AAqbxgAAhe0AAgA2TWFjaW50b3NoIEhEOlVzZXJzOnRv
-				Ymlhczpwcm9qZWN0czplcGljOmV0czp0ZXN0c2V0LnB5
-				AA4AFgAKAHQAZQBzAHQAcwBlAHQALgBwAHkADwAaAAwA
-				TQBhAGMAaQBuAHQAbwBzAGgAIABIAEQAEgApVXNlcnMv
-				dG9iaWFzL3Byb2plY3RzL2VwaWMvZXRzL3Rlc3RzZXQu
-				cHkAABMAAS8AABUAAgAN//8AAA==
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/tobias/projects/epic/ets/testset.py</string>
-				<key>RelativePath</key>
-				<string>./testset.py</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<key>ItemName</key>
-			<string>testset.py</string>
-			<key>ItemType</key>
-			<string>FileReference</string>
-		</dict>
 		<key>8B3A65FF-F12D-4A7B-8935-5DE42E8785D8</key>
 		<dict>
 			<key>ItemData</key>
@@ -246,39 +211,6 @@
 			</dict>
 			<key>ItemName</key>
 			<string>waybill</string>
-			<key>ItemType</key>
-			<string>FolderReference</string>
-		</dict>
-		<key>B40B817B-E3AB-4708-AAB4-B5DD67B2C28C</key>
-		<dict>
-			<key>ItemData</key>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAFuAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADGOvg0SCsAAABosfYGdGhpbmdzAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAIHtlchOE2wAAAAAAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
-				Os4EAAAAEQAIAADITek8AAAAAQAUAGix9gBmKV4ADUCw
-				AAqbxgAAhe0AAgAyTWFjaW50b3NoIEhEOlVzZXJzOnRv
-				Ymlhczpwcm9qZWN0czplcGljOmV0czp0aGluZ3MADgAO
-				AAYAdABoAGkAbgBnAHMADwAaAAwATQBhAGMAaQBuAHQA
-				bwBzAGgAIABIAEQAEgAlVXNlcnMvdG9iaWFzL3Byb2pl
-				Y3RzL2VwaWMvZXRzL3RoaW5ncwAAEwABLwAAFQACAA3/
-				/wAA
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/tobias/projects/epic/ets/things/</string>
-				<key>RelativePath</key>
-				<string>./things</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<key>ItemName</key>
-			<string>things</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
 		</dict>

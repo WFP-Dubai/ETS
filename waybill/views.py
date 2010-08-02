@@ -58,7 +58,7 @@ def listOfLtis(request,origin):
 	"""
 	# still to do: filter  out finished ltis
 	ltis = ltioriginal.objects.ltiCodesByWH(origin)
-	#ltis_qs =ltioriginal.objects.filter().filter().values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
+	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
 	
 	profile = ''
 	try:
@@ -94,7 +94,7 @@ def ltis_redirect_wh(request):
 	None
 	"""
 	wh_code = request.GET['dispatch_point']
-	return HttpResponseRedirect(reverse(listOfLtis ,[wh_code]))
+	return HttpResponseRedirect(reverse(listOfLtis ,args=[wh_code]))
 
 
 def import_ltis(request):
@@ -116,7 +116,7 @@ def import_ltis(request):
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
 	
 	## Fix filter to import only relevant LTIs beloning to Dispatch And Reciept points
-	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
+	original = ltioriginal.objects.using('compas')#.filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
 	recIn = False
 	dispIn = False
 	for myrecord in original:		
@@ -168,7 +168,7 @@ def import_ltis(request):
 def lti_detail(request):
 	lti_id=request.GET['lti_id']
 	#option here to redirect///
-	return HttpResponseRedirect(reverse(lti_detail_url,[lti_id]))
+	return HttpResponseRedirect(reverse(lti_detail_url,args=[lti_id]))
 	#return lti_detail_url(request,lti_id)
 
 def lti_detail_url(request,lti_code):
@@ -188,10 +188,8 @@ def single_lti_extra(request,lti_code):
 							  
 @login_required
 def dispatch(request):
-	dispatch_list = ltioriginal.objects.warehouses()
-	profile = ''
 	try:
-		return HttpResponseRedirect(reverse(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE])) 
+		return HttpResponseRedirect(reverse(lti_detail_url,args=[request.user.get_profile().warehouses.ORIGIN_WH_CODE])) 
 	except:
 		return HttpResponseRedirect(reverse(selectAction))
 
@@ -233,7 +231,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect(reverse(lti_detail_url,[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
+	return HttpResponseRedirect(reverse(lti_detail_url,args=[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
 	
 @login_required	
 def	waybill_finalize_reciept(request,wb_id):
@@ -247,7 +245,7 @@ def	waybill_finalize_reciept(request,wb_id):
 	except:
 		 return HttpResponseRedirect(reverse(selectAction))
 	
-	return HttpResponseRedirect(reverse(waybill_view_reception,[current_wb.id])) 
+	return HttpResponseRedirect(reverse(waybill_view_reception, args=[current_wb.id])) 
 
 
 @login_required
@@ -337,7 +335,7 @@ def waybill_edit(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect(reverse(waybill_view,[wb_new.id])) 
+			return HttpResponseRedirect(reverse(waybill_view,args=[wb_new.id])) 
 	else:			
 		form = WaybillForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
@@ -391,7 +389,10 @@ def waybill_view(request,wb_id):
 		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
 		extra_lines = 5 - number_of_lines
 		my_empty = ['']*extra_lines
-		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+		try:
+			disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+		except:
+			disp_person_object=''
 
 	except:
 		return HttpResponseRedirect(reverse(selectAction))
@@ -415,6 +416,11 @@ def reset_waybill(request):
 	if profile.superUser:
 		waybills = Waybill.objects.filter(waybillSentToCompas = False)
 		
+		return render_to_response('edit_wb_list.html',
+							  {'profile':profile,'waybill_list':waybills},
+							  context_instance=RequestContext(request))
+	elif profile.readerUser:
+		waybills = Waybill.objects.filter(waybillSentToCompas = False)
 		return render_to_response('edit_wb_list.html',
 							  {'profile':profile,'waybill_list':waybills},
 							  context_instance=RequestContext(request))

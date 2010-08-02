@@ -6,32 +6,55 @@
 .ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
 </style>
 <form action="" method=POST id="delform">
+{% for hidden in form.hidden_fields %}
+{{ hidden }}
+{% endfor %}
 {%for item in form%}
-{% if item.errors %}
+	{% if item.errors %}
     <ol>
-    {% for error in item.errors %}
-        <li>{{item.label}}<strong>{{ error|escape }}</strong></li>
-    {% endfor %}
+	    {% for error in item.errors %}
+	        <li>{{item.label}} <strong>{{ error|escape }}</strong></li>
+	    {% endfor %}
     </ol>
-{% endif %}
-  {% endfor %}
+	{% endif %}
+{% endfor %}
 <div class="form">
 	<div>
-		<span><strong>LTI:</strong> {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
+		<span><strong>LTI:</strong> {{lti_list.0.CODE}}</span>
 	</div>
 	<div>
-			<strong>Waybill Number:</strong>{{form.waybillNumber}} {{form.instance.waybillNumber}}
-
+		<strong>Waybill Number:</strong> {{form.instance.waybillNumber}}
 	</div>
-	<div>			
-		
-		
-		
+	<div>
 <br>
-	<span><strong>Dispatch Signed: {{form.dispatcherSigned}}<br>
-	Dispatch Validated: {{form.waybillValidated}}<br>
-	<span>Receipt Signed: {{form.recipientSigned}}<br>
-	Receipt Validated: {{form.waybillReceiptValidated}}<br></strong>
+	<span>
+	<table>
+		<tr>
+			<td>Dispatch Signed:</td>
+			<td>{{form.dispatcherSigned}}</td>
+		</tr>
+		<tr>
+			<td>Dispatch Validated:</td>
+			<td>{{form.waybillValidated}}</td>
+		</tr>
+		<tr>
+			<td>Dispatch In Compas:</td>
+			<td>{{form.waybillSentToCompas}}</td>
+		</tr>
+		<tr>
+			<td>Receipt Signed:</td>
+			<td>{{form.recipientSigned}}</td>
+		</tr>
+		<tr>
+			<td>Receipt Validated:</td>
+			<td>{{form.waybillReceiptValidated}}</td>
+		</tr>
+		<tr>
+			<td>Receipt In Compas:</td>
+			<td>{{form.waybillRecSentToCompas}}</td>
+		</tr>
+		
+	</table>
 	<br>
 	</span>
 		<span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
@@ -46,19 +69,16 @@
 			<td> {{form.transportType}}</td>
 		</tr>
 	</table>
-<strong>Recipient Location:</strong>   {{form.instance.recipientLocation}}  <br>
+<strong>Destination Location:</strong>   {{form.instance.recipientLocation}}  <br>
 <strong>Destination Warehouse<strong> {{form.destinationWarehouse}}
-{{ formset.management_form }}
-<br><br>
-
+<br>
+<br>
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
         <tr><th>Item</th><th>Dispatched</th><th>Good</th><th>Damaged</th><th>Lost</th>
         </thead>
-
     {% for sform in formset.forms %}
-
         <tr>
         	<td>{{ sform.id }}{{sform.siNo}}</td>
         	<td align="right">{{ sform.numberUnitsLoaded }}</td>
@@ -67,15 +87,15 @@
         	<td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
         </tr>
     {% endfor %}
-    </table>
+</table>
 <div>
  <br>
 <div>
 <div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
-<div><strong>Dispatcher Name:</strong>{{form.dispatcherName}}{{form.dispatcherTitle}}{{user.get_profile.compasUser.last_name}}</div>
+<div><strong>Dispatcher Name:</strong>{{form.thisDispName}} {{form.instance.dispatcherTitle}}</div>
 <br>
 <div><table>
-<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}{{form.transportContractor}}</td></tr>
+<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}</td></tr>
 <tr><td><strong>Transport Subcontractor:</strong></td><td>{{form.transportSubContractor}}</td></tr>
 <tr><td><strong>Driver's Name:</strong></td><td>{{form.transportDriverName}}</td></tr>
 <tr><td><strong>Driver's Licens No:</strong></td><td>{{form.transportDriverLicenceID}}</td></tr>
@@ -91,8 +111,8 @@
 <BR>	
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
-<tr><td><strong>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
-<tr><td><strong>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
+<tr><td><strong>Recipient Location:</td><td> {{form.instance.recipientLocation}}</td></tr>
+<tr><td><strong>Consignee:</td><td>{{form.instance.recipientConsingee}}</td></tr>
 
 <tr><td><strong>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
 <tr><td><strong>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
@@ -103,8 +123,8 @@
 <table>
 <tr><td colspan="3"><strong>Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
 
-<tr><td><strong>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td><strong> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
-<tr><td><strong>Container 2:</td><td>{{form.instance.containerTwoNumber}}</td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
+<tr><td><strong>Container 1:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
+<tr><td><strong>Container 2:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
 
 </table>
 

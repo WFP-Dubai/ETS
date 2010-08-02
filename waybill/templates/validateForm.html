@@ -4,11 +4,9 @@
     {{ formset.management_form }}
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Origin Warehouse</th><th>Consignee</th><th>Delivery Location</th><th>Dispatched</th><th>Received</th><th>Validated</th><th>Processed For Payment</th><th></th></tr>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Origin Warehouse</th><th>Consignee</th><th>Delivery Location</th><th>Dispatched</th><th>Received</th><th>Validated</th><th></th></tr>
         </thead>
     {% for form in formset.forms %}
-    
-
     <tr>
  			<td>{{form.id}}{{form.instance.ltiNumber}}</td>
  			<td>{{form.instance.waybillNumber}}</td>
@@ -18,10 +16,8 @@
  			<td>{%if form.instance.dispatcherSigned%}Yes{%else%}No{%endif%} </td>
  			<td>{%if form.instance.recipientSigned%}Yes{%else%}No{%endif%} </td>
  			<td>{{ form.waybillValidated }} </td>
-  			<td>{%if form.instance.waybillProcessedForPayment%}Yes{%else%}No{%endif%} </td>
- 			<td><a href='viewwb/{{form.instance.id}}'>Select</a></td>
+ 			<td><a href='viewwb/{{form.instance.id}}'>View</a></td>
     </tr>
-
     {% endfor %}
 </table>
 
@@ -32,10 +28,7 @@
     <thead>
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin Warehouse</th><th>Consignee</th><th>Delivery Location</th><th>Dispatched</th><th>Received</th><th>Validated</th></tr>
         </thead>
-
     {% for wb in validatedWB %}
-    
-
     <tr>
  			<td>{{wb.ltiNumber}}</td>
  			<td>{{wb.waybillNumber}}</td>
@@ -46,7 +39,6 @@
  			<td>{%if wb.recipientSigned%}Yes{%else%}No{%endif%} </td>
  			<td>{%if wb.waybillValidated%}Yes{%else%}No{%endif%} </td>
     </tr>
-
     {% endfor %}
 </table>
 <form method="post" action="commit_to_compas_dispatch/">
@@ -57,8 +49,22 @@
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
-				$('#example').dataTable( {});
-		$('#example2').dataTable( {});
+				$('#example').dataTable( {
+					"bPaginate": false,
+					"bLengthChange": false,
+					"bFilter": false,
+					"bSort": false,
+					"bInfo": false,
+					"bAutoWidth": false 
+				});
+		$('#example2').dataTable( {
+					"bPaginate": false,
+					"bLengthChange": false,
+					"bFilter": false,
+					"bSort": false,
+					"bInfo": false,
+					"bAutoWidth": false 
+				});
 } );
 </script>
 {%endblock extra-header%}

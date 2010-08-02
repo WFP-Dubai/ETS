@@ -88,29 +88,47 @@ class WaybillRecieptForm(ModelForm):
 
 class WaybillFullForm(ModelForm):
 	
-	dateOfDispatch = forms.DateField(required=False)
-	dateOfLoading = forms.DateField(required=False)
-	dispatchRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	ltiNumber = forms.CharField(widget=forms.HiddenInput())
-	recipientArrivalDate = forms.DateField(required=False)
-	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
-	recipientEndDischargeDate = forms.DateField(required=False)
-	recipientLocation = forms.CharField(widget=forms.HiddenInput())
-	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	recipientStartDischargeDate = forms.DateField(required=False)
-	transactionType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
-	transportContractor = forms.CharField(widget=forms.HiddenInput())
-	transportDriverLicenceID=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	transportDriverName=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	transportSubContractor=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	transportTrailerRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	transportType = forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
-	transportVehicleRegistration=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	waybillNumber = forms.CharField(widget=forms.HiddenInput())
-	
+	dateOfDispatch 					= forms.DateField(required=False)
+	dateOfLoading 					= forms.DateField(required=False)
+	dispatchRemarks					= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+
+	recipientArrivalDate 			= forms.DateField(required=False)
+	recipientEndDischargeDate 		= forms.DateField(required=False)
+	recipientRemarks				= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	recipientStartDischargeDate 	= forms.DateField(required=False)
+	transactionType 				= forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
+	transportDriverLicenceID		= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportDriverName				= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportSubContractor			= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportTrailerRegistration	= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	transportType 					= forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
+	transportVehicleRegistration	= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	recipientLocation 				= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientConsingee 				= forms.CharField(widget=forms.HiddenInput(),required=False)
+	ltiNumber 						= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportContractor 			= forms.CharField(widget=forms.HiddenInput(),required=False)	
+	waybillNumber					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientConsingee				= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientName					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientSignedTimestamp		= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
+	transportDispachSigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportDispachSignedTimestamp	= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
+	transportDeliverySigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportDeliverySignedTimestamp= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
+	dispatcherName					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	dispatcherTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
 
 	class Meta:
 		model=Waybill
+	
+	def thisDispName(self):
+		try:
+			name = EpicPerson.objects.get(person_pk=self.instance.dispatcherName)
+		except:
+			name = 'N/A'
+		return name
+		
 
 		
 class MyModelChoiceField(ModelChoiceField):

@@ -4,8 +4,8 @@
 <dict>
 	<key>EmbeddedEditorHidden:carlander</key>
 	<false/>
-	<key>ExpandedEditorWidth:carlander:displays([(0, 0), (1280, 1024)])</key>
-	<integer>815</integer>
+	<key>ExpandedEditorWidth:carlander:displays([(0, 0), (1920, 1080)]:[(-1280, 56), (1280, 1024)])</key>
+	<integer>917</integer>
 	<key>ExpandedItems:carlander</key>
 	<array>
 		<string>9574E8B9-10F9-428D-8B4E-47D0C1A3CB51</string>
@@ -53,49 +53,30 @@
 			<key>Version</key>
 			<integer>1</integer>
 		</dict>
-		<string>441DFF97-2290-45EB-ADBC-F2B0780496C2</string>
 		<dict>
 			<key>AliasData</key>
 			<data>
-			AAAAAAF6AAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN7C18DY3NzAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3sL
-			o8gybh0AAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAABW1l
-			ZGlhAAAQAAgAAMWzkHgAAAARAAgAAMgyNd0AAAABABgDewtfA3c9
-			2gNtaqUACzIoAAqMqgAAfQ0AAgA4TWFjaW50b3NoIEhEOlVzZXJz
-			OmNhcmxhbmRlcjpwcm9qZWN0czplcGljOmV0czptZWRpYTpjc3MA
-			DgAIAAMAYwBzAHMADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABI
-			AEQAEgArVXNlcnMvY2FybGFuZGVyL3Byb2plY3RzL2VwaWMvZXRz
-			L21lZGlhL2NzcwAAEwABLwAAFQACABD//wAA
+			AAAAAAG0AAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN4Eh4FcHJpbnQAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46x
+			1choapUAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyVQAAAAEAIAN4Eh4D
+			dz51A3c+MQN3PdoDbWqlAAsyKAAKjKoAAH0NAAIATk1hY2ludG9z
+			aCBIRDpVc2VyczpjYXJsYW5kZXI6cHJvamVjdHM6ZXBpYzpldHM6
+			d2F5YmlsbDp0ZW1wbGF0ZXM6d2F5YmlsbDpwcmludAAOAAwABQBw
+			AHIAaQBuAHQADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQA
+			EgBBVXNlcnMvY2FybGFuZGVyL3Byb2plY3RzL2VwaWMvZXRzL3dh
+			eWJpbGwvdGVtcGxhdGVzL3dheWJpbGwvcHJpbnQAABMAAS8AABUA
+			AgAQ//8AAA==
 			</data>
 			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/media/css/</string>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/waybill/print/</string>
 			<key>TypeID</key>
 			<string>_CFileLocator</string>
 			<key>Version</key>
 			<integer>1</integer>
 		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAF2AAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN7C18CanMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3sL
-			bMgybX0AAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAABW1l
-			ZGlhAAAQAAgAAMWzkHgAAAARAAgAAMgyNT0AAAABABgDewtfA3c9
-			2gNtaqUACzIoAAqMqgAAfQ0AAgA3TWFjaW50b3NoIEhEOlVzZXJz
-			OmNhcmxhbmRlcjpwcm9qZWN0czplcGljOmV0czptZWRpYTpqcwAA
-			DgAGAAIAagBzAA8AGgAMAE0AYQBjAGkAbgB0AG8AcwBoACAASABE
-			ABIAKlVzZXJzL2NhcmxhbmRlci9wcm9qZWN0cy9lcGljL2V0cy9t
-			ZWRpYS9qcwATAAEvAAAVAAIAEP//AAA=
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/media/js/</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
+		<string>B818C47E-FC39-4665-A43D-748B96D86D6C</string>
 	</array>
 	<key>FileFilterID:carlander</key>
 	<string>msng</string>
@@ -104,11 +85,63 @@
 		<dict>
 			<key>AliasData</key>
 			<data>
+			AAAAAAImAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAOaUTAfY29ybmVyc3RvbmUgKGRlbGV0ZSMzOUE1MTBD
+			LmxpYwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5pR
+			DMh8OFxURVhUUipjaP////8AAAkgAAAAAAAAAAAAAAAAAAAACjIw
+			MTAtMDgtMDIAEAAIAADFs5B4AAAAEQAIAADIfAAcAAAAAQAUA5pR
+			MAJUDbcCVAjhAAqMqgAAfQ0AAgBWTWFjaW50b3NoIEhEOlVzZXJz
+			OmNhcmxhbmRlcjouZHJvcGJveDpjYWNoZToyMDEwLTA4LTAyOmNv
+			cm5lcnN0b25lIChkZWxldGUjMzlBNTEwQy5saWMADgBmADIAYwBv
+			AHIAbgBlAHIAcwB0AG8AbgBlACAAKABkAGUAbABlAHQAZQBkACAA
+			NABjADUANgA0AGYAYQA4AC0AMQAwADEALQAzADMAMwAwADAANAAx
+			AGYAYwA5ADIAKQAuAGwAaQBjAA8AGgAMAE0AYQBjAGkAbgB0AG8A
+			cwBoACAASABEABIAXFVzZXJzL2NhcmxhbmRlci8uZHJvcGJveC9j
+			YWNoZS8yMDEwLTA4LTAyL2Nvcm5lcnN0b25lIChkZWxldGVkIDRj
+			NTY0ZmE4LTEwMS0zMzMwMDQxZmM5MikubGljABMAAS8AABUAAgAQ
+			//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/.dropbox/cache/2010-08-02/cornerstone%20(deleted%204c564fa8-101-3330041fc92).lic</string>
+			<key>RelativePath</key>
+			<string>../../../.dropbox/cache/2010-08-02/cornerstone (deleted 4c564fa8-101-3330041fc92).lic</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGYAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEJY29tcGFzLnB5AAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			lMhoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAEBNYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			Y29tcGFzLnB5AA4AFAAJAGMAbwBtAHAAYQBzAC4AcAB5AA8AGgAM
+			AE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIAM1VzZXJzL2Nhcmxh
+			bmRlci9wcm9qZWN0cy9lcGljL2V0cy93YXliaWxsL2NvbXBhcy5w
+			eQAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/compas.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/compas.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
 			AAAAAAGUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PjEIdmlld3MucHkAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3th
-			/8gn1rpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
-			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCeeegAAAAEAGAN3PjED
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5RI
+			3choaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAGAN3PjED
 			dz3aA21qpQALMigACoyqAAB9DQACAD9NYWNpbnRvc2ggSEQ6VXNl
 			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
 			dmlld3MucHkAAA4AEgAIAHYAaQBlAHcAcwAuAHAAeQAPABoADABN
@@ -129,10 +162,237 @@
 			<key>AliasData</key>
 			<data>
 			AAAAAAHWAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnUSbGlzdF93YXliaWxscy5odG1sAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			cshoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFNNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmxpc3Rfd2F5YmlsbHMuaHRtbAAADgAm
+			ABIAbABpAHMAdABfAHcAYQB5AGIAaQBsAGwAcwAuAGgAdABtAGwA
+			DwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQAEgBGVXNlcnMv
+			Y2FybGFuZGVyL3Byb2plY3RzL2VwaWMvZXRzL3dheWJpbGwvdGVt
+			cGxhdGVzL2xpc3Rfd2F5YmlsbHMuaHRtbAATAAEvAAAVAAIAEP//
+			AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/list_waybills.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/list_waybills.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGQAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEHdXJscy5weQAAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			kshoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAD5NYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			dXJscy5weQAOABAABwB1AHIAbABzAC4AcAB5AA8AGgAMAE0AYQBj
+			AGkAbgB0AG8AcwBoACAASABEABIAMVVzZXJzL2NhcmxhbmRlci9w
+			cm9qZWN0cy9lcGljL2V0cy93YXliaWxsL3VybHMucHkAABMAAS8A
+			ABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/urls.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/urls.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEIZm9ybXMucHkAAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			k8hoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAD9NYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			Zm9ybXMucHkAAA4AEgAIAGYAbwByAG0AcwAuAHAAeQAPABoADABN
+			AGEAYwBpAG4AdABvAHMAaAAgAEgARAASADJVc2Vycy9jYXJsYW5k
+			ZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC9mb3Jtcy5weQAT
+			AAEvAAAVAAIAEP//AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/forms.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/forms.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGYAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PjEJbW9kZWxzLnB5AAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5P8
+			0MhoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAGAN3PjED
+			dz3aA21qpQALMigACoyqAAB9DQACAEBNYWNpbnRvc2ggSEQ6VXNl
+			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
+			bW9kZWxzLnB5AA4AFAAJAG0AbwBkAGUAbABzAC4AcAB5AA8AGgAM
+			AE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIAM1VzZXJzL2Nhcmxh
+			bmRlci9wcm9qZWN0cy9lcGljL2V0cy93YXliaWxsL21vZGVscy5w
+			eQAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/models.py</string>
+			<key>RelativePath</key>
+			<string>./waybill/models.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAH0AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN4Eh4VbHRpb3JpZ2luYWxfbGlzdC5odG1sAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5JB
+			ushoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAIAN4Eh4D
+			dz51A3c+MQN3PdoDbWqlAAsyKAAKjKoAAH0NAAIAXk1hY2ludG9z
+			aCBIRDpVc2VyczpjYXJsYW5kZXI6cHJvamVjdHM6ZXBpYzpldHM6
+			d2F5YmlsbDp0ZW1wbGF0ZXM6d2F5YmlsbDpsdGlvcmlnaW5hbF9s
+			aXN0Lmh0bWwADgAsABUAbAB0AGkAbwByAGkAZwBpAG4AYQBsAF8A
+			bABpAHMAdAAuAGgAdABtAGwADwAaAAwATQBhAGMAaQBuAHQAbwBz
+			AGgAIABIAEQAEgBRVXNlcnMvY2FybGFuZGVyL3Byb2plY3RzL2Vw
+			aWMvZXRzL3dheWJpbGwvdGVtcGxhdGVzL3dheWJpbGwvbHRpb3Jp
+			Z2luYWxfbGlzdC5odG1sAAATAAEvAAAVAAIAEP//AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/waybill/ltioriginal_list.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/waybill/ltioriginal_list.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHqAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAOOsdUPd2JfbG9hZGluZy5odG1sAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5I3
+			lshoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAABXBy
+			aW50AAAQAAgAAMWzkHgAAAARAAgAAMhoMokAAAABACQDjrHVA3gS
+			HgN3PnUDdz4xA3c92gNtaqUACzIoAAqMqgAAfQ0AAgBeTWFjaW50
+			b3NoIEhEOlVzZXJzOmNhcmxhbmRlcjpwcm9qZWN0czplcGljOmV0
+			czp3YXliaWxsOnRlbXBsYXRlczp3YXliaWxsOnByaW50OndiX2xv
+			YWRpbmcuaHRtbAAOACAADwB3AGIAXwBsAG8AYQBkAGkAbgBnAC4A
+			aAB0AG0AbAAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAAS
+			AFFVc2Vycy9jYXJsYW5kZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5
+			YmlsbC90ZW1wbGF0ZXMvd2F5YmlsbC9wcmludC93Yl9sb2FkaW5n
+			Lmh0bWwAABMAAS8AABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/waybill/print/wb_loading.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/waybill/print/wb_loading.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHsAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN4Eh4Td2F5YmlsbF9kZXRhaWwuaHRtbAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			RshoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
+			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyGgyiQAAAAEAIAN4Eh4D
+			dz51A3c+MQN3PdoDbWqlAAsyKAAKjKoAAH0NAAIAXE1hY2ludG9z
+			aCBIRDpVc2VyczpjYXJsYW5kZXI6cHJvamVjdHM6ZXBpYzpldHM6
+			d2F5YmlsbDp0ZW1wbGF0ZXM6d2F5YmlsbDp3YXliaWxsX2RldGFp
+			bC5odG1sAA4AKAATAHcAYQB5AGIAaQBsAGwAXwBkAGUAdABhAGkA
+			bAAuAGgAdABtAGwADwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABI
+			AEQAEgBPVXNlcnMvY2FybGFuZGVyL3Byb2plY3RzL2VwaWMvZXRz
+			L3dheWJpbGwvdGVtcGxhdGVzL3dheWJpbGwvd2F5YmlsbF9kZXRh
+			aWwuaHRtbAAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/waybill/waybill_detail.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/waybill/waybill_detail.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHyAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnUZbGlzdF93YXliaWxsc19jb21wYXMuaHRtbAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			c8hoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFpNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmxpc3Rfd2F5YmlsbHNfY29tcGFzLmh0
+			bWwADgA0ABkAbABpAHMAdABfAHcAYQB5AGIAaQBsAGwAcwBfAGMA
+			bwBtAHAAYQBzAC4AaAB0AG0AbAAPABoADABNAGEAYwBpAG4AdABv
+			AHMAaAAgAEgARAASAE1Vc2Vycy9jYXJsYW5kZXIvcHJvamVjdHMv
+			ZXBpYy9ldHMvd2F5YmlsbC90ZW1wbGF0ZXMvbGlzdF93YXliaWxs
+			c19jb21wYXMuaHRtbAAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/list_waybills_compas.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/list_waybills_compas.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHSAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnURZGV0YWlsZWRfbHRpLmh0bWwAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			TshoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFJNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmRldGFpbGVkX2x0aS5odG1sAA4AJAAR
+			AGQAZQB0AGEAaQBsAGUAZABfAGwAdABpAC4AaAB0AG0AbAAPABoA
+			DABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAEVVc2Vycy9jYXJs
+			YW5kZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC90ZW1wbGF0
+			ZXMvZGV0YWlsZWRfbHRpLmh0bWwAABMAAS8AABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/detailed_lti.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/detailed_lti.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHWAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnUSZGlzcGF0Y2hfbGlzdC5odG1sAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3th
-			GMgoKvtURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIJ/K7AAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			eshoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFNNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOmRpc3BhdGNoX2xpc3QuaHRtbAAADgAm
@@ -154,122 +414,22 @@
 		<dict>
 			<key>AliasData</key>
 			<data>
-			AAAAAAGYAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PjEJbW9kZWxzLnB5AAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3tg
-			h8gya5xURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
-			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyDIzXAAAAAEAGAN3PjED
-			dz3aA21qpQALMigACoyqAAB9DQACAEBNYWNpbnRvc2ggSEQ6VXNl
-			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
-			bW9kZWxzLnB5AA4AFAAJAG0AbwBkAGUAbABzAC4AcAB5AA8AGgAM
-			AE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIAM1VzZXJzL2Nhcmxh
-			bmRlci9wcm9qZWN0cy9lcGljL2V0cy93YXliaWxsL21vZGVscy5w
-			eQAAEwABLwAAFQACABD//wAA
+			AAAAAAGUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAOOthcJdG9ieW1wLnB5AAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5I1
+			+shobhJURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAABmNv
+			bmZpZwAQAAgAAMWzkHgAAAARAAgAAMhoNdIAAAABABgDjrYXA3c9
+			2gNtaqUACzIoAAqMqgAAfQ0AAgA/TWFjaW50b3NoIEhEOlVzZXJz
+			OmNhcmxhbmRlcjpwcm9qZWN0czplcGljOmV0czpjb25maWc6dG9i
+			eW1wLnB5AAAOABQACQB0AG8AYgB5AG0AcAAuAHAAeQAPABoADABN
+			AGEAYwBpAG4AdABvAHMAaAAgAEgARAASADJVc2Vycy9jYXJsYW5k
+			ZXIvcHJvamVjdHMvZXBpYy9ldHMvY29uZmlnL3RvYnltcC5weQAT
+			AAEvAAAVAAIAEP//AAA=
 			</data>
 			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/models.py</string>
+			<string>file://localhost/Users/carlander/projects/epic/ets/config/tobymp.py</string>
 			<key>RelativePath</key>
-			<string>./waybill/models.py</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAHSAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PnURZGV0YWlsZWRfbHRpLmh0bWwAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3o+
-			Zsgn/qpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIJ8ZqAAAAAQAcA3c+
-			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFJNYWNpbnRvc2gg
-			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
-			eWJpbGw6dGVtcGxhdGVzOmRldGFpbGVkX2x0aS5odG1sAA4AJAAR
-			AGQAZQB0AGEAaQBsAGUAZABfAGwAdABpAC4AaAB0AG0AbAAPABoA
-			DABNAGEAYwBpAG4AdABvAHMAaAAgAEgARAASAEVVc2Vycy9jYXJs
-			YW5kZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC90ZW1wbGF0
-			ZXMvZGV0YWlsZWRfbHRpLmh0bWwAABMAAS8AABUAAgAQ//8AAA==
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/detailed_lti.html</string>
-			<key>RelativePath</key>
-			<string>./waybill/templates/detailed_lti.html</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAGQAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PjEHdXJscy5weQAAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3tS
-			Qcgn1rpURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
-			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCeeegAAAAEAGAN3PjED
-			dz3aA21qpQALMigACoyqAAB9DQACAD5NYWNpbnRvc2ggSEQ6VXNl
-			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
-			dXJscy5weQAOABAABwB1AHIAbABzAC4AcAB5AA8AGgAMAE0AYQBj
-			AGkAbgB0AG8AcwBoACAASABEABIAMVVzZXJzL2NhcmxhbmRlci9w
-			cm9qZWN0cy9lcGljL2V0cy93YXliaWxsL3VybHMucHkAABMAAS8A
-			ABUAAgAQ//8AAA==
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/urls.py</string>
-			<key>RelativePath</key>
-			<string>./waybill/urls.py</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAHWAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PnUSY3JlYXRlV2F5YmlsbC5odG1sAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3qb
-			38gpdTZURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIKTz2AAAAAQAcA3c+
-			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFNNYWNpbnRvc2gg
-			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
-			eWJpbGw6dGVtcGxhdGVzOmNyZWF0ZVdheWJpbGwuaHRtbAAADgAm
-			ABIAYwByAGUAYQB0AGUAVwBhAHkAYgBpAGwAbAAuAGgAdABtAGwA
-			DwAaAAwATQBhAGMAaQBuAHQAbwBzAGgAIABIAEQAEgBGVXNlcnMv
-			Y2FybGFuZGVyL3Byb2plY3RzL2VwaWMvZXRzL3dheWJpbGwvdGVt
-			cGxhdGVzL2NyZWF0ZVdheWJpbGwuaHRtbAATAAEvAAAVAAIAEP//
-			AAA=
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/createWaybill.html</string>
-			<key>RelativePath</key>
-			<string>./waybill/templates/createWaybill.html</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAHCAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN4MPEKbG9naW4uaHRtbAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3gw
-			88gpgBYAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAADHJl
-			Z2lzdHJhdGlvbgAQAAgAAMWzkHgAAAARAAgAAMgpR9YAAAABABgD
-			eDDxA3gwzAN4MMICia2rAAqMqgAAfQ0AAgBSTWFjaW50b3NoIEhE
-			OlVzZXJzOmNhcmxhbmRlcjouVHJhc2g6cmVnaXN0cmF0aW9uOnRl
-			bXBsYXRlczpyZWdpc3RyYXRpb246bG9naW4uaHRtbAAOABYACgBs
-			AG8AZwBpAG4ALgBoAHQAbQBsAA8AGgAMAE0AYQBjAGkAbgB0AG8A
-			cwBoACAASABEABIARVVzZXJzL2NhcmxhbmRlci8uVHJhc2gvcmVn
-			aXN0cmF0aW9uL3RlbXBsYXRlcy9yZWdpc3RyYXRpb24vbG9naW4u
-			aHRtbAAAEwABLwAAFQACABD//wAA
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/.Trash/registration/templates/registration/login.html</string>
-			<key>RelativePath</key>
-			<string>../../../.Trash/registration/templates/registration/login.html</string>
+			<string>./config/tobymp.py</string>
 			<key>TypeID</key>
 			<string>_CFileLocator</string>
 			<key>Version</key>
@@ -280,9 +440,9 @@
 			<data>
 			AAAAAAGyAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnUJbHRpcy5odG1sAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3tQ
-			c8gya5xURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIMjNcAAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			gMhoaslURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAEpNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOmx0aXMuaHRtbAAOABQACQBsAHQAaQBz
@@ -303,11 +463,61 @@
 		<dict>
 			<key>AliasData</key>
 			<data>
+			AAAAAAG6AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnULbHRpX3NpLmh0bWwAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3mT
+			3MgrxdxURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIK42cAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAExNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmx0aV9zaS5odG1sAA4AGAALAGwAdABp
+			AF8AcwBpAC4AaAB0AG0AbAAPABoADABNAGEAYwBpAG4AdABvAHMA
+			aAAgAEgARAASAD9Vc2Vycy9jYXJsYW5kZXIvcHJvamVjdHMvZXBp
+			Yy9ldHMvd2F5YmlsbC90ZW1wbGF0ZXMvbHRpX3NpLmh0bWwAABMA
+			AS8AABUAAgAQ//8AAA==
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/lti_si.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/lti_si.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAHCAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnUNbHRpX2xpc3QuaHRtbAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			dMhoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAE5NYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmx0aV9saXN0Lmh0bWwADgAcAA0AbAB0
+			AGkAXwBsAGkAcwB0AC4AaAB0AG0AbAAPABoADABNAGEAYwBpAG4A
+			dABvAHMAaAAgAEgARAASAEFVc2Vycy9jYXJsYW5kZXIvcHJvamVj
+			dHMvZXBpYy9ldHMvd2F5YmlsbC90ZW1wbGF0ZXMvbHRpX2xpc3Qu
+			aHRtbAAAEwABLwAAFQACABD//wAA
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/lti_list.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/lti_list.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
 			AAAAAAHaAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnUTcmVjaWV2ZVdheWJpbGwuaHRtbAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3qu
-			UcgxaNVURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIMTCVAAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			fchoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFRNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOnJlY2lldmVXYXliaWxsLmh0bWwADgAo
@@ -329,11 +539,60 @@
 		<dict>
 			<key>AliasData</key>
 			<data>
+			AAAAAAGIAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PdoLc2V0dGluZ3MucHkAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			w8hoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0
+			cwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAUA3c92gNtaqUA
+			CzIoAAqMqgAAfQ0AAgA6TWFjaW50b3NoIEhEOlVzZXJzOmNhcmxh
+			bmRlcjpwcm9qZWN0czplcGljOmV0czpzZXR0aW5ncy5weQAOABgA
+			CwBzAGUAdAB0AGkAbgBnAHMALgBwAHkADwAaAAwATQBhAGMAaQBu
+			AHQAbwBzAGgAIABIAEQAEgAtVXNlcnMvY2FybGFuZGVyL3Byb2pl
+			Y3RzL2VwaWMvZXRzL3NldHRpbmdzLnB5AAATAAEvAAAVAAIAEP//
+			AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/settings.py</string>
+			<key>RelativePath</key>
+			<string>./settings.py</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
+			AAAAAAGyAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
+			s8i4SCsAAAN3PnUJZm9ybS5odG1sAAAAAAAAAAAAAAAAAAAAAAAA
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			b8hoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
+			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAEpNYWNpbnRvc2gg
+			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
+			eWJpbGw6dGVtcGxhdGVzOmZvcm0uaHRtbAAOABQACQBmAG8AcgBt
+			AC4AaAB0AG0AbAAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgA
+			RAASAD1Vc2Vycy9jYXJsYW5kZXIvcHJvamVjdHMvZXBpYy9ldHMv
+			d2F5YmlsbC90ZW1wbGF0ZXMvZm9ybS5odG1sAAATAAEvAAAVAAIA
+			EP//AAA=
+			</data>
+			<key>FileURL</key>
+			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/form.html</string>
+			<key>RelativePath</key>
+			<string>./waybill/templates/form.html</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>AliasData</key>
+			<data>
 			AAAAAAHSAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnURc2VsZWN0QWN0aW9uLmh0bWwAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3tW
-			cMgya5xURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIMjNcAAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			cchoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFJNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOnNlbGVjdEFjdGlvbi5odG1sAA4AJAAR
@@ -356,9 +615,9 @@
 			<data>
 			AAAAAAG6AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnULc3RhdHVzLmh0bWwAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3sK
-			08gya5wAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIMjNcAAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3vc
+			T8gzsfcAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIM3m3AAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAExNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOnN0YXR1cy5odG1sAA4AGAALAHMAdABh
@@ -381,9 +640,9 @@
 			<data>
 			AAAAAAHWAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
 			s8i4SCsAAAN3PnUSYmFzZV90ZW1wbGF0ZS5odG1sAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3tQ
-			acgya5xURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIMjNcAAAAAQAcA3c+
+			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA46y
+			fMhoaskAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
+			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIaDKJAAAAAQAcA3c+
 			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAFNNYWNpbnRvc2gg
 			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
 			eWJpbGw6dGVtcGxhdGVzOmJhc2VfdGVtcGxhdGUuaHRtbAAADgAm
@@ -426,79 +685,6 @@
 			<key>Version</key>
 			<integer>1</integer>
 		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAGUAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PjEIZm9ybXMucHkAAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3qs
-			osgrAhJURVhUUipjaP////8AAAkgAAAAAAAAAAAAAAAAAAAAB3dh
-			eWJpbGwAABAACAAAxbOQeAAAABEACAAAyCrJ0gAAAAEAGAN3PjED
-			dz3aA21qpQALMigACoyqAAB9DQACAD9NYWNpbnRvc2ggSEQ6VXNl
-			cnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndheWJpbGw6
-			Zm9ybXMucHkAAA4AEgAIAGYAbwByAG0AcwAuAHAAeQAPABoADABN
-			AGEAYwBpAG4AdABvAHMAaAAgAEgARAASADJVc2Vycy9jYXJsYW5k
-			ZXIvcHJvamVjdHMvZXBpYy9ldHMvd2F5YmlsbC9mb3Jtcy5weQAT
-			AAEvAAAVAAIAEP//AAA=
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/forms.py</string>
-			<key>RelativePath</key>
-			<string>./waybill/forms.py</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAGyAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN3PnUJZm9ybS5odG1sAAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3qP
-			SsgrDgVURVhUAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIKtXFAAAAAQAcA3c+
-			dQN3PjEDdz3aA21qpQALMigACoyqAAB9DQACAEpNYWNpbnRvc2gg
-			SEQ6VXNlcnM6Y2FybGFuZGVyOnByb2plY3RzOmVwaWM6ZXRzOndh
-			eWJpbGw6dGVtcGxhdGVzOmZvcm0uaHRtbAAOABQACQBmAG8AcgBt
-			AC4AaAB0AG0AbAAPABoADABNAGEAYwBpAG4AdABvAHMAaAAgAEgA
-			RAASAD1Vc2Vycy9jYXJsYW5kZXIvcHJvamVjdHMvZXBpYy9ldHMv
-			d2F5YmlsbC90ZW1wbGF0ZXMvZm9ybS5odG1sAAATAAEvAAAVAAIA
-			EP//AAA=
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/projects/epic/ets/waybill/templates/form.html</string>
-			<key>RelativePath</key>
-			<string>./waybill/templates/form.html</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>AliasData</key>
-			<data>
-			AAAAAAGiAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAAAAAAAADF
-			s8i4SCsAAAN4MMwKbG9naW4uaHRtbAAAAAAAAAAAAAAAAAAAAAAA
-			AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3gw
-			xsgpgBYAAAAAAAAAAP////8AAAkgAAAAAAAAAAAAAAAAAAAACXRl
-			bXBsYXRlcwAAEAAIAADFs5B4AAAAEQAIAADIKUfWAAAAAQAUA3gw
-			zAN4MMICia2rAAqMqgAAfQ0AAgBFTWFjaW50b3NoIEhEOlVzZXJz
-			OmNhcmxhbmRlcjouVHJhc2g6cmVnaXN0cmF0aW9uOnRlbXBsYXRl
-			czpsb2dpbi5odG1sAAAOABYACgBsAG8AZwBpAG4ALgBoAHQAbQBs
-			AA8AGgAMAE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIAOFVzZXJz
-			L2NhcmxhbmRlci8uVHJhc2gvcmVnaXN0cmF0aW9uL3RlbXBsYXRl
-			cy9sb2dpbi5odG1sABMAAS8AABUAAgAQ//8AAA==
-			</data>
-			<key>FileURL</key>
-			<string>file://localhost/Users/carlander/.Trash/registration/templates/login.html</string>
-			<key>RelativePath</key>
-			<string>../../../.Trash/registration/templates/login.html</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
 	</array>
 	<key>ShowInvisibles:carlander</key>
 	<false/>
@@ -507,8 +693,8 @@
 	<key>ToolbarVisible:carlander</key>
 	<true/>
 	<key>ViewSplitterPosition:carlander</key>
-	<real>0.24884793162345886</real>
-	<key>WindowFrame:carlander:displays([(0, 0), (1280, 1024)])</key>
-	<string>rect(44,0,1020,1085)</string>
+	<real>0.28303360939025879</real>
+	<key>WindowFrame:carlander:displays([(0, 0), (1920, 1080)]:[(-1280, 56), (1280, 1024)])</key>
+	<string>rect(44,0,1036,1279)</string>
 </dict>
 </plist>
