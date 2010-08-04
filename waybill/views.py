@@ -513,33 +513,28 @@ def waybill_reception(request,wb_code):
 		class Meta:
 			model = LoadingDetail
 			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
-		def clean(self):
-			cleaned_data = self.cleaned_data
-			my_losses = cleaned_data.get('numberUnitsLost')
-			my_lr = cleaned_data.get('unitsLostReason')
-			my_damadged = cleaned_data.get('numberUnitsDamaged')
-			my_dr = cleaned_data.get('unitsDamagedReason')
-
+		def clean_unitsLostReason(self):
+			#cleaned_data = self.cleaned_data
+			my_losses = self.cleaned_data.get('numberUnitsLost')
+			my_lr = self.cleaned_data.get('unitsLostReason')
 			print my_losses
-			print my_damadged
-
-			if my_losses > 0:
+			if  long(my_losses) >0 :
 				print 'hmm'
 				if my_lr == None:
-					self._errors["numberUnitsLost"] = self.error_class(["You have forgotten Loss reason"])
-					del cleaned_data["numberUnitsLost"]	
-				else:
-					print 'ok'
+					raise forms.ValidationError("You have forgotten to select the Loss Reason")	
+			return my_lr
 
-			if my_damadged > 0:
-				print 'hmm'
+
+		def clean_unitsDamagedReason(self):
+			my_damage = self.cleaned_data.get('numberUnitsDamaged')
+			my_dr = self.cleaned_data.get('unitsDamagedReason')
+
+			if long(my_damage)>0:
+				print 'hmm2'
 				if my_dr == None:
-					del cleaned_data["numberUnitsDamaged"]
-					self._errors["numberUnitsDamaged"] = self.error_class(["You have forgotten Damaged reason"])
-				else:
-					print 'ok'
-			
-			return cleaned_data
+					raise forms.ValidationError("You have forgotten to select the Damage Reason")
+					
+			return my_dr
 		
 			
 			
