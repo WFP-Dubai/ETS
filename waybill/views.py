@@ -56,7 +56,8 @@ def listOfLtis(request,origin):
 	template:
 	/ets/waybill/templates/ltis.html
 	"""
-	# still to do: filter  out finished ltis
+	
+	
 	ltis = ltioriginal.objects.ltiCodesByWH(origin)
 	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
 	
@@ -65,8 +66,16 @@ def listOfLtis(request,origin):
 		profile=request.user.get_profile()
 	except:
 		pass
+	still_ltis=[]
+	# finished ltis
+	for lti in ltis:
+		listOfSI_withDeduction = restant_si(lti[0])
+		for item in listOfSI_withDeduction:
+			if item.CurrentAmount > 0:
+				still_ltis.append(lti)
+				
 	return render_to_response('ltis.html',
-							  {'ltis':ltis,'profile':profile},
+							  {'ltis':still_ltis,'profile':profile},
 							  context_instance=RequestContext(request))
 
 ## NOT IN USE
@@ -175,9 +184,12 @@ def lti_detail_url(request,lti_code):
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
 	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
 	listOfSI_withDeduction = restant_si(lti_code)
-	
+	lti_more_wb=False
+	for item in listOfSI_withDeduction:
+		if item.CurrentAmount > 0:
+			lti_more_wb=True
 	return render_to_response('detailed_lti.html',
-							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction},
+							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction,'moreWBs':lti_more_wb},
 							  context_instance=RequestContext(request))
 @login_required
 def single_lti_extra(request,lti_code):
@@ -275,6 +287,19 @@ def dispatchToCompas(request):
 		
 	return render_to_response('list_waybills_compas.html',
 							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
+							  context_instance=RequestContext(request))
+
+def listCompasWB(request):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+		
+	list_waybills_disp = Waybill.objects.filter(waybillSentToCompas = True)
+	list_waybills_rec = Waybill.objects.filter(waybillRecSentToCompas = True)
+	return render_to_response('list_waybills_compas_all.html',
+							  {'waybill_list':list_waybills_disp,'waybill_list_rec':list_waybills_rec,'profile':profile},
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -389,6 +414,8 @@ def waybill_view(request,wb_id):
 		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
 		extra_lines = 5 - number_of_lines
 		my_empty = ['']*extra_lines
+		disp_person_object=''
+		rec_person_object = ''
 		try:
 			disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
 			rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)

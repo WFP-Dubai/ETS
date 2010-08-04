@@ -34,8 +34,9 @@ border-color: black;
 	CONSEGNEE_NAME				:{{detailed.0.CONSEGNEE_NAME}}</pre>
 	{%endcomment%}
 	<br>
+	{%if moreWBs%}
 <a href='{%url ets.waybill.views.waybillCreate detailed.0.CODE%}'>Create New Waybill</a><br>
-
+{%endif%}
 <br>
 Items in LTI:
 <table class='bordered' >

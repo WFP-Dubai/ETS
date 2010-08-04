@@ -123,30 +123,19 @@ class ltioriginalManager(models.Manager):
  		these functions are related to the whole model/table not individual rows
  		some should be replaced using filter objects.view()
  		"""
-# 		def warehouses(self):				
-# 				cursor = connection.cursor()
-# 				cursor.execute("""
-# 						SELECT DISTINCT ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME,ORIGIN_WH_NAME,ORIGIN_WH_CODE
-# 						FROM epic_lti
-# 						""")
-# 				wh = cursor.fetchall()
-# 				
-# 				return wh
-				
-# 		def ltiCodes(self):
-# 				cursor = connection.cursor()
-# 				cursor.execute("""
-# 						SELECT DISTINCT CODE,ORIGIN_LOCATION_CODE,ORIGIN_LOC_NAME,ORIGIN_WH_NAME
-# 						FROM epic_lti order by LTI_ID
-# 						""")
-# 				lti_code = cursor.fetchall()
-# 				return lti_code
 				
 		def ltiCodesByWH(self,wh):
 				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock) and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
+				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
 				lti_code = cursor.fetchall()
-				lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
+				#lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
+				return lti_code
+		
+		def ltiCodesAll(self):
+				cursor = connection.cursor()
+				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )')
+				lti_code = cursor.fetchall()
+				#lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
 				return lti_code
 		
 		def si_for_lti(self,lti_code):
@@ -191,7 +180,6 @@ class ltioriginal(models.Model):
 		class Meta:
 				db_table = u'epic_lti'
 				
-
 		def  __unicode__(self):
 				#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
 				return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant() 

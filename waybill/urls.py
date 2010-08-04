@@ -56,7 +56,9 @@ urlpatterns = patterns('',
     (r'^waybill/viewwb/(.*)$',waybill_view),
     (r'^waybill/commit_to_compas_dispatch/$',dispatchToCompas),
     (r'^waybill/commit_to_compas_receipt/$',receiptToCompas),    
-    (r'^waybill/reset_waybill/$',reset_waybill),    
+    (r'^waybill/reset_waybill/$',reset_waybill),
+    (r'^waybill/compass_waybill/$',listCompasWB),
+    
     
     
 )
