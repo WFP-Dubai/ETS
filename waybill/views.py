@@ -391,6 +391,7 @@ def waybill_view(request,wb_id):
 		my_empty = ['']*extra_lines
 		try:
 			disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+			rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
 		except:
 			disp_person_object=''
 
@@ -400,9 +401,41 @@ def waybill_view(request,wb_id):
 							  {'object':waybill_instance,
 							  'ltioriginal':lti_detail_items,
 							  'disp_person':disp_person_object,
+							  'rec_person':rec_person_object,
 							  'extra_lines':my_empty,
 							  'zippedWB':zippedWB,
 							  },
+							  context_instance=RequestContext(request))
+
+
+@login_required
+def waybill_view_reception(request,wb_id):
+	rec_person_object = ''
+	disp_person_object =''
+	zippedWB=''
+	
+	try:
+		waybill_instance = Waybill.objects.get(id=wb_id)
+		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
+		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+		extra_lines = 5 - number_of_lines
+		my_empty = ['']*extra_lines
+		zippedWB = wb_compress(wb_id)	
+	except:
+			return HttpResponseRedirect(reverse(selectAction))
+	try:
+		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
+		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
+	except:
+		pass
+	
+	return render_to_response('waybill/print/waybill_detail_view_reception.html',
+							  {'object':waybill_instance,
+							  'ltioriginal':lti_detail_items,
+							  'disp_person':disp_person_object,
+							  'rec_person':rec_person_object,
+							  'extra_lines':my_empty,
+							  'zippedWB':zippedWB},
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -431,34 +464,6 @@ def reset_waybill(request):
 							  context_instance=RequestContext(request))
 	
 
-@login_required
-def waybill_view_reception(request,wb_id):
-	rec_person_object = ''
-	disp_person_object =''
-	zippedWB=''
-	
-	try:
-		waybill_instance = Waybill.objects.get(id=wb_id)
-		lti_detail_items = ltioriginal.objects.filter(CODE=waybill_instance.ltiNumber)
-		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
-		extra_lines = 5 - number_of_lines
-		my_empty = ['']*extra_lines
-		zippedWB = wb_compress(wb_id)	
-	except:
-			return HttpResponseRedirect(reverse(selectAction))
-	try:
-		disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
-		rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
-	except:
-		pass
-	
-	return render_to_response('waybill/print/waybill_detail_view_reception.html',
-							  {'object':waybill_instance,
-							  'ltioriginal':lti_detail_items,
-							  'disp_person':disp_person_object,
-							  'rec_person':rec_person_object,'extra_lines':my_empty,
-							  'zippedWB':zippedWB},
-							  context_instance=RequestContext(request))
 
 @login_required
 def waybill_reception(request,wb_code):
@@ -479,6 +484,17 @@ def waybill_reception(request,wb_code):
 		class Meta:
 			model = LoadingDetail
 			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
+		def clean_numberUnitsLost(self):
+			if self.instance.numberUnitsLost > 0:
+				print 'hmm'
+			else:	
+				print self.instance.numberUnitsLost
+			
+		
+		
+		
+			
+			
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
@@ -543,7 +559,7 @@ def waybill_search(request):
 	my_valid_wb=[]
 	if profile != '' :	
 		for waybill in found_wb:
-			if profile.isCompasUser:
+			if profile.isCompasUser or profile.readerUser:
 				my_valid_wb.append(waybill.id)
 			elif profile.warehouses and waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE  == profile.warehouses.ORIGIN_WH_CODE:
 				my_valid_wb.append(waybill.id)

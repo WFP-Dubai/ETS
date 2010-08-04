@@ -12,23 +12,32 @@ class compas_write:
 	ErrorCodes = ''
 
 	def __enter__(self):
-		self.__db = cx_Oracle.Connection("opt_epic/opt_epic@//10.11.216.4:1521/JERX001")
+		self.__db = cx_Oracle.Connection(settings.DATABASES['compas']['USER']+'/'+settings.DATABASES['compas']['PASSWORD']+'@//'+ settings.DATABASES['compas']['HOST'] +':1521/'+settings.COMPAS_STATION)
 		self.__cursor = self.__db.cursor()
 		return self 
 	def __exit__(self, type, value, traceback):
    		self.__cursor.close()
 		self.__db.close()
+		
+	def test_cps(self):
+		db = self.__db
+		cursor = self.__cursor
+		
+		cursor.arraysize = 50
+		cursor.execute("select * from Epic_Geo")
+
+		for column_1, column_2, column_3,col4,col5,col6,col7 in cursor.fetchall():
+			print "Values from DB:", column_1, column_2, column_3
+
 
 	def write_receipt_waybill_compas(self,waybill_id):
                 try:
-                        db = cx_Oracle.Connection(u'opt_epic/opt_epic@//10.11.216.4:1521/JERX001')
+                        db = self.__db
+                        cursor = self.__cursor
                         twoCont = False
                         all_ok = True
                         self.ErrorMessages = ''
                         self.ErrorCodes = ''
-                        cursor =  db.cursor()#connections['compas'].cursor()		
-                        
-                        
                         the_waybill = Waybill.objects.get(id=waybill_id)
                         lineItems = the_waybill.loadingdetail_set.select_related()
                         WB_CODE = the_waybill.waybillNumber
@@ -36,7 +45,7 @@ class compas_write:
                         recPersonOUC = receiverPerson.org_unit_code
                         recPersonCode = receiverPerson.code
                         arrival_date = unicode(the_waybill.recipientArrivalDate.strftime("%Y%m%d"))
-                        
+                       
                         ## check if containers = 2 & lines = 2
                         
                         if lineItems.count() == 2:
@@ -80,24 +89,6 @@ class compas_write:
                                 Response_Message.setvalue(0,u' '*200)
                                 Response_Code = cursor.var(cx_Oracle.STRING)
                                 Response_Code.setvalue(0,u' '*2)
-        #			print [Response_Message,
-        #				Response_Code,
-        #				CURR_CODE,
-        #				recPersonOUC,
-        #				recPersonCode,
-        #				arrival_date,
-        #				goodUnits,
-        #				damadgedReason,
-        #				damadgedUnits,
-        #				lossReason,
-        #				lostUnits,
-        #				Full_coi,
-        #				COMM_CATEGORY_CODE,
-        #				COMM_CODE,
-        #				PCKKCODE,
-        #				ALLCODE,
-        #				QUALITY]
-
                                 cursor.callproc(u'write_waybill.receipt',(
                                         Response_Message,
                                         Response_Code,
@@ -139,14 +130,11 @@ class compas_write:
                         the_waybill = Waybill.objects.get(id=waybill_id)
                         self.ErrorMessages = 'Problem with data of Waybill %s <br>'%(the_waybill)
                         return False
-                
-
-
-		
-
+   
+   
 	def write_dispatch_waybill_compas(self,waybill_id):
-		db = cx_Oracle.Connection(u'opt_epic/opt_epic@//10.11.216.4:1521/JERX001')
-		cursor =  db.cursor()#connections['compas'].cursor()		
+		db = self.__db
+		cursor = self.__cursor	
 		self.ErrorMessages = u''
 		self.ErrorCodes = u''
 		

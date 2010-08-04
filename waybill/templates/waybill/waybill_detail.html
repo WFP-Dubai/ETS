@@ -92,7 +92,7 @@
  <br>
 <div>
 <div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
-<div><strong>Dispatcher Name:</strong>{{form.thisDispName}} {{form.instance.dispatcherTitle}}</div>
+<div><strong>Dispatcher Name:</strong>{{form.thisDispName}} - {{form.instance.dispatcherTitle}}</div>
 <br>
 <div><table>
 <tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}</td></tr>
@@ -113,7 +113,7 @@
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td><strong>Recipient Location:</td><td> {{form.instance.recipientLocation}}</td></tr>
 <tr><td><strong>Consignee:</td><td>{{form.instance.recipientConsingee}}</td></tr>
-
+<tr><td><strong>Receivers Name:</td><td>{{form.thisRecName}} - {{form.instance.recipientTitle}}</td></tr>
 <tr><td><strong>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
 <tr><td><strong>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
 <tr><td><strong>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>

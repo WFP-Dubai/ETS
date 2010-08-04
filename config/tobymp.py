@@ -139,6 +139,6 @@ DEBUG_TOOLBAR_PANELS = (
 AUTH_PROFILE_MODULE='waybill.UserProfile'
 
 COMPAS_STATION='JERX001'
-
+INTSTANCE_LABLE="Toby Mac Pro"
 LOGIN_URL = 'accounts/login'
 LOGOUT_URL = 'accounts/logout'

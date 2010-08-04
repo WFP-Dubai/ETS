@@ -128,7 +128,12 @@ class WaybillFullForm(ModelForm):
 		except:
 			name = 'N/A'
 		return name
-		
+	def thisRecName(self):
+		try:
+			name = EpicPerson.objects.get(person_pk=self.instance.recipientName)
+		except:
+			name = 'N/A'
+		return name
 
 		
 class MyModelChoiceField(ModelChoiceField):

@@ -9,9 +9,9 @@ sys.path.append('config')
 from settings_default import *
 
 configs = {
-	'C:\epic\ets':'set_prod',
-	'C:\epic\training\ets':'set_test',
-	'C:\ETS\dev_env\ets':'sami',
+	'C:\\epic\\ets':'set_prod',
+	'C:\\epic\\training\\ets':'set_test',
+	'C:\\ETS\\dev_env\\ets':'sami',
 	'/Users/tobias/projects/epic/ets':'tobymb',
 	'/Users/carlander/projects/epic/ets':'tobymp',
 }

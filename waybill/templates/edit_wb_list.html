@@ -26,7 +26,8 @@
 				 <td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
 				 <td>{%if waybill.recipientSigned%}Y{%else%}N{%endif%} </td>
 				 <td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
-				 <td><a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a></td>
+				 <td>{%if not profile.superUser%}<a href='{%if  profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
+ 			{%if profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}</td>
 
 	 </tr>
 {% endfor%}

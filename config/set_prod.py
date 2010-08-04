@@ -115,6 +115,6 @@ AUTH_PROFILE_MODULE='waybill.UserProfile'
 
 COMPAS_STATION='JERX001'
 COMPASS_CONNECTION = "opt_epic/opt_epic@//10.11.216.4:1521/JERX001"
-
+INTSTANCE_LABLE=""
 LOGIN_URL = 'accounts/login'
 LOGOUT_URL = 'accounts/logout'
