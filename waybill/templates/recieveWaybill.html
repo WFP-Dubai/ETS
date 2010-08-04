@@ -12,7 +12,7 @@
     </ol>
 {% endif %}
   {% endfor %}
-<form action="" method=POST>
+ <form action="" method=POST>
 
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
@@ -33,7 +33,7 @@
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>Items</th><th>Dispatched</th><th>Good<br>Units</th><th>Damaged<br>Units</th><th>Lost<br>Units</th>
+        <tr><th>Items</th><th>Dispatched</th><th>Good<br>Units</th><th>Damaged<br>Units</th><th>Lost<br>Units</th><th></th>
         </thead>
 
     {% for sform in formset.forms %}
@@ -44,9 +44,11 @@
         	<td valign=top>{{ sform.numberUnitsGood }}</td>
         	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsDamaged}} </td></tr><tr><td>Type:</td><td> {{ sform.unitsDamagedType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsDamagedReason }}</td></tr></table></td>
         	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsLost }} </td></tr><tr><td>Type:</td><td>{{ sform.unitsLostType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsLostReason }}</td></tr></table></td>
+        	<td>{%for item in sform%}{% if item.errors %}{% for error in item.errors %}<strong>{{ error|escape }}</strong><br/>{% endfor %}{%endif%}{% endfor %}</td>
         </tr>
     {% endfor %}
     </table>
+
 <div>
 <br>
 

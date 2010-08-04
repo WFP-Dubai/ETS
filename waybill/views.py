@@ -414,13 +414,15 @@ def waybill_view(request,wb_id):
 		number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
 		extra_lines = 5 - number_of_lines
 		my_empty = ['']*extra_lines
-		disp_person_object=''
-		rec_person_object = ''
+
 		try:
 			disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
-			rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
 		except:
 			disp_person_object=''
+		try:
+			rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
+		except:
+			rec_person_object=''
 
 	except:
 		return HttpResponseRedirect(reverse(selectAction))
@@ -511,14 +513,33 @@ def waybill_reception(request,wb_code):
 		class Meta:
 			model = LoadingDetail
 			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
-		def clean_numberUnitsLost(self):
-			if self.instance.numberUnitsLost > 0:
+		def clean(self):
+			cleaned_data = self.cleaned_data
+			my_losses = cleaned_data.get('numberUnitsLost')
+			my_lr = cleaned_data.get('unitsLostReason')
+			my_damadged = cleaned_data.get('numberUnitsDamaged')
+			my_dr = cleaned_data.get('unitsDamagedReason')
+
+			print my_losses
+			print my_damadged
+
+			if my_losses > 0:
 				print 'hmm'
-			else:	
-				print self.instance.numberUnitsLost
+				if my_lr == None:
+					self._errors["numberUnitsLost"] = self.error_class(["You have forgotten Loss reason"])
+					del cleaned_data["numberUnitsLost"]	
+				else:
+					print 'ok'
+
+			if my_damadged > 0:
+				print 'hmm'
+				if my_dr == None:
+					del cleaned_data["numberUnitsDamaged"]
+					self._errors["numberUnitsDamaged"] = self.error_class(["You have forgotten Damaged reason"])
+				else:
+					print 'ok'
 			
-		
-		
+			return cleaned_data
 		
 			
 			
