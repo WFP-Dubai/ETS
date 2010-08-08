@@ -85,6 +85,39 @@ class WaybillRecieptForm(ModelForm):
 				'containerOneRemarksReciept',
 				'containerTwoRemarksReciept'
 			]
+	def clean(self):
+		cleaned = self.cleaned_data
+		print self.instance.dateOfDispatch
+		dispatch_date=self.instance.dateOfDispatch
+		arrival_date=cleaned.get('recipientArrivalDate')
+		discharge_start=cleaned.get('recipientStartDischargeDate')
+		discharge_end=cleaned.get('recipientEndDischargeDate')
+		faults=False
+		if arrival_date < dispatch_date:
+			myerror = ''
+			myerror =  "Cargo arrived before being dispatched"
+			self._errors['recipientArrivalDate'] = self._errors.get('recipientArrivalDate', [])
+			self._errors['recipientArrivalDate'].append(myerror)
+			faults=True
+		
+		if discharge_start < arrival_date:
+			myerror = ''
+			myerror =  "Cargo Discharge started before Arrival?"
+			self._errors['recipientStartDischargeDate'] = self._errors.get('recipientStartDischargeDate', [])
+			self._errors['recipientStartDischargeDate'].append(myerror)
+			faults=True		
+		
+		if discharge_end < discharge_start:
+			myerror = ''
+			myerror =  "Cargo finished Discharge before Starting?"
+			self._errors['recipientEndDischargeDate'] = self._errors.get('recipientEndDischargeDate', [])
+			self._errors['recipientEndDischargeDate'].append(myerror)
+			faults=True
+		
+		if faults:
+			raise forms.ValidationError(myerror)
+
+		return cleaned
 
 class WaybillFullForm(ModelForm):
 	

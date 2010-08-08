@@ -72,7 +72,8 @@ def listOfLtis(request,origin):
 		listOfSI_withDeduction = restant_si(lti[0])
 		for item in listOfSI_withDeduction:
 			if item.CurrentAmount > 0:
-				still_ltis.append(lti)
+				if not lti in still_ltis:
+					still_ltis.append(lti)
 				
 	return render_to_response('ltis.html',
 							  {'ltis':still_ltis,'profile':profile},
@@ -517,9 +518,7 @@ def waybill_reception(request,wb_code):
 			#cleaned_data = self.cleaned_data
 			my_losses = self.cleaned_data.get('numberUnitsLost')
 			my_lr = self.cleaned_data.get('unitsLostReason')
-			print my_losses
-			if  long(my_losses) >0 :
-				print 'hmm'
+			if  float(my_losses) >0 :
 				if my_lr == None:
 					raise forms.ValidationError("You have forgotten to select the Loss Reason")	
 			return my_lr
@@ -529,14 +528,50 @@ def waybill_reception(request,wb_code):
 			my_damage = self.cleaned_data.get('numberUnitsDamaged')
 			my_dr = self.cleaned_data.get('unitsDamagedReason')
 
-			if long(my_damage)>0:
-				print 'hmm2'
+			if float(my_damage)>0:
 				if my_dr == None:
 					raise forms.ValidationError("You have forgotten to select the Damage Reason")
-					
+			return my_dr
+
+		def clean_unitsLostType(self):
+			#cleaned_data = self.cleaned_data
+			my_losses = self.cleaned_data.get('numberUnitsLost')
+			my_lr = self.cleaned_data.get('unitsLostType')
+			if  float(my_losses) >0 :
+				if my_lr == None:
+					raise forms.ValidationError("You have forgotten to select the Loss Type")	
+			return my_lr
+
+
+		def clean_unitsDamagedType(self):
+			my_damage = self.cleaned_data.get('numberUnitsDamaged')
+			my_dr = self.cleaned_data.get('unitsDamagedType')
+
+			if float(my_damage)>0:
+				if my_dr == None:
+					raise forms.ValidationError("You have forgotten to select the Damage Type")
 			return my_dr
 		
+		def clean(self):
+			cleaned = self.cleaned_data
+			numberUnitsGood = float(cleaned.get('numberUnitsGood'))
+			loadedUnits = float(self.instance.numberUnitsLoaded)
+			damadgedUnits = float(cleaned.get('numberUnitsDamaged'))
+			lostUnits =float(cleaned.get('numberUnitsLost'))
+			totaloffload = numberUnitsGood+damadgedUnits+ lostUnits
+			if not totaloffload == loadedUnits:
+				myerror = ''
+				if totaloffload > loadedUnits:
+					myerror =  "%.2f Units loaded but %.2f units accounted for"%(loadedUnits,totaloffload)
+				if totaloffload < loadedUnits:
+					myerror =  "%.2f Units loaded but only %.2f units accounted for"%(loadedUnits,totaloffload)
+				
+				self._errors['numberUnitsGood'] = self._errors.get('numberUnitsGood', [])
+				self._errors['numberUnitsGood'].append(myerror)
+				raise forms.ValidationError(myerror)
 			
+			
+			return cleaned
 			
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
@@ -569,7 +604,7 @@ def waybill_reception(request,wb_code):
 			}
 		)
 		formset = LDFormSet(instance=current_wb)
-	return render_to_response('recieveWaybill.html', 
+	return render_to_response('receiveWaybill.html', 
 			{'form': form,'lti_list':current_lti,'formset':formset,'profile':profile},
 			context_instance=RequestContext(request))
 	#return render_to_response('recieveWaybill.html',						  {'status':'to be implemented'},							  context_instance=RequestContext(request))
@@ -620,7 +655,6 @@ def waybill_search(request):
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -646,23 +680,22 @@ def waybillCreate(request,lti_code):
 # 				
 # 			return cleaned_data
 
-
 	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
-
+	print 
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
 		formset = LDFormSet(request.POST)
-
+		tempinstances = formset.save(commit=False)
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
-			instances =formset.save(commit=False)
+			instances = formset.save(commit=False)
 			wb_new.waybillNumber = 'E' + '%04d' % wb_new.id
 			for subform in instances:
 				subform.wbNumber = wb_new
 				subform.save()
 			wb_new.save()
-			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) #
+			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id))
 	else:
 		
 		form = WaybillForm(
