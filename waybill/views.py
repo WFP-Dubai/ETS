@@ -126,7 +126,7 @@ def import_ltis(request):
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
 	
 	## Fix filter to import only relevant LTIs beloning to Dispatch And Reciept points
-	original = ltioriginal.objects.using('compas')#.filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
+	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
 	recIn = False
 	dispIn = False
 	for myrecord in original:		
