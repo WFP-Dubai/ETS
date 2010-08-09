@@ -352,7 +352,25 @@ def waybill_edit(request,wb_id):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
 			model = LoadingDetail
-			fields = ('id','siNo','numberUnitsLoaded','wbNumber','overload')
+			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
+# 		def clean(self):
+#   			print "cleaning"
+#   			cleaned = self.cleaned_data
+#   			siNo = cleaned.get("siNo")
+#   			units = cleaned.get("numberUnitsLoaded")
+#   			#overloaded = cleaned.get('overload')
+#   			print siNo.LTI_PK
+#   			#theSI = ltioriginal.objects.get(LTI_PK=siNo.siNo_id)
+#   			max_items = siNo.restant2()
+#   			print max_items
+#   			print units
+#   			if units > max_items: #and not overloaded:
+#   				myerror = "Overloaded!"
+#   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+#  				self._errors['numberUnitsLoaded'].append(myerror)
+#  				raise forms.ValidationError(myerror)
+#   				
+#    			return cleaned
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
@@ -685,23 +703,22 @@ def waybillCreate(request,lti_code):
 		
 #   		def clean(self):
 #   			print "cleaning"
-#   			cleaned_data = self.cleaned_data
-#   			siNo = cleaned_data.get("siNo")
-#   			units = cleaned_data.get("numberUnitsLoaded")
-#   			overloaded = cleaned_data.get('overload')
+#   			cleaned = self.cleaned_data
+#   			siNo = cleaned.get("siNo")
+#   			units = cleaned.get("numberUnitsLoaded")
+#   			#overloaded = cleaned.get('overload')
 #   			print siNo.LTI_PK
-#   			#theSI = ltioriginal.objects.get(LTI_PK=siNo.siNo_id)
-#   			max_items = siNo.restant()
+#   			max_items = siNo.restant2()
 #   			print max_items
 #   			print units
-#   			if units > max_items and not overloaded:
+#   			if units > max_items: #and not overloaded:
 #   				myerror = "Overloaded!"
 #   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
 #  				self._errors['numberUnitsLoaded'].append(myerror)
 #  				raise forms.ValidationError(myerror)
 #   				
-#   			return cleaned_data
-
+#    			return cleaned
+   			
 	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
@@ -709,7 +726,7 @@ def waybillCreate(request,lti_code):
 		form = WaybillForm(request.POST)
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet(request.POST)
-		tempinstances = formset.save(commit=False)
+#		tempinstances = formset.save(commit=False)
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances = formset.save(commit=False)

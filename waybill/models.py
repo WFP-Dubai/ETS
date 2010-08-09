@@ -182,13 +182,19 @@ class ltioriginal(models.Model):
 				
 		def  __unicode__(self):
 				#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
-				return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant() 
+				return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
 		def mydesc(self):
 				return self.CODE
 		def commodity(self):
 				return self.CMMNAME 
 		def restant(self):
 				return self.sitracker.number_units_left
+		def restant2(self):
+				lines = LoadingDetail.objects.filter(siNo=self)
+				used = 0
+				for line in lines:
+					used =+  line.numberUnitsLoaded
+				return self.NUMBER_OF_UNITS - used
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
 				return self.restant()

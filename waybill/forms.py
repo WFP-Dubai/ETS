@@ -57,6 +57,26 @@ class WaybillForm(ModelForm):
         	'recipientLocation',
 			'recipientConsingee',
         	]
+	def clean(self):
+		cleaned = self.cleaned_data
+		print self.instance.dateOfDispatch
+
+		dateOfDispatch=cleaned.get('dateOfDispatch')
+
+		dateOfLoading=cleaned.get('dateOfLoading')
+		faults=False
+		myerror = ''
+		if dateOfLoading > dateOfDispatch:
+			myerror = ''
+			myerror =  "Cargo Dispatched before being Loaded"
+			self._errors['dateOfDispatch'] = self._errors.get('dateOfDispatch', [])
+			self._errors['dateOfDispatch'].append(myerror)
+			faults=True
+	
+		if faults:
+			raise forms.ValidationError(myerror)
+
+		return cleaned
         	
 
 class WaybillRecieptForm(ModelForm):

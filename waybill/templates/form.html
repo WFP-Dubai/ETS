@@ -6,7 +6,7 @@
 .ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
 </style>
 <form action="" method=POST id="delform">
-{% if form.errors %}
+{% if item.errors %}
    <span class='error'>Review Form, as there is information missing</span>
 {% endif %}
 <div class="form">
@@ -23,7 +23,7 @@
 <table>
 		<tr>
 			<th>Transaction Type:</th>
-			<td> {{form.transactionType}}<span class='error'>{%for error in form.transactionType.errors%} {{error|escape}}{%endfor%}</span></td>
+			<td> {{form.transactionType}} {%for error in form.transactionType.errors%}<span class='error'>{{error|escape}}</span>{%endfor%} </td>
 			<td>&nbsp;</td>
 			<th>Transport Type:</th>
 			<td> {{form.transportType}}<span class='error'>{%for error in form.transportType.errors%} {{error|escape}}{%endfor%}</span></td>
@@ -33,7 +33,7 @@
 <strong>Recipient Location:</strong>    {{form.recipientLocation}} {{form.recipientConsingee}}    	{{lti_list.0.DESTINATION_LOC_NAME}}
 <br><strong>Consignee :</strong> {{lti_list.0.CONSEGNEE_NAME}}
 <br>
-<strong>Destination Warehouse:</strong> {{form.destinationWarehouse}}<span class='error'>{%for error in form.destinationWarehouse.errors%} {{error|escape}}{%endfor%}</span>
+<strong>Destination Warehouse:</strong> {{form.destinationWarehouse}}{%for error in form.destinationWarehouse.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}
 {{ formset.management_form }} 
 <br><br>
 <table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
@@ -41,7 +41,7 @@
 	<tr><th></th><th>Commodity</th><th>Number of units</th></tr>
 	 </thead>
 {% for sform in formset.forms %}
-<tr><td>	{{ sform.id }}{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }}</td></tr>
+<tr><td>	{{ sform.id }}{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }} {%for error in sform.numberUnitsLoaded.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}</td></tr>
 {% endfor %}
  </table>
  
