@@ -351,7 +351,7 @@ def waybill_edit(request,wb_id):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
 			model = LoadingDetail
-			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
+			fields = ('id','siNo','numberUnitsLoaded','wbNumber','overload')
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
 
@@ -364,6 +364,7 @@ def waybill_edit(request,wb_id):
 			return HttpResponseRedirect(reverse(waybill_view,args=[wb_new.id])) 
 	else:			
 		form = WaybillForm(instance=current_wb)
+		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet(instance=current_wb)
 		
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
