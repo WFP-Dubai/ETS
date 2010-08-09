@@ -134,6 +134,7 @@ def import_ltis(request):
 			if myrecord.CONSEGNEE_CODE in  rec['CONSEGNEE_CODE']:
 				for disp in listDispatchers:
 					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE']:
+						
 						myrecord.save(using='default')
 						try:
 							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
@@ -636,15 +637,28 @@ def waybill_search(request):
 	
 	found_wb = Waybill.objects.filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
+	curr_wh_disp = ''
+	
 	if profile != '' :	
 		for waybill in found_wb:
+			try:
+				curr_wh_disp = waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE
+			except:
+				curr_wh_disp = ''
+			try:
+				curr_wh_rec = waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE
+				curr_loc = waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME
+			except:
+				curr_wh_rec = ''
+				curr_loc = ''				
+
 			if profile.isCompasUser or profile.readerUser:
 				my_valid_wb.append(waybill.id)
-			elif profile.warehouses and waybill.loadingdetail_set.select_related()[0].siNo.ORIGIN_WH_CODE  == profile.warehouses.ORIGIN_WH_CODE:
+			elif profile.warehouses and curr_wh_disp  == profile.warehouses.ORIGIN_WH_CODE:
 				my_valid_wb.append(waybill.id)
-			elif profile.receptionPoints and  waybill.loadingdetail_set.select_related()[0].siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE and waybill.loadingdetail_set.select_related()[0].siNo.DESTINATION_LOC_NAME == profile.receptionPoints.LOC_NAME :
+			elif profile.receptionPoints and  curr_wh_rec == profile.receptionPoints.CONSEGNEE_CODE and curr_loc == profile.receptionPoints.LOC_NAME :
 				my_valid_wb.append(waybill.id)
-
+	
 	return render_to_response('list_waybills.html',
 							  {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
 							  context_instance=RequestContext(request))
@@ -669,23 +683,31 @@ def waybillCreate(request,lti_code):
 			model = LoadingDetail
 			fields = ('siNo','numberUnitsLoaded','wbNumber','overload')
 		
-# 		def clean(self):
-# 			cleaned_data = self.cleaned_data
-# 			siNo = cleaned_data.get("siNo")
-# 			units = cleaned_data.get("numberUnitsLoaded")
-# 			overloaded = cleaned_data.get('overload')
-# 			theSI = ltioriginal.objects.get(id=siNo)
-# 			max_items = theSI.restant()
-# 			if units > max_items and not overloaded:
-# 				pass
-# 				
-# 			return cleaned_data
+#   		def clean(self):
+#   			print "cleaning"
+#   			cleaned_data = self.cleaned_data
+#   			siNo = cleaned_data.get("siNo")
+#   			units = cleaned_data.get("numberUnitsLoaded")
+#   			overloaded = cleaned_data.get('overload')
+#   			print siNo.LTI_PK
+#   			#theSI = ltioriginal.objects.get(LTI_PK=siNo.siNo_id)
+#   			max_items = siNo.restant()
+#   			print max_items
+#   			print units
+#   			if units > max_items and not overloaded:
+#   				myerror = "Overloaded!"
+#   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+#  				self._errors['numberUnitsLoaded'].append(myerror)
+#  				raise forms.ValidationError(myerror)
+#   				
+#   			return cleaned_data
 
 	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
-	print 
+
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
+		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet(request.POST)
 		tempinstances = formset.save(commit=False)
 		if form.is_valid() and formset.is_valid():
