@@ -3,7 +3,7 @@ from ets.waybill.views import *
 from ets.waybill.models import ltioriginal
 from django.views.generic.simple import *
 
-from django.contrib.auth.views import login,logout
+from django.contrib.auth.views import login,logout,password_change
 
 
 info_dict_lti = {
@@ -25,6 +25,7 @@ info_dict_waybill_reception= {
 urlpatterns = patterns('',
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),
+    (r'^accounts/change_password',password_change),
     (r'^loginHere$',login),
     (r'^select-action$',selectAction),
     (r'^waybill/create/(.*)$',waybillCreate),
@@ -35,7 +36,7 @@ urlpatterns = patterns('',
     (r'^waybill/findwb/$',waybill_search),
     (r'^waybill/import$',import_ltis),
     (r'^waybill/info/(.*)$',lti_detail_url),
-    (r'^waybill/info$',lti_detail),
+#    (r'^waybill/info$',lti_detail),
     (r'^waybill/list/(.*)$',listOfLtis),
     (r'^waybill/list$',ltis_redirect_wh),
     (r'^waybill/lti/(.*)$',single_lti_extra),

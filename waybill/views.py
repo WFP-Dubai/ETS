@@ -115,26 +115,20 @@ def import_ltis(request):
 	template:
 	/ets/waybill/templates/status.html
 	"""
-	## Shoudl be split into separate functions and call them
 	#Copy Persons
-	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
-	for my_person in originalPerson:
-		my_person.save(using='default')	
-	
+	update_persons()
 	#copy LTIs
 	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
 	
-	## Fix filter to import only relevant LTIs beloning to Dispatch And Reciept points
+	## TODO: Fix so ltis imported are not expired
 	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
-	recIn = False
-	dispIn = False
-	for myrecord in original:		
+	
+	for myrecord in original:
 		for rec in listRecepients:
 			if myrecord.CONSEGNEE_CODE in  rec['CONSEGNEE_CODE']:
 				for disp in listDispatchers:
 					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE']:
-						
 						myrecord.save(using='default')
 						try:
 							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
@@ -151,38 +145,70 @@ def import_ltis(request):
 							mysist.number_units_left = myrecord.NUMBER_OF_UNITS
 							mysist.number_units_start = myrecord.NUMBER_OF_UNITS
 							mysist.save(using='default')
-#UPDATE GEO
-	try:
-		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='275')
-		for the_geo in my_geo:
-				the_geo.save(using='default')
-	except:
-		pass	
-	try:
-		my_geo = GeoLocations.objects.using('compas').filter(COUNTRY_CODE='376')
-		for the_geo in my_geo:
-				the_geo.save(using='default')
-	except:
-		pass	
-	#Copy Stock
+							
+	#cleanup ltis loop and see if changes to lti ie deleted rows
+	current = ltioriginal.objects.all()
+	for c in current:
+		if c not in original:
+			c.delete()
+
 	
-	EpicStock.objects.all().delete()
-	originalStock = EpicStock.objects.using('compas')
-	for myrecord in originalStock:
-		myrecord.save(using='default')
-	 
+	
+	#UPDATE GEO
+	import_geo()	
+	#Copy Stock
+	#EpicStock.objects.all().delete()
+	import_stock()
+	
+	
 	status = 'Import Finished'
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
 
-def lti_detail(request):
-	lti_id=request.GET['lti_id']
-	#option here to redirect///
-	return HttpResponseRedirect(reverse(lti_detail_url,args=[lti_id]))
-	#return lti_detail_url(request,lti_id)
 
-def lti_detail_url(request,lti_code):
+def update_persons():
+	"""
+	Executes Imports of LTIs Persons
+	"""
+	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
+	for my_person in originalPerson:
+		my_person.save(using='default')	
+	
+def import_geo():
+	"""
+	Executes Imports of places
+	"""
+	#UPDATE GEO
+	try:
+		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='275')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass	
+	try:
+		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='376')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass
+	return True
+
+def import_stock():
+	"""
+	Executes Imports of Stock
+	"""
+	originalStock = EpicStock.objects.using('compas')
+	for myrecord in originalStock:
+		myrecord.save(using='default')
+
+def lti_detail_url(request,lti_code):	"""
+	View:
+	lti_detail_url waybill/info/(lti_code)
+	Show detail of LTI and link to create waybill
+	template:
+	/ets/waybill/templates/detailed_lti.html
+	"""
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
 	listOfWaybills = Waybill.objects.filter(ltiNumber=lti_code)
 	listOfSI_withDeduction = restant_si(lti_code)
@@ -334,59 +360,6 @@ def receiptToCompas(request):
 							  context_instance=RequestContext(request))
 
 
-
-@login_required
-def waybill_edit(request,wb_id):
-	try:
-		current_wb =  Waybill.objects.get(id=wb_id)
-		lti_code = current_wb.ltiNumber
-		current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	except:
-		currnet_wb =''
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
-	class LoadingDetailDispatchForm(ModelForm):
-		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
-		class Meta:
-			model = LoadingDetail
-			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
-# 		def clean(self):
-#   			print "cleaning"
-#   			cleaned = self.cleaned_data
-#   			siNo = cleaned.get("siNo")
-#   			units = cleaned.get("numberUnitsLoaded")
-#   			#overloaded = cleaned.get('overload')
-#   			print siNo.LTI_PK
-#   			#theSI = ltioriginal.objects.get(LTI_PK=siNo.siNo_id)
-#   			max_items = siNo.restant2()
-#   			print max_items
-#   			print units
-#   			if units > max_items: #and not overloaded:
-#   				myerror = "Overloaded!"
-#   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
-#  				self._errors['numberUnitsLoaded'].append(myerror)
-#  				raise forms.ValidationError(myerror)
-#   				
-#    			return cleaned
-
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
-
-	if request.method == 'POST':
-		form = WaybillForm(request.POST,instance=current_wb)
-		formset = LDFormSet(request.POST,instance=current_wb)
-		if form.is_valid() and formset.is_valid():
-			wb_new = form.save()
-			instances =formset.save()
-			return HttpResponseRedirect(reverse(waybill_view,args=[wb_new.id])) 
-	else:			
-		form = WaybillForm(instance=current_wb)
-		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
-		formset = LDFormSet(instance=current_wb)
-		
-	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 @login_required
 def waybill_validate_form_update(request,wb_id):
@@ -701,23 +674,24 @@ def waybillCreate(request,lti_code):
 			model = LoadingDetail
 			fields = ('siNo','numberUnitsLoaded','wbNumber','overload')
 		
-#   		def clean(self):
-#   			print "cleaning"
-#   			cleaned = self.cleaned_data
-#   			siNo = cleaned.get("siNo")
-#   			units = cleaned.get("numberUnitsLoaded")
-#   			#overloaded = cleaned.get('overload')
-#   			print siNo.LTI_PK
-#   			max_items = siNo.restant2()
-#   			print max_items
-#   			print units
-#   			if units > max_items: #and not overloaded:
-#   				myerror = "Overloaded!"
-#   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
-#  				self._errors['numberUnitsLoaded'].append(myerror)
-#  				raise forms.ValidationError(myerror)
-#   				
-#    			return cleaned
+		def clean(self):
+  			print "cleaning"
+  			cleaned = self.cleaned_data
+  			siNo = cleaned.get("siNo")
+  			units = cleaned.get("numberUnitsLoaded")
+  			
+  			#overloaded = cleaned.get('overload')
+  			max_items = siNo.restant2()
+  			print max_items
+  			print units
+  			print self.instance.numberUnitsLoaded
+  			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
+  				myerror = "Overloaded!"
+  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+ 				self._errors['numberUnitsLoaded'].append(myerror)
+ 				raise forms.ValidationError(myerror)
+  				
+   			return cleaned
    			
 	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
@@ -754,6 +728,62 @@ def waybillCreate(request,lti_code):
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
+
+
+@login_required
+def waybill_edit(request,wb_id):
+	try:
+		current_wb =  Waybill.objects.get(id=wb_id)
+		lti_code = current_wb.ltiNumber
+		current_lti = ltioriginal.objects.filter(CODE = lti_code)
+	except:
+		currnet_wb =''
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	class LoadingDetailDispatchForm(ModelForm):
+		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
+		class Meta:
+			model = LoadingDetail
+			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
+		def clean(self):
+  			print "cleaning"
+  			cleaned = self.cleaned_data
+  			siNo = cleaned.get("siNo")
+  			units = cleaned.get("numberUnitsLoaded")
+  			
+  			#overloaded = cleaned.get('overload')
+  			max_items = siNo.restant2()
+  			print max_items
+  			print units
+  			print self.instance.numberUnitsLoaded
+  			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
+  				myerror = "Overloaded!"
+  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+ 				self._errors['numberUnitsLoaded'].append(myerror)
+ 				raise forms.ValidationError(myerror)
+  				
+   			return cleaned
+
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+
+	if request.method == 'POST':
+		form = WaybillForm(request.POST,instance=current_wb)
+		formset = LDFormSet(request.POST,instance=current_wb)
+		if form.is_valid() and formset.is_valid():
+			wb_new = form.save()
+			instances =formset.save()
+			return HttpResponseRedirect(reverse(waybill_view,args=[wb_new.id])) 
+	else:			
+		form = WaybillForm(instance=current_wb)
+		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
+		formset = LDFormSet(instance=current_wb)
+		
+	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+
 
 @login_required
 def waybill_validateSelect(request):
