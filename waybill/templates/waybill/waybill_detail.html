@@ -133,7 +133,12 @@
 
 <input type="submit" value="Save & Exit"> {% csrf_token %}
 </form>
-<form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}">
+<SCRIPT LANGUAGE="JavaScript">
+      function confirmAction() {
+        return confirm("Are you sure that you want to remove waybill {{form.instance.waybillNumber}}")
+      }
+</SCRIPT>
+<form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}"  onSubmit="return confirmAction()">
 <input type="submit" value="INVALIDATE"> 
 </form>
 {%endblock%}
