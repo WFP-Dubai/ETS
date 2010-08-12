@@ -25,6 +25,7 @@ class WaybillForm(ModelForm):
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	waybillNumber = forms.CharField(widget=forms.HiddenInput())
 	destinationWarehouse= ModelChoiceField(queryset=places.objects.all())	
+	invalidated= forms.CharField(widget=forms.HiddenInput())
 	
 	
         

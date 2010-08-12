@@ -33,10 +33,10 @@ border-color: black;
 	CONSEGNEE_CODE				:{{detailed.0.CONSEGNEE_CODE}}
 	CONSEGNEE_NAME				:{{detailed.0.CONSEGNEE_NAME}}</pre>
 	{%endcomment%}
-	<br>
+	<br>{%if profile.isDispatcher%}{%if detailed.0.ORIGIN_LOCATION_CODE == profile.warehouses.ORIGIN_LOCATION_CODE%}
 	{%if moreWBs%}
 <a href='{%url ets.waybill.views.waybillCreate detailed.0.CODE%}'>Create New Waybill</a><br>
-{%endif%}
+{%endif%}{%endif%}{%endif%}
 <br>
 Items in LTI:
 <table class='bordered' >

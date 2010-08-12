@@ -5,6 +5,8 @@
 	<key>HierarchyData</key>
 	<array>
 		<string>210DC253-4D65-476D-9C1C-380995E1A12C</string>
+		<string>29709E2D-847A-4334-8688-EFC3253AC11C</string>
+		<string>7DFF17CD-025D-48CD-A78C-D6E947DF3493</string>
 		<string>2080C4EC-AD6F-496F-99AF-22E836923582</string>
 		<string>8B3A65FF-F12D-4A7B-8935-5DE42E8785D8</string>
 		<string>9574E8B9-10F9-428D-8B4E-47D0C1A3CB51</string>
@@ -116,6 +118,40 @@
 			<key>ItemType</key>
 			<string>FileReference</string>
 		</dict>
+		<key>29709E2D-847A-4334-8688-EFC3253AC11C</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAGsAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADFs8i4SCsAAAN3PdoUc2V0dGluZ3NfdHJhaW5p
+				bmcucHkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAA5uO+sh/NRQAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
+				s5B4AAAAEQAIAADIfvzUAAAAAQAUA3c92gNtaqUACzIo
+				AAqMqgAAfQ0AAgBDTWFjaW50b3NoIEhEOlVzZXJzOmNh
+				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czpzZXR0aW5n
+				c190cmFpbmluZy5weQAADgAqABQAcwBlAHQAdABpAG4A
+				ZwBzAF8AdAByAGEAaQBuAGkAbgBnAC4AcAB5AA8AGgAM
+				AE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIANlVzZXJz
+				L2NhcmxhbmRlci9wcm9qZWN0cy9lcGljL2V0cy9zZXR0
+				aW5nc190cmFpbmluZy5weQATAAEvAAAVAAIAEP//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/carlander/projects/epic/ets/settings_training.py</string>
+				<key>RelativePath</key>
+				<string>./settings_training.py</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>settings_training.py</string>
+			<key>ItemType</key>
+			<string>FileReference</string>
+		</dict>
 		<key>441DFF97-2290-45EB-ADBC-F2B0780496C2</key>
 		<dict>
 			<key>ItemData</key>
@@ -147,6 +183,41 @@
 			<string>media</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
+		</dict>
+		<key>7DFF17CD-025D-48CD-A78C-D6E947DF3493</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAG0AAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADFs8i4SCsAAAN3PdoWc2V0dGluZ3NfcHJvZHVj
+				dGlvbi5weQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAA5uO+8h/NRQAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
+				s5B4AAAAEQAIAADIfvzUAAAAAQAUA3c92gNtaqUACzIo
+				AAqMqgAAfQ0AAgBFTWFjaW50b3NoIEhEOlVzZXJzOmNh
+				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czpzZXR0aW5n
+				c19wcm9kdWN0aW9uLnB5AAAOAC4AFgBzAGUAdAB0AGkA
+				bgBnAHMAXwBwAHIAbwBkAHUAYwB0AGkAbwBuAC4AcAB5
+				AA8AGgAMAE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIA
+				OFVzZXJzL2NhcmxhbmRlci9wcm9qZWN0cy9lcGljL2V0
+				cy9zZXR0aW5nc19wcm9kdWN0aW9uLnB5ABMAAS8AABUA
+				AgAQ//8AAA==
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/carlander/projects/epic/ets/settings_production.py</string>
+				<key>RelativePath</key>
+				<string>./settings_production.py</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>settings_production.py</string>
+			<key>ItemType</key>
+			<string>FileReference</string>
 		</dict>
 		<key>8B3A65FF-F12D-4A7B-8935-5DE42E8785D8</key>
 		<dict>

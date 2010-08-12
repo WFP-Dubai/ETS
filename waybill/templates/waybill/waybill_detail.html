@@ -133,6 +133,9 @@
 
 <input type="submit" value="Save & Exit"> {% csrf_token %}
 </form>
+<form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}">
+<input type="submit" value="INVALIDATE"> 
+</form>
 {%endblock%}
 {%block extra-header%}
 <script charset="utf-8" type="text/javascript">

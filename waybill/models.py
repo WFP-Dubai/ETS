@@ -107,6 +107,8 @@ class Waybill(models.Model):
 		waybillSentToCompas 			=models.BooleanField()
 		waybillRecSentToCompas 			=models.BooleanField()
 		waybillProcessedForPayment		=models.BooleanField()
+		invalidated						=models.BooleanField()
+		
 		def  __unicode__(self):
 				return self.waybillNumber
 		def mydesc(self):
@@ -133,7 +135,7 @@ class ltioriginalManager(models.Manager):
 		
 		def ltiCodesAll(self):
 				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )')
+				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE,ORIGIN_LOC_NAME FROM epic_lti  WHERE SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )')
 				lti_code = cursor.fetchall()
 				#lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
 				return lti_code
@@ -181,7 +183,6 @@ class ltioriginal(models.Model):
 				db_table = u'epic_lti'
 				
 		def  __unicode__(self):
-				#resting =  str(restant_si_item(self.LTI_ID,self.CMMNAME))
 				return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
 		def mydesc(self):
 				return self.CODE
@@ -197,6 +198,9 @@ class ltioriginal(models.Model):
 				return self.NUMBER_OF_UNITS - used
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
+				return self.restant()
+		def restoresi(self,units):
+				self.sitracker.updateUnitsRestore(units)
 				return self.restant()
 		def coi_code(self):
 				try:
@@ -407,6 +411,9 @@ class SiTracker(models.Model):
 				
 		def updateUnits(self,ammount):
 				self.number_units_left -=ammount
+				self.save()
+		def updateUnitsRestore(self,ammount):
+				self.number_units_left +=ammount
 				self.save()
 		def  __unicode__(self):
 				return self.number_units_left

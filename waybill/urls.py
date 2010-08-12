@@ -38,7 +38,7 @@ urlpatterns = patterns('',
     (r'^waybill/info/(.*)$',lti_detail_url),
 #    (r'^waybill/info$',lti_detail),
     (r'^waybill/list/(.*)$',listOfLtis),
-    (r'^waybill/list$',ltis_redirect_wh),
+    (r'^waybill/list$',ltis),
 #    (r'^waybill/lti/(.*)$',single_lti_extra),
 #    (r'^waybill/ltis_codes$',ltis_codes),
     (r'^waybill/print_original_reciept/(.*)$',waybill_finalize_reciept),    
@@ -58,6 +58,8 @@ urlpatterns = patterns('',
     (r'^waybill/commit_to_compas_receipt/$',receiptToCompas),    
     (r'^waybill/reset_waybill/$',reset_waybill),
     (r'^waybill/compass_waybill/$',listCompasWB),
+    (r'^waybill/invalidate_waybill/(.*)$',invalidate_waybill),
+    
     
     
     
