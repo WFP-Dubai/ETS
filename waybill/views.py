@@ -202,7 +202,8 @@ def import_stock():
 	for myrecord in originalStock:
 		myrecord.save(using='default')
 
-def lti_detail_url(request,lti_code):	"""
+def lti_detail_url(request,lti_code):	
+	"""
 	View:
 	lti_detail_url waybill/info/(lti_code)
 	Show detail of LTI and link to create waybill
@@ -219,12 +220,7 @@ def lti_detail_url(request,lti_code):	"""
 	return render_to_response('detailed_lti.html',
 							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction,'moreWBs':lti_more_wb},
 							  context_instance=RequestContext(request))
-@login_required
-def single_lti_extra(request,lti_code):
-	si_list = ltioriginal.objects.si_for_lti(lti_code)
-	return render_to_response('lti_si.html',
-							  {'lti_code':lti_code,'si_list':si_list},
-							  context_instance=RequestContext(request))
+
 							  
 @login_required
 def dispatch(request):
@@ -234,20 +230,7 @@ def dispatch(request):
 		return HttpResponseRedirect(reverse(selectAction))
 
 
-
-def ltis_codes(request):
-	lti_codes = ltioriginal.objects.values('CODE','ORIGIN_LOCATION_CODE','ORIGIN_LOC_NAME','ORIGIN_WH_NAME').distinct()
-	return render_to_response('lti_list.html',
-							  {'dispatch_list':lti_codes},
-							  context_instance=RequestContext(request))
-
-
 #### Waybill Views
-@login_required
-def waybill_info(request):
-		return render_to_response('status.html',
-							  {'status':'to be implemented'},
-							  context_instance=RequestContext(request))
 
 @login_required
 def waybill_create(request,lti_pk):
@@ -259,8 +242,9 @@ def waybill_create(request,lti_pk):
 	return render_to_response('detailed_waybill.html',
 							  {'detailed':detailed_lti,'lti_id':lti_pk},
 							  context_instance=RequestContext(request))
-							  
-@login_required							  
+
+
+@login_required
 def waybill_finalize_dispatch(request,wb_id):
 	current_wb =  Waybill.objects.get(id=wb_id)
 	current_wb.transportDispachSigned=True
@@ -273,7 +257,7 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.save()
 	return HttpResponseRedirect(reverse(lti_detail_url,args=[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
 	
-@login_required	
+@login_required
 def	waybill_finalize_reciept(request,wb_id):
 	try:
 		current_wb =  Waybill.objects.get(id=wb_id)
@@ -287,6 +271,13 @@ def	waybill_finalize_reciept(request,wb_id):
 	
 	return HttpResponseRedirect(reverse(waybill_view_reception, args=[current_wb.id])) 
 
+def sign_disp(current_wb):
+		current_wb =  Waybill.objects.get(id=wb_id)
+		current_wb.recipientSigned=True
+		current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
+		current_wb.recipientSignedTimestamp=datetime.datetime.now()	
+		current_wb.transportDeliverySigned=True
+		current_wb.save()
 
 @login_required
 def dispatchToCompas(request):
