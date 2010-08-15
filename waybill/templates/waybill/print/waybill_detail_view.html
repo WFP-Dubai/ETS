@@ -10,8 +10,8 @@
 <body><span class="hidden_print">
 <form class="the_forms" method="get" action="{%url ets.waybill.views.waybill_edit object.id%}">
 <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" name="Print Copy" id='PrintCopy'>Print Copy</button>
-{%if not object.dispatcherSigned and not object.transportDispachSigned%}<input type="submit" value="Edit" name="Edit" id='Edit'/>{%endif%}</form>
-{%if not object.dispatcherSigned and not object.transportDispachSigned%}
+{%if not object.dispatcherSigned and not user.profile.readerUser%}<input type="submit" value="Edit" name="Edit" id='Edit'/>{%endif%}</form>
+{%if not object.dispatcherSigned and not user.profile.readerUser%}
 <form class="the_forms" name="printoriginal" id="printoriginal" method="get" action="{%url ets.waybill.views.waybill_finalize_dispatch object.id%}">
 <input type="submit" onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" name="Print Original" id='Print1' value='Print Original'></form>
 {%endif%}<a href="{%url ets.waybill.views.lti_detail_url object.ltiNumber%}">Back to Dispatch</a>
@@ -29,7 +29,7 @@
 	{%else%}
 Waybill has been Deleted!!!	
 {%endif%}
-	
+
 </body>
 
 </html>

@@ -12,7 +12,7 @@
 			 <th>Validated</th>
 			 <th>Received</th>
 			 <th>Validated</th>
-			 <th></th>
+			 <th>&nbsp;</th>
         </tr>
     </thead>
 {% for waybill in waybill_list%}
@@ -39,19 +39,19 @@
 <script charset="utf-8">
 $(document).ready(function() {
 				$('#example').dataTable( {
-								"aoColumns": [ 
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			{ "bSearchable": false},
-		]
-				});
+								"aoColumns": [
+									null,
+									null,
+									null,
+									null,
+									null,
+									null,
+									null,
+									null,
+									{ "bSearchable": false},
+						
+								]
+							});
 } );
 </script>
 {%endblock extra-header%}
