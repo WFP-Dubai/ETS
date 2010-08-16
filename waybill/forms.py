@@ -25,7 +25,7 @@ class WaybillForm(ModelForm):
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	waybillNumber = forms.CharField(widget=forms.HiddenInput())
 	destinationWarehouse= ModelChoiceField(queryset=places.objects.all())	
-	invalidated= forms.CharField(widget=forms.HiddenInput())
+	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)
 	
 	
         
@@ -88,7 +88,7 @@ class WaybillRecieptForm(ModelForm):
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
-	invalidated= forms.CharField(widget=forms.HiddenInput())	
+	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)	
 	
 	class Meta:
 		model = Waybill
