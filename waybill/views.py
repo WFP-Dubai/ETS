@@ -10,7 +10,6 @@ from django.template import Template, RequestContext,Library, Node
 from ets.waybill.models import *
 from ets.waybill.forms import *
 from ets.waybill.compas import *
-from ets.waybill.taglib import *
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.conf import settings
