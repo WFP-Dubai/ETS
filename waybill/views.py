@@ -6,15 +6,18 @@ from django.forms.models import inlineformset_factory,modelformset_factory
 from django.forms.formsets import BaseFormSet
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import Template, RequestContext
+from django.template import Template, RequestContext,Library, Node
 from ets.waybill.models import *
 from ets.waybill.forms import *
 from ets.waybill.compas import *
+from ets.waybill.taglib import *
 from django.contrib.auth.models import User
 from django.core import serializers
 from django.conf import settings
 import os,StringIO, zlib,base64,string
 from django.core.urlresolvers import reverse
+
+
 
 
 def prep_req(request):
@@ -38,6 +41,7 @@ def selectAction(request):
 	template:
 	/ets/waybill/templates/selectAction.html
 	"""
+	
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -521,6 +525,12 @@ def waybill_reception(request,wb_code):
 		pass
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
+	
+	if  profile.isReciever or profile.superUser:
+		pass
+	else:
+		return HttpResponseRedirect(reverse(waybill_view ,args=[wb_code]))
+		
 	class LoadingDetailRecForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
 		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -705,8 +715,8 @@ def waybillCreate(request,lti_code):
   			#overloaded = cleaned.get('overload')
   			max_items = siNo.restant2()
   			print max_items
-  			print units
-  			print self.instance.numberUnitsLoaded
+  			print long(units)
+  			print units > max_items+self.instance.numberUnitsLoaded
   			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
   				myerror = "Overloaded!"
   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
@@ -732,6 +742,9 @@ def waybillCreate(request,lti_code):
 				subform.save()
 			wb_new.save()
 			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id))
+		else:
+			print formset.errors
+			print form.errors
 	else:
 		
 		form = WaybillForm(
@@ -744,6 +757,7 @@ def waybillCreate(request,lti_code):
 					'recipientLocation': current_lti[0].DESTINATION_LOC_NAME,
 					'recipientConsingee':current_lti[0].CONSEGNEE_NAME,
 					'transportContractor': current_lti[0].TRANSPORT_NAME,
+					'invalidated':'False',
 					'waybillNumber':'N/A'
 				}
 		)
@@ -779,8 +793,6 @@ def waybill_edit(request,wb_id):
   			
   			#overloaded = cleaned.get('overload')
   			max_items = siNo.restant2()
-  			print max_items
-  			print units
   			print self.instance.numberUnitsLoaded
   			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
   				myerror = "Overloaded!"
@@ -963,4 +975,4 @@ def restant_si(lti_code):
 				if si.SINumber == loading.siNo.SI_CODE:
 					si.reduceCurrent(loading.numberUnitsLoaded)
 	return listOfSI
-	
+

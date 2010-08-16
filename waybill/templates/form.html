@@ -6,6 +6,7 @@
 .ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
 </style>
 <form action="" method=POST id="delform">
+{{form.invalidated}}
 {% if item.errors %}
    <span class='error'>Review Form, as there is information missing</span>
 {% endif %}

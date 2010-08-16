@@ -88,6 +88,7 @@ class WaybillRecieptForm(ModelForm):
 	recipientLocation = forms.CharField(widget=forms.HiddenInput())
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
+	invalidated= forms.CharField(widget=forms.HiddenInput())	
 	
 	class Meta:
 		model = Waybill
@@ -172,6 +173,7 @@ class WaybillFullForm(ModelForm):
 	transportDeliverySignedTimestamp= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
 	dispatcherName					= forms.CharField(widget=forms.HiddenInput(),required=False)
 	dispatcherTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	invalidated= forms.CharField(widget=forms.HiddenInput())
 
 	class Meta:
 		model=Waybill
