@@ -613,6 +613,9 @@ def waybill_reception(request,wb_code):
 			wb_new.save()
 			instances =formset.save()
 			return HttpResponseRedirect('../viewwb_reception/'+ str(current_wb.id)) #
+		else:
+			print formset.errors
+			print form.errors
 		
 	else:
 		if current_wb.recipientArrivalDate:

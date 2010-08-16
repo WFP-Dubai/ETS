@@ -5,7 +5,7 @@
  <form action="" method=POST>
 {% if form.errors %}
    <span class='error'>Review Form, as there is information missing</span>
-{% endif %}
+{% endif %}{{form.invalidated}}
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td>Waybill Number:</td><td> {{form.waybillNumber}} {{form.instance.waybillNumber}}</td></tr>

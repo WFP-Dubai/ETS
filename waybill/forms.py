@@ -105,7 +105,7 @@ class WaybillRecieptForm(ModelForm):
 				'recipientSignedTimestamp',
 				'transportDeliverySigned',
 				'containerOneRemarksReciept',
-				'containerTwoRemarksReciept'
+				'containerTwoRemarksReciept','invalidated'
 			]
 	def clean(self):
 		cleaned = self.cleaned_data
@@ -173,7 +173,7 @@ class WaybillFullForm(ModelForm):
 	transportDeliverySignedTimestamp= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
 	dispatcherName					= forms.CharField(widget=forms.HiddenInput(),required=False)
 	dispatcherTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	invalidated= forms.CharField(widget=forms.HiddenInput())
+	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)
 
 	class Meta:
 		model=Waybill
