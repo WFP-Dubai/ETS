@@ -284,7 +284,7 @@ def waybill_finalize_dispatch(request,wb_id):
 		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
-	return HttpResponseRedirect(reverse(lti_detail_url,args=[request.user.get_profile().warehouses.ORIGIN_WH_CODE]))
+	return HttpResponseRedirect(reverse(lti_detail_url,args=[current_wb.ltiNumber]))
 	
 @login_required
 
