@@ -1,6 +1,4 @@
 TODO:
 
-Some work on the validate & logging
 Documentation
-Validate if checkbox dispatch/reciept signed untick for full edit
-Create a "logger" for  
+Create a "logger" for admin actions

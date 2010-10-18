@@ -2,17 +2,18 @@
 {%block content %}
  <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Dispatch Date</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Action</th></tr>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Dispatched Date</th><th>Action</th></tr>
         </thead>
 {% for waybill in object_list%}
     	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == profile.receptionPoints.CONSEGNEE_CODE  and profile.receptionPoints.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE %}
    <tr>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>
- 			<td>{{waybill.dateOfDispatch}}</td>
+ 			
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td>{{waybill.dateOfDispatch}}</td>
  			<td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
     </tr>
     {%endif%}{% endfor%}

@@ -15,13 +15,14 @@ from django.core import serializers
 from django.conf import settings
 import os,StringIO, zlib,base64,string
 from django.core.urlresolvers import reverse
+from ets.waybill.tools import *
 
 
 
 
 def prep_req(request):
 	return{'user': request.user}
-
+	
 
 def homepage(request):
 	""" 
@@ -173,7 +174,8 @@ def import_ltis(request):
 	current = ltioriginal.objects.all()
 	for c in current:
 		if c not in original:
-			c.delete()
+			#c.delete() # fix this as it removes even if in use!!!
+			c.remove_lti()
 
 	
 	
@@ -330,7 +332,61 @@ def dispatchToCompas(request):
 	return render_to_response('list_waybills_compas.html',
 							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
+							  
+def singleWBDispatchToCompas(request,wb_id):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	waybill = Waybill.objects.get(id=wb_id)
+	print waybill.waybillNumber
+	the_compas = compas_write()
+	error_message = ''
+	error_codes = ''
+	status_wb = the_compas.write_dispatch_waybill_compas(wb_id)
+	if  status_wb:
+		#aok
+		waybill.waybillSentToCompas=True
+		waybill.save()
+	else:
+		# error here
+		print waybill.waybillNumber
+		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
+		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
+# add field to say compas erroradd logging
+	
+	return render_to_response('status_waybill_compas.html',
+							  {'waybill':waybill,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
+							  context_instance=RequestContext(request))
+	
 
+def singleWBReceiptToCompas(request,wb_id):
+	profile = ''
+	try:
+		profile=request.user.get_profile()
+	except:
+		pass
+	waybill = Waybill.objects.get(id=wb_id)
+	the_compas = compas_write()
+	error_message = ''
+	error_codes = ''
+	status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
+	if  status_wb:
+		#aok
+		waybill.waybillSentToCompas=True
+		waybill.save()
+	else:
+		# error here
+		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
+		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
+# add field to say compas error/add logging
+	
+	return render_to_response('status_waybill_compas_rec.html',
+							  {'waybill':waybill,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
+							  context_instance=RequestContext(request))	
+	
+	
 def listCompasWB(request):
 	profile = ''
 	try:
@@ -487,31 +543,31 @@ def waybill_view_reception(request,wb_id):
 							  'zippedWB':zippedWB},
 							  context_instance=RequestContext(request))
 
-@login_required
-def reset_waybill(request):
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
-		
-	if profile.superUser:
-		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
-		
-		return render_to_response('edit_wb_list.html',
-							  {'profile':profile,'waybill_list':waybills},
-							  context_instance=RequestContext(request))
-	elif profile.readerUser:
-		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
-		return render_to_response('edit_wb_list.html',
-							  {'profile':profile,'waybill_list':waybills},
-							  context_instance=RequestContext(request))
-
-	else:
-		return render_to_response('selectAction.html',
-							  {'profile':profile},
-							  context_instance=RequestContext(request))
-	
+#@login_required
+# def reset_waybill(request):
+# 	profile = ''
+# 	try:
+# 		profile=request.user.get_profile()
+# 	except:
+# 		pass
+# 		
+# 	if profile.superUser:
+# 		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
+# 		
+# 		return render_to_response('edit_wb_list.html',
+# 							  {'profile':profile,'waybill_list':waybills},
+# 							  context_instance=RequestContext(request))
+# 	elif profile.readerUser:
+# 		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
+# 		return render_to_response('edit_wb_list.html',
+# 							  {'profile':profile,'waybill_list':waybills},
+# 							  context_instance=RequestContext(request))
+# 
+# 	else:
+# 		return render_to_response('selectAction.html',
+# 							  {'profile':profile},
+# 							  context_instance=RequestContext(request))
+# 	
 
 
 @login_required
@@ -657,9 +713,15 @@ def waybill_search(request):
 		profile=request.user.get_profile()
 	except:
 		pass
-		
-	search_string =  request.GET['wbnumber']
+	
+	search_string=''
 	found_wb=''
+	try:
+		search_string =  request.GET['wbnumber']
+	except:
+		pass
+	
+
 	
 	found_wb = Waybill.objects.filter(invalidated=False).filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
@@ -706,20 +768,20 @@ def waybillCreate(request,lti_code):
 		overload =  forms.BooleanField(required=False)
 		class Meta:
 			model = LoadingDetail
-			fields = ('siNo','numberUnitsLoaded','wbNumber','overload')
+			fields = ('siNo','numberUnitsLoaded','wbNumber','overloadedUnits')
 		
 		def clean(self):
   			print "cleaning"
   			cleaned = self.cleaned_data
   			siNo = cleaned.get("siNo")
   			units = cleaned.get("numberUnitsLoaded")
+  			overloaded = cleaned.get('overloadedUnits')
   			
-  			#overloaded = cleaned.get('overload')
   			max_items = siNo.restant2()
   			print max_items
   			print long(units)
   			print units > max_items+self.instance.numberUnitsLoaded
-  			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
+  			if units > max_items+self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
   				myerror = "Overloaded!"
   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
  				self._errors['numberUnitsLoaded'].append(myerror)
@@ -786,21 +848,19 @@ def waybill_edit(request,wb_id):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
 			model = LoadingDetail
-			fields = ('id','siNo','numberUnitsLoaded','wbNumber')
+			fields = ('id','siNo','numberUnitsLoaded','wbNumber','overloadedUnits')
 		def clean(self):
-  			print "cleaning"
   			cleaned = self.cleaned_data
   			siNo = cleaned.get("siNo")
   			units = cleaned.get("numberUnitsLoaded")
   			
-  			#overloaded = cleaned.get('overload')
+  			overloaded = cleaned.get('overloadedUnits')
   			max_items = siNo.restant2()
-  			print self.instance.numberUnitsLoaded
-  			if units > max_items+self.instance.numberUnitsLoaded: #and not overloaded:
-  				myerror = "Overloaded!"
-  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
- 				self._errors['numberUnitsLoaded'].append(myerror)
- 				raise forms.ValidationError(myerror)
+  			if units > max_items+self.instance.numberUnitsLoaded and overloaded == False:
+	  				myerror = "Overloaded!"
+	  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+	 				self._errors['numberUnitsLoaded'].append(myerror)
+ 					raise forms.ValidationError(myerror)
   				
    			return cleaned
 
@@ -925,7 +985,7 @@ def deserialize(request):
 ## Serialization of fixtures	
 def fixtures_serialize():
 	# serialise each of the fixtures 
-	# 	DispatchPoint	
+	# 	DispatchPoint
 	dispatchPointsData = DispatchPoint.objects.all()
 	receptionPointData = ReceptionPoint.objects.all()
 	packagingDescriptonShort = PackagingDescriptonShort.objects.all()
@@ -951,13 +1011,16 @@ def un64unZip(data):
 	uncompressed = zlib.decompress(zippedData)	
 	return uncompressed
 
-# takes a wb id and returns a zipped base64 string of the serialized object
+# takes a wb id and returns a zipped base64 string of the serialized object // ?use table to reduce column names save 1000 bytes?
 def wb_compress(wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
-	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))
+	lti_to_serialize =  ltioriginal.objects.filter(LTI_PK=items_to_serialize[0].siNo.LTI_PK)
+	print lti_to_serialize
+	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
 	zippedData =	zipBase64(data)
 	return zippedData
+
 
 def zipBase64(data):
 	zippedData = zlib.compress(data)
@@ -968,13 +1031,26 @@ def restant_si(lti_code):
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
 	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code)
 	listOfSI = []
-	for lti in detailed_lti:
-		listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
-		
-	for wb in listOfWaybills:
-		for loading in wb.loadingdetail_set.select_related():
-			for si in listOfSI:
-				if si.SINumber == loading.siNo.SI_CODE:
-					si.reduceCurrent(loading.numberUnitsLoaded)
-	return listOfSI
+	listExl =removedLtis.objects.list()
 
+	print listExl
+	for lti in detailed_lti:
+			if lti.LTI_PK not in listExl:
+				listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
+			else:
+				print lti.LTI_PK
+
+ 	for wb in listOfWaybills:
+ 		for loading in wb.loadingdetail_set.select_related():
+ 			for si in listOfSI:
+ 				if si.SINumber == loading.siNo.SI_CODE:
+ 					si.reduceCurrent(loading.numberUnitsLoaded)
+ 	return listOfSI
+
+def uniq(inlist):
+    # order preserving
+    uniques = []
+    for item in inlist:
+        if item not in uniques:
+            uniques.append(item)
+    return uniques

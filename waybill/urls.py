@@ -23,10 +23,11 @@ info_dict_waybill_reception= {
 
 
 urlpatterns = patterns('',
+    (r'^$',homepage),
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),
     (r'^accounts/change_password',password_change),
-    (r'^loginHere$',login),
+#    (r'^loginHere$',login),
     (r'^select-action$',selectAction),
     (r'^waybill/create/(.*)$',waybillCreate),
     (r'^waybill/deserialize/$',deserialize),
@@ -55,12 +56,10 @@ urlpatterns = patterns('',
     (r'^waybill/viewwb_reception/(.*)$',waybill_view_reception),
     (r'^waybill/viewwb/(.*)$',waybill_view),
     (r'^waybill/commit_to_compas_dispatch/$',dispatchToCompas),
-    (r'^waybill/commit_to_compas_receipt/$',receiptToCompas),    
-    (r'^waybill/reset_waybill/$',reset_waybill),
+    (r'^waybill/commit_to_compas_receipt/$',receiptToCompas),
+    (r'^waybill/commit_to_compas_dispatch_one/(.*)$',singleWBDispatchToCompas),
+    (r'^waybill/commit_to_compas_receipt_one/(.*)$',singleWBReceiptToCompas),
+    (r'^waybill/reset_waybill/$',waybill_search),
     (r'^waybill/compass_waybill/$',listCompasWB),
     (r'^waybill/invalidate_waybill/(.*)$',invalidate_waybill),
-    
-    
-    
-    
 )

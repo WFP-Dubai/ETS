@@ -183,7 +183,10 @@ class ltioriginal(models.Model):
 				db_table = u'epic_lti'
 				
 		def  __unicode__(self):
-				return self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
+				marker = ''
+				if self.LTI_PK in removedLtis.objects.list():
+					marker = 'Void '
+				return marker + self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
 		def mydesc(self):
 				return self.CODE
 		def commodity(self):
@@ -193,8 +196,12 @@ class ltioriginal(models.Model):
 		def restant2(self):
 				lines = LoadingDetail.objects.filter(siNo=self)
 				used = 0
+				print 'xxx'
 				for line in lines:
-					used =+  line.numberUnitsLoaded
+					used +=  line.numberUnitsLoaded
+					print  line.numberUnitsLoaded
+					print line
+				print 'Used:' + str(used)
 				return self.NUMBER_OF_UNITS - used
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
@@ -213,12 +220,39 @@ class ltioriginal(models.Model):
 				except:
 					try:
 						cursor = connection.cursor()
-						cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and SI_CODE=%s and COMM_CATEGORY_CODE=%s )",[self.ORIGIN_WH_CODE,self.SI_CODE,self.COMM_CATEGORY_CODE])
+						cursor.execute("SELECT origin_id from epic_stock where  ( SI_CODE=%s and COMM_CATEGORY_CODE=%s )",[self.SI_CODE,self.COMM_CATEGORY_CODE])
 						stock = cursor.fetchall()
 						item = stock[0]
 						return str(item[0][7:])
 					except:				
-						return 'No Stock '
+						try:
+							cursor = connection.cursor()
+							cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and SI_CODE=%s and COMM_CATEGORY_CODE=%s )",[self.ORIGIN_WH_CODE,self.SI_CODE,self.COMM_CATEGORY_CODE])
+							stock = cursor.fetchall()
+							item = stock[0]
+							return str(item[0][7:])
+						except:				
+							return 'No Stock '
+		def remove_lti(self):
+			this_lti = removedLtis()
+			this_lti.lti = self
+			this_lti.save()
+			
+class removedLtisManager(models.Manager):
+		def list(self):
+			listExl =[]
+			listOfExcluded = removedLtis.objects.all()
+			for exl in listOfExcluded:
+				listExl += [exl.lti.LTI_PK]
+			return listExl
+## helper table for nolonger existing lti items
+class removedLtis(models.Model):
+		lti = models.ForeignKey(ltioriginal)
+		
+		objects = removedLtisManager()
+		class Meta:
+				db_table = u'waybill_removed_ltis'
+	
 
 class EpicPerson(models.Model):
 		person_pk 								= models.CharField(max_length=20, blank=True, primary_key=True)
@@ -364,7 +398,7 @@ class LoadingDetail(models.Model):
 				return total
 		
 		def  __unicode__(self):
-				return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()
+				return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()  +' - '+ self.siNo.LTI_PK
 
 class DispatchPoint(models.Model):
 		ORIGIN_LOC_NAME						=models.CharField(max_length=20, blank=True)
@@ -438,7 +472,7 @@ class SIWithRestant:
 				self.StartAmount = StartAmount
 				self.CurrentAmount = StartAmount
 				self.CommodityName = CommodityName
-		
+
 		def reduceCurrent(self,reduce):
 				self.CurrentAmount = int(self.CurrentAmount) - reduce
 		def getCurrentAmount(self):

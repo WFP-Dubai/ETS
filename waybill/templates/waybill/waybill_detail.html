@@ -85,6 +85,7 @@
         	<td>{{ sform.numberUnitsGood }}</td>
         	<td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
         	<td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
+
         </tr>
     {% endfor %}
 </table>
@@ -127,20 +128,25 @@
 <tr><td><strong>Container 2:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
 
 </table>
-
-</div>
-
-
-<input type="submit" value="Save & Exit"> {% csrf_token %}
-</form>
-<SCRIPT LANGUAGE="JavaScript">
+<table>
+	<tr>
+		<td><input type="submit" value="Save & Exit"> {% csrf_token %}
+</form></td><td>&nbsp;</td>
+		<td><SCRIPT LANGUAGE="JavaScript">
       function confirmAction() {
         return confirm("Are you sure that you want to remove waybill {{form.instance.waybillNumber}}")
       }
 </SCRIPT>
 <form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}"  onSubmit="return confirmAction()">
 <input type="submit" value="INVALIDATE"> 
-</form>
+</form></td>
+	</tr>
+</table>
+
+
+</div>
+
+
 {%endblock%}
 {%block extra-header%}
 <script charset="utf-8" type="text/javascript">

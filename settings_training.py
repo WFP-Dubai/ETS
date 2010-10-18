@@ -20,10 +20,10 @@ DATABASES = {
 	},
     'compas': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '    10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
+        'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
         'USER': 'TEST2JERX001',                      	# Not used with sqlite3.
         'PASSWORD': 'TEST2JERX001',                  		# Not used with sqlite3.
-        'HOST': '10.11.33.199',                     	# Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     },
 }
@@ -111,6 +111,7 @@ AUTH_PROFILE_MODULE='waybill.UserProfile'
 
 COMPAS_STATION='JERX001'
 COMPASS_CONNECTION = "TESTJERX001/TESTJERX001@//10.11.216.4:1521/JERX001"
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 LOGIN_URL = 'accounts/login'
 LOGOUT_URL = 'accounts/logout'
+TRAINING=True

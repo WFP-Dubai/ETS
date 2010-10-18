@@ -39,10 +39,15 @@
 <br><br>
 <table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
     <thead>
-	<tr><th></th><th>Commodity</th><th>Number of units</th></tr>
+	<tr><th></th><th>Commodity</th><th>Number of units</th><th>Overload</th></tr>
 	 </thead>
 {% for sform in formset.forms %}
-<tr><td>	{{ sform.id }}{{forloop.counter}}</td><td>{{ sform.siNo }}</td><td>{{ sform.numberUnitsLoaded }} {%for error in sform.numberUnitsLoaded.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}</td></tr>
+<tr>
+<td>{{ sform.id }}{{forloop.counter}}</td>
+<td>{{ sform.siNo }}</td>
+<td>{{ sform.numberUnitsLoaded }} {%for error in sform.numberUnitsLoaded.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}</td>
+<td>{{ sform.overloadedUnits}}</td>
+</tr>
 {% endfor %}
  </table>
  

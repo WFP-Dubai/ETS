@@ -10,9 +10,9 @@ import datetime
 class compas_write:
 	ErrorMessages = ''
 	ErrorCodes = ''
-
+	ConnectionString = settings.DATABASES[u'compas'][u'USER']+'/'+settings.DATABASES[u'compas'][u'PASSWORD']+u'@//'+ settings.DATABASES[u'compas'][u'HOST'] +u':1521/'+settings.COMPAS_STATION
 	def __enter__(self):
-		self.__db = cx_Oracle.Connection(settings.DATABASES['compas']['USER']+'/'+settings.DATABASES['compas']['PASSWORD']+'@//'+ settings.DATABASES['compas']['HOST'] +':1521/'+settings.COMPAS_STATION)
+		self.__db = cx_Oracle.Connection(ConnectionString)
 		self.__cursor = self.__db.cursor()
 		return self 
 	def __exit__(self, type, value, traceback):
@@ -31,287 +31,213 @@ class compas_write:
 
 
 	def write_receipt_waybill_compas(self,waybill_id):
-                try:
-                        db = self.__db
-                        cursor = self.__cursor
-                        twoCont = False
-                        all_ok = True
-                        self.ErrorMessages = ''
-                        self.ErrorCodes = ''
-                        the_waybill = Waybill.objects.get(id=waybill_id)
-                        lineItems = the_waybill.loadingdetail_set.select_related()
-                        WB_CODE = the_waybill.waybillNumber
-                        receiverPerson  = EpicPerson.objects.get(person_pk = the_waybill.recipientName)
-                        recPersonOUC = receiverPerson.org_unit_code
-                        recPersonCode = receiverPerson.code
-                        arrival_date = unicode(the_waybill.recipientArrivalDate.strftime("%Y%m%d"))
-                       
-                        ## check if containers = 2 & lines = 2
+		try:
+			db = cx_Oracle.Connection(self.ConnectionString)
+			cursor = db.cursor()
+			twoCont = False
+			all_ok = True
+			self.ErrorMessages = ''
+			self.ErrorCodes = ''
+			the_waybill = Waybill.objects.get(id=waybill_id)
+			lineItems = the_waybill.loadingdetail_set.select_related()
+			WB_CODE = the_waybill.waybillNumber
+			receiverPerson  = EpicPerson.objects.get(person_pk = the_waybill.recipientName)
+			recPersonOUC = receiverPerson.org_unit_code
+			recPersonCode = receiverPerson.code
+			arrival_date = unicode(the_waybill.recipientArrivalDate.strftime("%Y%m%d"))
+			
+			## check if containers = 2 & lines = 2
                         
-                        if lineItems.count() == 2:
+			if lineItems.count() == 2:
                                 if len(the_waybill.containerTwoNumber) > 0:
                                         twoCont = True
-                        codeLetter = u'A'
-                        db.begin()
+			codeLetter = u'A'
+			db.begin()
                 
-                        for lineItem in lineItems:
-                                CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +WB_CODE)
-                                if twoCont:
-                                        CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + WB_CODE)
-                                        codeLetter = u'B'
-                                
-                                goodUnits = unicode(lineItem.numberUnitsGood)
-                                if lineItem.numberUnitsDamaged > 0:
-                                        damadgedUnits =unicode(lineItem.numberUnitsDamaged)
-                                        damadgedReason = unicode(lineItem.unitsDamagedReason.compasRC.REASON)
-                                else:
-                                        damadgedReason = u''
-                                        damadgedUnits = u''
-                                if lineItem.numberUnitsLost:
-                                        lostUnits =unicode(lineItem.numberUnitsLost)
-                                        lossReason = unicode(lineItem.unitsLostReason.compasRC.REASON)
-                                else:
-                                        lossReason = u''
-                                        lostUnits = u''
+			for lineItem in lineItems:
+				CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +WB_CODE)
+				if twoCont:
+					CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + WB_CODE)
+					codeLetter = u'B'
+                	
+				goodUnits = unicode(lineItem.numberUnitsGood)
+				if lineItem.numberUnitsDamaged > 0:
+					damadgedUnits =unicode(lineItem.numberUnitsDamaged)
+					damadgedReason = unicode(lineItem.unitsDamagedReason.compasRC.REASON)
+				else:
+					damadgedReason = u''
+					damadgedUnits = u''
+				if lineItem.numberUnitsLost:
+					lostUnits =unicode(lineItem.numberUnitsLost)
+					lossReason = unicode(lineItem.unitsLostReason.compasRC.REASON)
+				else:
+					lossReason = u''
+					lostUnits = u''
 
-                                COI_CODE = unicode(lineItem.siNo.coi_code())			
-                                TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
-                                Full_coi= TheStockItems[0].origin_id
-
-                                COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
-                                COMM_CODE = lineItem.siNo.COMMODITY_CODE
-                                #get stock
-                                PCKKCODE = TheStockItems[0].package_code
-                                ALLCODE = TheStockItems[0].allocation_code
-                                QUALITY = TheStockItems[0].qualitycode #'G'
-                                
-                                Response_Message = cursor.var(cx_Oracle.STRING)
-                                Response_Message.setvalue(0,u' '*200)
-                                Response_Code = cursor.var(cx_Oracle.STRING)
-                                Response_Code.setvalue(0,u' '*2)
-                                cursor.callproc(u'write_waybill.receipt',(
-                                        Response_Message,
-                                        Response_Code,
-                                        CURR_CODE,
-                                        recPersonOUC,
-                                        recPersonCode,
-                                        arrival_date,
-                                        goodUnits,
-                                        damadgedReason,
-                                        damadgedUnits,
-                                        lossReason,
-                                        lostUnits,
-                                        Full_coi,
-                                        COMM_CATEGORY_CODE,
-                                        COMM_CODE,
-                                        PCKKCODE,
-                                        ALLCODE,
-                                        QUALITY
-                                        ))
-                                        
-                                if(	Response_Code.getvalue() == 'S'):
-                                        pass
-                                else:
-                                        all_ok =False			
-                                        self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
-                                        self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
-                        
-                        if not all_ok:
-                                db.rollback()
-                        else:
-                                db.commit()
-
-                                
-                        cursor.close()
-                        db.close()
-                        return all_ok
-                except:
-                        print 'Issue with data'
-                        the_waybill = Waybill.objects.get(id=waybill_id)
-                        self.ErrorMessages = 'Problem with data of Waybill %s <br>'%(the_waybill)
-                        return False
+				COI_CODE = unicode(lineItem.siNo.coi_code())			
+				TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+				Full_coi= TheStockItems[0].origin_id
+				COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
+				COMM_CODE = lineItem.siNo.COMMODITY_CODE
+				#get stock
+				PCKKCODE = TheStockItems[0].package_code
+				ALLCODE = TheStockItems[0].allocation_code
+				QUALITY = TheStockItems[0].qualitycode #'G'
+				Response_Message = cursor.var(cx_Oracle.STRING)
+				Response_Message.setvalue(0,u' '*200)
+				Response_Code = cursor.var(cx_Oracle.STRING)
+				Response_Code.setvalue(0,u' '*2)
+				cursor.callproc(u'write_waybill.receipt',(Response_Message, Response_Code,CURR_CODE, recPersonOUC, recPersonCode, arrival_date, goodUnits,
+                                        damadgedReason,damadgedUnits,lossReason,lostUnits,Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY))
+				if(	Response_Code.getvalue() == 'S'):
+					pass
+				else:
+					all_ok =False			
+					self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
+					self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
+				
+			if not all_ok:
+				db.rollback()
+			else:
+				db.commit()
+			
+			cursor.close()
+			db.close()
+			return all_ok
+		except cx_Oracle.DatabaseError:
+			print 'Issue with Connection'
+			self.ErrorMessages = 'Problem with connection to COMPAS'
+			return False
+		except:
+			print 'Issue with data'
+			the_waybill = Waybill.objects.get(id=waybill_id)
+			self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill)
+			return False
    
    
 	def write_dispatch_waybill_compas(self,waybill_id):
-		db = self.__db
-		cursor = self.__cursor	
-		self.ErrorMessages = u''
-		self.ErrorCodes = u''
+		try:
+			db = cx_Oracle.Connection(self.ConnectionString)
+			cursor = db.cursor()
+			self.ErrorMessages = u''
+			self.ErrorCodes = u''
+			# gather wb info
+			the_waybill = Waybill.objects.get(id=waybill_id)
+			lineItems = the_waybill.loadingdetail_set.select_related()
+			LTI= lineItems[0].siNo
+			dispatch_person = EpicPerson.objects.get(person_pk = the_waybill.dispatcherName)
+			# make dispatch remarks::::
+			dispatch_remarks = the_waybill.dispatchRemarks
+			CODE =  the_waybill.waybillNumber
+			DOCUMENT_CODE = u'wb'
+			DISPATCH_DATE=unicode(the_waybill.dateOfDispatch.strftime("%Y%m%d"))
+			ORIGIN_TYPE=LTI.ORIGIN_TYPE
+			ORIGIN_LOCATION_CODE=LTI.ORIGIN_LOCATION_CODE
+			ORIGIN_CODE=LTI.ORIGIN_WH_CODE
+			ORIGIN_DESCR=u''
+			DESTINATION_LOCATION_CODE=LTI.DESTINATION_LOCATION_CODE
+			DESTINATION_CODE=unicode(the_waybill.destinationWarehouse.ORG_CODE)
+			PRO_ACTIVITY_CODE=u""
+			ACTIVITY_OUC=u""
+			LNDARRM_CODE=u""
+			LTI_ID=LTI.LTI_ID
+			LOADING_DATE=unicode(the_waybill.dateOfLoading.strftime("%Y%m%d"))
+			ORGANIZATION_ID=LTI.CONSEGNEE_CODE
+			TRAN_TYPE_CODE=the_waybill.transactionType
+			TRAN_TYPE_DESCR=the_waybill.transportVehicleRegistration
+			MODETRANS_CODE=the_waybill.transportType
+			COMMENTS=	dispatch_remarks
+			PERSON_CODE=dispatch_person.code
+			PERSON_OUC=dispatch_person.org_unit_code
+			CERTIFING_TITLE=dispatch_person.title
+			TRANS_CONTRACTOR_CODE=LTI.TRANSPORT_CODE
+			SUPPLIER1_OUC=LTI.TRANSPORT_OUC
+			DRIVER_NAME=the_waybill.transportDriverName
+			LICENSE=the_waybill.transportDriverLicenceID
+			VEHICLE_REGISTRATION=the_waybill.transportVehicleRegistration
+			TRAILER_PLATE=the_waybill.transportTrailerRegistration
+			CONTAINER_NUMBER=the_waybill.containerOneNumber
+			all_ok = True
+			## For each lineItems
+			## check if containers = 2 & lines = 2
+			twoCont = False
+			if lineItems.count() == 2:
+				if len(the_waybill.containerTwoNumber) > 0:
+					twoCont = True
+			codeLetter = u'A'
+			db.begin()
 		
-		# gather wb info
-		the_waybill = Waybill.objects.get(id=waybill_id)
-		lineItems = the_waybill.loadingdetail_set.select_related()
-		LTI= lineItems[0].siNo
-		dispatch_person = EpicPerson.objects.get(person_pk = the_waybill.dispatcherName)
-		# make dispatch remarks::::
-		dispatch_remarks = the_waybill.dispatchRemarks
-		CODE =  the_waybill.waybillNumber
-		DOCUMENT_CODE = u'wb'
-		DISPATCH_DATE=unicode(the_waybill.dateOfDispatch.strftime("%Y%m%d"))
-		ORIGIN_TYPE=LTI.ORIGIN_TYPE
-		ORIGIN_LOCATION_CODE=LTI.ORIGIN_LOCATION_CODE
-		ORIGIN_CODE=LTI.ORIGIN_WH_CODE
-		ORIGIN_DESCR=u''
-		DESTINATION_LOCATION_CODE=LTI.DESTINATION_LOCATION_CODE
-		DESTINATION_CODE=unicode(the_waybill.destinationWarehouse.ORG_CODE)
-		PRO_ACTIVITY_CODE=u""
-		ACTIVITY_OUC=u""
-		LNDARRM_CODE=u""
-		LTI_ID=LTI.LTI_ID
-		LOADING_DATE=unicode(the_waybill.dateOfLoading.strftime("%Y%m%d"))
-		ORGANIZATION_ID=LTI.CONSEGNEE_CODE
-		TRAN_TYPE_CODE=the_waybill.transactionType
-		TRAN_TYPE_DESCR=the_waybill.transportVehicleRegistration
-		MODETRANS_CODE=the_waybill.transportType
-		COMMENTS=	dispatch_remarks
-		PERSON_CODE=dispatch_person.code
-		PERSON_OUC=dispatch_person.org_unit_code
-		CERTIFING_TITLE=dispatch_person.title
-		TRANS_CONTRACTOR_CODE=LTI.TRANSPORT_CODE
-		SUPPLIER1_OUC=LTI.TRANSPORT_OUC
-		DRIVER_NAME=the_waybill.transportDriverName
-		LICENSE=the_waybill.transportDriverLicenceID
-		VEHICLE_REGISTRATION=the_waybill.transportVehicleRegistration
-		TRAILER_PLATE=the_waybill.transportTrailerRegistration
-		CONTAINER_NUMBER=the_waybill.containerOneNumber			
-		## For each lineItems
-		all_ok = True
-		## check if containers = 2 & lines = 2
-		twoCont = False
-		if lineItems.count() == 2:
-			if len(the_waybill.containerTwoNumber) > 0:
-				twoCont = True
-		codeLetter = u'A'
-		db.begin()
+			for lineItem in lineItems:
+				CURR_CONTAINER_NUMBER=CONTAINER_NUMBER
+				CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +CODE)
+				if twoCont:
+					CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + CODE)
+					codeLetter = u'B'
+					CONTAINER_NUMBER=unicode(the_waybill.containerTwoNumber)		
+					
+					
+				COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
+				COMM_CODE = lineItem.siNo.COMMODITY_CODE
+				COI_CODE = unicode(lineItem.siNo.coi_code())			
+				#get stock
+				TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+				PCKKCODE = TheStockItems[0].package_code
+				ALLCODE = TheStockItems[0].allocation_code
+				QUALITY = TheStockItems[0].qualitycode #'G'
+				UnitsLoaded = lineItem.numberUnitsLoaded
+				UnitNet= lineItem.siNo.UNIT_WEIGHT_NET
+				UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
+				
+				NetTotal =(UnitNet * UnitsLoaded) / 1000
+				strNetTotal = u'%.3f' % NetTotal
+				GrossTotal = (UnitGross * UnitsLoaded) / 1000
+				strGrossTotal = u'%.3f' % GrossTotal
 	
-		for lineItem in lineItems:
-			CURR_CONTAINER_NUMBER=CONTAINER_NUMBER
-			CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +CODE)
-			if twoCont:
-				CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + CODE)
-				codeLetter = u'B'
-				CONTAINER_NUMBER=unicode(the_waybill.containerTwoNumber)		
+				Response_Message = cursor.var(cx_Oracle.STRING)
+				Response_Message.setvalue(0,u' '*200)
+				Response_Code = cursor.var(cx_Oracle.STRING)
+				Response_Code.setvalue(0,u' '*2)
+				Full_coi= TheStockItems[0].origin_id
+				empty = u''
+	
+				print [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
+					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
+					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
+					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,UnitsLoaded,UnitNet,UnitGross,empty]
+	
+				cursor.callproc(u'write_waybill.dispatch',(Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
+					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
+					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
+					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,UnitsLoaded,UnitNet,UnitGross,empty))
+					
+				if(	Response_Code.getvalue() == 'S'):
+					pass
+				else:
+					all_ok =False
+					self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
+					self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
 				
+				print Response_Message.getvalue()
+				print Response_Code.getvalue()
 				
-			COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
-			COMM_CODE = lineItem.siNo.COMMODITY_CODE
-			COI_CODE = unicode(lineItem.siNo.coi_code())			
-			#get stock
-			TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
-			PCKKCODE = TheStockItems[0].package_code
-			ALLCODE = TheStockItems[0].allocation_code
-			QUALITY = TheStockItems[0].qualitycode #'G'
-			UnitsLoaded = lineItem.numberUnitsLoaded
-			UnitNet= lineItem.siNo.UNIT_WEIGHT_NET
-			UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
-			
-			NetTotal =(UnitNet * UnitsLoaded) / 1000
-			strNetTotal = u'%.3f' % NetTotal
-			GrossTotal = (UnitGross * UnitsLoaded) / 1000
-			strGrossTotal = u'%.3f' % GrossTotal
-
-			Response_Message = cursor.var(cx_Oracle.STRING)
-			Response_Message.setvalue(0,u' '*200)
-			Response_Code = cursor.var(cx_Oracle.STRING)
-			Response_Code.setvalue(0,u' '*2)
-			Full_coi= TheStockItems[0].origin_id
-			empty = u''
-
- 			print [CURR_CODE,
- 				DISPATCH_DATE,
-  				ORIGIN_TYPE,
-  				ORIGIN_LOCATION_CODE,
-  				ORIGIN_CODE,
-  				ORIGIN_DESCR,
- 				DESTINATION_LOCATION_CODE,
- 				DESTINATION_CODE,
-  				LTI_ID,
- 				LOADING_DATE,
- 				ORGANIZATION_ID,
- 				TRAN_TYPE_CODE,
- 				VEHICLE_REGISTRATION,
- 				MODETRANS_CODE,
- 				COMMENTS,
- 				PERSON_CODE,
- 				PERSON_OUC,
- 				CERTIFING_TITLE,
- 				TRANS_CONTRACTOR_CODE,
- 				SUPPLIER1_OUC,
- 				DRIVER_NAME,
- 				LICENSE,
- 				CURR_CONTAINER_NUMBER,
- 				settings.COMPAS_STATION,
- 				Full_coi,
- 				COMM_CATEGORY_CODE,
- 				COMM_CODE,
- 				PCKKCODE,
- 				ALLCODE,
- 				QUALITY,
- 				strNetTotal,
- 				strGrossTotal,
- 				UnitsLoaded,
- 				UnitNet,
- 				UnitGross,
- ]
-
-			cursor.callproc(u'write_waybill.dispatch',(
-				Response_Message,
-				Response_Code,
-				CURR_CODE,
-				DISPATCH_DATE,
-				ORIGIN_TYPE,
-				ORIGIN_LOCATION_CODE,
-				ORIGIN_CODE,
-				ORIGIN_DESCR,
-				DESTINATION_LOCATION_CODE,
-				DESTINATION_CODE,
-				LTI_ID,
-				LOADING_DATE,
-				ORGANIZATION_ID,
-				TRAN_TYPE_CODE,
-				VEHICLE_REGISTRATION,
-				MODETRANS_CODE,
-				COMMENTS,
-				PERSON_CODE,
-				PERSON_OUC,
-				CERTIFING_TITLE,
-				TRANS_CONTRACTOR_CODE,
-				SUPPLIER1_OUC,
-				DRIVER_NAME,
-				LICENSE,
-				CURR_CONTAINER_NUMBER,
-				settings.COMPAS_STATION,
-				Full_coi,
-				COMM_CATEGORY_CODE,
-				COMM_CODE,
-				PCKKCODE,
-				ALLCODE,
-				QUALITY,
-				strNetTotal,
-				strGrossTotal,
-				UnitsLoaded,
-				UnitNet,
-				UnitGross,
-				empty
-				)
-				)
-				
-			if(	Response_Code.getvalue() == 'S'):
-				pass
+			if not all_ok:
+				db.rollback()
 			else:
-				all_ok =False			
-				self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
-				self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
+				db.commit()
+				
+			cursor.close()
+			db.close()
 			
-			print Response_Message.getvalue()
-			print Response_Code.getvalue()
-			
-		if not all_ok:
-			db.rollback()
-		else:
-			db.commit()
-			
-		cursor.close()
-		db.close()
-		
-		return all_ok
+			return all_ok
+		except cx_Oracle.DatabaseError,e:
+			errorObj, = e.args
+			if errorObj.code == 12514:
+				print 'Issue with Connection' + str(errorObj.code)
+				self.ErrorMessages = 'Problem with connection to COMPAS'
+				return False
+			else:
+				print 'Issue with data'
+				the_waybill = Waybill.objects.get(id=waybill_id)
+				self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill)
+				return False
+

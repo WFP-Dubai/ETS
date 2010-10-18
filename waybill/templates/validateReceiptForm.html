@@ -1,5 +1,6 @@
 {% extends "base_template.html"%}
 {%block content %}
+<h3>Validate Receipt</h3>
 <form method="post" action="">
     {{ formset.management_form }}
    
@@ -16,8 +17,8 @@
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if form.instance.dispatcherSigned%}Yes{%else%}No{%endif%} </td>
- 			<td>{%if form.instance.recipientSigned%}Yes{%else%}No{%endif%} </td>
+ 			<td>{%if form.instance.dispatcherSigned%}{{form.instance.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+  			<td>{%if form.instance.recipientSigned%}{{form.instance.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
  			<td>{{ form.waybillReceiptValidated }} </td>
  			<td><a href='viewwb/{{form.instance.id}}'>View</a></td>
     </tr>
@@ -27,7 +28,7 @@
 
 <input type="submit" value="Validate Waybills"> {% csrf_token %}
 </form>
-
+<h3>Update To Compas</h3>
 <br>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
     <thead>
@@ -35,26 +36,24 @@
         </thead>
 
     {% for wb in validatedWB %}
-    
-
     <tr>
  			<td>    {{wb.ltiNumber}}</td>
  			<td>{{wb.waybillNumber}}</td>
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if wb.dispatcherSigned%}Yes{%else%}No{%endif%} </td>
- 			<td>{%if wb.recipientSigned%}Yes{%else%}No{%endif%} </td>
- 			<td>{%if wb.waybillReceiptValidated%}Yes{%else%}No{%endif%} </td>
+ 			<td>{%if wb.dispatcherSigned%}{{wb.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+  			<td>{%if wb.recipientSigned%}{{wb.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+ 			<td><form method="post" action='commit_to_compas_receipt_one/{{wb.id}}'> <input type="submit" value="Update In Compas"> <input type="hidden" name="wb_id" value="{{wb.id}}">{% csrf_token %}</form></td>
     </tr>
 
     {% endfor %}
 </table>
-
+<!--
 <form method="post" action="commit_to_compas_receipt/">
 <input type="submit" value="Update Compas"> {% csrf_token %}
 </form>
-
+-->
 
 {%endblock%}
 

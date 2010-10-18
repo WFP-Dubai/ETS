@@ -19,7 +19,7 @@ DATABASES = {
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
-    'compasTestOTP2': {
+    'compasTestRome': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.33.199/tst1',                	# Or path to database file if using sqlite3.
         'USER': 'COMPAS_JERX001',                      	# Not used with sqlite3.
@@ -27,6 +27,7 @@ DATABASES = {
         'HOST': '10.11.33.199',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     },
+    
     'compasTestOTP': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
@@ -35,7 +36,7 @@ DATABASES = {
         'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     },
-    'compas': {
+    'compasTest': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
         'USER': 'opt_epic',                      	# Not used with sqlite3.
@@ -44,14 +45,14 @@ DATABASES = {
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     },
     
-    'compasLivetOTP': {
+    'compas': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
         'USER': 'TEST2JERX001',                      	# Not used with sqlite3.
         'PASSWORD': 'TEST2JERX001',                  		# Not used with sqlite3.
         'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
-    }
+    }#test opt
 }
 
 # Local time zone for this installation. Choices can be found here:
@@ -141,5 +142,6 @@ AUTH_PROFILE_MODULE='waybill.UserProfile'
 
 COMPAS_STATION='JERX001'
 INTSTANCE_LABLE="Toby Mac Pro"
-LOGIN_URL = 'accounts/login'
-LOGOUT_URL = 'accounts/logout'
+LOGIN_URL = '/ets/accounts/login/'
+LOGOUT_URL = '/ets/accounts/logout/'
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True

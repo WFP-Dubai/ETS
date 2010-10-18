@@ -22,9 +22,10 @@
 				 <td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
 				 <td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
 				 <td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
-				 <td>{%if waybill.dispatcherSigned%}Y{%else%}N{%endif%} </td>
+				 <td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+  				 
 				 <td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
-				 <td>{%if waybill.recipientSigned%}Y{%else%}N{%endif%} </td>
+				 <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
 				 <td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
 				 <td>{%if not profile.superUser%}<a href='{%if  profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
  			{%if profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}</td>
@@ -49,7 +50,7 @@ $(document).ready(function() {
 									null,
 									null,
 									null,
-									{ "bSearchable": false},
+									{ "bSearchable": false}
 						
 								]
 							});
