@@ -11,13 +11,13 @@ from django.template.defaultfilters import stringfilter
 # Create your models here.
 
 class places(models.Model):
-		ORG_CODE 		=models.CharField(max_length=7, primary_key=True)
-		NAME						=models.CharField(max_length=100)
-		GEO_POINT_CODE =models.CharField(max_length=4)
-		GEO_NAME		=models.CharField(max_length=100)
+		ORG_CODE 			=models.CharField(max_length=7, primary_key=True)
+		NAME				=models.CharField(max_length=100)
+		GEO_POINT_CODE 		=models.CharField(max_length=4)
+		GEO_NAME			=models.CharField(max_length=100)
 		COUNTRY_CODE		=models.CharField(max_length=3)
-		REPORTING_CODE =models.CharField(max_length=7)
-		ORGANIZATION_ID =models.CharField(max_length=20)
+		REPORTING_CODE 		=models.CharField(max_length=7)
+		ORGANIZATION_ID 	=models.CharField(max_length=20)
 		def __unicode__(self):
 				return self.NAME
 
@@ -74,7 +74,7 @@ class Waybill(models.Model):
 		transportDispachSignedTimestamp	=models.DateTimeField(null=True, blank=True)
 		transportDeliverySigned			=models.BooleanField(blank=True)
 		transportDeliverySignedTimestamp=models.DateTimeField(null=True, blank=True)
-		
+
 		#Container		
 		containerOneNumber				=models.CharField(max_length=40,blank=True)
 		containerTwoNumber				=models.CharField(max_length=40,blank=True)
@@ -84,8 +84,6 @@ class Waybill(models.Model):
 		containerTwoRemarksDispatch		=models.CharField(max_length=40,blank=True)
 		containerOneRemarksReciept		=models.CharField(max_length=40,blank=True)
 		containerTwoRemarksReciept		=models.CharField(max_length=40,blank=True)
-		
-
 
 		#Reciver
 		recipientLocation				=models.CharField(max_length=100,blank=True)
@@ -100,7 +98,7 @@ class Waybill(models.Model):
 		recipientSigned					=models.BooleanField(blank=True)
 		recipientSignedTimestamp		=models.DateTimeField(null=True, blank=True)
 		destinationWarehouse 			=models.ForeignKey(places,blank=True)
-		
+
 		#Extra Fields
 		waybillValidated				=models.BooleanField()
 		waybillReceiptValidated 		=models.BooleanField()
@@ -147,36 +145,36 @@ class ltioriginalManager(models.Manager):
 				return si_list
 				
 class ltioriginal(models.Model):
-		LTI_PK								=models.CharField(max_length=50, primary_key=True)
-		LTI_ID								=models.CharField(max_length=40)
-		CODE            		=models.CharField(max_length=40)
-		LTI_DATE						=models.DateField()
-		EXPIRY_DATE						=models.DateField(blank=True,null=True)
+		LTI_PK						=models.CharField(max_length=50, primary_key=True)
+		LTI_ID						=models.CharField(max_length=40)
+		CODE            			=models.CharField(max_length=40)
+		LTI_DATE					=models.DateField()
+		EXPIRY_DATE					=models.DateField(blank=True,null=True)
 		TRANSPORT_CODE				=models.CharField(max_length=4)
 		TRANSPORT_OUC				=models.CharField(max_length=13)
 		TRANSPORT_NAME				=models.CharField(max_length=30)
-		ORIGIN_TYPE						=models.CharField(max_length=1)
-		ORIGINTYPE_DESC     =models.CharField(max_length=12,blank=True)
-		ORIGIN_LOCATION_CODE=models.CharField(max_length=10)
+		ORIGIN_TYPE					=models.CharField(max_length=1)
+		ORIGINTYPE_DESC				=models.CharField(max_length=12,blank=True)
+		ORIGIN_LOCATION_CODE		=models.CharField(max_length=10)
 		ORIGIN_LOC_NAME				=models.CharField(max_length=30)
 		ORIGIN_WH_CODE				=models.CharField(max_length=13,blank=True)
 		ORIGIN_WH_NAME				=models.CharField(max_length=50,blank=True)
-		DESTINATION_LOCATION_CODE		=models.CharField(max_length=10)
-		DESTINATION_LOC_NAME=models.CharField(max_length=30)
+		DESTINATION_LOCATION_CODE	=models.CharField(max_length=10)
+		DESTINATION_LOC_NAME		=models.CharField(max_length=30)
 		CONSEGNEE_CODE				=models.CharField(max_length=12)
 		CONSEGNEE_NAME				=models.CharField(max_length=80)
-		REQUESTED_DISPATCH_DATE				=models.DateField(blank=True,null=True)
-		PROJECT_WBS_ELEMENT		=models.CharField(max_length=24,blank=True)
+		REQUESTED_DISPATCH_DATE		=models.DateField(blank=True,null=True)
+		PROJECT_WBS_ELEMENT			=models.CharField(max_length=24,blank=True)
 		SI_RECORD_ID				=models.CharField(max_length=25,blank=True)
-		SI_CODE								=models.CharField(max_length=8)
-		COMM_CATEGORY_CODE		=models.CharField(max_length=9)
+		SI_CODE						=models.CharField(max_length=8)
+		COMM_CATEGORY_CODE			=models.CharField(max_length=9)
 		COMMODITY_CODE				=models.CharField(max_length=18)
-		CMMNAME								=models.CharField(max_length=100,blank=True)
+		CMMNAME						=models.CharField(max_length=100,blank=True)
 		QUANTITY_NET				=models.DecimalField(max_digits=11, decimal_places=3)
 		QUANTITY_GROSS				=models.DecimalField(max_digits=11, decimal_places=3)
 		NUMBER_OF_UNITS				=models.DecimalField(max_digits=7, decimal_places=0)
 		UNIT_WEIGHT_NET				=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
-		UNIT_WEIGHT_GROSS		=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
+		UNIT_WEIGHT_GROSS			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		
 		objects = ltioriginalManager()
 		class Meta:
@@ -196,12 +194,12 @@ class ltioriginal(models.Model):
 		def restant2(self):
 				lines = LoadingDetail.objects.filter(siNo=self)
 				used = 0
-				print 'xxx'
+#				print 'xxx'
 				for line in lines:
 					used +=  line.numberUnitsLoaded
-					print  line.numberUnitsLoaded
-					print line
-				print 'Used:' + str(used)
+#					print  line.numberUnitsLoaded
+#					print line
+#					print 'Used:' + str(used)
 				return self.NUMBER_OF_UNITS - used
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
@@ -255,22 +253,22 @@ class removedLtis(models.Model):
 	
 
 class EpicPerson(models.Model):
-		person_pk 								= models.CharField(max_length=20, blank=True, primary_key=True)
-		org_unit_code 						= models.CharField(max_length=13)
-		code 										= models.CharField(max_length=7)
-		type_of_document 				= models.CharField(max_length=2, blank=True)
-		organization_id 				= models.CharField(max_length=12)
-		last_name 								= models.CharField(max_length=30)
-		first_name 								= models.CharField(max_length=25)
-		title 										= models.CharField(max_length=50, blank=True)
-		document_number 				= models.CharField(max_length=25, blank=True)
-		e_mail_address 						= models.CharField(max_length=100, blank=True)
+		person_pk 					= models.CharField(max_length=20, blank=True, primary_key=True)
+		org_unit_code 				= models.CharField(max_length=13)
+		code 						= models.CharField(max_length=7)
+		type_of_document 			= models.CharField(max_length=2, blank=True)
+		organization_id 			= models.CharField(max_length=12)
+		last_name 					= models.CharField(max_length=30)
+		first_name 					= models.CharField(max_length=25)
+		title 						= models.CharField(max_length=50, blank=True)
+		document_number 			= models.CharField(max_length=25, blank=True)
+		e_mail_address 				= models.CharField(max_length=100, blank=True)
 		mobile_phone_number 		= models.CharField(max_length=20, blank=True)
 		official_tel_number 		= models.CharField(max_length=20, blank=True)
-		fax_number 								= models.CharField(max_length=20, blank=True)
-		effective_date 						= models.DateField(null=True, blank=True)
-		expiry_date 						= models.DateField(null=True, blank=True)
-		location_code 						= models.CharField(max_length=10)
+		fax_number 					= models.CharField(max_length=20, blank=True)
+		effective_date 				= models.DateField(null=True, blank=True)
+		expiry_date 				= models.DateField(null=True, blank=True)
+		location_code 				= models.CharField(max_length=10)
 		class Meta:
 				db_table = u'epic_persons'
 		def  __unicode__(self):
@@ -281,28 +279,28 @@ class EpicPersonsAdmin(admin.ModelAdmin):
 		list_filter = ( 'location_code','organization_id')
 
 class EpicStock(models.Model):
-		wh_pk = models.CharField(max_length=90, blank=True, primary_key=True)
-		wh_regional = models.CharField(max_length=4, blank=True)
-		wh_country = models.CharField(max_length=15)
-		wh_location = models.CharField(max_length=30)
-		wh_code = models.CharField(max_length=13)
-		wh_name = models.CharField(max_length=50, blank=True)
+		wh_pk 				= models.CharField(max_length=90, blank=True, primary_key=True)
+		wh_regional 		= models.CharField(max_length=4, blank=True)
+		wh_country 			= models.CharField(max_length=15)
+		wh_location 		= models.CharField(max_length=30)
+		wh_code 			= models.CharField(max_length=13)
+		wh_name 			= models.CharField(max_length=50, blank=True)
 		project_wbs_element = models.CharField(max_length=24, blank=True)
-		si_record_id = models.CharField(max_length=25)
-		si_code = models.CharField(max_length=8)
-		origin_id = models.CharField(max_length=23)
-		comm_category_code = models.CharField(max_length=9)
-		commodity_code = models.CharField(max_length=18)
-		cmmname = models.CharField(max_length=100, blank=True)
-		package_code = models.CharField(max_length=17)
-		packagename = models.CharField(max_length=50, blank=True)
-		qualitycode = models.CharField(max_length=1)
-		qualitydescr = models.CharField(max_length=11, blank=True)
-		quantity_net = models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
-		quantity_gross = models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
-		number_of_units = models.IntegerField()
-		allocation_code = models.CharField(max_length=10)
-		reference_number= models.CharField(max_length=50)
+		si_record_id 		= models.CharField(max_length=25)
+		si_code 			= models.CharField(max_length=8)
+		origin_id 			= models.CharField(max_length=23)
+		comm_category_code 	= models.CharField(max_length=9)
+		commodity_code 		= models.CharField(max_length=18)
+		cmmname 			= models.CharField(max_length=100, blank=True)
+		package_code 		= models.CharField(max_length=17)
+		packagename 		= models.CharField(max_length=50, blank=True)
+		qualitycode 		= models.CharField(max_length=1)
+		qualitydescr 		= models.CharField(max_length=11, blank=True)
+		quantity_net 		= models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
+		quantity_gross 		= models.DecimalField(null=True, max_digits=12, decimal_places=3, blank=True)
+		number_of_units 	= models.IntegerField()
+		allocation_code 	= models.CharField(max_length=10)
+		reference_number	= models.CharField(max_length=50)
 		class Meta:
 				db_table = u'epic_stock'
 		
@@ -338,18 +336,18 @@ class LossesDamagesType(models.Model):
 				return self.description
 
 class LoadingDetail(models.Model):
-		wbNumber						=models.ForeignKey(Waybill)
-		siNo									=models.ForeignKey(ltioriginal)
+		wbNumber					=models.ForeignKey(Waybill)
+		siNo						=models.ForeignKey(ltioriginal)
 		numberUnitsLoaded			=models.DecimalField(default=0, blank=True,null=True,max_digits=10, decimal_places=3)
 		numberUnitsGood				=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
 		numberUnitsLost				=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
-		numberUnitsDamaged		=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
+		numberUnitsDamaged			=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
 		unitsLostReason				=models.ForeignKey(LossesDamagesReason,related_name='LD_LostReason',blank=True,null=True)
-		unitsDamagedReason		=models.ForeignKey(LossesDamagesReason,related_name='LD_DamagedReason',blank=True,null=True)
+		unitsDamagedReason			=models.ForeignKey(LossesDamagesReason,related_name='LD_DamagedReason',blank=True,null=True)
 		unitsDamagedType 			=models.ForeignKey(LossesDamagesType,related_name='LD_DamagedType',blank=True,null=True)
-		unitsLostType 					=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
+		unitsLostType 				=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
 		overloadedUnits				=models.BooleanField()
-		loadingDetailSentToCompas =models.BooleanField()
+		loadingDetailSentToCompas 	=models.BooleanField()
 		
 		
 		def getStockItem(self):
@@ -402,33 +400,33 @@ class LoadingDetail(models.Model):
 
 class DispatchPoint(models.Model):
 		ORIGIN_LOC_NAME						=models.CharField(max_length=20, blank=True)
-		ORIGIN_LOCATION_CODE		=models.CharField(max_length=20, blank=True)
+		ORIGIN_LOCATION_CODE				=models.CharField(max_length=20, blank=True)
 		ORIGIN_WH_CODE						=models.CharField(max_length=20, blank=True)
 		ORIGIN_WH_NAME						=models.CharField(max_length=30, blank=True)
-		DESC_NAME								=models.CharField(max_length=20, blank=True,null=True)
+		DESC_NAME							=models.CharField(max_length=20, blank=True,null=True)
 		
 		def  __unicode__(self):
 				return self.ORIGIN_WH_CODE + ' - ' + self.ORIGIN_LOC_NAME
 		
 class ReceptionPoint(models.Model):
 		LOC_NAME				=models.CharField(max_length=20, blank=True)
-		LOCATION_CODE		=models.CharField(max_length=20, blank=True)
-		CONSEGNEE_CODE		=models.CharField(max_length=20, blank=True)
-		CONSEGNEE_NAME		=models.CharField(max_length=80, blank=True)
-		#DESC_NAME								=models.CharField(max_length=80, blank=True)
+		LOCATION_CODE			=models.CharField(max_length=20, blank=True)
+		CONSEGNEE_CODE			=models.CharField(max_length=20, blank=True)
+		CONSEGNEE_NAME			=models.CharField(max_length=80, blank=True)
+		#DESC_NAME				=models.CharField(max_length=80, blank=True)
 		def  __unicode__(self):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 
 class UserProfile(models.Model):
-		user						=models.OneToOneField(User, primary_key=True)
+		user				=models.OneToOneField(User, primary_key=True)
 		warehouses			=models.ForeignKey(DispatchPoint, blank=True,null=True)
 		receptionPoints		=models.ForeignKey(ReceptionPoint, blank=True,null=True)
 		isCompasUser		=models.BooleanField()
-		isDispatcher			=models.BooleanField()
-		isReciever				=models.BooleanField()
+		isDispatcher		=models.BooleanField()
+		isReciever			=models.BooleanField()
 		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True)
-		superUser				=models.BooleanField()
-		readerUser				=models.BooleanField()
+		superUser			=models.BooleanField()
+		readerUser			=models.BooleanField()
 		
 		def __unicode__(self):
 				return "%s's profile" % self.user 
@@ -439,9 +437,9 @@ class UserProfileAdmin(admin.ModelAdmin):
 		list_display=('user','warehouses')
 		
 class SiTracker(models.Model):
-		LTI = models.OneToOneField(ltioriginal,primary_key=True)
-		number_units_left = models.DecimalField(decimal_places=3,max_digits=10)
-		number_units_start = models.DecimalField(decimal_places=3,max_digits=10)
+		LTI 				= models.OneToOneField(ltioriginal,primary_key=True)
+		number_units_left 	= models.DecimalField(decimal_places=3,max_digits=10)
+		number_units_start 	= models.DecimalField(decimal_places=3,max_digits=10)
 				
 		def updateUnits(self,ammount):
 				self.number_units_left -=ammount
@@ -453,14 +451,26 @@ class SiTracker(models.Model):
 				return self.number_units_left
 
 class PackagingDescriptonShort(models.Model):
-		packageCode = models.CharField(primary_key=True,max_length=5)
-		packageShortName = models.CharField(max_length=10)
+		packageCode 		= models.CharField(primary_key=True,max_length=5)
+		packageShortName 	= models.CharField(max_length=10)
 		def  __unicode__(self):
 				return self.packageCode+' - '+ self.packageShortName
 				
 class PackagingDescriptonShortAdmin(admin.ModelAdmin):
 		list_display=('packageCode','packageShortName')
 		list_filter = ('packageCode','packageShortName') 
+		
+# class logger(models.Model):
+# 	timestamp		= models.DateTimeField(null=True, blank=True)
+# 	user			= models.ForeignKey(User, primary_key=True)
+# 	action			= models.CharField(max_length=50, blank=True)
+# 	error			= models.CharField(max_length=50, blank=True)
+# 	wb				= models.ForeignKey(Waybill, blank=True)
+# 	lti				= models.CharField(max_length=50, blank=True)
+# 	data_in			= models.CharField(max_length=5000, blank=True)
+# 	data_out		= models.CharField(max_length=5000, blank=True)
+ 
+	
 		
 class SIWithRestant:
 		SINumber = ''

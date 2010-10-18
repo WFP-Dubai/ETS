@@ -282,8 +282,8 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.transportDispachSignedTimestamp=datetime.datetime.now()
 	current_wb.dispatcherSigned=True
 	for lineitem in current_wb.loadingdetail_set.select_related():
-		print lineitem.numberUnitsLoaded
-		print lineitem.siNo.restant()
+#		print lineitem.numberUnitsLoaded
+#		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
 	return HttpResponseRedirect(reverse(lti_detail_url,args=[current_wb.ltiNumber]))
@@ -340,7 +340,7 @@ def singleWBDispatchToCompas(request,wb_id):
 	except:
 		pass
 	waybill = Waybill.objects.get(id=wb_id)
-	print waybill.waybillNumber
+#	print waybill.waybillNumber
 	the_compas = compas_write()
 	error_message = ''
 	error_codes = ''
@@ -351,7 +351,7 @@ def singleWBDispatchToCompas(request,wb_id):
 		waybill.save()
 	else:
 		# error here
-		print waybill.waybillNumber
+		#print waybill.waybillNumber
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 # add field to say compas erroradd logging
@@ -416,11 +416,11 @@ def receiptToCompas(request):
 		# call compas and read return
 		status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 		if  status_wb:
-			print "ok"
+			#print "ok"
 			waybill.waybillRecSentToCompas=True
 			waybill.save()
 		else:
-			print 'error'
+			#print 'error'
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 			
@@ -771,16 +771,16 @@ def waybillCreate(request,lti_code):
 			fields = ('siNo','numberUnitsLoaded','wbNumber','overloadedUnits')
 		
 		def clean(self):
-  			print "cleaning"
+  			#print "cleaning"
   			cleaned = self.cleaned_data
   			siNo = cleaned.get("siNo")
   			units = cleaned.get("numberUnitsLoaded")
   			overloaded = cleaned.get('overloadedUnits')
   			
   			max_items = siNo.restant2()
-  			print max_items
-  			print long(units)
-  			print units > max_items+self.instance.numberUnitsLoaded
+  			#print max_items
+  			#print long(units)
+  			#print units > max_items+self.instance.numberUnitsLoaded
   			if units > max_items+self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
   				myerror = "Overloaded!"
   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
@@ -1016,7 +1016,7 @@ def wb_compress(wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
 	lti_to_serialize =  ltioriginal.objects.filter(LTI_PK=items_to_serialize[0].siNo.LTI_PK)
-	print lti_to_serialize
+	#print lti_to_serialize
 	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
 	zippedData =	zipBase64(data)
 	return zippedData
@@ -1033,13 +1033,11 @@ def restant_si(lti_code):
 	listOfSI = []
 	listExl =removedLtis.objects.list()
 
-	print listExl
 	for lti in detailed_lti:
 			if lti.LTI_PK not in listExl:
 				listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
 			else:
 				print lti.LTI_PK
-
  	for wb in listOfWaybills:
  		for loading in wb.loadingdetail_set.select_related():
  			for si in listOfSI:
