@@ -230,7 +230,6 @@ class compas_write:
 			
 			return all_ok
 		except cx_Oracle.DatabaseError,e:
-			print e
 			errorObj, = e.args
 			if errorObj.code == 12514:
 				print 'Issue with Connection' + str(errorObj.code)
@@ -242,4 +241,8 @@ class compas_write:
 				self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill) + self.ErrorMessages
 				return False
 		except Exception as e:
-			print e
+			print 'Issue with data'
+			the_waybill = Waybill.objects.get(id=waybill_id)
+			self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill) + self.ErrorMessages
+			return False
+			
