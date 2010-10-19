@@ -352,6 +352,8 @@ def singleWBDispatchToCompas(request,wb_id):
 	else:
 		# error here
 		#print waybill.waybillNumber
+		waybill.waybillValidated =False
+		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 # add field to say compas erroradd logging
@@ -378,6 +380,8 @@ def singleWBReceiptToCompas(request,wb_id):
 		waybill.save()
 	else:
 		# error here
+		waybill.waybillReceiptValidated =False
+		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 # add field to say compas error/add logging
