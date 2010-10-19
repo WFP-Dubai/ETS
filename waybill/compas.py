@@ -241,5 +241,5 @@ class compas_write:
 				the_waybill = Waybill.objects.get(id=waybill_id)
 				self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill) + self.ErrorMessages
 				return False
-		except e:
+		except Exception as e:
 			print e
