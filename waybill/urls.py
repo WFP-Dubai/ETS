@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from ets.waybill.views import *
+from ets.waybill.tools import *
 from ets.waybill.models import ltioriginal
 from django.views.generic.simple import *
 

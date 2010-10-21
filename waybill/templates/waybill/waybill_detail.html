@@ -27,6 +27,9 @@
 	</div>
 	<div>
 <br>
+{%if form.instance.errors%}
+<span style='color:red;'>Compas Issue: <pre>{{form.instance.errors.errorDisp}}</pre><pre>{{form.instance.errors.errorRec}}</pre></span>
+{%endif%}
 	<span>
 	<table>
 		<tr>

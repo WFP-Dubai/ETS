@@ -2,6 +2,7 @@ import cx_Oracle
 from ets.waybill.models import *
 from ets.waybill.forms import *
 from ets.waybill.views import *
+from ets.waybill.tools import *
 from django.db import models
 from django.db import connections
 from django.conf import settings
@@ -116,7 +117,7 @@ class compas_write:
    
    
 	def write_dispatch_waybill_compas(self,waybill_id):
-		try:
+		#try:
 			db = cx_Oracle.Connection(self.ConnectionString)
 			cursor = db.cursor()
 			self.ErrorMessages = u''
@@ -185,51 +186,45 @@ class compas_write:
 				ALLCODE = TheStockItems[0].allocation_code
 				QUALITY = TheStockItems[0].qualitycode #'G'
 				UnitsLoaded = lineItem.numberUnitsLoaded
+				strUnitsLoaded =  u'%.3f' % UnitsLoaded
 				UnitNet= lineItem.siNo.UNIT_WEIGHT_NET
 				UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
-				
+				strUnitNet =  u'%.3f' % UnitNet
+				strUnitGross =  u'%.3f' % UnitGross
 				NetTotal =(UnitNet * UnitsLoaded) / 1000
 				strNetTotal = u'%.3f' % NetTotal
 				GrossTotal = (UnitGross * UnitsLoaded) / 1000
 				strGrossTotal = u'%.3f' % GrossTotal
-	
 				Response_Message = cursor.var(cx_Oracle.STRING)
-				Response_Message.setvalue(0,u' '*200)
+				Response_Message.setvalue(0,u'x'*80)
 				Response_Code = cursor.var(cx_Oracle.STRING)
-				Response_Code.setvalue(0,u' '*2)
+				Response_Code.setvalue(0,u'x'*2)
 				Full_coi= TheStockItems[0].origin_id
 				empty = u''
-	
-				print [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
+				printlist( [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
 					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
 					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
-					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,UnitsLoaded,UnitNet,UnitGross,empty]
-	
+					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,empty])
 				cursor.callproc(u'write_waybill.dispatch',(Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
 					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
 					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
-					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,UnitsLoaded,UnitNet,UnitGross,empty))
-					
+					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,u''))
 				if(	Response_Code.getvalue() == 'S'):
 					pass
 				else:
 					all_ok =False
 					self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
 					self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
-				
 				print Response_Message.getvalue()
 				print Response_Code.getvalue()
-				
 			if not all_ok:
 				db.rollback()
 			else:
 				db.commit()
-				
 			cursor.close()
 			db.close()
-			
 			return all_ok
-		except cx_Oracle.DatabaseError,e:
+		#except cx_Oracle.DatabaseError,e:
 			errorObj, = e.args
 			if errorObj.code == 12514:
 				print 'Issue with Connection' + str(errorObj.code)
@@ -240,9 +235,12 @@ class compas_write:
 				the_waybill = Waybill.objects.get(id=waybill_id)
 				self.ErrorMessages = 'Problem with data of Waybill %s: %s \n'%(the_waybill,str(errorObj.code))
 				return False
-		except Exception as e:
+		#except Exception as e:
 			print 'Issue with data'
 			the_waybill = Waybill.objects.get(id=waybill_id)
 			self.ErrorMessages = 'Problem with data of Waybill %s \n'%(the_waybill) + self.ErrorMessages
 			return False
-			
+
+def printlist(list):
+	for item in list:
+		print item

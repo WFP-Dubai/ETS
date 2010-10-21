@@ -4,7 +4,7 @@
 Select an action:
 <ul>
 {%if profile.isDispatcher%}<li><a href='{%url ets.waybill.views.listOfLtis profile.warehouses.ORIGIN_WH_CODE%}'>Create & Dispatch Waybill</a></li>{%endif%}
-{%if profile.isReciever%}<li><a href='{%url ets.waybill.views.waybill_reception_list %}'>Recieve Waybill</a></li>{%endif%}
+{%if profile.isReciever%}<li><a href='{%url ets.waybill.views.waybill_reception_list %}'>Receive Waybill</a></li>{%endif%}
 {%if profile.isCompasUser%}<li><a href='{%url ets.waybill.views.waybill_validateSelect%}'>Validate Waybill</a></li>
     <li><a href='{%url ets.waybill.views.import_ltis%}'>Update DB</a>{%endif%}
 {%if profile.superUser%}<li><a href='{%url ets.waybill.views.waybill_search%}'>Reset waybills</a>{%endif%}
@@ -12,8 +12,6 @@ Select an action:
  <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
     <li>&nbsp;
 {%if profile.isReciever%}<li>Scan Waybill --><form method='POST' action='waybill/deserialize/'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill"></li>{%endif%}
-</ul>
-{{ets.waybill.tools.theHello}}
+</ul>{{SERVER_NAME}}
 
-    {{request}}
 {%endblock%}

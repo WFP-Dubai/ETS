@@ -111,6 +111,8 @@ class Waybill(models.Model):
 				return self.waybillNumber
 		def mydesc(self):
 				return self.waybillNumber
+		def errors(self):
+			return loggerCompas.objects.get(wb=self)
 
 #### Compas Tables Imported
 
@@ -182,15 +184,21 @@ class ltioriginal(models.Model):
 				
 		def  __unicode__(self):
 				marker = ''
-				if self.LTI_PK in removedLtis.objects.list():
-					marker = 'Void '
-				return marker + self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
+				
+				#if self.LTI_PK in removedLtis.objects.list():
+				#	marker = 'Void '
+				return self.valid() + self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
 		def mydesc(self):
 				return self.CODE
 		def commodity(self):
 				return self.CMMNAME 
 		def restant(self):
 				return self.sitracker.number_units_left
+		def valid(self):
+			if removedLtis.objects.filter(lti = self.LTI_PK):
+				return "Void "
+			else:
+				return ''
 		def restant2(self):
 				lines = LoadingDetail.objects.filter(siNo=self)
 				used = 0
@@ -460,18 +468,19 @@ class PackagingDescriptonShortAdmin(admin.ModelAdmin):
 		list_display=('packageCode','packageShortName')
 		list_filter = ('packageCode','packageShortName') 
 		
-# class logger(models.Model):
-# 	timestamp		= models.DateTimeField(null=True, blank=True)
-# 	user			= models.ForeignKey(User, primary_key=True)
-# 	action			= models.CharField(max_length=50, blank=True)
-# 	error			= models.CharField(max_length=50, blank=True)
-# 	wb				= models.ForeignKey(Waybill, blank=True)
-# 	lti				= models.CharField(max_length=50, blank=True)
-# 	data_in			= models.CharField(max_length=5000, blank=True)
-# 	data_out		= models.CharField(max_length=5000, blank=True)
- 
+class loggerCompas(models.Model):
+ 	timestamp		= models.DateTimeField(null=True, blank=True)
+ 	user			= models.ForeignKey(User)
+ 	action			= models.CharField(max_length=50, blank=True)
+ 	errorRec		= models.CharField(max_length=200, blank=True)
+ 	errorDisp		= models.CharField(max_length=200, blank=True)
+ 	wb				= models.ForeignKey(Waybill, blank=True,primary_key=True)
+ 	lti				= models.CharField(max_length=50, blank=True)
+ 	data_in			= models.CharField(max_length=5000, blank=True)
+ 	data_out		= models.CharField(max_length=5000, blank=True)
+
+
 	
-		
 class SIWithRestant:
 		SINumber = ''
 		StartAmount = 0

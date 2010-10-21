@@ -54,12 +54,13 @@ Current Waybills:<br>
 <table class='bordered' >
 {%for wb in listOfWaybills%}
 	<tr><td colspan="3"  class='itemhead bordered'>WB:{{wb}} </td><td class='bordered'><a href='{%url ets.waybill.views.waybill_view wb.id%}?viewonly=true'> View Waybill</a></td></tr>
-	<tr class='itemhead'><td></td><td class='bordered'>SI</td><td class='bordered'>Commodity</td><td class='bordered'>Units dispatched</td></tr>
+	<tr class='itemhead'><td></td><td class='bordered'>Commodity</td><td class='bordered'>SI</td><td class='bordered'>Units dispatched</td></tr>
 	{%for loading in wb.loadingdetail_set.select_related %}
 		<tr class='bordered'>
 		<td class='bordered'>&nbsp;</td>
-		<td class='bordered' >&nbsp;{{loading.siNo.SI_CODE}}&nbsp;</td>
 		<td class='bordered'>&nbsp;{{loading.siNo.CMMNAME}}&nbsp; </td>
+		<td class='bordered' >&nbsp;{{loading.siNo.SI_CODE}}&nbsp;</td>
+
 		<td class='bordered' align="right">{{loading.numberUnitsLoaded}} </td>
 
 		</tr>

@@ -48,8 +48,8 @@ DATABASES = {
     'compas': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
-        'USER': 'TEST2JERX001',                      	# Not used with sqlite3.
-        'PASSWORD': 'TEST2JERX001',                  		# Not used with sqlite3.
+        'USER': 'test2jerx001',                      	# Not used with sqlite3.
+        'PASSWORD': 'test2jerx001',                  		# Not used with sqlite3.
         'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     }#test opt
@@ -145,3 +145,5 @@ INTSTANCE_LABLE="Toby Mac Pro"
 LOGIN_URL = '/ets/accounts/login/'
 LOGOUT_URL = '/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+EMAIL_HOST= 'docustore.wfp.org'
+#EMAIL_USE_TLS=True

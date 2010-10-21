@@ -19,7 +19,7 @@
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
  			<td>{%if form.instance.dispatcherSigned%}{{form.instance.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
   			<td>{%if form.instance.recipientSigned%}{{form.instance.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
- 			<td>{{ form.waybillReceiptValidated }} </td>
+ 			<td>{{ form.waybillReceiptValidated }} {%if form.instance.errors%}<span onMouseUp="alert('{{form.instance.errors.errorRec|escapejs}}')"><span style='color:red;'>Error!</span></span>{%endif%}</td>
  			<td><a href='viewwb/{{form.instance.id}}'>View</a></td>
     </tr>
 
