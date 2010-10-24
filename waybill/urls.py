@@ -22,7 +22,6 @@ info_dict_waybill_reception= {
 	'template_name': 'waybill/reception_list.html'
 }
 
-
 urlpatterns = patterns('',
     (r'^$',homepage),
     (r'^accounts/login/$',login),

@@ -140,7 +140,7 @@ DEBUG_TOOLBAR_PANELS = (
 )
 AUTH_PROFILE_MODULE='waybill.UserProfile'
 
-COMPAS_STATION='JERX001'
+COMPAS_STATION=u'JERX001'
 INTSTANCE_LABLE="Toby Mac Pro"
 LOGIN_URL = '/ets/accounts/login/'
 LOGOUT_URL = '/ets/accounts/logout/'
