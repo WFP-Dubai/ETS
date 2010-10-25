@@ -39,12 +39,15 @@ def loggit(items):
 		pass	
 	
 def viewLog():
-	logfile = 'logg.txt'
-	FILE = open(logfile,"r")
-	log = FILE.read()
-	FILE.close()
-	print log
-	return log
+	try:
+		logfile = 'logg.txt'
+		FILE = open(logfile,"r")
+		log = FILE.read()
+		FILE.close()
+		return log
+	except:
+		pass	
+
 	
 def uniq(inlist):
     # order preserving
