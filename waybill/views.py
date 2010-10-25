@@ -315,8 +315,16 @@ def singleWBDispatchToCompas(request,wb_id):
 	status_wb = the_compas.write_dispatch_waybill_compas(wb_id)
 	if  status_wb:
 		#aok
+		errorlog = ''
+		errorlog = loggerCompas()
+		errorlog.wb = waybill
+		errorlog.user = request.user
+		errorlog.errorDisp = ''
+		errorlog.timestamp = datetime.datetime.now()
+		errorlog.save()
 		waybill.waybillSentToCompas=True
 		waybill.save()
+		
 	else:
 		# error here
 		#print waybill.waybillNumber
@@ -352,7 +360,7 @@ def singleWBReceiptToCompas(request,wb_id):
 	status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 	if  status_wb:
 		#aok
-		waybill.waybillSentToCompas=True
+		waybill.waybillRecSentToCompas=True
 		waybill.save()
 	else:
 		# error here
@@ -852,7 +860,7 @@ def waybill_validate_dispatch_form(request):
 @login_required
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
-	validatedWB = Waybill.objects.filter(invalidated=False).filter(waybillReceiptValidated= True).filter(waybillRecSentToCompas=False)
+	validatedWB = Waybill.objects.filter(invalidated=False).filter(waybillReceiptValidated=True).filter(waybillRecSentToCompas=False).filter(waybillSentToCompas=True)
 	if request.method == 'POST':
 		formset = ValidateFormset(request.POST)
 		if  formset.is_valid():

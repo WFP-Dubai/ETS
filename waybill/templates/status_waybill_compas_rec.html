@@ -1,6 +1,7 @@
 {% extends "base_template.html"%}
 {%block content %}
 <h3>Submitted Receipt & Validated Waybills to Compas</h3>
+<a href='{%url ets.waybill.views.waybill_validate_receipt_form%}'>Back to List</a>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="myTable">
     <thead>
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th><th>Validated</th><th>Received</th><th>Validated</th><th>Compas Updated</th><th>&nbsp;</th></tr>
@@ -17,19 +18,20 @@
  			<td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
  			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%} </td>
  			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
-  			<td>{%if waybill.waybillSentToCompas%}Y{%else%}N{%endif%} </td>
+  			<td>{%if waybill.waybillRecSentToCompas%}Y{%else%}N{%endif%} </td>
  			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}
  					{%if profile.isReciever or profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Reciept</a>{%endif%}
  					{%if profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Full</a>{%endif%}
  			</td>
     </tr>
 </table>
+
+<br>
 {%if error_message %}
 <pre>
 <div>{{error_message}}
 </div></pre>
 {%endif%}
-<br>
 {%endblock%}
 
 {%block extra-header%}

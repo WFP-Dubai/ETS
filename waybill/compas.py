@@ -88,6 +88,9 @@ class compas_write:
 				Response_Message.setvalue(0,u' '*200)
 				Response_Code = cursor.var(cx_Oracle.STRING)
 				Response_Code.setvalue(0,u' '*2)
+				print [Response_Message, Response_Code,CURR_CODE, recPersonOUC, recPersonCode, arrival_date, goodUnits,
+                                        damadgedReason,damadgedUnits,lossReason,lostUnits,Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY]
+				
 				cursor.callproc(u'write_waybill.receipt',(Response_Message, Response_Code,CURR_CODE, recPersonOUC, recPersonCode, arrival_date, goodUnits,
                                         damadgedReason,damadgedUnits,lossReason,lostUnits,Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY))
 				if(	Response_Code.getvalue() == 'S'):
