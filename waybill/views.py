@@ -457,7 +457,7 @@ def waybill_validate_form_update(request,wb_id):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances =formset.save()
-			return HttpResponseRedirect(reverse(reset_waybill))
+			return HttpResponseRedirect(reverse(waybill_search))
 	else:			
 		form = WaybillFullForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)

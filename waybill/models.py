@@ -5,7 +5,8 @@ from django.contrib.auth.models import User
 from django.forms.models import inlineformset_factory
 import datetime
 from django.template.defaultfilters import stringfilter
-
+from audit_log.models.fields import LastUserField
+from audit_log.models.managers import AuditLog
 
 
 # Create your models here.
@@ -106,6 +107,7 @@ class Waybill(models.Model):
 		waybillRecSentToCompas 			=models.BooleanField()
 		waybillProcessedForPayment		=models.BooleanField()
 		invalidated						=models.BooleanField()
+		audit_log = AuditLog()
 		
 		def  __unicode__(self):
 				return self.waybillNumber
@@ -179,6 +181,8 @@ class ltioriginal(models.Model):
 		UNIT_WEIGHT_GROSS			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		
 		objects = ltioriginalManager()
+		
+		
 		class Meta:
 				db_table = u'epic_lti'
 				
@@ -277,6 +281,7 @@ class EpicPerson(models.Model):
 		effective_date 				= models.DateField(null=True, blank=True)
 		expiry_date 				= models.DateField(null=True, blank=True)
 		location_code 				= models.CharField(max_length=10)
+
 		class Meta:
 				db_table = u'epic_persons'
 		def  __unicode__(self):
@@ -309,6 +314,7 @@ class EpicStock(models.Model):
 		number_of_units 	= models.IntegerField()
 		allocation_code 	= models.CharField(max_length=10)
 		reference_number	= models.CharField(max_length=50)
+
 		class Meta:
 				db_table = u'epic_stock'
 		
@@ -356,6 +362,8 @@ class LoadingDetail(models.Model):
 		unitsLostType 				=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
 		overloadedUnits				=models.BooleanField()
 		loadingDetailSentToCompas 	=models.BooleanField()
+		
+		audit_log = AuditLog()
 		
 		
 		def getStockItem(self):
@@ -435,7 +443,7 @@ class UserProfile(models.Model):
 		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True)
 		superUser			=models.BooleanField()
 		readerUser			=models.BooleanField()
-		
+		audit_log = AuditLog()		
 		def __unicode__(self):
 				return "%s's profile" % self.user 
 
