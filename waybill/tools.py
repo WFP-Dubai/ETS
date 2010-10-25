@@ -27,6 +27,24 @@ def theHello():
 	
 def logger(action,user,datain,dataout):
 	pass
+
+def loggit(items):
+	try:
+		logfile = 'logg.txt'
+		FILE = open(logfile,"a")
+		FILE.write(str(datetime.datetime.now())+ ':'+items + '\n')
+		FILE.close()
+		print items
+	except:
+		pass	
+	
+def viewLog():
+	logfile = 'logg.txt'
+	FILE = open(logfile,"r")
+	log = FILE.read()
+	FILE.close()
+	print log
+	return log
 	
 def uniq(inlist):
     # order preserving

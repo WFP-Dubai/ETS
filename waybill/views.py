@@ -18,9 +18,6 @@ import datetime
 import os,StringIO, zlib,base64,string
 
 
-
-
-
 def prep_req(request):
 	return{'user': request.user}
 	
@@ -42,7 +39,7 @@ def selectAction(request):
 	template:
 	/ets/waybill/templates/selectAction.html
 	"""
-	print request
+
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -52,7 +49,7 @@ def selectAction(request):
 							  {'profile':profile},
 							  context_instance=RequestContext(request))
 
-@login_required	
+@login_required
 def listOfLtis(request,origin):
 	"""
 	View:
@@ -134,11 +131,12 @@ def import_ltis(request):
 	#copy LTIs
 	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
-	
+
 	## TODO: Fix so ltis imported are not expired
 	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
-	
+	# log each item
 	for myrecord in original:
+		not_in = True
 		for rec in listRecepients:
 			if myrecord.CONSEGNEE_CODE in  rec['CONSEGNEE_CODE']:
 				for disp in listDispatchers:
@@ -159,7 +157,16 @@ def import_ltis(request):
 							mysist.number_units_left = myrecord.NUMBER_OF_UNITS
 							mysist.number_units_start = myrecord.NUMBER_OF_UNITS
 							mysist.save(using='default')
-							
+						not_in = False
+						break
+				not_in = False
+				break
+
+		if not_in:
+			loggit('Not In %s'%myrecord)
+		else:
+			loggit('In %s'%myrecord)
+
 	#cleanup ltis loop and see if changes to lti ie deleted rows
 	current = ltioriginal.objects.all()
 	for c in current:
@@ -167,7 +174,6 @@ def import_ltis(request):
 			#c.delete() # fix this as it removes even if in use!!!
 			c.remove_lti()
 
-	
 	
 	#UPDATE GEO
 	import_geo()	
@@ -177,11 +183,10 @@ def import_ltis(request):
 	
 	
 	status = 'Import Finished'
+	print viewLog()
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
-
-
 
 def lti_detail_url(request,lti_code):	
 	"""
@@ -389,7 +394,7 @@ def receiptToCompas(request):
 	try:
 		profile=request.user.get_profile()
 	except:
-		print 'no person'
+		loggit( 'no person')
 	list_waybills = Waybill.objects.filter(invalidated=False).filter(waybillReceiptValidated = True).filter(waybillRecSentToCompas = False).filter(waybillSentToCompas=True)
 	the_compas = compas_write()
 	error_message = ''
@@ -574,11 +579,9 @@ def waybill_reception(request,wb_code):
 					raise forms.ValidationError("You have forgotten to select the Loss Reason")	
 			return my_lr
 
-
 		def clean_unitsDamagedReason(self):
 			my_damage = self.cleaned_data.get('numberUnitsDamaged')
 			my_dr = self.cleaned_data.get('unitsDamagedReason')
-
 			if float(my_damage)>0:
 				if my_dr == None:
 					raise forms.ValidationError("You have forgotten to select the Damage Reason")
@@ -592,7 +595,6 @@ def waybill_reception(request,wb_code):
 				if my_lr == None:
 					raise forms.ValidationError("You have forgotten to select the Loss Type")	
 			return my_lr
-
 
 		def clean_unitsDamagedType(self):
 			my_damage = self.cleaned_data.get('numberUnitsDamaged')
@@ -616,15 +618,10 @@ def waybill_reception(request,wb_code):
 					myerror =  "%.2f Units loaded but %.2f units accounted for"%(loadedUnits,totaloffload)
 				if totaloffload < loadedUnits:
 					myerror =  "%.2f Units loaded but only %.2f units accounted for"%(loadedUnits,totaloffload)
-				
 				self._errors['numberUnitsGood'] = self._errors.get('numberUnitsGood', [])
 				self._errors['numberUnitsGood'].append(myerror)
 				raise forms.ValidationError(myerror)
-			
-			
 			return cleaned
-			
-
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
 		form = WaybillRecieptForm(request.POST,instance=current_wb)
@@ -639,9 +636,8 @@ def waybill_reception(request,wb_code):
 			instances =formset.save()
 			return HttpResponseRedirect('../viewwb_reception/'+ str(current_wb.id)) #
 		else:
-			print formset.errors
-			print form.errors
-		
+			loggit( formset.errors)
+			loggit( form.errors)
 	else:
 		if current_wb.recipientArrivalDate:
 			form = WaybillRecieptForm(instance=current_wb)
@@ -662,8 +658,6 @@ def waybill_reception(request,wb_code):
 			{'form': form,'lti_list':current_lti,'formset':formset,'profile':profile},
 			context_instance=RequestContext(request))
 
-
-
 @login_required
 def waybill_reception_list(request):
 	waybills = Waybill.objects.filter(invalidated=False).filter(recipientSigned = False)
@@ -676,14 +670,12 @@ def waybill_reception_list(request):
 							  {'object_list':waybills,'profile':profile},
 							  context_instance=RequestContext(request))
 
-
 def waybill_search(request):
 	profile = ''
 	try:
 		profile=request.user.get_profile()
 	except:
 		pass
-	
 	search_string=''
 	found_wb=''
 	try:
@@ -691,12 +683,9 @@ def waybill_search(request):
 	except:
 		pass
 	
-
-	
 	found_wb = Waybill.objects.filter(invalidated=False).filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
 	curr_wh_disp = ''
-	
 	if profile != '' :	
 		for waybill in found_wb:
 			try:
@@ -709,7 +698,6 @@ def waybill_search(request):
 			except:
 				curr_wh_rec = ''
 				curr_loc = ''				
-
 			if profile.isCompasUser or profile.readerUser:
 				my_valid_wb.append(waybill.id)
 			elif profile.warehouses and curr_wh_disp  == profile.warehouses.ORIGIN_WH_CODE:
@@ -720,8 +708,6 @@ def waybill_search(request):
 	return render_to_response('list_waybills.html',
 							  {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
 							  context_instance=RequestContext(request))
-
-
 
 ### Create Waybill 
 @login_required
@@ -757,9 +743,7 @@ def waybillCreate(request,lti_code):
  				raise forms.ValidationError(myerror)
    			return cleaned
    			
-	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
-
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
@@ -775,8 +759,8 @@ def waybillCreate(request,lti_code):
 			wb_new.save()
 			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id))
 		else:
-			print formset.errors
-			print form.errors
+			loggit( formset.errors)
+			loggit( form.errors)
 	else:
 		
 		form = WaybillForm(
@@ -986,3 +970,8 @@ def import_stock():
 		if item not in current_stock:
 			item.number_of_units = 0;
 			item.save()
+def viewLogView(request):
+	status = '<h3>Log view</h3><pre>'+viewLog()+'</pre>'
+	return render_to_response('status.html',
+							  {'status':status},
+							  context_instance=RequestContext(request))
