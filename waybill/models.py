@@ -338,7 +338,7 @@ class EpicLossReason(models.Model):
 class LossesDamagesReason(models.Model):
 		compasRC = models.ForeignKey(EpicLossReason)
 		compasCode= models.CharField(max_length=20)
-		description  = models.CharField(max_length=20)
+		description  = models.CharField(max_length=80)
 		
 		def  __unicode__(self):
 				return self.description
