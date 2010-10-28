@@ -1,0 +1,13 @@
+{% extends "base_template.html"%}
+{%block content %}
+<table>
+    {% for item in stocklist%}
+ 		<tr>
+ 			<td>{{item.wh_name}}</td>
+ 			<td>{{item.cmmname}}</td>
+ 			<td >{{item.number_of_units}}</td>
+ 		</tr>
+    {% endfor%}
+</table>
+    
+{%endblock%}
