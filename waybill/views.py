@@ -760,7 +760,7 @@ def waybillCreate(request,lti_code):
 		if form.is_valid() and formset.is_valid():
 			wb_new = form.save()
 			instances = formset.save(commit=False)
-			wb_new.waybillNumber = 'E' + '%04d' % wb_new.id
+			wb_new.waybillNumber = newWaybillNo(wb_new)
 			for subform in instances:
 				subform.wbNumber = wb_new
 				subform.save()
@@ -788,7 +788,11 @@ def waybillCreate(request,lti_code):
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+##### Make Waybill number !!!! (make better)
+def newWaybillNo(waybill):
+    return 'E' + '%04d' % waybill.id
 
+####
 @login_required
 def waybill_edit(request,wb_id):
 	try:
@@ -978,8 +982,19 @@ def import_stock():
 		if item not in current_stock:
 			item.number_of_units = 0;
 			item.save()
+def view_stock(request):
+	stocklist = EpicStock.objects.all()
+	return render_to_response('stocklist.html', {'stocklist':stocklist}, context_instance=RequestContext(request))
+	
 def viewLogView(request):
 	status = '<h3>Log view</h3><pre>'+viewLog()+'</pre>'
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
+							  
+def profile(request):
+	status = request.user.get_profile()
+	return render_to_response('status.html',
+							  {'status':status},
+							  context_instance=RequestContext(request))
+	

@@ -28,22 +28,23 @@ class places(models.Model):
 class Waybill(models.Model):
 		transaction_type_choice=(
 						(u'WIT', u'WFP Internal'),
-#						(u'DIS', u'Distribution'),
-#						(u'LON', u'Loan'),
-#						(u'DSP', u'Disposal'),
-#						(u'PUR', u'Purchase'),
-#						(u'SHU',u'Shunting'),
-#						(u'COS',u'Costal Transshipment'),
+
 						(u'DEL',u'Delivery'),
 #						(u'SWA',u'Swap'),
 #						(u'REP',u'Repayment'),
 #						(u'SAL',u'Sale'),
 #						(u'ADR',u'Air drop'),
 #						(u'INL',u'Inland Shipment')
+#						(u'DIS', u'Distribution'),
+#						(u'LON', u'Loan'),
+#						(u'DSP', u'Disposal'),
+#						(u'PUR', u'Purchase'),
+#						(u'SHU',u'Shunting'),
+#						(u'COS',u'Costal Transshipment'),
 				)
 		transport_type=(
-#						(u'01',u'Rail'),
 						(u'02',u'Road'),
+#						(u'01',u'Rail'),
 #						(u'04',u'Air'),
 #						(u'I',u'Inland Waterways'),
 #						(u'C',u'Costal Waterways'),
@@ -318,6 +319,9 @@ class EpicStock(models.Model):
 		class Meta:
 				db_table = u'epic_stock'
 		
+		def  __unicode__(self):
+				return self.wh_name +'\t'+ self.cmmname +'\t'+ str(self.number_of_units)
+		
 		def packagingDescrShort(self):
 			pck= PackagingDescriptonShort.objects.get(pk=self.package_code)
 			#print pck
@@ -434,7 +438,7 @@ class ReceptionPoint(models.Model):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 
 class UserProfile(models.Model):
-		user				=models.OneToOneField(User, primary_key=True)
+		user				=models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
 		warehouses			=models.ForeignKey(DispatchPoint, blank=True,null=True)
 		receptionPoints		=models.ForeignKey(ReceptionPoint, blank=True,null=True)
 		isCompasUser		=models.BooleanField()

@@ -4,7 +4,7 @@ from ets.waybill.tools import *
 from ets.waybill.models import ltioriginal
 from django.views.generic.simple import *
 
-from django.contrib.auth.views import login,logout,password_change
+from django.contrib.auth.views import login,logout,password_change,password_change_done
 
 
 info_dict_lti = {
@@ -27,6 +27,8 @@ urlpatterns = patterns('',
     (r'^accounts/login/$',login),
     (r'^accounts/logout/$',logout),
     (r'^accounts/change_password',password_change),
+    (r'^accounts/profile',profile),
+    (r'^accounts/change_password_done',password_change_done),
 #    (r'^loginHere$',login),
     (r'^select-action$',selectAction),
     (r'^waybill/viewlog',viewLogView),
@@ -63,4 +65,5 @@ urlpatterns = patterns('',
     (r'^waybill/reset_waybill/$',waybill_search),
     (r'^waybill/compass_waybill/$',listCompasWB),
     (r'^waybill/invalidate_waybill/(.*)$',invalidate_waybill),
+    (r'^waybill/view_stock/$',view_stock),
 )
