@@ -12,7 +12,7 @@
 {% for waybill in waybill_list%}
 {%if waybill.id in my_wb%}
 
-<tr {%if waybill.errors%}style='color:red;'{%endif%}>
+<tr {%if waybill.errors%}{%if waybill.errors.errorRec != '' or waybill.errors.errorDisp != '' %}style='color:red;'{%endif%}{%endif%}>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>

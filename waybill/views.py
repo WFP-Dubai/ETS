@@ -315,13 +315,11 @@ def singleWBDispatchToCompas(request,wb_id):
 	status_wb = the_compas.write_dispatch_waybill_compas(wb_id)
 	if  status_wb:
 		#aok
-		errorlog = ''
-		errorlog = loggerCompas()
-		errorlog.wb = waybill
-		errorlog.user = request.user
-		errorlog.errorDisp = ''
-		errorlog.timestamp = datetime.datetime.now()
-		errorlog.save()
+		try:
+			errorlog =loggerCompas.objects.get(wb=waybill)
+			errorlog.delete()
+		except:
+			pass
 		waybill.waybillSentToCompas=True
 		waybill.save()
 		
@@ -329,13 +327,19 @@ def singleWBDispatchToCompas(request,wb_id):
 		# error here
 		#print waybill.waybillNumber
 		#log error.
-		errorlog = ''
-		errorlog = loggerCompas()
-		errorlog.wb = waybill
-		errorlog.user = request.user
-		errorlog.errorDisp = the_compas.ErrorMessages
-		errorlog.timestamp = datetime.datetime.now()
-		errorlog.save()
+		try:
+			errorlog =loggerCompas.objects.get(wb=waybill)
+			errorlog.user = request.user
+			errorlog.errorDisp = the_compas.ErrorMessages
+			errorlog.timestamp = datetime.datetime.now()
+			errorlog.save()
+		except:
+			errorlog =loggerCompas()
+			errorlog.wb = waybill
+			errorlog.user = request.user
+			errorlog.errorDisp = the_compas.ErrorMessages
+			errorlog.timestamp = datetime.datetime.now()
+			errorlog.save()
 
 		waybill.waybillValidated =False
 		waybill.save()
@@ -360,18 +364,30 @@ def singleWBReceiptToCompas(request,wb_id):
 	status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 	if  status_wb:
 		#aok
+		try:
+			errorlog =loggerCompas.objects.get(wb=waybill)
+			errorlog.delete()
+		except:
+			pass
+
 		waybill.waybillRecSentToCompas=True
 		waybill.save()
 	else:
-		# error here
-		#log error.
-		errorlog = ''
-		errorlog = loggerCompas()
-		errorlog.wb = waybill
-		errorlog.user = request.user
-		errorlog.errorRec = the_compas.ErrorMessages
-		errorlog.timestamp = datetime.datetime.now()
-		errorlog.save()
+		try:
+			errorlog =loggerCompas.objects.get(wb=waybill)
+			errorlog.user = request.user
+			errorlog.errorDisp = the_compas.ErrorMessages
+			errorlog.timestamp = datetime.datetime.now()
+			errorlog.save()
+		except:
+			errorlog = ''
+			errorlog = loggerCompas()
+			errorlog.wb = waybill
+			errorlog.user = request.user
+			errorlog.errorRec = the_compas.ErrorMessages
+			errorlog.timestamp = datetime.datetime.now()
+			errorlog.save()
+
 		waybill.waybillReceiptValidated =False
 		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
@@ -424,6 +440,21 @@ def receiptToCompas(request):
 
 def invalidate_waybill(request,wb_id):
 	#first mark waybill invalidate, then zero the stock usage for each line and update the si table
+# 	current_wb = Waybill.objects.get(id=wb_id)
+# 	for lineitem in current_wb.loadingdetail_set.select_related():
+# 		lineitem.siNo.restoresi(lineitem.numberUnitsLoaded)
+# 		lineitem.numberUnitsLoaded = 0
+# 		lineitem.save()
+# 	current_wb.invalidated=True
+# 	current_wb.save()
+	invalidate_waybill_action(wb_id)
+	current_wb = Waybill.objects.get(id=wb_id)
+	status = 'Waybill %s has now been Removed'%(current_wb.waybillNumber)
+	return render_to_response('status.html',
+							  {'status':status},
+							  context_instance=RequestContext(request))
+
+def invalidate_waybill_action(wb_id):
 	current_wb = Waybill.objects.get(id=wb_id)
 	for lineitem in current_wb.loadingdetail_set.select_related():
 		lineitem.siNo.restoresi(lineitem.numberUnitsLoaded)
@@ -431,13 +462,15 @@ def invalidate_waybill(request,wb_id):
 		lineitem.save()
 	current_wb.invalidated=True
 	current_wb.save()
-	status = 'Waybill %s has now been Removed'%(current_wb.waybillNumber)
-	return render_to_response('status.html',
-							  {'status':status},
-							  context_instance=RequestContext(request))
+	
 
 @login_required
 def waybill_validate_form_update(request,wb_id):
+	"""
+	Admin Edit waybill
+	waybill/validate/(.*)
+	waybill/waybill_detail.html
+	"""
 	current_wb =  Waybill.objects.get(id=wb_id)
 	lti_code = current_wb.ltiNumber
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)

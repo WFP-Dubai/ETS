@@ -27,12 +27,12 @@
 	</div>
 	<div>
 <br>
-{%if form.instance.errors%}
-<span style='color:red;'>Compas Issue:
-	{%if form.instance.errors.errorDisp%}Dispatch Error:<pre>{{form.instance.errors.errorDisp}}</pre><br>{%endif%}
-	{%if form.instance.errors.errorRec%}Dispatch Error:<pre>{{form.instance.errors.errorRec}}</pre>{%endif%}
-</span>
-{%endif%}
+{%if  form.instance.errors  %}{%if form.instance.errors.errorRec != '' or  form.instance.errors.errorDisp != '' %}
+<div style='background-color:red;border:2px red solid;'>Compas Issue:<br>
+	{%if form.instance.errors.errorDisp%}Dispatch Error: {{form.instance.errors.errorDisp}} <br>{%endif%}
+	{%if form.instance.errors.errorRec%}Receipt Error: {{form.instance.errors.errorRec}} {%endif%}
+</div>
+{%endif%}{%endif%}
 	<span>
 	<table>
 		<tr>
