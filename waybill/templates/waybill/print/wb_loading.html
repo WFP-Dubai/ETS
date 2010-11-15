@@ -102,14 +102,27 @@
 					<thead class="wb_head"><tr><th colspan="3">Certification of Commodities Loaded</th></tr></thead>
 						<tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup style="font-size:x-small;">Transport Contractor:</sup>{{ltioriginal.0.TRANSPORT_NAME}}</td></tr>
 						<tr><td><small style="font-size:x-small;">Name:</small>{{disp_person}}</td><td colspan="2"><small style="font-size:x-small;">Transport Subcontractor:</small> {{object.transportSubContractor}}</td></tr>
-						<tr><td><small style="font-size:x-small;">Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small style="font-size:x-small;">Driver's Name:</small> {{object.transportDriverName}}</td></tr>
-						<tr><td rowspan="4"><p style="font-size: x-small"><br>I hereby certify the loading of the commodities described above.<br><br><br><br>
-Name, signature and stamp:</p></td><td colspan="2"><small style="font-size:x-small;">Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+						<tr><td ><small style="font-size:x-small;">Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small style="font-size:x-small;">Driver's Name:</small> {{object.transportDriverName}}</td></tr>
+						
+						<tr><td valign=top rowspan="4"><p style="font-size: x-small; align:top;">I hereby certify the loading of the commodities described above.<br><br>
+Name, signature and stamp:
+{%if object.dispatcherSigned%}
+<div style='font-size:14px'>{{disp_person}}<br>Date: {{object.transportDispachSignedTimestamp|date}}</div>
+{%endif%}
+</p>
+</td>
+
+<td colspan="2"><small style="font-size:x-small;">Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+
 						<tr ><td><small style="font-size:x-small;">Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
 						<td><small style="font-size:x-small;">Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSealNumber}}
 						<br><small style="font-size:x-small;">Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSealNumber}} </td></tr>
-						<tr><td rowspan="2" colspan="2"><p style="font-size: x-small"><br>On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br><br><br>
-Name, signature and stamp:</p></td></tr>
+						<tr><td  valign=top  rowspan="2" colspan="2"><p style="font-size: x-small">On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br>
+Name, signature and stamp:<br>{%if object.dispatcherSigned%}
+<div style='font-size:14px'>{{object.transportDriverName|upper}}<br>Date: {{object.transportDispachSignedTimestamp|date}}</div>
+{%endif%}&nbsp;</p>
+
+</td></tr>
 				</table>
 			</td>
 		</tr>

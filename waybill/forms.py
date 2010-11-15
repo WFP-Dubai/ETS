@@ -1,4 +1,5 @@
 from django.forms import ModelForm
+from django.forms.models import  BaseModelFormSet
 from django.http import HttpResponse, HttpResponseRedirect
 from ets.waybill.views import *
 from ets.waybill.models import *
@@ -190,6 +191,16 @@ class WaybillFullForm(ModelForm):
 		except:
 			name = 'N/A'
 		return name
+
+class WaybillValidationFormset(BaseModelFormSet):
+    def clean(self):
+        super(MyModelFormSet, self).clean()
+        # example custom validation across forms in the formset:
+        for form in self.forms:
+            # your custom formset validation
+            pass
+
+
 
 		
 class MyModelChoiceField(ModelChoiceField):

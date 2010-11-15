@@ -25,9 +25,9 @@
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%} </td>
+ 			<td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
  			<td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
- 			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%} </td>
+ 			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
  			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
   			<td>{%if waybill.waybillSentToCompas%}Y{%else%}N{%endif%} </td>
  			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}

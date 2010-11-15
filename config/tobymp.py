@@ -18,6 +18,25 @@ DATABASES = {
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    
+    'compas': {
+        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
+        'USER': 'testjerx001',                      	# Not used with sqlite3.
+        'PASSWORD': 'testjerx001',                  		# Not used with sqlite3.
+        'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+    }#test opt
+}
+
+DATABASES_OTHER={
+    'default': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'wbprod',                      # Or path to database file if using sqlite3.
+        'USER': 'root',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
     'compasTestRome': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -89,6 +108,7 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
 
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -140,6 +160,15 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.logger.LoggingPanel',
 )
 AUTH_PROFILE_MODULE='waybill.UserProfile'
+
+TEMPLATE_CONTEXT_PROCESSORS =(
+"django.contrib.auth.context_processors.auth",
+"django.core.context_processors.debug",
+"django.core.context_processors.i18n",
+"django.contrib.messages.context_processors.messages",
+'django.core.context_processors.request'
+)
+
 
 COMPAS_STATION=u'JERX001'
 INTSTANCE_LABLE="Toby Mac Pro"

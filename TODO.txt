@@ -1,4 +1,131 @@
 TODO:
 
-Documentation
-Create a "logger" for admin actions
+Documentation:
+Comment Code
+Document packages used
+
+These are the tasks needed for ETS, not all for the consultant:
+
+Cleanup Tasks:
+Make barcode smaller by translating columns in json to numbers or something 
+(current barcode around 1600+ chars can get down to 800 or less)
+Audit Log views
+Refract code to clean models and views and move utility functions into tools and simplify views 
+Organize templates
+
+Handel Silos:
+Handel bulk load by weight
+Possible solution is to if item is in bulk copy Weight into Items.... Handle reconversion when sending to compas.
+Issue: Inconsistency in the bulk items, sometime the number of items is 0 sometimes it is a number....
+
+Local Barcode generator:
+Barcode Imager Aztec/QR-Code (local to server)(currently using google graphs api)
+
+Installer:
+Easy to install with no online access during install, download singel MSI/ZIP. (installing python and all packages needed and configuration with simpel interface)
+Configuration by wizard
+
+Offline Receipt:
+Easy to install with no online access (see above).
+Rely on Barcode to retrieve goods. 
+Prints the receipt, and save it so it can be sent or uploaded to Dispatch server
+
+Offline Dispatch (Needs internet access for syncing):
+Easy to install with no online access (see above).
+Synchronizes LTIs from Mother server,
+Creates dispatch offline with barcode (as server, but not using google graphs)
+Prints receipt, and at a later point upload to Mother server
+To resolve: how to make waybill number sequence without conflict on offline.
+
+Central Data-warehouse for reporting:
+Reporting server that either connects and get all info form all Mother Node servers, or all servers push info to it
+
+Connecting to multiple Compas Stations:
+Single Mother node connected to multiple compas servers (case Pak/Afg)
+To resolve: how to keep track of what Compas station to send dispatch/receipt to
+
+Receipt from other Instance:
+Manage receipt dispatched from other Mother Nodes
+To resolve: how to keep track of what compas station to send dispatch/receipt to
+
+
+All code should be "Single Source" i.e. the offline instances are using configuration to know what they are(exception: Data-Warehouse)
+
+
+
+
+
+
+The ETS application is a interface to COMPAS to create, print and update waybills 
+The system connects periodically to COMPAS to retrieve LTIs (Landside Transport Instructions), and then allows a warehouse keeper to create a Waybill against these, this dispatched waybill is then pushed into COMPAS, the waybill has a barcode containing all the info of the waybill that can be used to do the reception of the waybill even if the receiving station has no connectivity.
+
+Needed development Work:
+
+Extend the application so that it can used in an offline client mode both for the dispatch and receipt
+
+Possible workflow
+Actors:
+ETS-M: ETS system connected to COMPAS-D and COMPAS-R, and internet
+ETS-M2: ETS system connected to COMPAS-R2, and internet
+
+ETS-D: ETS system executing the dispatch, intermittently connected to ETS-M 
+ETS-R: ETS system executing the reception, "No" internet connectivity, i.e. should have method to extract records into transportable format such as a text file that can be e-mailed to xxx or uploaded onto ETS-M
+
+WH-D1: Warehouse keeper for offline Dispatching Warehouse
+WH-D2: Warehouse keeper for online Dispatching Warehouse
+WH-R1: Warehouse keeper for Receiving Warehouse
+WH-R1: Warehouse keeper for Receiving Warehouse2
+
+CP-O1: COMPAS Officer COMPAS-D
+CP-O2: COMPAS Officer COMPAS-R2
+
+COMPAS-D: Dispatching Offices COMPAS STATION
+COMPAS-R: Receiving Offices COMPAS STATION 
+COMPAS-R2: Receiving Offices COMPAS STATION
+
+Senario 1:
+Same COMPAS station for both dispatch & Receipt
+LTI Created in COMPAS-D
+ETS-M extract LTI from COMPAS-D
+WH-D1 synchronizes ETS-D with ETS-M
+WH-D1 goes offline and creates Waybill(s) in  ETS-D
+(WH-D2 creates waybill in ETS-M )*
+WH-D1 Returns online and synchronizes  ETS-D with  ETS-M
+CP-O validates dispatch and submits it to COMPAS-D
+WH-R Receives paper waybill and scans it into  ETS-R
+WH-R Updates & Prints Receipt using  ETS-R
+WH-R Extracts and emails the receipt record to CP-O1
+CP-O1 Uploads the  receipt record onto  ETS-M
+CP-O1 validates receipt and submits it to COMPAS-D
+
+
+Senario 2:
+Different COMPAS station for dispatch & Receipt, single ETS system.
+LTI Created in COMPAS-D
+ETS-M extract LTI from COMPAS-D
+WH-D1 synchronizes ETS-D with ETS-M
+WH-D1 goes offline and creates Waybill(s) in  ETS-D
+(WH-D2 creates waybill in ETS-M )*
+WH-D1 Returns online and synchronizes  ETS-D with  ETS-M
+CP-O validates dispatch and submits it to COMPAS-D
+WH-R Receives paper waybill and scans it into  ETS-R
+WH-R Updates & Prints Receipt using  ETS-R
+WH-R Extracts and emails the receipt record to CP-O1
+CP-O1 Uploads the  receipt record onto  ETS-M
+CP-O1 validates receipt and submits it to COMPAS-R
+
+Senario 3:
+Different COMPAS station for dispatch & Receipt, two ETS system.
+LTI Created in COMPAS-D
+ETS-M extract LTI from COMPAS-D
+WH-D1 synchronizes ETS-D with ETS-M
+WH-D1 goes offline and creates Waybill(s) in  ETS-D
+(WH-D2 creates waybill in ETS-M )*
+WH-D1 Returns online and synchronizes  ETS-D with  ETS-M
+CP-O validates dispatch and submits it to COMPAS-D
+WH-R Receives paper waybill and scans it into  ETS-R
+WH-R Updates & Prints Receipt using  ETS-R
+WH-R Extracts and emails the receipt record to CP-O1
+CP-O1 Uploads the  receipt record onto  ETS-M
+CP-O1 validates receipt and submits it to COMPAS-R
+

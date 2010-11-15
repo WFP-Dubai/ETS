@@ -73,12 +73,17 @@ def un64unZip(data):
 	return uncompressed
 
 # takes a wb id and returns a zipped base64 string of the serialized object // ?use table to reduce column names save 1000 bytes?
-def wb_compress(wb_code):
+
+def serialize_wb(wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
 	lti_to_serialize =  ltioriginal.objects.filter(LTI_PK=items_to_serialize[0].siNo.LTI_PK)
-	#print lti_to_serialize
 	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
+	return data
+
+def wb_compress(wb_code):
+	data = serialize_wb(wb_code)#serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
+	print data
 	zippedData =	zipBase64(data)
 	return zippedData
 
@@ -104,3 +109,52 @@ def restant_si(lti_code):
  				if si.SINumber == loading.siNo.SI_CODE:
  					si.reduceCurrent(loading.numberUnitsLoaded)
  	return listOfSI
+ 	
+##### Make Waybill number !!!! (make better)
+def newWaybillNo(waybill):
+    return 'E' + '%04d' % waybill.id
+
+####
+
+
+	
+def update_persons():
+	"""
+	Executes Imports of LTIs Persons
+	"""
+	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
+	for my_person in originalPerson:
+		my_person.save(using='default')	
+	
+def import_geo():
+	"""
+	Executes Imports of places
+	"""
+	#UPDATE GEO
+	try:
+		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='275')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass	
+	try:
+		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='376')
+		for the_geo in my_geo:
+				the_geo.save(using='default')
+	except:
+		pass
+	return True
+
+def import_stock():
+	"""
+	Executes Imports of Stock
+	"""
+	originalStock = EpicStock.objects.using('compas')
+	for myrecord in originalStock:
+		myrecord.save(using='default')
+	
+	current_stock = EpicStock.objects.all()
+	for item in current_stock:
+		if item not in current_stock:
+			item.number_of_units = 0;
+			item.save()

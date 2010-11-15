@@ -16,47 +16,44 @@ from ets.waybill.models import *
 from ets.waybill.tools import *
 import datetime
 import os,StringIO, zlib,base64,string
+from django.contrib import messages
 
 
 def prep_req(request):
 	return{'user': request.user}
-	
 
 def homepage(request):
 	""" 
-	View:
-	homepage /
-	redirects you to the selectAction page
+	View: homepage 
+	URL: /
+	Template: None
+	Redirects you to the selectAction page
 	"""
 	return HttpResponseRedirect(reverse(selectAction))
 							  
 @login_required	
 def selectAction(request):
 	"""
-	View:
-	selectAction /ets/select-action
+	View: selectAction 
+	URL: /ets/select-action
+	Template: /ets/waybill/templates/selectAction.html
 	Gives the loggedin user a choise of possible actions sepending on roles
-	template:
-	/ets/waybill/templates/selectAction.html
 	"""
-
 	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
+#	try:
+#		profile=request.user.get_profile()
+#	except:
+#		pass
 	return render_to_response('selectAction.html',
-							  {'profile':profile},
 							  context_instance=RequestContext(request))
 
 @login_required
 def listOfLtis(request,origin):
 	"""
-	View:
-	listOfLtis waybill/list/{{warehouse}}
+	View: listOfLtis 
+	URL: ets/waybill/list/{{warehouse}}
+	Template: /ets/waybill/templates/ltis.html
 	Shows the LTIs that are in a specific warehouse
-	template:
-	/ets/waybill/templates/ltis.html
 	"""
 	ltis = ltioriginal.objects.ltiCodesByWH(origin)
 	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
@@ -74,25 +71,21 @@ def listOfLtis(request,origin):
 				if not lti in still_ltis:
 					still_ltis.append(lti)
 	return render_to_response('ltis.html',
-							  {'ltis':still_ltis,'profile':profile},
+							  {'ltis':still_ltis},
 							  context_instance=RequestContext(request))
 
 ## repurposed show all ltis 
 def ltis(request):
 	"""
 	View:
-	ltis waybill/list
+	ltis
+	URL: ets/waybill/list
 	Shows the LTIs that are in a specific warehouse
 	template:
 	/ets/waybill/templates/ltis.html
 	"""
 	ltis = ltioriginal.objects.ltiCodesAll()
 	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	still_ltis=[]
 	# finished ltis
 	for lti in ltis:
@@ -102,7 +95,7 @@ def ltis(request):
 				if not lti in still_ltis:
 					still_ltis.append(lti)
 	return render_to_response('ltis_all.html',
-							  {'ltis':still_ltis,'profile':profile},
+							  {'ltis':still_ltis},
 							  context_instance=RequestContext(request))
 ## ^ NOT IN USE
 
@@ -110,21 +103,20 @@ def ltis(request):
 def ltis_redirect_wh(request):
 	"""
 	View:
-	ltis_redirect_wh waybill/list/
-	automatically redirects user to his dispatch point wh to listOfLtis
-	template:
-	None
+	ltis_redirect_wh 
+	URL: ets/waybill//list/
+	Template: None
+	Automatically redirects user to his dispatch point wh to listOfLtis
 	"""
 	wh_code = request.GET['dispatch_point']
 	return HttpResponseRedirect(reverse(listOfLtis ,args=[wh_code]))
 
 def import_ltis(request):
 	"""
-	View:
-	import_ltis ets/waybill/import
+	View: import_ltis 
+	URL: ets/waybill/import
+	Template: /ets/waybill/templates/status.html
 	Executes Imports of LTIs Persons Stock and updates SiTracker
-	template:
-	/ets/waybill/templates/status.html
 	"""
 	#Copy Persons
 	update_persons()
@@ -190,18 +182,11 @@ def import_ltis(request):
 
 def lti_detail_url(request,lti_code):	
 	"""
-	View:
-	lti_detail_url waybill/info/(lti_code)
+	View: lti_detail_url 
+	URL: ets/waybill/info/(lti_code)
+	Template: /ets/waybill/templates/detailed_lti.html
 	Show detail of LTI and link to create waybill
-	template:
-	/ets/waybill/templates/detailed_lti.html
 	"""
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
-	
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
 	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code)
 	listOfSI_withDeduction = restant_si(lti_code)
@@ -210,15 +195,15 @@ def lti_detail_url(request,lti_code):
 		if item.CurrentAmount > 0:
 			lti_more_wb=True
 	return render_to_response('detailed_lti.html',
-							  {'detailed':detailed_lti,'lti_id':lti_code,'profile':profile,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction,'moreWBs':lti_more_wb},
+							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction,'moreWBs':lti_more_wb},
 							  context_instance=RequestContext(request))
 							  
 @login_required
 def dispatch(request):
 	"""
-	View:
-	dispatch waybill/dispatch
-	template:
+	View: dispatch 
+	URL: ets/waybill/dispatch
+	Template: None
 	Redirects to Lti Details.
 	"""
 	try:
@@ -240,8 +225,9 @@ def waybill_create(request,lti_pk):
 @login_required
 def waybill_finalize_dispatch(request,wb_id):
 	"""
-	View:
-	waybill_finalize_dispatch waybill/dispatch
+	View: waybill_finalize_dispatch
+	URL: ets/waybill/dispatch
+	Templet:None
 	called when user pushes Print Original on dispatch
 	Redirects to Lti Details
 	"""
@@ -250,19 +236,18 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.transportDispachSignedTimestamp=datetime.datetime.now()
 	current_wb.dispatcherSigned=True
 	for lineitem in current_wb.loadingdetail_set.select_related():
-#		print lineitem.numberUnitsLoaded
-#		print lineitem.siNo.restant()
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
 	return HttpResponseRedirect(reverse(lti_detail_url,args=[current_wb.ltiNumber]))
 	
 @login_required
-def	waybill_finalize_reciept(request,wb_id):
+def	waybill_finalize_receipt(request,wb_id):
 	"""
-	View:
-	waybill_finalize_dispatch waybill/dispatch
-	called when user pushes Print Original on dispatch
+	View: waybill_finalize_receipt 
+	URL:ets/waybill/receipt/
+	Template:None
 	Redirects to Lti Details
+	Called when user pushes Print Original on dispatch
 	"""
 	try:
 		current_wb = Waybill.objects.get(id=wb_id)
@@ -277,6 +262,12 @@ def	waybill_finalize_reciept(request,wb_id):
 
 @login_required
 def dispatchToCompas(request):
+	"""
+	View: dispatchToCompas
+	URL:
+	Template: /ets/waybill/templates/list_waybills_compas.html
+	Was called when user clicked Send To Comas for all current items, No longer in use
+	"""
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -300,8 +291,15 @@ def dispatchToCompas(request):
 	return render_to_response('list_waybills_compas.html',
 							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
-							  
+
+@login_required							  
 def singleWBDispatchToCompas(request,wb_id):
+	"""
+	View: singleWBDispatchToCompas
+	URL: 
+	Template: /ets/waybill/templates/status_waybill_compas.html
+	Sends a single Dipatch into compas
+	"""
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -350,8 +348,14 @@ def singleWBDispatchToCompas(request,wb_id):
 							  {'waybill':waybill,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
 	
-
+@login_required
 def singleWBReceiptToCompas(request,wb_id):
+	"""
+	View: singleWBReceiptToCompas
+	URL: ...
+	Template: /ets/waybill/templates/status_waybill_compas_rec.html
+	Sends a single Receipt into compas
+	"""
 	profile = ''
 	try:
 		profile=request.user.get_profile()
@@ -440,13 +444,7 @@ def receiptToCompas(request):
 
 def invalidate_waybill(request,wb_id):
 	#first mark waybill invalidate, then zero the stock usage for each line and update the si table
-# 	current_wb = Waybill.objects.get(id=wb_id)
-# 	for lineitem in current_wb.loadingdetail_set.select_related():
-# 		lineitem.siNo.restoresi(lineitem.numberUnitsLoaded)
-# 		lineitem.numberUnitsLoaded = 0
-# 		lineitem.save()
-# 	current_wb.invalidated=True
-# 	current_wb.save()
+
 	invalidate_waybill_action(wb_id)
 	current_wb = Waybill.objects.get(id=wb_id)
 	status = 'Waybill %s has now been Removed'%(current_wb.waybillNumber)
@@ -821,11 +819,7 @@ def waybillCreate(request,lti_code):
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
-##### Make Waybill number !!!! (make better)
-def newWaybillNo(waybill):
-    return 'E' + '%04d' % waybill.id
 
-####
 @login_required
 def waybill_edit(request,wb_id):
 	try:
@@ -893,7 +887,8 @@ def waybill_validate_dispatch_form(request):
 	else:
 		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
 	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
-	
+
+
 @login_required
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
@@ -938,7 +933,8 @@ def testform(request,lti_code):
 def serialize(request,wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize =''# waybill_to_serialize[0].loadingdetail_set.select_related()
-	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))	
+	data = serialize_wb(wb_code)# serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))	
+	
 	zippedWB = wb_compress(wb_code)
 	return render_to_response('blank.html',{'status':data,'ziped':zippedWB},
 							  context_instance=RequestContext(request))
@@ -975,46 +971,6 @@ def fixtures_serialize():
 def custom_show_toolbar(request):
 	return True
 	
-def update_persons():
-	"""
-	Executes Imports of LTIs Persons
-	"""
-	originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
-	for my_person in originalPerson:
-		my_person.save(using='default')	
-	
-def import_geo():
-	"""
-	Executes Imports of places
-	"""
-	#UPDATE GEO
-	try:
-		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='275')
-		for the_geo in my_geo:
-				the_geo.save(using='default')
-	except:
-		pass	
-	try:
-		my_geo = places.objects.using('compas').filter(COUNTRY_CODE='376')
-		for the_geo in my_geo:
-				the_geo.save(using='default')
-	except:
-		pass
-	return True
-
-def import_stock():
-	"""
-	Executes Imports of Stock
-	"""
-	originalStock = EpicStock.objects.using('compas')
-	for myrecord in originalStock:
-		myrecord.save(using='default')
-	
-	current_stock = EpicStock.objects.all()
-	for item in current_stock:
-		if item not in current_stock:
-			item.number_of_units = 0;
-			item.save()
 def view_stock(request):
 	stocklist = EpicStock.objects.all()
 	return render_to_response('stocklist.html', {'stocklist':stocklist}, context_instance=RequestContext(request))

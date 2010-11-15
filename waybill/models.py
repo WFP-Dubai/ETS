@@ -10,7 +10,6 @@ from audit_log.models.managers import AuditLog
 
 
 # Create your models here.
-
 class places(models.Model):
 		ORG_CODE 			=models.CharField(max_length=7, primary_key=True)
 		NAME				=models.CharField(max_length=100)
@@ -25,10 +24,10 @@ class places(models.Model):
 		class Meta:
 				db_table = u'epic_geo'
 
+
 class Waybill(models.Model):
 		transaction_type_choice=(
 						(u'WIT', u'WFP Internal'),
-
 						(u'DEL',u'Delivery'),
 #						(u'SWA',u'Swap'),
 #						(u'REP',u'Repayment'),
@@ -245,9 +244,13 @@ class ltioriginal(models.Model):
 						except:				
 							return 'No Stock '
 		def remove_lti(self):
+			all_removed = removedLtis.objects.all()
 			this_lti = removedLtis()
 			this_lti.lti = self
-			this_lti.save()
+			if this_lti not in all_removed:
+				print('Add to removed')
+				this_lti.save()
+				
 			
 class removedLtisManager(models.Manager):
 		def list(self):
@@ -258,12 +261,13 @@ class removedLtisManager(models.Manager):
 			return listExl
 ## helper table for nolonger existing lti items
 class removedLtis(models.Model):
-		lti = models.ForeignKey(ltioriginal)
-		
+		lti = models.ForeignKey(ltioriginal,primary_key=True)
 		objects = removedLtisManager()
 		class Meta:
 				db_table = u'waybill_removed_ltis'
 	
+
+
 
 class EpicPerson(models.Model):
 		person_pk 					= models.CharField(max_length=20, blank=True, primary_key=True)
@@ -419,11 +423,13 @@ class LoadingDetail(models.Model):
 				return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()  +' - '+ self.siNo.LTI_PK
 
 class DispatchPoint(models.Model):
-		ORIGIN_LOC_NAME						=models.CharField(max_length=20, blank=True)
-		ORIGIN_LOCATION_CODE				=models.CharField(max_length=20, blank=True)
-		ORIGIN_WH_CODE						=models.CharField(max_length=20, blank=True)
-		ORIGIN_WH_NAME						=models.CharField(max_length=30, blank=True)
-		DESC_NAME							=models.CharField(max_length=20, blank=True,null=True)
+		ORIGIN_LOC_NAME			=models.CharField(max_length=20, blank=True)
+		ORIGIN_LOCATION_CODE	=models.CharField(max_length=20, blank=True)
+		ORIGIN_WH_CODE			=models.CharField(max_length=20, blank=True)
+		ORIGIN_WH_NAME			=models.CharField(max_length=30, blank=True)
+		DESC_NAME				=models.CharField(max_length=20, blank=True,null=True)
+		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
+		
 		
 		def  __unicode__(self):
 				return self.ORIGIN_WH_CODE + ' - ' + self.ORIGIN_LOC_NAME
@@ -434,6 +440,7 @@ class ReceptionPoint(models.Model):
 		CONSEGNEE_CODE			=models.CharField(max_length=20, blank=True)
 		CONSEGNEE_NAME			=models.CharField(max_length=80, blank=True)
 		#DESC_NAME				=models.CharField(max_length=80, blank=True)
+		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
 		def  __unicode__(self):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 

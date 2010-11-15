@@ -16,8 +16,8 @@
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{form.instance.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if form.instance.dispatcherSigned%}{{form.instance.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
-  			<td>{%if form.instance.recipientSigned%}{{form.instance.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+ 			<td>{%if form.instance.dispatcherSigned%}{{form.instance.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
+  			<td>{%if form.instance.recipientSigned%}{{form.instance.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
  			<td>{{ form.waybillValidated }}{%if form.instance.errors%}<span onMouseUp="alert('{{form.instance.errors.errorDisp|escapejs}}')"><span style='color:red;'>Error!</span></span>{%endif%}</td>
  			<td><a href='viewwb/{{form.instance.id}}'>View</a></td>
     </tr>
@@ -39,8 +39,8 @@
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.ORIGIN_WH_NAME}}</td>
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
  			<td>{{wb.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 			<td>{%if wb.dispatcherSigned%}{{wb.transportDispachSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
-  			<td>{%if wb.recipientSigned%}{{wb.recipientSignedTimestamp|date:"d/m/Y"}}{%else%}Pending{%endif%}</td>
+ 			<td>{%if wb.dispatcherSigned%}{{wb.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
+  			<td>{%if wb.recipientSigned%}{{wb.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
  			<td><form method="post" action='commit_to_compas_dispatch_one/{{wb.id}}'> <input type="submit" value="Update In Compas"> <input type="hidden" name="wb_id" value="{{wb.id}}">{% csrf_token %}</form></td>
     </tr>
     {% endfor %}

@@ -110,6 +110,14 @@ DEBUG_TOOLBAR_PANELS = (
 )
 AUTH_PROFILE_MODULE='waybill.UserProfile'
 
+TEMPLATE_CONTEXT_PROCESSORS =(
+"django.contrib.auth.context_processors.auth",
+"django.core.context_processors.debug",
+"django.core.context_processors.i18n",
+"django.contrib.messages.context_processors.messages",
+'django.core.context_processors.request'
+)
+
 COMPAS_STATION=u'JERX001'
 COMPASS_CONNECTION = "TEST2JERX001/TEST2JERX001@//10.11.216.4:1521/JERX001"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
