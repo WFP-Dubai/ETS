@@ -13,5 +13,5 @@ Select an action:
     <li>&nbsp;
 {%if user.profile.isReciever%}<li>Scan Waybill --><form method='POST' action='waybill/deserialize/'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill"></li>{%endif%}
 </ul>
-{{request.META.HTTP_REFERER}}
+
 {%endblock%}
