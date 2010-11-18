@@ -83,7 +83,7 @@ def serialize_wb(wb_code):
 
 def wb_compress(wb_code):
 	data = serialize_wb(wb_code)#serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
-	print data
+	printIt( data)
 	zippedData =	zipBase64(data)
 	return zippedData
 
@@ -158,3 +158,9 @@ def import_stock():
 		if item not in current_stock:
 			item.number_of_units = 0;
 			item.save()
+			
+			
+def printIt(line):
+#	print line
+	pass
+	
