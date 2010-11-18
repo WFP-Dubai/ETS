@@ -3,7 +3,7 @@
 {%block content %}
 Select an action:
 <ul>
-{%if profile.isCompasUser%}
+{%if user.profile.isCompasUser%}
 <li><a href='{%url ets.waybill.views.waybill_validate_dispatch_form%}'>Validate Dispatch Waybill</a></li>
 <li><a href='{%url ets.waybill.views.waybill_validate_receipt_form%}'>Validate Received Waybill</a></li>
 {%endif%}

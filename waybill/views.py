@@ -39,11 +39,6 @@ def selectAction(request):
 	Template: /ets/waybill/templates/selectAction.html
 	Gives the loggedin user a choise of possible actions sepending on roles
 	"""
-	profile = ''
-#	try:
-#		profile=request.user.get_profile()
-#	except:
-#		pass
 	return render_to_response('selectAction.html',
 							  context_instance=RequestContext(request))
 
@@ -98,7 +93,6 @@ def ltis(request):
 							  {'ltis':still_ltis},
 							  context_instance=RequestContext(request))
 ## ^ NOT IN USE
-
 
 def ltis_redirect_wh(request):
 	"""
@@ -258,7 +252,7 @@ def	waybill_finalize_receipt(request,wb_id):
 		current_wb.save()
 	except:
 		 return HttpResponseRedirect(reverse(selectAction))
-	return HttpResponseRedirect(reverse(waybill_view_reception, args=[current_wb.id])) 
+	return HttpResponseRedirect(reverse(waybill_reception_list)) 
 
 @login_required
 def dispatchToCompas(request):
@@ -343,7 +337,8 @@ def singleWBDispatchToCompas(request,wb_id):
 		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
-# add field to say compas erroradd logging
+		# Update stock after submit off waybill
+		import_stock()
 	return render_to_response('status_waybill_compas.html',
 							  {'waybill':waybill,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
@@ -405,15 +400,10 @@ def singleWBReceiptToCompas(request,wb_id):
 							  context_instance=RequestContext(request))	
 	
 def listCompasWB(request):
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	list_waybills_disp = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = True)
 	list_waybills_rec = Waybill.objects.filter(invalidated=False).filter(waybillRecSentToCompas = True)
 	return render_to_response('list_waybills_compas_all.html',
-							  {'waybill_list':list_waybills_disp,'waybill_list_rec':list_waybills_rec,'profile':profile},
+							  {'waybill_list':list_waybills_disp,'waybill_list_rec':list_waybills_rec},
 							  context_instance=RequestContext(request))
 
 @login_required
@@ -486,7 +476,7 @@ def waybill_validate_form_update(request,wb_id):
 	
 		class Meta:
 			model = LoadingDetail
-			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
+			fields = ('wbNumber','siNo','numberUnitsLoaded','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits','overOffloadUnits')
 
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=0)
 
@@ -608,7 +598,8 @@ def waybill_reception(request,wb_code):
 		numberUnitsDamaged= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
 		class Meta:
 			model = LoadingDetail
-			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason','unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits')
+			fields = ('wbNumber','siNo','numberUnitsGood','numberUnitsLost','numberUnitsDamaged','unitsLostReason',
+						'unitsDamagedReason','unitsDamagedType','unitsLostType','overloadedUnits','overOffloadUnits')
 		def clean_unitsLostReason(self):
 			#cleaned_data = self.cleaned_data
 			my_losses = self.cleaned_data.get('numberUnitsLost')
@@ -651,15 +642,16 @@ def waybill_reception(request,wb_code):
 			damadgedUnits = float(cleaned.get('numberUnitsDamaged'))
 			lostUnits =float(cleaned.get('numberUnitsLost'))
 			totaloffload = numberUnitsGood+damadgedUnits+ lostUnits
-			if not totaloffload == loadedUnits:
-				myerror = ''
-				if totaloffload > loadedUnits:
-					myerror =  "%.2f Units loaded but %.2f units accounted for"%(loadedUnits,totaloffload)
-				if totaloffload < loadedUnits:
-					myerror =  "%.2f Units loaded but only %.2f units accounted for"%(loadedUnits,totaloffload)
-				self._errors['numberUnitsGood'] = self._errors.get('numberUnitsGood', [])
-				self._errors['numberUnitsGood'].append(myerror)
-				raise forms.ValidationError(myerror)
+			if not cleaned.get('overOffloadUnits'):
+				if not totaloffload == loadedUnits:
+					myerror = ''
+					if totaloffload > loadedUnits:
+						myerror =  "%.2f Units loaded but %.2f units accounted for"%(loadedUnits,totaloffload)
+					if totaloffload < loadedUnits:
+						myerror =  "%.2f Units loaded but only %.2f units accounted for"%(loadedUnits,totaloffload)
+					self._errors['numberUnitsGood'] = self._errors.get('numberUnitsGood', [])
+					self._errors['numberUnitsGood'].append(myerror)
+					raise forms.ValidationError(myerror)
 			return cleaned
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
 	if request.method == 'POST':
@@ -866,36 +858,84 @@ def waybill_edit(request,wb_id):
 
 @login_required
 def waybill_validateSelect(request):
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
-	return render_to_response('selectValidateAction.html',
-							  {'profile':profile},
-							  context_instance=RequestContext(request))
+	return render_to_response('selectValidateAction.html', context_instance=RequestContext(request))
 
 @login_required
 def waybill_validate_dispatch_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillValidated',),extra=0)
 	validatedWB = Waybill.objects.filter(invalidated=False).filter(waybillValidated= True).filter(waybillSentToCompas=False)
+	issue=''
+	errorMessage = 'Problems with Stock, Not enough in Dispatch Warehouse'
 	if request.method == 'POST':
-		formset = ValidateFormset(request.POST)
-		if  formset.is_valid():
-			formset.save()
+		valid=True
+		issue='Problems with Stock on WB: '
+		formset = ValidateFormset(request.POST,WaybillValidationFormset)
+		if  formset.is_valid() :
+ 			instances =formset.save(commit=False)
+ 			for form in  instances:
+ 				if form.check_lines():
+ 					pass
+ 				else:
+ 					valid=False
+ 					issue += ' '+ str(form)
+ 					
+ 					form.waybillValidated=False
+					try:
+						errorlog =loggerCompas.objects.get(wb=form)
+						errorlog.user = request.user
+						errorlog.errorDisp = errorMessage
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+					except:
+						errorlog =loggerCompas()
+						errorlog.wb = form
+						errorlog.user = request.user
+						errorlog.errorDisp = errorMessage
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+ 			formset.save()
+ 			print issue
+				
 		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
 	else:
 		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
-	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
+	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB,'issue':issue}, context_instance=RequestContext(request))
 
 
 @login_required
 def waybill_validate_receipt_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillReceiptValidated',),extra=0)
 	validatedWB = Waybill.objects.filter(invalidated=False).filter(waybillReceiptValidated=True).filter(waybillRecSentToCompas=False).filter(waybillSentToCompas=True)
+	issue=''
+	errorMessage= 'Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!'
 	if request.method == 'POST':
 		formset = ValidateFormset(request.POST)
 		if  formset.is_valid():
+ 			instances =formset.save(commit=False)
+ 			for form in  instances:
+ 				if form.check_lines_receipt():
+ 					pass
+ 				else:
+ 					valid=False
+ 					issue += ' '+ str(form)
+ 					
+ 					form.waybillReceiptValidated=False
+					try:
+						errorlog =loggerCompas.objects.get(wb=form)
+						errorlog.user = request.user
+						errorlog.errorRec = errorMessage
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+					except:
+						errorlog =loggerCompas()
+						errorlog.wb = form
+						errorlog.user = request.user
+						errorlog.errorRec  = errorMessage
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+# 			formset.save()
+ 			print issue
+
 			formset.save()
 		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
 	else:

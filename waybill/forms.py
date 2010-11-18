@@ -143,38 +143,37 @@ class WaybillRecieptForm(ModelForm):
 		return cleaned
 
 class WaybillFullForm(ModelForm):
-	
+
 	dateOfDispatch 					= forms.DateField(required=False)
 	dateOfLoading 					= forms.DateField(required=False)
 	dispatchRemarks					= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-
+	dispatcherName					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	dispatcherTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	invalidated						= forms.CharField(widget=forms.HiddenInput(),required=False)
+	ltiNumber 						= forms.CharField(widget=forms.HiddenInput(),required=False)
 	recipientArrivalDate 			= forms.DateField(required=False)
+	recipientConsingee				= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientConsingee 				= forms.CharField(widget=forms.HiddenInput(),required=False)
 	recipientEndDischargeDate 		= forms.DateField(required=False)
+	recipientLocation 				= forms.CharField(widget=forms.HiddenInput(),required=False)
+	recipientName					= forms.CharField(widget=forms.HiddenInput(),required=False)
 	recipientRemarks				= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
+	recipientSignedTimestamp		= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
 	recipientStartDischargeDate 	= forms.DateField(required=False)
+	recipientTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
 	transactionType 				= forms.CharField(widget=forms.RadioSelect(choices=Waybill.transaction_type_choice))
+	transportContractor 			= forms.CharField(widget=forms.HiddenInput(),required=False)	
+	transportDeliverySigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportDeliverySignedTimestamp= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
+	transportDispachSigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
+	transportDispachSignedTimestamp	= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
 	transportDriverLicenceID		= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	transportDriverName				= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	transportSubContractor			= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	transportTrailerRegistration	= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	transportType 					= forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
 	transportVehicleRegistration	= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
-	recipientLocation 				= forms.CharField(widget=forms.HiddenInput(),required=False)
-	recipientConsingee 				= forms.CharField(widget=forms.HiddenInput(),required=False)
-	ltiNumber 						= forms.CharField(widget=forms.HiddenInput(),required=False)
-	transportContractor 			= forms.CharField(widget=forms.HiddenInput(),required=False)	
 	waybillNumber					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	recipientConsingee				= forms.CharField(widget=forms.HiddenInput(),required=False)
-	recipientName					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	recipientTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	recipientSignedTimestamp		= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
-	transportDispachSigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
-	transportDispachSignedTimestamp	= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
-	transportDeliverySigned			= forms.CharField(widget=forms.HiddenInput(),required=False)
-	transportDeliverySignedTimestamp= forms.DateTimeField(widget=forms.HiddenInput(),required=False)
-	dispatcherName					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	dispatcherTitle					= forms.CharField(widget=forms.HiddenInput(),required=False)
-	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)
 
 	class Meta:
 		model=Waybill
@@ -194,11 +193,21 @@ class WaybillFullForm(ModelForm):
 
 class WaybillValidationFormset(BaseModelFormSet):
     def clean(self):
-        super(MyModelFormSet, self).clean()
+    	print 'cleaning'
+        super(WaybillValidationFormset, self).clean()
         # example custom validation across forms in the formset:
         for form in self.forms:
-            # your custom formset validation
-            pass
+			if form.check_lines():
+				pass
+			else:
+				valid=False
+				issue += ' WB: '+ str(form)
+				raise form.ValidationError("You have an error")	
+			if valid:
+				pass#formset.save()
+			else:
+				print issue
+ 
 
 
 

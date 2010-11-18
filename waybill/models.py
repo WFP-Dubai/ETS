@@ -115,7 +115,27 @@ class Waybill(models.Model):
 				return self.waybillNumber
 		def errors(self):
 			return loggerCompas.objects.get(wb=self)
-
+		
+		def check_lines(self):
+			lines = LoadingDetail.objects.filter(wbNumber=self)
+			for line in lines:
+				if line.check_stock():
+					print 'OK'
+					pass
+				else:
+					print 'Over'
+					return False
+			return True
+		def check_lines_receipt(self):
+			lines = LoadingDetail.objects.filter(wbNumber=self)
+			for line in lines:
+				if line.check_reciept_item():
+					print 'OK'
+					pass
+				else:
+					print 'Over'
+					return False
+			return True
 #### Compas Tables Imported
 
 """
@@ -250,6 +270,7 @@ class ltioriginal(models.Model):
 			if this_lti not in all_removed:
 				print('Add to removed')
 				this_lti.save()
+
 				
 			
 class removedLtisManager(models.Manager):
@@ -370,9 +391,23 @@ class LoadingDetail(models.Model):
 		unitsLostType 				=models.ForeignKey(LossesDamagesType,related_name='LD_LossType',blank=True,null=True)
 		overloadedUnits				=models.BooleanField()
 		loadingDetailSentToCompas 	=models.BooleanField()
+		overOffloadUnits			=models.BooleanField()
 		
 		audit_log = AuditLog()
 		
+		def check_stock(self):
+			thisStock = EpicStock.objects.filter(si_code= self.siNo.SI_CODE).filter(wh_code = self.siNo.ORIGIN_WH_CODE)
+			#Am i in stock?
+			if self.numberUnitsLoaded > thisStock[0].number_of_units :
+				return False
+			else:
+				return True
+		def check_reciept_item(self):
+			totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
+			if totalUnitsOffloaded > self.numberUnitsLoaded:
+				return False
+			else:
+				return True
 		
 		def getStockItem(self):
 			try:
