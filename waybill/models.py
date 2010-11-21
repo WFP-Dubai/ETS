@@ -20,10 +20,8 @@ class places(models.Model):
 		ORGANIZATION_ID 	=models.CharField(max_length=20)
 		def __unicode__(self):
 				return self.NAME
-
 		class Meta:
 				db_table = u'epic_geo'
-
 
 class Waybill(models.Model):
 		transaction_type_choice=(
@@ -366,7 +364,7 @@ class LossesDamagesReason(models.Model):
 		description  = models.CharField(max_length=80)
 		
 		def  __unicode__(self):
-				return self.description
+				return self.compasRC.REASON
 
 class LossesDamagesReasonAdmin(admin.ModelAdmin):
 		list_display = ('compasCode','description','compasRC')

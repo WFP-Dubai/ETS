@@ -29,13 +29,13 @@ def logger(action,user,datain,dataout):
 	pass
 
 def loggit(items):
-	try:
-		logfile = 'logg.txt'
-		FILE = open(logfile,"a")
-		FILE.write(str(datetime.datetime.now())+ ':'+items + '\n')
-		FILE.close()
+# 	try:
+# 		logfile = 'logg.txt'
+# 		FILE = open(logfile,"a")
+# 		FILE.write(str(datetime.datetime.now())+ ':'+items + '\n')
+# 		FILE.close()
 		print items
-	except:
+# 	except:
 		pass	
 	
 def viewLog():
@@ -115,8 +115,6 @@ def newWaybillNo(waybill):
     return 'E' + '%04d' % waybill.id
 
 ####
-
-
 	
 def update_persons():
 	"""
@@ -155,10 +153,65 @@ def import_stock():
 	
 	current_stock = EpicStock.objects.all()
 	for item in current_stock:
-		if item not in current_stock:
+		if item not in originalStock:
 			item.number_of_units = 0;
 			item.save()
 			
+def import_lti():
+	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE','LOCATION_CODE','ACTIVE_START_DATE').distinct()
+	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE','ACTIVE_START_DATE').distinct()
+
+	## TODO: Fix so ltis imported are not expired
+	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
+	# log each item
+	for myrecord in original:
+		not_in = True
+		for rec in listRecepients:
+			#print rec
+			if myrecord.CONSEGNEE_CODE in rec['CONSEGNEE_CODE'] and myrecord.DESTINATION_LOCATION_CODE in rec['LOCATION_CODE'] and myrecord.LTI_DATE >  rec['ACTIVE_START_DATE']:
+				for disp in listDispatchers:
+					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE'] and myrecord.LTI_DATE >  disp['ACTIVE_START_DATE']:
+						myrecord.save(using='default')
+						try:
+							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+							if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
+								try:
+									change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
+									mysist.number_units_left =	mysist.number_units_left + change	
+									mysist.save(using='default')	
+								except:
+									pass
+						except:
+							mysist = SiTracker()
+							mysist.LTI=myrecord
+							mysist.number_units_left = myrecord.NUMBER_OF_UNITS
+							mysist.number_units_start = myrecord.NUMBER_OF_UNITS
+							mysist.save(using='default')
+						not_in = False
+						break
+				not_in = False
+				break
+			else:
+#				pass# not here (remove if it should no be here)
+				try:
+					ltioriginal.objects.get(id = myrecord.id)
+				except:
+					pass
+				
+
+		if not_in:
+			pass#loggit('Not In %s'%myrecord)
+		else:
+			loggit('In %s'%myrecord)
+			print rec
+
+	#cleanup ltis loop and see if changes to lti ie deleted rows
+	current = ltioriginal.objects.all()
+	for c in current:
+		if c not in original:
+			c.remove_lti()
+	#	if c.EXPIRY_DATE < datetime.date.today():
+	#		c.remove_lti()
 			
 def printIt(line):
 #	print line

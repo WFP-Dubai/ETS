@@ -112,62 +112,15 @@ def import_ltis(request):
 	Template: /ets/waybill/templates/status.html
 	Executes Imports of LTIs Persons Stock and updates SiTracker
 	"""
-	#Copy Persons
-	update_persons()
-	#copy LTIs
-	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE').distinct()
-	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE').distinct()
 
-	## TODO: Fix so ltis imported are not expired
-	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
-	# log each item
-	for myrecord in original:
-		not_in = True
-		for rec in listRecepients:
-			if myrecord.CONSEGNEE_CODE in  rec['CONSEGNEE_CODE']:
-				for disp in listDispatchers:
-					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE']:
-						myrecord.save(using='default')
-						try:
-							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
-							if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
-								try:
-									change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
-									mysist.number_units_left =	mysist.number_units_left + change	
-									mysist.save(using='default')	
-								except:
-									pass
-						except:
-							mysist = SiTracker()
-							mysist.LTI=myrecord
-							mysist.number_units_left = myrecord.NUMBER_OF_UNITS
-							mysist.number_units_start = myrecord.NUMBER_OF_UNITS
-							mysist.save(using='default')
-						not_in = False
-						break
-				not_in = False
-				break
-
-		if not_in:
-			loggit('Not In %s'%myrecord)
-		else:
-			loggit('In %s'%myrecord)
-
-	#cleanup ltis loop and see if changes to lti ie deleted rows
-	current = ltioriginal.objects.all()
-	for c in current:
-		if c not in original:
-			#c.delete() # fix this as it removes even if in use!!!
-			c.remove_lti()
-
-	
-	#UPDATE GEO
-	import_geo()	
-	#Copy Stock
-	#EpicStock.objects.all().delete()
+	print 'Import Stock'
 	import_stock()
-	
-	
+	print 'Import LTIs'
+	import_lti()
+	print 'Import Persons'
+	update_persons()
+	print 'Import GEO'
+	import_geo()	
 	status = 'Import Finished'
 	print viewLog()
 	return render_to_response('status.html',
@@ -773,11 +726,13 @@ def waybillCreate(request,lti_code):
  				self._errors['numberUnitsLoaded'].append(myerror)
  				raise forms.ValidationError(myerror)
    			return cleaned
-   			
+   	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+	current_wh =''
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
+		## Make Better using the organization_id
 		formset = LDFormSet(request.POST)
 #		tempinstances = formset.save(commit=False)
 		if form.is_valid() and formset.is_valid():
@@ -793,7 +748,11 @@ def waybillCreate(request,lti_code):
 			loggit( formset.errors)
 			loggit( form.errors)
 	else:
-		
+		qs = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME).filter(ORGANIZATION_ID=current_lti[0].CONSEGNEE_CODE)
+		if len(qs)==0:
+			qs = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
+		else:
+			current_wh = qs[0]
 		form = WaybillForm(
 			initial={
 					'dispatcherName': 	 profile.compasUser.person_pk, 	
@@ -805,10 +764,13 @@ def waybillCreate(request,lti_code):
 					'recipientConsingee':current_lti[0].CONSEGNEE_NAME,
 					'transportContractor': current_lti[0].TRANSPORT_NAME,
 					'invalidated':'False',
+					'destinationWarehouse':current_wh,
 					'waybillNumber':'N/A'
 				}
 		)
-		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
+		form.fields["destinationWarehouse"].queryset = qs
+		print current_lti[0].CONSEGNEE_CODE
+
 		formset = LDFormSet()
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
