@@ -359,7 +359,7 @@ def waybill_validate_form_update(request,wb_id):
 	current_wb =  Waybill.objects.get(id=wb_id)
 	lti_code = current_wb.ltiNumber
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-
+	current_audit = current_wb.audit_log.all()
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.all())
 		numberUnitsLoaded=forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -383,7 +383,7 @@ def waybill_validate_form_update(request,wb_id):
 	else:			
 		form = WaybillFullForm(instance=current_wb)
 		formset = LDFormSet(instance=current_wb)
-	return render_to_response('waybill/waybill_detail.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+	return render_to_response('waybill/waybill_detail.html', {'form': form,'lti_list':current_lti,'formset':formset,'audit':current_audit}, context_instance=RequestContext(request))
 
 
 @login_required
