@@ -47,6 +47,13 @@ function disableEnterKey(e)
 </div>
 <div class="menu"><a href='{%url ets.waybill.views.selectAction%}'>home</a> {% if user.is_authenticated %} <a href='{%url django.contrib.auth.views.logout%}?next={%url ets.waybill.views.selectAction%}'>Logout</a>{% else %}Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.selectAction%}'>login</a>{% endif %}</div>
 <br>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 <div class="content">
 {%block content %}
 <table>

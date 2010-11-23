@@ -40,19 +40,31 @@
 					{%for lineitem in object.loadingdetail_set.select_related%}
 					<tr style="font-size:small; text-align:right;">
 <td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
-<td>{{lineitem.numberUnitsGood|floatformat}}</td>
-<td>{{lineitem.calcNetRecievedGood|floatformat:3}}</td>
-<td style="text-align:center;">{%ifnotequal lineitem.numberUnitsLost 0%}
+<td>{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
+<td>{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}{{lineitem.calcNetRecievedGood|floatformat:3}}</td>
+<td style="text-align:center;">
+{%if lineitem.siNo.isBulk%}-{%else%}
+{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.numberUnitsLost|floatformat:3}}
 	{%endifnotequal%}
 	{%ifnotequal lineitem.numberUnitsDamaged 0%}
 	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
 	D:{{lineitem.numberUnitsDamaged|floatformat:3}}
 	{%endifnotequal%}
+{%endif%}
 	&nbsp;
 </td>
 
 <td style="text-align:center;">&nbsp;
+{%if lineitem.siNo.isBulk%}
+{%ifnotequal lineitem.numberUnitsLost 0%}
+	L:{{lineitem.numberUnitsLost|floatformat:3}}
+	{%endifnotequal%}
+	{%ifnotequal lineitem.numberUnitsDamaged 0%}
+	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
+	D:{{lineitem.numberUnitsDamaged|floatformat:3}}
+	{%endifnotequal%}
+{%else%}
 	{%ifnotequal lineitem.numberUnitsLost 0%}
 	L:{{lineitem.calcNetRecievedLost|floatformat:3}}
 	{%endifnotequal%}
@@ -60,7 +72,7 @@
 	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
 	D:{{lineitem.calcNetRecievedDamaged|floatformat:3}}
 	{%endifnotequal%}
-	
+{%endif%}
 	</td>
 	
 <td style="text-align:center;">&nbsp;{%ifnotequal lineitem.numberUnitsLost 0%}L{%ifnotequal lineitem.numberUnitsDamaged 0%}/{%endifnotequal%}{%endifnotequal%} {%ifnotequal lineitem.numberUnitsDamaged 0%}D{%endifnotequal%}</td>
@@ -76,8 +88,12 @@
 </td>
 
 
-<td>{{lineitem.calcTotalReceivedUnits|floatformat:3}}</td>
-<td>{{lineitem.calcTotalReceivedNet|floatformat:3}}</td>	
+<td>
+{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.calcTotalReceivedUnits|floatformat:3}}{%endif%}
+</td>
+<td>
+{%if lineitem.siNo.isBulk%}{{lineitem.calcTotalReceivedUnits|floatformat:3}}{%else%}{{lineitem.calcTotalReceivedNet|floatformat:3}}{%endif%}
+</td>	
 						
 					</tr>
 					{%endfor%}

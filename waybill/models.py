@@ -105,6 +105,7 @@ class Waybill(models.Model):
 		waybillRecSentToCompas 			=models.BooleanField()
 		waybillProcessedForPayment		=models.BooleanField()
 		invalidated						=models.BooleanField()
+		auditComment					=models.TextField(blank=True)
 		audit_log = AuditLog()
 		
 		def  __unicode__(self):
@@ -139,33 +140,9 @@ class Waybill(models.Model):
 """
 Models based on compas Views & Tables
 """
-class ltioriginalManager(models.Manager):
- 		"""
- 		Manager for the LTIOriginal Model
- 		these functions are related to the whole model/table not individual rows
- 		some should be replaced using filter objects.view()
- 		"""
-				
-		def ltiCodesByWH(self,wh):
-				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE FROM epic_lti  WHERE ORIGIN_WH_CODE = %s  and  SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )',[wh])
-				lti_code = cursor.fetchall()
-				#lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
-				return lti_code
-		
-		def ltiCodesAll(self):
-				cursor = connection.cursor()
-				cursor.execute('SELECT DISTINCT CODE,DESTINATION_LOC_NAME,CONSEGNEE_NAME,REQUESTED_DISPATCH_DATE,ORIGIN_LOC_NAME FROM epic_lti  WHERE SI_RECORD_ID in  (select si_record_id from epic_stock)  and CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )')
-				lti_code = cursor.fetchall()
-				#lti2_codes = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh).values('CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','REQUESTED_DISPATCH_DATE').extra(where=['SI_RECORD_ID in  (select si_record_id from epic_stock)','CONSEGNEE_NAME in (select CONSEGNEE_NAME from waybill_receptionpoint )']).distinct()
-				return lti_code
-		
-		def si_for_lti(self,lti_code):
-				cursor = connection.cursor()
-				cursor.execute("SELECT DISTINCT SI_CODE FROM epic_lti where CODE = %s",[lti_code])
-				si_list = cursor.fetchall()
-				return si_list
-				
+"""
+LTIs for office 
+"""
 class ltioriginal(models.Model):
 		LTI_PK						=models.CharField(max_length=50, primary_key=True)
 		LTI_ID						=models.CharField(max_length=40)
@@ -198,7 +175,7 @@ class ltioriginal(models.Model):
 		UNIT_WEIGHT_NET				=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		UNIT_WEIGHT_GROSS			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		
-		objects = ltioriginalManager()
+#		objects = ltioriginalManager()
 		
 		
 		class Meta:
@@ -209,7 +186,7 @@ class ltioriginal(models.Model):
 				
 				#if self.LTI_PK in removedLtis.objects.list():
 				#	marker = 'Void '
-				return self.valid() + self.coi_code() + '  ' + self.CMMNAME + '  %.0f'  %  self.restant2() 
+				return self.valid() +' '+ self.coi_code() + '  ' + self.CMMNAME + '  %.0f '  %  self.restant2() 
 		def mydesc(self):
 				return self.CODE
 		def commodity(self):
@@ -224,19 +201,51 @@ class ltioriginal(models.Model):
 		def restant2(self):
 				lines = LoadingDetail.objects.filter(siNo=self)
 				used = 0
-#				print 'xxx'
+				
 				for line in lines:
 					used +=  line.numberUnitsLoaded
-#					print  line.numberUnitsLoaded
-#					print line
-#					print 'Used:' + str(used)
-				return self.NUMBER_OF_UNITS - used
+				if self.isBulk:
+					return self.QUANTITY_NET - used
+				else:
+					return self.NUMBER_OF_UNITS - used
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
 				return self.restant()
+				
+		def inStock(self):
+			try:
+				thisItem = EpicStock.objects.filter(wh_code=self.ORIGIN_WH_CODE).filter(si_code=self.SI_CODE).filter(commodity_code=self.COMMODITY_CODE)
+			except:
+				pass
+			
+			
+			
+			
 		def restoresi(self,units):
 				self.sitracker.updateUnitsRestore(units)
 				return self.restant()
+		def packaging(self):
+			pack = 'Unknown'
+			try:
+				mypkg = EpicStock.objects.filter(wh_code=self.ORIGIN_WH_CODE).filter(si_code=self.SI_CODE).filter(commodity_code=self.COMMODITY_CODE)
+				
+				print self.ORIGIN_WH_CODE
+				pack = str(mypkg[0].packagename)
+				print mypkg
+				print pack
+			except:
+				print 'nogo'
+			print pack
+			return pack
+			
+		def isBulk(self):
+			mypkg = self.packaging()
+			print mypkg
+			if mypkg == 'BULK':
+				return True
+			else:
+				return False
+
 		def coi_code(self):
 				try:
 						cursor = connection.cursor()
@@ -284,6 +293,9 @@ class removedLtis(models.Model):
 		objects = removedLtisManager()
 		class Meta:
 				db_table = u'waybill_removed_ltis'
+		def  __unicode__(self):
+				return self.lti.LTI_ID
+		
 	
 
 
@@ -395,11 +407,20 @@ class LoadingDetail(models.Model):
 		
 		def check_stock(self):
 			thisStock = EpicStock.objects.filter(si_code= self.siNo.SI_CODE).filter(wh_code = self.siNo.ORIGIN_WH_CODE)
-			#Am i in stock?
-			if self.numberUnitsLoaded > thisStock[0].number_of_units :
-				return False
+			#Am i in stock? # fix for bulk...
+			if self.siNo.isBulk:
+				print len(thisStock)
+				if self.numberUnitsLoaded > thisStock[0].quantity_net:
+					print self.numberUnitsLoaded
+					print thisStock[0].quantity_net
+					return False
+				else:
+					return True
 			else:
-				return True
+				if self.numberUnitsLoaded > thisStock[0].number_of_units :
+					return False
+				else:
+					return True
 		def check_reciept_item(self):
 			totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
 			if totalUnitsOffloaded > self.numberUnitsLoaded:
@@ -476,6 +497,14 @@ class ReceptionPoint(models.Model):
 		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
 		def  __unicode__(self):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
+		class Meta:
+			ordering = ['LOC_NAME', 'CONSEGNEE_NAME']
+class ReceptionPointAdmin(admin.ModelAdmin):
+		list_display=('LOC_NAME','CONSEGNEE_NAME')
+		ordering = ('LOC_NAME',)
+		
+
+
 
 class UserProfile(models.Model):
 		user				=models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
@@ -535,8 +564,8 @@ class loggerCompas(models.Model):
 	
 class SIWithRestant:
 		SINumber = ''
-		StartAmount = 0
-		CurrentAmount = 0
+		StartAmount = 0.0
+		CurrentAmount = 0.0
 		CommodityName = ''
 		def __init__(self,SINumber,StartAmount,CommodityName):
 				self.SINumber = SINumber
@@ -545,9 +574,10 @@ class SIWithRestant:
 				self.CommodityName = CommodityName
 
 		def reduceCurrent(self,reduce):
-				self.CurrentAmount = int(self.CurrentAmount) - reduce
+			self.CurrentAmount = self.CurrentAmount - reduce
 		def getCurrentAmount(self):
-				return self.CurrentAmount
+		
+			return self.CurrentAmount
 		def getStartAmount(self):
 				return StartAmount
 		
@@ -556,7 +586,7 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 
 admin.site.register(UserProfile)
 admin.site.register(DispatchPoint)
-admin.site.register(ReceptionPoint)
+admin.site.register(ReceptionPoint,ReceptionPointAdmin)
 admin.site.register(EpicPerson,EpicPersonsAdmin)
 admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
 admin.site.register(LossesDamagesType)

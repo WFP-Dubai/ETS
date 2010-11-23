@@ -66,11 +66,11 @@
 						<td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
 						<td>{{lineitem.getStockItem.cmmname}}</td>
 						<td>{%if lineitem.getStockItem.packagingDescrShort != ''%}{{lineitem.getStockItem.packagingDescrShort}} {%else%} {{lineitem.getStockItem.packagename}}{%endif%}</td>
-						<td style="text-align:right;">{{lineitem.numberUnitsLoaded|floatformat}}</td>
-						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:3}}</td>
-						<td style="text-align:right;">{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:3}}</td>
-						<td style="text-align:right;">{{lineitem.calcTotalNet|floatformat:3}}</td>
-						<td style="text-align:right;">{{lineitem.calcTotalGross|floatformat:3}}</td>
+						<td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
+						<td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.siNo.UNIT_WEIGHT_NET|floatformat:3}}{%endif%}</td>
+						<td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.siNo.UNIT_WEIGHT_GROSS|floatformat:3}}{%endif%}</td>
+						<td style="text-align:right;">{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calcTotalNet|floatformat:3}}{%endif%}</td>
+						<td style="text-align:right;">{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calcTotalGross|floatformat:3}}{%endif%}</td>
 
 					</tr>
 					{%endfor%}

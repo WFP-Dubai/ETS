@@ -22,14 +22,15 @@ from django.contrib import messages
 def prep_req(request):
 	return{'user': request.user}
 
-def homepage(request):
-	""" 
-	View: homepage 
-	URL: /
-	Template: None
-	Redirects you to the selectAction page
-	"""
-	return HttpResponseRedirect(reverse(selectAction))
+# def homepage(request):
+# 	""" 
+# 	View: homepage 
+# 	URL: /
+# 	Template: None
+# 	Redirects you to the selectAction page
+# 	"""
+# 	#messages.add_message(request, messages.INFO, 'Hello world.')
+# 	return HttpResponseRedirect(reverse(selectAction))
 							  
 @login_required	
 def selectAction(request):
@@ -39,8 +40,7 @@ def selectAction(request):
 	Template: /ets/waybill/templates/selectAction.html
 	Gives the loggedin user a choise of possible actions sepending on roles
 	"""
-	return render_to_response('selectAction.html',
-							  context_instance=RequestContext(request))
+	return render_to_response('selectAction.html', context_instance=RequestContext(request))
 
 @login_required
 def listOfLtis(request,origin):
@@ -50,67 +50,46 @@ def listOfLtis(request,origin):
 	Template: /ets/waybill/templates/ltis.html
 	Shows the LTIs that are in a specific warehouse
 	"""
-	ltis = ltioriginal.objects.ltiCodesByWH(origin)
-	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	still_ltis=[]
+	ltis =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct().filter(ORIGIN_WH_CODE=origin)
 	# finished ltis
 	for lti in ltis:
-		listOfSI_withDeduction = restant_si(lti[0])
+		listOfSI_withDeduction = restant_si(lti['CODE'])
 		for item in listOfSI_withDeduction:
 			if item.CurrentAmount > 0:
 				if not lti in still_ltis:
 					still_ltis.append(lti)
-	return render_to_response('ltis.html',
-							  {'ltis':still_ltis},
-							  context_instance=RequestContext(request))
 
-## repurposed show all ltis 
+	return render_to_response('ltis.html', {'ltis':still_ltis}, context_instance=RequestContext(request))
+
+## Show all ltis 
+@login_required
 def ltis(request):
 	"""
 	View:
 	ltis
 	URL: ets/waybill/list
-	Shows the LTIs that are in a specific warehouse
+	Shows all the LTIs
 	template:
 	/ets/waybill/templates/ltis.html
 	"""
-	ltis = ltioriginal.objects.ltiCodesAll()
-	#ltis_qs =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE' ).distinct()
+	ltis =ltioriginal.objects.values( 'CODE','DESTINATION_LOC_NAME','CONSEGNEE_NAME','LTI_DATE','REQUESTED_DISPATCH_DATE','ORIGIN_LOC_NAME' ).distinct()
 	still_ltis=[]
-	# finished ltis
 	for lti in ltis:
-		listOfSI_withDeduction = restant_si(lti[0])
+		listOfSI_withDeduction = restant_si(lti['CODE'])
 		for item in listOfSI_withDeduction:
 			if item.CurrentAmount > 0:
 				if not lti in still_ltis:
 					still_ltis.append(lti)
-	return render_to_response('ltis_all.html',
-							  {'ltis':still_ltis},
-							  context_instance=RequestContext(request))
-## ^ NOT IN USE
+	return render_to_response('ltis_all_qs.html',{'ltis':still_ltis}, context_instance=RequestContext(request))
 
-def ltis_redirect_wh(request):
-	"""
-	View:
-	ltis_redirect_wh 
-	URL: ets/waybill//list/
-	Template: None
-	Automatically redirects user to his dispatch point wh to listOfLtis
-	"""
-	wh_code = request.GET['dispatch_point']
-	return HttpResponseRedirect(reverse(listOfLtis ,args=[wh_code]))
 
 def import_ltis(request):
 	"""
 	View: import_ltis 
 	URL: ets/waybill/import
 	Template: /ets/waybill/templates/status.html
-	Executes Imports of LTIs Persons Stock and updates SiTracker
+	Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
 	"""
 
 	print 'Import Stock'
@@ -123,9 +102,9 @@ def import_ltis(request):
 	import_geo()	
 	status = 'Import Finished'
 	print viewLog()
-	return render_to_response('status.html',
-							  {'status':status},
-							  context_instance=RequestContext(request))
+	messages.add_message(request, messages.INFO, status)
+	
+	return HttpResponseRedirect(reverse(selectAction))
 
 def lti_detail_url(request,lti_code):	
 	"""
@@ -138,6 +117,7 @@ def lti_detail_url(request,lti_code):
 	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code)
 	listOfSI_withDeduction = restant_si(lti_code)
 	lti_more_wb=False
+	
 	for item in listOfSI_withDeduction:
 		if item.CurrentAmount > 0:
 			lti_more_wb=True
@@ -163,12 +143,12 @@ def dispatch(request):
 def waybill_create(request,lti_pk):
 	try:
 		detailed_lti = ltioriginal.objects.get(LTI_PK=lti_pk)
-	except:
-		detailed_lti = ''
-	return render_to_response('detailed_waybill.html',
+		return render_to_response('detailed_waybill.html',
 							  {'detailed':detailed_lti,'lti_id':lti_pk},
 							  context_instance=RequestContext(request))
-
+	except:
+		return HttpResponseRedirect(reverse(selectAction))
+	
 @login_required
 def waybill_finalize_dispatch(request,wb_id):
 	"""
@@ -185,6 +165,8 @@ def waybill_finalize_dispatch(request,wb_id):
 	for lineitem in current_wb.loadingdetail_set.select_related():
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
+	status = 'Waybill '+ current_wb.waybillNumber +' Dispatch Signed'
+	messages.add_message(request, messages.INFO, status)
 	return HttpResponseRedirect(reverse(lti_detail_url,args=[current_wb.ltiNumber]))
 	
 @login_required
@@ -203,41 +185,12 @@ def	waybill_finalize_receipt(request,wb_id):
 		current_wb.recipientSignedTimestamp=datetime.datetime.now()	
 		current_wb.transportDeliverySigned=True
 		current_wb.save()
-	except:
-		 return HttpResponseRedirect(reverse(selectAction))
-	return HttpResponseRedirect(reverse(waybill_reception_list)) 
-
-@login_required
-def dispatchToCompas(request):
-	"""
-	View: dispatchToCompas
-	URL:
-	Template: /ets/waybill/templates/list_waybills_compas.html
-	Was called when user clicked Send To Comas for all current items, No longer in use
-	"""
-	profile = ''
-	try:
-		profile=request.user.get_profile()
+		status = 'Waybill '+ current_wb.waybillNumber +' Receipt Signed'
+		messages.add_message(request, messages.INFO, status)
 	except:
 		pass
-	list_waybills = Waybill.objects.filter(invalidated=False).filter(waybillValidated = True).filter(	waybillSentToCompas = False)
-	the_compas = compas_write()
-	error_message = ''
-	error_codes = ''
-	for waybill in list_waybills:
-		# call compas and read return
-		status_wb = the_compas.write_dispatch_waybill_compas(waybill.id)
-		if  status_wb:
-			#aok
-			waybill.waybillSentToCompas=True
-			waybill.save()
-		else:
-			# error here
-			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
-			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
-	return render_to_response('list_waybills_compas.html',
-							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
-							  context_instance=RequestContext(request))
+	return HttpResponseRedirect(reverse(waybill_reception_list)) 
+
 
 @login_required							  
 def singleWBDispatchToCompas(request,wb_id):
@@ -247,13 +200,7 @@ def singleWBDispatchToCompas(request,wb_id):
 	Template: /ets/waybill/templates/status_waybill_compas.html
 	Sends a single Dipatch into compas
 	"""
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	waybill = Waybill.objects.get(id=wb_id)
-#	print waybill.waybillNumber
 	the_compas = compas_write()
 	error_message = ''
 	error_codes = ''
@@ -267,11 +214,9 @@ def singleWBDispatchToCompas(request,wb_id):
 			pass
 		waybill.waybillSentToCompas=True
 		waybill.save()
-		
+		status = 'Waybill '+ waybill.waybillNumber +' Sucsessfully pushed to COMPAS'
+		messages.add_message(request, messages.INFO, status)
 	else:
-		# error here
-		#print waybill.waybillNumber
-		#log error.
 		try:
 			errorlog =loggerCompas.objects.get(wb=waybill)
 			errorlog.user = request.user
@@ -287,14 +232,15 @@ def singleWBDispatchToCompas(request,wb_id):
 			errorlog.save()
 
 		waybill.waybillValidated =False
+		status = 'Problem sending to compas: ' + the_compas.ErrorMessages
+		messages.add_message(request, messages.ERROR, status)
 		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
-		# Update stock after submit off waybill
-		import_stock()
-	return render_to_response('status_waybill_compas.html',
-							  {'waybill':waybill,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
-							  context_instance=RequestContext(request))
+	# Update stock after submit off waybill
+	print 'Update Stock'
+	import_stock()
+	return HttpResponseRedirect(reverse(waybill_validate_dispatch_form))
 	
 @login_required
 def singleWBReceiptToCompas(request,wb_id):
@@ -315,7 +261,6 @@ def singleWBReceiptToCompas(request,wb_id):
 	error_codes = ''
 	status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 	if  status_wb:
-		#aok
 		try:
 			errorlog =loggerCompas.objects.get(wb=waybill)
 			errorlog.delete()
@@ -387,7 +332,6 @@ def receiptToCompas(request):
 
 def invalidate_waybill(request,wb_id):
 	#first mark waybill invalidate, then zero the stock usage for each line and update the si table
-
 	invalidate_waybill_action(wb_id)
 	current_wb = Waybill.objects.get(id=wb_id)
 	status = 'Waybill %s has now been Removed'%(current_wb.waybillNumber)
@@ -415,11 +359,7 @@ def waybill_validate_form_update(request,wb_id):
 	current_wb =  Waybill.objects.get(id=wb_id)
 	lti_code = current_wb.ltiNumber
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
+
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.all())
 		numberUnitsLoaded=forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -503,33 +443,6 @@ def waybill_view_reception(request,wb_id):
 							  'zippedWB':zippedWB},
 							  context_instance=RequestContext(request))
 
-#@login_required
-# def reset_waybill(request):
-# 	profile = ''
-# 	try:
-# 		profile=request.user.get_profile()
-# 	except:
-# 		pass
-# 		
-# 	if profile.superUser:
-# 		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
-# 		
-# 		return render_to_response('edit_wb_list.html',
-# 							  {'profile':profile,'waybill_list':waybills},
-# 							  context_instance=RequestContext(request))
-# 	elif profile.readerUser:
-# 		waybills = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = False)
-# 		return render_to_response('edit_wb_list.html',
-# 							  {'profile':profile,'waybill_list':waybills},
-# 							  context_instance=RequestContext(request))
-# 
-# 	else:
-# 		return render_to_response('selectAction.html',
-# 							  {'profile':profile},
-# 							  context_instance=RequestContext(request))
-# 	
-
-
 @login_required
 def waybill_reception(request,wb_code):
 	# get the LTI info
@@ -594,14 +507,14 @@ def waybill_reception(request,wb_code):
 			loadedUnits = float(self.instance.numberUnitsLoaded)
 			damadgedUnits = float(cleaned.get('numberUnitsDamaged'))
 			lostUnits =float(cleaned.get('numberUnitsLost'))
-			totaloffload = numberUnitsGood+damadgedUnits+ lostUnits
+			totaloffload = float(numberUnitsGood+damadgedUnits+ lostUnits)
 			if not cleaned.get('overOffloadUnits'):
 				if not totaloffload == loadedUnits:
 					myerror = ''
 					if totaloffload > loadedUnits:
-						myerror =  "%.2f Units loaded but %.2f units accounted for"%(loadedUnits,totaloffload)
+						myerror =  "%.3f Units loaded but %.3f units accounted for"%(loadedUnits,totaloffload)
 					if totaloffload < loadedUnits:
-						myerror =  "%.2f Units loaded but only %.2f units accounted for"%(loadedUnits,totaloffload)
+						myerror =  "%.3f Units loaded but only %.3f units accounted for"%(loadedUnits,totaloffload)
 					self._errors['numberUnitsGood'] = self._errors.get('numberUnitsGood', [])
 					self._errors['numberUnitsGood'].append(myerror)
 					raise forms.ValidationError(myerror)
@@ -639,27 +552,17 @@ def waybill_reception(request,wb_code):
 		)
 		formset = LDFormSet(instance=current_wb)
 	return render_to_response('receiveWaybill.html', 
-			{'form': form,'lti_list':current_lti,'formset':formset,'profile':profile},
+			{'form': form,'lti_list':current_lti,'formset':formset},
 			context_instance=RequestContext(request))
 
 @login_required
 def waybill_reception_list(request):
 	waybills = Waybill.objects.filter(invalidated=False).filter(recipientSigned = False)
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	return render_to_response('waybill/reception_list.html',
-							  {'object_list':waybills,'profile':profile},
+							  {'object_list':waybills},
 							  context_instance=RequestContext(request))
 
 def waybill_search(request):
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	search_string=''
 	found_wb=''
 	try:
@@ -682,15 +585,15 @@ def waybill_search(request):
 			except:
 				curr_wh_rec = ''
 				curr_loc = ''				
-			if profile.isCompasUser or profile.readerUser:
+			if request.user.profile.isCompasUser or request.user.profile.readerUser:
 				my_valid_wb.append(waybill.id)
-			elif profile.warehouses and curr_wh_disp  == profile.warehouses.ORIGIN_WH_CODE:
+			elif request.user.profile.warehouses and curr_wh_disp  == request.user.profile.warehouses.ORIGIN_WH_CODE:
 				my_valid_wb.append(waybill.id)
-			elif profile.receptionPoints and  curr_wh_rec == profile.receptionPoints.CONSEGNEE_CODE and curr_loc == profile.receptionPoints.LOC_NAME :
+			elif request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.CONSEGNEE_CODE and curr_loc == request.user.profile.receptionPoints.LOC_NAME :
 				my_valid_wb.append(waybill.id)
 	
 	return render_to_response('list_waybills.html',
-							  {'waybill_list':found_wb,'profile':profile, 'my_wb':my_valid_wb},
+							  {'waybill_list':found_wb, 'my_wb':my_valid_wb},
 							  context_instance=RequestContext(request))
 
 ### Create Waybill 
@@ -698,17 +601,13 @@ def waybill_search(request):
 def waybillCreate(request,lti_code):
 	# get the LTI info
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
+
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		overload =  forms.BooleanField(required=False)
 		class Meta:
 			model = LoadingDetail
-			fields = ('siNo','numberUnitsLoaded','wbNumber','overloadedUnits')
+			fields = ('siNo','numberUnitsLoaded','wbNumber','overloadedUnits','overOffloadUnits')
 		
 		def clean(self):
   			#print "cleaning"
@@ -717,9 +616,7 @@ def waybillCreate(request,lti_code):
   			units = cleaned.get("numberUnitsLoaded")
   			overloaded = cleaned.get('overloadedUnits')
   			max_items = siNo.restant2()
-  			#print max_items
-  			#print long(units)
-  			#print units > max_items+self.instance.numberUnitsLoaded
+
   			if units > max_items+self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
   				myerror = "Overloaded!"
   				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
@@ -782,11 +679,6 @@ def waybill_edit(request,wb_id):
 		current_lti = ltioriginal.objects.filter(CODE = lti_code)
 	except:
 		currnet_wb =''
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
 		class Meta:
@@ -819,10 +711,6 @@ def waybill_edit(request,wb_id):
 	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 @login_required
-def waybill_validateSelect(request):
-	return render_to_response('selectValidateAction.html', context_instance=RequestContext(request))
-
-@login_required
 def waybill_validate_dispatch_form(request):
 	ValidateFormset = modelformset_factory(Waybill, fields=('id','waybillValidated',),extra=0)
 	validatedWB = Waybill.objects.filter(invalidated=False).filter(waybillValidated= True).filter(waybillSentToCompas=False)
@@ -830,18 +718,24 @@ def waybill_validate_dispatch_form(request):
 	errorMessage = 'Problems with Stock, Not enough in Dispatch Warehouse'
 	if request.method == 'POST':
 		valid=True
-		issue='Problems with Stock on WB: '
 		formset = ValidateFormset(request.POST,WaybillValidationFormset)
 		if  formset.is_valid() :
  			instances =formset.save(commit=False)
  			for form in  instances:
  				if form.check_lines():
- 					pass
+ 					try:
+						errorlog =loggerCompas.objects.get(wb=form)
+						errorlog.user = ''
+						errorlog.errorDisp = ''
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+					except:
+						pass
  				else:
  					valid=False
- 					issue += ' '+ str(form)
- 					
+ 					issue ='Problems with Stock on WB:  '+ str(form)
  					form.waybillValidated=False
+ 					messages.add_message(request, messages.ERROR, issue)
 					try:
 						errorlog =loggerCompas.objects.get(wb=form)
 						errorlog.user = request.user
@@ -857,11 +751,9 @@ def waybill_validate_dispatch_form(request):
 						errorlog.save()
  			formset.save()
  			print issue
-				
-		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
-	else:
-		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
-	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB,'issue':issue}, context_instance=RequestContext(request))
+
+	formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
+	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -876,11 +768,18 @@ def waybill_validate_receipt_form(request):
  			instances =formset.save(commit=False)
  			for form in  instances:
  				if form.check_lines_receipt():
- 					pass
+  					try:
+						errorlog =loggerCompas.objects.get(wb=form)
+						errorlog.user = request.user
+						errorlog.errorRec = ''
+						errorlog.timestamp = datetime.datetime.now()
+						errorlog.save()
+					except:
+						pass
  				else:
  					valid=False
- 					issue += ' '+ str(form)
- 					
+ 					issue ='Problems with Stock on WB:  '+ str(form)
+ 					messages.add_message(request, messages.ERROR, issue)
  					form.waybillReceiptValidated=False
 					try:
 						errorlog =loggerCompas.objects.get(wb=form)
@@ -897,38 +796,10 @@ def waybill_validate_receipt_form(request):
 						errorlog.save()
 # 			formset.save()
  			print issue
-
 			formset.save()
-		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
-	else:
-		formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
+	formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
 	return render_to_response('validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
-@login_required
-def testform(request,lti_code):
-	# get the LTI info
-	current_lti = ltioriginal.objects.filter(CODE = lti_code)
-	class LoadingDetailDispatchForm(ModelForm):
-		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = lti_code),label='Commodity')
-		class Meta:
-			model = LoadingDetail
-			fields = ('siNo','numberUnitsLoaded','wbNumber')
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
-	if request.method == 'POST':
-		form = WaybillForm(request.POST)
-		formset = LDFormSet(request.POST)
-		if form.is_valid() and formset.is_valid():
-			wb_new = form.save()
-			instances =formset.save(commit=False)
-			for subform in instances:
-				subform.wbNumber = wb_new
-				subform.save()
-			wb_new.save()
-			return HttpResponseRedirect('../viewwb/'+ str(wb_new.id)) # Redirect after POST
-	else:
-		form = WaybillForm(initial={'ltiNumber': current_lti[0].CODE})
-		formset = LDFormSet()
-	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 # Shows a page with the Serialized Waybill in comressed & uncompressed format
 @login_required

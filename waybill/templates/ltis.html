@@ -9,15 +9,15 @@
 {% for lti in ltis%}
     <tr>
         <td>
-            {{lti.0}} 
+            {{lti.CODE}} 
         </td>
-        <td>{{lti.3}}</td>
+        <td>{{lti.LTI_DATE}}</td>
         
-        <td>{{lti.1}}
+        <td>{{lti.DESTINATION_LOC_NAME}}
         </td>
-        <td>{{lti.2}}
+        <td>{{lti.CONSEGNEE_NAME}}
         </td>
-        <td><a href='../info/{{lti.0}}'>select</a>
+        <td><a href='../info/{{lti.CODE}}'>select</a>
         </td>
     </tr>
 {% endfor%}

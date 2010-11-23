@@ -3,7 +3,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     	<thead>
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th> <th>Received</th>
-{%if profile.superUser or profile.readerUser or profile.isCompasUser%}        
+{%if user.profile.superUser or user.profile.readerUser or user.profile.isCompasUser%}        
         <th>Validated</th><th>In Compas</th>
 {%endif%}
         <th>Action</th>
@@ -20,12 +20,12 @@
  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
 			<td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
   			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
-{%if profile.superUser or profile.readerUser or profile.isCompasUser%} 
+{%if user.profile.superUser or user.profile.readerUser or user.profile.isCompasUser%} 
  			<td>{%if waybill.waybillValidated%}D{%else%}-{%endif%}/{%if waybill.waybillReceiptValidated%}R{%else%}-{%endif%}</td>
  			<td>{%if waybill.waybillSentToCompas%}D{%else%}-{%endif%}/{%if waybill.waybillRecSentToCompas%}R{%else%}-{%endif%}</td>
 {%endif%}
- 			<td>{%if not profile.superUser%}<a href='{%if  profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
- 			{%if profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}
+ 			<td>{%if not user.profile.superUser%}<a href='{%if  user.profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
+ 			{%if user.profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}
  			</td>
     </tr>
 {%endif%}

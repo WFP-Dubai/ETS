@@ -53,8 +53,10 @@ class compas_write:
                                 if len(the_waybill.containerTwoNumber) > 0:
                                         twoCont = True
 			codeLetter = u'A'
+			#test if bulk or not
+			isBulk = lineItems[0].siNo.isBulk()
 			db.begin()
-                
+            
 			for lineItem in lineItems:
 				CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +WB_CODE)
 				if twoCont:
@@ -163,6 +165,9 @@ class compas_write:
 			CONTAINER_NUMBER=the_waybill.containerOneNumber
 			all_ok = True
 			## For each lineItems
+			# check if is bulk
+			isBulk = lineItems[0].siNo.isBulk()
+
 			## check if containers = 2 & lines = 2
 			twoCont = False
 			if lineItems.count() == 2:
@@ -172,14 +177,14 @@ class compas_write:
 			db.begin()
 		
 			for lineItem in lineItems:
-				CURR_CONTAINER_NUMBER=CONTAINER_NUMBER
 				CURR_CODE=unicode(datetime.datetime.now().strftime('%y') +CODE)
 				if twoCont:
 					CURR_CODE = unicode(datetime.datetime.now().strftime('%y') + codeLetter + CODE)
 					codeLetter = u'B'
 					CONTAINER_NUMBER=unicode(the_waybill.containerTwoNumber)		
 					
-					
+				
+				CURR_CONTAINER_NUMBER=CONTAINER_NUMBER	
 				COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
 				COMM_CODE = lineItem.siNo.COMMODITY_CODE
 				COI_CODE = unicode(lineItem.siNo.coi_code())			
@@ -204,6 +209,15 @@ class compas_write:
 				Response_Code.setvalue(0,u'x'*2)
 				Full_coi= TheStockItems[0].origin_id
 				empty = u''
+				
+				if isBulk:
+					pass# manage bulk..... set number of items to 1 and take the units and put them into NetTotal & Gross Total
+					strUnitsLoaded=u'1.000'
+					strUnitNet = u''
+					strUnitGross =  u''
+					strNetTotal = u'%.3f' % UnitsLoaded
+					strGrossTotal = u'%.3f' % UnitsLoaded
+					
 				printlist( [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
 					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
 					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,

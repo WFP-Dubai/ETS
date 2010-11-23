@@ -95,13 +95,16 @@ def zipBase64(data):
 	
 def restant_si(lti_code):
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
-	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code)
+	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code).filter(waybillSentToCompas=False)
 	listOfSI = []
 #	listExl =removedLtis.objects.list()
 
 	for lti in detailed_lti:
 			if not removedLtis.objects.filter(lti = lti.LTI_PK):
-				listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
+				if lti.isBulk:
+					listOfSI += [SIWithRestant(lti.SI_CODE,lti.QUANTITY_NET,lti.CMMNAME)]
+				else:
+					listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
 
  	for wb in listOfWaybills:
  		for loading in wb.loadingdetail_set.select_related():
@@ -160,7 +163,8 @@ def import_stock():
 def import_lti():
 	listRecepients = ReceptionPoint.objects.values('CONSEGNEE_CODE','LOCATION_CODE','ACTIVE_START_DATE').distinct()
 	listDispatchers = DispatchPoint.objects.values('ORIGIN_WH_CODE','ACTIVE_START_DATE').distinct()
-
+	# check what type is the comodity... if bulk swap
+	
 	## TODO: Fix so ltis imported are not expired
 	original = ltioriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
 	# log each item
@@ -171,9 +175,15 @@ def import_lti():
 			if myrecord.CONSEGNEE_CODE in rec['CONSEGNEE_CODE'] and myrecord.DESTINATION_LOCATION_CODE in rec['LOCATION_CODE'] and myrecord.LTI_DATE >  rec['ACTIVE_START_DATE']:
 				for disp in listDispatchers:
 					if myrecord.ORIGIN_WH_CODE in disp['ORIGIN_WH_CODE'] and myrecord.LTI_DATE >  disp['ACTIVE_START_DATE']:
-						myrecord.save(using='default')
+						myrecord.save(using='default') ## here we import the record...
+						try:
+							myr = removedLtis.objects.get(lti=myrecord)
+							myr.delete()
+						except:
+							pass
 						try:
 							mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+
 							if mysist.number_units_start != myrecord.NUMBER_OF_UNITS:
 								try:
 									change = myrecord.NUMBER_OF_UNITS - mysist.number_units_start 
@@ -202,8 +212,8 @@ def import_lti():
 		if not_in:
 			pass#loggit('Not In %s'%myrecord)
 		else:
-			loggit('In %s'%myrecord)
-			print rec
+			pass#loggit('In %s'%myrecord)
+			#print rec
 
 	#cleanup ltis loop and see if changes to lti ie deleted rows
 	current = ltioriginal.objects.all()
@@ -212,6 +222,7 @@ def import_lti():
 			c.remove_lti()
 	#	if c.EXPIRY_DATE < datetime.date.today():
 	#		c.remove_lti()
+
 			
 def printIt(line):
 #	print line

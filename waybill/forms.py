@@ -174,6 +174,7 @@ class WaybillFullForm(ModelForm):
 	transportType 					= forms.CharField(widget=forms.RadioSelect(choices=Waybill.transport_type))
 	transportVehicleRegistration	= forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	waybillNumber					= forms.CharField(widget=forms.HiddenInput(),required=False)
+	auditComment					= forms.CharField( widget=forms.Textarea,required=True)
 
 	class Meta:
 		model=Waybill

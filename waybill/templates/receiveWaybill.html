@@ -2,7 +2,6 @@
 {%load extra_tags%}
 {%block title %}Welcome to EPIC eTS{%endblock%}
 {%block content %}
-
  <form action="" method=POST>
 {% if form.errors %}
    <span class='error'>Review Form, as there is information missing</span>
@@ -33,7 +32,7 @@
        
         <tr>
         	<td  valign=top> {{ sform.id }}{{sform.siNo}}</td>
-        	<td  valign=top  align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded|floatformat}}</td>
+        	<td  valign=top  align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
         	<td valign=top>{{ sform.numberUnitsGood }} Over Offload:{{sform.overOffloadUnits}}</td>
         	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsDamaged}} </td></tr><tr><td>Type:</td><td> {{ sform.unitsDamagedType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsDamagedReason }}</td></tr></table></td>
         	<td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsLost }} </td></tr><tr><td>Type:</td><td>{{ sform.unitsLostType }} </td></tr><tr><td>Reason:</td><td>{{ sform.unitsLostReason }}</td></tr></table></td>
