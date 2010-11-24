@@ -90,6 +90,7 @@ class WaybillRecieptForm(ModelForm):
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)	
+	auditComment = forms.CharField(widget=forms.HiddenInput())
 	
 	class Meta:
 		model = Waybill

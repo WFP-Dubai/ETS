@@ -105,7 +105,7 @@ class Waybill(models.Model):
 		waybillRecSentToCompas 			=models.BooleanField()
 		waybillProcessedForPayment		=models.BooleanField()
 		invalidated						=models.BooleanField()
-		auditComment					=models.TextField(blank=True)
+		auditComment					=models.TextField(null=True,blank=True)
 		audit_log = AuditLog()
 		
 		def  __unicode__(self):

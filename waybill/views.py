@@ -483,6 +483,7 @@ def waybill_reception(request,wb_code):
 					raise forms.ValidationError("You have forgotten to select the Damage Reason")
 			return my_dr
 
+
 		def clean_unitsLostType(self):
 			#cleaned_data = self.cleaned_data
 			my_losses = self.cleaned_data.get('numberUnitsLost')
@@ -500,6 +501,7 @@ def waybill_reception(request,wb_code):
 				if my_dr == None:
 					raise forms.ValidationError("You have forgotten to select the Damage Type")
 			return my_dr
+
 		
 		def clean(self):
 			cleaned = self.cleaned_data
@@ -722,33 +724,56 @@ def waybill_validate_dispatch_form(request):
 		if  formset.is_valid() :
  			instances =formset.save(commit=False)
  			for form in  instances:
- 				if form.check_lines():
- 					try:
-						errorlog =loggerCompas.objects.get(wb=form)
-						errorlog.user = ''
-						errorlog.errorDisp = ''
-						errorlog.timestamp = datetime.datetime.now()
-						errorlog.save()
-					except:
-						pass
- 				else:
- 					valid=False
- 					issue ='Problems with Stock on WB:  '+ str(form)
- 					form.waybillValidated=False
- 					messages.add_message(request, messages.ERROR, issue)
-					try:
-						errorlog =loggerCompas.objects.get(wb=form)
-						errorlog.user = request.user
-						errorlog.errorDisp = errorMessage
-						errorlog.timestamp = datetime.datetime.now()
-						errorlog.save()
-					except:
-						errorlog =loggerCompas()
-						errorlog.wb = form
-						errorlog.user = request.user
-						errorlog.errorDisp = errorMessage
-						errorlog.timestamp = datetime.datetime.now()
-						errorlog.save()
+ 				try:
+					if form.check_lines():
+						form.auditComment ='Validated Dispatch'	
+						try:
+							errorlog =loggerCompas.objects.get(wb=form)
+							errorlog.user = ''
+							errorlog.errorDisp = ''
+							errorlog.timestamp = datetime.datetime.now()
+							errorlog.save()
+						except:
+							pass
+					else:
+						form.auditComment ='Tried to Validate Dispatch'
+						valid=False
+						issue ='Problems with Stock on WB:  '+ str(form)
+						form.waybillValidated=False
+						messages.add_message(request, messages.ERROR, issue)
+						try:
+							errorlog =loggerCompas.objects.get(wb=form)
+							errorlog.user = request.user
+							errorlog.errorDisp = errorMessage
+							errorlog.timestamp = datetime.datetime.now()
+							errorlog.save()
+						except:
+							errorlog =loggerCompas()
+							errorlog.wb = form
+							errorlog.user = request.user
+							errorlog.errorDisp = errorMessage
+							errorlog.timestamp = datetime.datetime.now()
+							errorlog.save()
+				except:
+						form.auditComment ='Tried to Validate Dispatch'
+						valid=False
+						issue ='Problems with Stock on WB:  '+ str(form)
+						form.waybillValidated=False
+						messages.add_message(request, messages.ERROR, issue)
+						try:
+							errorlog =loggerCompas.objects.get(wb=form)
+							errorlog.user = request.user
+							errorlog.errorDisp = errorMessage
+							errorlog.timestamp = datetime.datetime.now()
+							errorlog.save()
+						except:
+							errorlog =loggerCompas()
+							errorlog.wb = form
+							errorlog.user = request.user
+							errorlog.errorDisp = errorMessage
+							errorlog.timestamp = datetime.datetime.now()
+							errorlog.save()
+					
  			formset.save()
  			print issue
 
@@ -768,6 +793,7 @@ def waybill_validate_receipt_form(request):
  			instances =formset.save(commit=False)
  			for form in  instances:
  				if form.check_lines_receipt():
+					form.auditComment ='Validated Receipt'
   					try:
 						errorlog =loggerCompas.objects.get(wb=form)
 						errorlog.user = request.user
@@ -777,6 +803,7 @@ def waybill_validate_receipt_form(request):
 					except:
 						pass
  				else:
+ 					form.auditComment ='Tried to Validate Receipt'
  					valid=False
  					issue ='Problems with Stock on WB:  '+ str(form)
  					messages.add_message(request, messages.ERROR, issue)
@@ -794,8 +821,10 @@ def waybill_validate_receipt_form(request):
 						errorlog.errorRec  = errorMessage
 						errorlog.timestamp = datetime.datetime.now()
 						errorlog.save()
+
 # 			formset.save()
  			print issue
+ 			
 			formset.save()
 	formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
 	return render_to_response('validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
