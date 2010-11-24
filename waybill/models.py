@@ -114,27 +114,26 @@ class Waybill(models.Model):
 				return self.waybillNumber
 		def errors(self):
 			return loggerCompas.objects.get(wb=self)
-		
 		def check_lines(self):
 			lines = LoadingDetail.objects.filter(wbNumber=self)
 			for line in lines:
 				if line.check_stock():
-					print 'OK'
 					pass
 				else:
-					print 'Over'
 					return False
 			return True
 		def check_lines_receipt(self):
 			lines = LoadingDetail.objects.filter(wbNumber=self)
 			for line in lines:
 				if line.check_reciept_item():
-					print 'OK'
 					pass
 				else:
-					print 'Over'
 					return False
 			return True
+		def dispatchPerson(self):
+			return EpicPerson.objects.get(person_pk=self.dispatcherName)
+		def recieptPerson(self):
+			return EpicPerson.objects.get(person_pk=self.recipientName)
 #### Compas Tables Imported
 
 """
@@ -175,9 +174,6 @@ class ltioriginal(models.Model):
 		UNIT_WEIGHT_NET				=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		UNIT_WEIGHT_GROSS			=models.DecimalField(max_digits=8, decimal_places=3,blank=True,null=True)
 		
-#		objects = ltioriginalManager()
-		
-		
 		class Meta:
 				db_table = u'epic_lti'
 				
@@ -211,16 +207,11 @@ class ltioriginal(models.Model):
 		def reducesi(self,units):
 				self.sitracker.updateUnits(units)
 				return self.restant()
-				
 		def inStock(self):
 			try:
 				thisItem = EpicStock.objects.filter(wh_code=self.ORIGIN_WH_CODE).filter(si_code=self.SI_CODE).filter(commodity_code=self.COMMODITY_CODE)
 			except:
 				pass
-			
-			
-			
-			
 		def restoresi(self,units):
 				self.sitracker.updateUnitsRestore(units)
 				return self.restant()
@@ -237,7 +228,6 @@ class ltioriginal(models.Model):
 				print 'nogo'
 			print pack
 			return pack
-			
 		def isBulk(self):
 			mypkg = self.packaging()
 			print mypkg
@@ -245,7 +235,6 @@ class ltioriginal(models.Model):
 				return True
 			else:
 				return False
-
 		def coi_code(self):
 				try:
 						cursor = connection.cursor()
@@ -278,8 +267,6 @@ class ltioriginal(models.Model):
 				print('Add to removed')
 				this_lti.save()
 
-				
-			
 class removedLtisManager(models.Manager):
 		def list(self):
 			listExl =[]
@@ -296,10 +283,6 @@ class removedLtis(models.Model):
 		def  __unicode__(self):
 				return self.lti.LTI_ID
 		
-	
-
-
-
 class EpicPerson(models.Model):
 		person_pk 					= models.CharField(max_length=20, blank=True, primary_key=True)
 		org_unit_code 				= models.CharField(max_length=13)
@@ -499,13 +482,11 @@ class ReceptionPoint(models.Model):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
 		class Meta:
 			ordering = ['LOC_NAME', 'CONSEGNEE_NAME']
+
 class ReceptionPointAdmin(admin.ModelAdmin):
 		list_display=('LOC_NAME','CONSEGNEE_NAME')
 		ordering = ('LOC_NAME',)
 		
-
-
-
 class UserProfile(models.Model):
 		user				=models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
 		warehouses			=models.ForeignKey(DispatchPoint, blank=True,null=True)

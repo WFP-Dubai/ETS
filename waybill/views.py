@@ -9,7 +9,8 @@ from django.forms.formsets import BaseFormSet
 from django.forms.models import inlineformset_factory,modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import Template, RequestContext,Library, Node
+from django.template import Template, RequestContext,Library, Node, loader, Context
+
 from ets.waybill.compas import *
 from ets.waybill.forms import *
 from ets.waybill.models import *
@@ -60,7 +61,7 @@ def listOfLtis(request,origin):
 				if not lti in still_ltis:
 					still_ltis.append(lti)
 
-	return render_to_response('ltis.html', {'ltis':still_ltis}, context_instance=RequestContext(request))
+	return render_to_response('lti/ltis.html', {'ltis':still_ltis}, context_instance=RequestContext(request))
 
 ## Show all ltis 
 @login_required
@@ -81,7 +82,7 @@ def ltis(request):
 			if item.CurrentAmount > 0:
 				if not lti in still_ltis:
 					still_ltis.append(lti)
-	return render_to_response('ltis_all_qs.html',{'ltis':still_ltis}, context_instance=RequestContext(request))
+	return render_to_response('lti/ltis_all_qs.html',{'ltis':still_ltis}, context_instance=RequestContext(request))
 
 
 def import_ltis(request):
@@ -110,7 +111,7 @@ def lti_detail_url(request,lti_code):
 	"""
 	View: lti_detail_url 
 	URL: ets/waybill/info/(lti_code)
-	Template: /ets/waybill/templates/detailed_lti.html
+	Template: /ets/waybill/templates/lti/detailed_lti.html
 	Show detail of LTI and link to create waybill
 	"""
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
@@ -121,7 +122,7 @@ def lti_detail_url(request,lti_code):
 	for item in listOfSI_withDeduction:
 		if item.CurrentAmount > 0:
 			lti_more_wb=True
-	return render_to_response('detailed_lti.html',
+	return render_to_response('lti/detailed_lti.html',
 							  {'detailed':detailed_lti,'lti_id':lti_code,'listOfWaybills':listOfWaybills,'listOfSI_withDeduction':listOfSI_withDeduction,'moreWBs':lti_more_wb},
 							  context_instance=RequestContext(request))
 							  
@@ -162,6 +163,7 @@ def waybill_finalize_dispatch(request,wb_id):
 	current_wb.transportDispachSigned=True
 	current_wb.transportDispachSignedTimestamp=datetime.datetime.now()
 	current_wb.dispatcherSigned=True
+	current_wb.auditComment='Print Dispatch Original'
 	for lineitem in current_wb.loadingdetail_set.select_related():
 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
 	current_wb.save()
@@ -176,7 +178,7 @@ def	waybill_finalize_receipt(request,wb_id):
 	URL:ets/waybill/receipt/
 	Template:None
 	Redirects to Lti Details
-	Called when user pushes Print Original on dispatch
+	Called when user pushes Print Original on Receipt
 	"""
 	try:
 		current_wb = Waybill.objects.get(id=wb_id)
@@ -184,6 +186,7 @@ def	waybill_finalize_receipt(request,wb_id):
 		current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
 		current_wb.recipientSignedTimestamp=datetime.datetime.now()	
 		current_wb.transportDeliverySigned=True
+		current_wb.auditComment='Print Dispatch Receipt'
 		current_wb.save()
 		status = 'Waybill '+ current_wb.waybillNumber +' Receipt Signed'
 		messages.add_message(request, messages.INFO, status)
@@ -197,7 +200,7 @@ def singleWBDispatchToCompas(request,wb_id):
 	"""
 	View: singleWBDispatchToCompas
 	URL: 
-	Template: /ets/waybill/templates/status_waybill_compas.html
+	
 	Sends a single Dipatch into compas
 	"""
 	waybill = Waybill.objects.get(id=wb_id)
@@ -247,7 +250,7 @@ def singleWBReceiptToCompas(request,wb_id):
 	"""
 	View: singleWBReceiptToCompas
 	URL: ...
-	Template: /ets/waybill/templates/status_waybill_compas_rec.html
+	Template: /ets/waybill/templates/compas/status_waybill_compas_rec.html
 	Sends a single Receipt into compas
 	"""
 	profile = ''
@@ -289,8 +292,8 @@ def singleWBReceiptToCompas(request,wb_id):
 		waybill.save()
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
-# add field to say compas error/add logging
-	return render_to_response('status_waybill_compas_rec.html',
+# add field to say compas error/add logging Change to use messages....
+	return render_to_response('compas/status_waybill_compas_rec.html',
 							  {'waybill':waybill,
 							  'profile':profile,
 							  'error_message':error_message,
@@ -300,7 +303,7 @@ def singleWBReceiptToCompas(request,wb_id):
 def listCompasWB(request):
 	list_waybills_disp = Waybill.objects.filter(invalidated=False).filter(waybillSentToCompas = True)
 	list_waybills_rec = Waybill.objects.filter(invalidated=False).filter(waybillRecSentToCompas = True)
-	return render_to_response('list_waybills_compas_all.html',
+	return render_to_response('compas/list_waybills_compas_all.html',
 							  {'waybill_list':list_waybills_disp,'waybill_list_rec':list_waybills_rec},
 							  context_instance=RequestContext(request))
 
@@ -326,7 +329,7 @@ def receiptToCompas(request):
 			#print 'error'
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
-	return render_to_response('list_waybills_compas_received.html',
+	return render_to_response('compas/list_waybills_compas_received.html',
 							  {'waybill_list':list_waybills,'profile':profile, 'error_message':error_message,'error_codes':error_codes},
 							  context_instance=RequestContext(request))
 
@@ -360,6 +363,7 @@ def waybill_validate_form_update(request,wb_id):
 	lti_code = current_wb.ltiNumber
 	current_lti = ltioriginal.objects.filter(CODE = lti_code)
 	current_audit = current_wb.audit_log.all()
+	current_wb.auditComment=''
 	class LoadingDetailDispatchForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.all())
 		numberUnitsLoaded=forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -446,17 +450,15 @@ def waybill_view_reception(request,wb_id):
 @login_required
 def waybill_reception(request,wb_code):
 	# get the LTI info
-	profile = ''
-	try:
-		profile=request.user.get_profile()
-	except:
-		pass
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
-	if  profile.isReciever or profile.superUser:
+	if  request.user.profile.isReciever or request.user.profile.superUser:
 		pass
 	else:
 		return HttpResponseRedirect(reverse(waybill_view ,args=[wb_code]))
+#	current_wb.auditComment = 'Reciept Action'
+#	current_wb.save()
+		
 	class LoadingDetailRecForm(ModelForm):
 		siNo= ModelChoiceField(queryset=ltioriginal.objects.filter(CODE = current_lti),label='Commodity',)
 		numberUnitsGood= forms.CharField(widget=forms.TextInput(attrs={'size':'5'}),required=False)
@@ -522,15 +524,21 @@ def waybill_reception(request,wb_code):
 					raise forms.ValidationError(myerror)
 			return cleaned
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailRecForm,fk_name="wbNumber",  extra=0)
+	
 	if request.method == 'POST':
+		
 		form = WaybillRecieptForm(request.POST,instance=current_wb)
+
 		formset = LDFormSet(request.POST,instance=current_wb)
 		if form.is_valid() and formset.is_valid():
-			form.recipientTitle =  profile.compasUser.title
-			form.recipientName=   profile.compasUser.person_pk
+			form.recipientTitle =   request.user.profile.compasUser.title
+			form.recipientName=    request.user.profile.compasUser.person_pk
+			
+
 			wb_new = form.save()
-			wb_new.recipientTitle =  profile.compasUser.title
-			wb_new.recipientName=  profile.compasUser.person_pk
+			wb_new.recipientTitle =   request.user.profile.compasUser.title
+			wb_new.recipientName=   request.user.profile.compasUser.person_pk
+			wb_new.auditComment = 'Receipt Action'
 			wb_new.save()
 			instances =formset.save()
 			return HttpResponseRedirect('../viewwb_reception/'+ str(current_wb.id)) #
@@ -540,20 +548,23 @@ def waybill_reception(request,wb_code):
 	else:
 		if current_wb.recipientArrivalDate:
 			form = WaybillRecieptForm(instance=current_wb)
-			form.recipientTitle =  profile.compasUser.title
-			form.recipientName=  profile.compasUser.last_name + ', ' +profile.compasUser.first_name
+			#form.instance.auditComment= 'Receipt Action'
+			form.recipientTitle =   request.user.profile.compasUser.title
+			form.recipientName=   request.user.profile.compasUser.last_name + ', ' +  request.user.profile.compasUser.first_name
+			#form.auditComment = 'Receipt Action'
 		else:
 			form = WaybillRecieptForm(instance=current_wb,
 			initial={
 				'recipientArrivalDate':datetime.date.today(),
 				'recipientStartDischargeDate':datetime.date.today(),
 				'recipientEndDischargeDate':datetime.date.today(),
-				'recipientName': 	 profile.compasUser.last_name + ', ' +profile.compasUser.first_name, 	
-				'recipientTitle': 	 profile.compasUser.title,
+				'recipientName': 	  request.user.profile.compasUser.last_name + ', ' +  request.user.profile.compasUser.first_name, 	
+				'recipientTitle': 	  request.user.profile.compasUser.title,
+				#'auditComment': 'Receipt Action',
 			}
 		)
 		formset = LDFormSet(instance=current_wb)
-	return render_to_response('receiveWaybill.html', 
+	return render_to_response('waybill/receiveWaybill.html', 
 			{'form': form,'lti_list':current_lti,'formset':formset},
 			context_instance=RequestContext(request))
 
@@ -571,7 +582,7 @@ def waybill_search(request):
 		search_string =  request.GET['wbnumber']
 	except:
 		pass
-	
+
 	found_wb = Waybill.objects.filter(invalidated=False).filter(waybillNumber__icontains=search_string)
 	my_valid_wb=[]
 	curr_wh_disp = ''
@@ -594,7 +605,7 @@ def waybill_search(request):
 			elif request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.CONSEGNEE_CODE and curr_loc == request.user.profile.receptionPoints.LOC_NAME :
 				my_valid_wb.append(waybill.id)
 	
-	return render_to_response('list_waybills.html',
+	return render_to_response('waybill/list_waybills.html',
 							  {'waybill_list':found_wb, 'my_wb':my_valid_wb},
 							  context_instance=RequestContext(request))
 
@@ -654,8 +665,8 @@ def waybillCreate(request,lti_code):
 			current_wh = qs[0]
 		form = WaybillForm(
 			initial={
-					'dispatcherName': 	 profile.compasUser.person_pk, 	
-					'dispatcherTitle': 	 profile.compasUser.title,
+					'dispatcherName': 	 request.user.profile.compasUser.person_pk, 	
+					'dispatcherTitle': 	 request.user.profile.compasUser.title,
 					'ltiNumber':		 current_lti[0].CODE,
 					'dateOfLoading':	 datetime.date.today(),
 					'dateOfDispatch':	datetime.date.today(),
@@ -671,7 +682,7 @@ def waybillCreate(request,lti_code):
 		print current_lti[0].CONSEGNEE_CODE
 
 		formset = LDFormSet()
-	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+	return render_to_response('waybill/createWaybill.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 @login_required
 def waybill_edit(request,wb_id):
@@ -778,7 +789,7 @@ def waybill_validate_dispatch_form(request):
  			print issue
 
 	formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True))
-	return render_to_response('validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
+	return render_to_response('validate/validateForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
 
 @login_required
@@ -827,7 +838,7 @@ def waybill_validate_receipt_form(request):
  			
 			formset.save()
 	formset = ValidateFormset(queryset=Waybill.objects.filter(invalidated=False).filter( waybillReceiptValidated = False).filter(recipientSigned=True).filter(waybillValidated= True))
-	return render_to_response('validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
+	return render_to_response('validate/validateReceiptForm.html', {'formset':formset,'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
 
 # Shows a page with the Serialized Waybill in comressed & uncompressed format
@@ -875,7 +886,7 @@ def custom_show_toolbar(request):
 	
 def view_stock(request):
 	stocklist = EpicStock.objects.all()
-	return render_to_response('stocklist.html', {'stocklist':stocklist}, context_instance=RequestContext(request))
+	return render_to_response('stock/stocklist.html', {'stocklist':stocklist}, context_instance=RequestContext(request))
 	
 def viewLogView(request):
 	status = '<h3>Log view</h3><pre>'+viewLog()+'</pre>'
@@ -888,4 +899,24 @@ def profile(request):
 	return render_to_response('status.html',
 							  {'status':status},
 							  context_instance=RequestContext(request))
+	
+	
+	
+def ltis_report(request):
+	ltis = ltioriginal.objects.all()
+	items=[]
+	for lti in ltis:
+		items += lti.loadingdetail_set.select_related()
+	response = HttpResponse(mimetype='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=list-'+str(datetime.date.today()) + '.csv'
+	t = loader.get_template('reporting/list_ltis.txt')
+	c = Context({
+			'ltis': ltis,
+		})
+	response.write(t.render(c))
+	return response
+# 	return render_to_response('reporting/list_ltis.txt', {'ltis':ltis}, context_instance=RequestContext(request))
+							  
+							  
+	
 	

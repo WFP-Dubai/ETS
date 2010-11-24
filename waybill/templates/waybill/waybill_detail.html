@@ -135,10 +135,7 @@
 <tr><td><strong>Container 2:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
 <tr v-align=top><td ><strong>Reason for Changes:</td><td>{{form.auditComment}}</td></tr>
 </table>
-<ul>
-{%for line in audit%}
-<li>{{line.action_date}} - {{line.action_user}} - {{line.auditComment}}
-{%endfor%}
+
 <table>
 	<tr>
 		<td><input type="submit" value="Save & Exit"> {% csrf_token %}
@@ -153,7 +150,11 @@
 </form></td>
 	</tr>
 </table>
-
+<ul>
+{%for line in audit%}
+<li>{{line.action_date}} - {{line.action_user}} - {{line.auditComment}}
+{%endfor%}
+</ul>
 
 </div>
 

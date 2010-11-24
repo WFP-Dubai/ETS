@@ -27,6 +27,7 @@ class WaybillForm(ModelForm):
 	waybillNumber = forms.CharField(widget=forms.HiddenInput())
 	destinationWarehouse= ModelChoiceField(queryset=places.objects.all())	
 	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)
+	auditComment = forms.CharField(widget=forms.HiddenInput(),required=False)
 	
 	
         
@@ -58,14 +59,13 @@ class WaybillForm(ModelForm):
         	'containerTwoRemarksDispatch',
         	'recipientLocation',
 			'recipientConsingee',
+			'auditComment',
         	]
 	def clean(self):
 		cleaned = self.cleaned_data
-		print self.instance.dateOfDispatch
-
 		dateOfDispatch=cleaned.get('dateOfDispatch')
-
 		dateOfLoading=cleaned.get('dateOfLoading')
+
 		faults=False
 		myerror = ''
 		if dateOfLoading > dateOfDispatch:
@@ -79,7 +79,6 @@ class WaybillForm(ModelForm):
 			raise forms.ValidationError(myerror)
 
 		return cleaned
-        	
 
 class WaybillRecieptForm(ModelForm):
 	recipientArrivalDate = forms.DateField()
@@ -90,7 +89,8 @@ class WaybillRecieptForm(ModelForm):
 	recipientRemarks=forms.CharField(widget=forms.TextInput(attrs={'size':'40'}),required=False)
 	recipientConsingee = forms.CharField(widget=forms.HiddenInput())
 	invalidated= forms.CharField(widget=forms.HiddenInput(),required=False)	
-	auditComment = forms.CharField(widget=forms.HiddenInput())
+	auditComment = forms.CharField(widget=forms.HiddenInput(),required=False)
+
 	
 	class Meta:
 		model = Waybill
@@ -107,7 +107,9 @@ class WaybillRecieptForm(ModelForm):
 				'recipientSignedTimestamp',
 				'transportDeliverySigned',
 				'containerOneRemarksReciept',
-				'containerTwoRemarksReciept','invalidated'
+				'containerTwoRemarksReciept',
+				'invalidated',
+				'auditComment',
 			]
 	def clean(self):
 		cleaned = self.cleaned_data
@@ -210,10 +212,7 @@ class WaybillValidationFormset(BaseModelFormSet):
 			else:
 				print issue
  
-
-
-
-		
+	
 class MyModelChoiceField(ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s - %s" % (obj.SI_CODE , obj.CMMNAME )
