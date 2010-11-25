@@ -27,7 +27,7 @@
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>Items</th><th>Dispatched</th><th>Good<br>Units</th><th>Damaged<br>Units</th><th>Lost<br>Units</th><th></th>
+        <tr><th>Items</th><th>Dispatched<br>{%if formset.forms.0.instance.siNo.isBulk%}MT{%else%}Units{%endif%}</th><th>Good<br>{%if formset.forms.0.instance.siNo.isBulk%}MT{%else%}Units{%endif%}</th><th>Damaged<br>{%if formset.forms.0.instance.siNo.isBulk%}MT{%else%}Units{%endif%}</th><th>Lost<br>{%if formset.forms.0.instance.siNo.isBulk%}MT{%else%}Units{%endif%}</th><th></th>
         </thead>
 
     {% for sform in formset.forms %}

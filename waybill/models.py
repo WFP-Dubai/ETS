@@ -134,6 +134,8 @@ class Waybill(models.Model):
 			return EpicPerson.objects.get(person_pk=self.dispatcherName)
 		def recieptPerson(self):
 			return EpicPerson.objects.get(person_pk=self.recipientName)
+		def isBulk(self):
+			return ltioriginal.filter(CODE=self.ltiNumber)[0].isBulk
 #### Compas Tables Imported
 
 """

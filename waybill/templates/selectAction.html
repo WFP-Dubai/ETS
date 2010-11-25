@@ -1,6 +1,7 @@
 {% extends "base_template.html"%}
 {%block title %}Select Action{%endblock%}
 {%block content %}
+ {% if user.is_authenticated %} 
 Select an action:
 <ul>
 {%if user.profile.isDispatcher%}<li><a href='{%url ets.waybill.views.listOfLtis user.profile.warehouses.ORIGIN_WH_CODE%}'>Create & Dispatch Waybill</a></li>{%endif%}
@@ -12,5 +13,9 @@ Select an action:
  <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
     <li>&nbsp;
 {%if user.profile.isReciever%}<li>Scan Waybill --><form method='POST' action='waybill/deserialize/'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill"></li>{%endif%}
+<li><a href="{%url  ets.waybill.views.select_report%}">Reports</a>
 </ul>
+{%else%}
+Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.selectAction%}'>login</a>
+{%endif%}
 {%endblock%}

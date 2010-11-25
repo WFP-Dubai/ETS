@@ -915,8 +915,55 @@ def ltis_report(request):
 		})
 	response.write(t.render(c))
 	return response
+
+def dispatch_report_wh(request,wh):
+	ltis = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh)
+	items=[]
+	for lti in ltis:
+		items += lti.loadingdetail_set.select_related()
+	response = HttpResponse(mimetype='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=list-'+ wh +'-'+str(datetime.date.today()) + '.csv'
+	t = loader.get_template('reporting/list_ltis.txt')
+	c = Context({
+			'ltis': ltis,
+		})
+	response.write(t.render(c))
+	return response
+#	return render_to_response('reporting/list_ltis.txt', context_instance=RequestContext(request))
+
+def receipt_report_wh(request,loc,cons):
+	ltis = ltioriginal.objects.filter(DESTINATION_LOCATION_CODE=loc).filter(CONSEGNEE_CODE=cons)
+	items=[]
+	for lti in ltis:
+		items += lti.loadingdetail_set.select_related()
+	response = HttpResponse(mimetype='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=receipt-'+ loc +'-'+str(datetime.date.today()) + '.csv'
+	t = loader.get_template('reporting/list_ltis.txt')
+	c = Context({
+			'ltis': ltis,
+		})
+	response.write(t.render(c))
+	return response
+
+def receipt_report_org(request,wh):
+	ltis = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh)
+	items=[]
+	for lti in ltis:
+		items += lti.loadingdetail_set.select_related()
+	response = HttpResponse(mimetype='text/csv')
+	response['Content-Disposition'] = 'attachment; filename=list-'+str(datetime.date.today()) + '.csv'
+	t = loader.get_template('reporting/list_ltis.txt')
+	c = Context({
+			'ltis': ltis,
+		})
+	response.write(t.render(c))
+	return response
+	
 # 	return render_to_response('reporting/list_ltis.txt', {'ltis':ltis}, context_instance=RequestContext(request))
-							  
+def select_report(request):
+	pass
+	return render_to_response('reporting/select_report.html', context_instance=RequestContext(request))
+	
 							  
 	
 	
