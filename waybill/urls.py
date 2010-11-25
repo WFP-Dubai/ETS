@@ -68,4 +68,5 @@ urlpatterns = patterns('',
     (r'^waybill/report/select$',select_report),
     (r'^waybill/report/dispatch/(.*)$',dispatch_report_wh),
     (r'^waybill/report/receipt/(.*)/(.*)$',receipt_report_wh),
+     (r'^waybill/report/receipt/(.*)$',receipt_report_cons),
 )

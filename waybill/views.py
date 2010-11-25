@@ -945,8 +945,8 @@ def receipt_report_wh(request,loc,cons):
 	response.write(t.render(c))
 	return response
 
-def receipt_report_org(request,wh):
-	ltis = ltioriginal.objects.filter(ORIGIN_WH_CODE=wh)
+def receipt_report_cons(request,cons):
+	ltis = ltioriginal.objects.filter(CONSEGNEE_CODE=cons)
 	items=[]
 	for lti in ltis:
 		items += lti.loadingdetail_set.select_related()
