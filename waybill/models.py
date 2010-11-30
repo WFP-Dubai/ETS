@@ -135,7 +135,7 @@ class Waybill(models.Model):
 		def recieptPerson(self):
 			return EpicPerson.objects.get(person_pk=self.recipientName)
 		def isBulk(self):
-			return ltioriginal.filter(CODE=self.ltiNumber)[0].isBulk
+			return ltioriginal.filter(CODE=self.ltiNumber)[0].isBulk()
 #### Compas Tables Imported
 
 """
@@ -202,7 +202,7 @@ class ltioriginal(models.Model):
 				
 				for line in lines:
 					used +=  line.numberUnitsLoaded
-				if self.isBulk:
+				if self.isBulk():
 					return self.QUANTITY_NET - used
 				else:
 					return self.NUMBER_OF_UNITS - used
@@ -393,7 +393,7 @@ class LoadingDetail(models.Model):
 		def check_stock(self):
 			thisStock = EpicStock.objects.filter(si_code= self.siNo.SI_CODE).filter(wh_code = self.siNo.ORIGIN_WH_CODE)
 			#Am i in stock? # fix for bulk...
-			if self.siNo.isBulk:
+			if self.siNo.isBulk():
 				print len(thisStock)
 				if self.numberUnitsLoaded > thisStock[0].quantity_net:
 					print self.numberUnitsLoaded

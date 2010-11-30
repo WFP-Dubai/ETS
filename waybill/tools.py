@@ -99,12 +99,15 @@ def restant_si(lti_code):
 	listOfSI = []
 #	listExl =removedLtis.objects.list()
 
+	
 	for lti in detailed_lti:
 			if not removedLtis.objects.filter(lti = lti.LTI_PK):
-				if lti.isBulk:
+				if lti.isBulk():
 					listOfSI += [SIWithRestant(lti.SI_CODE,lti.QUANTITY_NET,lti.CMMNAME)]
+					print 'bulk'
 				else:
 					listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
+					print 'not bulk'
 
  	for wb in listOfWaybills:
  		for loading in wb.loadingdetail_set.select_related():
