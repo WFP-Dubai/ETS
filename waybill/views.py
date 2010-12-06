@@ -844,12 +844,9 @@ def waybill_validate_receipt_form(request):
 # Shows a page with the Serialized Waybill in comressed & uncompressed format
 @login_required
 def serialize(request,wb_code):
-	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
-	items_to_serialize =''# waybill_to_serialize[0].loadingdetail_set.select_related()
 	data = serialize_wb(wb_code)# serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize))	
-	
 	zippedWB = wb_compress(wb_code)
-	return render_to_response('blank.html',{'status':data,'ziped':zippedWB},
+	return render_to_response('blank.html',{'status':data,'ziped':zippedWB,'wb_code':wb_code},
 							  context_instance=RequestContext(request))
 
 ## recives a POST with the comressed or uncompressed WB and sends you to the Reveive WB 
@@ -964,6 +961,12 @@ def select_report(request):
 	pass
 	return render_to_response('reporting/select_report.html', context_instance=RequestContext(request))
 	
-							  
-	
+def barcode_qr(request,wb):
+	from qrencode import Encoder
+	enc = Encoder()
+	myz = wb_compress(wb)
+	im = enc.encode(myz, { 'width': 250 })
+	response = HttpResponse(mimetype="image/png")
+	im.save(response, "PNG")
+	return response
 	

@@ -87,7 +87,6 @@ def serialize_wbx(wb_code):
 def serialize_wb(wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
-
 	lti_to_serialize = []
 	for item in items_to_serialize:
 		lti_to_serialize.append(ltioriginal.objects.get(LTI_PK=item.siNo.LTI_PK))
@@ -243,4 +242,5 @@ def import_lti():
 def printIt(line):
 #	print line
 	pass
+
 	

@@ -478,7 +478,7 @@ class ReceptionPoint(models.Model):
 		LOCATION_CODE			=models.CharField(max_length=20, blank=True)
 		CONSEGNEE_CODE			=models.CharField(max_length=20, blank=True)
 		CONSEGNEE_NAME			=models.CharField(max_length=80, blank=True)
-		#DESC_NAME				=models.CharField(max_length=80, blank=True)
+		DESC_NAME				=models.CharField(max_length=80, blank=True)
 		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
 		def  __unicode__(self):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
@@ -491,17 +491,22 @@ class ReceptionPointAdmin(admin.ModelAdmin):
 		
 class UserProfile(models.Model):
 		user				=models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
-		warehouses			=models.ForeignKey(DispatchPoint, blank=True,null=True)
-		receptionPoints		=models.ForeignKey(ReceptionPoint, blank=True,null=True)
-		isCompasUser		=models.BooleanField()
-		isDispatcher		=models.BooleanField()
-		isReciever			=models.BooleanField()
-		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True)
-		superUser			=models.BooleanField()
-		readerUser			=models.BooleanField()
+		warehouses			=models.ForeignKey(DispatchPoint, blank=True,null=True,verbose_name='Dispatch Warehouse')
+		receptionPoints		=models.ForeignKey(ReceptionPoint, blank=True,null=True,verbose_name='Receipt Warehouse')
+		isCompasUser		=models.BooleanField('Is Compas User')
+		isDispatcher		=models.BooleanField('Is Dispatcher')
+		isReciever			=models.BooleanField('Is Receiver')
+		isAllReceiver		=models.BooleanField('Is Super Receiver (Can Receipt for All Warehouses)')
+		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True,verbose_name='Use this Compas User',help_text='Select the corrisponding user from Compas')
+		superUser			=models.BooleanField('Super User',help_text='This user has Full Privileges to edit Waybills even after Signatures')
+		readerUser			=models.BooleanField('Readonly User')
+		
 		audit_log = AuditLog()		
 		def __unicode__(self):
-				return "%s's profile" % self.user 
+			if self.user.first_name and self.user.last_name:
+				return "%s %s's profile (%s)" % (self.user.first_name, self.user.last_name,self.user.username)
+			else:
+				return "%s's profile" % self.user.username
 
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
 				
@@ -542,8 +547,6 @@ class loggerCompas(models.Model):
  	lti				= models.CharField(max_length=50, blank=True)
  	data_in			= models.CharField(max_length=5000, blank=True)
  	data_out		= models.CharField(max_length=5000, blank=True)
-
-
 	
 class SIWithRestant:
 		SINumber = ''
