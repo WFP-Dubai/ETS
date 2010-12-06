@@ -406,11 +406,11 @@ class LoadingDetail(models.Model):
 					return False
 				else:
 					return True
-		def check_reciept_item(self):
-			totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
-			if totalUnitsOffloaded > self.numberUnitsLoaded:
-				return False
-			else:
+		def check_reciept_item(self): # Removed validation for offload!!!
+# 			totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
+# 			if totalUnitsOffloaded > self.numberUnitsLoaded:
+# 				return False
+# 			else:
 				return True
 		
 		def getStockItem(self):
