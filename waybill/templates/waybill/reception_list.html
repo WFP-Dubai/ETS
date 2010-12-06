@@ -5,7 +5,7 @@
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Dispatched Date</th><th>Action</th></tr>
         </thead>
 {% for waybill in object_list%}
-    	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == user.profile.receptionPoints.CONSEGNEE_CODE  and user.profile.receptionPoints.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE %}
+    	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == user.profile.receptionPoints.CONSEGNEE_CODE  and user.profile.receptionPoints.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE  or user.profile.isCompasUser%}
    <tr>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>

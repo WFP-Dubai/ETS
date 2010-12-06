@@ -452,7 +452,7 @@ def waybill_reception(request,wb_code):
 	# get the LTI info
 	current_wb = Waybill.objects.get(id=wb_code)
 	current_lti = current_wb.ltiNumber
-	if  request.user.profile.isReciever or request.user.profile.superUser:
+	if  request.user.profile.isReciever or request.user.profile.superUser or request.user.profile.compasUser:
 		pass
 	else:
 		return HttpResponseRedirect(reverse(waybill_view ,args=[wb_code]))
