@@ -20,6 +20,8 @@ import cx_Oracle
 import datetime
 import os,StringIO, zlib,base64,string
 
+def removeNonAsciiChars(s):
+	return s if s=='' else ''.join([i for i in s if s in string.printable])
 
 def theHello():
 	print 'hello'
@@ -74,10 +76,21 @@ def un64unZip(data):
 
 # takes a wb id and returns a zipped base64 string of the serialized object // ?use table to reduce column names save 1000 bytes?
 
-def serialize_wb(wb_code):
+def serialize_wbx(wb_code):
 	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
 	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
 	lti_to_serialize =  ltioriginal.objects.filter(LTI_PK=items_to_serialize[0].siNo.LTI_PK)
+	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
+	return data
+
+
+def serialize_wb(wb_code):
+	waybill_to_serialize = Waybill.objects.filter(id=wb_code)
+	items_to_serialize = waybill_to_serialize[0].loadingdetail_set.select_related()
+
+	lti_to_serialize = []
+	for item in items_to_serialize:
+		lti_to_serialize.append(ltioriginal.objects.get(LTI_PK=item.siNo.LTI_PK))
 	data = serializers.serialize('json',list(waybill_to_serialize)+list(items_to_serialize)+list(lti_to_serialize))
 	return data
 

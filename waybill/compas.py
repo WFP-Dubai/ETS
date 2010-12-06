@@ -152,7 +152,7 @@ class compas_write:
 			TRAN_TYPE_CODE=the_waybill.transactionType
 			TRAN_TYPE_DESCR=the_waybill.transportVehicleRegistration
 			MODETRANS_CODE=the_waybill.transportType
-			COMMENTS=	dispatch_remarks
+			COMMENTS=	removeNonAsciiChars(dispatch_remarks)
 			PERSON_CODE=dispatch_person.code
 			PERSON_OUC=dispatch_person.org_unit_code
 			CERTIFING_TITLE=dispatch_person.title
