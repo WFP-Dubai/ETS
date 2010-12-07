@@ -5,7 +5,7 @@
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Dispatched Date</th><th>Action</th></tr>
         </thead>
 {% for waybill in object_list%}
-    	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == user.profile.receptionPoints.CONSEGNEE_CODE  and user.profile.receptionPoints.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE  or user.profile.isAllReceiver%}
+	{%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == user.profile.receptionPoints.CONSEGNEE_CODE  and user.profile.receptionPoints.LOCATION_CODE == waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOCATION_CODE  %}
    <tr>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>
@@ -15,7 +15,23 @@
  			<td>{{waybill.dateOfDispatch}}</td>
  			<td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
     </tr>
-    {%endif%}{%endfor%}
+   {%else%}
+	   {%if user.profile.isAllReceiver %}
+		   {%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == 'W200000475'%}x
+      <tr>
+ 			<td>{{waybill.ltiNumber}}</td>
+ 			<td>{{waybill.waybillNumber}}</td>
+  			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
+ 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
+ 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td>{{waybill.dateOfDispatch}}</td>
+ 			<td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
+    </tr>
+		    {%endif%}
+    	{%endif%}
+    {%endif%}
+    
+{%endfor%}
 </table>
 {%endblock%}
 {%block extra-header%}

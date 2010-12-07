@@ -721,7 +721,7 @@ def waybill_edit(request,wb_id):
 		form = WaybillForm(instance=current_wb)
 		form.fields["destinationWarehouse"].queryset = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME)
 		formset = LDFormSet(instance=current_wb)
-	return render_to_response('form.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
+	return render_to_response('waybill/createWaybill.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
 
 @login_required
 def waybill_validate_dispatch_form(request):
