@@ -17,7 +17,7 @@
     </tr>
    {%else%}
 	   {%if user.profile.isAllReceiver %}
-		   {%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == 'W200000475'%}x
+		   {%if waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_CODE == 'W200000475'%}
       <tr>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>
