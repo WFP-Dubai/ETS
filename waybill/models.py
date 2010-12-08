@@ -462,23 +462,27 @@ class LoadingDetail(models.Model):
 				return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()  +' - '+ self.siNo.LTI_PK
 
 class DispatchPoint(models.Model):
-		ORIGIN_LOC_NAME			=models.CharField(max_length=20, blank=True)
-		ORIGIN_LOCATION_CODE	=models.CharField(max_length=20, blank=True)
-		ORIGIN_WH_CODE			=models.CharField(max_length=20, blank=True)
-		ORIGIN_WH_NAME			=models.CharField(max_length=30, blank=True)
-		DESC_NAME				=models.CharField(max_length=20, blank=True,null=True)
+		ORIGIN_LOC_NAME			=models.CharField('Location Name',max_length=20, blank=True)
+		ORIGIN_LOCATION_CODE	=models.CharField('Location Code',max_length=20, blank=True)
+		ORIGIN_WH_CODE			=models.CharField('Warehouse Code',max_length=20, blank=True)
+		ORIGIN_WH_NAME			=models.CharField('Warehouse Name',max_length=30, blank=True)
+		#DESC_NAME				=models.CharField(max_length=20, blank=True,null=True)
 		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
 		
 		
 		def  __unicode__(self):
 				return self.ORIGIN_WH_CODE + ' - ' + self.ORIGIN_LOC_NAME
+class DispatchPointAdmin(admin.ModelAdmin):
+		list_display=('ORIGIN_WH_NAME','ORIGIN_LOC_NAME','ORIGIN_WH_CODE')
+		ordering = ('ORIGIN_LOC_NAME',)
+		list_filter = ('ORIGIN_LOC_NAME',) 
 		
 class ReceptionPoint(models.Model):
-		LOC_NAME				=models.CharField(max_length=20, blank=True)
-		LOCATION_CODE			=models.CharField(max_length=20, blank=True)
-		CONSEGNEE_CODE			=models.CharField(max_length=20, blank=True)
-		CONSEGNEE_NAME			=models.CharField(max_length=80, blank=True)
-		DESC_NAME				=models.CharField(max_length=80, blank=True)
+		LOC_NAME				=models.CharField('Location Name',max_length=20, blank=True)
+		LOCATION_CODE			=models.CharField('Location Code',max_length=20, blank=True)
+		CONSEGNEE_CODE			=models.CharField('Consengee Code',max_length=20, blank=True)
+		CONSEGNEE_NAME			=models.CharField('Consengee Name',max_length=80, blank=True)
+		#DESC_NAME				=models.CharField(max_length=80, blank=True)
 		ACTIVE_START_DATE		=models.DateField(null=True, blank=True)
 		def  __unicode__(self):
 				return self.LOC_NAME + ' ' + self.CONSEGNEE_CODE + ' - ' + self.CONSEGNEE_NAME
@@ -486,8 +490,9 @@ class ReceptionPoint(models.Model):
 			ordering = ['LOC_NAME', 'CONSEGNEE_NAME']
 
 class ReceptionPointAdmin(admin.ModelAdmin):
-		list_display=('LOC_NAME','CONSEGNEE_NAME')
+		list_display=('LOC_NAME','CONSEGNEE_NAME','CONSEGNEE_CODE')
 		ordering = ('LOC_NAME',)
+		list_filter = ('CONSEGNEE_NAME',) 
 		
 class UserProfile(models.Model):
 		user				=models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
@@ -496,7 +501,7 @@ class UserProfile(models.Model):
 		isCompasUser		=models.BooleanField('Is Compas User')
 		isDispatcher		=models.BooleanField('Is Dispatcher')
 		isReciever			=models.BooleanField('Is Receiver')
-		isAllReceiver		=models.BooleanField('Is Super Receiver (Can Receipt for All Warehouses)')
+		isAllReceiver		=models.BooleanField('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)')
 		compasUser			=models.ForeignKey(EpicPerson, blank=True,null=True,verbose_name='Use this Compas User',help_text='Select the corrisponding user from Compas')
 		superUser			=models.BooleanField('Super User',help_text='This user has Full Privileges to edit Waybills even after Signatures')
 		readerUser			=models.BooleanField('Readonly User')
@@ -571,7 +576,7 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 		list_display=('waybillNumber','siNo')
 
 admin.site.register(UserProfile)
-admin.site.register(DispatchPoint)
+admin.site.register(DispatchPoint,DispatchPointAdmin)
 admin.site.register(ReceptionPoint,ReceptionPointAdmin)
 admin.site.register(EpicPerson,EpicPersonsAdmin)
 admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)

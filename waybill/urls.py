@@ -3,6 +3,7 @@ from ets.waybill.views import *
 from ets.waybill.tools import *
 from ets.waybill.models import ltioriginal
 from django.views.generic.simple import *
+from django.contrib import databrowse
 
 from django.contrib.auth.views import login,logout,password_change,password_change_done
 
@@ -48,7 +49,7 @@ urlpatterns = patterns('',
     (r'^waybill/receive$',waybill_reception_list),
     (r'^waybill/serialize/(.*)$',serialize),     
     (r'^waybill/test$','django.views.generic.list_detail.object_list', info_dict_lti),
-#    (r'^waybill/validate/$',waybill_validateSelect),
+    #(r'^waybill/validate/$',waybill_validateSelect),
     (r'^waybill/validate/$','django.views.generic.simple.direct_to_template', {'template': 'selectValidateAction.html'}),
     (r'^waybill/validate_dispatch$',waybill_validate_dispatch_form),
     (r'^waybill/validate_receipt_form$',waybill_validate_receipt_form),
@@ -68,6 +69,7 @@ urlpatterns = patterns('',
     (r'^waybill/report/select$',select_report),
     (r'^waybill/report/dispatch/(.*)$',dispatch_report_wh),
     (r'^waybill/report/receipt/(.*)/(.*)$',receipt_report_wh),
-     (r'^waybill/report/receipt/(.*)$',receipt_report_cons),
-     (r'^waybill/images/qrcode/(.*)$',barcode_qr),
+    (r'^waybill/report/receipt/(.*)$',receipt_report_cons),
+    (r'^waybill/images/qrcode/(.*)$',barcode_qr),
+    (r'^databrowse/(.*)', databrowse.site.root),
 )

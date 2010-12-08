@@ -91,6 +91,7 @@ def import_ltis(request):
 	URL: ets/waybill/import
 	Template: /ets/waybill/templates/status.html
 	Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
+	add tag to say when last done
 	"""
 
 	print 'Import Stock'
@@ -102,7 +103,7 @@ def import_ltis(request):
 	print 'Import GEO'
 	import_geo()	
 	status = 'Import Finished'
-	print viewLog()
+	track_compas_update()
 	messages.add_message(request, messages.INFO, status)
 	
 	return HttpResponseRedirect(reverse(selectAction))

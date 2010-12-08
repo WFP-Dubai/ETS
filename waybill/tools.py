@@ -19,6 +19,13 @@ from ets.waybill.views import *
 import cx_Oracle
 import datetime
 import os,StringIO, zlib,base64,string
+## Databrowse
+from django.contrib import databrowse
+
+databrowse.site.register(Waybill)
+databrowse.site.register(EpicStock)
+databrowse.site.register(ltioriginal)
+
 
 def removeNonAsciiChars(s):
 	return s if s=='' else ''.join([i for i in s if s in string.printable])
@@ -39,6 +46,23 @@ def loggit(items):
 		print items
 # 	except:
 		pass	
+
+def track_compas_update():
+	file = 'tagfile.tag'
+	FILE = open(file,"w")
+	FILE.write(str(datetime.datetime.now()))
+	FILE.close()
+
+def readTag():
+	print 'here'
+	try:
+		logfile = 'tagfile.tag'
+		FILE = open(logfile)
+		log = FILE.read()
+		FILE.close()
+		return log + 'x'
+	except:
+		return 'None'
 	
 def viewLog():
 	try:
@@ -107,7 +131,7 @@ def zipBase64(data):
 	
 def restant_si(lti_code):
 	detailed_lti = ltioriginal.objects.filter(CODE=lti_code)
-	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code).filter(waybillSentToCompas=False)
+	listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code)
 	listOfSI = []
 #	listExl =removedLtis.objects.list()
 

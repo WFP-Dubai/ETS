@@ -1,4 +1,5 @@
 {% extends "base_template.html"%}
+{%load extra_tags%}
 {%block title %}Select Action{%endblock%}
 {%block content %}
  {% if user.is_authenticated %} 
@@ -20,4 +21,5 @@ Select an action:
 {%else%}
 Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.selectAction%}'>login</a>
 {%endif%}
+{%print_tag%}
 {%endblock%}
