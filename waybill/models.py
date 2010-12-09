@@ -221,18 +221,13 @@ class ltioriginal(models.Model):
 			pack = 'Unknown'
 			try:
 				mypkg = EpicStock.objects.filter(wh_code=self.ORIGIN_WH_CODE).filter(si_code=self.SI_CODE).filter(commodity_code=self.COMMODITY_CODE)
-				
-				print self.ORIGIN_WH_CODE
 				pack = str(mypkg[0].packagename)
-				print mypkg
-				print pack
 			except:
-				print 'nogo'
-			print pack
+				pass
 			return pack
+
 		def isBulk(self):
 			mypkg = self.packaging()
-			print mypkg
 			if mypkg == 'BULK':
 				return True
 			else:
@@ -266,7 +261,6 @@ class ltioriginal(models.Model):
 			this_lti = removedLtis()
 			this_lti.lti = self
 			if this_lti not in all_removed:
-				print('Add to removed')
 				this_lti.save()
 
 class removedLtisManager(models.Manager):
@@ -344,7 +338,6 @@ class EpicStock(models.Model):
 		
 		def packagingDescrShort(self):
 			pck= PackagingDescriptonShort.objects.get(pk=self.package_code)
-			#print pck
 			return pck.packageShortName
 			
 class EpicLossReason(models.Model):
@@ -394,10 +387,7 @@ class LoadingDetail(models.Model):
 			thisStock = EpicStock.objects.filter(si_code= self.siNo.SI_CODE).filter(wh_code = self.siNo.ORIGIN_WH_CODE)
 			#Am i in stock? # fix for bulk...
 			if self.siNo.isBulk():
-				print len(thisStock)
 				if self.numberUnitsLoaded > thisStock[0].quantity_net:
-					print self.numberUnitsLoaded
-					print thisStock[0].quantity_net
 					return False
 				else:
 					return True

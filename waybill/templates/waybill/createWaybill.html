@@ -38,6 +38,7 @@
 {{ formset.management_form }} 
 
 <br><br>
+{{formset.non_form_errors}}
 <table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
     <thead>
 	<tr><th></th><th>Commodity</th><th>{%if lti_list.0.isBulk%}Metric Tons{%else%}Number of Units{%endif%}</th><th>Overload</th></tr>

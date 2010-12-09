@@ -19,14 +19,22 @@ DATABASES = {
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },    
-    'compas': {
+#         'compas': {
+#         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+#         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
+#         'USER': 'opt_epic',                      	# Not used with sqlite3.
+#         'PASSWORD': 'opt_epic',                  		# Not used with sqlite3.
+#         'HOST': '10.11.33.199',                     	# Set to empty string for localhost. Not used with sqlite3.
+#         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+#     }
+        'compas': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
         'USER': 'testjerx001',                      	# Not used with sqlite3.
         'PASSWORD': 'testjerx001',                  		# Not used with sqlite3.
         'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
-    }#test opt
+    }
 }
 
 DATABASES_OTHER = {
@@ -38,6 +46,14 @@ DATABASES_OTHER = {
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
+        'compas': {
+        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
+        'USER': 'testjerx001',                      	# Not used with sqlite3.
+        'PASSWORD': 'testjerx001',                  		# Not used with sqlite3.
+        'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+    },#test opt
     'compasTestRome': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.33.199/tst1',                	# Or path to database file if using sqlite3.
@@ -55,7 +71,7 @@ DATABASES_OTHER = {
         'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
     },
-    'compasTest': {
+    'compas': {
         'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
         'USER': 'opt_epic',                      	# Not used with sqlite3.

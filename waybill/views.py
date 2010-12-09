@@ -242,7 +242,6 @@ def singleWBDispatchToCompas(request,wb_id):
 		error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 		error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 	# Update stock after submit off waybill
-	print 'Update Stock'
 	import_stock()
 	return HttpResponseRedirect(reverse(waybill_validate_dispatch_form))
 	
@@ -323,11 +322,9 @@ def receiptToCompas(request):
 		# call compas and read return
 		status_wb = the_compas.write_receipt_waybill_compas(waybill.id)
 		if  status_wb:
-			#print "ok"
 			waybill.waybillRecSentToCompas=True
 			waybill.save()
 		else:
-			#print 'error'
 			error_message +=waybill.waybillNumber + '-' + the_compas.ErrorMessages
 			error_codes +=waybill.waybillNumber +'-'+ the_compas.ErrorCodes
 	return render_to_response('compas/list_waybills_compas_received.html',
@@ -599,12 +596,14 @@ def waybill_search(request):
 			except:
 				curr_wh_rec = ''
 				curr_loc = ''				
-			if request.user.profile.isCompasUser or request.user.profile.readerUser:
+			if request.user.profile.isCompasUser or request.user.profile.readerUser or (request.user.profile.warehouses and curr_wh_disp  == request.user.profile.warehouses.ORIGIN_WH_CODE) or (request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.CONSEGNEE_CODE and curr_loc == request.user.profile.receptionPoints.LOC_NAME) or (request.user.profile.isAllReceiver and curr_wh_rec == 'W200000475'):
 				my_valid_wb.append(waybill.id)
-			elif request.user.profile.warehouses and curr_wh_disp  == request.user.profile.warehouses.ORIGIN_WH_CODE:
-				my_valid_wb.append(waybill.id)
-			elif request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.CONSEGNEE_CODE and curr_loc == request.user.profile.receptionPoints.LOC_NAME :
-				my_valid_wb.append(waybill.id)
+# 			elif request.user.profile.warehouses and curr_wh_disp  == request.user.profile.warehouses.ORIGIN_WH_CODE:
+# 				my_valid_wb.append(waybill.id)
+# 			elif request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.CONSEGNEE_CODE and curr_loc == request.user.profile.receptionPoints.LOC_NAME :
+# 				my_valid_wb.append(waybill.id)
+# 			elif request.user.profile.isAllReceiver and curr_wh_rec == 'W200000475':
+# 					my_valid_wb.append(waybill.id)
 	
 	return render_to_response('waybill/list_waybills.html',
 							  {'waybill_list':found_wb, 'my_wb':my_valid_wb},
@@ -638,7 +637,7 @@ def waybillCreate(request,lti_code):
  				raise forms.ValidationError(myerror)
    			return cleaned
    	
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,form=LoadingDetailDispatchForm,fk_name="wbNumber",formset=BaseLoadingDetailFormFormSet,  extra=5,max_num=5)
 	current_wh =''
 	if request.method == 'POST':
 		form = WaybillForm(request.POST)
@@ -658,6 +657,7 @@ def waybillCreate(request,lti_code):
 		else:
 			loggit( formset.errors)
 			loggit( form.errors)
+			loggit(formset.non_form_errors)
 	else:
 		qs = places.objects.filter(GEO_NAME = current_lti[0].DESTINATION_LOC_NAME).filter(ORGANIZATION_ID=current_lti[0].CONSEGNEE_CODE)
 		if len(qs)==0:

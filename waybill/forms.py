@@ -1,5 +1,5 @@
 from django.forms import ModelForm
-from django.forms.models import  BaseModelFormSet
+from django.forms.models import  BaseModelFormSet,BaseInlineFormSet
 from django.http import HttpResponse, HttpResponseRedirect
 from ets.waybill.views import *
 from ets.waybill.models import *
@@ -144,6 +144,21 @@ class WaybillRecieptForm(ModelForm):
 			raise forms.ValidationError(myerror)
 
 		return cleaned
+class BaseLoadingDetailFormFormSet(BaseInlineFormSet):
+	def append_non_form_error(self, message):
+		errors = super(BaseLoadingDetailFormFormSet, self).non_form_errors()
+		errors.append(message)
+		raise forms.ValidationError(errors)
+	def clean(self):
+		count = 0
+		for form in self.forms:
+			if form.is_bound:
+				if form.cleaned_data.get('numberUnitsLoaded'):
+					count +=1
+		"""Checks that no two articles have the same title."""
+		if count < 1: 
+			raise forms.ValidationError('You must have at least one Item')
+		
 
 class WaybillFullForm(ModelForm):
 
