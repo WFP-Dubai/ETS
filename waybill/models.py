@@ -369,7 +369,7 @@ class LossesDamagesType(models.Model):
 class LoadingDetail(models.Model):
 		wbNumber					=models.ForeignKey(Waybill)
 		siNo						=models.ForeignKey(ltioriginal)
-		numberUnitsLoaded			=models.DecimalField(default=0, blank=True,null=True,max_digits=10, decimal_places=3)
+		numberUnitsLoaded			=models.DecimalField(default=0, blank=False,null=False,max_digits=10, decimal_places=3)
 		numberUnitsGood				=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
 		numberUnitsLost				=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)
 		numberUnitsDamaged			=models.DecimalField(default=0,blank=True,null=True,max_digits=10, decimal_places=3)

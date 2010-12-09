@@ -623,19 +623,25 @@ def waybillCreate(request,lti_code):
 			fields = ('siNo','numberUnitsLoaded','wbNumber','overloadedUnits','overOffloadUnits')
 		
 		def clean(self):
-  			#print "cleaning"
-  			cleaned = self.cleaned_data
-  			siNo = cleaned.get("siNo")
-  			units = cleaned.get("numberUnitsLoaded")
-  			overloaded = cleaned.get('overloadedUnits')
-  			max_items = siNo.restant2()
-
-  			if units > max_items+self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
-  				myerror = "Overloaded!"
-  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
- 				self._errors['numberUnitsLoaded'].append(myerror)
- 				raise forms.ValidationError(myerror)
-   			return cleaned
+			try:
+				#print "cleaning"
+				cleaned = self.cleaned_data
+				siNo = cleaned.get("siNo")
+				units = cleaned.get("numberUnitsLoaded")
+				overloaded = cleaned.get('overloadedUnits')
+				max_items = siNo.restant2()
+	
+				if units > max_items+self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
+					myerror = "Overloaded!"
+					self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+					self._errors['numberUnitsLoaded'].append(myerror)
+					raise forms.ValidationError(myerror)
+				return cleaned
+			except:
+					myerror = "Value error!"
+					self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+					self._errors['numberUnitsLoaded'].append(myerror)
+					raise forms.ValidationError(myerror)				
    	
 	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,form=LoadingDetailDispatchForm,fk_name="wbNumber",formset=BaseLoadingDetailFormFormSet,  extra=5,max_num=5)
 	current_wh =''

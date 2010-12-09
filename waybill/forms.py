@@ -153,11 +153,13 @@ class BaseLoadingDetailFormFormSet(BaseInlineFormSet):
 		count = 0
 		for form in self.forms:
 			if form.is_bound:
-				if form.cleaned_data.get('numberUnitsLoaded'):
-					count +=1
-		"""Checks that no two articles have the same title."""
+				try:
+					if form.cleaned_data.get('numberUnitsLoaded'):
+						count +=1
+				except:
+					pass
 		if count < 1: 
-			raise forms.ValidationError('You must have at least one Item')
+			raise forms.ValidationError('You must have at least one commodity')
 		
 
 class WaybillFullForm(ModelForm):
