@@ -705,18 +705,24 @@ def waybill_edit(request,wb_id):
 			model = LoadingDetail
 			fields = ('id','siNo','numberUnitsLoaded','wbNumber','overloadedUnits')
 		def clean(self):
-  			cleaned = self.cleaned_data
-  			siNo = cleaned.get("siNo")
-  			units = cleaned.get("numberUnitsLoaded")
-  			overloaded = cleaned.get('overloadedUnits')
-  			max_items = siNo.restant2()
-  			if units > max_items+self.instance.numberUnitsLoaded and overloaded == False:
-	  				myerror = "Overloaded!"
-	  				self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
-	 				self._errors['numberUnitsLoaded'].append(myerror)
- 					raise forms.ValidationError(myerror)
-   			return cleaned
-	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber",  extra=5,max_num=5)
+			try:
+				cleaned = self.cleaned_data
+				siNo = cleaned.get("siNo")
+				units = cleaned.get("numberUnitsLoaded")
+				overloaded = cleaned.get('overloadedUnits')
+				max_items = siNo.restant2()
+				if units > max_items+self.instance.numberUnitsLoaded and overloaded == False:
+						myerror = "Overloaded!"
+						self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+						self._errors['numberUnitsLoaded'].append(myerror)
+						raise forms.ValidationError(myerror)
+				return cleaned
+			except:
+					myerror = "Value error!"
+					self._errors['numberUnitsLoaded'] = self._errors.get('numberUnitsLoaded', [])
+					self._errors['numberUnitsLoaded'].append(myerror)
+					raise forms.ValidationError(myerror)		
+	LDFormSet = inlineformset_factory(Waybill, LoadingDetail,LoadingDetailDispatchForm,fk_name="wbNumber", formset=BaseLoadingDetailFormFormSet, extra=5,max_num=5)
 	if request.method == 'POST':
 		form = WaybillForm(request.POST,instance=current_wb)
 		formset = LDFormSet(request.POST,instance=current_wb)
