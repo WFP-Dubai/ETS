@@ -96,6 +96,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'ets.waybill',
+    'django.contrib.databrowse',
 #    'dojango',
 #    'debug_toolbar',
 )
