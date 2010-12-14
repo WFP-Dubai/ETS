@@ -16,7 +16,6 @@
 		<string>FEAE95AB-FF01-4F8E-8D04-3CA2FB732F4C</string>
 		<string>E7976B9F-418D-4C7B-BEEE-1F34D7C0BA81</string>
 		<string>17A5E6B1-0794-4868-B985-5539DA9EA180</string>
-		<string>A3125CBA-4AB7-48E3-B2CB-0F41FB9FEB6A</string>
 	</array>
 	<key>ProjectItems</key>
 	<dict>
@@ -285,39 +284,6 @@
 			<string>waybill</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
-		</dict>
-		<key>A3125CBA-4AB7-48E3-B2CB-0F41FB9FEB6A</key>
-		<dict>
-			<key>ItemData</key>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAGEAAIAAAxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADFs8i4SCsAAAN3PdoKUkVBRE1FLnR4dAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAA8pahsjTOUJURVhUUipjaP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
-				s5B4AAAAEQAIAADI0wECAAAAAQAUA3c92gNtaqUACzIo
-				AAqMqgAAfQ0AAgA5TWFjaW50b3NoIEhEOlVzZXJzOmNh
-				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czpSRUFETUUu
-				dHh0AAAOABYACgBSAEUAQQBEAE0ARQAuAHQAeAB0AA8A
-				GgAMAE0AYQBjAGkAbgB0AG8AcwBoACAASABEABIALFVz
-				ZXJzL2NhcmxhbmRlci9wcm9qZWN0cy9lcGljL2V0cy9S
-				RUFETUUudHh0ABMAAS8AABUAAgAQ//8AAA==
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/carlander/projects/epic/ets/README.txt</string>
-				<key>RelativePath</key>
-				<string>./README.txt</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<key>ItemName</key>
-			<string>README.txt</string>
-			<key>ItemType</key>
-			<string>FileReference</string>
 		</dict>
 		<key>B818C47E-FC39-4665-A43D-748B96D86D6C</key>
 		<dict>
