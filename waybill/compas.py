@@ -183,57 +183,59 @@ class compas_write:
 					codeLetter = u'B'
 					CONTAINER_NUMBER=unicode(the_waybill.containerTwoNumber)		
 					
-				
-				CURR_CONTAINER_NUMBER=CONTAINER_NUMBER	
-				COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
-				COMM_CODE = lineItem.siNo.COMMODITY_CODE
-				COI_CODE = unicode(lineItem.siNo.coi_code())			
-				#get stock
-				TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
-				PCKKCODE = TheStockItems[0].package_code
-				ALLCODE = TheStockItems[0].allocation_code
-				QUALITY = TheStockItems[0].qualitycode #'G'
-				UnitsLoaded = lineItem.numberUnitsLoaded
-				strUnitsLoaded =  u'%.3f' % UnitsLoaded
-				UnitNet= lineItem.siNo.UNIT_WEIGHT_NET
-				UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
-				strUnitNet =  u'%.3f' % UnitNet
-				strUnitGross =  u'%.3f' % UnitGross
-				NetTotal =(UnitNet * UnitsLoaded) / 1000
-				strNetTotal = u'%.3f' % NetTotal
-				GrossTotal = (UnitGross * UnitsLoaded) / 1000
-				strGrossTotal = u'%.3f' % GrossTotal
-				Response_Message = cursor.var(cx_Oracle.STRING)
-				Response_Message.setvalue(0,u'x'*80)
-				Response_Code = cursor.var(cx_Oracle.STRING)
-				Response_Code.setvalue(0,u'x'*2)
-				Full_coi= TheStockItems[0].origin_id
-				empty = u''
-				
-				if isBulk:
-					pass# manage bulk..... set number of items to 1 and take the units and put them into NetTotal & Gross Total
-					strUnitsLoaded=u'1.000'
-					strUnitNet = u''
-					strUnitGross =  u''
-					strNetTotal = u'%.3f' % UnitsLoaded
-					strGrossTotal = u'%.3f' % UnitsLoaded
-					
-				printlist( [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
-					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
-					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
-					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,empty])
-				cursor.callproc(u'write_waybill.dispatch',(Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
-					ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
-					COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
-					Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,u''))
-				if(	Response_Code.getvalue() == 'S'):
+				if lineItem.loadingDetailSentToCompas:
 					pass
 				else:
-					all_ok =False
-					self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
-					self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
-				print Response_Message.getvalue()
-				print Response_Code.getvalue()
+					CURR_CONTAINER_NUMBER=CONTAINER_NUMBER	
+					COMM_CATEGORY_CODE = lineItem.siNo.COMM_CATEGORY_CODE
+					COMM_CODE = lineItem.siNo.COMMODITY_CODE
+					COI_CODE = unicode(lineItem.siNo.coi_code())			
+					#get stock
+					TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+					PCKKCODE = TheStockItems[0].package_code
+					ALLCODE = TheStockItems[0].allocation_code
+					QUALITY = TheStockItems[0].qualitycode #'G'
+					UnitsLoaded = lineItem.numberUnitsLoaded
+					strUnitsLoaded =  u'%.3f' % UnitsLoaded
+					UnitNet= lineItem.siNo.UNIT_WEIGHT_NET
+					UnitGross = lineItem.siNo.UNIT_WEIGHT_GROSS
+					strUnitNet =  u'%.3f' % UnitNet
+					strUnitGross =  u'%.3f' % UnitGross
+					NetTotal =(UnitNet * UnitsLoaded) / 1000
+					strNetTotal = u'%.3f' % NetTotal
+					GrossTotal = (UnitGross * UnitsLoaded) / 1000
+					strGrossTotal = u'%.3f' % GrossTotal
+					Response_Message = cursor.var(cx_Oracle.STRING)
+					Response_Message.setvalue(0,u'x'*80)
+					Response_Code = cursor.var(cx_Oracle.STRING)
+					Response_Code.setvalue(0,u'x'*2)
+					Full_coi= TheStockItems[0].origin_id
+					empty = u''
+					
+					if isBulk:
+						pass# manage bulk..... set number of items to 1 and take the units and put them into NetTotal & Gross Total
+						strUnitsLoaded=u'1.000'
+						strUnitNet = u''
+						strUnitGross =  u''
+						strNetTotal = u'%.3f' % UnitsLoaded
+						strGrossTotal = u'%.3f' % UnitsLoaded
+						
+					printlist( [Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
+						ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
+						COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
+						Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,empty])
+					cursor.callproc(u'write_waybill.dispatch',(Response_Message,Response_Code,CURR_CODE,DISPATCH_DATE,ORIGIN_TYPE,ORIGIN_LOCATION_CODE,ORIGIN_CODE,
+						ORIGIN_DESCR,DESTINATION_LOCATION_CODE,DESTINATION_CODE,LTI_ID,LOADING_DATE,ORGANIZATION_ID,TRAN_TYPE_CODE,VEHICLE_REGISTRATION,MODETRANS_CODE,
+						COMMENTS,PERSON_CODE,PERSON_OUC,CERTIFING_TITLE,TRANS_CONTRACTOR_CODE,SUPPLIER1_OUC,DRIVER_NAME,LICENSE,CURR_CONTAINER_NUMBER,settings.COMPAS_STATION,
+						Full_coi,COMM_CATEGORY_CODE,COMM_CODE,PCKKCODE,ALLCODE,QUALITY,strNetTotal,strGrossTotal,strUnitsLoaded,strUnitNet,strUnitGross,u''))
+					if(	Response_Code.getvalue() == 'S'):
+						pass
+					else:
+						all_ok =False
+						self.ErrorMessages += Full_coi+":"+Response_Message.getvalue() + " "
+						self.ErrorCodes += Full_coi+":"+ Response_Code.getvalue()+ " "
+					print Response_Message.getvalue()
+					print Response_Code.getvalue()
 			if not all_ok:
 				db.rollback()
 			else:
