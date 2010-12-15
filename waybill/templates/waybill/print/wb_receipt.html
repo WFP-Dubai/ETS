@@ -41,7 +41,7 @@
 					<tr style="font-size:small; text-align:right;">
 <td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
 <td>{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
-<td>{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}{{lineitem.calcNetRecievedGood|floatformat:3}}</td>
+<td>{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.calcNetRecievedGood|floatformat:3}}{%endif%}</td>
 <td style="text-align:center;">
 {%if lineitem.siNo.isBulk%}-{%else%}
 {%ifnotequal lineitem.numberUnitsLost 0%}
@@ -57,20 +57,20 @@
 
 <td style="text-align:center;">&nbsp;
 {%if lineitem.siNo.isBulk%}
-{%ifnotequal lineitem.numberUnitsLost 0%}
-	L:{{lineitem.numberUnitsLost|floatformat:3}}
-	{%endifnotequal%}
-	{%ifnotequal lineitem.numberUnitsDamaged 0%}
-	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
-	D:{{lineitem.numberUnitsDamaged|floatformat:3}}
+	{%ifnotequal lineitem.numberUnitsLost 0%}
+		L:{{lineitem.numberUnitsLost|floatformat:3}}
+		{%endifnotequal%}
+		{%ifnotequal lineitem.numberUnitsDamaged 0%}
+		{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
+		D:{{lineitem.numberUnitsDamaged|floatformat:3}}
 	{%endifnotequal%}
 {%else%}
 	{%ifnotequal lineitem.numberUnitsLost 0%}
-	L:{{lineitem.calcNetRecievedLost|floatformat:3}}
-	{%endifnotequal%}
-	{%ifnotequal lineitem.numberUnitsDamaged 0%}
-	{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
-	D:{{lineitem.calcNetRecievedDamaged|floatformat:3}}
+		L:{{lineitem.calcNetRecievedLost|floatformat:3}}
+		{%endifnotequal%}
+		{%ifnotequal lineitem.numberUnitsDamaged 0%}
+		{%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
+		D:{{lineitem.calcNetRecievedDamaged|floatformat:3}}
 	{%endifnotequal%}
 {%endif%}
 	</td>
