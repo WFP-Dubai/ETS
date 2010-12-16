@@ -204,6 +204,8 @@ class compas_write:
 					NetTotal =(UnitNet * UnitsLoaded) / 1000
 					strNetTotal = u'%.3f' % NetTotal
 					GrossTotal = (UnitGross * UnitsLoaded) / 1000
+					if GrossTotal >  TheStockItems[0].quantity_gross:
+						GrossTotal = TheStockItems[0].quantity_gross
 					strGrossTotal = u'%.3f' % GrossTotal
 					Response_Message = cursor.var(cx_Oracle.STRING)
 					Response_Message.setvalue(0,u'x'*80)
