@@ -21,19 +21,19 @@
 {% endfor %}
 <div class="form">
 	<div>
-		<span><strong>LTI:</strong> {{form.instance.ltiNumber}}</span>
+		<span><strong>LTI:</strong> {{lti_list.0.CODE}}</span>
 	</div>
 	<div>
 		<strong>Waybill Number:</strong> {{form.instance.waybillNumber}}
 	</div>
 	<div>
 <br>
-{%if  form.instance.hasError  %}
+{%if  form.instance.errors  %}{%if form.instance.errors.errorRec != '' or  form.instance.errors.errorDisp != '' %}
 <div style='background-color:red;border:2px red solid;'>Compas Issue:<br>
-	{%if form.instance.dispError%}Dispatch Error: {{form.instance.dispError}} <br>{%endif%}
-	{%if form.instance.recError%}Receipt Error: {{form.instance.recError}} {%endif%}
+	{%if form.instance.errors.errorDisp%}Dispatch Error: {{form.instance.errors.errorDisp}} <br>{%endif%}
+	{%if form.instance.errors.errorRec%}Receipt Error: {{form.instance.errors.errorRec}} {%endif%}
 </div>
-{%endif%}
+{%endif%}{%endif%}
 	<span>
 	<table>
 		<tr>

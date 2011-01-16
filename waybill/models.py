@@ -113,7 +113,10 @@ class Waybill(models.Model):
 		def mydesc(self):
 				return self.waybillNumber
 		def errors(self):
-			return loggerCompas.objects.get(wb=self)
+			try:
+				return loggerCompas.objects.get(wb=self)
+			except:
+				return ''
 		def check_lines(self):
 			lines = LoadingDetail.objects.filter(wbNumber=self)
 			for line in lines:

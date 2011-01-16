@@ -1,0 +1,221 @@
+{% extends "offliner_base_template.html"%}
+
+{%block title %}
+	Waybill Creation 
+{%endblock%}
+
+{%block content %}
+
+<style type="text/css">
+	.ul-inline ul, .ul-inline ul li{border-width: 1px; display: inline; padding: 0px;}
+	.ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
+</style>
+
+<form action="" method=POST id="delform">
+
+	{{form.invalidated}}
+
+	{% if item.errors %}
+   		<span class='error'>Review Form, as there is information missing</span>
+	{% endif %}
+	<div class="form">
+		<div>
+			<span><strong>LTI:</strong> {{lti_list.0.CODE}}{{form.ltiNumber}}</span>
+		</div>
+		{%if form.instance.waybillNumber%}
+			<div>
+				<span><strong>Waybill Nr:</strong> {{form.instance.waybillNumber}}</span>
+			</div>
+		{%endif%} 
+	
+	{{form.waybillNumber}}
+	
+	<div>
+		<span>
+			<strong>Date of Loading:</strong> 
+			{{form.dateOfLoading}} 
+			<span class='error'>
+				{%for error in form.dateOfLoading.errors%} 
+					{{error|escape}}
+				{%endfor%}
+			</span>
+		</span>
+		<span>
+			<strong>Date of Dispatch: </strong>
+			{{form.dateOfDispatch}}
+			<span class='error'>
+				{%for error in form.dateOfDispatch.errors%} 
+					{{error|escape}}
+				{%endfor%}
+			</span>
+		</span>
+	</div>
+	
+	<table>
+		<tr>
+			<th>Transaction Type:</th>
+			<td> 
+				{{form.transactionType}} 
+				{%for error in form.transactionType.errors%}
+					<span class='error'>{{error|escape}}</span>
+				{%endfor%} 
+			</td>
+			<td>&nbsp;</td>
+			<th>Transport Type:</th>
+			<td>
+				{{form.transportType}}
+				<span class='error'>
+					{%for error in form.transportType.errors%} 
+						{{error|escape}}
+					{%endfor%}
+				</span>
+			</td>
+		</tr>	
+	</table>
+	
+	<strong>Recipient Location:</strong>    
+	
+	{{form.recipientLocation}} 
+	{{form.recipientConsingee}}    	
+	{{lti_list.0.destination_loc_name}}
+	
+	<br>
+	
+	<strong>Consignee :</strong> 
+	{{lti_list.0.consegnee_name}}
+	
+	<br>
+
+	<strong>Destination Warehouse:</strong> 
+	{{form.destinationWarehouse}}
+	{%for error in form.destinationWarehouse.errors%}
+		<span class='error'>{{error|escape}}</span>
+	{%endfor%}
+	
+	{{ formset.management_form }} 
+
+	<br>
+	<br>
+	
+	<table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
+    	<thead>
+			<tr>
+				<th></th>
+				<th>Commodity</th>
+				<th>
+					{%if lti_list.0.isBulk%}
+						Metric Tons
+					{%else%}
+						Number of Units
+					{%endif%}
+				</th>
+				<th>Overload</th>
+			</tr>
+	 	</thead>
+		
+		{% for sform in formset.forms %}
+		<tr>
+			<td>{{ sform.id }}{{forloop.counter}}</td>
+			<td>{{ sform.siNo }}</td>
+			<td>{{ sform.numberUnitsLoaded }} 
+				{%for error in sform.numberUnitsLoaded.errors%}
+					<span class='error'> 
+						{{error|escape}}
+					</span>
+				{%endfor%}
+			</td>
+			<td>{{ sform.overloadedUnits}}</td>
+		</tr>
+		{% endfor %}
+ 
+ 	</table>
+ 
+ 	<br>
+
+	<div>
+	
+	<div>
+		<strong>Dispatch Remarks:</strong> 
+		{{form.dispatchRemarks}}
+
+	<div>
+		<strong>Dispatcher Name:</strong>
+		{{form.dispatcherName}}
+		{{form.dispatcherTitle}}
+	</div>
+
+	<br>
+	
+	<div>
+		<table>
+			<tr>
+				<td><strong>Transport Contractor:</strong></td>
+				<td>{{lti_list.0.transport_name}}{{form.transportContractor}}</td>
+			</tr>
+			<tr>
+				<td><strong>Transport Subcontractor:</strong></td>
+				<td>{{form.transportSubContractor}}</td>
+			</tr>
+			<tr>
+				<td><strong>Driver's Name:</strong></td>
+				<td>{{form.transportDriverName}}</td>
+			</tr>
+			<tr>
+				<td><strong>Driver's Licens No:</strong></td>
+				<td>{{form.transportDriverLicenceID}}</td>
+			</tr>
+			<tr>
+				<td><strong>Vehicle Registration No:</strong></td>
+				<td>{{form.transportVehicleRegistration}}</td>
+			</tr>
+			<tr>
+				<td><strong>Trailer Registration No:</strong></td>
+				<td>{{form.transportTrailerRegistration}}</td>
+			</tr>
+		</table>
+	</div>
+
+	<br>
+	
+	<strong>Container 1: Number:</strong>
+	{{form.containerOneNumber}}
+	<strong> Seal:</strong>
+	{{form.containerOneSealNumber}}
+	<strong> Remarks:</strong>
+	{{form.containerOneRemarksDispatch}}
+	
+	<br>
+	
+	<strong>Container 2: Number:</strong>
+	{{form.containerTwoNumber}}
+	<strong> Seal:</strong>
+	{{form.containerTwoSealNumber}}
+	<strong> Remarks:</strong>
+	{{form.containerTwoRemarksDispatch}}
+
+	</div>
+
+	<input type="submit" value="Save & Print"> {% csrf_token %}
+
+</form>
+
+{%endblock%}
+
+{%block extra-header%}
+
+<script charset="utf-8" type="text/javascript">
+$(document).ready(function() {
+				$('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
+				$('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });				
+				$('#example').dataTable( {
+				"bPaginate": false,
+		"bLengthChange": false,
+		"bFilter": false,
+		"bSort": false,
+		"bInfo": false,
+		"bAutoWidth": false 
+				});
+} );
+</script>
+
+{%endblock extra-header%}

@@ -140,10 +140,9 @@ def restant_si(lti_code):
 			if not removedLtis.objects.filter(lti = lti.LTI_PK):
 				if lti.isBulk():
 					listOfSI += [SIWithRestant(lti.SI_CODE,lti.QUANTITY_NET,lti.CMMNAME)]
-					print 'bulk'
 				else:
 					listOfSI += [SIWithRestant(lti.SI_CODE,lti.NUMBER_OF_UNITS,lti.CMMNAME)]
-					print 'not bulk'
+
 
  	for wb in listOfWaybills:
  		for loading in wb.loadingdetail_set.select_related():
@@ -263,6 +262,14 @@ def import_lti():
 	#		c.remove_lti()
 
 			
+def getMyProfile(request):
+	myprofile =''
+	try:
+		myprofile = request.user.profile
+	except:
+		pass
+	return myprofile
+
 def printIt(line):
 #	print line
 	pass

@@ -33,7 +33,7 @@ ALL_DB = {
     },
        'default_tc_mp': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'wbprod',                      # Or path to database file if using sqlite3.
+        'NAME': 'waybill',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -113,7 +113,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ROOT_URLCONF = 'ets.urls'
 
@@ -130,7 +130,7 @@ INSTALLED_APPS = (
     'ets.waybill',
     'django.contrib.databrowse',
 #    'dojango',
-#    'debug_toolbar',
+    'debug_toolbar',
 )
 INTERNAL_IPS = ('127.0.0.1',)
 

@@ -3,7 +3,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     	<thead>
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th> <th>Received</th>
-{%if user.profile.superUser or user.profile.readerUser or user.profile.isCompasUser%}        
+{%if myprofile.superUser or myprofile.readerUser or myprofile.isCompasUser%}        
         <th>Validated</th><th>In Compas</th>
 {%endif%}
         <th>Action</th>
@@ -12,20 +12,20 @@
 {% for waybill in waybill_list%}
 {%if waybill.id in my_wb%}
 
-<tr {%if waybill.errors%}{%if waybill.errors.errorRec != '' or waybill.errors.errorDisp != '' %}style='color:red;'{%endif%}{%endif%}>
+<tr {%if waybill.hasError %}style='color:red;'{%endif%}>
  			<td>{{waybill.ltiNumber}}</td>
  			<td>{{waybill.waybillNumber}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
+ 			<td>{{waybill.ORIGIN_LOC_NAME}}</td>
+ 			<td>{{waybill.CONSEGNEE_NAME}}</td>
+ 			<td>{{waybill.DESTINATION_LOC_NAME}}</td>
 			<td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
   			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%}</td>
-{%if user.profile.superUser or user.profile.readerUser or user.profile.isCompasUser%} 
+{%if myprofile.superUser or myprofile.readerUser or myprofile.isCompasUser%} 
  			<td>{%if waybill.waybillValidated%}D{%else%}-{%endif%}/{%if waybill.waybillReceiptValidated%}R{%else%}-{%endif%}</td>
  			<td>{%if waybill.waybillSentToCompas%}D{%else%}-{%endif%}/{%if waybill.waybillRecSentToCompas%}R{%else%}-{%endif%}</td>
 {%endif%}
- 			<td>{%if not user.profile.superUser%}<a href='{%if  user.profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
- 			{%if user.profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}
+ 			<td>{%if not myprofile.superUser%}<a href='{%if  myprofile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
+ 			{%if myprofile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}
  			</td>
     </tr>
 {%endif%}
