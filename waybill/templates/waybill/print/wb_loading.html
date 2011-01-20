@@ -8,10 +8,9 @@
 						<td><sup style="font-size:x-small;">Origin(location):</sup><br>{{ltioriginal.0.ORIGIN_LOC_NAME}}</td>
 						<td><sup style="font-size:x-small;" >Origin(warehouse):</sup><br>{{ltioriginal.0.ORIGIN_WH_NAME}}</td>
 						<td><sup style="font-size:x-small;">Destination(location)</sup><br>{{ltioriginal.0.DESTINATION_LOC_NAME}}</td>
-						<td  rowspan=5>{%if zippedWB%}
-						<img style="left: 0px; right: 0px;"  height='200pt' src='http://chart.apis.google.com/chart?cht=qr&chs=300x300&chld=L|2&chl={{zippedWB}}'>
-						<!--img style="left: 0px; right: 0px;"  height='200pt' src='../images/qrcode/{{object.id}}'-->
-						{%else%}<img  src="/ets/media/images/b.png" alt="barcode" >{%endif%}
+						<td  rowspan=5>
+						{% include 'waybill/print/barcode.html'%}
+
 						</td>
 					
 					</tr>

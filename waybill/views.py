@@ -1064,17 +1064,18 @@ def select_report(request):
 	return render_to_response('reporting/select_report.html', context_instance=RequestContext(request))
 	
 def barcode_qr(request,wb):
-# 	from qrencode import Encoder
-# 	enc = Encoder()
-# 	myz = wb_compress(wb)
-# 	im = enc.encode(myz, { 'width': 250 })
-# 	response = HttpResponse(mimetype="image/png")
-# 	im.save(response, "PNG")
-# 	return response
-	from hubarcode.qrcode import QRCodeEncoder
-	#enc = QRCodeEncoder('hello')
-	myz = wb_compress(wb)
-	im =QRCodeEncoder(myz)
-	response = HttpResponse(im.get_imagedata(1),mimetype="image/png")
-	
+	import platform
+	if platform.system() == 'Windows':
+		import subprocess
+		myz = wb_compress(wb)
+		mydata=subprocess.Popen(['C:\\Program Files\\Zint\\zint.exe','--directpng','--barcode=58','-d%s'%myz ],stdout=subprocess.PIPE)
+		image = mydata.communicate()[0]
+		response = HttpResponse(image,mimetype="image/png")
+	else:
+		from qrencode import Encoder
+		enc = Encoder()
+		myz = wb_compress(wb)
+		im = enc.encode(myz, { 'width': 250 })
+		response = HttpResponse(mimetype="image/png")
+		im.save(response, "PNG")
 	return response

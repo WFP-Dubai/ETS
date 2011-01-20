@@ -9,8 +9,9 @@
 		<string>7DFF17CD-025D-48CD-A78C-D6E947DF3493</string>
 		<string>2080C4EC-AD6F-496F-99AF-22E836923582</string>
 		<string>8B3A65FF-F12D-4A7B-8935-5DE42E8785D8</string>
+		<string>A9C6C1DA-CFE3-43AE-9D20-CDACB0F7D67B</string>
+		<string>9B1857A6-77EF-4B3A-97F0-037D20C6A8F6</string>
 		<string>9574E8B9-10F9-428D-8B4E-47D0C1A3CB51</string>
-		<string>441DFF97-2290-45EB-ADBC-F2B0780496C2</string>
 		<string>B818C47E-FC39-4665-A43D-748B96D86D6C</string>
 		<string>D6A33DF3-AB09-47C7-887C-E38CCF768F99</string>
 		<string>FEAE95AB-FF01-4F8E-8D04-3CA2FB732F4C</string>
@@ -152,38 +153,6 @@
 			<key>ItemType</key>
 			<string>FileReference</string>
 		</dict>
-		<key>441DFF97-2290-45EB-ADBC-F2B0780496C2</key>
-		<dict>
-			<key>ItemData</key>
-			<dict>
-				<key>AliasData</key>
-				<data>
-				AAAAAAFqAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
-				AAAAAADGOwZESCsAAABosfYFbWVkaWEAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-				AAAAAAAAAAAAAAAAAAAAAHC+5sgx9YoAAAAAAAAAAP//
-				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
-				Os4EAAAAEQAIAADIMb1KAAAAAQAUAGix9gBmKV4ADUCw
-				AAqbxgAAhe0AAgAxTWFjaW50b3NoIEhEOlVzZXJzOnRv
-				Ymlhczpwcm9qZWN0czplcGljOmV0czptZWRpYQAADgAM
-				AAUAbQBlAGQAaQBhAA8AGgAMAE0AYQBjAGkAbgB0AG8A
-				cwBoACAASABEABIAJFVzZXJzL3RvYmlhcy9wcm9qZWN0
-				cy9lcGljL2V0cy9tZWRpYQATAAEvAAAVAAIADf//AAA=
-				</data>
-				<key>FileURL</key>
-				<string>file://localhost/Users/tobias/projects/epic/ets/media/</string>
-				<key>RelativePath</key>
-				<string>./media</string>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-			<key>ItemName</key>
-			<string>media</string>
-			<key>ItemType</key>
-			<string>FolderReference</string>
-		</dict>
 		<key>7DFF17CD-025D-48CD-A78C-D6E947DF3493</key>
 		<dict>
 			<key>ItemData</key>
@@ -282,6 +251,71 @@
 			</dict>
 			<key>ItemName</key>
 			<string>waybill</string>
+			<key>ItemType</key>
+			<string>FolderReference</string>
+		</dict>
+		<key>9B1857A6-77EF-4B3A-97F0-037D20C6A8F6</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAF8AAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADFs8i4SCsAAAN3PdoIb2ZmbGluZXIAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAABDVaKMlYbuYAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADF
+				s5B4AAAAEQAIAADJWDamAAAAAQAUA3c92gNtaqUACzIo
+				AAqMqgAAfQ0AAgA3TWFjaW50b3NoIEhEOlVzZXJzOmNh
+				cmxhbmRlcjpwcm9qZWN0czplcGljOmV0czpvZmZsaW5l
+				cgAADgASAAgAbwBmAGYAbABpAG4AZQByAA8AGgAMAE0A
+				YQBjAGkAbgB0AG8AcwBoACAASABEABIAKlVzZXJzL2Nh
+				cmxhbmRlci9wcm9qZWN0cy9lcGljL2V0cy9vZmZsaW5l
+				cgATAAEvAAAVAAIAEP//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/carlander/projects/epic/ets/offliner/</string>
+				<key>RelativePath</key>
+				<string>./offliner</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>offliner</string>
+			<key>ItemType</key>
+			<string>FolderReference</string>
+		</dict>
+		<key>A9C6C1DA-CFE3-43AE-9D20-CDACB0F7D67B</key>
+		<dict>
+			<key>ItemData</key>
+			<dict>
+				<key>AliasData</key>
+				<data>
+				AAAAAAFqAAIAAQxNYWNpbnRvc2ggSEQAAAAAAAAAAAAA
+				AAAAAADGOwZESCsAAABosfYFbWVkaWEAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+				AAAAAAAAAAAAAAAAAAAAAHC+5sgx9YoAAAAAAAAAAP//
+				//8AAAkgAAAAAAAAAAAAAAAAAAAAA2V0cwAAEAAIAADG
+				Os4EAAAAEQAIAADIMb1KAAAAAQAUAGix9gBmKV4ADUCw
+				AAqbxgAAhe0AAgAxTWFjaW50b3NoIEhEOlVzZXJzOnRv
+				Ymlhczpwcm9qZWN0czplcGljOmV0czptZWRpYQAADgAM
+				AAUAbQBlAGQAaQBhAA8AGgAMAE0AYQBjAGkAbgB0AG8A
+				cwBoACAASABEABIAJFVzZXJzL3RvYmlhcy9wcm9qZWN0
+				cy9lcGljL2V0cy9tZWRpYQATAAEvAAAVAAIADf//AAA=
+				</data>
+				<key>FileURL</key>
+				<string>file://localhost/Users/tobias/projects/epic/ets/media/</string>
+				<key>RelativePath</key>
+				<string>./media</string>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+			<key>ItemName</key>
+			<string>media</string>
 			<key>ItemType</key>
 			<string>FolderReference</string>
 		</dict>
