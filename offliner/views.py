@@ -133,7 +133,7 @@ def waybill_view(request, wb_id):
     
     data_dict = {
                  'object':waybill_instance,
-                 'ltioriginal':lti_detail_items,
+                 'LtiOriginal':lti_detail_items,
                  'disp_person':disp_person_object,
                  'rec_person':rec_person_object,
                  'extra_lines':my_empty,
@@ -154,6 +154,7 @@ def waybill_create(request, lti_code):
     '''
     # get the LTI info
     current_lti = LtiOriginal.objects.filter(code=lti_code)
+    print current_lti[0].destination_loc_name
 
     class LoadingDetailDispatchForm(ModelForm):
         siNo = ModelChoiceField(queryset=LtiOriginal.objects.filter(code=lti_code), label='Commodity')
@@ -179,10 +180,11 @@ def waybill_create(request, lti_code):
             return cleaned
        
     LDFormSet = inlineformset_factory(Waybill, LoadingDetail, LoadingDetailDispatchForm, fk_name="wbNumber", extra=5, max_num=5)
-    
+    print current_lti[0].destination_loc_name
     current_wh = ''
     if request.method == 'POST':
         form = WaybillForm(request.POST)
+        print current_lti[0].destination_loc_name
         form.fields["destinationWarehouse"].queryset = Places.objects.filter(geo_name=current_lti[0].destination_loc_name)
         form.initial['dispatcherName'] = settings.USER_DISPATCHER_NAME  
         form.initial['dispatcherTitle'] = settings.USER_DISPATCHER_TITLE
@@ -315,38 +317,38 @@ def lti_download(request):
     
 def waybill_finalize_dispatch_offline(request,wb_id):
     '''
-	View: waybill_finalize_dispatch
-	URL: ets/waybill/dispatch
-	Templet:None
-	called when user pushes Print Original on dispatch
-	Redirects to Lti Details
-	'''
+    View: waybill_finalize_dispatch
+    URL: ets/waybill/dispatch
+    Templet:None
+    called when user pushes Print Original on dispatch
+    Redirects to Lti Details
+    '''
     current_wb =  Waybill.objects.get(id=wb_id)
     current_wb.transportDispachSigned=True
     current_wb.transportDispachSignedTimestamp=datetime.datetime.now()
     current_wb.dispatcherSigned=True
     current_wb.auditComment='Print Dispatch Original'
-# 	for lineitem in current_wb.loadingdetail_set.select_related():
-# 		lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
+#     for lineitem in current_wb.loadingdetail_set.select_related():
+#         lineitem.siNo.reducesi(lineitem.numberUnitsLoaded)
     current_wb.save()
     status = 'Waybill '+ current_wb.waybillNumber +' Dispatch Signed'
-#	messages.add_message(request, messages.INFO, status)
+#    messages.add_message(request, messages.INFO, status)
     return HttpResponseRedirect(reverse(lti_detail,args=[current_wb.ltiNumber]))
 
 
-def	waybill_finalize_receipt_offline(request,wb_id):
+def    waybill_finalize_receipt_offline(request,wb_id):
     '''
-	View: waybill_finalize_receipt 
-	URL:ets/waybill/receipt/
-	Template:None
-	Redirects to Lti Details
-	Called when user pushes Print Original on Receipt
+    View: waybill_finalize_receipt 
+    URL:ets/waybill/receipt/
+    Template:None
+    Redirects to Lti Details
+    Called when user pushes Print Original on Receipt
     '''
     try:
         current_wb = Waybill.objects.get(id=wb_id)
         current_wb.recipientSigned=True
         current_wb.transportDeliverySignedTimestamp=datetime.datetime.now()
-        current_wb.recipientSignedTimestamp=datetime.datetime.now()	
+        current_wb.recipientSignedTimestamp=datetime.datetime.now()    
         current_wb.transportDeliverySigned=True
         current_wb.auditComment='Print Dispatch Receipt'
         current_wb.save()
@@ -537,7 +539,7 @@ def waybill_view_reception(request,wb_id):
     
     data_dict = {
                  'object':waybill_instance,
-                 'ltioriginal':lti_detail_items,
+                 'LtiOriginal':lti_detail_items,
                  'disp_person':disp_person_object,
                  'rec_person':rec_person_object,
                  'extra_lines':my_empty,

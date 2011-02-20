@@ -2,7 +2,7 @@
 {%block content %}
 <ul>
 {% for lti in object_list%}
-    <li><a href='{%url ets.waybill.views.lti_detail_url lti.CODE%}'>{{lti.CODE}} -{{lti.SI_CODE}}- {{lti.DESTINATION_LOC_NAME}} - {{lti.LTI_DATE}}</a>
+    <li><a href='{%url ets.waybill.views.lti_detail_url lti.code%}'>{{lti.code}} -{{lti.si_code}}- {{lti.destination_loc_name}} - {{lti.lti_date}}</a>
 {% endfor%}
 <ul>
 {%endblock%}

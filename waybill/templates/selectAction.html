@@ -5,7 +5,7 @@
  {% if user.is_authenticated %} 
 Select an action:
 <ul>
-{%if myprofile.isDispatcher%}<li><a href='{%url ets.waybill.views.listOfLtis myprofile.warehouses.ORIGIN_WH_CODE%}'>Create & Dispatch Waybill</a></li>{%endif%}
+{%if myprofile.isDispatcher%}<li><a href='{%url ets.waybill.views.listOfLtis myprofile.warehouses.origin_wh_code%}'>Create & Dispatch Waybill</a></li>{%endif%}
 {%if myprofile.isReciever%}<li><a href='{%url ets.waybill.views.waybill_reception_list %}'>Receive Waybill</a></li>{%endif%}
 {%if myprofile.isCompasUser%}<li><a href='waybill/validate'>Validate Waybill</a></li>
     <li><a href='{%url ets.waybill.views.import_ltis%}'>Update DB</a>{%endif%}

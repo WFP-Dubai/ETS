@@ -11,45 +11,45 @@ Select an action:
 <br/>
 
 <ul>
-	<li>
-		<form action='waybill/export'> 
-			waybill number:&nbsp&nbsp<input type="text" size=10 name="wbnumber"/>&nbsp&nbsp&nbsp<input type="submit" value="Export Waybill">
-		</form>
-	<li>
-	<li>
-		<form method=POST action='waybill/import/' enctype="multipart/form-data">
-			{%csrf_token%}
-	    	{{import_form}}
-	    	<input type="submit" value="Import Waybill">
-		</form>	
-	<li>
-	<li>
-		<form method=POST action='waybill/scan/'>
-			{%csrf_token%}
+    <li>
+        <form action='waybill/export'> 
+            waybill number:&nbsp&nbsp<input type="text" size=10 name="wbnumber"/>&nbsp&nbsp&nbsp<input type="submit" value="Export Waybill">
+        </form>
+    <li>
+    <li>
+        <form method=POST action='waybill/import/' enctype="multipart/form-data">
+            {%csrf_token%}
+            {{import_form}}
+            <input type="submit" value="Import Waybill">
+        </form>    
+    <li>
+    <li>
+        <form method=POST action='waybill/scan/'>
+            {%csrf_token%}
             <label>
                 <textarea name="wb_compressed_str" rows="8" cols="100"></textarea>
             </label>
             <input type="submit" value="Scan Waybill">
-		</form>
-	<li>
+        </form>
+    <li>
 </ul>
 
 <br/>
 
 Offline Dispatch:
 <ul>
-	<li><a href='{%url ltis_list%}'>Create & Dispatch Waybill</a></li>
-	<li><a href='{%url waybills_list%}'>View Waybills</a></li>
-	<li><a href='{%url stock_download%}'>Update Stocks</a></li>
-	<li><a href='{%url lti_download%}'>Update Ltis</a></li>
+    <li><a href='{%url ltis_list%}'>Create & Dispatch Waybill</a></li>
+    <li><a href='{%url waybills_list%}'>View Waybills</a></li>
+    <li><a href='{%url stock_download%}'>Update Stocks</a></li>
+    <li><a href='{%url lti_download%}'>Update Ltis</a></li>
 </ul>
 
 Offline Receipt:
 <ul>
-	<!-- decomment me after receipt_waybill_download fix -->
-		<!-- <li><a href='url receipt_waybill_download'>Update Waybill</a></li>  -->
-	<!-- decomment me after receipt_waybill_download fix -->
-		
-	<li><a href='{%url waybill_reception_list%}'>Receive Waybill</a></li>
+    <!-- decomment me after receipt_waybill_download fix -->
+        <!-- <li><a href='url receipt_waybill_download'>Update Waybill</a></li>  -->
+    <!-- decomment me after receipt_waybill_download fix -->
+        
+    <li><a href='{%url waybill_reception_list%}'>Receive Waybill</a></li>
 </ul>
 {%endblock%}

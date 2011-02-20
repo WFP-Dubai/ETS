@@ -70,7 +70,7 @@
       "country_code": "275", 
       "geo_name": "KEFEL HARES"
     }
-  }, 
+  },
   {
     "pk": "3SCX001", 
     "model": "offliner.Places", 

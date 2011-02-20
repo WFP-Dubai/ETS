@@ -5,16 +5,16 @@
         <tr><th>Warehouse</th></tr>
         </thead>
     {% for wh in dispatch_list%}
-			{%if wh.3 == profile.warehouses.ORIGIN_WH_CODE%}
+            {%if wh.3 == profile.warehouses.origin_wh_code%}
 <tr><td><a href='list/{{wh.3}}'> {{wh.2}}</a></td></tr>
-			{%endif%}
+            {%endif%}
     {% endfor%}
 </table>
 {%endblock%}
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
-				$('#example').dataTable( { });
+                $('#example').dataTable( { });
 } );
 </script>
 {%endblock extra-header%}

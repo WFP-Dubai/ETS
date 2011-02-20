@@ -1,92 +1,92 @@
 {%load extra_tags%}
 <tr>
-	<td>
-		<table cellpadding="0" cellspacing="0" border="1px" >
-			<thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
-			<tr>
-				<td><sup style="font-size:x-small;">Location:</sup>&nbsp;</td>
-				<td ><sup style="font-size:x-small;">Arrival Date:</sup>&nbsp;</td>
-			</tr>
-			<tr>
-				<td><sup style="font-size:x-small;">Consignee:</sup>&nbsp;</td>
-				<td ><sup style="font-size:x-small;">Start Discherge Date:</sup>&nbsp;</td>
-			</tr>
-			<tr>
-				<td><sup style="font-size:x-small;">Name:</sup>&nbsp;</td>
-				<td ><sup style="font-size:x-small;">End Discharge Date:</sup>&nbsp;</td>
-			</tr>
-			<tr>
-				<td style="font-size:x-small;">Title:&nbsp;</td>
-				<td  style="font-size: x-small">Distance in KM:&nbsp;</td>
-			</tr>
-		</table>
-	</td>
+    <td>
+        <table cellpadding="0" cellspacing="0" border="1px" >
+            <thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
+            <tr>
+                <td><sup style="font-size:x-small;">Location:</sup>&nbsp;</td>
+                <td ><sup style="font-size:x-small;">Arrival Date:</sup>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><sup style="font-size:x-small;">Consignee:</sup>&nbsp;</td>
+                <td ><sup style="font-size:x-small;">Start Discherge Date:</sup>&nbsp;</td>
+            </tr>
+            <tr>
+                <td><sup style="font-size:x-small;">Name:</sup>&nbsp;</td>
+                <td ><sup style="font-size:x-small;">End Discharge Date:</sup>&nbsp;</td>
+            </tr>
+            <tr>
+                <td style="font-size:x-small;">Title:&nbsp;</td>
+                <td  style="font-size: x-small">Distance in KM:&nbsp;</td>
+            </tr>
+        </table>
+    </td>
 </tr>
 <tr>
-	<td>
-		
-		<table cellpadding="0" cellspacing="0" border="1px">
-			<thead class="wb_head">
-				<tr><th colspan="10">Observations</th></tr>
-			</thead>
-			<tr   style="font-size:x-small;">
-				<td><sup>Receipt Condition</sup></td>
-				<td colspan="2"><sup>Good</sup></td>
-				<td colspan="5"><sup>Lost or Damaged cargo</sup></td>
-				
-				<td colspan="2"><sup>Total received</sup></td>
-			</tr>
-			<tr  style="font-size:x-small;">
-				<td><sup>SI No</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>	<td><sup >(L)oss or (D)amage</sup></td>	<td><sup>Type (specify)</sup></td><td>Reason</td>	<td><sup>Units</sup></td>	<td><sup>Net MT</sup></td>
-			</tr>
+    <td>
+        
+        <table cellpadding="0" cellspacing="0" border="1px">
+            <thead class="wb_head">
+                <tr><th colspan="10">Observations</th></tr>
+            </thead>
+            <tr   style="font-size:x-small;">
+                <td><sup>Receipt Condition</sup></td>
+                <td colspan="2"><sup>Good</sup></td>
+                <td colspan="5"><sup>Lost or Damaged cargo</sup></td>
+                
+                <td colspan="2"><sup>Total received</sup></td>
+            </tr>
+            <tr  style="font-size:x-small;">
+                <td><sup>SI No</sup></td>    <td><sup>Units</sup></td>    <td><sup>Net MT</sup></td>    <td><sup>Units</sup></td>    <td><sup>Net MT</sup></td>    <td><sup >(L)oss or (D)amage</sup></td>    <td><sup>Type (specify)</sup></td><td>Reason</td>    <td><sup>Units</sup></td>    <td><sup>Net MT</sup></td>
+            </tr>
 
-			{%for lineitem in object.loadingdetail_set.select_related%}
-			<tr style="font-size:x-small;">
-				<td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>					
-			</tr>
-			{%endfor%}
-			
-			{%for lineitem in extra_lines%}
-			<tr  style="font-size:small;">
-				<td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>
-				<td>&nbsp;</td>						
-			</tr>
-			{%endfor%}
-			
-			<tr>
-				<td  style="font-size: x-small" colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
-			</tr>
-		</table>
-	</td>
+            {%for lineitem in object.loadingdetail_set.select_related%}
+            <tr style="font-size:x-small;">
+                <td><span style="font-size:small;">ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>                    
+            </tr>
+            {%endfor%}
+            
+            {%for lineitem in extra_lines%}
+            <tr  style="font-size:small;">
+                <td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>                        
+            </tr>
+            {%endfor%}
+            
+            <tr>
+                <td  style="font-size: x-small" colspan="10"><sup>Reciptient Remarks</sup>{{object.recipientRemarks}}<br><br></td>
+            </tr>
+        </table>
+    </td>
 </tr>
 <tr style="font-size: x-small">
-	<td>
-		<table cellpadding="0" cellspacing="0" border="1px" >
-			<tr>
-				<td>
-					<p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.
-					<br>Name, signature and stamp</p>
-					<p style="font-size: x-small">Endorse this section with an official stamp</p></td><td>
-					<p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.<br>Name, signature and stamp</p>
-					<p style="font-size: x-small">Endorse this section with an official stamp</p></td>
-			</tr>
-		</table>
-	</td>
+    <td>
+        <table cellpadding="0" cellspacing="0" border="1px" >
+            <tr>
+                <td>
+                    <p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.
+                    <br>Name, signature and stamp</p>
+                    <p style="font-size: x-small">Endorse this section with an official stamp</p></td><td>
+                    <p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.<br>Name, signature and stamp</p>
+                    <p style="font-size: x-small">Endorse this section with an official stamp</p></td>
+            </tr>
+        </table>
+    </td>
 </tr>

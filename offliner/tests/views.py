@@ -110,7 +110,7 @@ class ViewTestCase(AbstractTestCase):
         
         #    Testing response context content
         self.assertEquals(response.context['object'], waybill)
-        self.assertEqualList(response.context['ltioriginal'], ltis)   
+        self.assertEqualList(response.context['LtiOriginal'], ltis)   
         
     def test_waybill_reception_list(self):
         client = Client()
@@ -161,7 +161,7 @@ class ViewTestCase(AbstractTestCase):
         
         #    Testing response context content
         self.assertEquals(waybill, response.context['object'])
-        self.assertEqualList(ltis, response.context['ltioriginal']) 
+        self.assertEqualList(ltis, response.context['LtiOriginal']) 
         self.assertEquals(my_empty, response.context['extra_lines'])
         self.assertEquals(disp_person, response.context['disp_person'])  
         self.assertEquals(rec_person, response.context['rec_person'])    

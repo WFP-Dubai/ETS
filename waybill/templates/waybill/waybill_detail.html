@@ -11,71 +11,71 @@
 {{ hidden }}
 {% endfor %}
 {%for item in form%}
-	{% if item.errors %}
+    {% if item.errors %}
     <ol>
-	    {% for error in item.errors %}
-	        <li>{{item.label}} <strong>{{ error|escape }}</strong></li>
-	    {% endfor %}
+        {% for error in item.errors %}
+            <li>{{item.label}} <strong>{{ error|escape }}</strong></li>
+        {% endfor %}
     </ol>
-	{% endif %}
+    {% endif %}
 {% endfor %}
 <div class="form">
-	<div>
-		<span><strong>LTI:</strong> {{form.instance.ltiNumber}}</span>
-	</div>
-	<div>
-		<strong>Waybill Number:</strong> {{form.instance.waybillNumber}}
-	</div>
-	<div>
+    <div>
+        <span><strong>LTI:</strong> {{form.instance.ltiNumber}}</span>
+    </div>
+    <div>
+        <strong>Waybill Number:</strong> {{form.instance.waybillNumber}}
+    </div>
+    <div>
 <br>
 {%if  form.instance.hasError  %}
 <div style='background-color:red;border:2px red solid;'>Compas Issue:<br>
-	{%if form.instance.dispError%}Dispatch Error: {{form.instance.dispError}} <br>{%endif%}
-	{%if form.instance.recError%}Receipt Error: {{form.instance.recError}} {%endif%}
+    {%if form.instance.dispError%}Dispatch Error: {{form.instance.dispError}} <br>{%endif%}
+    {%if form.instance.recError%}Receipt Error: {{form.instance.recError}} {%endif%}
 </div>
 {%endif%}
-	<span>
-	<table>
-		<tr>
-			<td>Dispatch Signed:</td>
-			<td>{{form.dispatcherSigned}}</td>
-		</tr>
-		<tr>
-			<td>Dispatch Validated:</td>
-			<td>{{form.waybillValidated}}</td>
-		</tr>
-		<tr>
-			<td>Dispatch In Compas:</td>
-			<td>{{form.waybillSentToCompas}}</td>
-		</tr>
-		<tr>
-			<td>Receipt Signed:</td>
-			<td>{{form.recipientSigned}}</td>
-		</tr>
-		<tr>
-			<td>Receipt Validated:</td>
-			<td>{{form.waybillReceiptValidated}}</td>
-		</tr>
-		<tr>
-			<td>Receipt In Compas:</td>
-			<td>{{form.waybillRecSentToCompas}}</td>
-		</tr>
-		
-	</table>
-	<br>
-	</span>
-		<span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
-		<span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
-	</div>
+    <span>
+    <table>
+        <tr>
+            <td>Dispatch Signed:</td>
+            <td>{{form.dispatcherSigned}}</td>
+        </tr>
+        <tr>
+            <td>Dispatch Validated:</td>
+            <td>{{form.waybillValidated}}</td>
+        </tr>
+        <tr>
+            <td>Dispatch In Compas:</td>
+            <td>{{form.waybillSentToCompas}}</td>
+        </tr>
+        <tr>
+            <td>Receipt Signed:</td>
+            <td>{{form.recipientSigned}}</td>
+        </tr>
+        <tr>
+            <td>Receipt Validated:</td>
+            <td>{{form.waybillReceiptValidated}}</td>
+        </tr>
+        <tr>
+            <td>Receipt In Compas:</td>
+            <td>{{form.waybillRecSentToCompas}}</td>
+        </tr>
+        
+    </table>
+    <br>
+    </span>
+        <span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
+        <span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
+    </div>
 <table>
-		<tr>
-			<th>Transaction Type:</th>
-			<td> {{form.transactionType}}</td>
-			<td>&nbsp;</td>
-			<th>Transport Type:</th>
-			<td> {{form.transportType}}</td>
-		</tr>
-	</table>
+        <tr>
+            <th>Transaction Type:</th>
+            <td> {{form.transactionType}}</td>
+            <td>&nbsp;</td>
+            <th>Transport Type:</th>
+            <td> {{form.transportType}}</td>
+        </tr>
+    </table>
 <strong>Destination Location:</strong>   {{form.instance.recipientLocation}}  <br>
 <strong>Destination Warehouse<strong> {{form.destinationWarehouse}}
 <br>
@@ -87,11 +87,11 @@
         </thead>
     {% for sform in formset.forms %}
         <tr>
-        	<td>{{ sform.id }}{{sform.siNo}}</td>
-        	<td align="right">{{ sform.numberUnitsLoaded }}</td>
-        	<td>{{ sform.numberUnitsGood }}</td>
-        	<td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
-        	<td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
+            <td>{{ sform.id }}{{sform.siNo}}</td>
+            <td align="right">{{ sform.numberUnitsLoaded }}</td>
+            <td>{{ sform.numberUnitsGood }}</td>
+            <td>{{ sform.numberUnitsDamaged }} Type: {{ sform.unitsDamagedType }} Reason:{{ sform.unitsDamagedReason }}</td>
+            <td>{{ sform.numberUnitsLost }} Type:{{ sform.unitsLostType }} Reason:{{ sform.unitsLostReason }}</td>
 
         </tr>
     {% endfor %}
@@ -103,7 +103,7 @@
 <div><strong>Dispatcher Name:</strong>{{form.thisDispName}} - {{form.instance.dispatcherTitle}}</div>
 <br>
 <div><table>
-<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.TRANSPORT_NAME}}</td></tr>
+<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.transport_name}}</td></tr>
 <tr><td><strong>Transport Subcontractor:</strong></td><td>{{form.transportSubContractor}}</td></tr>
 <tr><td><strong>Driver's Name:</strong></td><td>{{form.transportDriverName}}</td></tr>
 <tr><td><strong>Driver's Licens No:</strong></td><td>{{form.transportDriverLicenceID}}</td></tr>
@@ -116,7 +116,7 @@
 <strong>Container 2: Number:</strong>{{form.containerTwoNumber}}<strong> Seal:</strong>{{form.containerTwoSealNumber}}<strong> Remarks:</strong>{{form.containerTwoRemarksDispatch}}
 
 </div>
-<BR>	
+<BR>    
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
 <tr><td><strong>Recipient Location:</td><td> {{form.instance.recipientLocation}}</td></tr>
@@ -137,10 +137,10 @@
 </table>
 
 <table>
-	<tr>
-		<td><input type="submit" value="Save & Exit"> {% csrf_token %}
+    <tr>
+        <td><input type="submit" value="Save & Exit"> {% csrf_token %}
 </form></td><td>&nbsp;</td>
-		<td><SCRIPT LANGUAGE="JavaScript">
+        <td><SCRIPT LANGUAGE="JavaScript">
       function confirmAction() {
         return confirm("Are you sure that you want to remove waybill {{form.instance.waybillNumber}}")
       }
@@ -148,7 +148,7 @@
 <form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}"  onSubmit="return confirmAction()">
 <input type="submit" value="INVALIDATE"> 
 </form></td>
-	</tr>
+    </tr>
 </table>
 <ul>
 {%for line in audit%}
@@ -166,19 +166,19 @@
 
 $(document).ready(function() {
 
-				$('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
-				$('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
-				$('#id_recipientEndDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
-				$('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
-				$('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });				
-				$('#example').dataTable( {
-					"bPaginate": false,
-					"bLengthChange": false,
-					"bFilter": false,
-					"bSort": false,
-					"bInfo": false,
-					"bAutoWidth": true 
-				});
+                $('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_recipientEndDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });                
+                $('#example').dataTable( {
+                    "bPaginate": false,
+                    "bLengthChange": false,
+                    "bFilter": false,
+                    "bSort": false,
+                    "bInfo": false,
+                    "bAutoWidth": true 
+                });
 } );
 
 </script>

@@ -1,10 +1,10 @@
 {%load extra_tags%}<html>
 <head>
 <style type="text/css" >
-	@import '/ets/media/css/show_print.css';
+    @import '/ets/media/css/show_print.css';
 </style>
 <style media="print" type="text/css">
-	@import '/ets/media/css/print.css';
+    @import '/ets/media/css/print.css';
 </style>
 </head>
 <body>
@@ -24,17 +24,17 @@
 </span>
 
 {%if not object.invalidated%}
-	<table cellpadding="0" cellspacing="0" border="0px" >
-			{% include 'waybill/print/wb_header.html'%}
-		{% include 'waybill/print/wb_loading.html'%}
-		{%if not object.recipientSigned%}
-		{% include 'waybill/print/wb_receipt_empty.html'%}
-		{%else%}
-		{% include 'waybill/print/wb_receipt.html'%}
-		{%endif%}
-	</table>
-	{%else%}
-Waybill has been Deleted!!!	
+    <table cellpadding="0" cellspacing="0" border="0px" >
+            {% include 'waybill/print/wb_header.html'%}
+        {% include 'waybill/print/wb_loading.html'%}
+        {%if not object.recipientSigned%}
+        {% include 'waybill/print/wb_receipt_empty.html'%}
+        {%else%}
+        {% include 'waybill/print/wb_receipt.html'%}
+        {%endif%}
+    </table>
+    {%else%}
+Waybill has been Deleted!!!    
 {%endif%}
 
 </body>

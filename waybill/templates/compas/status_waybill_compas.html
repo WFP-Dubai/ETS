@@ -9,20 +9,20 @@
 
 
 <tr>
- 			<td>{{waybill.ltiNumber}}</td>
- 			<td>{{waybill.waybillNumber}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.ORIGIN_LOC_NAME}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.CONSEGNEE_NAME}}</td>
- 			<td>{{waybill.loadingdetail_set.select_related.0.siNo.DESTINATION_LOC_NAME}}</td>
- 		 			<td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
- 			<td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
- 			<td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
- 			<td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
-  			<td>{%if waybill.waybillSentToCompas%}Y{%else%}N{%endif%} </td>
- 			<td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}
- 					{%if profile.isReciever or profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Reciept</a>{%endif%}
- 					{%if profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Full</a>{%endif%}
- 			</td>
+             <td>{{waybill.ltiNumber}}</td>
+             <td>{{waybill.waybillNumber}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
+                      <td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
+             <td>{%if waybill.waybillValidated%}Y{%else%}N{%endif%}  </td>
+             <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}Pending{%endif%} </td>
+             <td>{%if waybill.waybillReceiptValidated%}Y{%else%}N{%endif%}  </td>
+              <td>{%if waybill.waybillSentToCompas%}Y{%else%}N{%endif%} </td>
+             <td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{%url ets.waybill.views.waybill_view waybill.id%}'>View Dispatch</a>{%endif%}
+                     {%if profile.isReciever or profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Reciept</a>{%endif%}
+                     {%if profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>View Full</a>{%endif%}
+             </td>
     </tr>
 </table>
 
@@ -37,20 +37,20 @@
 {%block extra-header%}
 <script charset="utf-8">
 $(document).ready(function() {
-				$('#myTable').dataTable( {
-				"aoColumns": [ 
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			null,
-			{ "bSearchable": false}
-		] });
+                $('#myTable').dataTable( {
+                "aoColumns": [ 
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "bSearchable": false}
+        ] });
 } );
 </script>
 {%endblock extra-header%}

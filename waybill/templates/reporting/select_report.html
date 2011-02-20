@@ -2,10 +2,10 @@
 {%block title %}Select Action{%endblock%}
 {%block content %}
 <ul>
-<li>Wareouse Dispatch Report <a href='{%url ets.waybill.views.dispatch_report_wh user.profile.warehouses.ORIGIN_WH_CODE%}'>download</a></li>
-<li>Warehouse Reciept Report <a href='{%url ets.waybill.views.receipt_report_wh user.profile.receptionPoints.LOCATION_CODE  user.profile.receptionPoints.CONSEGNEE_CODE%}'>download</a></li></li>
+<li>Wareouse Dispatch Report <a href='{%url ets.waybill.views.dispatch_report_wh user.profile.warehouses.origin_wh_code%}'>download</a></li>
+<li>Warehouse Reciept Report <a href='{%url ets.waybill.views.receipt_report_wh user.profile.receptionPoints.LOCATION_CODE  user.profile.receptionPoints.consegnee_code%}'>download</a></li></li>
 <li>Full LTI Report <a href='{%url ets.waybill.views.ltis_report%}'>download</a></li>
-<li>Recipient Report: All for {{user.profile.receptionPoints.CONSEGNEE_CODE}} <a href='{%url ets.waybill.views.receipt_report_cons  user.profile.receptionPoints.CONSEGNEE_CODE%}'>download</a>
+<li>Recipient Report: All for {{user.profile.receptionPoints.consegnee_code}} <a href='{%url ets.waybill.views.receipt_report_cons  user.profile.receptionPoints.consegnee_code%}'>download</a>
 </li>
 </ul>
 

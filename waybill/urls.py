@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import *
 from ets.waybill.views import *
 from ets.waybill.tools import *
-from ets.waybill.models import ltioriginal
+from ets.waybill.models import LtiOriginal
 from django.views.generic.simple import *
 from django.contrib import databrowse
 
@@ -9,18 +9,16 @@ from django.contrib.auth.views import login,logout,password_change,password_chan
 
 
 info_dict_lti = {
-    'queryset': ltioriginal.objects.all()#,
-#    'template_name': "ltioriginal_list.html"
+    'queryset': LtiOriginal.objects.all()
 }
 info_dict_waybill = {
-    'queryset': Waybill.objects.all()#,
-#    'template_name': "ltioriginal_list.html"
+    'queryset': Waybill.objects.all()
 }
 
 
 info_dict_waybill_reception= {
-	'queryset': Waybill.objects.all(),
-	'template_name': 'waybill/reception_list.html'
+    'queryset': Waybill.objects.all(),
+    'template_name': 'waybill/reception_list.html'
 }
 
 urlpatterns = patterns('',
@@ -72,4 +70,11 @@ urlpatterns = patterns('',
     (r'^waybill/report/receipt/(.*)$',receipt_report_cons),
     (r'^waybill/images/qrcode/(.*)$',barcode_qr),
     (r'^databrowse/(.*)', databrowse.site.root),
+         (r'^waybill/synchro/upload/',post_synchronize_waybill), 
+
+     # download services
+     (r'^stock/synchro/download/',get_synchronize_stock),
+     (r'^lti/synchro/download/',get_synchronize_lti),
+     (r'^waybill/synchro/download/',get_synchronize_waybill),
+     
 )

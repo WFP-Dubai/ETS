@@ -215,36 +215,36 @@ class LtiOriginal(Model):
     objects = Manager()
     owned = OwnedLtiOriginalManager()
     
-    lti_pk = models.CharField(max_length=50, primary_key=True, db_column='LTI_PK')
-    lti_id = models.CharField(max_length=40, db_column='LTI_ID')
-    code = models.CharField(max_length=40, db_column='CODE')
-    lti_date = models.DateField(db_column='LTI_DATE')
-    expiry_date = models.DateField(blank=True, null=True, db_column='EXPIRY_DATE')
-    transport_code = models.CharField(max_length=4, db_column='TRANSPORT_CODE')
-    transport_ouc = models.CharField(max_length=13, db_column='TRANSPORT_OUC')
-    transport_name = models.CharField(max_length=30, db_column='TRANSPORT_NAME')
-    origin_type = models.CharField(max_length=1, db_column='ORIGIN_TYPE')
-    origintype_desc = models.CharField(max_length=12, blank=True, db_column='ORIGINTYPE_DESC')
-    origin_location_code = models.CharField(max_length=10, db_column='ORIGIN_LOCATION_CODE')
-    origin_loc_name = models.CharField(max_length=30, db_column='ORIGIN_LOC_NAME')
-    origin_wh_code = models.CharField(max_length=13, blank=True, db_column='ORIGIN_WH_CODE')
-    origin_wh_name = models.CharField(max_length=50, blank=True, db_column='ORIGIN_WH_NAME')
-    destination_location_code = models.CharField(max_length=10, db_column='DESTINATION_LOCATION_CODE')
-    destination_loc_name = models.CharField(max_length=30, db_column='DESTINATION_LOC_NAME')
-    consegnee_code = models.CharField(max_length=12, db_column='CONSEGNEE_CODE')
-    consegnee_name = models.CharField(max_length=80, db_column='CONSEGNEE_NAME')
-    requested_dispatch_date = models.DateField(blank=True, null=True, db_column='REQUESTED_DISPATCH_DATE')
-    project_wbs_element = models.CharField(max_length=24, blank=True, db_column='PROJECT_WBS_ELEMENT')
-    si_record_id = models.CharField(max_length=25, blank=True, db_column='SI_RECORD_ID')
-    si_code = models.CharField(max_length=8, db_column='SI_CODE')
-    comm_category_code = models.CharField(max_length=9, db_column='COMM_CATEGORY_CODE')
-    commodity_code = models.CharField(max_length=18, db_column='COMMODITY_CODE')
-    cmmname = models.CharField(max_length=100, blank=True, db_column='CMMNAME')
-    quantity_net = models.DecimalField(max_digits=11, decimal_places=3, db_column='QUANTITY_NET')
-    quantity_gross = models.DecimalField(max_digits=11, decimal_places=3, db_column='QUANTITY_GROSS')
-    number_of_units = models.DecimalField(max_digits=7, decimal_places=0, db_column='NUMBER_OF_UNITS')
-    unit_weight_net = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True, db_column='UNIT_WEIGHT_NET')
-    unit_weight_gross = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True, db_column='UNIT_WEIGHT_GROSS')
+    lti_pk = models.CharField(max_length=50, primary_key=True, db_column='lti_pk')
+    lti_id = models.CharField(max_length=40, db_column='lti_id')
+    code = models.CharField(max_length=40, db_column='code')
+    lti_date = models.DateField(db_column='lti_date')
+    expiry_date = models.DateField(blank=True, null=True, db_column='expiry_date')
+    transport_code = models.CharField(max_length=4, db_column='transport_code')
+    transport_ouc = models.CharField(max_length=13, db_column='transport_ouc')
+    transport_name = models.CharField(max_length=30, db_column='transport_name')
+    origin_type = models.CharField(max_length=1, db_column='origin_type')
+    origintype_desc = models.CharField(max_length=12, blank=True, db_column='origintype_desc')
+    origin_location_code = models.CharField(max_length=10, db_column='origin_location_code')
+    origin_loc_name = models.CharField(max_length=30, db_column='origin_loc_name')
+    origin_wh_code = models.CharField(max_length=13, blank=True, db_column='origin_wh_code')
+    origin_wh_name = models.CharField(max_length=50, blank=True, db_column='origin_wh_name')
+    destination_location_code = models.CharField(max_length=10, db_column='destination_location_code')
+    destination_loc_name = models.CharField(max_length=30, db_column='destination_loc_name')
+    consegnee_code = models.CharField(max_length=12, db_column='consegnee_code')
+    consegnee_name = models.CharField(max_length=80, db_column='consegnee_name')
+    requested_dispatch_date = models.DateField(blank=True, null=True, db_column='request_dispatch_date')
+    project_wbs_element = models.CharField(max_length=24, blank=True, db_column='project_wbs_element')
+    si_record_id = models.CharField(max_length=25, blank=True, db_column='si_record_id')
+    si_code = models.CharField(max_length=8, db_column='si_code')
+    comm_category_code = models.CharField(max_length=9, db_column='comm_category_code')
+    commodity_code = models.CharField(max_length=18, db_column='commodity_code')
+    cmmname = models.CharField(max_length=100, blank=True, db_column='cmmname')
+    quantity_net = models.DecimalField(max_digits=11, decimal_places=3, db_column='quantity_net')
+    quantity_gross = models.DecimalField(max_digits=11, decimal_places=3, db_column='quantity_gross')
+    number_of_units = models.DecimalField(max_digits=7, decimal_places=0, db_column='number_of_units')
+    unit_weight_net = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True, db_column='unit_weight_net')
+    unit_weight_gross = models.DecimalField(max_digits=8, decimal_places=3, blank=True, null=True, db_column='unit_weight_gross')
         
     class Meta:
         db_table = u'epic_lti'
@@ -306,21 +306,21 @@ class LtiOriginal(Model):
     def coi_code(self):
         try:
             cursor = connection.cursor()
-            cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and SI_CODE=%s and COMMODITY_CODE=%s )", [self.origin_wh_code, self.si_code, self.commodity_code])
+            cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and si_code=%s and commodity_code=%s )", [self.origin_wh_code, self.si_code, self.commodity_code])
             stock = cursor.fetchall()
             item = stock[0]
             return str(item[0][7:])              
         except:
             try:
                 cursor = connection.cursor()
-                cursor.execute("SELECT origin_id from epic_stock where  ( SI_CODE=%s and COMM_CATEGORY_CODE=%s )", [self.si_code, self.comm_category_code])
+                cursor.execute("SELECT origin_id from epic_stock where  ( si_code=%s and comm_category_code=%s )", [self.si_code, self.comm_category_code])
                 stock = cursor.fetchall()
                 item = stock[0]
                 return str(item[0][7:])
             except:                
                 try:
                     cursor = connection.cursor()
-                    cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and SI_CODE=%s and COMM_CATEGORY_CODE=%s )", [self.origin_wh_code, self.si_code, self.comm_category_code])
+                    cursor.execute("SELECT origin_id from epic_stock where  (WH_CODE=%s  and si_code=%s and comm_category_code=%s )", [self.origin_wh_code, self.si_code, self.comm_category_code])
                     stock = cursor.fetchall()
                     item = stock[0]
                     return str(item[0][7:])
@@ -344,7 +344,7 @@ class removedLtisManager(models.Manager):
         listExl = []
         listOfExcluded = RemovedLtis.objects.all()
         for exl in listOfExcluded:
-            listExl += [exl.lti.LTI_PK]
+            listExl += [exl.lti.lti_pk]
         return listExl
 
 
@@ -577,10 +577,10 @@ class DispatchPoint(Model):
     DispatchPoint: Class that models a dispatch point.
     This data are managed by Compas.
     '''    
-    origin_loc_name = models.CharField(max_length=20, blank=True, db_column='ORIGIN_LOC_NAME')
-    origin_location_code = models.CharField(max_length=20, blank=True, db_column='ORIGIN_LOCATION_CODE')
-    origin_wh_code = models.CharField(max_length=20, blank=True, db_column='ORIGIN_WH_CODE')
-    origin_wh_name = models.CharField(max_length=30, blank=True, db_column='ORIGIN_WH_NAME')
+    origin_loc_name = models.CharField(max_length=20, blank=True, db_column='origin_loc_name')
+    origin_location_code = models.CharField(max_length=20, blank=True, db_column='origin_location_code')
+    origin_wh_code = models.CharField(max_length=20, blank=True, db_column='origin_wh_code')
+    origin_wh_name = models.CharField(max_length=30, blank=True, db_column='origin_wh_name')
     desc_name = models.CharField(max_length=20, blank=True, null=True, db_column='DESC_NAME')
     active_start_date = models.DateField(null=True, blank=True, db_column='ACTIVE_START_DATE')
  
@@ -598,8 +598,8 @@ class ReceptionPoint(Model):
     '''     
     loc_name = models.CharField(max_length=20, blank=True, db_column='LOC_NAME')
     location_code = models.CharField(max_length=20, blank=True, db_column='LOCATION_CODE')
-    consegnee_code = models.CharField(max_length=20, blank=True, db_column='CONSEGNEE_CODE')
-    consegnee_name = models.CharField(max_length=80, blank=True, db_column='CONSEGNEE_NAME')
+    consegnee_code = models.CharField(max_length=20, blank=True, db_column='consegnee_code')
+    consegnee_name = models.CharField(max_length=80, blank=True, db_column='consegnee_name')
     #DESC_NAME                = models.CharField(max_length=80, blank=True)
     active_start_date = models.DateField(null=True, blank=True, db_column='ACTIVE_START_DATE')
     
