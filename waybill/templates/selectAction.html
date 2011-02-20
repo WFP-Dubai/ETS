@@ -11,7 +11,7 @@ Select an action:
     <li><a href='{%url ets.waybill.views.import_ltis%}'>Update DB</a>{%endif%}
 {%if myprofile.superUser%}<li><a href='{%url ets.waybill.views.waybill_search%}'>Reset waybills</a>{%endif%}
 {%if myprofile.readerUser or myprofile.superUser%}<li><a href='{%url ets.waybill.views.ltis%}'>View LTIs</a>{%endif%}
-<!--{%if myprofile.superUser%}<li><a href="{%url  ets.waybill.views.select_report%}">Reports</a>{%endif%}-->
+{%if myprofile.superUser%}<li><a href="{%url  ets.waybill.views.select_report%}">Reports</a>{%endif%}
 
 <li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
     <li>&nbsp;

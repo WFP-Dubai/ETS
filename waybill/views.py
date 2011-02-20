@@ -1068,14 +1068,7 @@ def select_report(request):
     return render_to_response('reporting/select_report.html', context_instance=RequestContext(request))
     
 def barcode_qr(request,wb):
-# 	from hubarcode.qrcode import QRCodeEncoder
-# 	#enc = QRCodeEncoder('hello')
-# 	myz = wb_compress(wb)
-# 	im =QRCodeEncoder(myz)
-# 	#response = HttpResponse(im.get_imagedata(1),mimetype="image/png")
-# 	im.save(wb+'.png',3)
-# 	image = im.get_imagedata(2)
-# 	return HttpResponse(image,mimetype="image/png")
+
  	from qrencode import Encoder
  	enc = Encoder()
  	myz = wb_compress(wb)
