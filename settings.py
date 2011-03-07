@@ -19,19 +19,16 @@ try:
 	}
 	config_module = __import__('%s' % configs[current_server], globals(), locals(), 'ets')
 	
-	
 	for setting in dir(config_module):
 	    if setting == setting.upper():
 	        locals()[setting] = getattr(config_module, setting)
 except:
     pass
-   
-
 
 import os
 MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
 
-try:
-    from settings_local import *
-except ImportError:
-    pass
+#try:
+#    from settings_local import *
+#except ImportError:
+#    pass

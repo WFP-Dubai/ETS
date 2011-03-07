@@ -449,10 +449,10 @@ class LoadingDetail(models.Model):
                 return self.wbNumber.mydesc() +' - '+ self.siNo.mydesc()  +' - '+ self.siNo.lti_pk
 
 class DispatchPoint(models.Model):
-        origin_loc_name            =models.CharField('Location Name',max_length=20, blank=True)
-        origin_location_code    =models.CharField('Location Code',max_length=20, blank=True)
-        origin_wh_code            =models.CharField('Warehouse Code',max_length=20, blank=True)
-        origin_wh_name            =models.CharField('Warehouse Name',max_length=30, blank=True)
+        origin_loc_name            =models.CharField('Location Name',max_length=40, blank=True)
+        origin_location_code    =models.CharField('Location Code',max_length=40, blank=True)
+        origin_wh_code            =models.CharField('Warehouse Code',max_length=40, blank=True)
+        origin_wh_name            =models.CharField('Warehouse Name',max_length=80, blank=True)
         #DESC_NAME                =models.CharField(max_length=20, blank=True,null=True)
         ACTIVE_START_DATE        =models.DateField(null=True, blank=True)
         
@@ -465,9 +465,9 @@ class DispatchPointAdmin(admin.ModelAdmin):
         list_filter = ('origin_loc_name',) 
         
 class ReceptionPoint(models.Model):
-        LOC_NAME                =models.CharField('Location Name',max_length=20, blank=True)
-        LOCATION_CODE            =models.CharField('Location Code',max_length=20, blank=True)
-        consegnee_code            =models.CharField('Consengee Code',max_length=20, blank=True)
+        LOC_NAME                =models.CharField('Location Name',max_length=40, blank=True)
+        LOCATION_CODE            =models.CharField('Location Code',max_length=40, blank=True)
+        consegnee_code            =models.CharField('Consengee Code',max_length=40, blank=True)
         consegnee_name            =models.CharField('Consengee Name',max_length=80, blank=True)
         #DESC_NAME                =models.CharField(max_length=80, blank=True)
         ACTIVE_START_DATE        =models.DateField(null=True, blank=True)
@@ -562,12 +562,12 @@ class SIWithRestant:
 class LoadingDetailAdmin(admin.ModelAdmin):
         list_display=('waybillNumber','siNo')
 
-admin.site.register(UserProfile)
-admin.site.register(DispatchPoint,DispatchPointAdmin)
-admin.site.register(ReceptionPoint,ReceptionPointAdmin)
-admin.site.register(EpicPerson,EpicPersonsAdmin)
-admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
-admin.site.register(LossesDamagesType)
-admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)
-admin.site.register(EpicLossReason)
-#admin.site.register(LoadingDetailAuditLogEntry)
+# admin.site.register(UserProfile)
+# admin.site.register(DispatchPoint,DispatchPointAdmin)
+# admin.site.register(ReceptionPoint,ReceptionPointAdmin)
+# admin.site.register(EpicPerson,EpicPersonsAdmin)
+# admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
+# admin.site.register(LossesDamagesType)
+# admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)
+# admin.site.register(EpicLossReason)
+# #admin.site.register(LoadingDetailAuditLogEntry)

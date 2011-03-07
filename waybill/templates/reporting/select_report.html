@@ -1,13 +1,12 @@
 {% extends "base_template.html"%}
 {%block title %}Select Action{%endblock%}
 {%block content %}
-<ul>
-<li>Wareouse Dispatch Report <a href='{%url ets.waybill.views.dispatch_report_wh user.profile.warehouses.origin_wh_code%}'>download</a></li>
-<li>Warehouse Reciept Report <a href='{%url ets.waybill.views.receipt_report_wh user.profile.receptionPoints.LOCATION_CODE  user.profile.receptionPoints.consegnee_code%}'>download</a></li></li>
-<li>Full LTI Report <a href='{%url ets.waybill.views.ltis_report%}'>download</a></li>
-<li>Recipient Report: All for {{user.profile.receptionPoints.consegnee_code}} <a href='{%url ets.waybill.views.receipt_report_cons  user.profile.receptionPoints.consegnee_code%}'>download</a>
-</li>
-</ul>
+<table>
+<tr><td>{%if user.profile.isDispatcher%}Warehouse Dispatch Report for {{user.profile.warehouses.origin_wh_name}} </td><td><a href='{%url ets.waybill.views.dispatch_report_wh user.profile.warehouses.origin_wh_code%}'>download</a>{%endif%}</td></tr>
+<tr><td>{%if user.profile.isReciever%}Warehouse Reciept Report {{user.profile.receptionPoints.LOC_NAME}} </td><td><a href='{%url ets.waybill.views.receipt_report_wh user.profile.receptionPoints.LOCATION_CODE  user.profile.receptionPoints.consegnee_code%}'>download</a>{%endif%}</td></tr>
+<tr><td>{%if user.profile.superUser%}Full LTI Report </td><td><a href='{%url ets.waybill.views.ltis_report%}'>download</a>{%endif%}</td></tr>
+<tr><td>Recipient Report: All items for {{user.profile.receptionPoints.consegnee_name}} </td><td><a href='{%url ets.waybill.views.receipt_report_cons  user.profile.receptionPoints.consegnee_code%}'>download</a></td></tr>
+</table>
 
 
 {%endblock%}

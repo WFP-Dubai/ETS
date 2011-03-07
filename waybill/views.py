@@ -80,7 +80,7 @@ def ltis(request):
     myprofile =getMyProfile(request)
 
 
-    ltis =LtiOriginal.objects.values( 'code','destination_loc_name','consegnee_name','lti_date','request_dispatch_date','origin_loc_name' ).distinct()
+    ltis =LtiOriginal.objects.values( 'code','destination_loc_name','consegnee_name','lti_date','requested_dispatch_date','origin_loc_name' ).distinct()
     still_ltis=[]
 
     for lti in ltis:
@@ -100,15 +100,17 @@ def import_ltis(request):
     Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
     add tag to say when last done
     """
-
-    print 'Import Stock'
-    import_stock()
-    print 'Import LTIs'
-    import_lti()
+    
     print 'Import Persons'
     update_persons()
     print 'Import GEO'
     import_geo()    
+    print 'Import Stock'
+    import_stock()
+    print 'Import Setup'
+    import_setup()
+    print 'Import LTIs'
+    import_lti()
     status = 'Import Finished'
     track_compas_update()
     messages.add_message(request, messages.INFO, status)

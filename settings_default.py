@@ -1,5 +1,5 @@
 # Django settings for ets project.
-
+print 'Settings Default'
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -9,12 +9,25 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {},    
-    'compas': {}
-}
+
 
 ALL_DB = {
+    'default_tc_pak': {
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'wb_pak',                      # Or path to database file if using sqlite3.
+        'USER': 'root',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    },
+    'compas_test_pak': {
+        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '10.11.70.50/ISBX002',                	# Or path to database file if using sqlite3.
+        'USER': 'TESTISBX002',                      	# Not used with sqlite3.
+        'PASSWORD': 'TESTISBX002',                  		# Not used with sqlite3.
+        'HOST': '10.11.70.50',                     	# Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+    },
     'default_tc_mb': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'waybill',                      # Or path to database file if using sqlite3.
@@ -89,8 +102,10 @@ ALL_DB = {
     }
 
 }
-print 'imported default'
-
+DATABASES = {
+    'default': {},    
+    'compas': {}
+}
 
 
 TIME_ZONE = 'Europe/Rome'

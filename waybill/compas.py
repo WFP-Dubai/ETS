@@ -173,7 +173,7 @@ class compas_write:
                     COMM_CODE = lineItem.siNo.commodity_code
                     COI_CODE = unicode(lineItem.siNo.coi_code())            
                     #get stock
-                    TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+                    TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE,wh_code =ORIGIN_CODE )
                     PCKKCODE = TheStockItems[0].package_code
                     ALLCODE = TheStockItems[0].allocation_code
                     QUALITY = TheStockItems[0].qualitycode #'G'

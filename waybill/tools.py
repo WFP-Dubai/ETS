@@ -465,28 +465,53 @@ def zipBase64(data):
 def update_persons():
     """
     Executes Imports of LTIs Persons
+    Fix to include Compas Station
     """
-    originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code='JERX001')
+    
+    originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code=settings.COMPAS_STATION)
     for my_person in originalPerson:
         my_person.save(using='default')    
+
+
+
+## Importing Needs to add imports for DispatchPoint & ReceptionPoint
+
+def import_setup():
+    ## read all ltis from compas & extract Dispatch points & reception points
+    #select distinct origin_loc_name,origin_location_code,origin_wh_name,origin_wh_code from epic_lti
+    #select distinct destination_location_code,consegnee_name,destination_loc_name,consingee_code from epic_lti
+    disp = LtiOriginal.objects.using('compas').values('origin_loc_name','origin_location_code','origin_wh_name','origin_wh_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
+    rec = LtiOriginal.objects.using('compas').values('destination_location_code','consegnee_name','destination_loc_name','consegnee_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
+    ## maybe add a time limit?
+    for d in rec:
+        this_dp,created = ReceptionPoint.objects.get_or_create(LOC_NAME=d['destination_loc_name'],LOCATION_CODE=d['destination_location_code'],consegnee_name=d['consegnee_name'],consegnee_code=d['consegnee_code'])
+        if created:
+            this_dp.ACTIVE_START_DATE = datetime.date(9999,12,31)
+            this_dp.save()
+
+    for d in disp:
+        this_dp,created = DispatchPoint.objects.get_or_create(origin_loc_name=d['origin_loc_name'],origin_location_code=d['origin_location_code'],origin_wh_name=d['origin_wh_name'],origin_wh_code=d['origin_wh_code'])
+        if created:
+            this_dp.ACTIVE_START_DATE = datetime.date(9999,12,31)
+            this_dp.save()
+
+    
     
 def import_geo():
     """
     Executes Imports of places
     """
+    ## Fix countries, get by config
+    
     #UPDATE GEO
-    try:
-        my_geo = places.objects.using('compas').filter(COUNTRY_CODE='275')
-        for the_geo in my_geo:
-                the_geo.save(using='default')
-    except:
-        pass    
-    try:
-        my_geo = places.objects.using('compas').filter(COUNTRY_CODE='376')
-        for the_geo in my_geo:
-                the_geo.save(using='default')
-    except:
-        pass
+    #loop thrugh CC
+    for country in settings.COUNTRIES:
+        try:
+            my_geo = places.objects.using('compas').filter(COUNTRY_CODE=country)
+            for the_geo in my_geo:
+                    the_geo.save(using='default')
+        except:
+            pass    
     return True
 
 def import_stock():
@@ -504,28 +529,30 @@ def import_stock():
             item.save()
             
 def import_lti():
-    listRecepients = ReceptionPoint.objects.values('consegnee_code','LOCATION_CODE','ACTIVE_START_DATE').distinct()
-    listDispatchers = DispatchPoint.objects.values('origin_wh_code','ACTIVE_START_DATE').distinct()
+    listRecepients = ReceptionPoint.objects.values('consegnee_code','LOCATION_CODE','ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
+    listDispatchers = DispatchPoint.objects.values('origin_wh_code','ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
     # check what type is the comodity... if bulk swap
     
     ## TODO: Fix so ltis imported are not expired
-    original = LtiOriginal.objects.using('compas').filter(REQUESTED_DISPATCH_DATE__gt='2010-06-28')
+    original = LtiOriginal.objects.using('compas').filter(requested_dispatch_date__gt='2011-01-01')
     # log each item
     for myrecord in original:
         not_in = True
         for rec in listRecepients:
-            #print rec
-            if myrecord.consegnee_code in rec['consegnee_code'] and myrecord.destination_location_code in rec['LOCATION_CODE'] and myrecord.lti_date >  rec['ACTIVE_START_DATE']:
+            if myrecord.consegnee_code in rec['consegnee_code'] and myrecord.destination_location_code in rec['LOCATION_CODE'] and myrecord.lti_date >=  rec['ACTIVE_START_DATE']:
+                print 'in rec:%s %s'%(myrecord.consegnee_code,myrecord.consegnee_code)
+                print myrecord.si_code
                 for disp in listDispatchers:
-                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >  disp['ACTIVE_START_DATE']:
+                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >=  disp['ACTIVE_START_DATE']:
                         myrecord.save(using='default') ## here we import the record...
+                        print 'saved'
                         try:
                             myr = removedLtis.objects.get(lti=myrecord)
                             myr.delete()
                         except:
                             pass
                         try:
-                            mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal
+                            mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal#Use get or create!!
 
                             if mysist.number_units_start != myrecord.number_of_units:
                                 try:
@@ -542,10 +569,11 @@ def import_lti():
                             mysist.save(using='default')
                         not_in = False
                         break
+                    
                 not_in = False
                 break
             else:
-#                pass# not here (remove if it should no be here)
+                #pass# not here (remove if it should no be here)
                 try:
                     LtiOriginal.objects.get(id = myrecord.id)
                 except:
@@ -553,7 +581,7 @@ def import_lti():
                 
 
         if not_in:
-            pass#loggit('Not In %s'%myrecord)
+            print 'bla'
         else:
             pass#loggit('In %s'%myrecord)
             #print rec
