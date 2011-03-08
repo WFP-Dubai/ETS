@@ -255,7 +255,7 @@ def restant_si(lti_code):
 #    listExl =removedLtis.objects.list()
 
     for lti in detailed_lti:
-        if not RemovedLtis.objects.filter(lti=lti.lti_pk):
+        if not removedLtis.objects.filter(lti=lti.lti_pk):
             if lti.isBulk():
                 listOfSI += [SIWithRestant(lti.si_code, lti.quantity_net, lti.cmmname)]
                 #print 'bulk'

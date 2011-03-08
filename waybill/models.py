@@ -183,9 +183,9 @@ class LtiOriginal(models.Model):
         class Meta:
                 db_table = u'epic_lti'
                 
-		def  __unicode__(self):
-		    return u"%s %s  %s  %.0f " % (self.valid(), self.coi_code(), self.cmmname, self.restant2())
-		    
+        def  __unicode__(self):
+            return u"%s %s  %s  %.0f " % (self.valid(), self.coi_code(), self.cmmname, self.restant2())
+            
         def mydesc(self):
             return self.code
         def commodity(self):
@@ -233,30 +233,30 @@ class LtiOriginal(models.Model):
                 return True
             else:
                 return False
-		def coi_code(self):
-			stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
-			if stock_items_qs.count() > 0:
-				return str(stock_items_qs[0].origin_id[7:])
-			else:
-				stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
-				if stock_items_qs.count() > 0:
-					return str(stock_items_qs[0].origin_id[7:])
-				else:
-					stock_items_qs = EpicStock.objects.filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
-					if stock_items_qs.count() > 0:
-						return str(stock_items_qs[0].origin_id[7:])
-					else:
-						return 'No Stock '
+        def coi_code(self):
+            stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
+            if stock_items_qs.count() > 0:
+                return str(stock_items_qs[0].origin_id[7:])
+            else:
+                stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
+                if stock_items_qs.count() > 0:
+                    return str(stock_items_qs[0].origin_id[7:])
+                else:
+                    stock_items_qs = EpicStock.objects.filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
+                    if stock_items_qs.count() > 0:
+                        return str(stock_items_qs[0].origin_id[7:])
+                    else:
+                        return 'No Stock '
 
-		def remove_lti(self):
-			all_removed = removedLtis.objects.all()
-			this_lti = removedLtis()
-			this_lti.lti = self
-			if this_lti not in all_removed:
-				print('Add to removed')
-				this_lti.save()
-		def get_stocks(self):
-			return EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
+        def remove_lti(self):
+            all_removed = removedLtis.objects.all()
+            this_lti = removedLtis()
+            this_lti.lti = self
+            if this_lti not in all_removed:
+                print('Add to removed')
+                this_lti.save()
+        def get_stocks(self):
+            return EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
 
 
 
