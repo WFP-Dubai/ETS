@@ -24,4 +24,3 @@ except:
     except ImportError:
         pass
         
-print MEDIA_URL

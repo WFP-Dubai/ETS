@@ -296,9 +296,11 @@ class EpicPerson(models.Model):
 
         class Meta:
                 db_table = u'epic_persons'
+                verbose_name = 'COMPAS User'
+                
         def  __unicode__(self):
                 return self.last_name + ', ' + self.first_name
-                
+        
 
 class EpicStock(models.Model):
         wh_pk                 = models.CharField(max_length=90, blank=True, primary_key=True)
@@ -326,6 +328,7 @@ class EpicStock(models.Model):
 
         class Meta:
                 db_table = u'epic_stock'
+                
         
         def  __unicode__(self):
                 return self.wh_name +'\t'+ self.cmmname +'\t'+ str(self.number_of_units)
@@ -338,7 +341,8 @@ class EpicLossReason(models.Model):
         REASON_CODE =models.CharField(max_length=5,primary_key=True)
         REASON =models.CharField(max_length=80)
         class Meta:
-                db_table = u'epic_lossreason'
+            db_table = u'epic_lossreason'
+            verbose_name = 'Loss/Damages Reason'
         def  __unicode__(self):
                 return self.REASON        
 
@@ -349,11 +353,14 @@ class LossesDamagesReason(models.Model):
         
         def  __unicode__(self):
                 return self.compasRC.REASON
+        class Meta:
+            verbose_name = 'COMPAS Loss/Damages Reason'
 
         
 class LossesDamagesType(models.Model):
         description = models.CharField(max_length=20)
-        
+        class Meta:
+            verbose_name = 'Loss/Damages Type'
         def  __unicode__(self):
                 return self.description
 
@@ -448,7 +455,9 @@ class DispatchPoint(models.Model):
         origin_wh_code            =models.CharField('Warehouse Code',max_length=40, blank=True)
         origin_wh_name            =models.CharField('Warehouse Name',max_length=80, blank=True)
         ACTIVE_START_DATE        =models.DateField('Start of Service',null=True, blank=True)
-
+        
+        class Meta:
+            verbose_name = 'Dispatch Warehouse'
         def  __unicode__(self):
                 return self.origin_wh_code + ' - ' + self.origin_loc_name +' - '+ self.origin_wh_name
 
@@ -463,7 +472,7 @@ class ReceptionPoint(models.Model):
                 return self.LOC_NAME + ' - '  + self.consegnee_name
         class Meta:
             ordering = ['LOC_NAME', 'consegnee_name']
-
+            verbose_name = 'Reception Warehouse'
  
 class UserProfile(models.Model):
         user                =models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
