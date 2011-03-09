@@ -253,7 +253,6 @@ class LtiOriginal(models.Model):
             this_lti = removedLtis()
             this_lti.lti = self
             if this_lti not in all_removed:
-                print('Add to removed')
                 this_lti.save()
         def get_stocks(self):
             return EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
@@ -267,6 +266,7 @@ class removedLtisManager(models.Manager):
             for exl in listOfExcluded:
                 listExl += [exl.lti.lti_pk]
             return listExl
+
 ## helper table for nolonger existing lti items
 class removedLtis(models.Model):
         lti = models.ForeignKey(LtiOriginal,primary_key=True)
@@ -275,7 +275,7 @@ class removedLtis(models.Model):
                 db_table = u'waybill_removed_ltis'
         def  __unicode__(self):
                 return self.lti.lti_id
-        
+
 class EpicPerson(models.Model):
         person_pk                     = models.CharField(max_length=20, blank=True, primary_key=True)
         org_unit_code                 = models.CharField(max_length=13)
@@ -299,9 +299,6 @@ class EpicPerson(models.Model):
         def  __unicode__(self):
                 return self.last_name + ', ' + self.first_name
                 
-class EpicPersonsAdmin(admin.ModelAdmin):
-        list_display = ('last_name','first_name','title' , 'location_code')
-        list_filter = ( 'location_code','organization_id')
 
 class EpicStock(models.Model):
         wh_pk                 = models.CharField(max_length=90, blank=True, primary_key=True)
@@ -353,9 +350,6 @@ class LossesDamagesReason(models.Model):
         def  __unicode__(self):
                 return self.compasRC.REASON
 
-class LossesDamagesReasonAdmin(admin.ModelAdmin):
-        list_display = ('compasCode','description','compasRC')
-        list_filter = ('compasRC',) 
         
 class LossesDamagesType(models.Model):
         description = models.CharField(max_length=20)
@@ -453,17 +447,11 @@ class DispatchPoint(models.Model):
         origin_location_code    =models.CharField('Location Code',max_length=40, blank=True)
         origin_wh_code            =models.CharField('Warehouse Code',max_length=40, blank=True)
         origin_wh_name            =models.CharField('Warehouse Name',max_length=80, blank=True)
-        #DESC_NAME                =models.CharField(max_length=20, blank=True,null=True)
-        ACTIVE_START_DATE        =models.DateField(null=True, blank=True)
-        
-        
+        ACTIVE_START_DATE        =models.DateField('Start of Service',null=True, blank=True)
+
         def  __unicode__(self):
-                return self.origin_wh_code + ' - ' + self.origin_loc_name
-class DispatchPointAdmin(admin.ModelAdmin):
-        list_display=('origin_wh_name','origin_loc_name','origin_wh_code')
-        ordering = ('origin_loc_name',)
-        list_filter = ('origin_loc_name',) 
-        
+                return self.origin_wh_code + ' - ' + self.origin_loc_name +' - '+ self.origin_wh_name
+
 class ReceptionPoint(models.Model):
         LOC_NAME                =models.CharField('Location Name',max_length=40, blank=True)
         LOCATION_CODE            =models.CharField('Location Code',max_length=40, blank=True)
@@ -472,15 +460,11 @@ class ReceptionPoint(models.Model):
         #DESC_NAME                =models.CharField(max_length=80, blank=True)
         ACTIVE_START_DATE        =models.DateField(null=True, blank=True)
         def  __unicode__(self):
-                return self.LOC_NAME + ' ' + self.consegnee_code + ' - ' + self.consegnee_name
+                return self.LOC_NAME + ' - '  + self.consegnee_name
         class Meta:
             ordering = ['LOC_NAME', 'consegnee_name']
 
-class ReceptionPointAdmin(admin.ModelAdmin):
-        list_display=('LOC_NAME','consegnee_name','consegnee_code')
-        ordering = ('LOC_NAME',)
-        list_filter = ('consegnee_name',) 
-        
+ 
 class UserProfile(models.Model):
         user                =models.ForeignKey(User, unique=True,primary_key=True)#OneToOneField(User, primary_key=True)
         warehouses            =models.ForeignKey(DispatchPoint, blank=True,null=True,verbose_name='Dispatch Warehouse')
@@ -502,8 +486,7 @@ class UserProfile(models.Model):
 
 User.profile = property(lambda u: UserProfile.objects.get_or_create(user=u)[0])
                 
-class UserProfileAdmin(admin.ModelAdmin):
-        list_display=('user','warehouses')
+
         
 class SiTracker(models.Model):
         LTI                 = models.OneToOneField(LtiOriginal,primary_key=True)
@@ -525,9 +508,6 @@ class PackagingDescriptonShort(models.Model):
         def  __unicode__(self):
                 return self.packageCode+' - '+ self.packageShortName
                 
-class PackagingDescriptonShortAdmin(admin.ModelAdmin):
-        list_display=('packageCode','packageShortName')
-        list_filter = ('packageCode','packageShortName') 
         
 class loggerCompas(models.Model):
      timestamp        = models.DateTimeField(null=True, blank=True)
@@ -558,16 +538,3 @@ class SIWithRestant:
             return self.CurrentAmount
         def getStartAmount(self):
                 return StartAmount
-        
-class LoadingDetailAdmin(admin.ModelAdmin):
-        list_display=('waybillNumber','siNo')
-
-# admin.site.register(UserProfile)
-# admin.site.register(DispatchPoint,DispatchPointAdmin)
-# admin.site.register(ReceptionPoint,ReceptionPointAdmin)
-# admin.site.register(EpicPerson,EpicPersonsAdmin)
-# admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
-# admin.site.register(LossesDamagesType)
-# admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)
-# admin.site.register(EpicLossReason)
-# #admin.site.register(LoadingDetailAuditLogEntry)

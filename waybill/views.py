@@ -599,7 +599,6 @@ def waybill_reception_list(request):
             mysi = waybill.loadingdetail_set.select_related()[0].siNo
             myerror = waybill.errors()
             try:
-                print myerror.errorRec
                 if (myerror.errorRec != '' or myerror.errorDisp != ''):
                     waybill.hasError = True
             except:
@@ -637,7 +636,6 @@ def waybill_search(request):
             mysi = waybill.loadingdetail_set.select_related()[0].siNo
             myerror = waybill.errors()
             try:
-                print myerror.errorRec
                 if (myerror.errorRec != '' or myerror.errorDisp != ''):
                     waybill.hasError = True
             except:
@@ -682,7 +680,6 @@ def waybillCreate(request,lti_code):
         
         def clean(self):
             try:
-                #print "cleaning"
                 cleaned = self.cleaned_data
                 siNo = cleaned.get("siNo")
                 units = cleaned.get("numberUnitsLoaded")
@@ -744,7 +741,6 @@ def waybillCreate(request,lti_code):
                 }
         )
         form.fields["destinationWarehouse"].queryset = qs
-        print current_lti[0].consegnee_code
 
         formset = LDFormSet()
     return render_to_response('waybill/createWaybill.html', {'form': form,'lti_list':current_lti,'formset':formset}, context_instance=RequestContext(request))
@@ -858,14 +854,12 @@ def waybill_validate_dispatch_form(request):
                             errorlog.save()
                     
              formset.save()
-             print issue
     waybills = Waybill.objects.filter(invalidated=False).filter(waybillValidated= False).filter(dispatcherSigned=True)
     for waybill in waybills:
         waybill.hasError=False
         mysi = waybill.loadingdetail_set.select_related()[0].siNo
         myerror = waybill.errors()
         try:
-            print myerror.errorRec
             if (myerror.errorRec != '' or myerror.errorDisp != ''):
                 waybill.hasError = True
         except:
@@ -923,7 +917,6 @@ def waybill_validate_receipt_form(request):
                         errorlog.save()
 
 #             formset.save()
-            print issue
              
             formset.save()
             
@@ -1087,7 +1080,6 @@ def post_synchronize_waybill(request):
     that posts a serialized waybill.
     The waybill is deserialized and stored in the online database.
     '''
-    #print 'In postSyncronizeWaybill...'
     if request.method == 'POST':
         serilized_waybill = request.POST['serilized_waybill']
         
@@ -1127,7 +1119,6 @@ def post_synchronize_waybill(request):
                 except:
                     print 'Exception when saving LoadingDetail'
     
-        #print '...in postSyncronizeWaybill.'
     
     response = HttpResponse('SYNCHRONIZATION_DONE')
         

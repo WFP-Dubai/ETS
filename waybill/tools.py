@@ -21,7 +21,7 @@ import datetime
 import os,StringIO, zlib,base64,string
 ## Databrowse
 from django.contrib import databrowse
-
+import json
 databrowse.site.register(Waybill)
 databrowse.site.register(EpicStock)
 databrowse.site.register(LtiOriginal)
@@ -43,7 +43,6 @@ def track_compas_update():
     FILE.close()
 
 def readTag():
-    print 'here'
     try:
         logfile = 'tagfile.tag'
         FILE = open(logfile)
@@ -213,7 +212,6 @@ def wb_compress_repr(wb_id):
     data = serialized_wb_repr(wb_id)
     from kiowa.utils.encode import DecimalJSONEncoder
     zippedData = zipBase64(json.dumps(data, cls=DecimalJSONEncoder))
-    print zippedData
     return zippedData
 
 
@@ -258,10 +256,8 @@ def restant_si(lti_code):
         if not removedLtis.objects.filter(lti=lti.lti_pk):
             if lti.isBulk():
                 listOfSI += [SIWithRestant(lti.si_code, lti.quantity_net, lti.cmmname)]
-                #print 'bulk'
             else:
                 listOfSI += [SIWithRestant(lti.si_code, lti.number_of_units, lti.cmmname)]
-                #print 'not bulk'
 
     for wb in listOfWaybills:
         for loading in wb.loadingdetail_set.select_related():
@@ -331,8 +327,6 @@ def synchronize_waybill(waybill_id):
     except Exception, e:
         print 'exception occurred'
         print e
-
-    print 'closing connection'
     conn.close()
 
     return response_message
@@ -390,7 +384,6 @@ def synchronize_stocks(warehouse_code):
         print 'exception occurred'
         print e
 
-    print 'closing connection'
     conn.close()
 
     return message
@@ -540,12 +533,9 @@ def import_lti():
         not_in = True
         for rec in listRecepients:
             if myrecord.consegnee_code in rec['consegnee_code'] and myrecord.destination_location_code in rec['LOCATION_CODE'] and myrecord.lti_date >=  rec['ACTIVE_START_DATE']:
-                print 'in rec:%s %s'%(myrecord.consegnee_code,myrecord.consegnee_code)
-                print myrecord.si_code
                 for disp in listDispatchers:
                     if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >=  disp['ACTIVE_START_DATE']:
                         myrecord.save(using='default') ## here we import the record...
-                        print 'saved'
                         try:
                             myr = removedLtis.objects.get(lti=myrecord)
                             myr.delete()
@@ -579,12 +569,6 @@ def import_lti():
                 except:
                     pass
                 
-
-        if not_in:
-            print 'bla'
-        else:
-            pass#loggit('In %s'%myrecord)
-            #print rec
 
     #cleanup ltis loop and see if changes to lti ie deleted rows
     current = LtiOriginal.objects.all()

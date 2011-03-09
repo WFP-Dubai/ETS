@@ -112,7 +112,6 @@ TIME_ZONE = 'Europe/Rome'
 LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 USE_I18N = True
-MEDIA_ROOT = ''
 MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
@@ -128,12 +127,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 ROOT_URLCONF = 'ets.urls'
 
-TEMPLATE_DIRS = (
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -144,8 +141,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'ets.waybill',
     'django.contrib.databrowse',
-#    'dojango',
-    'debug_toolbar',
 )
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -163,18 +158,23 @@ DEBUG_TOOLBAR_PANELS = (
 AUTH_PROFILE_MODULE='waybill.UserProfile'
 
 TEMPLATE_CONTEXT_PROCESSORS =(
-"django.contrib.auth.context_processors.auth",
-"django.core.context_processors.debug",
-"django.core.context_processors.i18n",
-"django.contrib.messages.context_processors.messages",
-'django.core.context_processors.request'
+'django.contrib.auth.context_processors.auth',
+'django.core.context_processors.debug',
+'django.core.context_processors.i18n',
+'django.contrib.messages.context_processors.messages',
+'django.core.context_processors.request',
+'ets.waybill.context_processor.request'
 )
 
-
+import os
+MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
+TEMPLATE_DIRS = (
+    os.path.join(os.path.dirname(__file__), 'templates')
+)
+print TEMPLATE_DIRS
 COMPAS_STATION=u'JERX001'
-INTSTANCE_LABLE="Toby Mac Pro"
+INTSTANCE_LABLE='Toby Mac Pro'
 LOGIN_URL = '/ets/accounts/login/'
 LOGOUT_URL = '/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-EMAIL_HOST= 'docustore.wfp.org'
-#EMAIL_USE_TLS=True
+IN_PROCDUCTION=True
