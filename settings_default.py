@@ -20,7 +20,7 @@ ALL_DB = {
         'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
-    'default_test_pak': : {
+    'default_test_pak': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'waybill_pak',                      # Or path to database file if using sqlite3.
         'USER': 'root',                      # Not used with sqlite3.
