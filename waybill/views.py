@@ -437,7 +437,7 @@ def waybill_view(request,wb_id):
 
 
 
-    return render_to_response('waybill/print/waybill_detail.html', data_dict, context_instance=RequestContext(request))
+    return render_to_response('waybill/print/waybill_detail_view.html', data_dict, context_instance=RequestContext(request))
 
 
 @login_required
