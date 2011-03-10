@@ -9,4 +9,5 @@ COMPAS_STATION=u'ISBX002'
 COUNTRIES=['586']
 MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
 MEDIA_URL = '/ets/media'
+SESSION_COOKIE_NAME = 'ets-demo'
 #IN_PRODUCTION=True

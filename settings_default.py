@@ -187,3 +187,4 @@ LOGIN_URL = '/ets/accounts/login/'
 LOGOUT_URL = '/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 IN_PRODUCTION=False
+SESSION_COOKIE_NAME = 'ets-demo'

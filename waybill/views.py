@@ -1063,14 +1063,24 @@ def select_report(request):
     return render_to_response('reporting/select_report.html', context_instance=RequestContext(request))
     
 def barcode_qr(request,wb):
+    import sys
+    if sys.platform == 'darwin':
 
- 	from qrencode import Encoder
- 	enc = Encoder()
- 	myz = wb_compress(wb)
- 	im = enc.encode(myz, { 'width': 350 })
- 	response = HttpResponse(mimetype="image/png")
- 	im.save(response, "PNG")
- 	return response
+        from qrencode import Encoder
+        enc = Encoder()
+        myz = wb_compress(wb)
+        im = enc.encode(myz, { 'width': 350 })
+        response = HttpResponse(mimetype="image/png")
+        im.save(response, "PNG")
+    else:
+        import subprocess
+        myz = wb_compress(wb)
+        mydata=subprocess.Popen(['zint','--directpng','--barcode=58','-d%s'%myz ],stdout=subprocess.PIPE)
+        image = mydata.communicate()[0]
+        #print mydata.communicate()
+        response = HttpResponse(image,mimetype="Image/png")
+
+    return response
 
 
 @csrf_exempt                              

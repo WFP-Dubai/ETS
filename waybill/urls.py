@@ -70,7 +70,7 @@ urlpatterns = patterns('',
     (r'^waybill/report/receipt/(.*)$',receipt_report_cons),
     (r'^waybill/images/qrcode/(.*)$',barcode_qr),
     (r'^databrowse/(.*)', databrowse.site.root),
-         (r'^waybill/synchro/upload/',post_synchronize_waybill), 
+    (r'^waybill/synchro/upload/',post_synchronize_waybill), 
 
      # download services
      (r'^stock/synchro/download/',get_synchronize_stock),
