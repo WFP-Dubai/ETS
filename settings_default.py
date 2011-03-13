@@ -9,113 +9,106 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-
-
 ALL_DB = {
     'default_tc_pak': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'wb_pak',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wb_pak',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
     },
     'default_test_pak': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybill_pak',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': 'trackme',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'waybill_pak',
+        'USER': 'root',
+        'PASSWORD': 'trackme',
+        'HOST': 'localhost',
+        'PORT': '',
     },
     'compas_test_pak': {
-        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '10.11.70.50/ISBX002',                	# Or path to database file if using sqlite3.
-        'USER': 'TESTISBX002',                      	# Not used with sqlite3.
-        'PASSWORD': 'TESTISBX002',                  		# Not used with sqlite3.
-        'HOST': '10.11.70.50',                     	# Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': '10.11.70.50/ISBX002',
+        'USER': 'TESTISBX002',
+        'PASSWORD': 'TESTISBX002',
+        'HOST': '10.11.70.50',
+        'PORT': '',
     },
-    
     'default_tc_mb': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybill',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'waybill',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
     },
     'compas_test_pal': {
-        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
-        'USER': 'TESTJERX001',                      	# Not used with sqlite3.
-        'PASSWORD': 'TESTJERX001',                  		# Not used with sqlite3.
-        'HOST': '10.11.216.4',                     	# Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': '10.11.216.4/JERX001',
+        'USER': 'TESTJERX001',
+        'PASSWORD': 'TESTJERX001',
+        'HOST': '10.11.216.4',
+        'PORT': '',
     },
-       'default_tc_mp': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybill',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    'default_tc_mp': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'waybill',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '',
     },
     'compas_test_rome': {
-        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '10.11.33.199/tst1',                	# Or path to database file if using sqlite3.
-        'USER': 'COMPAS_JERX001',                      	# Not used with sqlite3.
-        'PASSWORD': 'JERX001',                  		# Not used with sqlite3.
-        'HOST': '10.11.33.199',                     	# Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': '10.11.33.199/tst1',
+        'USER': 'COMPAS_JERX001',
+        'PASSWORD': 'JERX001',
+        'HOST': '10.11.33.199',
+        'PORT': '',
     },
     'compas_prod_pal': {
-        'ENGINE': 'django.db.backends.oracle', 			# Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '10.11.216.4/JERX001',                	# Or path to database file if using sqlite3.
-        'USER': 'opt_epic',                      	# Not used with sqlite3.
-        'PASSWORD': 'opt_epic',                  		# Not used with sqlite3.
-        'HOST': '10.11.33.199',                     	# Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      				# Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': '10.11.216.4/JERX001',
+        'USER': 'opt_epic',
+        'PASSWORD': 'opt_epic',
+        'HOST': '10.11.33.199',
+        'PORT': '',
     },
-        'default_serafino': {
-        'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybill',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'postgres_password',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    'default_serafino': {
+        'ENGINE': 'postgresql_psycopg2',
+        'NAME': 'waybill',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres_password',
+        'HOST': 'localhost',
+        'PORT': '',
     },
     'offline_serafino': {
-        'ENGINE': 'postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'offline',                      # Or path to database file if using sqlite3.
-        'USER': 'postgres',                      # Not used with sqlite3.
-        'PASSWORD': 'postgres_password',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'postgresql_psycopg2',
+        'NAME': 'offline',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres_password',
+        'HOST': 'localhost',
+        'PORT': '',
     },
-        'default_training_pal': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybilltraining',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': 'epic',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
-	},
-	'default_prod_pal': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'waybill',                      # Or path to database file if using sqlite3.
-        'USER': 'root',                      # Not used with sqlite3.
-        'PASSWORD': 'epic',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+    'default_training_pal': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'waybilltraining',
+        'USER': 'root',
+        'PASSWORD': 'epic',
+        'HOST': 'localhost',
+        'PORT': '',
+    },
+    'default_prod_pal': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'waybill',
+        'USER': 'root',
+        'PASSWORD': 'epic',
+        'HOST': 'localhost',
+        'PORT': '',
     }
-
-}
-DATABASES = {
-    'default': {},    
-    'compas': {}
 }
 
+DATABASES = {'default': {}, 'compas': {}}
 
 TIME_ZONE = 'Europe/Rome'
 LANGUAGE_CODE = 'en-us'
@@ -164,9 +157,9 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
 )
-AUTH_PROFILE_MODULE='waybill.UserProfile'
+AUTH_PROFILE_MODULE = 'waybill.UserProfile'
 
-TEMPLATE_CONTEXT_PROCESSORS =(
+TEMPLATE_CONTEXT_PROCESSORS = (
 'django.contrib.auth.context_processors.auth',
 'django.core.context_processors.debug',
 'django.core.context_processors.i18n',
@@ -181,10 +174,10 @@ TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates')
 )
 print TEMPLATE_DIRS
-COMPAS_STATION=u'JERX001'
-INTSTANCE_LABLE='Toby Mac Pro'
+COMPAS_STATION = u'JERX001'
+INTSTANCE_LABLE = 'Toby Mac Pro'
 LOGIN_URL = '/ets/accounts/login/'
 LOGOUT_URL = '/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-IN_PRODUCTION=False
+IN_PRODUCTION = False
 SESSION_COOKIE_NAME = 'ets-demo'

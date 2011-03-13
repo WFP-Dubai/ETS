@@ -3,8 +3,10 @@ from ets.waybill.models import *
 from django.contrib.auth.models import User
 import datetime
 
+
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
+
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "warehouses":
                 kwargs["queryset"] = DispatchPoint.objects.filter(ACTIVE_START_DATE__lte=datetime.date.today())
@@ -13,10 +15,9 @@ class UserProfileInline(admin.StackedInline):
             
             return super(UserProfileInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
-    
+
 class UserAdmin(admin.ModelAdmin):
     list_display = ('username',  'first_name',  'last_name',  'email')
-    
     inlines = [
         UserProfileInline,
     ]
@@ -26,13 +27,16 @@ class UserAdmin(admin.ModelAdmin):
     ('Info',{'fields':['last_login',  'date_joined'], 'classes': ['collapse']})
     ]
 
+
 class EpicPersonsAdmin(admin.ModelAdmin):
-        list_display = ('last_name','first_name','title' , 'location_code')
-        list_filter = ( 'location_code','organization_id')
+        list_display = ('last_name', 'first_name', 'title', 'location_code')
+        list_filter = ('location_code', 'organization_id')
+
 
 class LossesDamagesReasonAdmin(admin.ModelAdmin):
-        list_display = ('compasCode','description','compasRC')
-        list_filter = ('compasRC',) 
+        list_display = ('compasCode', 'description', 'compasRC')
+        list_filter = ('compasRC',)
+
 
 class DispatchPointAdmin(admin.ModelAdmin):
         list_display=('origin_wh_name','origin_loc_name','origin_wh_code','ACTIVE_START_DATE')
@@ -43,6 +47,7 @@ class DispatchPointAdmin(admin.ModelAdmin):
             ('Info',{'fields':['origin_loc_name','origin_wh_code','origin_location_code']}),
             (None,{'fields':['ACTIVE_START_DATE','origin_wh_name']})
         ]
+
 
 class ReceptionPointAdmin(admin.ModelAdmin):
         list_display=('LOC_NAME','consegnee_name','consegnee_code','ACTIVE_START_DATE')
@@ -55,7 +60,8 @@ class ReceptionPointAdmin(admin.ModelAdmin):
         ]        
         
 class UserProfileAdmin(admin.ModelAdmin):
-        list_display=('user','warehouses','receptionPoints')
+        list_display = ('user', 'warehouses', 'receptionPoints')
+
         def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "warehouses":
                 kwargs["queryset"] = DispatchPoint.objects.filter(ACTIVE_START_DATE__lte=datetime.date.today())
@@ -65,20 +71,23 @@ class UserProfileAdmin(admin.ModelAdmin):
             return super(UserProfileAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
+
 class PackagingDescriptonShortAdmin(admin.ModelAdmin):
-        list_display=('packageCode','packageShortName')
-        list_filter = ('packageCode','packageShortName') 
+        list_display = ('packageCode', 'packageShortName')
+        list_filter = ('packageCode', 'packageShortName')
+
 
 class LoadingDetailAdmin(admin.ModelAdmin):
-        list_display=('waybillNumber','siNo')
+        list_display = ('waybillNumber', 'siNo')
+
 
 admin.site.unregister(User)
-admin.site.register(User,UserAdmin)
-admin.site.register(UserProfile,UserProfileAdmin)
-admin.site.register(DispatchPoint,DispatchPointAdmin)
-admin.site.register(ReceptionPoint,ReceptionPointAdmin)
-admin.site.register(EpicPerson,EpicPersonsAdmin)
-admin.site.register(LossesDamagesReason,LossesDamagesReasonAdmin)
+admin.site.register(User, UserAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)
+admin.site.register(DispatchPoint, DispatchPointAdmin)
+admin.site.register(ReceptionPoint, ReceptionPointAdmin)
+admin.site.register(EpicPerson, EpicPersonsAdmin)
+admin.site.register(LossesDamagesReason, LossesDamagesReasonAdmin)
 admin.site.register(LossesDamagesType)
-admin.site.register(PackagingDescriptonShort,PackagingDescriptonShortAdmin)
+admin.site.register(PackagingDescriptonShort, PackagingDescriptonShortAdmin)
 admin.site.register(EpicLossReason)
