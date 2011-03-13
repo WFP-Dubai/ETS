@@ -173,7 +173,7 @@ MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
 TEMPLATE_DIRS = (
     os.path.join(os.path.dirname(__file__), 'templates')
 )
-print TEMPLATE_DIRS
+
 COMPAS_STATION = u'JERX001'
 INTSTANCE_LABLE = 'Toby Mac Pro'
 LOGIN_URL = '/ets/accounts/login/'

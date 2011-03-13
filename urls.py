@@ -9,7 +9,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
     # Example:
     (r'^ets/media/(?P<path>.*)$', 'django.views.static.serve',
-        {'document_root': '/Users/tobias/projects/epic/ets/media'}),
+        {'document_root': MEDIA_ROOT}),
     (r'^ets/', include('ets.waybill.urls')),
     (r'^$', 'django.views.generic.simple.redirect_to', {'url': 'ets/select-action'}),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
