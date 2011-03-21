@@ -17,14 +17,14 @@ class UserProfileInline(admin.StackedInline):
 
 
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('username',  'first_name',  'last_name',  'email')
+    list_display = ('username', 'first_name', 'last_name', 'email')
     inlines = [
         UserProfileInline,
     ]
-    fieldsets=[
-    (None,{'fields':[  'username',  'first_name',  'last_name',  'email']}),
-    ('Permissions',{'fields':['password','is_staff','is_active', 'is_superuser','groups','user_permissions'], 'classes': ['collapse']}),
-    ('Info',{'fields':['last_login',  'date_joined'], 'classes': ['collapse']})
+    fieldsets = [
+    (None, {'fields':[  'username','password', 'first_name', 'last_name', 'email']}),
+    ('Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']}),
+    ('Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']})
     ]
 
 
@@ -39,24 +39,24 @@ class LossesDamagesReasonAdmin(admin.ModelAdmin):
 
 
 class DispatchPointAdmin(admin.ModelAdmin):
-        list_display=('origin_wh_name','origin_loc_name','origin_wh_code','ACTIVE_START_DATE')
-        ordering = ('ACTIVE_START_DATE','origin_loc_name',)
+        list_display = ('origin_wh_name', 'origin_loc_name', 'origin_wh_code', 'ACTIVE_START_DATE')
+        ordering = ('ACTIVE_START_DATE', 'origin_loc_name',)
         list_filter = ('origin_loc_name',)
-        readonly_fields=('origin_loc_name','origin_wh_code','origin_location_code',)
-        fieldsets=[
-            ('Info',{'fields':['origin_loc_name','origin_wh_code','origin_location_code']}),
-            (None,{'fields':['ACTIVE_START_DATE','origin_wh_name']})
+        readonly_fields = ('origin_loc_name', 'origin_wh_code', 'origin_location_code',)
+        fieldsets = [
+            ('Info', {'fields':['origin_loc_name', 'origin_wh_code', 'origin_location_code']}),
+            (None, {'fields':['ACTIVE_START_DATE', 'origin_wh_name']})
         ]
 
 
 class ReceptionPointAdmin(admin.ModelAdmin):
-        list_display=('LOC_NAME','consegnee_name','consegnee_code','ACTIVE_START_DATE')
-        ordering = ('ACTIVE_START_DATE','LOC_NAME',)
-        list_filter = ('consegnee_name','LOC_NAME',) 
-        readonly_fields=('LOC_NAME','consegnee_code','LOCATION_CODE',)
-        fieldsets=[
-            ('Info',{'fields':['LOC_NAME','consegnee_code','LOCATION_CODE']}),
-            (None,{'fields':['ACTIVE_START_DATE','consegnee_name']})
+        list_display = ('LOC_NAME', 'consegnee_name', 'consegnee_code', 'ACTIVE_START_DATE')
+        ordering = ('ACTIVE_START_DATE', 'LOC_NAME',)
+        list_filter = ('consegnee_name', 'LOC_NAME',) 
+        readonly_fields = ('LOC_NAME', 'consegnee_code', 'LOCATION_CODE',)
+        fieldsets = [
+            ('Info', {'fields':['LOC_NAME', 'consegnee_code', 'LOCATION_CODE']}),
+            (None, {'fields':['ACTIVE_START_DATE', 'consegnee_name']})
         ]        
         
 class UserProfileAdmin(admin.ModelAdmin):
