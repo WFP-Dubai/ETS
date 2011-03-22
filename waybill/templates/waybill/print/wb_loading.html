@@ -27,10 +27,10 @@
                     </tr>
 
                     <tr>
-                        <td><sup style="font-size:x-small;">Type of Transaction: </sup>
-                         {%if object.transactionType == 'WIT'%}WFP Internal{%endif%}{%if object.transactionType == 'DEL'%}Delivery{%endif%}</td>
-                        <td><sup style="font-size:x-small;">Transport Type: </sup>Road</td>
-                        <td><sup style="font-size:x-small;">LTI no: </sup>{{object.ltiNumber}}</td>
+                        <td><sup style="font-size:x-small;">Type of Transaction</sup><br>
+                         {{object.get_transactionType_display}}</td>
+                        <td><sup style="font-size:x-small;">Transport Type: </sup><br>{{object.get_transportType_display}}</td>
+                        <td><sup style="font-size:x-small;">LTI no: </sup><br>{{object.ltiNumber}}</td>
                     </tr>
                     <tr ><td colspan=3 valign="top" style="font-size:small;"><sup style="font-size:x-small;">Dispatch Remarks:</sup>{{object.dispatchRemarks}}
                         {%if object.containerOneRemarksDispatch%}
@@ -65,13 +65,13 @@
                     {%for lineitem in object.loadingdetail_set.select_related%}
                     <tr  style="font-size:small;">
                         <td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
-                        <td>{{lineitem.getStockItem.cmmname}}</td>
-                        <td>{%if lineitem.getStockItem.packagingDescrShort != ''%}{{lineitem.getStockItem.packagingDescrShort}} {%else%} {{lineitem.getStockItem.packagename}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.siNo.unit_weight_net|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.siNo.unit_weight_gross|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calcTotalNet|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calcTotalGross|floatformat:3}}{%endif%}</td>
+                        <td>{{lineitem.get_stock_item.cmmname}}</td>
+                        <td>{{lineitem.get_stock_item.packaging_description_short}}</td>
+                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.siNo.unit_weight_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.siNo.unit_weight_gross|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_gross|floatformat:3}}{%endif%}</td>
 
                     </tr>
                     {%endfor%}

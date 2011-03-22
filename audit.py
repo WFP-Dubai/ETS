@@ -5,7 +5,7 @@ from django.contrib import admin
 import copy
 import re
 import types
-import audit
+#import audit
 try:
     import settings_audit
 except ImportError:

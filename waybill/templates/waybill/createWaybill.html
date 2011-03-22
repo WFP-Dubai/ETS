@@ -41,7 +41,7 @@
 {%if formset.non_form_errors%} <span class='error'>{{formset.non_form_errors}}</span>{%endif%}
 <table cellpadding="1px" cellspacing="1px" id="example" style="border:1px;">
     <thead>
-    <tr><th></th><th>Commodity</th><th>{%if lti_list.0.isBulk%}Metric Tons{%else%}Number of Units{%endif%}</th><th>Overload</th></tr>
+    <tr><th></th><th>Commodity</th><th>{%if lti_list.0.is_bulk%}Metric Tons{%else%}Number of Units{%endif%}</th><th>Overload</th></tr>
      </thead>
 {% for sform in formset.forms %}
 <tr>

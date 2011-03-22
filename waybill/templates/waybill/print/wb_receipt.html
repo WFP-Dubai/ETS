@@ -40,10 +40,10 @@
                     {%for lineitem in object.loadingdetail_set.select_related%}
                     <tr style="font-size:small; text-align:right;">
 <td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
-<td>{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
-<td>{%if lineitem.siNo.isBulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.calcNetRecievedGood|floatformat:3}}{%endif%}</td>
+<td>{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
+<td>{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.calculate_net_received_good|floatformat:3}}{%endif%}</td>
 <td style="text-align:center;">
-{%if lineitem.siNo.isBulk%}-{%else%}
+{%if lineitem.siNo.is_bulk%}-{%else%}
 {%ifnotequal lineitem.numberUnitsLost 0%}
     L:{{lineitem.numberUnitsLost|floatformat:3}}
     {%endifnotequal%}
@@ -56,7 +56,7 @@
 </td>
 
 <td style="text-align:center;">&nbsp;
-{%if lineitem.siNo.isBulk%}
+{%if lineitem.siNo.is_bulk%}
     {%ifnotequal lineitem.numberUnitsLost 0%}
         L:{{lineitem.numberUnitsLost|floatformat:3}}
         {%endifnotequal%}
@@ -66,11 +66,11 @@
     {%endifnotequal%}
 {%else%}
     {%ifnotequal lineitem.numberUnitsLost 0%}
-        L:{{lineitem.calcNetRecievedLost|floatformat:3}}
+        L:{{lineitem.calculate_net_received_lost|floatformat:3}}
         {%endifnotequal%}
         {%ifnotequal lineitem.numberUnitsDamaged 0%}
         {%ifnotequal lineitem.numberUnitsLost 0%}/{%endifnotequal%}
-        D:{{lineitem.calcNetRecievedDamaged|floatformat:3}}
+        D:{{lineitem.calculate_net_received_damaged|floatformat:3}}
     {%endifnotequal%}
 {%endif%}
     </td>
@@ -89,10 +89,10 @@
 
 
 <td>
-{%if lineitem.siNo.isBulk%}-{%else%}{{lineitem.calcTotalReceivedUnits|floatformat:3}}{%endif%}
+{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.calculate_total_received_units|floatformat:3}}{%endif%}
 </td>
 <td>
-{%if lineitem.siNo.isBulk%}{{lineitem.calcTotalReceivedUnits|floatformat:3}}{%else%}{{lineitem.calcTotalReceivedNet|floatformat:3}}{%endif%}
+{%if lineitem.siNo.is_bulk%}{{lineitem.calculate_total_received_units|floatformat:3}}{%else%}{{lineitem.calculate_total_received_net|floatformat:3}}{%endif%}
 </td>    
                         
                     </tr>

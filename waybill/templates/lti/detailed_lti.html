@@ -40,7 +40,7 @@ border-color: black;
 <br>
 Items in LTI:
 <table class='bordered' >
-    <tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>{%if detailed.0.isBulk%}MT{%else%}Units{%endif%}</th><th class='bordered'>To Be Dispatched</th></tr>
+    <tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>{%if detailed.0.is_bulk%}MT{%else%}Units{%endif%}</th><th class='bordered'>To Be Dispatched</th></tr>
     {%for si in listOfSI_withDeduction%}
          <tr  class='bordered'><td  class='bordered'>{{si.CommodityName}}&nbsp;</td>
          <td  class='bordered'>&nbsp;{{si.SINumber}}&nbsp;</td>
@@ -57,7 +57,7 @@ Current Waybills:<br>
 <table class='bordered' >
 {%for wb in listOfWaybills%}
     <tr><td colspan="3"  class='itemhead bordered'>WB:{{wb}} </td><td class='bordered'><a href='{%url ets.waybill.views.waybill_view wb.id%}?viewonly=true'> View Waybill</a></td></tr>
-    <tr class='itemhead'><td></td><td class='bordered'>Commodity</td><td class='bordered'>SI</td><td class='bordered'>{%if detailed.0.isBulk%}MT{%else%}Units{%endif%} dispatched</td></tr>
+    <tr class='itemhead'><td></td><td class='bordered'>Commodity</td><td class='bordered'>SI</td><td class='bordered'>{%if detailed.0.is_bulk%}MT{%else%}Units{%endif%} dispatched</td></tr>
     {%for loading in wb.loadingdetail_set.select_related %}
         <tr class='bordered'>
         <td class='bordered'>&nbsp;</td>

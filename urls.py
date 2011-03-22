@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 from ets.waybill.views import *
-
+from ets.settings import MEDIA_ROOT
 from django.contrib.auth.views import login, logout
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin

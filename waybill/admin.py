@@ -2,10 +2,12 @@ from django.contrib import admin
 from ets.waybill.models import *
 from django.contrib.auth.models import User
 import datetime
+from django.contrib.auth.admin import UserAdmin
 
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
+    verbose_name_plural = 'User Profile'
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
             if db_field.name == "warehouses":
@@ -16,16 +18,20 @@ class UserProfileInline(admin.StackedInline):
             return super(UserProfileInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
-class UserAdmin(admin.ModelAdmin):
+class MyUserAdmin(UserAdmin):
     list_display = ('username', 'first_name', 'last_name', 'email')
-    inlines = [
-        UserProfileInline,
-    ]
+    inlines = [UserProfileInline,]
     fieldsets = [
     (None, {'fields':[  'username','password', 'first_name', 'last_name', 'email']}),
     ('Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']}),
     ('Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']})
     ]
+    def add_view(self, request, obj=None, **kwargs):
+        # hide every other field apart from url
+        # if we are adding
+        if obj is None:
+            super(MyUserAdmin,self).__setattr__('inline',None)
+        return super(MyUserAdmin, self).add_view(request, obj, **kwargs)
 
 
 class EpicPersonsAdmin(admin.ModelAdmin):
@@ -82,7 +88,7 @@ class LoadingDetailAdmin(admin.ModelAdmin):
 
 
 admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register(User, MyUserAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 admin.site.register(DispatchPoint, DispatchPointAdmin)
 admin.site.register(ReceptionPoint, ReceptionPointAdmin)

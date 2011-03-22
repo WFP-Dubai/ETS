@@ -1,24 +1,23 @@
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.contrib.auth.views import login,logout
+from django.contrib.auth.views import login, logout
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db import connections
 from django.db import models
 from django.forms.formsets import BaseFormSet
-from django.forms.models import inlineformset_factory,modelformset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.template import Template, RequestContext,Library, Node
+from django.template import Template, RequestContext, Library, Node
 from ets.waybill.compas import *
 from ets.waybill.forms import *
 from ets.waybill.models import *
-from ets.waybill.tools import *
 from ets.waybill.views import *
 import cx_Oracle
 import datetime
-import os,StringIO, zlib,base64,string
+import os, StringIO, zlib, base64, string
 ## Databrowse
 from django.contrib import databrowse
 import json
@@ -28,9 +27,9 @@ databrowse.site.register(LtiOriginal)
 
 
 def removeNonAsciiChars(s):
-    return s if s=='' else ''.join([i for i in s if s in string.printable])
+    return s if s == '' else ''.join([i for i in s if s in string.printable])
 
-def logger(action,user,datain,dataout):
+def logger(action, user, datain, dataout):
     pass
 
 def loggit(items):
@@ -38,7 +37,7 @@ def loggit(items):
 
 def track_compas_update():
     file = 'tagfile.tag'
-    FILE = open(file,"w")
+    FILE = open(file, "w")
     FILE.write(str(datetime.datetime.now()))
     FILE.close()
 
@@ -55,7 +54,7 @@ def readTag():
 def viewLog():
     try:
         logfile = 'logg.txt'
-        FILE = open(logfile,"r")
+        FILE = open(logfile, "r")
         log = FILE.read()
         FILE.close()
         return log
@@ -71,7 +70,7 @@ def uniq(inlist):
     return uniques
     
 #prints a list item....
-def printlistitem(list,index):
+def printlistitem(list, index):
     print list(index)
 
 def printlist(list):
@@ -80,7 +79,7 @@ def printlist(list):
 
 # takes compressed base64 Data and uncompresses it
 def un64unZip(data):
-    data= string.replace(data,' ','+')
+    data = string.replace(data, ' ', '+')
     zippedData = base64.b64decode(data)
     uncompressed = zlib.decompress(zippedData)    
     return uncompressed
@@ -107,22 +106,17 @@ def serialize_wb(wb_id):
     waybill_to_serialize = Waybill.objects.get(id=wb_id)
 
     # Add related LoadingDetais to serialized representation
-
     loadingdetails_to_serialize = waybill_to_serialize.loadingdetail_set.select_related()
-
     # Add related LtiOriginals to serialized representation
-
     ltis_to_serialize = LtiOriginal.objects.filter(code=waybill_to_serialize.ltiNumber)
-
     # Add related EpicStocks to serialized representation
-
     stocks_to_serialize = []
     for lti in ltis_to_serialize:
         for s in lti.get_stocks():
             stocks_to_serialize.append(s)
-
     data = serializers.serialize('json', [waybill_to_serialize] + list(loadingdetails_to_serialize) + list(ltis_to_serialize) + list(stocks_to_serialize))
     return data
+
 def serialized_wb_repr(wb_id):
     """
     This method gives the serialized representation of the Waybill identified by the wb_id param with related LoadingDetails, LtiOriginals and EpicStocks.
@@ -169,7 +163,7 @@ def serialized_wb_repr(wb_id):
 
     ltis = LtiOriginal.objects.filter(code=waybill.ltiNumber)
     ltis_list = []
-    from structures import lti_named2positional_dict
+    from ets.waybill.structures import lti_named2positional_dict
     for lti in ltis:
         lti_dict = instance_as_dict(lti, exclude=['id'])
         lti_positional_dict = lti_named2positional_dict(lti_dict)
@@ -180,7 +174,7 @@ def serialized_wb_repr(wb_id):
     # Add related EpicStocks to serialized representation
 
     stocks_list = []
-    from structures import stock_named2positional_dict
+    from ets.waybill.structures import stock_named2positional_dict
     for lti in ltis:
         for stock in lti.get_stocks():
             stock_dict = instance_as_dict(stock, exclude=['id'])
@@ -236,7 +230,7 @@ def wb_uncompress_repr(compressed_wb):
     >>> u
     [{u'42': u'False', u'43': u'False', u'24': u'1r', u'25': u'2r', u'26': u'', u'27': u'', u'20': u'1n', u'21': u'2n', u'22': u'1s', u'23': u'2s', u'46': u'', u'44': u'False', u'45': u'False', u'28': u'QALANDIA', u'29': u'WORLD FOOD PROGRAMME', u'40': u'False', u'41': u'False', u'1': u'X0167', u'0': u'JERX0011000Z7901P', u'3': u'2011-01-18', u'2': u'2011-01-18', u'5': u'Road', u'4': u'Delivery', u'7': u'JERX0010002630', u'6': u'dr', u'9': u'False', u'8': u'LOGISTICS OFFICER', u'39': u'QD9X001', u'11': u'ts', u'10': u'RAIS MIDDLE EAST LTD.', u'13': u'dln', u'12': u'dn', u'15': u'trn', u'14': u'vrn', u'16': u'False', u'18': u'False', u'31': u'', u'30': u'', u'37': u'False', u'36': u''}, [], [{u'24': u'WHEAT FLOUR', u'25': u'150.000', u'26': u'150.300', u'27': u'3000', u'20': u'HQX0001000000000000990922', u'21': u'00004178', u'22': u'CER', u'23': u'CERWHF', u'28': u'50.000', u'29': u'50.100', u'1': u'JERX001000000000000011031', u'0': u'JERX001000000000000011031HQX0001000000000000990922', u'3': u'2010-06-29', u'2': u'JERX0011000Z7901P', u'5': u'R001', u'4': u'2010-07-04', u'7': u'RAIS MIDDLE EAST LTD.', u'6': u'JERX001', u'9': u'Warehouse', u'8': u'2', u'11': u'ASHDOD', u'10': u'ASHX', u'13': u'ASHDOD_OVERSEAS_BONDED', u'12': u'ASHX004', u'15': u'QALANDIA', u'14': u'QD9X', u'17': u'WORLD FOOD PROGRAMME', u'16': u'WFP', u'19': u'103871.1', u'18': u'2010-06-29'}, {u'24': u'CHICKPEAS', u'25': u'200.000', u'26': u'200.400', u'27': u'4000', u'20': u'HQX0001000000000000991507', u'21': u'00005581', u'22': u'PUL', u'23': u'PULCKP', u'28': u'50.000', u'29': u'50.100', u'1': u'JERX001000000000000011031', u'0': u'JERX001000000000000011031HQX0001000000000000991507', u'3': u'2010-06-29', u'2': u'JERX0011000Z7901P', u'5': u'R001', u'4': u'2010-07-04', u'7': u'RAIS MIDDLE EAST LTD.', u'6': u'JERX001', u'9': u'Warehouse', u'8': u'2', u'11': u'ASHDOD', u'10': u'ASHX', u'13': u'ASHDOD_OVERSEAS_BONDED', u'12': u'ASHX004', u'15': u'QALANDIA', u'14': u'QD9X', u'17': u'WORLD FOOD PROGRAMME', u'16': u'WFP', u'19': u'103871.1', u'18': u'2010-06-29'}, {u'24': u'VEGETABLE OIL', u'25': u'357.000', u'26': u'384.000', u'27': u'30000', u'20': u'HQX0001000000000000890038', u'21': u'82492906', u'22': u'OIL', u'23': u'OILVEG', u'28': u'11.900', u'29': u'12.800', u'1': u'JERX001000000000000011031', u'0': u'JERX001000000000000011031HQX0001000000000000890038', u'3': u'2010-06-29', u'2': u'JERX0011000Z7901P', u'5': u'R001', u'4': u'2010-07-04', u'7': u'RAIS MIDDLE EAST LTD.', u'6': u'JERX001', u'9': u'Warehouse', u'8': u'2', u'11': u'ASHDOD', u'10': u'ASHX', u'13': u'ASHDOD_OVERSEAS_BONDED', u'12': u'ASHX004', u'15': u'QALANDIA', u'14': u'QD9X', u'17': u'WORLD FOOD PROGRAMME', u'16': u'WFP', u'19': u'10387.1.01.01', u'18': u'2010-06-29'}], [{u'20': u'275', u'21': u'0080003270', u'1': u'OMC', u'0': u'ASHX004JERX0010000417801CERCERWHFBY17275', u'3': u'ASHDOD', u'2': u'ISRAEL', u'5': u'ASHDOD_OVERSEAS_BONDED', u'4': u'ASHX004', u'7': u'HQX0001000000000000990922', u'6': u'103871.1', u'9': u'JERX0010000417801', u'8': u'00004178', u'11': u'CERWHF', u'10': u'CER', u'13': u'BY17', u'12': u'WHEAT FLOUR', u'15': u'G', u'14': u'BAG, POLYPROPYLENE, 50 KG', u'17': u'10000.000', u'16': u'Good', u'19': u'200', u'18': u'10020.390'}, {u'20': u'275', u'21': u'0080003713', u'1': u'OMC', u'0': u'ASHX004JERX0010000558101PULPULCKPBY17275', u'3': u'ASHDOD', u'2': u'ISRAEL', u'5': u'ASHDOD_OVERSEAS_BONDED', u'4': u'ASHX004', u'7': u'HQX0001000000000000991507', u'6': u'103871.1', u'9': u'JERX0010000558101', u'8': u'00005581', u'11': u'PULCKP', u'10': u'PUL', u'13': u'BY17', u'12': u'CHICKPEAS', u'15': u'G', u'14': u'BAG, POLYPROPYLENE, 50 KG', u'17': u'500.000', u'16': u'Good', u'19': u'100000', u'18': u'510.054'}]]
     """
-    unbase64_data = base64.b64decode(compressed_wb.replace(' ','+'))
+    unbase64_data = base64.b64decode(compressed_wb.replace(' ', '+'))
     unzipped = zlib.decompress(unbase64_data)
 
     deserialized_content = json.loads(unzipped)
@@ -250,11 +244,11 @@ def restant_si(lti_code):
     detailed_lti = LtiOriginal.objects.filter(code=lti_code)
     listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code).filter(waybillSentToCompas=False)
     listOfSI = []
-#    listExl =removedLtis.objects.list()
+#    listExl =RemovedLtis.objects.list()
 
     for lti in detailed_lti:
-        if not removedLtis.objects.filter(lti=lti.lti_pk):
-            if lti.isBulk():
+        if not RemovedLtis.objects.filter(lti=lti.lti_pk):
+            if lti.is_bulk():
                 listOfSI += [SIWithRestant(lti.si_code, lti.quantity_net, lti.cmmname)]
             else:
                 listOfSI += [SIWithRestant(lti.si_code, lti.number_of_units, lti.cmmname)]
@@ -263,7 +257,7 @@ def restant_si(lti_code):
         for loading in wb.loadingdetail_set.select_related():
             for si in listOfSI:
                 if si.SINumber == loading.siNo.si_code:
-                    si.reduceCurrent(loading.numberUnitsLoaded)
+                    si.reduce_current(loading.numberUnitsLoaded)
     return listOfSI
 
 ##### Make Waybill number !!!! (make better)
@@ -364,7 +358,7 @@ def synchronize_stocks(warehouse_code):
     conn = httplib.HTTPConnection(settings.ONLINE_HOST_NAME, settings.ONLINE_HOST_PORT)
 
     try:
-        conn.request("GET", "/ets/stock/synchro/download/?warehouse_code="+warehouse_code, {}, headers)
+        conn.request("GET", "/ets/stock/synchro/download/?warehouse_code=" + warehouse_code, {}, headers)
 
         response = conn.getresponse()
         data = response.read()
@@ -473,34 +467,31 @@ def import_setup():
     ## read all ltis from compas & extract Dispatch points & reception points
     #select distinct origin_loc_name,origin_location_code,origin_wh_name,origin_wh_code from epic_lti
     #select distinct destination_location_code,consegnee_name,destination_loc_name,consingee_code from epic_lti
-    disp = LtiOriginal.objects.using('compas').values('origin_loc_name','origin_location_code','origin_wh_name','origin_wh_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
-    rec = LtiOriginal.objects.using('compas').values('destination_location_code','consegnee_name','destination_loc_name','consegnee_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
+    disp = LtiOriginal.objects.using('compas').values('origin_loc_name', 'origin_location_code', 'origin_wh_name', 'origin_wh_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
+    rec = LtiOriginal.objects.using('compas').values('destination_location_code', 'consegnee_name', 'destination_loc_name', 'consegnee_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
     ## maybe add a time limit?
     for d in rec:
-        this_dp,created = ReceptionPoint.objects.get_or_create(LOC_NAME=d['destination_loc_name'],LOCATION_CODE=d['destination_location_code'],consegnee_name=d['consegnee_name'],consegnee_code=d['consegnee_code'])
+        this_dp, created = ReceptionPoint.objects.get_or_create(LOC_NAME=d['destination_loc_name'], LOCATION_CODE=d['destination_location_code'], consegnee_name=d['consegnee_name'], consegnee_code=d['consegnee_code'])
         if created:
-            this_dp.ACTIVE_START_DATE = datetime.date(9999,12,31)
+            this_dp.ACTIVE_START_DATE = datetime.date(9999, 12, 31)
             this_dp.save()
 
     for d in disp:
-        this_dp,created = DispatchPoint.objects.get_or_create(origin_loc_name=d['origin_loc_name'],origin_location_code=d['origin_location_code'],origin_wh_name=d['origin_wh_name'],origin_wh_code=d['origin_wh_code'])
+        this_dp, created = DispatchPoint.objects.get_or_create(origin_loc_name=d['origin_loc_name'], origin_location_code=d['origin_location_code'], origin_wh_name=d['origin_wh_name'], origin_wh_code=d['origin_wh_code'])
         if created:
-            this_dp.ACTIVE_START_DATE = datetime.date(9999,12,31)
+            this_dp.ACTIVE_START_DATE = datetime.date(9999, 12, 31)
             this_dp.save()
 
     
     
 def import_geo():
     """
-    Executes Imports of places
+    Executes Imports of Places
     """
-    ## Fix countries, get by config
     
-    #UPDATE GEO
-    #loop thrugh CC
     for country in settings.COUNTRIES:
         try:
-            my_geo = places.objects.using('compas').filter(COUNTRY_CODE=country)
+            my_geo = Places.objects.using('compas').filter(COUNTRY_CODE=country)
             for the_geo in my_geo:
                     the_geo.save(using='default')
         except:
@@ -520,75 +511,77 @@ def import_stock():
         if item not in originalStock:
             item.number_of_units = 0;
             item.save()
-            
+
+
 def import_lti():
-    listRecepients = ReceptionPoint.objects.values('consegnee_code','LOCATION_CODE','ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
-    listDispatchers = DispatchPoint.objects.values('origin_wh_code','ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
-    # check what type is the comodity... if bulk swap
+    listRecepients = ReceptionPoint.objects.values('consegnee_code', 'LOCATION_CODE', 'ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
+    listDispatchers = DispatchPoint.objects.values('origin_wh_code', 'ACTIVE_START_DATE').filter(ACTIVE_START_DATE__lt=datetime.date.today()).distinct()
     
     ## TODO: Fix so ltis imported are not expired
     original = LtiOriginal.objects.using('compas').filter(requested_dispatch_date__gt='2011-01-01')
     # log each item
     for myrecord in original:
-        not_in = True
         for rec in listRecepients:
-            if myrecord.consegnee_code in rec['consegnee_code'] and myrecord.destination_location_code in rec['LOCATION_CODE'] and myrecord.lti_date >=  rec['ACTIVE_START_DATE']:
+            if myrecord.consegnee_code in rec['consegnee_code'] and myrecord.destination_location_code in rec['LOCATION_CODE'] and myrecord.lti_date >= rec['ACTIVE_START_DATE']:
                 for disp in listDispatchers:
-                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >=  disp['ACTIVE_START_DATE']:
+                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >= disp['ACTIVE_START_DATE']:
                         myrecord.save(using='default') ## here we import the record...
                         try:
-                            myr = removedLtis.objects.get(lti=myrecord)
+                            myr = RemovedLtis.objects.get(lti=myrecord)
                             myr.delete()
                         except:
                             pass
                         try:
-                            mysist =myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal#Use get or create!!
-
+                            mysist = myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal#Use get or create!!
                             if mysist.number_units_start != myrecord.number_of_units:
                                 try:
                                     change = myrecord.number_of_units - mysist.number_units_start 
-                                    mysist.number_units_left =    mysist.number_units_left + change    
+                                    mysist.number_units_left = mysist.number_units_left + change    
                                     mysist.save(using='default')    
                                 except:
                                     pass
                         except:
                             mysist = SiTracker()
-                            mysist.LTI=myrecord
+                            mysist.LTI = myrecord
                             mysist.number_units_left = myrecord.number_of_units
                             mysist.number_units_start = myrecord.number_of_units
                             mysist.save(using='default')
-                        not_in = False
                         break
-                    
-                not_in = False
                 break
             else:
                 #pass# not here (remove if it should no be here)
                 try:
-                    LtiOriginal.objects.get(id = myrecord.id)
+                    LtiOriginal.objects.get(id=myrecord.id)
                 except:
                     pass
-                
 
     #cleanup ltis loop and see if changes to lti ie deleted rows
     current = LtiOriginal.objects.all()
     for c in current:
         if c not in original:
             c.remove_lti()
-    #    if c.expiry_date < datetime.date.today():
-    #        c.remove_lti()
+        if settings.IN_PRODUCTION:
+            if c.expiry_date < datetime.date.today():
+                c.remove_lti()
 
-            
-def getMyProfile(request):
-    myprofile =''
-    try:
-        myprofile = request.user.profile
-    except:
-        pass
-    return myprofile
 
-def printIt(line):
-#    print line
-    pass
-
+def serialized_all_items():
+    wh_disp_list = DispatchPoint.objects.all()
+    wh_rec_list = ReceptionPoint.objects.all()
+    users_list = User.objects.all()
+    profiles_list = UserProfile.objects.all()
+    persons_list = EpicPerson.objects.all()
+    places_list = Places.objects.all()
+    data = serializers.serialize('json', list(wh_disp_list)+list(wh_rec_list)+list(users_list)+list(profiles_list)+list(places_list)+list(persons_list))
+    print data
+    return data
+    
+def serialized_all_wb_stock(warehouse):
+    wh = DispatchPoint.objects.get(id=warehouse)
+    print wh
+    ltis_list = LtiOriginal.objects.filter(origin_wh_code=wh.origin_wh_code)
+    stocks_list = EpicStock.objects.filter(wh_code=wh.origin_wh_code)
+    data = serializers.serialize('json', list(ltis_list) + list(stocks_list))
+    print data
+    return data
     

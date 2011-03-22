@@ -1,5 +1,5 @@
 from django import template
-import time,calendar 
+import time, calendar 
 register = template.Library()
 # Sample
 @register.tag(name="current_time")
@@ -70,7 +70,7 @@ class PrintTagNode(template.Node):
             print the_date[0:19]
             
             
-            return '<small>Latest COMPAS import:' + the_date[0:19]+'</small>'
+            return '<small>Latest COMPAS import:' + the_date[0:19] + '</small>'
         except Exception as e:
             print e
             return ''
