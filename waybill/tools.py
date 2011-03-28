@@ -18,7 +18,7 @@ from ets.waybill.views import *
 import cx_Oracle
 import datetime
 import os, StringIO, zlib, base64, string
-## Databrowse
+
 from django.contrib import databrowse
 import json
 databrowse.site.register(Waybill)
@@ -60,16 +60,8 @@ def viewLog():
         return log
     except:
         pass    
-
-def uniq(inlist):
-    # order preserving
-    uniques = []
-    for item in inlist:
-        if item not in uniques:
-            uniques.append(item)
-    return uniques
     
-#prints a list item....
+
 def printlistitem(list, index):
     print list(index)
 
@@ -77,14 +69,13 @@ def printlist(list):
     for item in list:
         print item
 
-# takes compressed base64 Data and uncompresses it
+
 def un64unZip(data):
     data = string.replace(data, ' ', '+')
     zippedData = base64.b64decode(data)
     uncompressed = zlib.decompress(zippedData)    
     return uncompressed
 
-# takes a wb id and returns a zipped base64 string of the serialized object // ?use table to reduce column names save 1000 bytes?
 
 def serialize_wb(wb_id):
     """
@@ -239,7 +230,7 @@ def wb_uncompress_repr(compressed_wb):
     
 def restant_si(lti_code):
     """
-    @todo: write method definition
+    TODO: write method definition
     """
     detailed_lti = LtiOriginal.objects.filter(code=lti_code)
     listOfWaybills = Waybill.objects.filter(invalidated=False).filter(ltiNumber=lti_code).filter(waybillSentToCompas=False)
@@ -260,10 +251,7 @@ def restant_si(lti_code):
                     si.reduce_current(loading.numberUnitsLoaded)
     return listOfSI
 
-##### Make Waybill number !!!! (make better)
-def newWaybillNo(waybill):
-    return 'E' + '%04d' % waybill.id
-    
+
 def new_waybill_no(waybill):
     """
     This method gives a waybill identifier for the waybill instance param, chaining the warehouse identifier char with the sequence of the table.
@@ -403,7 +391,6 @@ def wb_compress(wb_id):
     data = serialize_wb(wb_id)
     from kiowa.utils.encode import DecimalJSONEncoder
     zippedData = zipBase64(json.dumps(data, cls=DecimalJSONEncoder))
-
     return zippedData
 
 
@@ -438,30 +425,19 @@ def zipBase64(data):
     >>> z
     'eJwLzs9NVUhJLEnU09MDABtiA9k='
     """
-
-    zippedData = zlib.compress(data)
-    base64Data = base64.b64encode(zippedData)
+    base64Data = base64.b64encode(zlib.compress(data))
     return base64Data
 
-    
-     
-
-
-####
     
 def update_persons():
     """
     Executes Imports of LTIs Persons
-    Fix to include Compas Station
     """
     
     originalPerson = EpicPerson.objects.using('compas').filter(org_unit_code=settings.COMPAS_STATION)
     for my_person in originalPerson:
         my_person.save(using='default')    
 
-
-
-## Importing Needs to add imports for DispatchPoint & ReceptionPoint
 
 def import_setup():
     ## read all ltis from compas & extract Dispatch points & reception points
@@ -471,24 +447,14 @@ def import_setup():
     rec = LtiOriginal.objects.using('compas').values('destination_location_code', 'consegnee_name', 'destination_loc_name', 'consegnee_code').filter(lti_id__startswith=settings.COMPAS_STATION).distinct()
     ## maybe add a time limit?
     for d in rec:
-        this_dp, created = ReceptionPoint.objects.get_or_create(LOC_NAME=d['destination_loc_name'], LOCATION_CODE=d['destination_location_code'], consegnee_name=d['consegnee_name'], consegnee_code=d['consegnee_code'])
-        if created:
-            this_dp.ACTIVE_START_DATE = datetime.date(9999, 12, 31)
-            this_dp.save()
-
+        ReceptionPoint.objects.get_or_create(LOC_NAME=d['destination_loc_name'], LOCATION_CODE=d['destination_location_code'], consegnee_name=d['consegnee_name'], consegnee_code=d['consegnee_code'],defaults={'ACTIVE_START_DATE':datetime.date(9999, 12, 31)})
     for d in disp:
-        this_dp, created = DispatchPoint.objects.get_or_create(origin_loc_name=d['origin_loc_name'], origin_location_code=d['origin_location_code'], origin_wh_name=d['origin_wh_name'], origin_wh_code=d['origin_wh_code'])
-        if created:
-            this_dp.ACTIVE_START_DATE = datetime.date(9999, 12, 31)
-            this_dp.save()
-
-    
+        DispatchPoint.objects.get_or_create(origin_loc_name=d['origin_loc_name'], origin_location_code=d['origin_location_code'], origin_wh_name=d['origin_wh_name'], origin_wh_code=d['origin_wh_code'],defaults={'ACTIVE_START_DATE':datetime.date(9999, 12, 31)})
     
 def import_geo():
     """
     Executes Imports of Places
     """
-    
     for country in settings.COUNTRIES:
         try:
             my_geo = Places.objects.using('compas').filter(COUNTRY_CODE=country)
@@ -505,7 +471,6 @@ def import_stock():
     originalStock = EpicStock.objects.using('compas')
     for myrecord in originalStock:
         myrecord.save(using='default')
-    
     current_stock = EpicStock.objects.all()
     for item in current_stock:
         if item not in originalStock:
@@ -573,15 +538,13 @@ def serialized_all_items():
     persons_list = EpicPerson.objects.all()
     places_list = Places.objects.all()
     data = serializers.serialize('json', list(wh_disp_list)+list(wh_rec_list)+list(users_list)+list(profiles_list)+list(places_list)+list(persons_list))
-    print data
     return data
+
     
 def serialized_all_wb_stock(warehouse):
     wh = DispatchPoint.objects.get(id=warehouse)
-    print wh
     ltis_list = LtiOriginal.objects.filter(origin_wh_code=wh.origin_wh_code)
     stocks_list = EpicStock.objects.filter(wh_code=wh.origin_wh_code)
     data = serializers.serialize('json', list(ltis_list) + list(stocks_list))
-    print data
     return data
     

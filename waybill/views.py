@@ -24,27 +24,17 @@ import simplejson as json
 
 def prep_req(request):
     return{'user': request.user}
-
-# def homepage(request):
-#     """ 
-#     View: homepage 
-#     URL: /
-#     Template: None
-#     Redirects you to the selectAction page
-#     """
-#     #messages.add_message(request, messages.INFO, 'Hello world.')
-#     return HttpResponseRedirect(reverse(selectAction))
                               
 @login_required    
-def selectAction(request):
+def select_action(request):
     """
-    View: selectAction 
+    View: select_action 
     URL: /ets/select-action
-    Template: /ets/waybill/templates/selectAction.html
+    Template: /ets/waybill/templates/select_action.html
     Gives the loggedin user a choise of possible actions sepending on roles
     """
 
-    return render_to_response('selectAction.html',  context_instance=RequestContext(request))
+    return render_to_response('select_action.html',  context_instance=RequestContext(request))
 
 @login_required
 def listOfLtis(request, origin):
@@ -112,7 +102,7 @@ def import_ltis(request):
     track_compas_update()
     messages.add_message(request, messages.INFO, status)
     
-    return HttpResponseRedirect(reverse(selectAction))
+    return HttpResponseRedirect(reverse(select_action))
 
 def lti_detail_url(request, lti_code):    
     """
@@ -144,7 +134,7 @@ def dispatch(request):
     try:
         return HttpResponseRedirect(reverse(listOfLtis, args=[request.user.get_profile().warehouses.origin_wh_code])) 
     except:
-        return HttpResponseRedirect(reverse(selectAction))
+        return HttpResponseRedirect(reverse(select_action))
 
 #### Waybill Views
 @login_required
@@ -155,7 +145,7 @@ def waybill_create(request, lti_pk):
                               {'detailed':detailed_lti, 'lti_id':lti_pk},
                               context_instance=RequestContext(request))
     except:
-        return HttpResponseRedirect(reverse(selectAction))
+        return HttpResponseRedirect(reverse(select_action))
     
 @login_required
 def waybill_finalize_dispatch(request, wb_id):
@@ -384,8 +374,6 @@ def waybill_validate_form_update(request, wb_id):
     qs = Places.objects.filter(geo_name=current_lti[0].destination_loc_name).filter(organization_id=current_lti[0].consegnee_code)
     if len(qs) == 0:
         qs = Places.objects.filter(geo_name=current_lti[0].destination_loc_name)
-    else:
-        current_wh = qs[0]
 
     if request.method == 'POST':
         
@@ -393,8 +381,8 @@ def waybill_validate_form_update(request, wb_id):
         form.fields["destinationWarehouse"].queryset = qs
         formset = LDFormSet(request.POST, instance=current_wb)
         if form.is_valid() and formset.is_valid():
-            wb_new = form.save()
-            instances = formset.save()
+            form.save()
+            formset.save()
             return HttpResponseRedirect(reverse(waybill_search))
     else:            
         form = WaybillFullForm(instance=current_wb)
@@ -406,6 +394,7 @@ def waybill_validate_form_update(request, wb_id):
 
 @login_required
 def waybill_view(request, wb_id):
+    ## TODO: remove dependency of zippedWB
     try:
         waybill_instance = Waybill.objects.get(id=wb_id)
         zippedWB = wb_compress(wb_id)
@@ -422,7 +411,7 @@ def waybill_view(request, wb_id):
         except:
             rec_person_object = ''
     except:
-        return HttpResponseRedirect(reverse(selectAction))
+        return HttpResponseRedirect(reverse(select_action))
     data_dict = {
                  'object': waybill_instance,
                  'LtiOriginal': lti_detail_items,
@@ -431,14 +420,12 @@ def waybill_view(request, wb_id):
                  'extra_lines': my_empty,
                  'zippedWB': zippedWB,
     }
-
-
-
     return render_to_response('waybill/print/waybill_detail_view.html', data_dict, context_instance=RequestContext(request))
 
 
 @login_required
 def waybill_view_reception(request, wb_id):
+    ## TODO: remove dependency of zippedWB
     rec_person_object = ''
     disp_person_object = ''
     zippedWB = ''
@@ -450,7 +437,7 @@ def waybill_view_reception(request, wb_id):
         my_empty = [''] * extra_lines
         zippedWB = wb_compress(wb_id)    
     except:
-        return HttpResponseRedirect(reverse(selectAction))
+        return HttpResponseRedirect(reverse(select_action))
     try:
         disp_person_object = EpicPerson.objects.get(person_pk=waybill_instance.dispatcherName)
         rec_person_object = EpicPerson.objects.get(person_pk=waybill_instance.recipientName)
@@ -474,7 +461,7 @@ def waybill_reception(request, wb_code):
         pass
     else:
         return HttpResponseRedirect(reverse(waybill_view , args=[wb_code]))
-#    current_wb.auditComment = 'Reciept Action'
+#    current_wb.auditComment = 'Receipt Action'
 #    current_wb.save()
         
     class LoadingDetailRecForm(ModelForm):
@@ -558,7 +545,7 @@ def waybill_reception(request, wb_code):
             wb_new.recipientName = request.user.profile.compasUser.person_pk
             wb_new.auditComment = 'Receipt Action'
             wb_new.save()
-            instances = formset.save()
+            formset.save()
             return HttpResponseRedirect('../viewwb_reception/' + str(current_wb.id)) #
         else:
             loggit(formset.errors)
@@ -605,15 +592,12 @@ def waybill_reception_list(request):
             waybill.destination_loc_name = mysi.destination_loc_name
             waybill.origin_loc_name = mysi.origin_loc_name
             waybill.consegnee_name = mysi.consegnee_name
-
-    
     return render_to_response('waybill/reception_list.html',
                               {'object_list':waybills},
                               context_instance=RequestContext(request))
 
 def waybill_search(request):
     search_string = ''
-    found_wb = ''
     try:
         search_string = request.GET['wbnumber']
     except:
@@ -705,7 +689,7 @@ def waybillCreate(request, lti_code):
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
             instances = formset.save(commit=False)
-            wb_new.waybillNumber = newWaybillNo(wb_new)
+            wb_new.waybillNumber = new_waybill_no(wb_new)
             for subform in instances:
                 subform.wbNumber = wb_new
                 subform.save()
@@ -908,9 +892,6 @@ def waybill_validate_receipt_form(request):
                         errorlog.errorRec = errorMessage
                         errorlog.timestamp = datetime.datetime.now()
                         errorlog.save()
-
-#             formset.save()
-             
             formset.save()
             
     waybills = Waybill.objects.filter(invalidated=False).filter(waybillReceiptValidated=False).filter(recipientSigned=True).filter(waybillValidated=True)
@@ -943,7 +924,7 @@ def serialize(request, wb_code):
     return render_to_response('blank.html', {'status':data, 'ziped':zippedWB, 'wb_code':wb_code},
                               context_instance=RequestContext(request))
 
-## recives a POST with the comressed or uncompressed WB and sends you to the Reveive WB 
+## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB 
 @login_required
 def deserialize(request):
     waybillnumber = ''
@@ -1123,10 +1104,7 @@ def post_synchronize_waybill(request):
                     obj.object.save()
                 except:
                     print 'Exception when saving LoadingDetail'
-    
-    
     response = HttpResponse('SYNCHRONIZATION_DONE')
-        
     return response
 
 
@@ -1139,8 +1117,6 @@ def get_synchronize_stock(request):
     if request.method == 'GET':
     
         warehouse_code = request.GET['warehouse_code']
-        
-#        from waybill.models import EpicStock    
         stocks_list = EpicStock.objects.filter(wh_code=warehouse_code)
         
         from kiowa.db.utils import instance_as_dict
@@ -1256,7 +1232,7 @@ def get_all_data(request):
     data = serialized_all_items()
     response = HttpResponse(data, mimetype='application/json')
     return response    
-    
+@csrf_exempt    
 def get_all_data_download(request):
     print 'Donwload'
     data = serialized_all_items()
