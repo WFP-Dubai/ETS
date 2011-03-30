@@ -109,26 +109,26 @@ class WaybillFieldsMap:
     }
 
 
-def waybill_name2position(name):
+def waybill_name2position( name ):
     return WaybillFieldsMap.NAME_2_POSITION[name]
 
 
-def waybill_position2name(position):
+def waybill_position2name( position ):
     return WaybillFieldsMap.POSITION_2_NAME[position]
 
 
-def waybill_named2positional_dict(name_dict):
+def waybill_named2positional_dict( name_dict ):
     positional_dict = {}
     for key, value in name_dict.items():
         #positional_dict["W%s" % str(waybill_name2position(key))] = value
-        positional_dict[waybill_name2position(key)] = value
+        positional_dict[waybill_name2position( key )] = value
     return positional_dict
 
 
-def waybill_positional2named_dict(positional_dict):
+def waybill_positional2named_dict( positional_dict ):
     named_dict = {}
     for key, value in positional_dict.items():
-        named_dict[waybill_position2name(key)] = value
+        named_dict[waybill_position2name( key )] = value
     return named_dict
 
 
@@ -167,26 +167,26 @@ class LoadingDetailFieldsMap():
     }
 
 
-def loadingdetail_name2position(name):
+def loadingdetail_name2position( name ):
     return LoadingDetailFieldsMap.NAME_2_POSITION[name]
 
 
-def loadingdetail_position2name(position):
+def loadingdetail_position2name( position ):
     return LoadingDetailFieldsMap.POSITION_2_NAME[position]
 
 
-def loadingdetail_named2positional_dict(name_dict):
+def loadingdetail_named2positional_dict( name_dict ):
     positional_dict = {}
     for key, value in name_dict.items():
         #positional_dict["L%s" % str(loadingdetail_name2position(key))] = value
-        positional_dict[loadingdetail_name2position(key)] = value
+        positional_dict[loadingdetail_name2position( key )] = value
     return positional_dict
 
 
-def loadingdetail_positional2named_dict(positional_dict):
+def loadingdetail_positional2named_dict( positional_dict ):
     named_dict = {}
     for key, value in positional_dict.items():
-        named_dict[loadingdetail_position2name(key)] = value
+        named_dict[loadingdetail_position2name( key )] = value
     return named_dict
 
 
@@ -259,25 +259,25 @@ class LtiOriginalFieldsMap():
     }
 
 
-def lti_name2position(name):
+def lti_name2position( name ):
     return LtiOriginalFieldsMap.NAME_2_POSITION[name]
 
 
-def lti_position2name(position):
+def lti_position2name( position ):
     return LtiOriginalFieldsMap.POSITION_2_NAME[position]
 
 
-def lti_named2positional_dict(name_dict):
+def lti_named2positional_dict( name_dict ):
     positional_dict = {}
     for key, value in name_dict.items():
-        positional_dict[lti_name2position(key)] = value
+        positional_dict[lti_name2position( key )] = value
     return positional_dict
 
 
-def lti_positional2named_dict(positional_dict):
+def lti_positional2named_dict( positional_dict ):
     named_dict = {}
     for key, value in positional_dict.items():
-        named_dict[lti_position2name(key)] = value
+        named_dict[lti_position2name( key )] = value
     return named_dict
 
 
@@ -334,23 +334,23 @@ class EpicStocklFieldsMap():
     }
 
 
-def stock_name2position(name):
+def stock_name2position( name ):
     return EpicStocklFieldsMap.NAME_2_POSITION[name]
 
 
-def stock_position2name(position):
+def stock_position2name( position ):
     return EpicStocklFieldsMap.POSITION_2_NAME[position]
 
 
-def stock_named2positional_dict(name_dict):
+def stock_named2positional_dict( name_dict ):
     positional_dict = {}
     for key, value in name_dict.items():
-        positional_dict[stock_name2position(key)] = value
+        positional_dict[stock_name2position( key )] = value
     return positional_dict
 
 
-def stock_positional2named_dict(positional_dict):
+def stock_positional2named_dict( positional_dict ):
     named_dict = {}
     for key, value in positional_dict.items():
-        named_dict[stock_position2name(key)] = value
+        named_dict[stock_position2name( key )] = value
     return named_dict

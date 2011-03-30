@@ -3,9 +3,9 @@ print 'Settings Default'
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
+ADMINS = ( 
     # ('Your Name', 'your_email@domain.com'),
-)
+ )
 
 MANAGERS = ADMINS
 
@@ -117,12 +117,12 @@ USE_I18N = True
 MEDIA_URL = ''
 ADMIN_MEDIA_PREFIX = '/media/'
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
-TEMPLATE_LOADERS = (
+TEMPLATE_LOADERS = ( 
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
-)
-MIDDLEWARE_CLASSES = (
+ )
+MIDDLEWARE_CLASSES = ( 
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
@@ -130,11 +130,11 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
 #    'debug_toolbar.middleware.DebugToolbarMiddleware',
-)
+ )
 ROOT_URLCONF = 'ets.urls'
 
 
-INSTALLED_APPS = (
+INSTALLED_APPS = ( 
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -143,10 +143,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'ets.waybill',
     'django.contrib.databrowse',
-)
-INTERNAL_IPS = ('127.0.0.1',)
+ )
+INTERNAL_IPS = ( '127.0.0.1', )
 
-DEBUG_TOOLBAR_PANELS = (
+DEBUG_TOOLBAR_PANELS = ( 
     'debug_toolbar.panels.version.VersionDebugPanel',
     'debug_toolbar.panels.timer.TimerDebugPanel',
     'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
@@ -156,23 +156,23 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.sql.SQLDebugPanel',
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
-)
+ )
 AUTH_PROFILE_MODULE = 'waybill.UserProfile'
 
-TEMPLATE_CONTEXT_PROCESSORS = (
+TEMPLATE_CONTEXT_PROCESSORS = ( 
 'django.contrib.auth.context_processors.auth',
 'django.core.context_processors.debug',
 'django.core.context_processors.i18n',
 'django.contrib.messages.context_processors.messages',
 'django.core.context_processors.request',
 'ets.waybill.context_processor.request'
-)
+ )
 
 import os
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'media')
-TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__), 'templates')
-)
+MEDIA_ROOT = os.path.join( os.path.dirname( __file__ ), 'media' )
+TEMPLATE_DIRS = ( 
+    os.path.join( os.path.dirname( __file__ ), 'templates' )
+ )
 
 COMPAS_STATION = u'JERX001'
 INTSTANCE_LABLE = 'Toby Mac Pro'
@@ -181,4 +181,4 @@ LOGOUT_URL = '/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 IN_PRODUCTION = False
 SESSION_COOKIE_NAME = 'ets-demo'
-WAYBILL_LETTER='A'
+WAYBILL_LETTER = 'A'
