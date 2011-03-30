@@ -146,7 +146,59 @@ class Waybill(models.Model):
             return EpicPerson.objects.get(person_pk=self.recipientName)
 
         def is_bulk(self):
-            return LtiOriginal.filter(code=self.ltiNumber)[0].is_bulk()
+            return LtiOriginal.objects.filter(code=self.ltiNumber)[0].is_bulk()
+        
+        def consegnee_name(self):
+            try:
+                return LtiOriginal.objects.filter(code=self.ltiNumber)[0].consegnee_name
+            except:
+                return None
+        consegnee_name = property(consegnee_name)
+       
+        def origin_wh_code(self):
+            try:
+                return LtiOriginal.objects.filter(code=self.ltiNumber)[0].origin_wh_code
+            except:
+                return None
+        
+        origin_wh_code = property(origin_wh_code)
+        
+        def destination_loc_name(self):
+            try:
+                return LtiOriginal.objects.filter(code=self.ltiNumber)[0].destination_loc_name
+            except:
+                return None
+        
+        destination_loc_name = property(destination_loc_name)
+
+        def consegnee_code(self):
+            try:
+                return LtiOriginal.objects.filter(code=self.ltiNumber)[0].consegnee_code
+            except:
+                return None
+        
+        consegnee_code = property(consegnee_code)
+
+        def origin_wh_name(self):
+            try:
+                return LtiOriginal.objects.filter(code=self.ltiNumber)[0].origin_wh_name
+            except:
+                return None
+        
+        origin_wh_name = property(origin_wh_name)
+        
+        def hasError(self):
+            myerror = self.errors()
+            try:
+                if (myerror.errorRec != '' or myerror.errorDisp != ''):
+                    return True
+            except:
+                return None
+        
+        hasError = property(hasError)
+        
+        
+
 #### Compas Tables Imported
 
 
@@ -243,15 +295,15 @@ class LtiOriginal(models.Model):
             else:
                 return False
         def coi_code(self):
-            stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
+            stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code).order_by('-number_of_units')
             if stock_items_qs.count() > 0:
                 return str(stock_items_qs[0].origin_id[7:])
             else:
-                stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
+                stock_items_qs = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code).order_by('-number_of_units')
                 if stock_items_qs.count() > 0:
                     return str(stock_items_qs[0].origin_id[7:])
                 else:
-                    stock_items_qs = EpicStock.objects.filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code)
+                    stock_items_qs = EpicStock.objects.filter(si_code=self.si_code).filter(comm_category_code=self.comm_category_code).order_by('-number_of_units')
                     if stock_items_qs.count() > 0:
                         return str(stock_items_qs[0].origin_id[7:])
                     else:
@@ -394,18 +446,24 @@ class LoadingDetail(models.Model):
         audit_log = AuditLog()
         
         def check_stock(self):
-            thisStock = EpicStock.objects.filter(si_code=self.siNo.si_code).filter(wh_code=self.siNo.origin_wh_code)
-            #Am i in stock? # fix for bulk...
-            if self.siNo.is_bulk():
-                if self.numberUnitsLoaded > thisStock[0].quantity_net:
-                    return False
+           
+            thisStock = EpicStock.objects.filter(si_code= self.siNo.si_code).filter(wh_code = self.siNo.origin_wh_code).filter(commodity_code=self.siNo.commodity_code).order_by('-number_of_units')
+            for stock in thisStock:
+                if self.siNo.is_bulk():
+                    print 'HereB'
+                    if self.numberUnitsLoaded <= stock.quantity_net:
+                        return True
+                    else:
+                        print 'no b'
                 else:
-                    return True
-            else:
-                if self.numberUnitsLoaded > thisStock[0].number_of_units :
-                    return False
-                else:
-                    return True
+                    print 'HereN'
+                    if self.numberUnitsLoaded <= stock.number_of_units :
+                        return True
+                    else:
+                        print 'no n'
+            print 'out'
+            return False
+        
         def check_reciept_item(self): # Removed validation for offload!!!
 #             totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
 #             if totalUnitsOffloaded > self.numberUnitsLoaded:

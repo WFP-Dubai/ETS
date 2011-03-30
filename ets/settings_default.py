@@ -23,7 +23,7 @@ ALL_DB = {
         'NAME': 'waybill_pak',
         'USER': 'root',
         'PASSWORD': 'trackme',
-        'HOST': 'localhost',
+        'HOST': '10.11.208.20',
         'PORT': '',
     },
     'compas_test_pak': {

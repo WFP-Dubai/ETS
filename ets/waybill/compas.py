@@ -60,7 +60,7 @@ class compas_write:
                     lostUnits = u''
 
                 COI_CODE = unicode(lineItem.siNo.coi_code())            
-                TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE)
+                TheStockItems = TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE, wh_code=lineItem.siNo.origin_wh_code, commodity_code= lineItem.siNo.commodity_code)
                 Full_coi = TheStockItems[0].origin_id
                 comm_category_code = lineItem.siNo.comm_category_code
                 COMM_CODE = lineItem.siNo.commodity_code
@@ -173,7 +173,7 @@ class compas_write:
                     COMM_CODE = lineItem.siNo.commodity_code
                     COI_CODE = unicode(lineItem.siNo.coi_code())            
                     #get stock
-                    TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE, wh_code=ORIGIN_CODE)
+                    TheStockItems = EpicStock.objects.filter(origin_id__contains=COI_CODE, wh_code=ORIGIN_CODE, commodity_code= COMM_CODE)
                     PCKKCODE = TheStockItems[0].package_code
                     ALLCODE = TheStockItems[0].allocation_code
                     QUALITY = TheStockItems[0].qualitycode #'G'
@@ -216,7 +216,8 @@ class compas_write:
                         pass
                     else:
                         all_ok = False
-                        self.ErrorMessages += Full_coi + ":" + Response_Message.getvalue() + " "
+                        error_first_line = Response_Message.getvalue().split('\n')[0]
+                        self.ErrorMessages += Full_coi + ":" + error_first_line + " "
                         self.ErrorCodes += Full_coi + ":" + Response_Code.getvalue() + " "
                     print Response_Message.getvalue()
                     print Response_Code.getvalue()
@@ -234,13 +235,14 @@ class compas_write:
                 self.ErrorMessages = 'Problem with connection to COMPAS'
                 return False
             else:
-                print 'Issue with data'
+                print 'Issue with data1'
                 the_waybill = Waybill.objects.get(id=waybill_id)
                 self.ErrorMessages = 'Problem with data of Waybill %s: %s \n' % (the_waybill, str(errorObj.code))
                 return False
         except Exception as e:
-            print 'Issue with data'
+            print 'Issue with data2'
             the_waybill = Waybill.objects.get(id=waybill_id)
+            print self.ErrorMessages
             self.ErrorMessages = 'Problem with data of Waybill %s \n' % (the_waybill) + self.ErrorMessages
             return False
 

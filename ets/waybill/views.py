@@ -348,14 +348,12 @@ def waybill_validate_form_update(request, wb_id):
     current_wb = Waybill.objects.get(id=wb_id)
     lti_code = current_wb.ltiNumber
     current_lti = LtiOriginal.objects.filter(code=lti_code)
-    current_wb.hasError = False
     current_audit = current_wb.audit_log.all()
     current_wb.auditComment = ''
     myerror = current_wb.errors()
     
     
     if myerror:
-        current_wb.hasError = True
         current_wb.dispError = myerror.errorDisp
         current_wb.recError = myerror.errorRec
          
@@ -592,6 +590,8 @@ def waybill_reception_list(request):
             waybill.destination_loc_name = mysi.destination_loc_name
             waybill.origin_loc_name = mysi.origin_loc_name
             waybill.consegnee_name = mysi.consegnee_name
+            waybill.destination_location_code = mysi.destination_location_code
+
     return render_to_response('waybill/reception_list.html',
                               {'object_list':waybills},
                               context_instance=RequestContext(request))
@@ -611,20 +611,12 @@ def waybill_search(request):
     
     if request.user.profile != '' :    
         for waybill in found_wb:
-            #first_line=  waybill.loadingdetail_set.select_related()[0]
-            waybill.hasError = False
-            mysi = waybill.loadingdetail_set.select_related()[0].siNo
             myerror = waybill.errors()
             try:
                 if (myerror.errorRec != '' or myerror.errorDisp != ''):
-                    waybill.hasError = True
+                    pass
             except:
                 pass
-            waybill.origin_wh_code = mysi.origin_wh_code
-            waybill.consegnee_code = mysi.consegnee_code
-            waybill.destination_loc_name = mysi.destination_loc_name
-            waybill.origin_loc_name = mysi.origin_loc_name
-            waybill.consegnee_name = mysi.consegnee_name
             try:
                 curr_wh_disp = waybill.origin_wh_code
             except:
@@ -762,7 +754,7 @@ def waybill_edit(request, wb_id):
         formset = LDFormSet(request.POST, instance=current_wb)
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
-            instances = formset.save()
+            formset.save()
             return HttpResponseRedirect(reverse(waybill_view, args=[wb_new.id])) 
     else:            
         form = WaybillForm(instance=current_wb)
@@ -778,7 +770,6 @@ def waybill_validate_dispatch_form(request):
     issue = ''
     errorMessage = 'Problems with Stock, Not enough in Dispatch Warehouse'
     if request.method == 'POST':
-        valid = True
         formset = ValidateFormset(request.POST, WaybillValidationFormset)
         if  formset.is_valid() :
             instances = formset.save(commit=False)
@@ -796,7 +787,6 @@ def waybill_validate_dispatch_form(request):
                             pass
                     else:
                         form.auditComment = 'Tried to Validate Dispatch'
-                        valid = False
                         issue = 'Problems with Stock on WB:  ' + str(form)
                         form.waybillValidated = False
                         messages.add_message(request, messages.ERROR, issue)
@@ -815,7 +805,6 @@ def waybill_validate_dispatch_form(request):
                             errorlog.save()
                 except:
                         form.auditComment = 'Tried to Validate Dispatch'
-                        valid = False
                         issue = 'Problems with Stock on WB:  ' + str(form)
                         form.waybillValidated = False
                         messages.add_message(request, messages.ERROR, issue)
@@ -835,21 +824,6 @@ def waybill_validate_dispatch_form(request):
                     
             formset.save()
     waybills = Waybill.objects.filter(invalidated=False).filter(waybillValidated=False).filter(dispatcherSigned=True)
-    for waybill in waybills:
-        waybill.hasError = False
-        mysi = waybill.loadingdetail_set.select_related()[0].siNo
-        myerror = waybill.errors()
-        try:
-            if (myerror.errorRec != '' or myerror.errorDisp != ''):
-                waybill.hasError = True
-        except:
-            pass
-
-        waybill.origin_wh_code = mysi.origin_wh_code
-        waybill.consegnee_code = mysi.consegnee_code
-        waybill.destination_loc_name = mysi.destination_loc_name
-        waybill.origin_loc_name = mysi.origin_loc_name
-        waybill.consegnee_name = mysi.consegnee_name
     formset = ValidateFormset(queryset=waybills)
     return render_to_response('validate/validateForm.html', {'formset':formset, 'validatedWB':validatedWB}, context_instance=RequestContext(request))
 
