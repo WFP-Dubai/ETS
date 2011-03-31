@@ -580,6 +580,7 @@ def waybill_reception_list( request ):
 
 def waybill_search( request ):
     search_string = ''
+    isSuperUser = False
     try:
         search_string = request.GET['wbnumber']
     except:
