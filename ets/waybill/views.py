@@ -574,24 +574,6 @@ def waybill_reception( request, wb_code ):
 @login_required
 def waybill_reception_list( request ):
     waybills = Waybill.objects.filter( invalidated = False ).filter( recipientSigned = False )
-
-    for waybill in waybills:
-            waybill.hasError = False
-            mysi = waybill.loadingdetail_set.select_related()[0].siNo
-            myerror = waybill.errors()
-            try:
-                if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
-                    waybill.hasError = True
-            except:
-                pass
-
-            waybill.origin_wh_code = mysi.origin_wh_code
-            waybill.consegnee_code = mysi.consegnee_code
-            waybill.destination_loc_name = mysi.destination_loc_name
-            waybill.origin_loc_name = mysi.origin_loc_name
-            waybill.consegnee_name = mysi.consegnee_name
-            waybill.destination_location_code = mysi.destination_location_code
-
     return render_to_response( 'waybill/reception_list.html',
                               {'object_list':waybills},
                               context_instance = RequestContext( request ) )
@@ -605,28 +587,10 @@ def waybill_search( request ):
 
     found_wb = Waybill.objects.filter( invalidated = False ).filter( waybillNumber__icontains = search_string )
     my_valid_wb = []
-    curr_wh_disp = ''
-    curr_wh_rec = ''
-    curr_loc = ''
 
     if request.user.profile != '' :
         for waybill in found_wb:
-            myerror = waybill.errors()
-            try:
-                if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
-                    pass
-            except:
-                pass
-            try:
-                curr_wh_disp = waybill.origin_wh_code
-            except:
-                pass
-            try:
-                curr_wh_rec = waybill.consegnee_code
-                curr_loc = waybill.destination_loc_name
-            except:
-                pass
-            if request.user.profile.isCompasUser or request.user.profile.readerUser or ( request.user.profile.warehouses and curr_wh_disp == request.user.profile.warehouses.origin_wh_code ) or ( request.user.profile.receptionPoints and  curr_wh_rec == request.user.profile.receptionPoints.consegnee_code and curr_loc == request.user.profile.receptionPoints.LOC_NAME ) or ( request.user.profile.isAllReceiver and curr_wh_rec == 'W200000475' ):
+            if request.user.profile.isCompasUser or request.user.profile.readerUser or ( request.user.profile.warehouses and waybill.origin_wh_code == request.user.profile.warehouses.origin_wh_code ) or ( request.user.profile.receptionPoints and  waybill.consegnee_code == request.user.profile.receptionPoints.consegnee_code and waybill.destination_loc_name == request.user.profile.receptionPoints.LOC_NAME ) or ( request.user.profile.isAllReceiver and waybill.consegnee_code == 'W200000475' ):
                 my_valid_wb.append( waybill.id )
 
     if request.user.profile.superUser or request.user.profile.readerUser or request.user.profile.isCompasUser:
@@ -869,22 +833,6 @@ def waybill_validate_receipt_form( request ):
             formset.save()
 
     waybills = Waybill.objects.filter( invalidated = False ).filter( waybillReceiptValidated = False ).filter( recipientSigned = True ).filter( waybillValidated = True )
-    for waybill in waybills:
-        waybill.hasError = False
-        mysi = waybill.loadingdetail_set.select_related()[0].siNo
-
-        try:
-            myerror = waybill.errors()
-            if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
-                waybill.hasError = True
-        except:
-            pass
-
-        waybill.origin_wh_code = mysi.origin_wh_code
-        waybill.consegnee_code = mysi.consegnee_code
-        waybill.destination_loc_name = mysi.destination_loc_name
-        waybill.origin_loc_name = mysi.origin_loc_name
-        waybill.consegnee_name = mysi.consegnee_name
     formset = ValidateFormset( queryset = waybills )
 
     return render_to_response( 'validate/validateReceiptForm.html', {'formset':formset, 'validatedWB':validatedWB}, context_instance = RequestContext( request ) )

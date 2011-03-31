@@ -197,6 +197,14 @@ class Waybill( models.Model ):
 
         hasError = property( hasError )
 
+        def destination_location_code( self ):
+            try:
+                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
+            except:
+                return None
+
+        destination_location_code = property( destination_location_code )
+
 
 
 #### Compas Tables Imported

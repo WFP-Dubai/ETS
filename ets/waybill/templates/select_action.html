@@ -13,11 +13,11 @@ Select an action:
 {%if myprofile.readerUser or myprofile.superUser%}<li><a href='{%url ets.waybill.views.ltis%}'>View LTIs</a>{%endif%}
 {%if myprofile.superUser%}<li><a href="{%url  ets.waybill.views.select_report%}">Reports</a>{%endif%}
 <li><a href="{%url  ets.waybill.views.select_data%}">Download Data</a>
-<li><form action='waybill/findwb'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
+<li><form action='{%url ets.waybill.views.waybill_search%}'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
 <li>&nbsp;{%if myprofile.isReciever%}<li>Scan Waybill --><form method='POST' action='waybill/deserialize/'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill" /></form></li>{%endif%}
 </ul>
 {%else%}
-Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>login</a>
+Please log in <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>login</a>
 {%endif%}
 {%print_tag%}
 {%endblock%}
