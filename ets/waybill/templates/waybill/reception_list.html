@@ -1,6 +1,6 @@
 {% extends "base_template.html"%}
 {%block content %}
- <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+ <table title="Waybills Ready for receipt" summary="waybills to receive" cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
         <tr><th>LTI</th><th>Waybill Number</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Dispatched Date</th><th>Action</th></tr>
         </thead>
@@ -26,16 +26,14 @@
              <td>{{waybill.destination_loc_name}}</td>
              <td>{{waybill.dateOfDispatch}}</td>
              <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
-    </tr>
-            {%endif%}
+    </tr>{%endif%}
         {%endif%}
     {%endif%}
-    
 {%endfor%}
 </table>
 {%endblock%}
 {%block extra-header%}
-<script charset="utf-8">
+<script charset="utf-8" type="application/javascript">
 $(document).ready(function() {
                 $('#example').dataTable( {});
 } );
