@@ -46,7 +46,7 @@
 <div>
 <br>
 
-<table>
+<table summary=" ">
 <tr><td colspan="3">Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
 
 <tr><td>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
@@ -56,13 +56,13 @@
 
 </div>
 
-<input type="submit" value="Save & Print"> {% csrf_token %}
+<input type="submit" value="Save &amp; Print"> {% csrf_token %}
 </form>
 
 
 {%endblock%}
 {%block extra-header%}
-<script charset="utf-8">
+<script charset="utf-8" type="application/javascript">
 $(document).ready(function() {
                 $('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
                 $('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });

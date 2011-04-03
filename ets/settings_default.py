@@ -1,5 +1,5 @@
 # Django settings for ets project.
-print 'Settings Default'
+#print 'Settings Default'
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 

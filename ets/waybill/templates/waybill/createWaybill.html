@@ -48,6 +48,7 @@
     	  	<td>{{ sform.siNo }}</td>
     	  	<td>{{ sform.numberUnitsLoaded }} {%for error in sform.numberUnitsLoaded.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}</td>
     	  	<td>{{ sform.overloadedUnits}}</td>
+    	  	<td>{{sform.coi_code}}</td>
     	</tr>
     	{% endfor %}
  	</table>

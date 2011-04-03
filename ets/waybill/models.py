@@ -11,23 +11,23 @@ from audit_log.models.managers import AuditLog
 
 # Create your models here.
 class Places( models.Model ):
-        org_code = models.CharField( max_length = 7, primary_key = True )
-        name = models.CharField( max_length = 100 )
-        geo_point_code = models.CharField( max_length = 4 )
-        geo_name = models.CharField( max_length = 100 )
-        country_code = models.CharField( max_length = 3 )
-        reporting_code = models.CharField( max_length = 7 )
-        organization_id = models.CharField( max_length = 20 )
+    org_code = models.CharField( max_length = 7, primary_key = True )
+    name = models.CharField( max_length = 100 )
+    geo_point_code = models.CharField( max_length = 4 )
+    geo_name = models.CharField( max_length = 100 )
+    country_code = models.CharField( max_length = 3 )
+    reporting_code = models.CharField( max_length = 7 )
+    organization_id = models.CharField( max_length = 20 )
 
-        def __unicode__( self ):
-                return self.name
+    def __unicode__( self ):
+        return self.name
 
-        class Meta:
-                db_table = u'epic_geo'
+    class Meta:
+        db_table = u'epic_geo'
 
 
 class Waybill( models.Model ):
-        transaction_type_choice = ( 
+    transaction_type_choice = ( 
                         ( u'WIT', u'WFP Internal' ),
                         ( u'DEL', u'Delivery' ),
                         ( u'SWA', u'Swap' ),
@@ -42,7 +42,7 @@ class Waybill( models.Model ):
                         ( u'SHU', u'Shunting' ),
                         ( u'COS', u'Costal Transshipment' ),
                 )
-        transport_type = ( 
+    transport_type = ( 
                         ( u'02', u'Road' ),
                         ( u'01', u'Rail' ),
                         ( u'04', u'Air' ),
@@ -51,160 +51,164 @@ class Waybill( models.Model ):
                         ( u'07', u'Multi-mode' ),
 #                        (u'O', u'Other Please Specify')
                 )
-        #general
-        ltiNumber = models.CharField( max_length = 20 )
-        waybillNumber = models.CharField( max_length = 20 )
-        dateOfLoading = models.DateField( null = True, blank = True )
-        dateOfDispatch = models.DateField( null = True, blank = True )
-        transactionType = models.CharField( max_length = 10, choices = transaction_type_choice )
-        transportType = models.CharField( max_length = 10, choices = transport_type )
-        #Dispatcher
-        dispatchRemarks = models.CharField( max_length = 200 )
-        dispatcherName = models.TextField( blank = True, null = True )
-        dispatcherTitle = models.TextField( blank = True )
-        dispatcherSigned = models.BooleanField( blank = True )
-        #Transporter
-        transportContractor = models.TextField( blank = True )
-        transportSubContractor = models.TextField( blank = True )
-        transportDriverName = models.TextField( blank = True )
-        transportDriverLicenceID = models.TextField( blank = True )
-        transportVehicleRegistration = models.TextField( blank = True )
-        transportTrailerRegistration = models.TextField( blank = True )
-        transportDispachSigned = models.BooleanField( blank = True )
-        transportDispachSignedTimestamp = models.DateTimeField( null = True, blank = True )
-        transportDeliverySigned = models.BooleanField( blank = True )
-        transportDeliverySignedTimestamp = models.DateTimeField( null = True, blank = True )
 
-        #Container        
-        containerOneNumber = models.CharField( max_length = 40, blank = True )
-        containerTwoNumber = models.CharField( max_length = 40, blank = True )
-        containerOneSealNumber = models.CharField( max_length = 40, blank = True )
-        containerTwoSealNumber = models.CharField( max_length = 40, blank = True )
-        containerOneRemarksDispatch = models.CharField( max_length = 40, blank = True )
-        containerTwoRemarksDispatch = models.CharField( max_length = 40, blank = True )
-        containerOneRemarksReciept = models.CharField( max_length = 40, blank = True )
-        containerTwoRemarksReciept = models.CharField( max_length = 40, blank = True )
+    ltiNumber = models.CharField( max_length = 20 )
+    waybillNumber = models.CharField( max_length = 20 )
+    dateOfLoading = models.DateField( null = True, blank = True )
+    dateOfDispatch = models.DateField( null = True, blank = True )
+    transactionType = models.CharField( max_length = 10, choices = transaction_type_choice )
+    transportType = models.CharField( max_length = 10, choices = transport_type )
+    #Dispatcher
+    dispatchRemarks = models.CharField( max_length = 200 )
+    dispatcherName = models.TextField( blank = True, null = True )
+    dispatcherTitle = models.TextField( blank = True )
+    dispatcherSigned = models.BooleanField( blank = True )
+    #Transporter
+    transportContractor = models.TextField( blank = True )
+    transportSubContractor = models.TextField( blank = True )
+    transportDriverName = models.TextField( blank = True )
+    transportDriverLicenceID = models.TextField( blank = True )
+    transportVehicleRegistration = models.TextField( blank = True )
+    transportTrailerRegistration = models.TextField( blank = True )
+    transportDispachSigned = models.BooleanField( blank = True )
+    transportDispachSignedTimestamp = models.DateTimeField( null = True, blank = True )
+    transportDeliverySigned = models.BooleanField( blank = True )
+    transportDeliverySignedTimestamp = models.DateTimeField( null = True, blank = True )
 
-        #Reciver
-        recipientLocation = models.CharField( max_length = 100, blank = True )
-        recipientConsingee = models.CharField( max_length = 100, blank = True )
-        recipientName = models.CharField( max_length = 100, blank = True )
-        recipientTitle = models.CharField( max_length = 100, blank = True )
-        recipientArrivalDate = models.DateField( null = True, blank = True )
-        recipientStartDischargeDate = models.DateField( null = True, blank = True )
-        recipientEndDischargeDate = models.DateField( null = True, blank = True )
-        recipientDistance = models.IntegerField( blank = True, null = True )
-        recipientRemarks = models.TextField( blank = True )
-        recipientSigned = models.BooleanField( blank = True )
-        recipientSignedTimestamp = models.DateTimeField( null = True, blank = True )
-        destinationWarehouse = models.ForeignKey( Places, blank = True )
+    #Container        
+    containerOneNumber = models.CharField( max_length = 40, blank = True )
+    containerTwoNumber = models.CharField( max_length = 40, blank = True )
+    containerOneSealNumber = models.CharField( max_length = 40, blank = True )
+    containerTwoSealNumber = models.CharField( max_length = 40, blank = True )
+    containerOneRemarksDispatch = models.CharField( max_length = 40, blank = True )
+    containerTwoRemarksDispatch = models.CharField( max_length = 40, blank = True )
+    containerOneRemarksReciept = models.CharField( max_length = 40, blank = True )
+    containerTwoRemarksReciept = models.CharField( max_length = 40, blank = True )
 
-        #Extra Fields
-        waybillValidated = models.BooleanField()
-        waybillReceiptValidated = models.BooleanField()
-        waybillSentToCompas = models.BooleanField()
-        waybillRecSentToCompas = models.BooleanField()
-        waybillProcessedForPayment = models.BooleanField()
-        invalidated = models.BooleanField()
-        auditComment = models.TextField( null = True, blank = True )
-        audit_log = AuditLog()
+    #Reciver
+    recipientLocation = models.CharField( max_length = 100, blank = True )
+    recipientConsingee = models.CharField( max_length = 100, blank = True )
+    recipientName = models.CharField( max_length = 100, blank = True )
+    recipientTitle = models.CharField( max_length = 100, blank = True )
+    recipientArrivalDate = models.DateField( null = True, blank = True )
+    recipientStartDischargeDate = models.DateField( null = True, blank = True )
+    recipientEndDischargeDate = models.DateField( null = True, blank = True )
+    recipientDistance = models.IntegerField( blank = True, null = True )
+    recipientRemarks = models.TextField( blank = True )
+    recipientSigned = models.BooleanField( blank = True )
+    recipientSignedTimestamp = models.DateTimeField( null = True, blank = True )
+    destinationWarehouse = models.ForeignKey( Places, blank = True )
 
-        def  __unicode__( self ):
-                return self.waybillNumber
+    #Extra Fields
+    waybillValidated = models.BooleanField()
+    waybillReceiptValidated = models.BooleanField()
+    waybillSentToCompas = models.BooleanField()
+    waybillRecSentToCompas = models.BooleanField()
+    waybillProcessedForPayment = models.BooleanField()
+    invalidated = models.BooleanField()
+    auditComment = models.TextField( null = True, blank = True )
+    audit_log = AuditLog()
 
-        def mydesc( self ):
-                return self.waybillNumber
+    def  __unicode__( self ):
+            return self.waybillNumber
 
-        def errors( self ):
-            try:
-                return CompasLogger.objects.get( wb = self )
-            except:
-                return ''
+    def mydesc( self ):
+            return self.waybillNumber
 
-        def check_lines( self ):
-            lines = LoadingDetail.objects.filter( wbNumber = self )
-            for line in lines:
-                if line.check_stock():
-                    pass
-                else:
-                    return False
-            return True
+    def errors( self ):
+        try:
+            return CompasLogger.objects.get( wb = self )
+        except:
+            return ''
 
-        def check_lines_receipt( self ):
-            lines = LoadingDetail.objects.filter( wbNumber = self )
-            for line in lines:
-                if line.check_reciept_item():
-                    pass
-                else:
-                    return False
-            return True
+    def check_lines( self ):
+        lines = LoadingDetail.objects.filter( wbNumber = self )
+        for line in lines:
+            if line.check_stock():
+                pass
+            else:
+                return False
+        return True
 
-        def dispatch_person( self ):
-            return EpicPerson.objects.get( person_pk = self.dispatcherName )
+    def check_lines_receipt( self ):
+        lines = LoadingDetail.objects.filter( wbNumber = self )
+        for line in lines:
+            if line.check_receipt_item():
+                pass
+            else:
+                return False
+        return True
 
-        def receipt_person( self ):
-            return EpicPerson.objects.get( person_pk = self.recipientName )
+    def dispatch_person( self ):
+        return EpicPerson.objects.get( person_pk = self.dispatcherName )
 
-        def is_bulk( self ):
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk()
+    def receipt_person( self ):
+        return EpicPerson.objects.get( person_pk = self.recipientName )
 
-        def consegnee_name( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
-            except:
-                return None
-        consegnee_name = property( consegnee_name )
+    def is_bulk( self ):
+        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk()
 
-        def origin_wh_code( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_code
-            except:
-                return None
+    def consegnee_name( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
+        except:
+            return None
+    consegnee_name = property( consegnee_name )
 
-        origin_wh_code = property( origin_wh_code )
+    def origin_wh_code( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_code
+        except:
+            return None
 
-        def destination_loc_name( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_loc_name
-            except:
-                return None
+    origin_wh_code = property( origin_wh_code )
 
-        destination_loc_name = property( destination_loc_name )
+    def destination_loc_name( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_loc_name
+        except:
+            return None
 
-        def consegnee_code( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_code
-            except:
-                return None
+    destination_loc_name = property( destination_loc_name )
 
-        consegnee_code = property( consegnee_code )
+    def consegnee_code( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_code
+        except:
+            return None
 
-        def origin_wh_name( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_name
-            except:
-                return None
+    consegnee_code = property( consegnee_code )
 
-        origin_wh_name = property( origin_wh_name )
+    def origin_wh_name( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_name
+        except:
+            return None
 
-        def hasError( self ):
-            myerror = self.errors()
-            try:
-                if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
-                    return True
-            except:
-                return None
+    origin_wh_name = property( origin_wh_name )
 
-        hasError = property( hasError )
+    def hasError( self ):
+        myerror = self.errors()
+        try:
+            if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
+                return True
+        except:
+            return None
 
-        def destination_location_code( self ):
-            try:
-                return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
-            except:
-                return None
+    hasError = property( hasError )
 
-        destination_location_code = property( destination_location_code )
-
+    def destination_location_code( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
+        except:
+            return None
+    destination_location_code = property( destination_location_code )
+#    def lti_date( self ):
+#        try:
+#            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].lti_date
+#        except:
+#            return None
+#    lti_date = property( lti_date )
 
 
 #### Compas Tables Imported
@@ -217,114 +221,111 @@ Models based on compas Views & Tables
 LTIs for office 
 """
 class LtiOriginal( models.Model ):
-        lti_pk = models.CharField( max_length = 50, primary_key = True, db_column = 'LTI_PK' )
-        lti_id = models.CharField( max_length = 40, db_column = 'LTI_ID' )
-        code = models.CharField( max_length = 40, db_column = 'CODE' )
-        lti_date = models.DateField( db_column = 'LTI_DATE' )
-        expiry_date = models.DateField( blank = True, null = True, db_column = 'EXPIRY_DATE' )
-        transport_code = models.CharField( max_length = 4, db_column = 'TRANSPORT_CODE' )
-        transport_ouc = models.CharField( max_length = 13, db_column = 'TRANSPORT_OUC' )
-        transport_name = models.CharField( max_length = 30, db_column = 'TRANSPORT_NAME' )
-        origin_type = models.CharField( max_length = 1, db_column = 'ORIGIN_TYPE' )
-        origintype_desc = models.CharField( max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
-        origin_location_code = models.CharField( max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
-        origin_loc_name = models.CharField( max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
-        origin_wh_code = models.CharField( max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
-        origin_wh_name = models.CharField( max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
-        destination_location_code = models.CharField( max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
-        destination_loc_name = models.CharField( max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
-        consegnee_code = models.CharField( max_length = 12, db_column = 'CONSEGNEE_CODE' )
-        consegnee_name = models.CharField( max_length = 80, db_column = 'CONSEGNEE_NAME' )
-        requested_dispatch_date = models.DateField( blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
-        project_wbs_element = models.CharField( max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
-        si_record_id = models.CharField( max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
-        si_code = models.CharField( max_length = 8, db_column = 'SI_CODE' )
-        comm_category_code = models.CharField( max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
-        commodity_code = models.CharField( max_length = 18, db_column = 'COMMODITY_CODE' )
-        cmmname = models.CharField( max_length = 100, blank = True, db_column = 'CMMNAME' )
-        quantity_net = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
-        quantity_gross = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
-        number_of_units = models.DecimalField( max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
-        unit_weight_net = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
-        unit_weight_gross = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
+    lti_pk = models.CharField( max_length = 50, primary_key = True, db_column = 'LTI_PK' )
+    lti_id = models.CharField( max_length = 40, db_column = 'LTI_ID' )
+    code = models.CharField( max_length = 40, db_column = 'CODE' )
+    lti_date = models.DateField( db_column = 'LTI_DATE' )
+    expiry_date = models.DateField( blank = True, null = True, db_column = 'EXPIRY_DATE' )
+    transport_code = models.CharField( max_length = 4, db_column = 'TRANSPORT_CODE' )
+    transport_ouc = models.CharField( max_length = 13, db_column = 'TRANSPORT_OUC' )
+    transport_name = models.CharField( max_length = 30, db_column = 'TRANSPORT_NAME' )
+    origin_type = models.CharField( max_length = 1, db_column = 'ORIGIN_TYPE' )
+    origintype_desc = models.CharField( max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
+    origin_location_code = models.CharField( max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
+    origin_loc_name = models.CharField( max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
+    origin_wh_code = models.CharField( max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
+    origin_wh_name = models.CharField( max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
+    destination_location_code = models.CharField( max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
+    destination_loc_name = models.CharField( max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
+    consegnee_code = models.CharField( max_length = 12, db_column = 'CONSEGNEE_CODE' )
+    consegnee_name = models.CharField( max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    requested_dispatch_date = models.DateField( blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
+    project_wbs_element = models.CharField( max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
+    si_record_id = models.CharField( max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
+    si_code = models.CharField( max_length = 8, db_column = 'SI_CODE' )
+    comm_category_code = models.CharField( max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
+    commodity_code = models.CharField( max_length = 18, db_column = 'COMMODITY_CODE' )
+    cmmname = models.CharField( max_length = 100, blank = True, db_column = 'CMMNAME' )
+    quantity_net = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
+    quantity_gross = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
+    number_of_units = models.DecimalField( max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
+    unit_weight_net = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
+    unit_weight_gross = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
 
 
-        class Meta:
-                db_table = u'epic_lti'
+    class Meta:
+            db_table = u'epic_lti'
 
-        def  __unicode__( self ):
-            return u"%s %s  %s  %.0f " % ( self.valid(), self.coi_code(), self.cmmname, self.items_left() )
+    def  __unicode__( self ):
+        return u"%s %s  %s  %.0f " % ( self.valid(), self.coi_code(), self.cmmname, self.items_left() )
 
-        def mydesc( self ):
-            return self.code
-        def commodity( self ):
-            return self.cmmname
-        def valid( self ):
-            if RemovedLtis.objects.filter( lti = self.lti_pk ):
-                return "Void "
+    def mydesc( self ):
+        return self.code
+    def commodity( self ):
+        return self.cmmname
+    def valid( self ):
+        if RemovedLtis.objects.filter( lti = self.lti_pk ):
+            return "Void "
+        else:
+            return ''
+    def items_left( self ):
+            lines = LoadingDetail.objects.filter( siNo = self )
+            used = 0
+
+            for line in lines:
+                used += line.numberUnitsLoaded
+            if self.is_bulk():
+                return self.quantity_net - used
             else:
-                return ''
-        def items_left( self ):
-                lines = LoadingDetail.objects.filter( siNo = self )
-                used = 0
+                return self.number_of_units - used
+    def reduce_si( self, units ):
+            self.sitracker.update_units( units )
+            return self.items_left()
 
-                for line in lines:
-                    used += line.numberUnitsLoaded
-                if self.is_bulk():
-                    return self.quantity_net - used
-                else:
-                    return self.number_of_units - used
-        def reduce_si( self, units ):
-                self.sitracker.update_units( units )
-                return self.items_left()
+    def restore_si( self, units ):
+            self.sitracker.update_units_restore( units )
+            return self.items_left()
 
-#        def inStock(self):
-#            try:
-#                thisItem = EpicStock.objects.filter(wh_code=self.origin_wh_code).filter(si_code=self.si_code).filter(commodity_code=self.commodity_code)
-#            except:
-#                pass
-#            return 
-        def restore_si( self, units ):
-                self.sitracker.update_units_restore( units )
-                return self.items_left()
-        def packaging( self ):
-            pack = 'Unknown'
-            try:
-                mypkg = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
-                pack = str( mypkg[0].packagename )
-            except:
-                pass
-            return pack
+    def packaging( self ):
+        pack = 'Unknown'
+        try:
+            mypkg = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+            pack = str( mypkg[0].packagename )
+        except:
+            pass
+        return pack
 
-        def is_bulk( self ):
-            mypkg = self.packaging()
-            if mypkg == 'BULK':
-                return True
-            else:
-                return False
-        def coi_code( self ):
-            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+    def is_bulk( self ):
+        mypkg = self.packaging()
+        if mypkg == 'BULK':
+            return True
+        else:
+            return False
+
+    def coi_code( self ):
+        stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+        if stock_items_qs.count() > 0:
+            return str( stock_items_qs[0].origin_id[7:] )
+        else:
+            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
             if stock_items_qs.count() > 0:
                 return str( stock_items_qs[0].origin_id[7:] )
             else:
-                stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
+                stock_items_qs = EpicStock.objects.filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
                 if stock_items_qs.count() > 0:
                     return str( stock_items_qs[0].origin_id[7:] )
                 else:
-                    stock_items_qs = EpicStock.objects.filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
-                    if stock_items_qs.count() > 0:
-                        return str( stock_items_qs[0].origin_id[7:] )
-                    else:
-                        return 'No Stock '
-
-        def remove_lti( self ):
-            all_removed = RemovedLtis.objects.all()
-            this_lti = RemovedLtis()
-            this_lti.lti = self
-            if this_lti not in all_removed:
-                this_lti.save()
-        def get_stocks( self ):
-            return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+                    return 'No Stock '
+    def related_stock( self ):
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+    def remove_lti( self ):
+        all_removed = RemovedLtis.objects.all()
+        this_lti = RemovedLtis()
+        this_lti.lti = self
+        if this_lti not in all_removed:
+            this_lti.save()
+    def get_stocks( self ):
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
 
 
 
@@ -336,7 +337,6 @@ class RemovedLtisManager( models.Manager ):
                 listExl += [exl.lti.lti_pk]
             return listExl
 
-## helper table for nolonger existing lti items
 class RemovedLtis( models.Model ):
         lti = models.ForeignKey( LtiOriginal, primary_key = True )
         objects = RemovedLtisManager()
@@ -371,6 +371,10 @@ class EpicPerson( models.Model ):
                 return self.last_name + ', ' + self.first_name
 
 
+class StockModel( models.Manager ):
+    def get_query_set( self ):
+        return super( StockModel, self ).get_query_set().filter( number_of_units__gt = 0 )
+
 class EpicStock( models.Model ):
         wh_pk = models.CharField( max_length = 90, blank = True, primary_key = True )
         wh_regional = models.CharField( max_length = 4, blank = True )
@@ -394,20 +398,23 @@ class EpicStock( models.Model ):
         number_of_units = models.IntegerField()
         allocation_code = models.CharField( max_length = 10 )
         reference_number = models.CharField( max_length = 50 )
+        objects = models.Manager()
+        in_stock_objects = StockModel()
 
         class Meta:
                 db_table = u'epic_stock'
 
-
         def  __unicode__( self ):
-                return self.wh_name + '\t' + self.cmmname + '\t' + str( self.number_of_units )
+                return self.wh_name + '\t' + self.cmmname + '\t' + str( self.number_of_units ) + '\t' + self.coi_code()
 
         def packaging_description_short( self ):
             try:
-                pck = PackagingDescriptonShort.objects.get( pk = self.package_code )
+                pck = PackagingDescriptionShort.objects.get( pk = self.package_code )
                 return pck.packageShortName
             except:
                 return self.packagename
+        def coi_code( self ):
+            return self.origin_id[7:]
 
 class EpicLossReason( models.Model ):
         REASON_CODE = models.CharField( max_length = 5, primary_key = True )
@@ -447,6 +454,7 @@ class LoadingDetail( models.Model ):
         unitsDamagedReason = models.ForeignKey( LossesDamagesReason, related_name = 'LD_DamagedReason', blank = True, null = True )
         unitsDamagedType = models.ForeignKey( LossesDamagesType, related_name = 'LD_DamagedType', blank = True, null = True )
         unitsLostType = models.ForeignKey( LossesDamagesType, related_name = 'LD_LossType', blank = True, null = True )
+        coi_code = models.CharField( max_length = 12, blank = True, null = True )
         overloadedUnits = models.BooleanField()
         loadingDetailSentToCompas = models.BooleanField()
         overOffloadUnits = models.BooleanField()
@@ -454,30 +462,18 @@ class LoadingDetail( models.Model ):
         audit_log = AuditLog()
 
         def check_stock( self ):
-
             thisStock = EpicStock.objects.filter( si_code = self.siNo.si_code ).filter( wh_code = self.siNo.origin_wh_code ).filter( commodity_code = self.siNo.commodity_code ).order_by( '-number_of_units' )
             for stock in thisStock:
                 if self.siNo.is_bulk():
-                    print 'HereB'
                     if self.numberUnitsLoaded <= stock.quantity_net:
                         return True
-                    else:
-                        print 'no b'
                 else:
-                    print 'HereN'
                     if self.numberUnitsLoaded <= stock.number_of_units :
                         return True
-                    else:
-                        print 'no n'
-            print 'out'
             return False
 
-        def check_reciept_item( self ): # Removed validation for offload!!!
-#             totalUnitsOffloaded = self.numberUnitsGood+ self.numberUnitsDamaged + self.numberUnitsLost
-#             if totalUnitsOffloaded > self.numberUnitsLoaded:
-#                 return False
-#             else:
-                return True
+        def check_receipt_item( self ):
+            return True
 
         def get_stock_item( self ):
             try:
@@ -576,24 +572,24 @@ User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )
 
 
 class SiTracker( models.Model ):
-        LTI = models.OneToOneField( LtiOriginal, primary_key = True )
-        number_units_left = models.DecimalField( decimal_places = 3, max_digits = 10 )
-        number_units_start = models.DecimalField( decimal_places = 3, max_digits = 10 )
+    LTI = models.OneToOneField( LtiOriginal, primary_key = True )
+    number_units_left = models.DecimalField( decimal_places = 3, max_digits = 10 )
+    number_units_start = models.DecimalField( decimal_places = 3, max_digits = 10 )
 
-        def update_units( self, ammount ):
-                self.number_units_left -= ammount
-                self.save()
-        def update_units_restore( self, ammount ):
-                self.number_units_left += ammount
-                self.save()
-        def  __unicode__( self ):
-                return self.number_units_left
+    def update_units( self, ammount ):
+        self.number_units_left -= ammount
+        self.save()
+    def update_units_restore( self, ammount ):
+        self.number_units_left += ammount
+        self.save()
+    def  __unicode__( self ):
+        return self.number_units_left
 
-class PackagingDescriptonShort( models.Model ):
-        packageCode = models.CharField( primary_key = True, max_length = 5 )
-        packageShortName = models.CharField( max_length = 10 )
-        def  __unicode__( self ):
-                return self.packageCode + ' - ' + self.packageShortName
+class PackagingDescriptionShort( models.Model ):
+    packageCode = models.CharField( primary_key = True, max_length = 5 )
+    packageShortName = models.CharField( max_length = 10 )
+    def  __unicode__( self ):
+        return self.packageCode + ' - ' + self.packageShortName
 
 
 class CompasLogger( models.Model ):

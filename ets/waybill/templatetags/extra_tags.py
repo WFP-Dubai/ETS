@@ -62,14 +62,11 @@ def do_print_tag( parser, token ):
 
 class PrintTagNode( template.Node ):
     def render( self, context ):
-        print 'One'
         try:
             logfile = 'tagfile.tag'
             FILE = open( logfile )
             the_date = FILE.read()
             print the_date[0:19]
-
-
             return '<small>Latest COMPAS import:' + the_date[0:19] + '</small>'
         except Exception as e:
             print e

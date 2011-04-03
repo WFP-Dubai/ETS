@@ -606,10 +606,16 @@ def waybill_search( request ):
 @login_required
 def waybillCreate( request, lti_code ):
     # get the LTI info 2
+    c_sis = []
     current_lti = LtiOriginal.objects.filter( code = lti_code )
+    for lti in current_lti:
+        c_sis.append( lti.si_code )
 
+    current_stock = EpicStock.in_stock_objects.filter( si_code__in = c_sis ).filter( wh_code = current_lti[0].origin_wh_code )
+    for st in current_stock:
+        print st
     class LoadingDetailDispatchForm( ModelForm ):
-        siNo = ModelChoiceField( queryset = LtiOriginal.objects.filter( code = lti_code ), label = 'Commodity' )
+        siNo = ModelChoiceField( queryset = current_lti, label = 'Commodity' )
         overload = forms.BooleanField( required = False )
         class Meta:
             model = LoadingDetail
@@ -640,9 +646,7 @@ def waybillCreate( request, lti_code ):
     if request.method == 'POST':
         form = WaybillForm( request.POST )
         form.fields["destinationWarehouse"].queryset = Places.objects.filter( geo_name = current_lti[0].destination_loc_name )
-        ## Make Better using the organization_id
         formset = LDFormSet( request.POST )
-#        tempinstances = formset.save(commit=False)
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
             instances = formset.save( commit = False )
@@ -868,7 +872,7 @@ def fixtures_serialize():
     #     DispatchPoint
     dispatchPointsData = DispatchPoint.objects.all()
     receptionPointData = ReceptionPoint.objects.all()
-    packagingDescriptonShort = PackagingDescriptonShort.objects.all()
+    packagingDescriptonShort = PackagingDescriptionShort.objects.all()
     lossesDamagesReason = LossesDamagesReason.objects.all()
     lossesDamagesType = LossesDamagesType.objects.all()
     serialized_data = serializers.serialize( 'json', list( dispatchPointsData ) + list( receptionPointData ) + list( packagingDescriptonShort ) + list( lossesDamagesReason ) + list( lossesDamagesType ) )
