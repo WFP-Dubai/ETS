@@ -1,12 +1,12 @@
 Frameworks Used:
 Django
-django-audit-log http://code.google.com/p/django-audit-log/
+django-audit-log https://github.com/Atomidata/django-audit-log
 MySQLdb
 cx_Oracle
 
 Requirements:
 Oracle connection (using instantclient)
-MySQL for server/sqlite for client
+MySQL for server
 
 
 

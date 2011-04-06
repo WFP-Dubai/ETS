@@ -2,7 +2,7 @@
 
 {%block content %}
 <h3>Warehouse: {{user.profile.warehouses.origin_wh_name}}</h3>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="example" summary="LTIs">
     <thead>
         <tr><th>LTI</th><th>Date</th><th>Destination</th><th>Dest Location</th><th>Action</th></tr>
         </thead>
@@ -25,7 +25,7 @@
     </table>
 {%endblock%}
 {%block extra-header%}
-<script charset="utf-8">
+<script charset="utf-8" type="text/javascript">
 $(document).ready(function() {
                 $('#example').dataTable({
 		"aaSorting": [[ 0, "asc" ]],
