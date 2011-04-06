@@ -3,35 +3,34 @@ from ets.waybill.models import *
 from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.admin import UserAdmin
-
+from django.utils.functional import curry
 
 class UserProfileInline( admin.StackedInline ):
     model = UserProfile
     verbose_name_plural = 'User Profile'
+    extra = 0
 
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
             if db_field.name == "warehouses":
                 kwargs["queryset"] = DispatchPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
             if db_field.name == "receptionPoints":
                 kwargs["queryset"] = ReceptionPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
-
             return super( UserProfileInline, self ).formfield_for_foreignkey( db_field, request, **kwargs )
-
+    def get_formset( self, request, obj = None, **kwargs ):
+        if  obj:
+            self.extra = 1
+        else:
+            self.extra = 0
+        return super( UserProfileInline, self ).get_formset( request, obj, **kwargs )
 
 class MyUserAdmin( UserAdmin ):
     list_display = ( 'username', 'first_name', 'last_name', 'email' )
     inlines = [UserProfileInline, ]
     fieldsets = [
-    ( None, {'fields':[  'username', 'password', 'first_name', 'last_name', 'email']} ),
-    ( 'Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']} ),
-    ( 'Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']} )
+                ( None, {'fields':[  'username', 'password', 'first_name', 'last_name', 'email']} ),
+                ( 'Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']} ),
+                ( 'Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']} )
     ]
-    def add_view( self, request, obj = None, **kwargs ):
-        # hide every other field apart from url
-        # if we are adding
-        if obj is None:
-            super( MyUserAdmin, self ).__setattr__( 'inline', None )
-        return super( MyUserAdmin, self ).add_view( request, obj, **kwargs )
 
 
 class EpicPersonsAdmin( admin.ModelAdmin ):
