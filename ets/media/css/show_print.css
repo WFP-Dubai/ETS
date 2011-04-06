@@ -17,7 +17,7 @@ img{position: relative; left: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
 .hidden{
 	display: none;
-	visibility: hide;
+	visibility: hidden;
 }
 .shown{
 	display:inherit;

@@ -23,7 +23,7 @@ img{position: relative; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
 .hidden{
 	display: none;
-	visibility: hide;
+	visibility:hidden;
 	height: 0px;
 	margin: 0px;
 	padding: 0px;
@@ -31,7 +31,7 @@ img{position: relative; text-align: right;}
 }
 .hidden_print{
 	display: none;
-	visibility: hide;
+	visibility: hidden;
 	height: 0px;
 	margin: 0px;
 	padding: 0px;

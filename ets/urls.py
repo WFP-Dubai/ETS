@@ -19,4 +19,5 @@ urlpatterns = patterns( '',
     ( r'^admin/', include( admin.site.urls ) ),
     #(r'^dojango/', include('dojango.urls')),
     #(r'^accounts/login/$',login),
+
  )
