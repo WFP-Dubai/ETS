@@ -242,9 +242,9 @@ class MyModelChoiceField( ModelChoiceField ):
 class LoadingDetailDispatchForm( ModelForm ):
     class Meta:
         model = LoadingDetail
-        fields = ( 'siNo', 'numberUnitsLoaded' )
+        fields = ( 'order_item', 'numberUnitsLoaded' )
 
 class LoadingDetailRecieptForm( ModelForm ):
     class Meta:
         model = LoadingDetail
-        fields = ( 'siNo', 'numberUnitsLoaded', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 'unitsDamagedReason', )
+        fields = ( 'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 'unitsDamagedReason', )

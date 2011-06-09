@@ -1,12 +1,17 @@
 from django.conf.urls.defaults import *
-from ets.waybill.views import *
-from ets.waybill.tools import *
-from ets.waybill.models import LtiOriginal
-from django.views.generic.simple import *
+from ets.waybill.views import select_action, viewLogView, waybillCreate, deserialize, dispatch, waybill_edit
+from ets.waybill.views import waybill_search, import_ltis, lti_detail_url, listOfLtis, waybill_finalize_receipt
+from ets.waybill.views import waybill_finalize_dispatch, waybill_reception, waybill_reception_list, serialize, profile, ltis
+from ets.waybill.views import waybill_validate_dispatch_form, waybill_validate_receipt_form, waybill_validate_form_update, waybill_view_reception
+from ets.waybill.views import waybill_view, receiptToCompas, singleWBDispatchToCompas, singleWBReceiptToCompas, listCompasWB
+from ets.waybill.views import invalidate_waybill, view_stock, ltis_report, select_report
+from ets.waybill.views import dispatch_report_wh, receipt_report_wh, receipt_report_cons, barcode_qr, post_synchronize_waybill, select_data, get_synchronize_stock, get_synchronize_lti, get_synchronize_waybill, get_synchronize_waybill2, get_all_data_download, get_all_data, get_wb_stock
+#from ets.waybill.tools import *
+from ets.waybill.models import LtiOriginal, Waybill
+from django.views.generic.simple import redirect_to, direct_to_template
 from django.contrib import databrowse
-
+from django.views.generic.list_detail import object_list
 from django.contrib.auth.views import login, logout, password_change, password_change_done
-
 
 info_dict_lti = {
     'queryset': LtiOriginal.objects.all()
@@ -46,15 +51,13 @@ urlpatterns = patterns( '',
     ( r'^waybill/receive$', waybill_reception_list ),
     ( r'^waybill/serialize/(.*)$', serialize ),
     ( r'^waybill/test$', 'django.views.generic.list_detail.object_list', info_dict_lti ),
-    #(r'^waybill/validate/$',waybill_validateSelect),
-    ( r'^waybill/validate/$', 'django.views.generic.simple.direct_to_template', {'template': 'selectValidateAction.html'} ),
+    ( r'^waybill/validate/$', direct_to_template, {'template': 'selectValidateAction.html'} ),
     ( r'^waybill/validate_dispatch$', waybill_validate_dispatch_form ),
     ( r'^waybill/validate_receipt_form$', waybill_validate_receipt_form ),
     ( r'^waybill/validate/(.*)$', waybill_validate_form_update ),
     ( r'^waybill/viewwb_reception_edit/(.*)$', waybill_view_reception ),
     ( r'^waybill/viewwb_reception/(.*)$', waybill_view_reception ),
     ( r'^waybill/viewwb/(.*)$', waybill_view ),
-    #(r'^waybill/commit_to_compas_dispatch/$',dispatchToCompas),
     ( r'^waybill/commit_to_compas_receipt/$', receiptToCompas ),
     ( r'^waybill/commit_to_compas_dispatch_one/(.*)$', singleWBDispatchToCompas ),
     ( r'^waybill/commit_to_compas_receipt_one/(.*)$', singleWBReceiptToCompas ),
@@ -64,7 +67,6 @@ urlpatterns = patterns( '',
     ( r'^waybill/view_stock/$', view_stock ),
     ( r'^waybill/report/ltis/$', ltis_report ),
     ( r'^waybill/report/select$', select_report ),
-
     ( r'^waybill/report/dispatch/(.*)$', dispatch_report_wh ),
     ( r'^waybill/report/receipt/(.*)/(.*)$', receipt_report_wh ),
     ( r'^waybill/report/receipt/(.*)$', receipt_report_cons ),

@@ -11,10 +11,13 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext, Library, Node
-from ets.waybill.compas import *
+
 from ets.waybill.forms import *
 from ets.waybill.models import *
 from ets.waybill.views import *
+
+from ets.waybill.compas import *
+
 import cx_Oracle
 import datetime
 import os, StringIO, zlib, base64, string
@@ -99,12 +102,16 @@ def serialize_wb( wb_id ):
     # Add related LoadingDetais to serialized representation
     loadingdetails_to_serialize = waybill_to_serialize.loadingdetail_set.select_related()
     # Add related LtiOriginals to serialized representation
-    ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
+    ltis_to_serialize = []
     # Add related EpicStocks to serialized representation
     stocks_to_serialize = []
-    for lti in ltis_to_serialize:
-        for s in lti.get_stocks():
-            stocks_to_serialize.append( s )
+    for ld in loadingdetails_to_serialize:
+        s = ld.order_item.stock_item
+        stocks_to_serialize.append( s )
+        lti = ld.order_item.lti_line
+        ltis_to_serialize.append( lti )
+
+
     data = serializers.serialize( 'json', [waybill_to_serialize] + list( loadingdetails_to_serialize ) + list( ltis_to_serialize ) + list( stocks_to_serialize ) )
     return data
 
@@ -232,14 +239,14 @@ def restant_si( lti_code ):
     """
     TODO: write method definition
     """
-    detailed_lti = LtiOriginal.objects.filter( code = lti_code )
+    listExl = RemovedLtis.objects.all()
+    detailed_lti = LtiOriginal.objects.filter( code = lti_code ).exclude( pk__in = listExl )
     listOfWaybills = Waybill.objects.filter( invalidated = False ).filter( ltiNumber = lti_code ).filter( waybillSentToCompas = False )
     listOfSI = []
-#    listExl =RemovedLtis.objects.list()
 
     for lti in detailed_lti:
         if not RemovedLtis.objects.filter( lti = lti.lti_pk ):
-            if lti.is_bulk():
+            if lti.is_bulk:
                 listOfSI += [SIWithRestant( lti.si_code, lti.quantity_net, lti.cmmname )]
             else:
                 listOfSI += [SIWithRestant( lti.si_code, lti.number_of_units, lti.cmmname )]
@@ -247,8 +254,9 @@ def restant_si( lti_code ):
     for wb in listOfWaybills:
         for loading in wb.loadingdetail_set.select_related():
             for si in listOfSI:
-                if si.SINumber == loading.siNo.si_code:
+                if si.SINumber == loading.order_item.lti_line.si_code:
                     si.reduce_current( loading.numberUnitsLoaded )
+
     return listOfSI
 
 
@@ -256,7 +264,7 @@ def new_waybill_no( waybill ):
     """
     This method gives a waybill identifier for the waybill instance param, chaining the warehouse identifier char with the sequence of the table.
     Note: Different offliner app installation must have different warehouse identifier char.
-
+    # TODO: Make waybill id = code
     @param waybill: the Waybill instance
     @return: a string containing the waybill identifier.
     """
@@ -390,6 +398,7 @@ def wb_compress( wb_id ):
 
     data = serialize_wb( wb_id )
     from kiowa.utils.encode import DecimalJSONEncoder
+
     zippedData = zipBase64( json.dumps( data, cls = DecimalJSONEncoder ) )
     return zippedData
 
@@ -451,6 +460,12 @@ def import_setup():
     for d in disp:
         DispatchPoint.objects.get_or_create( origin_loc_name = d['origin_loc_name'], origin_location_code = d['origin_location_code'], origin_wh_name = d['origin_wh_name'], origin_wh_code = d['origin_wh_code'], defaults = {'ACTIVE_START_DATE':datetime.date( 9999, 12, 31 )} )
 
+def import_reason():
+    reasons = EpicLossDamages.objects.using( 'compas' ).all()
+    for myrecord in reasons:
+        myrecord.save( using = 'default' )
+
+
 def import_geo():
     """
     Executes Imports of Places
@@ -481,9 +496,12 @@ def import_stock():
 def import_lti():
     listRecepients = ReceptionPoint.objects.values( 'consegnee_code', 'LOCATION_CODE', 'ACTIVE_START_DATE' ).filter( ACTIVE_START_DATE__lt = datetime.date.today() ).distinct()
     listDispatchers = DispatchPoint.objects.values( 'origin_wh_code', 'ACTIVE_START_DATE' ).filter( ACTIVE_START_DATE__lt = datetime.date.today() ).distinct()
-
     ## TODO: Fix so ltis imported are not expired
-    original = LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = '2011-01-01' )
+    maximum_date = settings.MAX_DATE
+    if settings.DISABLE_EXPIERED_LTI:
+        original = LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = maximum_date )
+    else:
+        original = LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = maximum_date ).filter( expiry_date_gt = datetime.date.today() )
     # log each item
     for myrecord in original:
         for rec in listRecepients:
@@ -547,3 +565,59 @@ def serialized_all_wb_stock( warehouse ):
     stocks_list = EpicStock.objects.filter( wh_code = wh.origin_wh_code )
     data = serializers.serialize( 'json', list( ltis_list ) + list( stocks_list ) )
     return data
+
+# TODO: get old wb for current ltis.... (filter local)
+def get_old_waybills():
+    all_ltis = LtiOriginal.objects.all()
+#    all_items = DispatchMaster.objects.using( 'compas' ).filter( dispatch_date__gt = '2011-01-01' ).filter( document_code = 'WB' ).filter( offid = 'ISBX002' )
+    for lti in all_ltis:
+        all_items = DispatchMaster.objects.using( 'compas' ).filter( lti_id = lti.lti_id )
+        for master in all_items:
+            waybill_id = master.code[9:-1]
+            try:
+                Waybill.objects.get( waybillNumber = waybill_id )
+            except:
+            #check if save & get DispatchDetails
+            #dispatch_details.code like 'ISBX002%' and dispatch_date > '01-FEB-2011' and dispatch_date < '17-FEB-2011'
+                try:
+                    DispatchMaster.objects.get( code = master.code )
+                except:
+                    master.save( using = 'default' )
+                    cursor = connections['compas'].cursor()
+                    all_lines = cursor.execute( 'select * from dispatch_details where code = %s', [master.code] )
+                    for line in all_lines:
+                        print line
+                        myline = DispatchDetail()
+                        myline.code = master
+                        myline.document_code = line[1]
+                        myline.si_record_id = line[2]
+                        myline.origin_id = line[3]
+                        myline.comm_category_code = line[4]
+                        myline.commodity_code = line[5]
+                        myline.package_code = line[6]
+                        myline.allocation_destination_code = line[7]
+                        myline.quality = line[8]
+                        myline.quantity_net = line[9]
+                        myline.quantity_gross = line[10]
+                        myline.number_of_units = line[11]
+                        myline.unit_weight_net = line[12]
+                        myline.unit_weight_gross = line[13]
+                        myline.save()
+
+def sync_lti_stock():
+    all_stock = EpicStock.objects.all()
+    all_ltis = LtiOriginal.objects.all()
+    for lti_item in all_ltis:
+        stock_items = lti_item.get_stocks()
+        for item in stock_items:
+            the_match = LtiWithStock.objects.get_or_create( lti_line = lti_item, stock_item = item , lti_code = lti_item.code )
+            the_match[0].save()
+
+def coi_for_lti_item( lti_line ):
+    lti = LtiOriginal.objects.get( pk = lti_line )
+    items = LtiWithStock.objects.filter( lti_code = lti )
+    return items
+
+def coi_for_lti_code( lti_code ):
+    items = LtiWithStock.objects.filter( lti_code = lti_code )
+    return items

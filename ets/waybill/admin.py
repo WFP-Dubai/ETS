@@ -38,9 +38,6 @@ class EpicPersonsAdmin( admin.ModelAdmin ):
         list_filter = ( 'location_code', 'organization_id' )
 
 
-class LossesDamagesReasonAdmin( admin.ModelAdmin ):
-        list_display = ( 'compasCode', 'description', 'compasRC' )
-        list_filter = ( 'compasRC', )
 
 
 class DispatchPointAdmin( admin.ModelAdmin ):
@@ -92,7 +89,7 @@ admin.site.register( UserProfile, UserProfileAdmin )
 admin.site.register( DispatchPoint, DispatchPointAdmin )
 admin.site.register( ReceptionPoint, ReceptionPointAdmin )
 admin.site.register( EpicPerson, EpicPersonsAdmin )
-admin.site.register( LossesDamagesReason, LossesDamagesReasonAdmin )
-admin.site.register( LossesDamagesType )
+#admin.site.register( LossesDamagesReason, LossesDamagesReasonAdmin )
+#admin.site.register( LossesDamagesType )
 admin.site.register( PackagingDescriptionShort, PackagingDescriptonShortAdmin )
-admin.site.register( EpicLossReason )
+#admin.site.register( EpicLossReason )

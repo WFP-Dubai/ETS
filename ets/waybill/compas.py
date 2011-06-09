@@ -1,12 +1,12 @@
 import cx_Oracle
-from ets.waybill.models import *
-from ets.waybill.forms import *
-from ets.waybill.views import *
-from ets.waybill.tools import *
+from ets.waybill.models import * #@UnusedWildImport
+from ets.waybill.forms import * #@UnusedWildImport
+from ets.waybill.views import * #@UnusedWildImport
+from ets.waybill.tools import * #@UnusedWildImport
 from django.db import models
 #from django.db import connections
-from django.conf import settings
-import datetime
+from django.conf import settings #@Reimport
+import datetime #@Reimport 
 
 class compas_write:
     ErrorMessages = ''
@@ -158,12 +158,13 @@ class compas_write:
             codeLetter = u'A'
             db.begin()
 
-            for lineItem in lineItems:
+            for index, lineItem in enumerate( lineItems ):
                 CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + code )
                 if twoCont:
                     CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + codeLetter + code )
                     codeLetter = u'B'
-                    CONTAINER_NUMBER = unicode( the_waybill.containerTwoNumber )
+                    if index == 1:
+                        CONTAINER_NUMBER = unicode( the_waybill.containerTwoNumber )
 
                 if lineItem.loadingDetailSentToCompas:
                     pass
@@ -211,7 +212,7 @@ class compas_write:
                     cursor.callproc( u'write_waybill.dispatch', ( Response_Message, Response_Code, CURR_CODE, DISPATCH_DATE, origin_type, origin_location_code, ORIGIN_CODE,
                         ORIGIN_DESCR, destination_location_code, DESTINATION_CODE, lti_id, LOADING_DATE, ORGANIZATION_ID, TRAN_TYPE_CODE, VEHICLE_REGISTRATION, MODETRANS_CODE,
                         COMMENTS, PERSON_CODE, PERSON_OUC, CERTIFING_TITLE, TRANS_CONTRACTOR_CODE, SUPPLIER1_OUC, DRIVER_NAME, LICENSE, CURR_CONTAINER_NUMBER, settings.COMPAS_STATION,
-                        Full_coi, comm_category_code, COMM_CODE, PCKKCODE, ALLCODE, QUALITY, strNetTotal, strGrossTotal, strUnitsLoaded, strUnitNet, strUnitGross, u'' ) )
+                        Full_coi, comm_category_code, COMM_CODE, PCKKCODE, ALLCODE, QUALITY, strNetTotal, strGrossTotal, strUnitsLoaded, strUnitNet, strUnitGross, u'', u'', u'' ) )
                     if( Response_Code.getvalue() == 'S' ):
                         pass
                     else:

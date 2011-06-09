@@ -40,12 +40,14 @@ border-color: black;
 <br>
 Items in LTI:
 <table class='bordered' >
-    <tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>{%if detailed.0.is_bulk%}MT{%else%}Units{%endif%}</th><th class='bordered'>To Be Dispatched</th></tr>
-    {%for si in listOfSI_withDeduction%}
-         <tr  class='bordered'><td  class='bordered'>{{si.CommodityName}}&nbsp;</td>
-         <td  class='bordered'>&nbsp;{{si.SINumber}}&nbsp;</td>
-         <td  class='bordered' align="right">{{si.StartAmount}}</td>
-         <td  class='bordered' align="right">{{si.CurrentAmount|floatformat:3}}</td></tr>
+    <tr class='itemhead'><th class='bordered'>Commodity</th><th>SI</th><th class='bordered'>{%if detailed.0.is_bulk%}MT{%else%}Units{%endif%}</th><th class='bordered'>To Be Dispatched</th><th  class='bordered'>Stock In Warehouse</th></tr>
+    {%for si in detailed%}
+         <tr class='bordered'><td  class='bordered'>{{si.cmmname}}&nbsp;</td>
+         <td class='bordered'>&nbsp;{{si.si_code}}&nbsp;</td>
+         <td class='bordered' align="right">{{si.number_of_units}}</td>
+         <td class='bordered' align="right">{{si.items_left}}</td>
+         <td class='bordered' align="right"> {{si.total_stock}}</td>
+         </tr>
     {%endfor%}
 </table>
 
@@ -61,8 +63,8 @@ Current Waybills:<br>
     {%for loading in wb.loadingdetail_set.select_related %}
         <tr class='bordered'>
         <td class='bordered'>&nbsp;</td>
-        <td class='bordered'>&nbsp;{{loading.siNo.cmmname}}&nbsp; </td>
-        <td class='bordered' >&nbsp;{{loading.siNo.si_code}}&nbsp;</td>
+        <td class='bordered'>&nbsp;{{loading.order_item.stock_item.cmmname}}&nbsp; </td>
+        <td class='bordered' >&nbsp;{{loading.order_item.stock_item.coi_code}}&nbsp;</td>
 
         <td class='bordered' align="right">{{loading.numberUnitsLoaded}} </td>
 

@@ -64,14 +64,14 @@
                     </tr>
                     {%for lineitem in object.loadingdetail_set.select_related%}
                     <tr  style="font-size:small;">
-                        <td>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</td>
+                        <td>ID {{forloop.counter}}. {{lineitem.order_item.coi_code}}</td>
                         <td>{{lineitem.get_stock_item.cmmname}}</td>
                         <td>{{lineitem.get_stock_item.packaging_description_short}}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.siNo.unit_weight_net|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.siNo.unit_weight_gross|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_net|floatformat:3}}{%endif%}</td>
-                        <td style="text-align:right;">{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_gross|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.order_item.lti_line.unit_weight_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.order_item.lti_line.unit_weight_gross|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_gross|floatformat:3}}{%endif%}</td>
 
                     </tr>
                     {%endfor%}

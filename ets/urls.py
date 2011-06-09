@@ -1,9 +1,8 @@
-from django.conf.urls.defaults import *
-from ets.waybill.views import *
+from django.conf.urls.defaults import * #@UnusedWildImport
+from ets.waybill.views import * #@UnusedWildImport
 from ets.settings import MEDIA_ROOT
-from django.contrib.auth.views import login, logout
 # Uncomment the next two lines to enable the admin:
-from django.contrib import admin
+from django.contrib import admin #@Reimport
 admin.autodiscover()
 
 urlpatterns = patterns( '',
@@ -17,6 +16,7 @@ urlpatterns = patterns( '',
     ( r'^admin/doc/', include( 'django.contrib.admindocs.urls' ) ),
     # Uncomment the next line to enable the admin:
     ( r'^admin/', include( admin.site.urls ) ),
+#    ( r'^grappelli/', include( 'grappelli.urls' ) ),
     #(r'^dojango/', include('dojango.urls')),
     #(r'^accounts/login/$',login),
 

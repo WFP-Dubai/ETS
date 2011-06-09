@@ -1,5 +1,5 @@
 # Django settings for ets project.
-#print 'Settings Default'
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -60,10 +60,10 @@ ALL_DB = {
     },
     'compas_test_rome': {
         'ENGINE': 'django.db.backends.oracle',
-        'NAME': '10.11.33.199/tst1',
-        'USER': 'COMPAS_JERX001',
-        'PASSWORD': 'JERX001',
-        'HOST': '10.11.33.199',
+        'NAME': '10.11.32.26/CMPS',
+        'USER': 'bw_reader',
+        'PASSWORD': 'readme',
+        'HOST': '10.11.32.26',
         'PORT': '',
     },
     'compas_prod_pal': {
@@ -115,7 +115,8 @@ LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 USE_I18N = True
 MEDIA_URL = ''
-ADMIN_MEDIA_PREFIX = '/media/'
+ADMIN_MEDIA_PREFIX = '/django/admin/media/'
+#ADMIN_MEDIA_PREFIX = '/ets/media/grapelli/'
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
 TEMPLATE_LOADERS = ( 
     'django.template.loaders.filesystem.Loader',
@@ -129,12 +130,13 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
  )
 ROOT_URLCONF = 'ets.urls'
 
 
 INSTALLED_APPS = ( 
+#    'grappelli',
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -143,6 +145,10 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'ets.waybill',
     'django.contrib.databrowse',
+    'django_extensions',
+#    'south',
+#    'ajax_select',
+    'debug_toolbar',
  )
 INTERNAL_IPS = ( '127.0.0.1', )
 
@@ -176,9 +182,11 @@ TEMPLATE_DIRS = (
 
 COMPAS_STATION = u'JERX001'
 INTSTANCE_LABLE = 'Toby Mac Pro'
-LOGIN_URL = '/ets/accounts/login/'
-LOGOUT_URL = '/ets/accounts/logout/'
+LOGIN_URL = '/test/ets/accounts/login/'
+LOGOUT_URL = '/test/ets/accounts/logout/'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 IN_PRODUCTION = False
 SESSION_COOKIE_NAME = 'ets-demo'
 WAYBILL_LETTER = 'A'
+MAX_DATE = '2010-01-01'
+DISABLE_EXPIERED_LTI = DEBUG

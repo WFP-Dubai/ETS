@@ -8,7 +8,6 @@ from django.template.defaultfilters import stringfilter
 from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
 
-
 # Create your models here.
 class Places( models.Model ):
     org_code = models.CharField( max_length = 7, primary_key = True )
@@ -145,48 +144,53 @@ class Waybill( models.Model ):
     def receipt_person( self ):
         return EpicPerson.objects.get( person_pk = self.recipientName )
 
+    @property
     def is_bulk( self ):
-        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk()
+        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk
 
+    @property
     def consegnee_name( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
         except:
             return None
-    consegnee_name = property( consegnee_name )
 
+    @property
     def origin_wh_code( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_code
         except:
             return None
 
-    origin_wh_code = property( origin_wh_code )
+    @property
+    def origin_loc_name( self ):
+        try:
+            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_loc_name
+        except:
+            return None
 
+    @property
     def destination_loc_name( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_loc_name
         except:
             return None
 
-    destination_loc_name = property( destination_loc_name )
-
+    @property
     def consegnee_code( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_code
         except:
             return None
 
-    consegnee_code = property( consegnee_code )
-
+    @property
     def origin_wh_name( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_name
         except:
             return None
 
-    origin_wh_name = property( origin_wh_name )
-
+    @property
     def hasError( self ):
         myerror = self.errors()
         try:
@@ -195,14 +199,14 @@ class Waybill( models.Model ):
         except:
             return None
 
-    hasError = property( hasError )
-
+    @property
     def destination_location_code( self ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
         except:
             return None
-    destination_location_code = property( destination_location_code )
+
+
 #    def lti_date( self ):
 #        try:
 #            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].lti_date
@@ -252,12 +256,13 @@ class LtiOriginal( models.Model ):
     unit_weight_net = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
     unit_weight_gross = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
 
+    objects = models.Manager()
 
     class Meta:
             db_table = u'epic_lti'
 
     def  __unicode__( self ):
-        return u"%s %s  %s  %.0f " % ( self.valid(), self.coi_code(), self.cmmname, self.items_left() )
+        return u"%s %s -  %.0f " % ( self.valid(), self.cmmname, self.items_left )
 
     def mydesc( self ):
         return self.code
@@ -268,19 +273,27 @@ class LtiOriginal( models.Model ):
             return "Void "
         else:
             return ''
+    @property
     def items_left( self ):
-            lines = LoadingDetail.objects.filter( siNo = self )
-            used = 0
+        order_item = LtiWithStock.objects.filter( lti_line = self )
+        used = 0
+        for lines in order_item:
+            wblines = LoadingDetail.objects.filter( order_item = lines )
+            for line in wblines:
+                if line.invalid == False and line.wbNumber.dispatcherSigned == True:
+                    used += line.numberUnitsLoaded
+        if self.is_bulk:
+            return self.quantity_net - used
+        else:
+            return self.number_of_units - used
 
-            for line in lines:
-                used += line.numberUnitsLoaded
-            if self.is_bulk():
-                return self.quantity_net - used
-            else:
-                return self.number_of_units - used
+    def stock_items( self ):
+
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+
     def reduce_si( self, units ):
             self.sitracker.update_units( units )
-            return self.items_left()
+            return self.items_left
 
     def restore_si( self, units ):
             self.sitracker.update_units_restore( units )
@@ -295,6 +308,7 @@ class LtiOriginal( models.Model ):
             pass
         return pack
 
+    @property
     def is_bulk( self ):
         mypkg = self.packaging()
         if mypkg == 'BULK':
@@ -316,8 +330,10 @@ class LtiOriginal( models.Model ):
                     return str( stock_items_qs[0].origin_id[7:] )
                 else:
                     return 'No Stock '
+
     def related_stock( self ):
         return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+
     def remove_lti( self ):
         all_removed = RemovedLtis.objects.all()
         this_lti = RemovedLtis()
@@ -326,6 +342,15 @@ class LtiOriginal( models.Model ):
             this_lti.save()
     def get_stocks( self ):
         return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+
+    @property
+    def total_stock( self ):
+        my_stock = self.related_stock()
+        total = 0
+        for item in my_stock:
+            total = +item.number_of_units
+        return total
+#    total_stock = property( total_stock )
 
 
 
@@ -416,45 +441,45 @@ class EpicStock( models.Model ):
         def coi_code( self ):
             return self.origin_id[7:]
 
-class EpicLossReason( models.Model ):
-        REASON_CODE = models.CharField( max_length = 5, primary_key = True )
-        REASON = models.CharField( max_length = 80 )
+
+class EpicLossDamages( models.Model ):
+        type = models.CharField( max_length = 1 )
+        comm_category_code = models.CharField( max_length = 9 )
+        cause = models.CharField( max_length = 100 )
         class Meta:
-            db_table = u'epic_lossreason'
+            db_table = u'epic_lossdamagereason'
             verbose_name = 'Loss/Damages Reason'
         def  __unicode__( self ):
-                return self.REASON
-
-class LossesDamagesReason( models.Model ):
-        compasRC = models.ForeignKey( EpicLossReason )
-        compasCode = models.CharField( max_length = 20 )
-        description = models.CharField( max_length = 80 )
-
-        def  __unicode__( self ):
-                return self.compasRC.REASON
-        class Meta:
-            verbose_name = 'COMPAS Loss/Damages Reason'
+            return self.cause
+        def x( self ):
+            cause = self.cause
+            length_c = len( self.cause ) - 10
+            if length_c > 20:
+                cause = self.cause[0:20] + '...' + self.cause[length_c:]
+            return cause
 
 
-class LossesDamagesType( models.Model ):
-        description = models.CharField( max_length = 20 )
-        class Meta:
-            verbose_name = 'Loss/Damages Type'
-        def  __unicode__( self ):
-                return self.description
+class LtiWithStock( models.Model ):
+    lti_line = models.ForeignKey( LtiOriginal )
+    stock_item = models.ForeignKey( EpicStock )
+    lti_code = models.CharField( max_length = 20, db_index = True )
+    def  __unicode__( self ):
+        return str( self.stock_item ) + ' ' + str( self.lti_line )
+    def coi_code( self ):
+        return self.stock_item.coi_code()
+
 
 class LoadingDetail( models.Model ):
         wbNumber = models.ForeignKey( Waybill )
-        siNo = models.ForeignKey( LtiOriginal )
+        order_item = models.ForeignKey( LtiWithStock )
         numberUnitsLoaded = models.DecimalField( default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
         numberUnitsGood = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
         numberUnitsLost = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
         numberUnitsDamaged = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-        unitsLostReason = models.ForeignKey( LossesDamagesReason, related_name = 'LD_LostReason', blank = True, null = True )
-        unitsDamagedReason = models.ForeignKey( LossesDamagesReason, related_name = 'LD_DamagedReason', blank = True, null = True )
-        unitsDamagedType = models.ForeignKey( LossesDamagesType, related_name = 'LD_DamagedType', blank = True, null = True )
-        unitsLostType = models.ForeignKey( LossesDamagesType, related_name = 'LD_LossType', blank = True, null = True )
-        coi_code = models.CharField( max_length = 12, blank = True, null = True )
+        unitsLostReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
+        unitsDamagedReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
+        unitsDamagedType = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
+        unitsLostType = models.ForeignKey( EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
         overloadedUnits = models.BooleanField()
         loadingDetailSentToCompas = models.BooleanField()
         overOffloadUnits = models.BooleanField()
@@ -462,66 +487,68 @@ class LoadingDetail( models.Model ):
         audit_log = AuditLog()
 
         def check_stock( self ):
-            thisStock = EpicStock.objects.filter( si_code = self.siNo.si_code ).filter( wh_code = self.siNo.origin_wh_code ).filter( commodity_code = self.siNo.commodity_code ).order_by( '-number_of_units' )
-            for stock in thisStock:
-                if self.siNo.is_bulk():
-                    if self.numberUnitsLoaded <= stock.quantity_net:
-                        return True
-                else:
-                    if self.numberUnitsLoaded <= stock.number_of_units :
-                        return True
+            stock = EpicStock.objects.get( pk = self.stock_item )
+            if self.get_stock_item.is_bulk:
+                if self.numberUnitsLoaded <= stock.quantity_net:
+                    return True
+            else:
+                if self.numberUnitsLoaded <= stock.number_of_units :
+                    return True
             return False
 
         def check_receipt_item( self ):
             return True
-
+        @property
         def get_stock_item( self ):
-            try:
-                stockItem = EpicStock.objects.filter( si_code = self.siNo.si_code ).filter( commodity_code = self.siNo.commodity_code ).filter( wh_code = self.siNo.origin_wh_code )
-                return stockItem[0]
-            except:
-                try:
-                    stockItem = EpicStock.objects.filter( si_code = self.siNo.si_code ).filter( comm_category_code = self.siNo.comm_category_code )
-                    return stockItem[0]
-                except:
-                    return 'N/A'
+            stockItem = EpicStock.objects.get( pk = self.order_item.stock_item.pk )
+            return stockItem
 
         def calculate_total_net( self ):
-                totalNet = ( self.numberUnitsLoaded * self.siNo.unit_weight_net ) / 1000
-                return totalNet
+            totalNet = ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_net ) / 1000
+            return totalNet
+
         def calculate_total_gross( self ):
-                totalGross = ( self.numberUnitsLoaded * self.siNo.unit_weight_gross ) / 1000
-                return totalGross
+            totalGross = ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_gross ) / 1000
+            return totalGross
 
         def calculate_net_received_good( self ):
-                totalNet = ( self.numberUnitsGood * self.siNo.unit_weight_net ) / 1000
-                return totalNet
+            totalNet = ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_net ) / 1000
+            return totalNet
+
         def calculate_gross_received_good( self ):
-                totalGross = ( self.numberUnitsGood * self.siNo.unit_weight_gross ) / 1000
-                return totalGross
+            totalGross = ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_gross ) / 1000
+            return totalGross
 
         def calculate_net_received_damaged( self ):
-                totalNet = ( self.numberUnitsDamaged * self.siNo.unit_weight_net ) / 1000
+                totalNet = ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_net ) / 1000
                 return totalNet
+
         def calculate_gross_received_damaged( self ):
-                totalGross = ( self.numberUnitsDamaged * self.siNo.unit_weight_gross ) / 1000
+                totalGross = ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_gross ) / 1000
                 return totalGross
 
         def calculate_net_received_lost( self ):
-                totalNet = ( self.numberUnitsLost * self.siNo.unit_weight_net ) / 1000
+                totalNet = ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_net ) / 1000
                 return totalNet
+
         def calculate_gross_received_lost( self ):
-                totalGross = ( self.numberUnitsLost * self.siNo.unit_weight_gross ) / 1000
+                totalGross = ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_gross ) / 1000
                 return totalGross
+
         def calculate_total_received_units( self ):
                 total = self.numberUnitsGood + self.numberUnitsDamaged
                 return total
+
         def calculate_total_received_net( self ):
                 total = self.calculate_net_received_good() + self.calculate_net_received_damaged()
                 return total
 
+        @property
+        def invalid( self ):
+            return self.wbNumber.invalidated
+
         def  __unicode__( self ):
-                return self.wbNumber.mydesc() + ' - ' + self.siNo.mydesc() + ' - ' + self.siNo.lti_pk
+                return self.wbNumber.mydesc() + ' - ' + str( self.order_item.stock_item ) + ' - ' + self.order_item.lti_code #.mydesc() + ' - ' + self.order_item.stock_item.lti_pk
 
 class DispatchPoint( models.Model ):
         origin_loc_name = models.CharField( 'Location Name', max_length = 40, blank = True )
@@ -611,6 +638,8 @@ class SIWithRestant:
         StartAmount = 0.0
         CurrentAmount = 0.0
         CommodityName = ''
+        InStock = 0
+        COI_Code = ''
         def __init__( self, SINumber, StartAmount, CommodityName ):
                 self.SINumber = SINumber
                 self.StartAmount = StartAmount
@@ -620,7 +649,90 @@ class SIWithRestant:
         def reduce_current( self, reduce ):
             self.CurrentAmount = self.CurrentAmount - reduce
         def get_current_amount( self ):
-
             return self.CurrentAmount
         def get_start_amount( self ):
                 return self.StartAmount
+
+
+# TODO: Importing of old waybills....
+class DispatchMaster( models.Model ):
+    code = models.CharField( max_length = 25, primary_key = True )
+    document_code = models.CharField( max_length = 2 )
+    dispatch_date = models.DateField()
+    origin_type = models.CharField( max_length = 1 )
+    origin_location_code = models.CharField( max_length = 13 )
+    intvyg_code = models.CharField( max_length = 25, blank = True )
+    intdlv_code = models.IntegerField( null = True, blank = True )
+    origin_code = models.CharField( max_length = 13, blank = True )
+    origin_descr = models.CharField( max_length = 50, blank = True )
+    destination_location_code = models.CharField( max_length = 10 )
+    destination_code = models.CharField( max_length = 13, blank = True )
+    pro_activity_code = models.CharField( max_length = 6, blank = True )
+    activity_ouc = models.CharField( max_length = 13, blank = True )
+    lndarrm_code = models.CharField( max_length = 25, blank = True )
+    lti_id = models.CharField( max_length = 25, blank = True )
+    loan_id = models.CharField( max_length = 25, blank = True )
+    loading_date = models.DateField()
+    organization_id = models.CharField( max_length = 12 )
+    tran_type_code = models.CharField( max_length = 4 )
+    tran_type_descr = models.CharField( max_length = 50, blank = True )
+    modetrans_code = models.CharField( max_length = 2 )
+    comments = models.CharField( max_length = 250, blank = True )
+    person_code = models.CharField( max_length = 7 )
+    person_ouc = models.CharField( max_length = 13 )
+    certifing_title = models.CharField( max_length = 50, blank = True )
+    trans_contractor_code = models.CharField( max_length = 4 )
+    supplier1_ouc = models.CharField( max_length = 13 )
+    trans_subcontractor_code = models.CharField( max_length = 4, blank = True )
+    supplier2_ouc = models.CharField( max_length = 13, blank = True )
+    nmbplt_id = models.CharField( max_length = 25, blank = True )
+    nmbtrl_id = models.CharField( max_length = 25, blank = True )
+    driver_name = models.CharField( max_length = 50, blank = True )
+    license = models.CharField( max_length = 20, blank = True )
+    vehicle_registration = models.CharField( max_length = 20, blank = True )
+    trailer_plate = models.CharField( max_length = 20, blank = True )
+    container_number = models.CharField( max_length = 15, blank = True )
+    atl_li_code = models.CharField( max_length = 8, blank = True )
+    notify_indicator = models.CharField( max_length = 1, blank = True )
+    customised = models.CharField( max_length = 50, blank = True )
+    org_unit_code = models.CharField( max_length = 13 )
+    printed_indicator = models.CharField( max_length = 1, blank = True )
+    notify_org_unit_code = models.CharField( max_length = 13, blank = True )
+    offid = models.CharField( max_length = 13, blank = True )
+    send_pack = models.BigIntegerField( null = True, blank = True )
+    recv_pack = models.BigIntegerField( null = True, blank = True )
+    last_mod_user = models.CharField( max_length = 30, blank = True )
+    last_mod_date = models.DateField( null = True, blank = True )
+    class Meta:
+        db_table = u'dispatch_masters'
+    def  __unicode__( self ):
+        return self.code
+
+
+class DispatchDetail( models.Model ):
+    code = models.ForeignKey( DispatchMaster )
+    document_code = models.CharField( max_length = 2 )
+    si_record_id = models.CharField( max_length = 25, blank = True, null = True )
+    origin_id = models.CharField( max_length = 23, blank = True )
+    comm_category_code = models.CharField( max_length = 9 )
+    commodity_code = models.CharField( max_length = 18 )
+    package_code = models.CharField( max_length = 17 )
+    allocation_destination_code = models.CharField( max_length = 10 )
+    quality = models.CharField( max_length = 1 )
+    quantity_net = models.DecimalField( max_digits = 11, decimal_places = 3 )
+    quantity_gross = models.DecimalField( max_digits = 11, decimal_places = 3 )
+    number_of_units = models.IntegerField()
+    unit_weight_net = models.DecimalField( null = True, max_digits = 8, decimal_places = 3, blank = True )
+    unit_weight_gross = models.DecimalField( null = True, max_digits = 8, decimal_places = 3, blank = True )
+    lonmst_id = models.CharField( max_length = 25, blank = True )
+    londtl_id = models.IntegerField( null = True, blank = True )
+    rpydtl_id = models.IntegerField( null = True, blank = True )
+    offid = models.CharField( max_length = 13, blank = True )
+    send_pack = models.BigIntegerField( null = True, blank = True )
+    recv_pack = models.BigIntegerField( null = True, blank = True )
+    last_mod_user = models.CharField( max_length = 30, blank = True )
+    last_mod_date = models.DateField( null = True, blank = True )
+    class Meta:
+        db_table = u'dispatch_details'
+
+
