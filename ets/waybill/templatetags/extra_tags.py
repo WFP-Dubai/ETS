@@ -1,5 +1,6 @@
 from django import template
 import time, calendar
+from ets import settings
 register = template.Library()
 # Sample
 @register.tag( name = "current_time" )
@@ -66,8 +67,7 @@ class PrintTagNode( template.Node ):
             logfile = 'tagfile.tag'
             FILE = open( logfile )
             the_date = FILE.read()
-            print the_date[0:19]
-            return '<small>Latest COMPAS import:' + the_date[0:19] + '</small>'
+            return '<br/><small>Latest COMPAS import from <b>' + settings.COMPAS_STATION + '</b>: ' + the_date[0:19] + '</small>'
         except Exception as e:
             print e
             return ''

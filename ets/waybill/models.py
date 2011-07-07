@@ -262,17 +262,23 @@ class LtiOriginal( models.Model ):
             db_table = u'epic_lti'
 
     def  __unicode__( self ):
-        return u"%s %s -  %.0f " % ( self.valid(), self.cmmname, self.items_left )
+        if self.valid():
+            return u"%s -  %.0f " % ( self.cmmname, self.items_left )
+        else:
+            return u"Void %s -  %.0f " % ( self.cmmname, self.items_left )
 
     def mydesc( self ):
         return self.code
+
     def commodity( self ):
         return self.cmmname
+
     def valid( self ):
         if RemovedLtis.objects.filter( lti = self.lti_pk ):
-            return "Void "
+            return False
         else:
-            return ''
+            return True
+
     @property
     def items_left( self ):
         order_item = LtiWithStock.objects.filter( lti_line = self )
@@ -288,7 +294,6 @@ class LtiOriginal( models.Model ):
             return self.number_of_units - used
 
     def stock_items( self ):
-
         return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
 
     def reduce_si( self, units ):
@@ -340,6 +345,7 @@ class LtiOriginal( models.Model ):
         this_lti.lti = self
         if this_lti not in all_removed:
             this_lti.save()
+
     def get_stocks( self ):
         return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
 
@@ -350,7 +356,6 @@ class LtiOriginal( models.Model ):
         for item in my_stock:
             total = +item.number_of_units
         return total
-#    total_stock = property( total_stock )
 
 
 
@@ -450,8 +455,7 @@ class EpicLossDamages( models.Model ):
             db_table = u'epic_lossdamagereason'
             verbose_name = 'Loss/Damages Reason'
         def  __unicode__( self ):
-            return self.cause
-        def x( self ):
+
             cause = self.cause
             length_c = len( self.cause ) - 10
             if length_c > 20:
@@ -464,7 +468,14 @@ class LtiWithStock( models.Model ):
     stock_item = models.ForeignKey( EpicStock )
     lti_code = models.CharField( max_length = 20, db_index = True )
     def  __unicode__( self ):
-        return str( self.stock_item ) + ' ' + str( self.lti_line )
+        item_name = unicode( self.coi_code() ) + u' - ' + unicode( self.stock_item.cmmname ) + ' (' + unicode( self.lti_line.items_left ) + ')'
+
+        in_stock = self.lti_line.valid()
+        if in_stock :
+            return item_name
+        else:
+            return 'Void ' + item_name
+
     def coi_code( self ):
         return self.stock_item.coi_code()
 
@@ -487,8 +498,8 @@ class LoadingDetail( models.Model ):
         audit_log = AuditLog()
 
         def check_stock( self ):
-            stock = EpicStock.objects.get( pk = self.stock_item )
-            if self.get_stock_item.is_bulk:
+            stock = self.order_item.stock_item
+            if self.order_item.lti_line.is_bulk:
                 if self.numberUnitsLoaded <= stock.quantity_net:
                     return True
             else:

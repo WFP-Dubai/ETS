@@ -1,4 +1,5 @@
-{%load extra_tags%}<tr>
+{%load extra_tags%}
+        <tr>
             <td>
                 <table cellpadding="0" cellspacing="0" border="1px"  >
                     <thead class="wb_head"><tr><th colspan="2">Certification of Commodities Received</th></tr></thead>
@@ -24,14 +25,9 @@
         <tr>
             <td>
                 <table cellpadding="0" cellspacing="0" border="1px" >
-                    <thead class="wb_head">
-                        <tr><th colspan="11">Observations</th></tr>
-                    </thead>
-                    <tr   style="font-size:x-small;">
-                        <td><sup>Receipt Condition</sup></td>
-                        <td colspan="2"><sup>Good</sup></td>
+                    <thead class="wb_head"><tr><th colspan="11">Observations</th></tr></thead>
+                    <tr   style="font-size:x-small;"><td><sup>Receipt Condition</sup></td><td colspan="2"><sup>Good</sup></td>
                         <td colspan="5"><sup>Lost or Damaged cargo</sup></td>
-                        
                         <td colspan="2"><sup>Total received</sup></td>
                     </tr>
                     <tr  style="font-size:x-small;">
@@ -39,11 +35,11 @@
                     </tr>
                     {%for lineitem in object.loadingdetail_set.select_related%}
                     <tr style="font-size:small; text-align:right;">
-<td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.siNo.coi_code}}</span></td>
-<td>{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
-<td>{%if lineitem.siNo.is_bulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.calculate_net_received_good|floatformat:3}}{%endif%}</td>
+<td style="text-align:left;"><span>ID {{forloop.counter}}. {{lineitem.order_item.coi_code}}</span></td>
+<td>{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.numberUnitsGood|floatformat}}{%endif%}</td>
+<td>{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.numberUnitsGood|floatformat:3}}{%else%}{{lineitem.calculate_net_received_good|floatformat:3}}{%endif%}</td>
 <td style="text-align:center;">
-{%if lineitem.siNo.is_bulk%}-{%else%}
+{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}
 {%ifnotequal lineitem.numberUnitsLost 0%}
     L:{{lineitem.numberUnitsLost|floatformat:3}}
     {%endifnotequal%}
@@ -56,7 +52,7 @@
 </td>
 
 <td style="text-align:center;">&nbsp;
-{%if lineitem.siNo.is_bulk%}
+{%if lineitem.order_item.lti_line.is_bulk%}
     {%ifnotequal lineitem.numberUnitsLost 0%}
         L:{{lineitem.numberUnitsLost|floatformat:3}}
         {%endifnotequal%}
@@ -89,10 +85,10 @@
 
 
 <td>
-{%if lineitem.siNo.is_bulk%}-{%else%}{{lineitem.calculate_total_received_units|floatformat:3}}{%endif%}
+{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.calculate_total_received_units|floatformat:3}}{%endif%}
 </td>
 <td>
-{%if lineitem.siNo.is_bulk%}{{lineitem.calculate_total_received_units|floatformat:3}}{%else%}{{lineitem.calculate_total_received_net|floatformat:3}}{%endif%}
+{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.calculate_total_received_units|floatformat:3}}{%else%}{{lineitem.calculate_total_received_net|floatformat:3}}{%endif%}
 </td>    
                         
                     </tr>
@@ -127,20 +123,27 @@
                 </table>
             </td>
         </tr>
-        <tr><td><table cellpadding="0" cellspacing="0" border="1px" ><tr><td>
-        <p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.
-        <br>Name, signature and stamp:
-        {%if object.recipientSigned%}
-<div style='font-size:14px'>{{rec_person}}<br>Date: {{object.recipientSignedTimestamp|date}}</div>
-{%endif%}
-        </p>
-        <p style="font-size: x-small">Endorse this section with an official stamp
-        
-        </p></td><td>
-        <p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.<br>Name, signature and stamp
-        {%if object.recipientSigned%}
-<div style='font-size:14px'>{{object.transportDriverName|upper}}<br>Date: {{object.recipientSignedTimestamp|date}}</div>
-{%endif%}</p>
-        <p style="font-size: x-small">Endorse this section with an official stamp</p></td></tr></table></td>
-</tr>
-
+        <tr>
+        	<td>
+        		<table cellpadding="0" cellspacing="0" border="1px" >
+        			<tr>
+        				<td>
+        					<p style="font-size: x-small">On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above.
+        						<br>Name, signature and stamp:
+        						{%if object.recipientSigned%}<div style='font-size:14px'>{{rec_person}}<br>Date: {{object.recipientSignedTimestamp|date}}</div>{%endif%}
+        					</p>
+						    <p style="font-size: x-small">Endorse this section with an official stamp
+						    
+						    </p>
+  						</td>
+						<td>
+							<p style="font-size: x-small">On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above.<br>Name, signature and stamp
+					        {%if object.recipientSigned%}
+								<div style='font-size:14px'>{{object.transportDriverName|upper}}<br>Date: {{object.recipientSignedTimestamp|date}}</div>
+							{%endif%}</p>
+        					<p style="font-size: x-small">Endorse this section with an official stamp</p>
+        				</td>
+        			</tr>
+        		</table>
+        	</td>
+        </tr>

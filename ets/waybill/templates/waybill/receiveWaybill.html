@@ -33,7 +33,7 @@
     {% for sform in formset.forms %}
        
         <tr>
-            <td  valign=top> {{ sform.id }}{{sform.siNo}}</td>
+            <td  valign=top> {{ sform.id }}{{sform.order_item}}</td>
             <td  valign=top  align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
             <td valign=top>{{ sform.numberUnitsGood }} Over Offload:{{sform.overOffloadUnits}}</td>
             <td  valign=top><table ><tr><td>Units:</td><td>{{ sform.numberUnitsDamaged}} </td></tr><!--<tr><td>Type:</td><td> {{ sform.unitsDamagedType }} </td></tr>--><tr><td>Reason:</td><td>{{ sform.unitsDamagedReason }}</td></tr></table></td>

@@ -221,7 +221,6 @@ class WaybillValidationFormset( BaseModelFormSet ):
     def clean( self ):
         issue = ''
         super( WaybillValidationFormset, self ).clean()
-        # example custom validation across forms in the formset:
         for form in self.forms:
             if form.check_lines():
                 pass

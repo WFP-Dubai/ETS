@@ -124,13 +124,14 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
  )
 MIDDLEWARE_CLASSES = ( 
+#    'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 #    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+#    'debug_toolbar.middleware.DebugToolbarMiddleware',
  )
 ROOT_URLCONF = 'ets.urls'
 
@@ -148,7 +149,7 @@ INSTALLED_APPS = (
     'django_extensions',
 #    'south',
 #    'ajax_select',
-    'debug_toolbar',
+#    'debug_toolbar',
  )
 INTERNAL_IPS = ( '127.0.0.1', )
 

@@ -87,7 +87,7 @@
         </thead>
     {% for sform in formset.forms %}
         <tr>
-            <td>{{ sform.id }}{{sform.siNo}}</td>
+            <td>{{ sform.id }}{{sform.order_item}}</td>
             <td align="right">{{ sform.numberUnitsLoaded }}</td>
             <td>{{ sform.numberUnitsGood }}</td>
             <td>{{ sform.numberUnitsDamaged }}  Reason:{{ sform.unitsDamagedReason }}</td>
