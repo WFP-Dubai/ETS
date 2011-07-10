@@ -1,5 +1,5 @@
 # Django settings for ets project.
-#testing to push
+#testing to push again
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
