@@ -123,18 +123,14 @@ class Waybill( models.Model ):
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
         for line in lines:
-            if line.check_stock():
-                pass
-            else:
+            if not line.check_stock():
                 return False
         return True
 
     def check_lines_receipt( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
         for line in lines:
-            if line.check_receipt_item():
-                pass
-            else:
+            if not line.check_receipt_item():
                 return False
         return True
 

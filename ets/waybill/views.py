@@ -796,13 +796,12 @@ def waybill_validate_dispatch_form( request ):
         formset = ValidateFormset( request.POST, WaybillValidationFormset )
         if  formset.is_valid() :
             instances = formset.save( commit = False )
-            for form in  instances:
-                print form.check_lines()
+            for waybill in instances:
                 try:
-                    if form.check_lines():
-                        form.auditComment = 'Validated Dispatch'
+                    if waybill.check_lines():
+                        waybill.auditComment = 'Validated Dispatch'
                         try:
-                            errorlog = CompasLogger.objects.get( wb = form )
+                            errorlog = CompasLogger.objects.get( wb = waybill )
                             errorlog.user = ''
                             errorlog.errorDisp = ''
                             errorlog.timestamp = datetime.datetime.now()
@@ -810,37 +809,37 @@ def waybill_validate_dispatch_form( request ):
                         except:
                             pass
                     else:
-                        form.auditComment = 'Tried to Validate Dispatch'
-                        issue = 'Problems with Stock on WB:  ' + str( form )
-                        form.waybillValidated = False
+                        waybill.auditComment = 'Tried to Validate Dispatch'
+                        issue = 'Problems with Stock on WB:  ' + str( waybill )
+                        waybill.waybillValidated = False
                         messages.add_message( request, messages.ERROR, issue )
                         try:
-                            errorlog = CompasLogger.objects.get( wb = form )
+                            errorlog = CompasLogger.objects.get( wb = waybill )
                             errorlog.user = request.user
                             errorlog.errorDisp = errorMessage
                             errorlog.timestamp = datetime.datetime.now()
                             errorlog.save()
                         except:
                             errorlog = CompasLogger()
-                            errorlog.wb = form
+                            errorlog.wb = waybill
                             errorlog.user = request.user
                             errorlog.errorDisp = errorMessage
                             errorlog.timestamp = datetime.datetime.now()
                             errorlog.save()
                 except:
-                        form.auditComment = 'Tried to Validate Dispatch'
-                        issue = 'Problems with Stock on WB:  ' + str( form )
-                        form.waybillValidated = False
+                        waybill.auditComment = 'Tried to Validate Dispatch'
+                        issue = 'Problems with Stock on WB:  ' + str( waybill )
+                        waybill.waybillValidated = False
                         messages.add_message( request, messages.ERROR, issue )
                         try:
-                            errorlog = CompasLogger.objects.get( wb = form )
+                            errorlog = CompasLogger.objects.get( wb = waybill )
                             errorlog.user = request.user
                             errorlog.errorDisp = errorMessage
                             errorlog.timestamp = datetime.datetime.now()
                             errorlog.save()
                         except:
                             errorlog = CompasLogger()
-                            errorlog.wb = form
+                            errorlog.wb = waybill
                             errorlog.user = request.user
                             errorlog.errorDisp = errorMessage
                             errorlog.timestamp = datetime.datetime.now()
@@ -861,11 +860,11 @@ def waybill_validate_receipt_form( request ):
         formset = ValidateFormset( request.POST )
         if  formset.is_valid():
             instances = formset.save( commit = False )
-            for form in  instances:
-                if form.check_lines_receipt():
-                    form.auditComment = 'Validated Receipt'
+            for waybill in  instances:
+                if waybill.check_lines_receipt():
+                    waybill.auditComment = 'Validated Receipt'
                     try:
-                        errorlog = CompasLogger.objects.get( wb = form )
+                        errorlog = CompasLogger.objects.get( wb = waybill )
                         errorlog.user = request.user
                         errorlog.errorRec = ''
                         errorlog.timestamp = datetime.datetime.now()
@@ -873,19 +872,19 @@ def waybill_validate_receipt_form( request ):
                     except:
                         pass
                 else:
-                    form.auditComment = 'Tried to Validate Receipt'
-                    issue = 'Problems with Stock on WB:  ' + str( form )
+                    waybill.auditComment = 'Tried to Validate Receipt'
+                    issue = 'Problems with Stock on WB:  ' + str( waybill )
                     messages.add_message( request, messages.ERROR, issue )
-                    form.waybillReceiptValidated = False
+                    waybill.waybillReceiptValidated = False
                     try:
-                        errorlog = CompasLogger.objects.get( wb = form )
+                        errorlog = CompasLogger.objects.get( wb = waybill )
                         errorlog.user = request.user
                         errorlog.errorRec = errorMessage
                         errorlog.timestamp = datetime.datetime.now()
                         errorlog.save()
                     except:
                         errorlog = CompasLogger()
-                        errorlog.wb = form
+                        errorlog.wb = waybill
                         errorlog.user = request.user
                         errorlog.errorRec = errorMessage
                         errorlog.timestamp = datetime.datetime.now()
