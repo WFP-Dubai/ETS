@@ -1,9 +1,13 @@
+
+import datetime
+
 from django.db import models, connection
 from django.contrib import admin
 from django.forms import ModelForm, ModelChoiceField
 from django.contrib.auth.models import User
 from django.forms.models import inlineformset_factory
-import datetime
+from django.db.models import Sum
+
 from django.template.defaultfilters import stringfilter
 from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
@@ -134,11 +138,15 @@ class Waybill( models.Model ):
                 return False
         return True
 
-    def dispatch_person( self ):
-        return EpicPerson.objects.get( person_pk = self.dispatcherName )
+    #===================================================================================================================
+    # def dispatch_person( self ):
+    #    return EpicPerson.objects.get( person_pk = self.dispatcherName )
+    #===================================================================================================================
 
-    def receipt_person( self ):
-        return EpicPerson.objects.get( person_pk = self.recipientName )
+    #===================================================================================================================
+    # def receipt_person( self ):
+    #    return EpicPerson.objects.get( person_pk = self.recipientName )
+    #===================================================================================================================
 
     @property
     def is_bulk( self ):
@@ -149,7 +157,7 @@ class Waybill( models.Model ):
         try:
             return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
         except:
-            return None
+            pass
 
     @property
     def origin_wh_code( self ):
@@ -252,10 +260,10 @@ class LtiOriginal( models.Model ):
     unit_weight_net = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
     unit_weight_gross = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
 
-    objects = models.Manager()
+    #objects = models.Manager()
 
     class Meta:
-            db_table = u'epic_lti'
+        db_table = u'epic_lti'
 
     def  __unicode__( self ):
         if self.valid():
@@ -270,10 +278,7 @@ class LtiOriginal( models.Model ):
         return self.cmmname
 
     def valid( self ):
-        if RemovedLtis.objects.filter( lti = self.lti_pk ):
-            return False
-        else:
-            return True
+        return RemovedLtis.objects.filter( lti = self.lti_pk ).count() == 0 
 
     @property
     def items_left( self ):
@@ -290,15 +295,17 @@ class LtiOriginal( models.Model ):
             return self.number_of_units - used
 
     def stock_items( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+                                         si_code = self.si_code, 
+                                         commodity_code = self.commodity_code )
 
     def reduce_si( self, units ):
-            self.sitracker.update_units( units )
-            return self.items_left
+        self.sitracker.update_units( units )
+        return self.items_left
 
     def restore_si( self, units ):
-            self.sitracker.update_units_restore( units )
-            return self.items_left()
+        self.sitracker.update_units_restore( units )
+        return self.items_left()
 
     def packaging( self ):
         pack = 'Unknown'
@@ -333,7 +340,10 @@ class LtiOriginal( models.Model ):
                     return 'No Stock '
 
     def related_stock( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+                                         si_code = self.si_code, 
+                                         commodity_code = self.commodity_code 
+                                         ).order_by( '-number_of_units' )
 
     def remove_lti( self ):
         all_removed = RemovedLtis.objects.all()
@@ -343,128 +353,132 @@ class LtiOriginal( models.Model ):
             this_lti.save()
 
     def get_stocks( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+                                         si_code = self.si_code, 
+                                         commodity_code = self.commodity_code )
 
     @property
     def total_stock( self ):
-        my_stock = self.related_stock()
-        total = 0
-        for item in my_stock:
-            total = +item.number_of_units
-        return total
+        return self.related_stock().aggregate(units_count=Sum('number_of_units'))['units_count']
 
 
-
-class RemovedLtisManager( models.Manager ):
-        def list( self ):
-            listExl = []
-            listOfExcluded = RemovedLtis.objects.all()
-            for exl in listOfExcluded:
-                listExl += [exl.lti.lti_pk]
-            return listExl
+#=======================================================================================================================
+# class RemovedLtisManager( models.Manager ):
+#        def list( self ):
+#            listExl = []
+#            listOfExcluded = RemovedLtis.objects.all()
+#            for exl in listOfExcluded:
+#                listExl += [exl.lti.lti_pk]
+#            return listExl
+#=======================================================================================================================
 
 class RemovedLtis( models.Model ):
-        lti = models.ForeignKey( LtiOriginal, primary_key = True )
-        objects = RemovedLtisManager()
-        class Meta:
-                db_table = u'waybill_removed_ltis'
-        def  __unicode__( self ):
-                return self.lti.lti_id
+    lti = models.ForeignKey( LtiOriginal, primary_key = True )
+    #objects = RemovedLtisManager()
+    
+    class Meta:
+        db_table = u'waybill_removed_ltis'
+    
+    def  __unicode__( self ):
+            return self.lti.lti_id
 
 class EpicPerson( models.Model ):
-        person_pk = models.CharField( max_length = 20, blank = True, primary_key = True )
-        org_unit_code = models.CharField( max_length = 13 )
-        code = models.CharField( max_length = 7 )
-        type_of_document = models.CharField( max_length = 2, blank = True )
-        organization_id = models.CharField( max_length = 12 )
-        last_name = models.CharField( max_length = 30 )
-        first_name = models.CharField( max_length = 25 )
-        title = models.CharField( max_length = 50, blank = True )
-        document_number = models.CharField( max_length = 25, blank = True )
-        e_mail_address = models.CharField( max_length = 100, blank = True )
-        mobile_phone_number = models.CharField( max_length = 20, blank = True )
-        official_tel_number = models.CharField( max_length = 20, blank = True )
-        fax_number = models.CharField( max_length = 20, blank = True )
-        effective_date = models.DateField( null = True, blank = True )
-        expiry_date = models.DateField( null = True, blank = True )
-        location_code = models.CharField( max_length = 10 )
+    person_pk = models.CharField( max_length = 20, blank = True, primary_key = True )
+    org_unit_code = models.CharField( max_length = 13 )
+    code = models.CharField( max_length = 7 )
+    type_of_document = models.CharField( max_length = 2, blank = True )
+    organization_id = models.CharField( max_length = 12 )
+    last_name = models.CharField( max_length = 30 )
+    first_name = models.CharField( max_length = 25 )
+    title = models.CharField( max_length = 50, blank = True )
+    document_number = models.CharField( max_length = 25, blank = True )
+    e_mail_address = models.CharField( max_length = 100, blank = True )
+    mobile_phone_number = models.CharField( max_length = 20, blank = True )
+    official_tel_number = models.CharField( max_length = 20, blank = True )
+    fax_number = models.CharField( max_length = 20, blank = True )
+    effective_date = models.DateField( null = True, blank = True )
+    expiry_date = models.DateField( null = True, blank = True )
+    location_code = models.CharField( max_length = 10 )
 
-        class Meta:
-                db_table = u'epic_persons'
-                verbose_name = 'COMPAS User'
+    class Meta:
+            db_table = u'epic_persons'
+            verbose_name = 'COMPAS User'
 
-        def  __unicode__( self ):
-                return self.last_name + ', ' + self.first_name
+    def  __unicode__( self ):
+            return self.last_name + ', ' + self.first_name
 
 
-class StockModel( models.Manager ):
+class StockManager( models.Manager ):
     def get_query_set( self ):
-        return super( StockModel, self ).get_query_set().filter( number_of_units__gt = 0 )
+        return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
 
 class EpicStock( models.Model ):
-        wh_pk = models.CharField( max_length = 90, blank = True, primary_key = True )
-        wh_regional = models.CharField( max_length = 4, blank = True )
-        wh_country = models.CharField( max_length = 15 )
-        wh_location = models.CharField( max_length = 30 )
-        wh_code = models.CharField( max_length = 13 )
-        wh_name = models.CharField( max_length = 50, blank = True )
-        project_wbs_element = models.CharField( max_length = 24, blank = True )
-        si_record_id = models.CharField( max_length = 25 )
-        si_code = models.CharField( max_length = 8 )
-        origin_id = models.CharField( max_length = 23 )
-        comm_category_code = models.CharField( max_length = 9 )
-        commodity_code = models.CharField( max_length = 18 )
-        cmmname = models.CharField( max_length = 100, blank = True )
-        package_code = models.CharField( max_length = 17 )
-        packagename = models.CharField( max_length = 50, blank = True )
-        qualitycode = models.CharField( max_length = 1 )
-        qualitydescr = models.CharField( max_length = 11, blank = True )
-        quantity_net = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
-        quantity_gross = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
-        number_of_units = models.IntegerField()
-        allocation_code = models.CharField( max_length = 10 )
-        reference_number = models.CharField( max_length = 50 )
-        objects = models.Manager()
-        in_stock_objects = StockModel()
+    wh_pk = models.CharField( max_length = 90, blank = True, primary_key = True )
+    wh_regional = models.CharField( max_length = 4, blank = True )
+    wh_country = models.CharField( max_length = 15 )
+    wh_location = models.CharField( max_length = 30 )
+    wh_code = models.CharField( max_length = 13 )
+    wh_name = models.CharField( max_length = 50, blank = True )
+    project_wbs_element = models.CharField( max_length = 24, blank = True )
+    si_record_id = models.CharField( max_length = 25 )
+    si_code = models.CharField( max_length = 8 )
+    origin_id = models.CharField( max_length = 23 )
+    comm_category_code = models.CharField( max_length = 9 )
+    commodity_code = models.CharField( max_length = 18 )
+    cmmname = models.CharField( max_length = 100, blank = True )
+    package_code = models.CharField( max_length = 17 )
+    packagename = models.CharField( max_length = 50, blank = True )
+    qualitycode = models.CharField( max_length = 1 )
+    qualitydescr = models.CharField( max_length = 11, blank = True )
+    quantity_net = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
+    quantity_gross = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
+    number_of_units = models.IntegerField()
+    allocation_code = models.CharField( max_length = 10 )
+    reference_number = models.CharField( max_length = 50 )
+    
+    objects = models.Manager()
+    in_stock_objects = StockManager()
 
-        class Meta:
-                db_table = u'epic_stock'
+    class Meta:
+        db_table = u'epic_stock'
 
-        def  __unicode__( self ):
-                return self.wh_name + '\t' + self.cmmname + '\t' + str( self.number_of_units ) + '\t' + self.coi_code()
+    def  __unicode__( self ):
+        return self.wh_name + '\t' + self.cmmname + '\t' + str( self.number_of_units ) + '\t' + self.coi_code()
 
-        def packaging_description_short( self ):
-            try:
-                pck = PackagingDescriptionShort.objects.get( pk = self.package_code )
-                return pck.packageShortName
-            except:
-                return self.packagename
-        def coi_code( self ):
-            return self.origin_id[7:]
+    def packaging_description_short( self ):
+        try:
+            return PackagingDescriptionShort.objects.get( pk = self.package_code ).packageShortName
+        except:
+            return self.packagename
+        
+    def coi_code( self ):
+        return self.origin_id[7:]
 
 
 class EpicLossDamages( models.Model ):
-        type = models.CharField( max_length = 1 )
-        comm_category_code = models.CharField( max_length = 9 )
-        cause = models.CharField( max_length = 100 )
-        class Meta:
-            db_table = u'epic_lossdamagereason'
-            verbose_name = 'Loss/Damages Reason'
-        def  __unicode__( self ):
+    type = models.CharField( max_length = 1 )
+    comm_category_code = models.CharField( max_length = 9 )
+    cause = models.CharField( max_length = 100 )
 
-            cause = self.cause
-            length_c = len( self.cause ) - 10
-            if length_c > 20:
-                cause = self.cause[0:20] + '...' + self.cause[length_c:]
-            return cause
+    class Meta:
+        db_table = u'epic_lossdamagereason'
+        verbose_name = 'Loss/Damages Reason'
+    
+    def  __unicode__( self ):
+        cause = self.cause
+        length_c = len( self.cause ) - 10
+        if length_c > 20:
+            cause = self.cause[0:20] + '...' + self.cause[length_c:]
+        return cause
 
 
 class LtiWithStock( models.Model ):
     lti_line = models.ForeignKey( LtiOriginal )
     stock_item = models.ForeignKey( EpicStock )
     lti_code = models.CharField( max_length = 20, db_index = True )
+    
     def  __unicode__( self ):
-        item_name = unicode( self.coi_code() ) + u' - ' + unicode( self.stock_item.cmmname ) + ' (' + unicode( self.lti_line.items_left ) + ')'
+        item_name = u"%s - %s (%s)" % (self.coi_code(), self.stock_item.cmmname, self.lti_line.items_left)
 
         in_stock = self.lti_line.valid()
         if in_stock :
