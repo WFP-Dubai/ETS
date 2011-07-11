@@ -1228,7 +1228,7 @@ def get_synchronize_waybill2( request ):
         # Add related EpicStocks to serialized representation
         stocks_to_serialize = []
         for lti in ltis_to_serialize:
-            for s in lti.get_stocks():
+            for s in lti.stock_items():
                 stocks_to_serialize.append( s )
         ld += loadingdetails_to_serialize
         ltis += ltis_to_serialize

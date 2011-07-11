@@ -174,7 +174,7 @@ def serialized_wb_repr( wb_id ):
     stocks_list = []
     from ets.waybill.structures import stock_named2positional_dict
     for lti in ltis:
-        for stock in lti.get_stocks():
+        for stock in lti.stock_items():
             stock_dict = instance_as_dict( stock, exclude = ['id'] )
             stock_positional_dict = stock_named2positional_dict( stock_dict )
             stocks_list.append( stock_positional_dict )
@@ -608,16 +608,12 @@ def sync_lti_stock():
     all_stock = EpicStock.objects.all()
     all_ltis = LtiOriginal.objects.all()
     for lti_item in all_ltis:
-        stock_items = lti_item.get_stocks()
-        for item in stock_items:
-            the_match = LtiWithStock.objects.get_or_create( lti_line = lti_item, stock_item = item , lti_code = lti_item.code )
-            the_match[0].save()
+        for item in lti_item.stock_items():
+            the_match, created = LtiWithStock.objects.get_or_create( lti_line = lti_item, stock_item = item , lti_code = lti_item.code )
 
 def coi_for_lti_item( lti_line ):
     lti = LtiOriginal.objects.get( pk = lti_line )
-    items = LtiWithStock.objects.filter( lti_code = lti )
-    return items
+    return LtiWithStock.objects.filter( lti_code = lti )
 
 def coi_for_lti_code( lti_code ):
-    items = LtiWithStock.objects.filter( lti_code = lti_code )
-    return items
+    return LtiWithStock.objects.filter( lti_code = lti_code )

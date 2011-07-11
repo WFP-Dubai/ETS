@@ -297,7 +297,8 @@ class LtiOriginal( models.Model ):
     def stock_items( self ):
         return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
                                          si_code = self.si_code, 
-                                         commodity_code = self.commodity_code )
+                                         commodity_code = self.commodity_code 
+                                         ).order_by( '-number_of_units' )
 
     def reduce_si( self, units ):
         self.sitracker.update_units( units )
@@ -310,7 +311,7 @@ class LtiOriginal( models.Model ):
     def packaging( self ):
         pack = 'Unknown'
         try:
-            mypkg = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code )
+            mypkg = self.stock_items()
             pack = str( mypkg[0].packagename )
         except:
             pass
@@ -318,32 +319,33 @@ class LtiOriginal( models.Model ):
 
     @property
     def is_bulk( self ):
-        mypkg = self.packaging()
-        if mypkg == 'BULK':
-            return True
-        else:
-            return False
+        return self.packaging() == 'BULK'
 
     def coi_code( self ):
-        stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( commodity_code = self.commodity_code ).order_by( '-number_of_units' )
+        stock_items_qs = self.stock_items()
         if stock_items_qs.count() > 0:
-            return str( stock_items_qs[0].origin_id[7:] )
+            return str( stock_items_qs[0].coi_code() )
         else:
-            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code ).filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
+            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+                                                       si_code = self.si_code, 
+                                                       comm_category_code = self.comm_category_code 
+                                                       ).order_by( '-number_of_units' )
             if stock_items_qs.count() > 0:
-                return str( stock_items_qs[0].origin_id[7:] )
+                return str( stock_items_qs[0].coi_code() )
             else:
                 stock_items_qs = EpicStock.objects.filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
                 if stock_items_qs.count() > 0:
-                    return str( stock_items_qs[0].origin_id[7:] )
+                    return str( stock_items_qs[0].coi_code() )
                 else:
                     return 'No Stock '
 
-    def related_stock( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                         si_code = self.si_code, 
-                                         commodity_code = self.commodity_code 
-                                         ).order_by( '-number_of_units' )
+    #===================================================================================================================
+    # def related_stock( self ):
+    #    return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+    #                                     si_code = self.si_code, 
+    #                                     commodity_code = self.commodity_code 
+    #                                     ).order_by( '-number_of_units' )
+    #===================================================================================================================
 
     def remove_lti( self ):
         all_removed = RemovedLtis.objects.all()
@@ -352,14 +354,16 @@ class LtiOriginal( models.Model ):
         if this_lti not in all_removed:
             this_lti.save()
 
-    def get_stocks( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                         si_code = self.si_code, 
-                                         commodity_code = self.commodity_code )
+    #===================================================================================================================
+    # def get_stocks( self ):
+    #    return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+    #                                     si_code = self.si_code, 
+    #                                     commodity_code = self.commodity_code )
+    #===================================================================================================================
 
     @property
     def total_stock( self ):
-        return self.related_stock().aggregate(units_count=Sum('number_of_units'))['units_count']
+        return self.stock_items().aggregate(units_count=Sum('number_of_units'))['units_count']
 
 
 #=======================================================================================================================
@@ -614,7 +618,6 @@ class UserProfile( models.Model ):
 User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )[0] )
 
 
-
 class SiTracker( models.Model ):
     LTI = models.OneToOneField( LtiOriginal, primary_key = True )
     number_units_left = models.DecimalField( decimal_places = 3, max_digits = 10 )
@@ -623,17 +626,20 @@ class SiTracker( models.Model ):
     def update_units( self, ammount ):
         self.number_units_left -= ammount
         self.save()
+        
     def update_units_restore( self, ammount ):
         self.number_units_left += ammount
         self.save()
+        
     def  __unicode__( self ):
         return self.number_units_left
 
 class PackagingDescriptionShort( models.Model ):
     packageCode = models.CharField( primary_key = True, max_length = 5 )
     packageShortName = models.CharField( max_length = 10 )
+    
     def  __unicode__( self ):
-        return self.packageCode + ' - ' + self.packageShortName
+        return "%s - %s" % (self.packageCode, self.packageShortName)
 
 
 class CompasLogger( models.Model ):
@@ -647,28 +653,32 @@ class CompasLogger( models.Model ):
     data_in = models.CharField( max_length = 5000, blank = True )
     data_out = models.CharField( max_length = 5000, blank = True )
     #loggercompas
+    
     class Meta:
         db_table = u'loggercompas'
 
 class SIWithRestant:
-        SINumber = ''
-        StartAmount = 0.0
-        CurrentAmount = 0.0
-        CommodityName = ''
-        InStock = 0
-        COI_Code = ''
-        def __init__( self, SINumber, StartAmount, CommodityName ):
-                self.SINumber = SINumber
-                self.StartAmount = StartAmount
-                self.CurrentAmount = StartAmount
-                self.CommodityName = CommodityName
+    SINumber = ''
+    StartAmount = 0.0
+    CurrentAmount = 0.0
+    CommodityName = ''
+    InStock = 0
+    COI_Code = ''
 
-        def reduce_current( self, reduce ):
-            self.CurrentAmount = self.CurrentAmount - reduce
-        def get_current_amount( self ):
-            return self.CurrentAmount
-        def get_start_amount( self ):
-                return self.StartAmount
+    def __init__( self, SINumber, StartAmount, CommodityName ):
+        self.SINumber = SINumber
+        self.StartAmount = StartAmount
+        self.CurrentAmount = StartAmount
+        self.CommodityName = CommodityName
+
+    def reduce_current( self, reduce ):
+        self.CurrentAmount = self.CurrentAmount - reduce
+        
+    def get_current_amount( self ):
+        return self.CurrentAmount
+    
+    def get_start_amount( self ):
+        return self.StartAmount
 
 
 # TODO: Importing of old waybills....
@@ -720,8 +730,10 @@ class DispatchMaster( models.Model ):
     recv_pack = models.BigIntegerField( null = True, blank = True )
     last_mod_user = models.CharField( max_length = 30, blank = True )
     last_mod_date = models.DateField( null = True, blank = True )
+    
     class Meta:
         db_table = u'dispatch_masters'
+    
     def  __unicode__( self ):
         return self.code
 
@@ -749,6 +761,7 @@ class DispatchDetail( models.Model ):
     recv_pack = models.BigIntegerField( null = True, blank = True )
     last_mod_user = models.CharField( max_length = 30, blank = True )
     last_mod_date = models.DateField( null = True, blank = True )
+    
     class Meta:
         db_table = u'dispatch_details'
 
