@@ -380,7 +380,7 @@ class RemovedLtis( models.Model ):
         db_table = u'waybill_removed_ltis'
     
     def  __unicode__( self ):
-            return self.lti.lti_id
+        return self.lti.lti_id
 
 class EpicPerson( models.Model ):
     person_pk = models.CharField( max_length = 20, blank = True, primary_key = True )
@@ -401,11 +401,11 @@ class EpicPerson( models.Model ):
     location_code = models.CharField( max_length = 10 )
 
     class Meta:
-            db_table = u'epic_persons'
-            verbose_name = 'COMPAS User'
+        db_table = u'epic_persons'
+        verbose_name = 'COMPAS User'
 
     def  __unicode__( self ):
-            return self.last_name + ', ' + self.first_name
+        return "%s, %s" % (self.last_name, self.first_name)
 
 
 class StockManager( models.Manager ):
@@ -443,7 +443,7 @@ class EpicStock( models.Model ):
         db_table = u'epic_stock'
 
     def  __unicode__( self ):
-        return self.wh_name + '\t' + self.cmmname + '\t' + str( self.number_of_units ) + '\t' + self.coi_code()
+        return "%s\t%s\t%s\t%s" % (self.wh_name, self.cmmname, self.number_of_units, self.coi_code())
 
     def packaging_description_short( self ):
         try:
@@ -479,142 +479,138 @@ class LtiWithStock( models.Model ):
     
     def  __unicode__( self ):
         item_name = u"%s - %s (%s)" % (self.coi_code(), self.stock_item.cmmname, self.lti_line.items_left)
-
-        in_stock = self.lti_line.valid()
-        if in_stock :
-            return item_name
-        else:
-            return 'Void ' + item_name
+        return self.lti_line.valid() and item_name or 'Void %s' % item_name
 
     def coi_code( self ):
         return self.stock_item.coi_code()
 
 
 class LoadingDetail( models.Model ):
-        wbNumber = models.ForeignKey( Waybill )
-        order_item = models.ForeignKey( LtiWithStock )
-        numberUnitsLoaded = models.DecimalField( default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
-        numberUnitsGood = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-        numberUnitsLost = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-        numberUnitsDamaged = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-        unitsLostReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
-        unitsDamagedReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
-        unitsDamagedType = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
-        unitsLostType = models.ForeignKey( EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
-        overloadedUnits = models.BooleanField()
-        loadingDetailSentToCompas = models.BooleanField()
-        overOffloadUnits = models.BooleanField()
+    wbNumber = models.ForeignKey( Waybill )
+    order_item = models.ForeignKey( LtiWithStock )
+    numberUnitsLoaded = models.DecimalField( default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
+    numberUnitsGood = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsLost = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsDamaged = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    unitsLostReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
+    unitsDamagedReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
+    unitsDamagedType = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
+    unitsLostType = models.ForeignKey( EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
+    overloadedUnits = models.BooleanField()
+    loadingDetailSentToCompas = models.BooleanField()
+    overOffloadUnits = models.BooleanField()
 
-        audit_log = AuditLog()
+    audit_log = AuditLog()
 
-        def check_stock( self ):
-            stock = self.order_item.stock_item
-            if self.order_item.lti_line.is_bulk:
-                if self.numberUnitsLoaded <= stock.quantity_net:
-                    return True
-            else:
-                if self.numberUnitsLoaded <= stock.number_of_units :
-                    return True
-            return False
+    def check_stock( self ):
+        stock = self.order_item.stock_item
+        if self.order_item.lti_line.is_bulk:
+            if self.numberUnitsLoaded <= stock.quantity_net:
+                return True
+        else:
+            if self.numberUnitsLoaded <= stock.number_of_units :
+                return True
+        
+        return False
 
-        def check_receipt_item( self ):
-            return True
-        @property
-        def get_stock_item( self ):
-            stockItem = EpicStock.objects.get( pk = self.order_item.stock_item.pk )
-            return stockItem
+    def check_receipt_item( self ):
+        return True
+    
+    def get_stock_item( self ):
+        return EpicStock.objects.get( pk = self.order_item.stock_item.pk )
 
-        def calculate_total_net( self ):
-            totalNet = ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_net ) / 1000
-            return totalNet
+    def calculate_total_net( self ):
+        return ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_net ) / 1000
 
-        def calculate_total_gross( self ):
-            totalGross = ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_gross ) / 1000
-            return totalGross
+    def calculate_total_gross( self ):
+        return ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_gross ) / 1000
 
-        def calculate_net_received_good( self ):
-            totalNet = ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_net ) / 1000
-            return totalNet
+    def calculate_net_received_good( self ):
+        return ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_net ) / 1000
 
-        def calculate_gross_received_good( self ):
-            totalGross = ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_gross ) / 1000
-            return totalGross
+    #===============================================================================================================
+    # def calculate_gross_received_good( self ):
+    #    return ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_gross ) / 1000
+    #===============================================================================================================
 
-        def calculate_net_received_damaged( self ):
-                totalNet = ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_net ) / 1000
-                return totalNet
+    def calculate_net_received_damaged( self ):
+        return ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_net ) / 1000
 
-        def calculate_gross_received_damaged( self ):
-                totalGross = ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_gross ) / 1000
-                return totalGross
+    #===============================================================================================================
+    # def calculate_gross_received_damaged( self ):
+    #    return ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_gross ) / 1000
+    #===============================================================================================================
 
-        def calculate_net_received_lost( self ):
-                totalNet = ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_net ) / 1000
-                return totalNet
+    def calculate_net_received_lost( self ):
+        return ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_net ) / 1000
 
-        def calculate_gross_received_lost( self ):
-                totalGross = ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_gross ) / 1000
-                return totalGross
+    #===============================================================================================================
+    # def calculate_gross_received_lost( self ):
+    #    return ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_gross ) / 1000
+    #===============================================================================================================
 
-        def calculate_total_received_units( self ):
-                total = self.numberUnitsGood + self.numberUnitsDamaged
-                return total
+    def calculate_total_received_units( self ):
+        return self.numberUnitsGood + self.numberUnitsDamaged
 
-        def calculate_total_received_net( self ):
-                total = self.calculate_net_received_good() + self.calculate_net_received_damaged()
-                return total
+    def calculate_total_received_net( self ):
+        return self.calculate_net_received_good() + self.calculate_net_received_damaged()
 
-        @property
-        def invalid( self ):
-            return self.wbNumber.invalidated
+    @property
+    def invalid( self ):
+        return self.wbNumber.invalidated
 
-        def  __unicode__( self ):
-                return self.wbNumber.mydesc() + ' - ' + str( self.order_item.stock_item ) + ' - ' + self.order_item.lti_code #.mydesc() + ' - ' + self.order_item.stock_item.lti_pk
+    def  __unicode__( self ):
+        return "%s - %s - " % (self.wbNumber.mydesc(), self.order_item.stock_item, self.order_item.lti_code) #.mydesc() + ' - ' + self.order_item.stock_item.lti_pk
 
 class DispatchPoint( models.Model ):
-        origin_loc_name = models.CharField( 'Location Name', max_length = 40, blank = True )
-        origin_location_code = models.CharField( 'Location Code', max_length = 40, blank = True )
-        origin_wh_code = models.CharField( 'Warehouse Code', max_length = 40, blank = True )
-        origin_wh_name = models.CharField( 'Warehouse Name', max_length = 80, blank = True )
-        ACTIVE_START_DATE = models.DateField( 'Start of Service', null = True, blank = True )
+    origin_loc_name = models.CharField( 'Location Name', max_length = 40, blank = True )
+    origin_location_code = models.CharField( 'Location Code', max_length = 40, blank = True )
+    origin_wh_code = models.CharField( 'Warehouse Code', max_length = 40, blank = True )
+    origin_wh_name = models.CharField( 'Warehouse Name', max_length = 80, blank = True )
+    ACTIVE_START_DATE = models.DateField( 'Start of Service', null = True, blank = True )
 
-        class Meta:
-            verbose_name = 'Dispatch Warehouse'
-        def  __unicode__( self ):
-                return self.origin_wh_code + ' - ' + self.origin_loc_name + ' - ' + self.origin_wh_name
+    class Meta:
+        verbose_name = 'Dispatch Warehouse'
+        
+    def  __unicode__( self ):
+        return "%s - %s - %s" % (self.origin_wh_code, self.origin_loc_name, self.origin_wh_name)
 
 class ReceptionPoint( models.Model ):
-        LOC_NAME = models.CharField( 'Location Name', max_length = 40, blank = True )
-        LOCATION_CODE = models.CharField( 'Location Code', max_length = 40, blank = True )
-        consegnee_code = models.CharField( 'Consengee Code', max_length = 40, blank = True )
-        consegnee_name = models.CharField( 'Consengee Name', max_length = 80, blank = True )
-        #DESC_NAME = models.CharField(max_length = 80, blank = True)
-        ACTIVE_START_DATE = models.DateField( null = True, blank = True )
-        def  __unicode__( self ):
-                return self.LOC_NAME + ' - ' + self.consegnee_name
-        class Meta:
-            ordering = ['LOC_NAME', 'consegnee_name']
-            verbose_name = 'Reception Warehouse'
+    LOC_NAME = models.CharField( 'Location Name', max_length = 40, blank = True )
+    LOCATION_CODE = models.CharField( 'Location Code', max_length = 40, blank = True )
+    consegnee_code = models.CharField( 'Consengee Code', max_length = 40, blank = True )
+    consegnee_name = models.CharField( 'Consengee Name', max_length = 80, blank = True )
+    #DESC_NAME = models.CharField(max_length = 80, blank = True)
+    ACTIVE_START_DATE = models.DateField( null = True, blank = True )
+    
+    def  __unicode__( self ):
+        return "%s - %s" % (self.LOC_NAME, self.consegnee_name)
+        
+    class Meta:
+        ordering = ('LOC_NAME', 'consegnee_name')
+        verbose_name = 'Reception Warehouse'
 
 class UserProfile( models.Model ):
-        user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-        warehouses = models.ForeignKey( DispatchPoint, blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
-        receptionPoints = models.ForeignKey( ReceptionPoint, blank = True, null = True, verbose_name = 'Receipt Warehouse' )
-        isCompasUser = models.BooleanField( 'Is Compas User' )
-        isDispatcher = models.BooleanField( 'Is Dispatcher' )
-        isReciever = models.BooleanField( 'Is Receiver' )
-        isAllReceiver = models.BooleanField( 'Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)' )
-        compasUser = models.ForeignKey( EpicPerson, blank = True, null = True, verbose_name = 'Use this Compas User', help_text = 'Select the corrisponding user from Compas' )
-        superUser = models.BooleanField( 'Super User', help_text = 'This user has Full Privileges to edit Waybills even after Signatures' )
-        readerUser = models.BooleanField( 'Readonly User' )
+    user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
+    warehouses = models.ForeignKey( DispatchPoint, blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
+    receptionPoints = models.ForeignKey( ReceptionPoint, blank = True, null = True, verbose_name = 'Receipt Warehouse' )
+    isCompasUser = models.BooleanField( 'Is Compas User' )
+    isDispatcher = models.BooleanField( 'Is Dispatcher' )
+    isReciever = models.BooleanField( 'Is Receiver' )
+    isAllReceiver = models.BooleanField( 'Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)' )
+    compasUser = models.ForeignKey( EpicPerson, blank = True, null = True, verbose_name = 'Use this Compas User', help_text = 'Select the corrisponding user from Compas' )
+    superUser = models.BooleanField( 'Super User', help_text = 'This user has Full Privileges to edit Waybills even after Signatures' )
+    readerUser = models.BooleanField( 'Readonly User' )
 
-        audit_log = AuditLog()
-        def __unicode__( self ):
-            if self.user.first_name and self.user.last_name:
-                return "%s %s's profile (%s)" % ( self.user.first_name, self.user.last_name, self.user.username )
-            else:
-                return "%s's profile" % self.user.username
+    audit_log = AuditLog()
+    
+    def __unicode__( self ):
+        if self.user.first_name and self.user.last_name:
+            return "%s %s's profile (%s)" % ( self.user.first_name, self.user.last_name, self.user.username )
+        else:
+            return "%s's profile" % self.user.username
 
+#: XXX: Correct it 
 User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )[0] )
 
 
