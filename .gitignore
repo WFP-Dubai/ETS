@@ -42,3 +42,5 @@ db
 /static
 /var
 /docs/_build/init_spatialite-2.3.sql
+
+ets/settings_local.py
