@@ -289,6 +289,7 @@ class LtiOriginal( models.Model ):
             for line in wblines:
                 if line.invalid == False and line.wbNumber.dispatcherSigned == True:
                     used += line.numberUnitsLoaded
+        
         if self.is_bulk:
             return self.quantity_net - used
         else:
@@ -333,7 +334,9 @@ class LtiOriginal( models.Model ):
             if stock_items_qs.count() > 0:
                 return str( stock_items_qs[0].coi_code() )
             else:
-                stock_items_qs = EpicStock.objects.filter( si_code = self.si_code ).filter( comm_category_code = self.comm_category_code ).order_by( '-number_of_units' )
+                stock_items_qs = EpicStock.objects.filter( si_code = self.si_code, 
+                                                           comm_category_code = self.comm_category_code 
+                                                           ).order_by( '-number_of_units' )
                 if stock_items_qs.count() > 0:
                     return str( stock_items_qs[0].coi_code() )
                 else:
@@ -413,6 +416,7 @@ class EpicPerson( models.Model ):
 
 
 class StockManager( models.Manager ):
+    
     def get_query_set( self ):
         return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
 
@@ -470,9 +474,9 @@ class EpicLossDamages( models.Model ):
     
     def  __unicode__( self ):
         cause = self.cause
-        length_c = len( self.cause ) - 10
+        length_c = len( cause ) - 10
         if length_c > 20:
-            cause = self.cause[0:20] + '...' + self.cause[length_c:]
+            cause = "%s...%s" % (cause[0:20], cause[length_c:])
         return cause
 
 
