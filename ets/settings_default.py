@@ -17,6 +17,14 @@ ALL_DB = {
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '',
+    }, 
+    'default_tc_pak_rem': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'wb_pak',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': '10.11.208.20',
+        'PORT': '',
     },
     'default_test_pak': {
         'ENGINE': 'django.db.backends.mysql',
