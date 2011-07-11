@@ -33,7 +33,11 @@ urlpatterns = patterns( '',
     ( r'^accounts/change_password', password_change ),
     ( r'^accounts/profile', profile ),
     ( r'^accounts/change_password_done', password_change_done ),
-    ( r'^select-action$', select_action ),
+    
+    url( r'^select-action/$', select_action, {
+        'template': 'select_action.html',
+    }, name="select_action" ),
+    
     ( r'^waybill/viewlog', viewLogView ),
     ( r'^waybill/create/(.*)$', waybillCreate ),
     ( r'^waybill/deserialize/$', deserialize ),

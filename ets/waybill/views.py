@@ -1,4 +1,6 @@
-# Create your views here.
+import datetime
+import os, StringIO, zlib, base64, string
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -11,32 +13,37 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext, Library, Node, loader, Context
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import simplejson
+from django.views.generic.simple import redirect_to, direct_to_template
+
 from kiowa.utils.encode import DecimalJSONEncoder
+
 from ets.waybill.compas import *
 from ets.waybill.forms import *
 from ets.waybill.models import *
 from ets.waybill.tools import *
-import datetime
-import os, StringIO, zlib, base64, string
+
+
 from django.contrib import messages
-import simplejson as json
 from django.forms.fields import ChoiceField
+from logilab.astng.test.data.module import redirect
 
 
 def prep_req( request ):
 
-    return{'user': request.user}
+    return {'user': request.user}
 
 @login_required
-def select_action( request ):
+def select_action( request, **kwargs ):
     """
     View: select_action 
     URL: /ets/select-action
     Template: /ets/waybill/templates/select_action.html
     Gives the loggedin user a choise of possible actions sepending on roles
     """
-
-    return render_to_response( 'select_action.html', context_instance = RequestContext( request ) )
+    
+    return direct_to_template(request, **kwargs)
+    
 
 @login_required
 def listOfLtis( request, origin ):
@@ -114,7 +121,7 @@ def import_ltis( request ):
     track_compas_update()
     messages.add_message( request, messages.INFO, status )
 
-    return HttpResponseRedirect( reverse( select_action ) )
+    return redirect("select_action")
 
 def lti_detail_url( request, lti_code ):
     """
@@ -145,7 +152,7 @@ def dispatch( request ):
     try:
         return HttpResponseRedirect( reverse( listOfLtis, args = [request.user.get_profile().warehouses.origin_wh_code] ) )
     except:
-        return HttpResponseRedirect( reverse( select_action ) )
+        return redirect( "select_action" )
 
 #### Waybill Views
 @login_required
@@ -156,7 +163,7 @@ def waybill_create( request, lti_pk ):
                               {'detailed':detailed_lti, 'lti_id':lti_pk},
                               context_instance = RequestContext( request ) )
     except:
-        return HttpResponseRedirect( reverse( select_action ) )
+        return redirect( "select_action" )
 
 
 @login_required
@@ -442,7 +449,7 @@ def waybill_view( request, wb_id ):
             rec_person_object = ''
     except Exception as e:
         print e
-        return HttpResponseRedirect( reverse( select_action ) )
+        return redirect( "select_action" )
     data_dict = {
                  'object': waybill_instance,
                  'LtiOriginal': lti_detail_items,
@@ -468,7 +475,7 @@ def waybill_view_reception( request, wb_id ):
         my_empty = [''] * extra_lines
         zippedWB = wb_compress( wb_id )
     except:
-        return HttpResponseRedirect( reverse( select_action ) )
+        return redirect( "select_action" )
     try:
         disp_person_object = EpicPerson.objects.get( person_pk = waybill_instance.dispatcherName )
         rec_person_object = EpicPerson.objects.get( person_pk = waybill_instance.recipientName )
@@ -1142,7 +1149,7 @@ def get_synchronize_stock( request ):
         for element in stocks_list:
             l.append( instance_as_dict( element ) )
 
-        serialized_stocks = json.dumps( l, cls = DecimalJSONEncoder )
+        serialized_stocks = simplejson.dumps( l, cls = DecimalJSONEncoder )
 
         response = HttpResponse( serialized_stocks, mimetype = 'application/json' )
 
@@ -1167,7 +1174,7 @@ def get_synchronize_lti( request ):
         for element in ltis_list:
             l.append( instance_as_dict( element ) )
 
-        serialized_ltis = json.dumps( l, cls = DecimalJSONEncoder )
+        serialized_ltis = simplejson.dumps( l, cls = DecimalJSONEncoder )
 
         response = HttpResponse( serialized_ltis, mimetype = 'application/json' )
 
@@ -1202,7 +1209,7 @@ def get_synchronize_waybill( request ):
         l = []
         for element in waybills_list:
             l.append( instance_as_dict( element ) )
-        serialized_waybills = json.dumps( l, cls = DecimalJSONEncoder )
+        serialized_waybills = simplejson.dumps( l, cls = DecimalJSONEncoder )
         response = HttpResponse( serialized_waybills, mimetype = 'application/json' )
 
     return response
@@ -1252,6 +1259,7 @@ def get_all_data( request ):
     data = serialized_all_items()
     response = HttpResponse( data, mimetype = 'application/json' )
     return response
+
 @csrf_exempt
 def get_all_data_download( request ):
     print 'Donwload'
