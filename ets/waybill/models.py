@@ -217,6 +217,14 @@ class Waybill( models.Model ):
 #        except:
 #            return None
 #    lti_date = property( lti_date )
+    
+    def invalidate_waybill_action( self ):
+        for lineitem in self.loadingdetail_set.select_related():
+            lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
+            lineitem.numberUnitsLoaded = 0
+            lineitem.save()
+        self.invalidated = True
+        self.save()
 
 
 #### Compas Tables Imported
