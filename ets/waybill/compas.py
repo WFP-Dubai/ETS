@@ -107,7 +107,7 @@ class compas_write:
                         GrossTotal = TheStockItem.quantity_gross
                     strGrossTotal = u'%.3f' % GrossTotal
                     Response_Message = cursor.var( cx_Oracle.STRING )
-                    Response_Message.setvalue( 0, u'x' * 80 )
+                    Response_Message.setvalue( 0, u' ' * 80 )
                     Response_Code = cursor.var( cx_Oracle.STRING )
                     Response_Code.setvalue( 0, u'x' * 2 )
                     Full_coi = TheStockItem.origin_id
@@ -196,16 +196,17 @@ class compas_write:
                                 if len( the_waybill.containerTwoNumber ) > 0:
                                         twoCont = True
             codeLetter = u'A'
-            #test if bulk or not
-#            is_bulk = lineItems[0].siNo.is_bulk()
+
             db.begin()
 
             for lineItem in lineItems:
-                CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + WB_CODE )
+                CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + CODE )
                 if twoCont:
-                    CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + codeLetter + WB_CODE )
+                    CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + codeLetter + CODE )
                     codeLetter = u'B'
-
+                    if index == 1:
+                        CONTAINER_NUMBER = unicode( the_waybill.containerTwoNumber )
+                
                 goodUnits = unicode( lineItem.numberUnitsGood )
                 if lineItem.numberUnitsDamaged > 0:
                     damadgedUnits = unicode( lineItem.numberUnitsDamaged )
@@ -220,15 +221,14 @@ class compas_write:
                     lossReason = u''
                     lostUnits = u''
 
-                COI_CODE = unicode( lineItem.siNo.coi_code() )
-                TheStockItems = TheStockItems = EpicStock.objects.filter( origin_id__contains = COI_CODE, wh_code = lineItem.siNo.origin_wh_code, commodity_code = lineItem.siNo.commodity_code )
-                Full_coi = TheStockItems[0].origin_id
+                TheStockItem = lineItem.stock_item
+                Full_coi = TheStockItem.origin_id
                 comm_category_code = lineItem.siNo.comm_category_code
                 COMM_CODE = lineItem.siNo.commodity_code
-                #get stock
-                PCKKCODE = TheStockItems[0].package_code
-                ALLCODE = TheStockItems[0].allocation_code
-                QUALITY = TheStockItems[0].qualitycode #'G'
+
+                PCKKCODE = TheStockItem.package_code
+                ALLCODE = TheStockItem.allocation_code
+                QUALITY = TheStockItem.qualitycode
                 Response_Message = cursor.var( cx_Oracle.STRING )
                 Response_Message.setvalue( 0, u' ' * 200 )
                 Response_Code = cursor.var( cx_Oracle.STRING )
