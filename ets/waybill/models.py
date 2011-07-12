@@ -12,6 +12,8 @@ from django.template.defaultfilters import stringfilter
 from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
 
+name = "1234"
+
 # Create your models here.
 class Places( models.Model ):
     org_code = models.CharField( max_length = 7, primary_key = True )

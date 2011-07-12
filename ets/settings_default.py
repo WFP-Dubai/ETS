@@ -1,15 +1,33 @@
 # Django settings for ets project.
-#testing to push again
+
+# This module is available as common_settings from projects' settings module.
+# It contains settings used in all projects.
+
+import os.path
+from django.conf import global_settings
+
+PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
+
+ugettext = lambda s: s
+
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+MANAGERS = ( 
+    # ('Your Name', 'your_email@domain.com'),
+ )
 ADMINS = ( 
     # ('Your Name', 'your_email@domain.com'),
  )
 
-MANAGERS = ADMINS
 
 ALL_DB = {
+    'default': {
+        'NAME': 'db',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'USER': '',
+        'PASSWORD': '',
+    },
     'default_tc_pak': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wb_pak',
@@ -113,89 +131,199 @@ ALL_DB = {
         'PASSWORD': 'epic',
         'HOST': 'localhost',
         'PORT': '',
-    }
+    },
 }
 
-DATABASES = {'default': {}, 'compas': {}}
+DATABASES = {
+    "default": ALL_DB['default'],
+    "compas": ALL_DB["compas_test_pak"],
+}
+
+LANGUAGE_CODE = 'en'
+LANGUAGES = (
+    ('en', ugettext('English')),
+)
+
+USE_I18N = True
+USE_L10N = True
 
 TIME_ZONE = 'Europe/Rome'
-LANGUAGE_CODE = 'en-us'
+
+STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_URL = '/static/'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+
+SERVE_STATIC = True
+
+STATICFILES_FINDERS = (
+  "django.contrib.staticfiles.finders.FileSystemFinder",
+  "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+  "ets.finders.AppMediaDirectoriesFinder",
+)
+
 SITE_ID = 1
-USE_I18N = True
-MEDIA_URL = ''
-ADMIN_MEDIA_PREFIX = '/django/admin/media/'
-#ADMIN_MEDIA_PREFIX = '/ets/media/grapelli/'
+
+# Make this unique, and don't share it with anybody.
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
-TEMPLATE_LOADERS = ( 
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-    'django.template.loaders.eggs.Loader',
- )
-MIDDLEWARE_CLASSES = ( 
-#    'django.middleware.gzip.GZipMiddleware',
+
+# List of callables that know how to import templates from various sources.
+TEMPLATE_LOADERS = (
+    ('django.template.loaders.cached.Loader', (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+        'django.template.loaders.eggs.Loader',
+    )),
+)
+
+MIDDLEWARE_CLASSES = (
+    #'django.middleware.cache.UpdateCacheMiddleware',
+    
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-#    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
+    
     'audit_log.middleware.UserLoggingMiddleware',
-#    'debug_toolbar.middleware.DebugToolbarMiddleware',
- )
+    
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    #'django.middleware.cache.FetchFromCacheMiddleware',
+)
+
 ROOT_URLCONF = 'ets.urls'
 
+INSTALLED_APPS = (
 
-INSTALLED_APPS = ( 
-#    'grappelli',
+    #own
+    'ets',
+    'ets.waybill',
+    
+    # builtin
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'ets.waybill',
     'django.contrib.databrowse',
+    'django.contrib.staticfiles',
+    
+    #external
     'django_extensions',
-#    'south',
-#    'ajax_select',
-#    'debug_toolbar',
- )
-INTERNAL_IPS = ( '127.0.0.1', )
+    #'ajax_select',
+    #'uni_form',
+    #'endless_pagination',
+    #'sorl.thumbnail',
+    #'tabs',
+    #'mptt',
+    #'south',
+    #'oembed',
+    #'oembed.contrib',
+    #'mailer',
+    #'autoslug',
+    #'native_tags',
+    'rosetta',
+    #'django_countries',
+    'debug_toolbar',
+    #'logicaldelete',
+    #'floppyforms',
+)
 
-DEBUG_TOOLBAR_PANELS = ( 
-    'debug_toolbar.panels.version.VersionDebugPanel',
-    'debug_toolbar.panels.timer.TimerDebugPanel',
-    'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
-    'debug_toolbar.panels.headers.HeaderDebugPanel',
-    'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
-    'debug_toolbar.panels.template.TemplateDebugPanel',
-    'debug_toolbar.panels.sql.SQLDebugPanel',
-    'debug_toolbar.panels.signals.SignalDebugPanel',
-    'debug_toolbar.panels.logger.LoggingPanel',
- )
-AUTH_PROFILE_MODULE = 'waybill.UserProfile'
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
+    'django.core.context_processors.csrf',
+    'ets.waybill.context_processor.common'
+)
 
-TEMPLATE_CONTEXT_PROCESSORS = ( 
-'django.contrib.auth.context_processors.auth',
-'django.core.context_processors.debug',
-'django.core.context_processors.i18n',
-'django.contrib.messages.context_processors.messages',
-'django.core.context_processors.request',
-'ets.waybill.context_processor.request'
- )
+TEST_RUNNER = "ets.tests.coverage_runner.run_tests"
+COVERAGE_REPORT_PATH = os.path.join(PROJECT_ROOT, 'coverage_report')
 
-import os
-MEDIA_ROOT = os.path.join( os.path.dirname( __file__ ), 'media' )
-TEMPLATE_DIRS = ( 
-    os.path.join( os.path.dirname( __file__ ), 'templates' )
- )
-
-COMPAS_STATION = u'JERX001'
-INTSTANCE_LABLE = 'Toby Mac Pro'
+LOGIN_REDIRECT_URL = '/'
+#=======================================================================================================================
+# LOGIN_URL = '/account/login/'
+# LOGOUT_URL = '/account/logout/'
+#=======================================================================================================================
 LOGIN_URL = '/test/ets/accounts/login/'
 LOGOUT_URL = '/test/ets/accounts/logout/'
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+AUTH_PROFILE_MODULE = 'waybill.UserProfile'
+
 IN_PRODUCTION = False
+
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_NAME = 'ets-demo'
+
 WAYBILL_LETTER = 'A'
 MAX_DATE = '2010-01-01'
 DISABLE_EXPIERED_LTI = DEBUG
+
+SITE_NAME = ugettext('ETS')
+DEFAULT_FROM_EMAIL = 'no-reply@wfp.com'
+EMAIL_SUBJECT_PREFIX = ugettext("[ETS] ")
+FEEDBACK_EMAIL = 'support@wfp.com'
+#EMAIL_BACKEND = "mailer.backend.DbBackend"
+SERVER_EMAIL = 'no-reply@wfp.com'
+
+# debug toolbar
+INTERNAL_IPS = ('127.0.0.1', )
+DEBUG_TOOLBAR_PANELS = (
+        #'debug_toolbar.panels.version.VersionDebugPanel',
+        'debug_toolbar.panels.timer.TimerDebugPanel',
+        #'debug_toolbar.panels.settings_vars.SettingsVarsDebugPanel',
+        'debug_toolbar.panels.headers.HeaderDebugPanel',
+        'debug_toolbar.panels.request_vars.RequestVarsDebugPanel',
+        'debug_toolbar.panels.template.TemplateDebugPanel',
+        'debug_toolbar.panels.sql.SQLDebugPanel',
+        #'debug_toolbar.panels.cache.CacheDebugPanel',
+        #'debug_toolbar.panels.signals.SignalDebugPanel',
+        'debug_toolbar.panels.logger.LoggingPanel',
+)
+
+DEBUG_TOOLBAR_CONFIG = {
+    'INTERCEPT_REDIRECTS': False,
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'mail_admins': {
+            'level': 'ERROR',
+            'class': 'django.utils.log.AdminEmailHandler'
+        }
+    },
+    'loggers': {
+        'django.request':{
+            'handlers': ['mail_admins'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    }
+}
+
+COMPAS_STATION = u'JERX001'
+
+# Local settings for development / production
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
+ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
+
+
+
+#testing to push again
+
+
+#=======================================================================================================================
+# TEMPLATE_DIRS = ( 
+#    os.path.join( os.path.dirname( __file__ ), 'templates' )
+# )
+#=======================================================================================================================
+
+#=======================================================================================================================
+# INTSTANCE_LABLE = 'Toby Mac Pro'
+#=======================================================================================================================
