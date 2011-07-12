@@ -1,3 +1,7 @@
+import cx_Oracle
+import datetime
+import os, StringIO, zlib, base64, string
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -11,6 +15,7 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import Template, RequestContext, Library, Node
+from django.utils import simplejson
 
 from ets.waybill.forms import *
 from ets.waybill.models import *
@@ -18,12 +23,9 @@ from ets.waybill.views import *
 
 from ets.waybill.compas import *
 
-import cx_Oracle
-import datetime
-import os, StringIO, zlib, base64, string
-
 from django.contrib import databrowse
-import json
+
+
 databrowse.site.register( Waybill )
 databrowse.site.register( EpicStock )
 databrowse.site.register( LtiOriginal )
@@ -203,7 +205,7 @@ def wb_compress_repr( wb_id ):
 
     data = serialized_wb_repr( wb_id )
     from kiowa.utils.encode import DecimalJSONEncoder
-    zippedData = zipBase64( json.dumps( data, cls = DecimalJSONEncoder ) )
+    zippedData = zipBase64( simplejson.dumps( data, cls = DecimalJSONEncoder ) )
     return zippedData
 
 
@@ -231,7 +233,7 @@ def wb_uncompress_repr( compressed_wb ):
     unbase64_data = base64.b64decode( compressed_wb.replace( ' ', '+' ) )
     unzipped = zlib.decompress( unbase64_data )
 
-    deserialized_content = json.loads( unzipped )
+    deserialized_content = simplejson.loads( unzipped )
 
     return deserialized_content
 
@@ -360,7 +362,7 @@ def synchronize_stocks( warehouse_code ):
         data = response.read()
 
         # Try to update the stock data on local offline db
-        r = json.loads( data )
+        r = simplejson.loads( data )
         for el in r:
             x = EpicStock()
             for k, v in el.items():
@@ -399,7 +401,7 @@ def wb_compress( wb_id ):
     data = serialize_wb( wb_id )
     from kiowa.utils.encode import DecimalJSONEncoder
 
-    zippedData = zipBase64( json.dumps( data, cls = DecimalJSONEncoder ) )
+    zippedData = zipBase64( simplejson.dumps( data, cls = DecimalJSONEncoder ) )
     return zippedData
 
 
