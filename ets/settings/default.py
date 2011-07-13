@@ -7,11 +7,11 @@ import os.path
 from django.conf import global_settings
 
 PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
+EGG_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../')
 
 ugettext = lambda s: s
 
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 MANAGERS = ( 
     # ('Your Name', 'your_email@domain.com'),
@@ -149,11 +149,11 @@ USE_L10N = True
 
 TIME_ZONE = 'Europe/Rome'
 
-STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static')
+STATIC_ROOT = os.path.join(EGG_ROOT, 'static')
 STATIC_URL = '/static/'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media')
+MEDIA_ROOT = os.path.join(EGG_ROOT, 'media')
 
 SERVE_STATIC = True
 
@@ -167,6 +167,14 @@ SITE_ID = 1
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
+
+TEMPLATE_DIRS = ( 
+    os.path.join( PROJECT_ROOT, 'templates' ),
+)
+
+STATICFILES_DIRS = (
+    os.path.join( PROJECT_ROOT, 'static' ),
+)
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -198,7 +206,7 @@ ROOT_URLCONF = 'ets.urls'
 INSTALLED_APPS = (
 
     #own
-    'ets',
+    #'ets',
     'ets.waybill',
     
     # builtin
@@ -239,7 +247,7 @@ TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
 )
 
 TEST_RUNNER = "ets.tests.coverage_runner.run_tests"
-COVERAGE_REPORT_PATH = os.path.join(PROJECT_ROOT, 'coverage_report')
+COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 
 LOGIN_REDIRECT_URL = '/'
 #=======================================================================================================================
@@ -257,7 +265,6 @@ SESSION_COOKIE_NAME = 'ets-demo'
 
 WAYBILL_LETTER = 'A'
 MAX_DATE = '2010-01-01'
-DISABLE_EXPIERED_LTI = DEBUG
 
 SITE_NAME = ugettext('ETS')
 DEFAULT_FROM_EMAIL = 'no-reply@wfp.com'
@@ -307,22 +314,17 @@ COMPAS_STATION = u'JERX001'
 
 # Local settings for development / production
 try:
-    from local_settings import *
+    from local import *
 except ImportError:
     pass
 
+TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
+DISABLE_EXPIERED_LTI = DEBUG
 
 
 
 #testing to push again
-
-
-#=======================================================================================================================
-# TEMPLATE_DIRS = ( 
-#    os.path.join( os.path.dirname( __file__ ), 'templates' )
-# )
-#=======================================================================================================================
 
 #=======================================================================================================================
 # INTSTANCE_LABLE = 'Toby Mac Pro'

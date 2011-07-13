@@ -27,25 +27,16 @@ Change directory to project's root.
 Specific settings
 -----------------
 
-Create local settings (./src/ets/local_settings.py)::
-    
-  EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-  
-  DEBUG = True
-  
-  TEMPLATE_LOADERS = (
-    (
-        'django.template.loaders.app_directories.Loader',
-        'django.template.loaders.eggs.Loader',
-    ),
-  )
-
 Build project
 -------------
 
 Build project using buildout and run it::
 
   python ./bootstrap.py; ./bin/buildout; ./bin/instance runserver
+  
+If you user Pydev, change last command as follows::
+
+  ./bin/instance runserver -c ./pydev.cfg
 
 Test environment
 ----------------

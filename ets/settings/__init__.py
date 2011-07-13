@@ -5,7 +5,7 @@ current_server = os.path.dirname( os.path.abspath( __file__ ) )
 sys.path.append( 'config' )
 
 try:
-    from settings_default import *
+    from .default import *
     configs = {
         'C:\\epic\\ets': 'set_prod',
         'C:\\epic\\training\\ets': 'set_test',
@@ -20,6 +20,6 @@ try:
             locals()[setting] = getattr( config_module, setting )
 except:
     try:
-        from settings_local import *
+        from .local import *
     except ImportError:
         pass

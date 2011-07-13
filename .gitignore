@@ -5,7 +5,7 @@
 # *~
 
 #local settings
-local_settings.py
+ets/settings/local.py
 
 #Eclipse's specific
 .project
@@ -38,9 +38,5 @@ src/.idea/
 db
 
 #media
-/media
 /static
 /var
-/docs/_build/init_spatialite-2.3.sql
-
-ets/settings_local.py

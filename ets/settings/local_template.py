@@ -1,6 +1,7 @@
 from datetime import *
 # Django settings for ets project.
-from  settings_default import *
+from .default import *
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 DATABASES['default'] = ALL_DB['default_tc_pak']
