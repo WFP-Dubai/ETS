@@ -43,6 +43,7 @@ install_requires = [
         #'django-floppyforms==0.4.5',
         'django-audit-log',
         #'cx_Oracle',
+        'simplejson >= 2.1.0',
 ]
 
 #Extra dependencies for test purposes

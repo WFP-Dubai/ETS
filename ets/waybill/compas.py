@@ -123,10 +123,15 @@ class compas_write:
                         strNetTotal = u'%.3f' % UnitsLoaded
                         strGrossTotal = u'%.3f' % UnitsLoaded
 
-                    printlist( [Response_Message, Response_Code, CURR_CODE, DISPATCH_DATE, ORIGIN_TYPE, ORIGIN_LOCATION_CODE, ORIGIN_CODE,
-                        ORIGIN_DESCR, DESTINATION_LOCATION_CODE, DESTINATION_CODE, LTI_ID, LOADING_DATE, ORGANIZATION_ID, TRAN_TYPE_CODE, VEHICLE_REGISTRATION, MODETRANS_CODE,
-                        COMMENTS, PERSON_CODE, PERSON_OUC, CERTIFING_TITLE, TRANS_CONTRACTOR_CODE, SUPPLIER1_OUC, DRIVER_NAME, LICENSE, CURR_CONTAINER_NUMBER, settings.COMPAS_STATION,
-                        Full_coi, COMM_CATEGOTY_CODE, COMM_CODE, PCKKCODE, ALLCODE, QUALITY, strNetTotal, strGrossTotal, strUnitsLoaded, strUnitNet, strUnitGross, empty] )
+                    print "\n".join([
+                        Response_Message, Response_Code, CURR_CODE, DISPATCH_DATE, ORIGIN_TYPE, ORIGIN_LOCATION_CODE, 
+                        ORIGIN_CODE, ORIGIN_DESCR, DESTINATION_LOCATION_CODE, DESTINATION_CODE, LTI_ID, LOADING_DATE, 
+                        ORGANIZATION_ID, TRAN_TYPE_CODE, VEHICLE_REGISTRATION, MODETRANS_CODE, COMMENTS, PERSON_CODE, 
+                        PERSON_OUC, CERTIFING_TITLE, TRANS_CONTRACTOR_CODE, SUPPLIER1_OUC, DRIVER_NAME, LICENSE, 
+                        CURR_CONTAINER_NUMBER, settings.COMPAS_STATION, Full_coi, COMM_CATEGOTY_CODE, COMM_CODE, 
+                        PCKKCODE, ALLCODE, QUALITY, strNetTotal, strGrossTotal, strUnitsLoaded, strUnitNet, 
+                        strUnitGross, empty
+                    ])
 
                     cursor.callproc( u'write_waybill.dispatch', ( Response_Message, Response_Code,
                                                                   CURR_CODE, DISPATCH_DATE, ORIGIN_TYPE, ORIGIN_LOCATION_CODE, ORIGIN_CODE,
@@ -200,9 +205,9 @@ class compas_write:
             db.begin()
 
             for lineItem in lineItems:
-                CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + CODE )
+                CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + WB_CODE )
                 if twoCont:
-                    CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + codeLetter + CODE )
+                    CURR_CODE = unicode( datetime.datetime.now().strftime( '%y' ) + codeLetter + WB_CODE )
                     codeLetter = u'B'
                     if index == 1:
                         CONTAINER_NUMBER = unicode( the_waybill.containerTwoNumber )
@@ -265,6 +270,8 @@ class compas_write:
             return False
 
 
-def printlist( list ):
-    for item in list:
-        print item
+#=======================================================================================================================
+# def printlist( list ):
+#    for item in list:
+#        print item
+#=======================================================================================================================
