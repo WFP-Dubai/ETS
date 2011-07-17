@@ -13,6 +13,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
+from django.views.generic.list_detail import object_list
 from django.contrib import messages
 
 from ets.compas import compas_write
