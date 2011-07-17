@@ -18,6 +18,7 @@ src/.idea/
 
 #buildout's specific
 .installed.cfg
+.mr.developer.cfg
 .settings/*
 /eggs
 /bin

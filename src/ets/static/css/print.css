@@ -1,0 +1,48 @@
+#print
+
+body{
+	height: 100%;
+	border-width: 0px;
+	padding: 0px;
+	margin: 0px;
+	font-size: 12pt;
+}
+.wb_head{color:white;background-color:black;}
+.centric h1{ font-weight: bold; text-align: center;}
+.centric p{font-size: small; text-align: center;}
+table {
+	margin: 0px;
+	padding: 0px;
+	max-width: 100%;
+	min-width: 100%;
+	width: 100%;
+	height: 100%;
+}
+img{position: relative; text-align: right;}
+.right{ position: absolute; right: 20px; text-align: right;}
+.centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility:hidden;
+	height: 0px;
+	margin: 0px;
+	padding: 0px;
+
+}
+.hidden_print{
+	display: none;
+	visibility: hidden;
+	height: 0px;
+	margin: 0px;
+	padding: 0px;
+
+}
+
+.shown{
+	display:inherit;
+	visibility: visible;
+}
+.the_forms{
+	display: inline;
+	height: 0px;
+}

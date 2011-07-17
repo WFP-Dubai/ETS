@@ -1,0 +1,129 @@
+{%load extra_tags%}<tr>
+            <td>
+                <table cellpadding="0" cellspacing="0" border="1px" >
+                    <thead class="wb_head">
+                        <tr><th colspan="5" bgcolor='black' color='white'>Transaction Details</th></tr>
+                    </thead>
+                    <tr>
+                        <td><sup style="font-size:x-small;">Origin(location):</sup><br>{{LtiOriginal.0.origin_loc_name}}</td>
+                        <td><sup style="font-size:x-small;" >Origin(warehouse):</sup><br>{{LtiOriginal.0.origin_wh_name}}</td>
+                        <td><sup style="font-size:x-small;">Destination(location)</sup><br>{{LtiOriginal.0.destination_loc_name}}</td>
+                        <td  rowspan=5>
+                        {% include 'waybill/print/barcode.html'%}
+
+                        </td>
+                    
+                    </tr>
+                    <tr>
+                        <td><sup style="font-size:x-small;">Project no.</sup> {{LtiOriginal.0.project_wbs_element}}</td>
+                        <td><sup style="font-size:x-small;">Date of Loading:</sup> {{object.dateOfLoading}}</td>
+                        <td><sup style="font-size:x-small;">Date of Dispatch:</sup> {{object.dateOfDispatch}}</td>
+                    </tr>
+                    <tr>
+                        <td><sup style="font-size:x-small;">Destination(warehouse): </sup><br>{{object.destinationWarehouse}}</td>
+                        <td><sup style="font-size:x-small;">Allocation Destination:</sup><br>{{LtiOriginal.0.destination_loc_name}}</td>
+                        <td><sup style="font-size:x-small;">Consignee</sup><br>{{LtiOriginal.0.consegnee_name}}</td>
+                        
+                    </tr>
+
+                    <tr>
+                        <td><sup style="font-size:x-small;">Type of Transaction</sup><br>
+                         {{object.get_transactionType_display}}</td>
+                        <td><sup style="font-size:x-small;">Transport Type: </sup><br>{{object.get_transportType_display}}</td>
+                        <td><sup style="font-size:x-small;">LTI no: </sup><br>{{object.ltiNumber}}</td>
+                    </tr>
+                    <tr ><td colspan=3 valign="top" style="font-size:small;"><sup style="font-size:x-small;">Dispatch Remarks:</sup>{{object.dispatchRemarks}}
+                        {%if object.containerOneRemarksDispatch%}
+                        <br>Container 1 Remarks:{{object.containerOneRemarksDispatch}}
+                        {%endif%}
+                        {%if object.containerTwoRemarksDispatch%}
+                        <br>Container 2 Remarks:{{object.containerTwoRemarksDispatch}}
+                        {%endif%}</td></tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table cellpadding="0" cellspacing="0" border="1px" style='border-collapse: separate;'  >
+                    <thead class="wb_head">
+                        <tr><th colspan="8">Loading Details</th></tr>
+                    </thead>
+                    <tr   style="font-size:x-small;">
+                        <td rowspan="2"><sup>SI No</sup></td>
+                        <td rowspan="2"><sup>Commodity</sup></td>
+                        <td rowspan="2"><sup>Packing</sup></td>
+                        <td rowspan="2"><sup>Number of Units</sup></td>
+                        <td colspan="2"><sup>Unit Weight (kg)</sup></td>
+                        <td colspan="2"><sup>Tonnage</sup></td>
+                    </tr>
+                    <tr   style="font-size:x-small;">
+                        <td><sup>Net</sup></td>
+                        <td><sup>Gross</sup></td>
+                        <td><sup>Net</sup></td>
+                        <td><sup>Gross</sup></td>
+                    </tr>
+                    {%for lineitem in object.loadingdetail_set.select_related%}
+                    <tr  style="font-size:small;">
+                        <td>ID {{forloop.counter}}. {{lineitem.order_item.coi_code}}</td>
+                        <td>{{lineitem.get_stock_item.cmmname}}</td>
+                        <td>{{lineitem.get_stock_item.packaging_description_short}}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.numberUnitsLoaded|floatformat}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.order_item.lti_line.unit_weight_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}-{%else%}{{lineitem.order_item.lti_line.unit_weight_gross|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_net|floatformat:3}}{%endif%}</td>
+                        <td style="text-align:right;">{%if lineitem.order_item.lti_line.is_bulk%}{{lineitem.numberUnitsLoaded|floatformat:3}}{%else%}{{lineitem.calculate_total_gross|floatformat:3}}{%endif%}</td>
+
+                    </tr>
+                    {%endfor%}
+                    
+                    {%for lineitem in extra_lines%}
+
+                    <tr  style="font-size:small;border-collapse: separate;">
+                        <td>ID {{forloop.counter|add:object.loadingdetail_set.select_related.count}}.</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td style="text-align:right;">&nbsp; </td>
+                        <td style="text-align:right;">&nbsp; </td>
+                        <td style="text-align:right;">&nbsp; </td>
+                        <td style="text-align:right;">&nbsp; </td>
+                        <td style="text-align:right;">&nbsp; </td>
+
+                    </tr>
+                    {%endfor%}
+                    <tr>
+                        <td colspan="8">
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <table cellpadding="0" cellspacing="0" border="1px"  style="font-size:small;"  >
+                    <thead class="wb_head"><tr><th colspan="3">Certification of Commodities Loaded</th></tr></thead>
+                        <tr><td><sup>Warehouse or Dispatch Point</sup></td><td colspan="2"><sup style="font-size:x-small;">Transport Contractor:</sup>{{LtiOriginal.0.transport_name}}</td></tr>
+                        <tr><td><small style="font-size:x-small;">Name:</small>{{disp_person}}</td><td colspan="2"><small style="font-size:x-small;">Transport Subcontractor:</small> {{object.transportSubContractor}}</td></tr>
+                        <tr><td ><small style="font-size:x-small;">Title:</small>{{object.dispatcherTitle}}</td><td colspan="2"><small style="font-size:x-small;">Driver's Name:</small> {{object.transportDriverName}}</td></tr>
+                        
+                        <tr><td valign=top rowspan="4"><p style="font-size: x-small; align:top;">I hereby certify the loading of the commodities described above.<br><br>
+Name, signature and stamp:
+{%if object.dispatcherSigned%}
+<div style='font-size:14px'>{{disp_person}}<br>Date: {{object.transportDispachSignedTimestamp|date}}</div>
+{%endif%}
+</p>
+</td>
+
+<td colspan="2"><small style="font-size:x-small;">Driver's Licence/ID:</small>{{object.transportDriverLicenceID}}</td></tr>
+
+                        <tr ><td><small style="font-size:x-small;">Vehicle registration:</small>{{object.transportVehicleRegistration}}<br><small>Trailer No.:</small>{{object.transportTrailerRegistration}}</td>
+                        <td><small style="font-size:x-small;">Container no 1:</small>{{object.containerOneNumber}} <small>Seal:</small>{{object.containerOneSealNumber}}
+                        <br><small style="font-size:x-small;">Container no 2:</small>{{object.containerTwoNumber}} <small>Seal:</small>{{object.containerTwoSealNumber}} </td></tr>
+                        <tr><td  valign=top  rowspan="2" colspan="2"><p style="font-size: x-small">On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above.<br>
+Name, signature and stamp:<br>{%if object.dispatcherSigned%}
+<div style='font-size:14px'>{{object.transportDriverName|upper}}<br>Date: {{object.transportDispachSignedTimestamp|date}}</div>
+{%endif%}&nbsp;</p>
+
+</td></tr>
+                </table>
+            </td>
+        </tr>
