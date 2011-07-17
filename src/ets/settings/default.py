@@ -168,10 +168,6 @@ SITE_ID = 1
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
 
-TEMPLATE_DIRS = ( 
-    os.path.join( PROJECT_ROOT, 'templates' ),
-)
-
 STATICFILES_DIRS = (
     os.path.join( PROJECT_ROOT, 'static' ),
 )
@@ -179,7 +175,6 @@ STATICFILES_DIRS = (
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
-        'django.template.loaders.filesystem.Loader',
         'django.template.loaders.app_directories.Loader',
         'django.template.loaders.eggs.Loader',
     )),
@@ -206,8 +201,8 @@ ROOT_URLCONF = 'ets.urls'
 INSTALLED_APPS = (
 
     #own
-    #'ets',
-    'ets.waybill',
+    'ets',
+    
     
     # builtin
     'django.contrib.auth',
@@ -243,7 +238,7 @@ INSTALLED_APPS = (
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'django.core.context_processors.csrf',
-    'ets.waybill.context_processor.common'
+    'ets.context_processor.common'
 )
 
 TEST_RUNNER = "ets.tests.coverage_runner.run_tests"
@@ -256,7 +251,7 @@ LOGIN_REDIRECT_URL = '/'
 #=======================================================================================================================
 LOGIN_URL = '/test/ets/accounts/login/'
 LOGOUT_URL = '/test/ets/accounts/logout/'
-AUTH_PROFILE_MODULE = 'waybill.UserProfile'
+AUTH_PROFILE_MODULE = 'ets.UserProfile'
 
 IN_PRODUCTION = False
 

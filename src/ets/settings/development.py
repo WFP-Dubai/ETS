@@ -1,4 +1,3 @@
-from datetime import *
 # Django settings for ets project.
 from .default import *
 
@@ -15,7 +14,6 @@ DEBUG = True
 
 TEMPLATE_LOADERS = (
   (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
   ),

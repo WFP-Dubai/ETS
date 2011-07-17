@@ -5,7 +5,7 @@
 
 {% block branding %}
 <h1 id="site-name"><img src='{{MEDIA_URL}}/images/epic_logo_small.png' ><br/>{% trans 'ETS administration' %}</h1>
-<a href='{%url ets.waybill.views.select_action%}'>Back to ETS for {{COMPAS_STATION}}</a>
+<a href='{% url select_action %}'>Back to ETS for {{COMPAS_STATION}}</a>
 {% endblock %}
 
 {% block nav-global %}{% endblock %}

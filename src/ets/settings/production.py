@@ -95,7 +95,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.messages',
-    'ets.waybill',
+    'ets',
 #    'django.contrib.databrowse',
 #    'dojango',
 #    'debug_toolbar',
@@ -113,7 +113,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
  )
-AUTH_PROFILE_MODULE = 'waybill.UserProfile'
+AUTH_PROFILE_MODULE = 'ets.UserProfile'
 
 TEMPLATE_CONTEXT_PROCESSORS = ( 
 "django.contrib.auth.context_processors.auth",

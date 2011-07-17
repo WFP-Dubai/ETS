@@ -1,0 +1,80 @@
+{% extends "base_template.html"%}
+{%load extra_tags%}
+{%block title %}Welcome to EPIC eTS{%endblock%}
+{%block content %}
+ <form action="" method=POST>
+{% if form.errors %}
+   <span class='error'>Review Form, as there is information missing</span>
+   {{form.errors}}
+{% endif %}
+{{form.invalidated}}
+<div>
+<table cellpadding="0" cellspacing="0" border="0">
+<tr><td>Waybill Number:</td><td> {{form.waybillNumber}} {{form.instance.waybillNumber}}</td></tr>
+<tr><td>Dispatch Location</td><td>{{formset.forms.0.instance.siNo.origin_loc_name}}</td></tr>
+<tr><td>Recipient Location:</td><td> {{form.recipientLocation}}{{form.instance.recipientLocation}}</td></tr>
+<tr><td>Consignee:</td><td>{{form.recipientConsingee}}{{form.instance.recipientConsingee}}</td></tr>
+
+<tr><td>&nbsp;</td><td></td></tr>
+<tr><td>Arrival Date: </td><td>{{form.recipientArrivalDate}}<span class='error'>{%for error in form.recipientArrivalDate.errors%} {{error|escape}}{%endfor%}</span></td></tr>
+<tr><td>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}<span class='error'>{%for error in form.recipientStartDischargeDate.errors%} {{error|escape}}{%endfor%}</span></td></tr>
+<tr><td>End Discharge: </td><td>{{form.recipientEndDischargeDate}}<span class='error'>{%for error in form.recipientEndDischargeDate.errors%} {{error|escape}}{%endfor%}</span></td></tr>
+<tr><td>Distance: </td><td>{{form.recipientDistance}}</td></tr>
+</table>
+</div>
+<br>
+<style type="text/css">select{font-size:10px;}</style>
+ {{ formset.management_form }}
+ <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
+    <thead>
+        <tr><th>Items</th><th>Dispatched<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th><th>Good<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th><th>Damaged<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th><th>Lost<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th><th></th>
+        </thead>
+
+    {% for sform in formset.forms %}
+       
+        <tr>
+            <td  valign=top> {{ sform.id }}{{sform.order_item}}</td>
+            <td  valign=top  align="right">{{ sform.numberUnitsLoaded }}{{sform.instance.numberUnitsLoaded}}</td>
+            <td valign=top>{{ sform.numberUnitsGood }} Over Offload:{{sform.overOffloadUnits}}</td>
+            <td  valign=top><table ><tr><td>Units:</td><td>{{ sform.numberUnitsDamaged}} </td></tr><!--<tr><td>Type:</td><td> {{ sform.unitsDamagedType }} </td></tr>--><tr><td>Reason:</td><td>{{ sform.unitsDamagedReason }}</td></tr></table></td>
+            <td  valign=top><table><tr><td>Units:</td><td>{{ sform.numberUnitsLost }} </td></tr><tr><!--<td>Type:</td><td>{{ sform.unitsLostType }} </td></tr>--><tr><td>Reason:</td><td>{{ sform.unitsLostReason }}</td></tr></table></td>
+            <td>{%for item in sform%}{% if item.errors %}{% for error in item.errors %}<span class='error'>{{ error|escape }}</span><br/>{% endfor %}{%endif%}{% endfor %}</td>
+        </tr>
+    {% endfor %}
+    </table>
+
+<div>
+<br>
+
+<table summary=" ">
+<tr><td colspan="3">Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
+
+<tr><td>Container 1:</td><td>{{form.instance.containerOneNumber}}</td><td> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
+<tr><td>Container 2:</td><td>{{form.instance.containerTwoNumber}}</td><td> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
+
+</table>
+
+</div>
+
+<input type="submit" value="Save &amp; Print"> {% csrf_token %}
+</form>
+
+
+{%endblock%}
+{%block extra-header%}
+<script charset="utf-8" type="application/javascript">
+$(document).ready(function() {
+                $('#id_recipientArrivalDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_recipientStartDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#id_recipientEndDischargeDate').datepicker({ dateFormat: 'yy-mm-dd' });
+                $('#example').dataTable( {
+                "bPaginate": false,
+        "bLengthChange": false,
+        "bFilter": false,
+        "bSort": false,
+        "bInfo": false,
+        "bAutoWidth": false 
+                });
+} );
+</script>
+{%endblock extra-header%}

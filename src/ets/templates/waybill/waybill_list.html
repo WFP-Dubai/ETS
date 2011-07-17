@@ -1,0 +1,31 @@
+{% extends "base_template.html"%}
+{%block content %}
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr><th>LTI</th><th>Waybill Number</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th><th>Reception</th><th>Validated</th><th>Processed For Payment</th><th></th></tr>
+        </thead>
+{% for waybill in object_list%}
+<tr>
+             <td>{{waybill.ltiNumber}}</td>
+             <td>{{waybill.waybillNumber}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
+             <td>{%if waybill.dispatcherSigned%}X{%else%}N{%endif%} </td>
+             <td>{%if waybill.recipientSigned%}X{%else%}N{%endif%} </td>
+             <td>{%if waybill.waybillValidated%}X{%else%}N{%endif%}  </td>
+              <td>{%if waybill.waybillProcessedForPayment%}X{%else%}N{%endif%} </td>
+             <td><a href=''{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Select</a></td>
+    </tr>
+
+{% endfor%}
+</table>
+
+{%endblock%}
+
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+                $('#example').dataTable( {});
+} );
+</script>
+{%endblock extra-header%}
