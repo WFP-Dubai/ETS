@@ -1,9 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
     "http://www.w3.org/TR/html4/strict.dtd"
     >
+{% load i18n %}    
 <html lang="en">
 <head>
-    <title>ETS {%block title%}{{section.title}}{%endblock%} - {{COMPAS_STATION}}</title>
+    <title>{% blocktrans %} ETS {%block title%}{{section.title}}{%endblock%} - {{COMPAS_STATION}} {% endblocktrans %}</title>
     <style type="text/css" title="currentStyle">
         @import "{{MEDIA_URL}}/css/demo_page.css";
         @import "{{MEDIA_URL}}/css/demo_table.css";
@@ -42,44 +43,44 @@ function disableEnterKey(e)
 </head>
 <body OnKeyPress="return disableEnterKey(event)">
 <div class="header">
-<span style="font-weight:bold">WFP Electronic Tracking System - eWaybill - {{COMPAS_STATION}}</span>
+<span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill - {{COMPAS_STATION}} {% endblocktrans %}</span>
 </div>
-<div class="menu"><a href='{%url ets.waybill.views.select_action%}'>home</a> {% if user.is_authenticated %} <a href='{%url django.contrib.auth.views.logout%}?next={%url ets.waybill.views.select_action%}'>Logout</a>{% else %}Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>login</a>{% endif %}</div>
+<div class="menu"><a href='{%url ets.waybill.views.select_action%}'>{% trans "home" %}</a> {% if user.is_authenticated %} <a href='{%url django.contrib.auth.views.logout%}?next={%url ets.waybill.views.select_action%}'>{% trans "Logout" %}</a>{% else %} {% trans "Please log in." %} <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>{% trans "login" %}</a>{% endif %}</div>
 <br>
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
-    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{% blocktrans %} {{ message }} {% endblocktrans %}</li>
     {% endfor %}
 </ul>
 {% endif %}
 <div class="content">
 {%block content %}
 <table>
-<tr><th>Test</th><th>Table<th></tr>
-<tr><td>data one</td><td>data two</td>
-<tr><td>data one</td><td>data two</td>
-<tr><td>data one</td><td>data two</td>
-<tr><td>data one</td><td>data two</td>
+<tr><th>{% trans "Test" %}</th><th>{% trans "Table" %}<th></tr>
+<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
+<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
+<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
+<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
 </table>
 <form>
-<label>Item One</label><input type="text" />
-<label>Select</label><select><option>test</option></select>
-<label>button</label><input type="submit"/>
+<label>{% trans "Item One" %}</label><input type="text" />
+<label>{% trans "Select" %}</label><select><option>{% trans "test" %}</option></select>
+<label>{% trans "button" %}</label><input type="submit"/>
 
 </form>
-<label>List</label>
-<ul><li>one</li><li>two</li></ul>
-<p>This is a paragraph</p>
+<label>{% trans "List" %}</label>
+<ul><li>{% trans "one" %}</li><li>{% trans "two" %}</li></ul>
+<p>{% trans "This is a paragraph" %}</p>
 
 {%endblock%}
 </div>
 <br>
 <div class='footer'>
 {% if user.is_authenticated %}
-    Logged in as:<span class="highlight"> {{ user.username }}</span>.
+  {% trans  "Logged in as:" %}<span class="highlight">{% blocktrans %} {{ user.username }} {% endblocktrans %}</span>.
 {% else %}
-   Please log in. <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>login</a>
+  {% trans "Please log in." %} <a href='{%url django.contrib.auth.views.login%}?next={%url ets.waybill.views.select_action%}'>{% trans "login" %}</a>
 {% endif %}
 </div>
 {%block extra-header%}

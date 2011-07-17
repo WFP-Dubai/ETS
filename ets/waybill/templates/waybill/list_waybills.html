@@ -2,11 +2,11 @@
 {%block content %}
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
         <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Dispatch</th> <th>Received</th>
+        <tr><th>{% trans LTI %}</th><th>{% trans Waybill Number %}</th><th>{% trans Origin %}</th><th>{% trans Consignee %}</th><th>{% trans Delivery Location %}</th><th>{% trans Dispatch %}</th> <th>{% trans Received %}</th>
 {%if myprofile.superUser or myprofile.readerUser or myprofile.isCompasUser%}        
-        <th>Validated</th><th>In Compas</th>
+        <th>{% trans Validated %}</th><th>{% trans In Compas %}</th>
 {%endif%}
-        <th>Action</th>
+        <th>{% trans Action %}</th>
         </tr>
         </thead>
 {% for waybill in waybill_list%}
@@ -25,7 +25,7 @@
              <td>{%if waybill.waybillSentToCompas%}D{%else%}-{%endif%}/{%if waybill.waybillRecSentToCompas%}R{%else%}-{%endif%}</td>
 {%endif%}
              <td>{%if not myprofile.superUser%}<a href='{%if  myprofile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>View WB</a>{%endif%}
-             {%if myprofile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>Edit</a>{%endif%}
+             {%if myprofile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>{% trans Edit %}</a>{%endif%}
              </td>
     </tr>
 {%endif%}

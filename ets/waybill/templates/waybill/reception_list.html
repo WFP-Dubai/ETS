@@ -1,8 +1,8 @@
 {% extends "base_template.html"%}
 {%block content %}
- <table title="Waybills Ready for receipt" summary="waybills to receive" cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+ <table title="{% trans 'Waybills Ready for receipt' %}" summary="waybills to receive" cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Origin<th>Consignee</th><th>Delivery Location</th><th>Dispatched Date</th><th>Action</th></tr>
+        <tr><th>{% trans LTI %}</th><th>{% trans Waybill Number %}</th><th>{% trans Origin %}<th>{% trans Consignee %}</th><th>{% trans Delivery Location %}</th><th>{% trans Dispatched Date %}</th><th>{% trans Action %}</th></tr>
         </thead>
 {% for waybill in object_list%}
     {%if waybill.consegnee_code == myprofile.receptionPoints.consegnee_code  and myprofile.receptionPoints.LOCATION_CODE == waybill.destination_location_code  %}
@@ -13,7 +13,7 @@
              <td>{{waybill.consegnee_name}}</td>
              <td>{{waybill.destination_loc_name}}</td>
              <td>{{waybill.dateOfDispatch}}</td>
-             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
+             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>{% trans Select %}</a></td>
     </tr>
    {%else%}
        {%if myprofile.isAllReceiver %}
@@ -25,7 +25,7 @@
              <td>{{waybill.consegnee_name}}</td>
              <td>{{waybill.destination_loc_name}}</td>
              <td>{{waybill.dateOfDispatch}}</td>
-             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>Select</a></td>
+             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>{% trans Select %}</a></td>
     </tr>{%endif%}
         {%endif%}
     {%endif%}

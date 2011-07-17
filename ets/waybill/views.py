@@ -25,6 +25,7 @@ from ets.waybill.tools import restant_si
 from ets.waybill.tools import import_setup, import_lti, track_compas_update
 from ets.waybill.tools import un64unZip, viewLog 
 from ets.waybill.tools import serialized_all_items
+from django.utils.translation import ungettext as _
 
 
 def prep_req( request ):
@@ -188,13 +189,13 @@ def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
     current_wb.transportDispachSigned = True
     current_wb.transportDispachSignedTimestamp = datetime.datetime.now()
     current_wb.dispatcherSigned = True
-    current_wb.auditComment = 'Print Dispatch Original'
+    current_wb.auditComment = _('Print Dispatch Original')
     
     for lineitem in current_wb.loadingdetail_set.select_related():
         lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
     
     current_wb.save()
-    messages.add_message( request, messages.INFO, 'Waybill %s Dispatch Signed' % current_wb.waybillNumber )
+    messages.add_message( request, messages.INFO, _('Waybill')' %s'_(' Dispatch Signed') % current_wb.waybillNumber )
     
     return redirect( "lti_detail_url", current_wb.ltiNumber)
 
@@ -214,10 +215,10 @@ def waybill_finalize_receipt( request, wb_id ):
         current_wb.transportDeliverySignedTimestamp = datetime.datetime.now()
         current_wb.recipientSignedTimestamp = datetime.datetime.now()
         current_wb.transportDeliverySigned = True
-        current_wb.auditComment = 'Print Dispatch Receipt'
+        current_wb.auditComment = _('Print Dispatch Receipt')
         current_wb.save()
         
-        messages.add_message( request, messages.INFO, 'Waybill %s Receipt Signed' % current_wb.waybillNumber )
+        messages.add_message( request, messages.INFO, _('Waybill')' %s'_('Receipt Signed') % current_wb.waybillNumber )
     except:
         pass
     
@@ -257,13 +258,13 @@ def singleWBDispatchToCompas( request, wb_id, queryset=Waybill.objects.all() ):
         waybill.save()
         
         messages.add_message( request, messages.INFO, 
-                              'Waybill %s Sucsessfully pushed to COMPAS' % waybill.waybillNumber )
+                              _('Waybill')' %s' _('Sucsessfully pushed to COMPAS') % waybill.waybillNumber )
     else:
         create_or_update(waybill, request.user, the_compas.ErrorMessages)
 
         waybill.waybillValidated = False
         waybill.save()
-        messages.add_message( request, messages.ERROR, 'Problem sending to compas: %s' % the_compas.ErrorMessages )
+        messages.add_message( request, messages.ERROR, _('Problem sending to compas:')' %s' % the_compas.ErrorMessages )
         
         error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
         error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
@@ -534,7 +535,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             my_lr = self.cleaned_data.get( 'unitsLostReason' )
             if  float( my_losses ) > 0 :
                 if my_lr == None:
-                    raise forms.ValidationError( "You have forgotten to select the Loss Reason" )
+                    raise forms.ValidationError( _("You have forgotten to select the Loss Reason") )
             return my_lr
 
         def clean_unitsDamagedReason( self ):
@@ -542,7 +543,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             my_dr = self.cleaned_data.get( 'unitsDamagedReason' )
             if float( my_damage ) > 0:
                 if my_dr == None:
-                    raise forms.ValidationError( "You have forgotten to select the Damage Reason" )
+                    raise forms.ValidationError( _("You have forgotten to select the Damage Reason") )
             return my_dr
 
 
@@ -552,7 +553,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             my_lr = self.cleaned_data.get( 'unitsLostType' )
             if  float( my_losses ) > 0 :
                 if my_lr == None:
-                    raise forms.ValidationError( "You have forgotten to select the Loss Type" )
+                    raise forms.ValidationError( _("You have forgotten to select the Loss Type") )
             return my_lr
 
         def clean_unitsDamagedType( self ):
@@ -561,7 +562,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
 
             if float( my_damage ) > 0:
                 if my_dr == None:
-                    raise forms.ValidationError( "You have forgotten to select the Damage Type" )
+                    raise forms.ValidationError( _("You have forgotten to select the Damage Type") )
             return my_dr
 
 
@@ -576,9 +577,9 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
                 if not totaloffload == loadedUnits:
                     myerror = ''
                     if totaloffload > loadedUnits:
-                        myerror = "%.3f Units loaded but %.3f units accounted for" % ( loadedUnits, totaloffload )
+                        myerror = "%.3f" _("Units loaded but")" %.3f"_("units accounted for") % ( loadedUnits, totaloffload )
                     if totaloffload < loadedUnits:
-                        myerror = "%.3f Units loaded but only %.3f units accounted for" % ( loadedUnits, totaloffload )
+                        myerror = "%.3f" _("Units loaded but only ") "%.3f" _("units accounted for") % ( loadedUnits, totaloffload )
                     self._errors['numberUnitsGood'] = self._errors.get( 'numberUnitsGood', [] )
                     self._errors['numberUnitsGood'].append( myerror )
                     raise forms.ValidationError( myerror )
@@ -810,7 +811,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
     ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillValidated', ), extra = 0 )
     validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillValidated = True ).filter( waybillSentToCompas = False )
     issue = ''
-    errorMessage = 'Problems with Stock, Not enough in Dispatch Warehouse'
+    errorMessage = _('Problems with Stock, Not enough in Dispatch Warehouse')
     if request.method == 'POST':
         formset = ValidateFormset( request.POST, WaybillValidationFormset )
         if  formset.is_valid() :
@@ -818,7 +819,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
             for waybill in instances:
                 try:
                     if waybill.check_lines():
-                        waybill.auditComment = 'Validated Dispatch'
+                        waybill.auditComment = _('Validated Dispatch')
                         try:
                             errorlog = CompasLogger.objects.get( wb = waybill )
                             errorlog.user = ''
@@ -828,14 +829,14 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
                         except:
                             pass
                     else:
-                        waybill.auditComment = 'Tried to Validate Dispatch'
-                        issue = 'Problems with Stock on WB:  ' + str( waybill )
+                        waybill.auditComment = _('Tried to Validate Dispatch')
+                        issue = _('Problems with Stock on WB:  ' )+ str( waybill )
                         waybill.waybillValidated = False
                         messages.add_message( request, messages.ERROR, issue )
                         create_or_update(waybill, request.user, errorMessage)
                 except:
-                        waybill.auditComment = 'Tried to Validate Dispatch'
-                        issue = 'Problems with Stock on WB:  ' + str( waybill )
+                        waybill.auditComment = _('Tried to Validate Dispatch')
+                        issue = _('Problems with Stock on WB:  ') + str( waybill )
                         waybill.waybillValidated = False
                         messages.add_message( request, messages.ERROR, issue )
                         create_or_update(waybill, request.user, errorMessage)
@@ -853,21 +854,21 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
 def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
     ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillReceiptValidated', ), extra = 0 )
     validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillReceiptValidated = True ).filter( waybillRecSentToCompas = False ).filter( waybillSentToCompas = True )
-    errorMessage = 'Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!'
+    errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
     if request.method == 'POST':
         formset = ValidateFormset( request.POST )
         if  formset.is_valid():
             instances = formset.save( commit = False )
             for waybill in  instances:
                 if waybill.check_lines_receipt():
-                    waybill.auditComment = 'Validated Receipt'
+                    waybill.auditComment = _('Validated Receipt')
                     
                     CompasLogger.objects.filter( wb = waybill )\
                                 .update(user = request.user, errorRec = '', timestamp = datetime.datetime.now())
                     
                 else:
-                    waybill.auditComment = 'Tried to Validate Receipt'
-                    messages.add_message( request, messages.ERROR, 'Problems with Stock on WB: %s' % waybill )
+                    waybill.auditComment = _('Tried to Validate Receipt')
+                    messages.add_message( request, messages.ERROR, _('Problems with Stock on WB:')' %s' % waybill )
                     waybill.waybillReceiptValidated = False
                     create_or_update(waybill, request.user, errorMessage)
                     
