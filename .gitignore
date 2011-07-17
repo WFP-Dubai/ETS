@@ -40,3 +40,6 @@ db
 #media
 /static
 /var
+
+#Mac
+.DS_Store
