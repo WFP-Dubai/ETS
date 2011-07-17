@@ -9,7 +9,7 @@ DATABASES['compas'] = ALL_DB['compas_test_pak']
 COMPAS_STATION = u'ISBX002'
 COUNTRIES = ['586']
 MEDIA_ROOT = os.path.join( os.path.dirname( __file__ ), 'media' )
-MEDIA_URL = '/ets/media'
+MEDIA_URL = '/media/'
 SESSION_COOKIE_NAME = 'ets-demo'
 #date of the start of ltis to import
 DISABLE_EXPIERED_LTI = DEBUG

@@ -26,27 +26,23 @@ info_dict_waybill_reception = {
 }
 
 
-urlpatterns = patterns( '',
-    ( r'^$', 'django.views.generic.simple.redirect_to', {'url':'select-action'} ),
-) 
-
-urlpatterns += patterns("ets.views",
+urlpatterns = patterns("ets.views",
                         
-    ( r'^select-action/$', "select_action", {
+    ( r'^$', "select_action", {
         'template': 'select_action.html',
     }, "select_action" ),
     
-    ( r'^waybill/viewlog', "viewLogView" ),
+    ( r'^waybill/viewlog/', "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate" ),
-    ( r'^waybill/deserialize/$', "deserialize" ),
+    ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
     ( r'^waybill/dispatch/$', "dispatch" ),
     ( r'^waybill/edit/(.*)/$', "waybill_edit" ),
     ( r'^waybill/edit/$', "waybill_edit" ),
     ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
-    ( r'^waybill/import/$', "import_ltis" ),
+    ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
     ( r'^waybill/info/(.*)/$', "lti_detail_url", {}, "lti_detail_url" ),
     ( r'^waybill/list/(.*)/$', "listOfLtis", {}, "listOfLtis" ),
-    ( r'^waybill/list/$', "ltis" ),
+    ( r'^waybill/list/$', "ltis", {}, "ltis"),
     ( r'^waybill/print_original_receipt/(.*)/$', "waybill_finalize_receipt" ),
     ( r'^waybill/print_original/(.*)/$', "waybill_finalize_dispatch" ),
     ( r'^waybill/receive/(.*)/$', "waybill_reception", {}, "waybill_reception" ),
@@ -94,7 +90,7 @@ urlpatterns += patterns("ets.views",
     ( r'^waybill/synchro/upload/', "post_synchronize_waybill" ),
     
     # download services
-    ( r'^waybill/data/select/$', "select_data" ),
+    ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),
     ( r'^waybill/synchro/download/', "get_synchronize_waybill" ),
     ( r'^waybill/synchro/download2/', "get_synchronize_waybill2" ),
 
@@ -106,11 +102,19 @@ urlpatterns += patterns("ets.views",
     ( r'^all/download/stock_ets/', "get_wb_stock" ),
     
     ( r'^accounts/profile', "profile" ),
-    ( r'^accounts/', include( admin.site.urls ) ),
+    ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
     ( r'^admin/', include( admin.site.urls ) ),
 )
 
 if settings.DEBUG:
-    from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-    urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += patterns('',
+        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    )
+
+    #===================================================================================================================
+    # from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    # urlpatterns += staticfiles_urlpatterns()
+    #===================================================================================================================

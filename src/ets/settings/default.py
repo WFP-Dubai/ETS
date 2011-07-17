@@ -189,7 +189,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     
-    'audit_log.middleware.UserLoggingMiddleware',
+    #'audit_log.middleware.UserLoggingMiddleware',
     
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 
@@ -245,18 +245,14 @@ TEST_RUNNER = "ets.tests.coverage_runner.run_tests"
 COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 
 LOGIN_REDIRECT_URL = '/'
-#=======================================================================================================================
-# LOGIN_URL = '/account/login/'
-# LOGOUT_URL = '/account/logout/'
-#=======================================================================================================================
-LOGIN_URL = '/test/ets/accounts/login/'
-LOGOUT_URL = '/test/ets/accounts/logout/'
+LOGIN_URL = '/accounts/login/'
+LOGOUT_URL = '/accounts/logout/'
 AUTH_PROFILE_MODULE = 'ets.UserProfile'
 
 IN_PRODUCTION = False
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-SESSION_COOKIE_NAME = 'ets-demo'
+SESSION_COOKIE_NAME = 'ets'
 
 WAYBILL_LETTER = 'A'
 MAX_DATE = '2010-01-01'

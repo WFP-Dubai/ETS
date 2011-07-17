@@ -36,11 +36,11 @@ def prep_req( request ):
 def select_action( request, **kwargs ):
     """
     View: select_action 
-    URL: /ets/select-action
-    Template: /ets/waybill/templates/select_action.html
+    URL: /
+    Template: /waybill/templates/select_action.html
     Gives the loggedin user a choise of possible actions sepending on roles
     """
-    
+    print "!"*100
     return direct_to_template(request, **kwargs)
     
 
@@ -48,7 +48,7 @@ def select_action( request, **kwargs ):
 def listOfLtis( request, origin, template='lti/ltis.html'):
     """
     View: listOfLtis 
-    URL: ets/waybill/list/{{warehouse}}
+    URL: /waybill/list/{{warehouse}}
     Template: /ets/waybill/templates/ltis.html
     Shows the LTIs that are in a specific warehouse
     """
@@ -75,7 +75,7 @@ def ltis( request, template='lti/ltis_all_qs.html' ):
     """
     View:
     ltis
-    URL: ets/waybill/list
+    URL: /waybill/list
     Shows all the LTIs
     template:
     /ets/waybill/templates/ltis.html
@@ -102,7 +102,7 @@ def ltis( request, template='lti/ltis_all_qs.html' ):
 def import_ltis( request ):
     """
     View: import_ltis 
-    URL: ets/waybill/import
+    URL: /waybill/import
     Template: /ets/waybill/templates/status.html
     Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
     add tag to say when last done
@@ -127,7 +127,7 @@ def import_ltis( request ):
 def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
     """
     View: lti_detail_url 
-    URL: ets/waybill/info/(lti_code)
+    URL: /waybill/info/(lti_code)
     Template: /ets/waybill/templates/lti/detailed_lti.html
     Show detail of LTI and link to create waybill
     """
@@ -152,7 +152,7 @@ def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
 def dispatch( request ):
     """
     View: dispatch 
-    URL: ets/waybill/dispatch
+    URL: /waybill/dispatch
     Template: None
     Redirects to Lti Details.
     """
@@ -179,7 +179,7 @@ def dispatch( request ):
 def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
     """
     View: waybill_finalize_dispatch
-    URL: ets/waybill/dispatch
+    URL: /waybill/dispatch
     Templet:None
     called when user pushes Print Original on dispatch
     Redirects to Lti Details
@@ -204,7 +204,7 @@ def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
 def waybill_finalize_receipt( request, wb_id ):
     """
     View: waybill_finalize_receipt 
-    URL:ets/waybill/receipt/
+    URL:/waybill/receipt/
     Template:None
     Redirects to Lti Details
     Called when user pushes Print Original on Receipt
@@ -280,7 +280,7 @@ def singleWBReceiptToCompas( request, wb_id, queryset=Waybill.objects.all(), tem
     """
     View: singleWBReceiptToCompas
     URL: ...
-    Template: /ets/waybill/templates/compas/status_waybill_compas_rec.html
+    Template: //waybill/templates/compas/status_waybill_compas_rec.html
     Sends a single Receipt into compas
     """
     #profile = getMyProfile(request)
