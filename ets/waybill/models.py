@@ -2,23 +2,30 @@
 import datetime
 import zlib, base64, string
 
-from django.db import models, connection
-from django.contrib import admin
-from django.forms import ModelForm, ModelChoiceField
+from django.db import models#, connection
+#from django.contrib import admin
+#from django.forms import ModelForm, ModelChoiceField
 from django.contrib.auth.models import User
-from django.forms.models import inlineformset_factory
+#from django.forms.models import inlineformset_factory
 from django.db.models import Sum
 from django.core import serializers
-from django.forms.models import model_to_dict
+#from django.forms.models import model_to_dict
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 
-from django.template.defaultfilters import stringfilter
+#from django.template.defaultfilters import stringfilter
 from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
 
 name = "1234"
+
+# like a normal ForeignKey.
+try:
+    from south.modelsinspector import add_introspection_rules
+    add_introspection_rules([], ['^audit_log\.models\.fields\.LastUserField'])
+except ImportError:
+    pass
 
 # Create your models here.
 class Places( models.Model ):

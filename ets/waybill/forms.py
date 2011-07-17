@@ -1,22 +1,22 @@
+import datetime
+
 from django.forms import ModelForm
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
-from django.http import HttpResponse, HttpResponseRedirect
-from ets.waybill.views import *
-from ets.waybill.models import *
 from django import forms
-from django.forms.extras.widgets import SelectDateWidget
+#from django.forms.extras.widgets import SelectDateWidget
 
-from django import forms
+#from ets.waybill.views import *
+from ets.waybill import models as ets_models
 
 class WarehouseForm( forms.Form ):
-    warehouse = forms.ModelChoiceField( queryset = DispatchPoint.objects.filter( ACTIVE_START_DATE__lt = datetime.date.today() ) )
+    warehouse = forms.ModelChoiceField( queryset = ets_models.DispatchPoint.objects.filter( ACTIVE_START_DATE__lt = datetime.date.today() ) )
 
 class WaybillForm( ModelForm ):
 
     dateOfLoading = forms.DateField()
     dateOfDispatch = forms.DateField()
-    transportType = forms.CharField( widget = forms.Select( choices = Waybill.transport_type ) )
-    transactionType = forms.CharField( widget = forms.Select( choices = Waybill.transaction_type_choice ) )
+    transportType = forms.CharField( widget = forms.Select( choices = ets_models.Waybill.transport_type ) )
+    transactionType = forms.CharField( widget = forms.Select( choices = ets_models.Waybill.transaction_type_choice ) )
     dispatchRemarks = forms.CharField( widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
     ltiNumber = forms.CharField( widget = forms.HiddenInput() )
     transportContractor = forms.CharField( widget = forms.HiddenInput() )
@@ -30,14 +30,14 @@ class WaybillForm( ModelForm ):
     recipientLocation = forms.CharField( widget = forms.HiddenInput() )
     recipientConsingee = forms.CharField( widget = forms.HiddenInput() )
     waybillNumber = forms.CharField( widget = forms.HiddenInput() )
-    destinationWarehouse = ModelChoiceField( queryset = Places.objects.all() )
+    destinationWarehouse = forms.ModelChoiceField( queryset = ets_models.Places.objects.all() )
     invalidated = forms.CharField( widget = forms.HiddenInput(), required = False )
     auditComment = forms.CharField( widget = forms.HiddenInput(), required = False )
 
 
 
     class Meta:
-        model = Waybill
+        model = ets_models.Waybill
         fields = [
             'ltiNumber',
             'waybillNumber',
@@ -98,7 +98,7 @@ class WaybillRecieptForm( ModelForm ):
 
 
     class Meta:
-        model = Waybill
+        model = ets_models.Waybill
         fields = [
                 'waybillNumber',
                 'recipientLocation',
@@ -186,7 +186,7 @@ class WaybillFullForm( ModelForm ):
     recipientSignedTimestamp = forms.DateTimeField( widget = forms.HiddenInput(), required = False )
     recipientStartDischargeDate = forms.DateField( required = False )
     recipientTitle = forms.CharField( widget = forms.HiddenInput(), required = False )
-    transactionType = forms.CharField( widget = forms.Select( choices = Waybill.transaction_type_choice ) )
+    transactionType = forms.CharField( widget = forms.Select( choices = ets_models.Waybill.transaction_type_choice ) )
     transportContractor = forms.CharField( widget = forms.HiddenInput(), required = False )
     transportDeliverySigned = forms.CharField( widget = forms.HiddenInput(), required = False )
     transportDeliverySignedTimestamp = forms.DateTimeField( widget = forms.HiddenInput(), required = False )
@@ -196,23 +196,23 @@ class WaybillFullForm( ModelForm ):
     transportDriverName = forms.CharField( widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
     transportSubContractor = forms.CharField( widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
     transportTrailerRegistration = forms.CharField( widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    transportType = forms.CharField( widget = forms.Select( choices = Waybill.transport_type ) )
+    transportType = forms.CharField( widget = forms.Select( choices = ets_models.Waybill.transport_type ) )
     transportVehicleRegistration = forms.CharField( widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
     waybillNumber = forms.CharField( widget = forms.HiddenInput(), required = False )
     auditComment = forms.CharField( widget = forms.Textarea, required = True )
 
     class Meta:
-        model = Waybill
+        model = ets_models.Waybill
 
     def thisDispName( self ):
         try:
-            name = EpicPerson.objects.get( person_pk = self.instance.dispatcherName )
+            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.dispatcherName )
         except:
             name = 'N/A'
         return name
     def thisRecName( self ):
         try:
-            name = EpicPerson.objects.get( person_pk = self.instance.recipientName )
+            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.recipientName )
         except:
             name = 'N/A'
         return name
@@ -234,16 +234,16 @@ class WaybillValidationFormset( BaseModelFormSet ):
                 print issue
 
 
-class MyModelChoiceField( ModelChoiceField ):
+class MyModelChoiceField( forms.ModelChoiceField ):
     def label_from_instance( self, obj ):
         return "%s - %s" % ( obj.si_code , obj.cmmname )
 
 class LoadingDetailDispatchForm( ModelForm ):
     class Meta:
-        model = LoadingDetail
+        model = ets_models.LoadingDetail
         fields = ( 'order_item', 'numberUnitsLoaded' )
 
 class LoadingDetailRecieptForm( ModelForm ):
     class Meta:
-        model = LoadingDetail
+        model = ets_models.LoadingDetail
         fields = ( 'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 'unitsDamagedReason', )

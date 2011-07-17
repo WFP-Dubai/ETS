@@ -227,7 +227,7 @@ INSTALLED_APPS = (
     #'sorl.thumbnail',
     #'tabs',
     #'mptt',
-    #'south',
+    'south',
     #'oembed',
     #'oembed.contrib',
     #'mailer',
