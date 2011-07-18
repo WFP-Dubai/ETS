@@ -309,7 +309,12 @@ class Waybill( models.Model ):
         """
         #waybill = Waybill.objects.get( id = wb_id )
         return base64.b64encode( zlib.compress( simplejson.dumps( self.serialize(), use_decimal=True ) ) )
-            
+    
+    def decompress(self, data):
+        data = string.replace( data, ' ', '+' )
+        zippedData = base64.b64decode( data )
+        return zlib.decompress( zippedData )
+    
 #### Compas Tables Imported
 
 
