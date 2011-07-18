@@ -117,21 +117,18 @@ class WaybillForm( ModelForm ):
         }
     
     def clean( self ):
-        cleaned = self.cleaned_data
+        cleaned = super(WaybillForm, self).clean()
         dateOfDispatch = cleaned.get( 'dateOfDispatch' )
         dateOfLoading = cleaned.get( 'dateOfLoading' )
-
-        faults = False
-        myerror = ''
-        if dateOfLoading > dateOfDispatch:
-            myerror = ''
-            myerror = _("Cargo Dispatched before being Loaded")
-            self._errors['dateOfDispatch'] = self._errors.get( 'dateOfDispatch', [] )
-            self._errors['dateOfDispatch'].append( myerror )
-            faults = True
-
-        if faults:
-            raise forms.ValidationError( myerror )
+        
+        if dateOfDispatch and dateOfLoading:
+            if dateOfLoading > dateOfDispatch:
+                message = _("Cargo Dispatched before being Loaded")
+                #=======================================================================================================
+                # self._errors['dateOfDispatch'] = self._errors.get( 'dateOfDispatch', [] )
+                # self._errors['dateOfDispatch'].append( myerror )
+                #=======================================================================================================
+                raise forms.ValidationError( message )
 
         return cleaned
 
