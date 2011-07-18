@@ -1,15 +1,15 @@
 {% extends "base_template.html"%}
-{%block title%}Stock List{%endblock%}
+{%block title%}{% trans Stock List %}{%endblock%}
 {%block content %}
 <table id='toplist'>
     <thead>
         <tr>
-        <th>Warehouse</th>
-        <th>Commodity</th>
-        <th>SI</th>
-        <th>Items</th>
-        <th>MT Net</th>
-        <th>Quality</th></tr>
+        <th>{% trans Warehouse %}</th>
+        <th>{% trans Commodity %}</th>
+        <th>{% trans SI %}</th>
+        <th>{% trans Items %}</th>
+        <th>{% trans MT Net %}</th>
+        <th>{% trans Quality %}</th></tr>
         </thead>
     {% for item in stocklist%}
    

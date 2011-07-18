@@ -29,13 +29,13 @@ except ImportError:
 
 # Create your models here.
 class Places( models.Model ):
-    org_code = models.CharField( max_length = 7, primary_key = True )
-    name = models.CharField( max_length = 100 )
-    geo_point_code = models.CharField( max_length = 4 )
-    geo_name = models.CharField( max_length = 100 )
-    country_code = models.CharField( max_length = 3 )
-    reporting_code = models.CharField( max_length = 7 )
-    organization_id = models.CharField( max_length = 20 )
+    org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
+    name = models.CharField(_("Name"), max_length = 100 )
+    geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
+    geo_name = models.CharField(_("Geo name"), max_length = 100 )
+    country_code = models.CharField( _("Country code"),max_length = 3 )
+    reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
+    organization_id = models.CharField( _("Organization id"),max_length = 20 )
 
     def __unicode__( self ):
         return self.name
@@ -61,84 +61,84 @@ class Places( models.Model ):
 class Waybill( models.Model ):
     transaction_type_choice = ( 
                         ( u'WIT', _(u'WFP Internal') ),
-                        ( u'DEL', u'Delivery' ),
-                        ( u'SWA', u'Swap' ),
-                        ( u'REP', u'Repayment' ),
-                        ( u'SAL', u'Sale' ),
-                        ( u'ADR', u'Air drop' ),
-                        ( u'INL', u'Inland Shipment' ),
-                        ( u'DIS', u'Distribution' ),
-                        ( u'LON', u'Loan' ),
-                        ( u'DSP', u'Disposal' ),
-                        ( u'PUR', u'Purchase' ),
-                        ( u'SHU', u'Shunting' ),
-                        ( u'COS', u'Costal Transshipment' ),
+                        ( u'DEL',_( u'Delivery' )),
+                        ( u'SWA', _(u'Swap' )),
+                        ( u'REP', _(u'Repayment' )),
+                        ( u'SAL', _(u'Sale' )),
+                        ( u'ADR', _(u'Air drop' )),
+                        ( u'INL', _(u'Inland Shipment' )),
+                        ( u'DIS', _(u'Distribution' )),
+                        ( u'LON', _(u'Loan' )),
+                        ( u'DSP', _(u'Disposal' )),
+                        ( u'PUR', _(u'Purchase' )),
+                        ( u'SHU', _(u'Shunting' )),
+                        ( u'COS', _(u'Costal Transshipment' )),
                 )
     transport_type = ( 
-                        ( u'02', u'Road' ),
-                        ( u'01', u'Rail' ),
-                        ( u'04', u'Air' ),
-                        ( u'I', u'Inland Waterways' ),
-                        ( u'C', u'Costal Waterways' ),
-                        ( u'07', u'Multi-mode' ),
-#                        (u'O', u'Other Please Specify')
+                        ( u'02', _(u'Road' )),
+                        ( u'01', _(u'Rail' )),
+                        ( u'04', _(u'Air' )),
+                        ( u'I', _(u'Inland Waterways' )),
+                        ( u'C', _(u'Costal Waterways' )),
+                        ( u'07', _(u'Multi-mode' )),
+#                        (u'O', _(u'Other Please Specify'))
                 )
 
-    ltiNumber = models.CharField( max_length = 20 )
-    waybillNumber = models.CharField( max_length = 20 )
-    dateOfLoading = models.DateField( null = True, blank = True )
-    dateOfDispatch = models.DateField( null = True, blank = True )
-    transactionType = models.CharField( max_length = 10, choices = transaction_type_choice )
-    transportType = models.CharField( max_length = 10, choices = transport_type )
+    ltiNumber = models.CharField( _("LTI number"),max_length = 20 )
+    waybillNumber = models.CharField(_("Way bill number"), max_length = 20 )
+    dateOfLoading = models.DateField( _("Date of loading"),null = True, blank = True )
+    dateOfDispatch = models.DateField( _("Date od dispatch"),null = True, blank = True )
+    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = transaction_type_choice )
+    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = transport_type )
     #Dispatcher
-    dispatchRemarks = models.CharField( max_length = 200 )
-    dispatcherName = models.TextField( blank = True, null = True )
-    dispatcherTitle = models.TextField( blank = True )
-    dispatcherSigned = models.BooleanField( blank = True )
+    dispatchRemarks = models.CharField(_("Dispatch Remark"), max_length = 200 )
+    dispatcherName = models.TextField( _("Diapatcher Name"),blank = True, null = True )
+    dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
+    dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
     #Transporter
-    transportContractor = models.TextField( blank = True )
-    transportSubContractor = models.TextField( blank = True )
-    transportDriverName = models.TextField( blank = True )
-    transportDriverLicenceID = models.TextField( blank = True )
-    transportVehicleRegistration = models.TextField( blank = True )
-    transportTrailerRegistration = models.TextField( blank = True )
-    transportDispachSigned = models.BooleanField( blank = True )
-    transportDispachSignedTimestamp = models.DateTimeField( null = True, blank = True )
-    transportDeliverySigned = models.BooleanField( blank = True )
-    transportDeliverySignedTimestamp = models.DateTimeField( null = True, blank = True )
+    transportContractor = models.TextField(_("Transport Contarctor"), blank = True )
+    transportSubContractor = models.TextField(_("Transport Sub contarctor"), blank = True )
+    transportDriverName = models.TextField(_("Transport Driver Name"), blank = True )
+    transportDriverLicenceID = models.TextField(_("Transport Driver LicenceID "), blank = True )
+    transportVehicleRegistration = models.TextField(_("Transport Vehicle Registration "), blank = True )
+    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"),blank = True )
+    transportDispachSigned = models.BooleanField( _("Transport Dispach Signed"),blank = True )
+    transportDispachSignedTimestamp = models.DateTimeField( _("Transport Dispach Signed Timestamp"),null = True, blank = True )
+    transportDeliverySigned = models.BooleanField( _("Transport Delivery Signed"),blank = True )
+    transportDeliverySignedTimestamp = models.DateTimeField( _("Transport Delivery Signed Timestamp"),null = True, blank = True )
 
     #Container        
-    containerOneNumber = models.CharField( max_length = 40, blank = True )
-    containerTwoNumber = models.CharField( max_length = 40, blank = True )
-    containerOneSealNumber = models.CharField( max_length = 40, blank = True )
-    containerTwoSealNumber = models.CharField( max_length = 40, blank = True )
-    containerOneRemarksDispatch = models.CharField( max_length = 40, blank = True )
-    containerTwoRemarksDispatch = models.CharField( max_length = 40, blank = True )
-    containerOneRemarksReciept = models.CharField( max_length = 40, blank = True )
-    containerTwoRemarksReciept = models.CharField( max_length = 40, blank = True )
+    containerOneNumber = models.CharField(_("Container OneNumber"), max_length = 40, blank = True )
+    containerTwoNumber = models.CharField( _("Container TwoNumber"), max_length = 40, blank = True )
+    containerOneSealNumber = models.CharField(_("Container OneSeal Number"), max_length = 40, blank = True )
+    containerTwoSealNumber = models.CharField(_("Container TwoSeal Number"), max_length = 40, blank = True )
+    containerOneRemarksDispatch = models.CharField( _("Container OneRemarks Dispatch"), max_length = 40, blank = True )
+    containerTwoRemarksDispatch = models.CharField( _("Container TwoRemarks Dispatch"), max_length = 40, blank = True )
+    containerOneRemarksReciept = models.CharField( _("Container OneRemarks Reciept"), max_length = 40, blank = True )
+    containerTwoRemarksReciept = models.CharField(_("Container TwoRemarks Reciept"), max_length = 40, blank = True )
 
     #Reciver
-    recipientLocation = models.CharField( max_length = 100, blank = True )
-    recipientConsingee = models.CharField( max_length = 100, blank = True )
-    recipientName = models.CharField( max_length = 100, blank = True )
-    recipientTitle = models.CharField( max_length = 100, blank = True )
-    recipientArrivalDate = models.DateField( null = True, blank = True )
-    recipientStartDischargeDate = models.DateField( null = True, blank = True )
-    recipientEndDischargeDate = models.DateField( null = True, blank = True )
-    recipientDistance = models.IntegerField( blank = True, null = True )
-    recipientRemarks = models.TextField( blank = True )
-    recipientSigned = models.BooleanField( blank = True )
-    recipientSignedTimestamp = models.DateTimeField( null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Places, blank = True )
+    recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True )
+    recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
+    recipientName = models.CharField( _("Recipient Name"), max_length = 100, blank = True )
+    recipientTitle = models.CharField(_("Recipient Title "), max_length = 100, blank = True )
+    recipientArrivalDate = models.DateField( _("Recipient ArrivalDate"), null = True, blank = True )
+    recipientStartDischargeDate = models.DateField( _("Recipient Start DischargeDate"), null = True, blank = True )
+    recipientEndDischargeDate = models.DateField( _("Recipient End DischargeDate"), null = True, blank = True )
+    recipientDistance = models.IntegerField(_("Recipient Distance"), blank = True, null = True )
+    recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
+    recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
+    recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
+    destinationWarehouse = models.ForeignKey( _("Destination Warehouse"),Places, blank = True )
 
     #Extra Fields
-    waybillValidated = models.BooleanField()
-    waybillReceiptValidated = models.BooleanField()
-    waybillSentToCompas = models.BooleanField()
-    waybillRecSentToCompas = models.BooleanField()
-    waybillProcessedForPayment = models.BooleanField()
-    invalidated = models.BooleanField()
-    auditComment = models.TextField( null = True, blank = True )
+    waybillValidated = models.BooleanField( _("Waybill Validated"))
+    waybillReceiptValidated = models.BooleanField( _("Waybill Receipt Validated"))
+    waybillSentToCompas = models.BooleanField(_("Waybill SentToCompas"))
+    waybillRecSentToCompas = models.BooleanField(_("Waybill RecSentToCompas"))
+    waybillProcessedForPayment = models.BooleanField(_("Waybill Processed ForPayment"))
+    invalidated = models.BooleanField(_("Invalidated"))
+    auditComment = models.TextField( _("Audit Comment"),null = True, blank = True )
     audit_log = AuditLog()
 
     def  __unicode__( self ):
@@ -325,36 +325,36 @@ Models based on compas Views & Tables
 LTIs for office 
 """
 class LtiOriginal( models.Model ):
-    lti_pk = models.CharField( max_length = 50, primary_key = True, db_column = 'LTI_PK' )
-    lti_id = models.CharField( max_length = 40, db_column = 'LTI_ID' )
-    code = models.CharField( max_length = 40, db_column = 'CODE' )
-    lti_date = models.DateField( db_column = 'LTI_DATE' )
-    expiry_date = models.DateField( blank = True, null = True, db_column = 'EXPIRY_DATE' )
-    transport_code = models.CharField( max_length = 4, db_column = 'TRANSPORT_CODE' )
-    transport_ouc = models.CharField( max_length = 13, db_column = 'TRANSPORT_OUC' )
-    transport_name = models.CharField( max_length = 30, db_column = 'TRANSPORT_NAME' )
-    origin_type = models.CharField( max_length = 1, db_column = 'ORIGIN_TYPE' )
-    origintype_desc = models.CharField( max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
-    origin_location_code = models.CharField( max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
-    origin_loc_name = models.CharField( max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
-    origin_wh_code = models.CharField( max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
-    origin_wh_name = models.CharField( max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
-    destination_location_code = models.CharField( max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
-    destination_loc_name = models.CharField( max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
-    consegnee_code = models.CharField( max_length = 12, db_column = 'CONSEGNEE_CODE' )
-    consegnee_name = models.CharField( max_length = 80, db_column = 'CONSEGNEE_NAME' )
-    requested_dispatch_date = models.DateField( blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
-    project_wbs_element = models.CharField( max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
-    si_record_id = models.CharField( max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
-    si_code = models.CharField( max_length = 8, db_column = 'SI_CODE' )
-    comm_category_code = models.CharField( max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
-    commodity_code = models.CharField( max_length = 18, db_column = 'COMMODITY_CODE' )
-    cmmname = models.CharField( max_length = 100, blank = True, db_column = 'CMMNAME' )
-    quantity_net = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
-    quantity_gross = models.DecimalField( max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
-    number_of_units = models.DecimalField( max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
-    unit_weight_net = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
-    unit_weight_gross = models.DecimalField( max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
+    lti_pk = models.CharField( _("LTI primary key"),max_length = 50, primary_key = True, db_column = 'LTI_PK' )
+    lti_id = models.CharField(_("LTI ID"), max_length = 40, db_column = 'LTI_ID' )
+    code = models.CharField( _("Code"),max_length = 40, db_column = 'CODE' )
+    lti_date = models.DateField( _("LTI Date"),db_column = 'LTI_DATE' )
+    expiry_date = models.DateField(_("Expiry Date"), blank = True, null = True, db_column = 'EXPIRY_DATE' )
+    transport_code = models.CharField(_("Transport Code"), max_length = 4, db_column = 'TRANSPORT_CODE' )
+    transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, db_column = 'TRANSPORT_OUC' )
+    transport_name = models.CharField(_("Transport Name"), max_length = 30, db_column = 'TRANSPORT_NAME' )
+    origin_type = models.CharField(_("Origin Type"), max_length = 1, db_column = 'ORIGIN_TYPE' )
+    origintype_desc = models.CharField(_("Origintype desc"), max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
+    origin_location_code = models.CharField( _("Origin location code"),max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
+    origin_loc_name = models.CharField(_("Origin loc name"), max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
+    origin_wh_code = models.CharField( _("Origin wh code"),max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
+    origin_wh_name = models.CharField( _("Origin wh name"),max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
+    destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
+    destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
+    consegnee_code = models.CharField(_("Consegnee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
+    consegnee_name = models.CharField(_("Consegnee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
+    project_wbs_element = models.CharField(_("Project wbs element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
+    si_record_id = models.CharField( _("SI Record ID "),max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
+    si_code = models.CharField( _("SI Code"),max_length = 8, db_column = 'SI_CODE' )
+    comm_category_code = models.CharField(_("Comm Category Code"), max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
+    commodity_code = models.CharField(_("Commodity Code "), max_length = 18, db_column = 'COMMODITY_CODE' )
+    cmmname = models.CharField(_("Commodity Name"), max_length = 100, blank = True, db_column = 'CMMNAME' )
+    quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
+    quantity_gross = models.DecimalField( _("Quantity Gross"),max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
+    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
+    unit_weight_net = models.DecimalField( _("Unit Weight Net"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
+    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
 
     #objects = models.Manager()
 
@@ -487,22 +487,22 @@ class RemovedLtis( models.Model ):
         return self.lti.lti_id
 
 class EpicPerson( models.Model ):
-    person_pk = models.CharField( max_length = 20, blank = True, primary_key = True )
-    org_unit_code = models.CharField( max_length = 13 )
-    code = models.CharField( max_length = 7 )
-    type_of_document = models.CharField( max_length = 2, blank = True )
-    organization_id = models.CharField( max_length = 12 )
-    last_name = models.CharField( max_length = 30 )
-    first_name = models.CharField( max_length = 25 )
-    title = models.CharField( max_length = 50, blank = True )
-    document_number = models.CharField( max_length = 25, blank = True )
-    e_mail_address = models.CharField( max_length = 100, blank = True )
-    mobile_phone_number = models.CharField( max_length = 20, blank = True )
-    official_tel_number = models.CharField( max_length = 20, blank = True )
-    fax_number = models.CharField( max_length = 20, blank = True )
-    effective_date = models.DateField( null = True, blank = True )
-    expiry_date = models.DateField( null = True, blank = True )
-    location_code = models.CharField( max_length = 10 )
+    person_pk = models.CharField(_("person pk"), max_length = 20, blank = True, primary_key = True )
+    org_unit_code = models.CharField(_("org unit code"), max_length = 13 )
+    code = models.CharField(_("code"), max_length = 7 )
+    type_of_document = models.CharField(_("type of document"), max_length = 2, blank = True )
+    organization_id = models.CharField(_("organization id"), max_length = 12 )
+    last_name = models.CharField(_("last name"), max_length = 30 )
+    first_name = models.CharField(_("first name"), max_length = 25 )
+    title = models.CharField(_("title"), max_length = 50, blank = True )
+    document_number = models.CharField(_("document number"), max_length = 25, blank = True )
+    e_mail_address = models.CharField(_("e_mail address"), max_length = 100, blank = True )
+    mobile_phone_number = models.CharField(_("mobile phone number"), max_length = 20, blank = True )
+    official_tel_number = models.CharField(_("official tel number"), max_length = 20, blank = True )
+    fax_number = models.CharField(_("fax_number"), max_length = 20, blank = True )
+    effective_date = models.DateField(_("effective date"), null = True, blank = True )
+    expiry_date = models.DateField(_("expiry date "), null = True, blank = True )
+    location_code = models.CharField(_("location code"), max_length = 10 )
 
     class Meta:
         db_table = u'epic_persons'
@@ -526,28 +526,28 @@ class StockManager( models.Manager ):
         return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
 
 class EpicStock( models.Model ):
-    wh_pk = models.CharField( max_length = 90, blank = True, primary_key = True )
-    wh_regional = models.CharField( max_length = 4, blank = True )
-    wh_country = models.CharField( max_length = 15 )
-    wh_location = models.CharField( max_length = 30 )
-    wh_code = models.CharField( max_length = 13 )
-    wh_name = models.CharField( max_length = 50, blank = True )
-    project_wbs_element = models.CharField( max_length = 24, blank = True )
-    si_record_id = models.CharField( max_length = 25 )
-    si_code = models.CharField( max_length = 8 )
-    origin_id = models.CharField( max_length = 23 )
-    comm_category_code = models.CharField( max_length = 9 )
-    commodity_code = models.CharField( max_length = 18 )
-    cmmname = models.CharField( max_length = 100, blank = True )
-    package_code = models.CharField( max_length = 17 )
-    packagename = models.CharField( max_length = 50, blank = True )
-    qualitycode = models.CharField( max_length = 1 )
-    qualitydescr = models.CharField( max_length = 11, blank = True )
-    quantity_net = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
-    quantity_gross = models.DecimalField( null = True, max_digits = 12, decimal_places = 3, blank = True )
-    number_of_units = models.IntegerField()
-    allocation_code = models.CharField( max_length = 10 )
-    reference_number = models.CharField( max_length = 50 )
+    wh_pk = models.CharField(_("wh pk"), max_length = 90, blank = True, primary_key = True )
+    wh_regional = models.CharField(_("wh regional"), max_length = 4, blank = True )
+    wh_country = models.CharField(_("wh country"), max_length = 15 )
+    wh_location = models.CharField(_("wh location"), max_length = 30 )
+    wh_code = models.CharField(_("wh code"), max_length = 13 )
+    wh_name = models.CharField(_("wh name"), max_length = 50, blank = True )
+    project_wbs_element = models.CharField(_("Project wbs element"), max_length = 24, blank = True )
+    si_record_id = models.CharField(_("SI record id "), max_length = 25 )
+    si_code = models.CharField(_("SI code"), max_length = 8 )
+    origin_id = models.CharField(_("Origin id"), max_length = 23 )
+    comm_category_code = models.CharField(_("comm category code"), max_length = 9 )
+    commodity_code = models.CharField(_("commodity code "), max_length = 18 )
+    cmmname = models.CharField(_("commodity name"), max_length = 100, blank = True )
+    package_code = models.CharField(_("Package code"), max_length = 17 )
+    packagename = models.CharField(_("Package name"), max_length = 50, blank = True )
+    qualitycode = models.CharField(_("Quality code"), max_length = 1 )
+    qualitydescr = models.CharField(_("Quality descr "), max_length = 11, blank = True )
+    quantity_net = models.DecimalField(_("Quantity net"), null = True, max_digits = 12, decimal_places = 3, blank = True )
+    quantity_gross = models.DecimalField(_("Quantity gross"), null = True, max_digits = 12, decimal_places = 3, blank = True )
+    number_of_units = models.IntegerField(_("Number of units"))
+    allocation_code = models.CharField(_("Allocation code"), max_length = 10 )
+    reference_number = models.CharField( _("Reference number"),max_length = 50 )
     
     objects = models.Manager()
     in_stock_objects = StockManager()
@@ -568,7 +568,7 @@ class EpicStock( models.Model ):
         return self.origin_id[7:]
     
     @classmethod    
-    def update():
+    def update(self):
         """
         Executes Imports of Stock
         """
@@ -576,14 +576,17 @@ class EpicStock( models.Model ):
         for myrecord in originalStock:
             myrecord.save( using = 'default' )
             
-        EpicStock.objects.exclude(pk__in=originalStock.values_list('pk', flat=True))\
-                         .update(number_of_units=0)
-
+#        EpicStock.objects.exclude(pk__in=originalStock.values_list('pk', flat=True))\
+#                         .update(number_of_units=0)
+        for item in EpicStock.objects.all():
+            if item not in originalStock:
+                item.number_of_units = 0;
+                item.save()
 
 class EpicLossDamages( models.Model ):
-    type = models.CharField( max_length = 1 )
-    comm_category_code = models.CharField( max_length = 9 )
-    cause = models.CharField( max_length = 100 )
+    type = models.CharField(_("Type"), max_length = 1 )
+    comm_category_code = models.CharField(_("Comm category code"), max_length = 9 )
+    cause = models.CharField(_("Cause"), max_length = 100 )
 
     class Meta:
         db_table = u'epic_lossdamagereason'
@@ -598,9 +601,9 @@ class EpicLossDamages( models.Model ):
 
 
 class LtiWithStock( models.Model ):
-    lti_line = models.ForeignKey( LtiOriginal )
-    stock_item = models.ForeignKey( EpicStock )
-    lti_code = models.CharField( max_length = 20, db_index = True )
+    lti_line = models.ForeignKey(_("LTI Line"), LtiOriginal )
+    stock_item = models.ForeignKey(_("Stock Item"), EpicStock )
+    lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
     
     def  __unicode__( self ):
         item_name = u"%s - %s (%s)" % (self.coi_code(), self.stock_item.cmmname, self.lti_line.items_left)
@@ -611,19 +614,19 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill )
-    order_item = models.ForeignKey( LtiWithStock )
-    numberUnitsLoaded = models.DecimalField( default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
-    numberUnitsGood = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsLost = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsDamaged = models.DecimalField( default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey( EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey( EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
-    overloadedUnits = models.BooleanField()
-    loadingDetailSentToCompas = models.BooleanField()
-    overOffloadUnits = models.BooleanField()
+    wbNumber = models.ForeignKey(_("WB Number"), Waybill )
+    order_item = models.ForeignKey(_("Order item"), LtiWithStock )
+    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
+    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
+    unitsLostReason = models.ForeignKey(_("units Lost Reason"), EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
+    unitsDamagedReason = models.ForeignKey(_("units Damaged Reason"), EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
+    unitsDamagedType = models.ForeignKey(_("units Damaged Type"), EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
+    unitsLostType = models.ForeignKey(_("units LostType "), EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
+    overloadedUnits = models.BooleanField(_("overloaded Units"))
+    loadingDetailSentToCompas = models.BooleanField(_("loading Detail SentTo Compas "))
+    overOffloadUnits = models.BooleanField(_("over Off load Units"))
 
     audit_log = AuditLog()
 
@@ -688,14 +691,14 @@ class LoadingDetail( models.Model ):
         return "%s - %s - " % (self.wbNumber.mydesc(), self.order_item.stock_item, self.order_item.lti_code) #.mydesc() + ' - ' + self.order_item.stock_item.lti_pk
 
 class DispatchPoint( models.Model ):
-    origin_loc_name = models.CharField( 'Location Name', max_length = 40, blank = True )
-    origin_location_code = models.CharField( 'Location Code', max_length = 40, blank = True )
-    origin_wh_code = models.CharField( 'Warehouse Code', max_length = 40, blank = True )
-    origin_wh_name = models.CharField( 'Warehouse Name', max_length = 80, blank = True )
-    ACTIVE_START_DATE = models.DateField( 'Start of Service', null = True, blank = True )
+    origin_loc_name = models.CharField(_("Origin loc name"), 'Location Name', max_length = 40, blank = True )
+    origin_location_code = models.CharField(_("Origin location code"), 'Location Code', max_length = 40, blank = True )
+    origin_wh_code = models.CharField(_("Origin wh code"), 'Warehouse Code', max_length = 40, blank = True )
+    origin_wh_name = models.CharField(_("Origin wh name"), 'Warehouse Name', max_length = 80, blank = True )
+    ACTIVE_START_DATE = models.DateField(_("ACTIVE START DATE"), 'Start of Service', null = True, blank = True )
 
     class Meta:
-        verbose_name = 'Dispatch Warehouse'
+        verbose_name = _('Dispatch Warehouse')
         
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.origin_wh_code, self.origin_loc_name, self.origin_wh_name)
@@ -706,10 +709,10 @@ class DispatchPoint( models.Model ):
                                             + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
 
 class ReceptionPoint( models.Model ):
-    LOC_NAME = models.CharField( 'Location Name', max_length = 40, blank = True )
-    LOCATION_CODE = models.CharField( 'Location Code', max_length = 40, blank = True )
-    consegnee_code = models.CharField( 'Consengee Code', max_length = 40, blank = True )
-    consegnee_name = models.CharField( 'Consengee Name', max_length = 80, blank = True )
+    LOC_NAME = models.CharField(_("LOC NAME"),'Location Name', max_length = 40, blank = True )
+    LOCATION_CODE = models.CharField(_("LOCATION CODE"),'Location Code', max_length = 40, blank = True )
+    consegnee_code = models.CharField(_("consegnee code"), 'Consengee Code', max_length = 40, blank = True )
+    consegnee_name = models.CharField(_("Consegnee name"), 'Consengee Name', max_length = 80, blank = True )
     #DESC_NAME = models.CharField(max_length = 80, blank = True)
     ACTIVE_START_DATE = models.DateField( null = True, blank = True )
     
@@ -718,19 +721,19 @@ class ReceptionPoint( models.Model ):
         
     class Meta:
         ordering = ('LOC_NAME', 'consegnee_name')
-        verbose_name = 'Reception Warehouse'
+        verbose_name = _('Reception Warehouse')
 
 class UserProfile( models.Model ):
-    user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    warehouses = models.ForeignKey( DispatchPoint, blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
-    receptionPoints = models.ForeignKey( ReceptionPoint, blank = True, null = True, verbose_name = 'Receipt Warehouse' )
-    isCompasUser = models.BooleanField( 'Is Compas User' )
-    isDispatcher = models.BooleanField( 'Is Dispatcher' )
-    isReciever = models.BooleanField( 'Is Receiver' )
-    isAllReceiver = models.BooleanField( 'Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)' )
-    compasUser = models.ForeignKey( EpicPerson, blank = True, null = True, verbose_name = 'Use this Compas User', help_text = 'Select the corrisponding user from Compas' )
-    superUser = models.BooleanField( 'Super User', help_text = 'This user has Full Privileges to edit Waybills even after Signatures' )
-    readerUser = models.BooleanField( 'Readonly User' )
+    user = models.ForeignKey(_("User"), User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
+    warehouses = models.ForeignKey(_("Ware houses"), DispatchPoint, blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
+    receptionPoints = models.ForeignKey(_("Reception Points"), ReceptionPoint, blank = True, null = True, verbose_name = 'Receipt Warehouse' )
+    isCompasUser = models.BooleanField(_("Is Compas User"), 'Is Compas User' )
+    isDispatcher = models.BooleanField(_("Is Dispatcher"), 'Is Dispatcher' )
+    isReciever = models.BooleanField(_("Is Reciever"), 'Is Receiver' )
+    isAllReceiver = models.BooleanField( _("Is all receiver"),'Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)' )
+    compasUser = models.ForeignKey( EpicPerson, blank = True, null = True, verbose_name = 'Use this Compas User', help_text = _('Select the corrisponding user from Compas') )
+    superUser = models.BooleanField(_("Super User"), 'Super User', help_text = _('This user has Full Privileges to edit Waybills even after Signatures'))
+    readerUser = models.BooleanField(_("Read only USer"), 'Readonly User' )
 
     audit_log = AuditLog()
     
@@ -745,9 +748,9 @@ User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )
 
 
 class SiTracker( models.Model ):
-    LTI = models.OneToOneField( LtiOriginal, primary_key = True )
-    number_units_left = models.DecimalField( decimal_places = 3, max_digits = 10 )
-    number_units_start = models.DecimalField( decimal_places = 3, max_digits = 10 )
+    LTI = models.OneToOneField(_("LTI"), LtiOriginal, primary_key = True )
+    number_units_left = models.DecimalField(_("Number units left"), decimal_places = 3, max_digits = 10 )
+    number_units_start = models.DecimalField(_("Number units start"), decimal_places = 3, max_digits = 10 )
 
     def update_units( self, ammount ):
         self.number_units_left -= ammount
@@ -761,23 +764,23 @@ class SiTracker( models.Model ):
         return self.number_units_left
 
 class PackagingDescriptionShort( models.Model ):
-    packageCode = models.CharField( primary_key = True, max_length = 5 )
-    packageShortName = models.CharField( max_length = 10 )
+    packageCode = models.CharField(_("Package Code"), primary_key = True, max_length = 5 )
+    packageShortName = models.CharField(_("Package Short Name"), max_length = 10 )
     
     def  __unicode__( self ):
         return "%s - %s" % (self.packageCode, self.packageShortName)
 
 
 class CompasLogger( models.Model ):
-    timestamp = models.DateTimeField( null = True, blank = True )
-    user = models.ForeignKey( User )
-    action = models.CharField( max_length = 50, blank = True )
-    errorRec = models.CharField( max_length = 2000, blank = True )
-    errorDisp = models.CharField( max_length = 2000, blank = True )
-    wb = models.ForeignKey( Waybill, blank = True, primary_key = True )
-    lti = models.CharField( max_length = 50, blank = True )
-    data_in = models.CharField( max_length = 5000, blank = True )
-    data_out = models.CharField( max_length = 5000, blank = True )
+    timestamp = models.DateTimeField(_("Time stamp"), null = True, blank = True )
+    user = models.ForeignKey(_("User"), User )
+    action = models.CharField(_("Action"), max_length = 50, blank = True )
+    errorRec = models.CharField(_("Error Rec"), max_length = 2000, blank = True )
+    errorDisp = models.CharField(_("Error Disp"), max_length = 2000, blank = True )
+    wb = models.ForeignKey(_("Way Bill"), Waybill, blank = True, primary_key = True )
+    lti = models.CharField(_("LTI"), max_length = 50, blank = True )
+    data_in = models.CharField(_("Data in"), max_length = 5000, blank = True )
+    data_out = models.CharField(_("Data out"), max_length = 5000, blank = True )
     #loggercompas
     
     class Meta:
@@ -809,53 +812,53 @@ class SIWithRestant:
 
 # TODO: Importing of old waybills....
 class DispatchMaster( models.Model ):
-    code = models.CharField( max_length = 25, primary_key = True )
-    document_code = models.CharField( max_length = 2 )
-    dispatch_date = models.DateField()
-    origin_type = models.CharField( max_length = 1 )
-    origin_location_code = models.CharField( max_length = 13 )
-    intvyg_code = models.CharField( max_length = 25, blank = True )
-    intdlv_code = models.IntegerField( null = True, blank = True )
-    origin_code = models.CharField( max_length = 13, blank = True )
-    origin_descr = models.CharField( max_length = 50, blank = True )
-    destination_location_code = models.CharField( max_length = 10 )
-    destination_code = models.CharField( max_length = 13, blank = True )
-    pro_activity_code = models.CharField( max_length = 6, blank = True )
-    activity_ouc = models.CharField( max_length = 13, blank = True )
-    lndarrm_code = models.CharField( max_length = 25, blank = True )
-    lti_id = models.CharField( max_length = 25, blank = True )
-    loan_id = models.CharField( max_length = 25, blank = True )
-    loading_date = models.DateField()
-    organization_id = models.CharField( max_length = 12 )
-    tran_type_code = models.CharField( max_length = 4 )
-    tran_type_descr = models.CharField( max_length = 50, blank = True )
-    modetrans_code = models.CharField( max_length = 2 )
-    comments = models.CharField( max_length = 250, blank = True )
-    person_code = models.CharField( max_length = 7 )
-    person_ouc = models.CharField( max_length = 13 )
-    certifing_title = models.CharField( max_length = 50, blank = True )
-    trans_contractor_code = models.CharField( max_length = 4 )
-    supplier1_ouc = models.CharField( max_length = 13 )
-    trans_subcontractor_code = models.CharField( max_length = 4, blank = True )
-    supplier2_ouc = models.CharField( max_length = 13, blank = True )
-    nmbplt_id = models.CharField( max_length = 25, blank = True )
-    nmbtrl_id = models.CharField( max_length = 25, blank = True )
-    driver_name = models.CharField( max_length = 50, blank = True )
-    license = models.CharField( max_length = 20, blank = True )
-    vehicle_registration = models.CharField( max_length = 20, blank = True )
-    trailer_plate = models.CharField( max_length = 20, blank = True )
-    container_number = models.CharField( max_length = 15, blank = True )
-    atl_li_code = models.CharField( max_length = 8, blank = True )
-    notify_indicator = models.CharField( max_length = 1, blank = True )
-    customised = models.CharField( max_length = 50, blank = True )
-    org_unit_code = models.CharField( max_length = 13 )
-    printed_indicator = models.CharField( max_length = 1, blank = True )
-    notify_org_unit_code = models.CharField( max_length = 13, blank = True )
-    offid = models.CharField( max_length = 13, blank = True )
-    send_pack = models.BigIntegerField( null = True, blank = True )
-    recv_pack = models.BigIntegerField( null = True, blank = True )
-    last_mod_user = models.CharField( max_length = 30, blank = True )
-    last_mod_date = models.DateField( null = True, blank = True )
+    code = models.CharField(_("Code"), max_length = 25, primary_key = True )
+    document_code = models.CharField(_("Document code"), max_length = 2 )
+    dispatch_date = models.DateField(_("Dispatch date"))
+    origin_type = models.CharField(_("Origin type"), max_length = 1 )
+    origin_location_code = models.CharField(_("Origin location code"), max_length = 13 )
+    intvyg_code = models.CharField(_("Intvyg code"), max_length = 25, blank = True )
+    intdlv_code = models.IntegerField(_("Intdlv code"), null = True, blank = True )
+    origin_code = models.CharField(_("Origin code"), max_length = 13, blank = True )
+    origin_descr = models.CharField(_("Origin descr"), max_length = 50, blank = True )
+    destination_location_code = models.CharField(_("Destination location code"), max_length = 10 )
+    destination_code = models.CharField(_("Destination code"), max_length = 13, blank = True )
+    pro_activity_code = models.CharField(_("Pro activity code"), max_length = 6, blank = True )
+    activity_ouc = models.CharField(_("Activity ouc"), max_length = 13, blank = True )
+    lndarrm_code = models.CharField(_("Lndarrm code"), max_length = 25, blank = True )
+    lti_id = models.CharField(_("LTI id "), max_length = 25, blank = True )
+    loan_id = models.CharField(_("Loan id "), max_length = 25, blank = True )
+    loading_date = models.DateField(_("Loading date"))
+    organization_id = models.CharField(_("Organization id "), max_length = 12 )
+    tran_type_code = models.CharField(_("Tran type code"), max_length = 4 )
+    tran_type_descr = models.CharField(_("Tran type descr"), max_length = 50, blank = True )
+    modetrans_code = models.CharField(_("Modetrans code"), max_length = 2 )
+    comments = models.CharField(_("Comments"), max_length = 250, blank = True )
+    person_code = models.CharField(_("Person code"), max_length = 7 )
+    person_ouc = models.CharField(_("Person ouc"), max_length = 13 )
+    certifing_title = models.CharField(_("Certifing title"), max_length = 50, blank = True )
+    trans_contractor_code = models.CharField(_("Trans contractor code"), max_length = 4 )
+    supplier1_ouc = models.CharField(_("Supplier1 ouc"), max_length = 13 )
+    trans_subcontractor_code = models.CharField(_("Trans subcontractor code"), max_length = 4, blank = True )
+    supplier2_ouc = models.CharField(_("Supplier2 ouc "), max_length = 13, blank = True )
+    nmbplt_id = models.CharField(_("Nmbplt id"), max_length = 25, blank = True )
+    nmbtrl_id = models.CharField(_("Nmbtrl id "), max_length = 25, blank = True )
+    driver_name = models.CharField(_("Driver name"), max_length = 50, blank = True )
+    license = models.CharField(_("license"), max_length = 20, blank = True )
+    vehicle_registration = models.CharField(_("Vehicle registration"), max_length = 20, blank = True )
+    trailer_plate = models.CharField(_("Trailer plate"), max_length = 20, blank = True )
+    container_number = models.CharField(_("Container number"), max_length = 15, blank = True )
+    atl_li_code = models.CharField(_("Atl li code"), max_length = 8, blank = True )
+    notify_indicator = models.CharField(_("Notify indicator"), max_length = 1, blank = True )
+    customised = models.CharField(_("Customised"), max_length = 50, blank = True )
+    org_unit_code = models.CharField(_("Org unit code"), max_length = 13 )
+    printed_indicator = models.CharField(_("Printed indicator"), max_length = 1, blank = True )
+    notify_org_unit_code = models.CharField(_("Notify org unit code"), max_length = 13, blank = True )
+    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
+    send_pack = models.BigIntegerField( _("Send pack"), null = True, blank = True )
+    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
+    last_mod_user = models.CharField( _("Last mod user"), max_length = 30, blank = True )
+    last_mod_date = models.DateField( _("Last mod date"), null = True, blank = True )
     
     class Meta:
         db_table = u'dispatch_masters'
@@ -865,30 +868,31 @@ class DispatchMaster( models.Model ):
 
 
 class DispatchDetail( models.Model ):
-    code = models.ForeignKey( DispatchMaster )
-    document_code = models.CharField( max_length = 2 )
-    si_record_id = models.CharField( max_length = 25, blank = True, null = True )
-    origin_id = models.CharField( max_length = 23, blank = True )
-    comm_category_code = models.CharField( max_length = 9 )
-    commodity_code = models.CharField( max_length = 18 )
-    package_code = models.CharField( max_length = 17 )
-    allocation_destination_code = models.CharField( max_length = 10 )
-    quality = models.CharField( max_length = 1 )
-    quantity_net = models.DecimalField( max_digits = 11, decimal_places = 3 )
-    quantity_gross = models.DecimalField( max_digits = 11, decimal_places = 3 )
-    number_of_units = models.IntegerField()
-    unit_weight_net = models.DecimalField( null = True, max_digits = 8, decimal_places = 3, blank = True )
-    unit_weight_gross = models.DecimalField( null = True, max_digits = 8, decimal_places = 3, blank = True )
-    lonmst_id = models.CharField( max_length = 25, blank = True )
-    londtl_id = models.IntegerField( null = True, blank = True )
-    rpydtl_id = models.IntegerField( null = True, blank = True )
-    offid = models.CharField( max_length = 13, blank = True )
-    send_pack = models.BigIntegerField( null = True, blank = True )
-    recv_pack = models.BigIntegerField( null = True, blank = True )
-    last_mod_user = models.CharField( max_length = 30, blank = True )
-    last_mod_date = models.DateField( null = True, blank = True )
+    code = models.ForeignKey( _("Code"), DispatchMaster )
+    document_code = models.CharField( _("Document code "), max_length = 2 )
+    si_record_id = models.CharField( _("SI record id"), max_length = 25, blank = True, null = True )
+    origin_id = models.CharField( _("Origin id"), max_length = 23, blank = True )
+    comm_category_code = models.CharField( _("Comm category code"), max_length = 9 )
+    commodity_code = models.CharField( _("Commodity code"), max_length = 18 )
+    package_code = models.CharField( _("Package code"), max_length = 17 )
+    allocation_destination_code = models.CharField( _("Allocation destination code"), max_length = 10 )
+    quality = models.CharField( _("Quality"), max_length = 1 )
+    quantity_net = models.DecimalField( _("Quantity net"), max_digits = 11, decimal_places = 3 )
+    quantity_gross = models.DecimalField( _("Quantity gross"), max_digits = 11, decimal_places = 3 )
+    number_of_units = models.IntegerField( _("Number of units "))
+    unit_weight_net = models.DecimalField( _("Unit Weight net"), null = True, max_digits = 8, decimal_places = 3, blank = True )
+    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"), null = True, max_digits = 8, decimal_places = 3, blank = True )
+    lonmst_id = models.CharField( _("Lonmst id"), max_length = 25, blank = True )
+    londtl_id = models.IntegerField( _("Londtl id"), null = True, blank = True )
+    rpydtl_id = models.IntegerField( _("Rpydtl id"), null = True, blank = True )
+    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
+    send_pack = models.BigIntegerField( _("Send pack"),null = True, blank = True )
+    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
+    last_mod_user = models.CharField( _("Last mod user"),max_length = 30, blank = True )
+    last_mod_date = models.DateField( _("Last mod date"), null = True, blank = True )
     
     class Meta:
         db_table = u'dispatch_details'
+
 
 

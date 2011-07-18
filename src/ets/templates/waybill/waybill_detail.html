@@ -21,15 +21,15 @@
 {% endfor %}
 <div class="form">
     <div>
-        <span><strong>LTI:</strong> {{form.instance.ltiNumber}}</span>
+        <span><strong>{% trans LTI: %}</strong> {{form.instance.ltiNumber}}</span>
     </div>
     <div>
-        <strong>Waybill Number:</strong> {{form.instance.waybillNumber}}
+        <strong>{% trans Waybill Number: %}</strong> {{form.instance.waybillNumber}}
     </div>
     <div>
 <br>
 {%if  form.instance.hasError  %}
-<div style='background-color:red;border:2px red solid;'>Compas Issue:<br>
+<div style='background-color:red;border:2px red solid;'>{% trans Compas Issue: %}<br>
     {%if form.instance.dispError%}Dispatch Error: {{form.instance.dispError}} <br>{%endif%}
     {%if form.instance.recError%}Receipt Error: {{form.instance.recError}} {%endif%}
 </div>
@@ -37,53 +37,53 @@
     <span>
     <table>
         <tr>
-            <td>Dispatch Signed:</td>
+            <td>{% trans Dispatch Signed: %}</td>
             <td>{{form.dispatcherSigned}}</td>
         </tr>
         <tr>
-            <td>Dispatch Validated:</td>
+            <td>{% trans Dispatch Validated: %}</td>
             <td>{{form.waybillValidated}}</td>
         </tr>
         <tr>
-            <td>Dispatch In Compas:</td>
+            <td>{% trans Dispatch In Compas: %}</td>
             <td>{{form.waybillSentToCompas}}</td>
         </tr>
         <tr>
-            <td>Receipt Signed:</td>
+            <td>{% trans Receipt Signed: %}</td>
             <td>{{form.recipientSigned}}</td>
         </tr>
         <tr>
-            <td>Receipt Validated:</td>
+            <td>{% trans Receipt Validated: %}</td>
             <td>{{form.waybillReceiptValidated}}</td>
         </tr>
         <tr>
-            <td>Receipt In Compas:</td>
+            <td>{% trans Receipt In Compas: %}</td>
             <td>{{form.waybillRecSentToCompas}}</td>
         </tr>
         
     </table>
     <br>
     </span>
-        <span><strong>Date of Loading:</strong> {{form.dateOfLoading}}</span>
-        <span><strong>Date of Dispatch: </strong>{{form.dateOfDispatch}}</span>
+        <span><strong>{% trans Date of Loading: %}</strong> {{form.dateOfLoading}}</span>
+        <span><strong>{% trans Date of Dispatch: %} </strong>{{form.dateOfDispatch}}</span>
     </div>
 <table>
         <tr>
-            <th>Transaction Type:</th>
+            <th>{% trans Transaction Type: %}</th>
             <td> {{form.transactionType}}</td>
             <td>&nbsp;</td>
-            <th>Transport Type:</th>
+            <th>{% trans Transport Type: %}</th>
             <td> {{form.transportType}}</td>
         </tr>
     </table>
-<strong>Destination Location:</strong>   {{form.instance.recipientLocation}}  <br>
-<strong>Destination Warehouse<strong> {{form.destinationWarehouse}}
+<strong>{% trans Destination Location: %}</strong>   {{form.instance.recipientLocation}}  <br>
+<strong>{% trans Destination Warehouse %}<strong> {{form.destinationWarehouse}}
 <br>
 <br>
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>Item</th><th>Dispatched</th><th>Good</th><th>Damaged</th><th>Lost</th>
+        <tr><th>{% trans Item %}</th><th>{% trans Dispatched %}</th><th>{% trans Good %}</th><th>{% trans Damaged %}</th><th>{% trans Lost %}</th>
         </thead>
     {% for sform in formset.forms %}
         <tr>
@@ -99,54 +99,54 @@
 <div>
  <br>
 <div>
-<div><strong>Dispatch Remarks:</strong> {{form.dispatchRemarks}}
-<div><strong>Dispatcher Name:</strong>{{form.thisDispName}} - {{form.instance.dispatcherTitle}}</div>
+<div><strong>{% trans Dispatch Remarks: %}</strong> {{form.dispatchRemarks}}
+<div><strong>{% trans Dispatcher Name: %}</strong>{{form.thisDispName}} - {{form.instance.dispatcherTitle}}</div>
 <br>
 <div><table>
-<tr><td><strong>Transport Contractor:</strong></td><td>{{lti_list.0.transport_name}}</td></tr>
-<tr><td><strong>Transport Subcontractor:</strong></td><td>{{form.transportSubContractor}}</td></tr>
-<tr><td><strong>Driver's Name:</strong></td><td>{{form.transportDriverName}}</td></tr>
-<tr><td><strong>Driver's Licens No:</strong></td><td>{{form.transportDriverLicenceID}}</td></tr>
-<tr><td><strong>Vehicle Registration No:</strong></td><td>{{form.transportVehicleRegistration}}</td></tr>
-<tr><td><strong>Trailer Registration No:</strong></td><td>{{form.transportTrailerRegistration}}</td></tr>
+<tr><td><strong>{% trans Transport Contractor: %}</strong></td><td>{{lti_list.0.transport_name}}</td></tr>
+<tr><td><strong>{% trans Transport Subcontractor: %}</strong></td><td>{{form.transportSubContractor}}</td></tr>
+<tr><td><strong>{% trans Driver's Name: %}</strong></td><td>{{form.transportDriverName}}</td></tr>
+<tr><td><strong>{% trans Driver's Licens No: %}</strong></td><td>{{form.transportDriverLicenceID}}</td></tr>
+<tr><td><strong>{% trans Vehicle Registration No: %}</strong></td><td>{{form.transportVehicleRegistration}}</td></tr>
+<tr><td><strong>{% trans Trailer Registration No: %}</strong></td><td>{{form.transportTrailerRegistration}}</td></tr>
 </table>
 </div>
 <br>
-<strong>Container 1: Number:</strong>{{form.containerOneNumber}}<strong> Seal:</strong>{{form.containerOneSealNumber}}<strong> Remarks:</strong>{{form.containerOneRemarksDispatch}}<br>
-<strong>Container 2: Number:</strong>{{form.containerTwoNumber}}<strong> Seal:</strong>{{form.containerTwoSealNumber}}<strong> Remarks:</strong>{{form.containerTwoRemarksDispatch}}
+<strong>{% trans Container 1: Number: %}</strong>{{form.containerOneNumber}}<strong>{% trans Seal: %}</strong>{{form.containerOneSealNumber}}<strong> {% trans Remarks: %}</strong>{{form.containerOneRemarksDispatch}}<br>
+<strong>{% trans Container 2: Number: %}</strong>{{form.containerTwoNumber}}<strong>{% trans Seal: %}</strong>{{form.containerTwoSealNumber}}<strong> {% trans Remarks: %}</strong>{{form.containerTwoRemarksDispatch}}
 
 </div>
 <BR>    
 <div>
 <table cellpadding="0" cellspacing="0" border="0">
-<tr><td><strong>Recipient Location:</td><td> {{form.instance.recipientLocation}}</td></tr>
-<tr><td><strong>Consignee:</td><td>{{form.instance.recipientConsingee}}</td></tr>
-<tr><td><strong>Receivers Name:</td><td>{{form.thisRecName}} - {{form.instance.recipientTitle}}</td></tr>
-<tr><td><strong>Arrival Date: </td><td>{{form.recipientArrivalDate}}</td></tr>
-<tr><td><strong>Start Discharge:</td><td>{{form.recipientStartDischargeDate}}</td></tr>
-<tr><td><strong>End Discharge: </td><td>{{form.recipientEndDischargeDate}}</td></tr>
-<tr><td><strong>Distance: </td><td>{{form.recipientDistance}}</td></tr>
+<tr><td><strong>{% trans Recipient Location: %}</td><td> {{form.instance.recipientLocation}}</td></tr>
+<tr><td><strong>{% trans Consignee: %}</td><td>{{form.instance.recipientConsingee}}</td></tr>
+<tr><td><strong>{% trans Receivers Name: %}</td><td>{{form.thisRecName}} - {{form.instance.recipientTitle}}</td></tr>
+<tr><td><strong>{% trans Arrival Date: %}</td><td>{{form.recipientArrivalDate}}</td></tr>
+<tr><td><strong>{% trans Start Discharge: %}</td><td>{{form.recipientStartDischargeDate}}</td></tr>
+<tr><td><strong>{% trans End Discharge: %} </td><td>{{form.recipientEndDischargeDate}}</td></tr>
+<tr><td><strong>{% trans Distance: %} </td><td>{{form.recipientDistance}}</td></tr>
 </table>
 </div>
 <table>
-<tr><td colspan="3"><strong>Recipient Remarks:</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
+<tr><td colspan="3"><strong>{% trans Recipient Remarks: %}</td><td colspan="3">{{form.recipientRemarks}}</td></tr>
 
-<tr><td><strong>Container 1:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerOneSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerOneRemarksReciept}}</td></tr>
-<tr><td><strong>Container 2:</td><td></td><td><strong> Seal: </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> Remarks:</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
-<tr v-align=top><td ><strong>Reason <br>for Changes:</td><td colspan=5>{{form.auditComment}}</td></tr>
+<tr><td><strong>{% trans Container 1: %}</td><td></td><td><strong>{% trans Seal: %}</td><td>{{form.instance.containerOneSealNumber}}</td><td><strong> {% trans Remarks: %}</td><td>{{form.containerOneRemarksReciept}}</td></tr>
+<tr><td><strong>{% trans Container 2: %}</td><td></td><td><strong>{% trans Seal: %} </td><td>{{form.instance.containerTwoSealNumber}}</td><td><strong> {% trans Remarks: %}</td><td>{{form.containerTwoRemarksReciept}}</td></tr>
+<tr v-align=top><td ><strong>{% trans Reason %} <br>{% trans for Changes: %}</td><td colspan=5>{{form.auditComment}}</td></tr>
 </table>
 
 <table>
     <tr>
-        <td><input type="submit" value="Save & Exit"> {% csrf_token %}
+        <td><input type="submit" value="{% trans 'Save & Exit' %}"> {% csrf_token %}
 </form></td><td>&nbsp;</td>
         <td><SCRIPT LANGUAGE="JavaScript">
       function confirmAction() {
-        return confirm("Are you sure that you want to remove waybill {{form.instance.waybillNumber}}")
+        return confirm("{% trans 'Are you sure that you want to remove waybill' %} {{form.instance.waybillNumber}}")
       }
 </SCRIPT>
 <form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}"  onSubmit="return confirmAction()">
-<input type="submit" value="INVALIDATE"> 
+<input type="submit" value="{% trans 'INVALIDATE' %} "> 
 </form></td>
     </tr>
 </table>

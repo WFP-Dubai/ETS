@@ -6,14 +6,14 @@
                             <span><img height="75pt" src="/ets/media/images/logo_small.gif"/></span>
                         </td>
                         <td valign="top" align="center" width="60%">
-                            <h1 >Waybill</h1>
-                            <span style="font-size:small;">Conditions of carriage as indicated overleaf are applicable</span>
-                            <span id='original_lable' class="hidden">ORIGINAL</span>
-                            <span id='copy_lable' class="shown">COPY</span>
+                            <h1 >{% trans Waybill %}</h1>
+                            <span style="font-size:small;">{% trans Conditions of carriage as indicated overleaf are applicable %}</span>
+                            <span id='original_lable' class="hidden">{% trans ORIGINAL %}</span>
+                            <span id='copy_lable' class="shown">{% trans COPY %}</span>
                             
                         </td>
                         <td width="20%" align="right">
-                            <span valign=top style="font-size:x-large;">No:{{object.waybillNumber}}</span>
+                            <span valign=top style="font-size:x-large;">{% trans No: %}{{object.waybillNumber}}</span>
                         </td>
                     </tr>
                 </table>

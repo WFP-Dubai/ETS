@@ -3,6 +3,7 @@ from ets import models as ets_models
 from ets.tools import removeNonAsciiChars
 from django.conf import settings #@Reimport
 import datetime #@Reimport 
+from django.utils.translation import ugettext_lazy as _
 
 class compas_write:
     ErrorMessages = ''
@@ -159,18 +160,20 @@ class compas_write:
             errorObj, = e.args
             if errorObj.code == 12514:
                 print 'Issue with Connection' + str( errorObj.code )
-                self.ErrorMessages = 'Problem with connection to COMPAS'
+                self.ErrorMessages = _('Problem with connection to COMPAS')
                 return False
             else:
                 print 'Issue with data1'
-                the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
-                self.ErrorMessages = 'Problem with data of Waybill %s: %s \n' % ( the_waybill, str( errorObj.code ) )
+
+                the_waybill = Waybill.objects.get( id = waybill_id )
+                self.ErrorMessages = _('Problem with data of Waybill') '%s: %s \n' % ( the_waybill, str( errorObj.code ) )
+
                 return False
         except Exception as e:
             print 'Issue with data2'
             the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
             print self.ErrorMessages
-            self.ErrorMessages = 'Problem with data of Waybill %s \n' % ( the_waybill ) + self.ErrorMessages
+            self.ErrorMessages = _('Problem with data of Waybill')' %s \n' % ( the_waybill ) + self.ErrorMessages
             return False
 
 
@@ -257,12 +260,14 @@ class compas_write:
             return all_ok
         except cx_Oracle.DatabaseError:
             print 'Issue with Connection'
-            self.ErrorMessages = 'Problem with connection to COMPAS'
+            self.ErrorMessages = _('Problem with connection to COMPAS')
             return False
         except:
             print 'Issue with data'
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
-            self.ErrorMessages = 'Problem with data of Waybill %s \n' % ( the_waybill )
+
+            the_waybill = Waybill.objects.get( id = waybill_id )
+            self.ErrorMessages = _('Problem with data of Waybill') '%s \n' % ( the_waybill )
+
             return False
 
 

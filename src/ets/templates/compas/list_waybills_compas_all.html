@@ -1,9 +1,9 @@
 {% extends "base_template.html"%}
 {%block content %}
-<h3> Waybills Submitted to Compas</h3>
+<h3>{% trans "Waybills Submitted to Compas" %}</h3>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
     <thead>
-        <tr><th>LTI</th><th>Waybill Number</th><th>Origin</th><th>Consignee</th><th>Delivery Location</th><th>Compas Updated</th></tr>
+        <tr><th>{% trans "LTI" %}</th><th>{% trans "Waybill Number" %}</th><th>{% trans "Origin" %}</th><th>{% trans "Consignee" %}</th><th>{% trans "Delivery Location" %}</th><th>{% trans "Compas Updated" %}</th></tr>
         </thead>
 {% for waybill in waybill_list%}
 
@@ -13,7 +13,7 @@
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
-              <td>Dispatch</td>
+              <td>{% trans "Dispatch" %}</td>
     </tr>
 {% endfor%}
 {% for waybill in waybill_list_rec%}
@@ -24,16 +24,16 @@
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
-              <td>Receipt</td>
+              <td>{% trans "Receipt" %}</td>
              
     </tr>
 {% endfor%}
 </table>
 {%if error_message %}
 <pre>
-<div>{{error_message}}
+<div>{% blocktrans %} {{error_message}} {% endblocktrans %}
 </div><br>
-<div>{{error_message}}</div>
+<div>{% blocktrans %} {{error_message}} {% endblocktrans %}</div>
 </pre>
 {%endif%}
 <br>

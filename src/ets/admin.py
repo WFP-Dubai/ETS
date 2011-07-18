@@ -4,10 +4,12 @@ from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.admin import UserAdmin
 from django.utils.functional import curry
+from django.utils.translation import ugettext_lazy as _
 
 class UserProfileInline( admin.StackedInline ):
     model = ets.models.UserProfile
     verbose_name_plural = 'User Profile'
+
     extra = 0
 
     def formfield_for_foreignkey( self, db_field, request, **kwargs ):
@@ -27,7 +29,7 @@ class MyUserAdmin( UserAdmin ):
     list_display = ( 'username', 'first_name', 'last_name', 'email' )
     inlines = [UserProfileInline, ]
     fieldsets = [
-                ( None, {'fields':[  'username', 'password', 'first_name', 'last_name', 'email']} ),
+                ( None, {'fields':[ 'username', 'password', 'first_name', 'last_name', 'email']} ),
                 ( 'Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']} ),
                 ( 'Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']} )
     ]
@@ -75,7 +77,7 @@ class UserProfileAdmin( admin.ModelAdmin ):
 
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
-        list_display = ( 'packageCode', 'packageShortName' )
+        list_display = ( 'packageCode', 'packageShortName')
         list_filter = ( 'packageCode', 'packageShortName' )
 
 
