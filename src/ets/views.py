@@ -21,7 +21,7 @@ from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailForm
 from ets.forms import WaybillValidationFormset, WarehouseForm
 from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
 from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
-from ets.models import Places, EpicPerson, EpicStock, DispatchPoint
+from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
 from ets.tools import restant_si 
 from ets.tools import import_setup, import_lti, track_compas_update
 from ets.tools import un64unZip, viewLog 
@@ -112,7 +112,7 @@ def import_ltis( request ):
     print 'Import Persons'
     EpicPerson.update()
     print 'Import GEO'
-    Places.update()
+    Place.update()
     print 'Import Stock'
     EpicStock.update()
     print 'Import Setup'
@@ -403,9 +403,9 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
 
     LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
                                        fk_name = "wbNumber", extra = 0 )
-    qs = Places.objects.filter( geo_name = current_lti[0].destination_loc_name, organization_id = current_lti[0].consegnee_code )
+    qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, organization_id = current_lti[0].consegnee_code )
     if len( qs ) == 0:
-        qs = Places.objects.filter( geo_name = current_lti[0].destination_loc_name )
+        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
 
     if request.method == 'POST':
         form = WaybillFullForm( request.POST or None, instance = current_wb )
@@ -705,7 +705,7 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
     current_wh = ''
     if request.method == 'POST':
         form = WaybillForm( request.POST )
-        form.fields["destinationWarehouse"].queryset = Places.objects.filter( geo_name = current_lti[0].destination_loc_name )
+        form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
         formset = LDFormSet( request.POST )
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
@@ -721,9 +721,9 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
             print( form.errors )
             print( formset.non_form_errors )
     else:
-        qs = Places.objects.filter( geo_name = current_lti[0].destination_loc_name ).filter( organization_id = current_lti[0].consegnee_code )
+        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name ).filter( organization_id = current_lti[0].consegnee_code )
         if len( qs ) == 0:
-            qs = Places.objects.filter( geo_name = current_lti[0].destination_loc_name )
+            qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
         else:
             current_wh = qs[0]
         form = WaybillForm( 
@@ -797,7 +797,7 @@ def waybill_edit( request, wb_id, template='waybill/createWaybill.html' ):
             return redirect("waybill_view", wb_new.id )
     else:
         form = WaybillForm( instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = Places.objects.filter( geo_name = current_lti[0].destination_loc_name )
+        form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
         formset = LDFormSet( instance = current_wb )
     
     return direct_to_template( template, {

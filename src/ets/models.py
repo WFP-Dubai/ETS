@@ -13,9 +13,10 @@ from django.core import serializers
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 #from django.template.defaultfilters import stringfilter
-from audit_log.models.fields import LastUserField
+#from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
 
 name = "1234"
@@ -28,7 +29,7 @@ except ImportError:
     pass
 
 # Create your models here.
-class Places( models.Model ):
+class Place( models.Model ):
     org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
     name = models.CharField(_("Name"), max_length = 100 )
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
@@ -46,7 +47,7 @@ class Places( models.Model ):
     @classmethod
     def update(cls):
         """
-        Executes Imports of Places
+        Executes Imports of Place
         """
         #TODO: omit try...except
         for country in settings.COUNTRIES:
@@ -59,7 +60,7 @@ class Places( models.Model ):
     
     
 class Waybill( models.Model ):
-    transaction_type_choice = ( 
+    TRANSACTION_TYPES = ( 
                         ( u'WIT', _(u'WFP Internal') ),
                         ( u'DEL',_( u'Delivery' )),
                         ( u'SWA', _(u'Swap' )),
@@ -74,7 +75,7 @@ class Waybill( models.Model ):
                         ( u'SHU', _(u'Shunting' )),
                         ( u'COS', _(u'Costal Transshipment' )),
                 )
-    transport_type = ( 
+    TRANSPORT_TYPES = ( 
                         ( u'02', _(u'Road' )),
                         ( u'01', _(u'Rail' )),
                         ( u'04', _(u'Air' )),
@@ -84,15 +85,15 @@ class Waybill( models.Model ):
 #                        (u'O', _(u'Other Please Specify'))
                 )
 
-    ltiNumber = models.CharField( _("LTI number"),max_length = 20 )
+    ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Way bill number"), max_length = 20 )
-    dateOfLoading = models.DateField( _("Date of loading"),null = True, blank = True )
-    dateOfDispatch = models.DateField( _("Date od dispatch"),null = True, blank = True )
-    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = transaction_type_choice )
-    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = transport_type )
+    dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
+    dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
+    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
+    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = TRANSPORT_TYPES )
     #Dispatcher
-    dispatchRemarks = models.CharField(_("Dispatch Remark"), max_length = 200 )
-    dispatcherName = models.TextField( _("Diapatcher Name"),blank = True, null = True )
+    dispatchRemarks = models.CharField(_("Dispatch Remarks"), max_length = 200, blank=True)
+    dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
     dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
     dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
     #Transporter
@@ -101,7 +102,7 @@ class Waybill( models.Model ):
     transportDriverName = models.TextField(_("Transport Driver Name"), blank = True )
     transportDriverLicenceID = models.TextField(_("Transport Driver LicenceID "), blank = True )
     transportVehicleRegistration = models.TextField(_("Transport Vehicle Registration "), blank = True )
-    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"),blank = True )
+    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"), blank=True )
     transportDispachSigned = models.BooleanField( _("Transport Dispach Signed"),blank = True )
     transportDispachSignedTimestamp = models.DateTimeField( _("Transport Dispach Signed Timestamp"),null = True, blank = True )
     transportDeliverySigned = models.BooleanField( _("Transport Delivery Signed"),blank = True )
@@ -129,7 +130,7 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Places,verbose_name=_("Destination Warehouse"), blank = True )
+    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), blank = True )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
@@ -138,7 +139,7 @@ class Waybill( models.Model ):
     waybillRecSentToCompas = models.BooleanField(_("Waybill RecSentToCompas"))
     waybillProcessedForPayment = models.BooleanField(_("Waybill Processed ForPayment"))
     invalidated = models.BooleanField(_("Invalidated"))
-    auditComment = models.TextField( _("Audit Comment"),null = True, blank = True )
+    auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
     audit_log = AuditLog()
 
     def  __unicode__( self ):
@@ -152,7 +153,26 @@ class Waybill( models.Model ):
             return CompasLogger.objects.get( wb = self )
         except:
             return ''
+    
+    def clean(self):
+        """Validates Waybil instance. Checks different dates"""
+        if self.dateOfDispatch and self.dateOfLoading \
+        and self.dateOfLoading > self.dateOfDispatch:
+            raise ValidationError(_("Cargo Dispatched before being Loaded"))
+    
+        if self.recipientArrivalDate and self.dateOfDispatch \
+         and self.recipientArrivalDate < self.dateOfDispatch:
+            raise ValidationError(_("Cargo arrived before being dispatched"))
 
+        if self.recipientStartDischargeDate and self.recipientArrivalDate \
+        and self.recipientStartDischargeDate < self.recipientArrivalDate:
+            raise ValidationError(_("Cargo Discharge started before Arrival?"))
+
+        if self.recipientStartDischargeDate and self.recipientEndDischargeDate \
+        and self.recipientEndDischargeDate < self.recipientStartDischargeDate:
+            raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+    
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
         for line in lines:
@@ -576,13 +596,10 @@ class EpicStock( models.Model ):
         for myrecord in originalStock:
             myrecord.save( using = 'default' )
         
-        EpicStock.objects.exclude(pk__in=tuple(originalStock.values_list('pk', flat=True))).update(number_of_units=0)
-        #===============================================================================================================
-        # for item in EpicStock.objects.all():
-        #    if item not in originalStock:
-        #        item.number_of_units = 0
-        #        item.save()
-        #===============================================================================================================
+        for item in cls.objects.all():
+            if item not in originalStock:
+                item.number_of_units = 0
+                item.save()
 
 class EpicLossDamages( models.Model ):
     type = models.CharField(_("Type"), max_length = 1 )
@@ -726,13 +743,15 @@ class ReceptionPoint( models.Model ):
 
 class UserProfile( models.Model ):
     user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Ware houses"), blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
-    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points") blank = True, null = True )
+    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Dispatch Warehouse"), blank = True, null = True)
+    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points"), blank = True, null = True )
     isCompasUser = models.BooleanField(_('Is Compas User'))
     isDispatcher = models.BooleanField(_("Is Dispatcher"))
-    isReciever = models.BooleanField(_("Is Reciever")
+    isReciever = models.BooleanField(_("Is Reciever"))
     isAllReceiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') )
-    compasUser = models.ForeignKey( EpicPerson, blank = True, null = True, verbose_name = _('Use this Compas User'), help_text = _('Select the corrisponding user from Compas') )
+    compasUser = models.ForeignKey( EpicPerson, verbose_name = _('Use this Compas User'), 
+                                    help_text = _('Select the corrisponding user from Compas'), 
+                                    blank = True, null = True)
     superUser = models.BooleanField(_("Super User"), help_text = _('This user has Full Privileges to edit Waybills even after Signatures'))
     readerUser = models.BooleanField(_( 'Readonly User' ))
 
@@ -749,7 +768,7 @@ User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )
 
 
 class SiTracker( models.Model ):
-    LTI = models.OneToOneField(_("LTI"), LtiOriginal, primary_key = True )
+    LTI = models.OneToOneField(LtiOriginal, verbose_name=_("LTI"), primary_key = True )
     number_units_left = models.DecimalField(_("Number units left"), decimal_places = 3, max_digits = 10 )
     number_units_start = models.DecimalField(_("Number units start"), decimal_places = 3, max_digits = 10 )
 
