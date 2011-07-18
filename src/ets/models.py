@@ -13,6 +13,7 @@ from django.core import serializers
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
 #from django.template.defaultfilters import stringfilter
 from audit_log.models.fields import LastUserField
@@ -152,7 +153,26 @@ class Waybill( models.Model ):
             return CompasLogger.objects.get( wb = self )
         except:
             return ''
+    
+    def clean(self):
+        """Validates Waybil instance. Checks different dates"""
+        if self.dateOfDispatch and self.dateOfLoading \
+        and self.dateOfLoading > self.dateOfDispatch:
+            raise ValidationError(_("Cargo Dispatched before being Loaded"))
+    
+        if self.recipientArrivalDate and self.dateOfDispatch \
+         and self.recipientArrivalDate < self.dateOfDispatch:
+            raise ValidationError(_("Cargo arrived before being dispatched"))
 
+        if self.recipientStartDischargeDate and self.recipientArrivalDate \
+        and self.recipientStartDischargeDate < self.recipientArrivalDate:
+            raise ValidationError(_("Cargo Discharge started before Arrival?"))
+
+        if self.recipientStartDischargeDate and self.recipientEndDischargeDate \
+        and self.recipientEndDischargeDate < self.recipientStartDischargeDate:
+            raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+    
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
         for line in lines:
@@ -576,13 +596,10 @@ class EpicStock( models.Model ):
         for myrecord in originalStock:
             myrecord.save( using = 'default' )
         
-        EpicStock.objects.exclude(pk__in=tuple(originalStock.values_list('pk', flat=True))).update(number_of_units=0)
-        #===============================================================================================================
-        # for item in EpicStock.objects.all():
-        #    if item not in originalStock:
-        #        item.number_of_units = 0
-        #        item.save()
-        #===============================================================================================================
+        for item in cls.objects.all():
+            if item not in originalStock:
+                item.number_of_units = 0
+                item.save()
 
 class EpicLossDamages( models.Model ):
     type = models.CharField(_("Type"), max_length = 1 )
@@ -727,7 +744,7 @@ class ReceptionPoint( models.Model ):
 class UserProfile( models.Model ):
     user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
     warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Ware houses"), blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
-    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points") blank = True, null = True )
+    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points"), blank = True, null = True )
     isCompasUser = models.BooleanField(_("Is Compas User"), 'Is Compas User' )
     isDispatcher = models.BooleanField(_("Is Dispatcher"), 'Is Dispatcher' )
     isReciever = models.BooleanField(_("Is Reciever"), 'Is Receiver' )

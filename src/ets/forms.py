@@ -116,86 +116,122 @@ class WaybillForm( ModelForm ):
             'auditComment': forms.HiddenInput,
         }
     
-    def clean( self ):
-        cleaned = super(WaybillForm, self).clean()
-        dateOfDispatch = cleaned.get( 'dateOfDispatch' )
-        dateOfLoading = cleaned.get( 'dateOfLoading' )
-        
-        if dateOfDispatch and dateOfLoading:
-            if dateOfLoading > dateOfDispatch:
-                message = _("Cargo Dispatched before being Loaded")
-                #=======================================================================================================
-                # self._errors['dateOfDispatch'] = self._errors.get( 'dateOfDispatch', [] )
-                # self._errors['dateOfDispatch'].append( myerror )
-                #=======================================================================================================
-                raise forms.ValidationError( message )
-
-        return cleaned
+#=======================================================================================================================
+#    def clean( self ):
+#        cleaned = super(WaybillForm, self).clean()
+#        dateOfDispatch = cleaned.get( 'dateOfDispatch' )
+#        dateOfLoading = cleaned.get( 'dateOfLoading' )
+#        
+#        if dateOfDispatch and dateOfLoading:
+#            if dateOfLoading > dateOfDispatch:
+#                message = _("Cargo Dispatched before being Loaded")
+#                #=======================================================================================================
+#                # self._errors['dateOfDispatch'] = self._errors.get( 'dateOfDispatch', [] )
+#                # self._errors['dateOfDispatch'].append( myerror )
+#                #=======================================================================================================
+#                raise forms.ValidationError( message )
+# 
+#        return cleaned
+#=======================================================================================================================
 
 class WaybillRecieptForm( ModelForm ):
-    recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"))
-    recipientStartDischargeDate = forms.DateField(_("Recipient Start Discharge Date"))
-    recipientEndDischargeDate = forms.DateField(_("Recipient End Discharge Date"))
-    waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
-    recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
-    invalidated = forms.CharField(_("Invalidated "), widget = forms.HiddenInput(), required = False )
-    auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
-
-
+    #===================================================================================================================
+    # recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"))
+    #===================================================================================================================
+    #===================================================================================================================
+    # recipientStartDischargeDate = forms.DateField(_("Recipient Start Discharge Date"))
+    #===================================================================================================================
+    #===================================================================================================================
+    # recipientEndDischargeDate = forms.DateField(_("Recipient End Discharge Date"))
+    #===================================================================================================================
+    #===================================================================================================================
+    # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
+    #===================================================================================================================
+    #===================================================================================================================
+    # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
+    #===================================================================================================================
+    #===================================================================================================================
+    # recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    #===================================================================================================================
+    #===================================================================================================================
+    # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
+    #===================================================================================================================
+    #===================================================================================================================
+    # invalidated = forms.CharField(_("Invalidated "), widget = forms.HiddenInput(), required = False )
+    #===================================================================================================================
+    #===================================================================================================================
+    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
+    #===================================================================================================================
+    
+    def __init__(self, **kwargs):
+        self.fields['recipientArrivalDate'].required = True
+        self.fields['recipientStartDischargeDate'].required = True
+        self.fields['recipientEndDischargeDate'].required = True
+        
     class Meta:
         model = ets_models.Waybill
-        fields = [
-                'waybillNumber',
-                'recipientLocation',
-                'recipientConsingee',
-                'recipientArrivalDate',
-                'recipientStartDischargeDate',
-                'recipientEndDischargeDate',
-                'recipientDistance',
-                'recipientRemarks',
-                'recipientSigned',
-                'recipientSignedTimestamp',
-                'transportDeliverySigned',
-                'containerOneRemarksReciept',
-                'containerTwoRemarksReciept',
-                'invalidated',
-                'auditComment',
-            ]
-    def clean( self ):
-        cleaned = self.cleaned_data
-        print self.instance.dateOfDispatch
-        dispatch_date = self.instance.dateOfDispatch
-        arrival_date = cleaned.get( 'recipientArrivalDate' )
-        discharge_start = cleaned.get( 'recipientStartDischargeDate' )
-        discharge_end = cleaned.get( 'recipientEndDischargeDate' )
-        faults = False
-        if arrival_date < dispatch_date:
-            myerror = ''
-            myerror = _("Cargo arrived before being dispatched")
-            self._errors['recipientArrivalDate'] = self._errors.get( 'recipientArrivalDate', [] )
-            self._errors['recipientArrivalDate'].append( myerror )
-            faults = True
+        fields = (
+            'waybillNumber',
+            'recipientLocation',
+            'recipientConsingee',
+            'recipientArrivalDate',
+            'recipientStartDischargeDate',
+            'recipientEndDischargeDate',
+            'recipientDistance',
+            'recipientRemarks',
+            'recipientSigned',
+            'recipientSignedTimestamp',
+            'transportDeliverySigned',
+            'containerOneRemarksReciept',
+            'containerTwoRemarksReciept',
+            'invalidated',
+            'auditComment',
+        )
+        widgets = {
+            'waybillNumber': forms.HiddenInput,
+            'recipientLocation': forms.HiddenInput,
+            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
+            'recipientConsingee': forms.HiddenInput,
+            'invalidated': forms.HiddenInput,
+            'auditComment': forms.HiddenInput,
+        }
 
-        if discharge_start < arrival_date:
-            myerror = ''
-            myerror = _("Cargo Discharge started before Arrival?")
-            self._errors['recipientStartDischargeDate'] = self._errors.get( 'recipientStartDischargeDate', [] )
-            self._errors['recipientStartDischargeDate'].append( myerror )
-            faults = True
+#=======================================================================================================================
+#    def clean( self ):
+#        cleaned = self.cleaned_data
+#        print self.instance.dateOfDispatch
+#        dispatch_date = self.instance.dateOfDispatch
+#        arrival_date = cleaned.get( 'recipientArrivalDate' )
+#        discharge_start = cleaned.get( 'recipientStartDischargeDate' )
+#        discharge_end = cleaned.get( 'recipientEndDischargeDate' )
+#        faults = False
+#        if arrival_date < dispatch_date:
+#            myerror = ''
+#            myerror = _("Cargo arrived before being dispatched")
+#            self._errors['recipientArrivalDate'] = self._errors.get( 'recipientArrivalDate', [] )
+#            self._errors['recipientArrivalDate'].append( myerror )
+#            faults = True
+# 
+#        if discharge_start < arrival_date:
+#            myerror = ''
+#            myerror = _("Cargo Discharge started before Arrival?")
+#            self._errors['recipientStartDischargeDate'] = self._errors.get( 'recipientStartDischargeDate', [] )
+#            self._errors['recipientStartDischargeDate'].append( myerror )
+#            faults = True
+# 
+#        if discharge_end < discharge_start:
+#            myerror = ''
+#            myerror = _("Cargo finished Discharge before Starting?")
+#            self._errors['recipientEndDischargeDate'] = self._errors.get( 'recipientEndDischargeDate', [] )
+#            self._errors['recipientEndDischargeDate'].append( myerror )
+#            faults = True
+# 
+#        if faults:
+#            raise forms.ValidationError( myerror )
+# 
+#        return cleaned
+#=======================================================================================================================
 
-        if discharge_end < discharge_start:
-            myerror = ''
-            myerror = _("Cargo finished Discharge before Starting?")
-            self._errors['recipientEndDischargeDate'] = self._errors.get( 'recipientEndDischargeDate', [] )
-            self._errors['recipientEndDischargeDate'].append( myerror )
-            faults = True
-
-        if faults:
-            raise forms.ValidationError( myerror )
-
-        return cleaned
 class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
     def append_non_form_error( self, message ):
         errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
