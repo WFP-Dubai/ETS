@@ -568,20 +568,21 @@ class EpicStock( models.Model ):
         return self.origin_id[7:]
     
     @classmethod    
-    def update(self):
+    def update(cls):
         """
         Executes Imports of Stock
         """
-        originalStock = EpicStock.objects.using( 'compas' )
+        originalStock = cls.objects.using( 'compas' )
         for myrecord in originalStock:
             myrecord.save( using = 'default' )
-            
-#        EpicStock.objects.exclude(pk__in=originalStock.values_list('pk', flat=True))\
-#                         .update(number_of_units=0)
-        for item in EpicStock.objects.all():
-            if item not in originalStock:
-                item.number_of_units = 0;
-                item.save()
+        
+        EpicStock.objects.exclude(pk__in=tuple(originalStock.values_list('pk', flat=True))).update(number_of_units=0)
+        #===============================================================================================================
+        # for item in EpicStock.objects.all():
+        #    if item not in originalStock:
+        #        item.number_of_units = 0
+        #        item.save()
+        #===============================================================================================================
 
 class EpicLossDamages( models.Model ):
     type = models.CharField(_("Type"), max_length = 1 )
