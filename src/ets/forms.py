@@ -3,7 +3,7 @@ import datetime
 from django.forms import ModelForm
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
 from django import forms
-from django.forms.extras.widgets import SelectDateWidget
+#from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext_lazy as _
 from ets import models as ets_models
 
@@ -58,9 +58,15 @@ class WaybillForm( ModelForm ):
     #===================================================================================================================
     # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
     #===================================================================================================================
-    destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Places.objects.all() )
-    invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
-    auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
+    #===================================================================================================================
+    # destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Places.objects.all() )
+    #===================================================================================================================
+    #===================================================================================================================
+    # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
+    #===================================================================================================================
+    #===================================================================================================================
+    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
+    #===================================================================================================================
 
     class Meta:
         model = ets_models.Waybill
@@ -91,7 +97,7 @@ class WaybillForm( ModelForm ):
             'recipientLocation',
             'recipientConsingee',
             'auditComment',
-            )
+        )
         widgets = {
             'dispatchRemarks': forms.TextInput( attrs = {'size':'40'} ),
             'ltiNumber': forms.HiddenInput,
@@ -106,7 +112,8 @@ class WaybillForm( ModelForm ):
             'recipientLocation': forms.HiddenInput,
             'recipientConsingee': forms.HiddenInput,
             'waybillNumber': forms.HiddenInput,
-            
+            'invalidated': forms.HiddenInput,
+            'auditComment': forms.HiddenInput,
         }
     
     def clean( self ):

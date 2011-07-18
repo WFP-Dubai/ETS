@@ -129,7 +129,7 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Places,verbose_name=_("Destination Warehouse"), blank = True )
+    destinationWarehouse = models.ForeignKey( Places, verbose_name=_("Destination Warehouse"), blank = True )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
@@ -138,7 +138,7 @@ class Waybill( models.Model ):
     waybillRecSentToCompas = models.BooleanField(_("Waybill RecSentToCompas"))
     waybillProcessedForPayment = models.BooleanField(_("Waybill Processed ForPayment"))
     invalidated = models.BooleanField(_("Invalidated"))
-    auditComment = models.TextField( _("Audit Comment"),null = True, blank = True )
+    auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
     audit_log = AuditLog()
 
     def  __unicode__( self ):
