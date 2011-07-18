@@ -475,12 +475,12 @@ def import_setup():
 #=======================================================================================================================
 # def import_geo():
 #    """
-#    Executes Imports of Places
+#    Executes Imports of Place
 #    """
 #    #TODO: omit try...except
 #    for country in settings.COUNTRIES:
 #        try:
-#            for the_geo in Places.objects.using( 'compas' ).filter( COUNTRY_CODE = country ):
+#            for the_geo in Place.objects.using( 'compas' ).filter( COUNTRY_CODE = country ):
 #                the_geo.save( using = 'default' )
 #        except:
 #            pass
@@ -571,8 +571,8 @@ def serialized_all_items():
     users_list = User.objects.all()
     profiles_list = ets_models.UserProfile.objects.all()
     persons_list = ets_models.EpicPerson.objects.all()
-    places_list = ets_models.Places.objects.all()
-    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( places_list ) + list( persons_list ) )
+    place_list = ets_models.Place.objects.all()
+    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( place_list ) + list( persons_list ) )
     return data
 
 

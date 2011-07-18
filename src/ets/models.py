@@ -29,7 +29,7 @@ except ImportError:
     pass
 
 # Create your models here.
-class Places( models.Model ):
+class Place( models.Model ):
     org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
     name = models.CharField(_("Name"), max_length = 100 )
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
@@ -47,7 +47,7 @@ class Places( models.Model ):
     @classmethod
     def update(cls):
         """
-        Executes Imports of Places
+        Executes Imports of Place
         """
         #TODO: omit try...except
         for country in settings.COUNTRIES:
@@ -130,7 +130,7 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Places, verbose_name=_("Destination Warehouse"), blank = True )
+    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), blank = True )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))

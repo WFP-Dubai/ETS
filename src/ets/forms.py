@@ -32,7 +32,7 @@ class WaybillForm( ModelForm ):
     # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
     # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
     # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    # destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Places.objects.all() )
+    # destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Place.objects.all() )
     # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
     # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
     #===================================================================================================================

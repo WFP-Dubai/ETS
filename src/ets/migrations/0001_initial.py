@@ -8,7 +8,7 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding model 'Places'
+        # Adding model 'Place'
         db.create_table(u'epic_geo', (
             ('org_code', self.gf('django.db.models.fields.CharField')(max_length=7, primary_key=True)),
             ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
@@ -18,7 +18,7 @@ class Migration(SchemaMigration):
             ('reporting_code', self.gf('django.db.models.fields.CharField')(max_length=7)),
             ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=20)),
         ))
-        db.send_create_signal('ets', ['Places'])
+        db.send_create_signal('ets', ['Place'])
 
         # Adding model 'WaybillAuditLogEntry'
         db.create_table('ets_waybillauditlogentry', (
@@ -62,7 +62,7 @@ class Migration(SchemaMigration):
             ('recipientRemarks', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('recipientSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('recipientSignedTimestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Places'], blank=True)),
+            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Place'], blank=True)),
             ('waybillValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillReceiptValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillSentToCompas', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -119,7 +119,7 @@ class Migration(SchemaMigration):
             ('recipientRemarks', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('recipientSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('recipientSignedTimestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Places'], blank=True)),
+            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Place'], blank=True)),
             ('waybillValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillReceiptValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillSentToCompas', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -447,7 +447,7 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         
-        # Deleting model 'Places'
+        # Deleting model 'Place'
         db.delete_table(u'epic_geo')
 
         # Deleting model 'WaybillAuditLogEntry'
@@ -776,8 +776,8 @@ class Migration(SchemaMigration):
             'packageCode': ('django.db.models.fields.CharField', [], {'max_length': '5', 'primary_key': 'True'}),
             'packageShortName': ('django.db.models.fields.CharField', [], {'max_length': '10'})
         },
-        'ets.places': {
-            'Meta': {'object_name': 'Places', 'db_table': "u'epic_geo'"},
+        'ets.place': {
+            'Meta': {'object_name': 'Place', 'db_table': "u'epic_geo'"},
             'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
             'geo_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'geo_point_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
@@ -848,7 +848,7 @@ class Migration(SchemaMigration):
             'containerTwoSealNumber': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
             'dateOfDispatch': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'dateOfLoading': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Places']", 'blank': 'True'}),
+            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Place']", 'blank': 'True'}),
             'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'dispatcherName': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dispatcherSigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -903,7 +903,7 @@ class Migration(SchemaMigration):
             'containerTwoSealNumber': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
             'dateOfDispatch': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'dateOfLoading': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Places']", 'blank': 'True'}),
+            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Place']", 'blank': 'True'}),
             'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'dispatcherName': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dispatcherSigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
