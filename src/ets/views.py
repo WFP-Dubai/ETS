@@ -196,7 +196,8 @@ def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
         lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
     
     current_wb.save()
-    messages.add_message( request, messages.INFO, _('Waybill')' %s'_(' Dispatch Signed') % current_wb.waybillNumber )
+    messages.add_message( request, messages.INFO, 
+                          _('Waybill %(waybill)s Dispatch Signed') % {"waybill": current_wb.waybillNumber})
     
     return redirect( "lti_detail_url", current_wb.ltiNumber)
 
@@ -219,7 +220,8 @@ def waybill_finalize_receipt( request, wb_id ):
         current_wb.auditComment = _('Print Dispatch Receipt')
         current_wb.save()
         
-        messages.add_message( request, messages.INFO, _('Waybill')' %s'_('Receipt Signed') % current_wb.waybillNumber )
+        messages.add_message( request, messages.INFO, 
+                              _('Waybill %(waybill)s Receipt Signed') % { 'waybill': current_wb.waybillNumber})
     except:
         pass
     
@@ -259,13 +261,14 @@ def singleWBDispatchToCompas( request, wb_id, queryset=Waybill.objects.all() ):
         waybill.save()
         
         messages.add_message( request, messages.INFO, 
-                              _('Waybill')' %s' _('Sucsessfully pushed to COMPAS') % waybill.waybillNumber )
+                _('Waybill %(waybill)s Sucsessfully pushed to COMPAS') % {'waybill': waybill.waybillNumber} )
     else:
         create_or_update(waybill, request.user, the_compas.ErrorMessages)
 
         waybill.waybillValidated = False
         waybill.save()
-        messages.add_message( request, messages.ERROR, _('Problem sending to compas:')' %s' % the_compas.ErrorMessages )
+        messages.add_message( request, messages.ERROR, 
+                              _('Problem sending to compas: %(message)s') % { 'message': the_compas.ErrorMessages} )
         
         error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
         error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
@@ -578,9 +581,9 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
                 if not totaloffload == loadedUnits:
                     myerror = ''
                     if totaloffload > loadedUnits:
-                        myerror = "%.3f" _("Units loaded but")" %.3f"_("units accounted for") % ( loadedUnits, totaloffload )
+                        myerror = _("%.3f Units loaded but %.3f units accounted for") % ( loadedUnits, totaloffload )
                     if totaloffload < loadedUnits:
-                        myerror = "%.3f" _("Units loaded but only ") "%.3f" _("units accounted for") % ( loadedUnits, totaloffload )
+                        myerror = _("%.3f Units loaded but only %.3f units accounted for") % ( loadedUnits, totaloffload )
                     self._errors['numberUnitsGood'] = self._errors.get( 'numberUnitsGood', [] )
                     self._errors['numberUnitsGood'].append( myerror )
                     raise forms.ValidationError( myerror )
@@ -869,7 +872,8 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
                     
                 else:
                     waybill.auditComment = _('Tried to Validate Receipt')
-                    messages.add_message( request, messages.ERROR, _('Problems with Stock on WB:')' %s' % waybill )
+                    messages.add_message( request, messages.ERROR, 
+                                          _('Problems with Stock on WB: %(waybill)s') % {'waybill': waybill} )
                     waybill.waybillReceiptValidated = False
                     create_or_update(waybill, request.user, errorMessage)
                     
