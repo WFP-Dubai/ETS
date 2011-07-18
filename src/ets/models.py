@@ -129,7 +129,7 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( _("Destination Warehouse"),Places, blank = True )
+    destinationWarehouse = models.ForeignKey( Places,verbose_name=_("Destination Warehouse"), blank = True )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
@@ -593,8 +593,8 @@ class EpicLossDamages( models.Model ):
 
 
 class LtiWithStock( models.Model ):
-    lti_line = models.ForeignKey(_("LTI Line"), LtiOriginal )
-    stock_item = models.ForeignKey(_("Stock Item"), EpicStock )
+    lti_line = models.ForeignKey( LtiOriginal,verbose_name = _("LTI Line") )
+    stock_item = models.ForeignKey( EpicStock,verbose_name = _("Stock Item"))
     lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
     
     def  __unicode__( self ):
@@ -606,16 +606,16 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey(_("WB Number"), Waybill )
-    order_item = models.ForeignKey(_("Order item"), LtiWithStock )
+    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("WB Number"))
+    order_item = models.ForeignKey( LtiWithStock,verbose_name =_("Order item") )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
     numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
     numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
     numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey(_("units Lost Reason"), EpicLossDamages, related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey(_("units Damaged Reason"), EpicLossDamages, related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey(_("units Damaged Type"), EpicLossDamages, related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey(_("units LostType "), EpicLossDamages, related_name = 'LD_LossType', blank = True, null = True )
+    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), related_name = 'LD_LostReason', blank = True, null = True )
+    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), related_name = 'LD_DamagedReason', blank = True, null = True )
+    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),related_name = 'LD_DamagedType', blank = True, null = True )
+    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), related_name = 'LD_LossType', blank = True, null = True )
     overloadedUnits = models.BooleanField(_("overloaded Units"))
     loadingDetailSentToCompas = models.BooleanField(_("loading Detail SentTo Compas "))
     overOffloadUnits = models.BooleanField(_("over Off load Units"))
@@ -716,9 +716,9 @@ class ReceptionPoint( models.Model ):
         verbose_name = _('Reception Warehouse')
 
 class UserProfile( models.Model ):
-    user = models.ForeignKey(_("User"), User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    warehouses = models.ForeignKey(_("Ware houses"), DispatchPoint, blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
-    receptionPoints = models.ForeignKey(_("Reception Points"), ReceptionPoint, blank = True, null = True, verbose_name = 'Receipt Warehouse' )
+    user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
+    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Ware houses"), blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
+    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points") blank = True, null = True )
     isCompasUser = models.BooleanField(_("Is Compas User"), 'Is Compas User' )
     isDispatcher = models.BooleanField(_("Is Dispatcher"), 'Is Dispatcher' )
     isReciever = models.BooleanField(_("Is Reciever"), 'Is Receiver' )
@@ -765,11 +765,11 @@ class PackagingDescriptionShort( models.Model ):
 
 class CompasLogger( models.Model ):
     timestamp = models.DateTimeField(_("Time stamp"), null = True, blank = True )
-    user = models.ForeignKey(_("User"), User )
+    user = models.ForeignKey( User )
     action = models.CharField(_("Action"), max_length = 50, blank = True )
     errorRec = models.CharField(_("Error Rec"), max_length = 2000, blank = True )
     errorDisp = models.CharField(_("Error Disp"), max_length = 2000, blank = True )
-    wb = models.ForeignKey(_("Way Bill"), Waybill, blank = True, primary_key = True )
+    wb = models.ForeignKey( Waybill, verbose_name=_("Way Bill"), blank = True, primary_key = True )
     lti = models.CharField(_("LTI"), max_length = 50, blank = True )
     data_in = models.CharField(_("Data in"), max_length = 5000, blank = True )
     data_out = models.CharField(_("Data out"), max_length = 5000, blank = True )
@@ -860,7 +860,7 @@ class DispatchMaster( models.Model ):
 
 
 class DispatchDetail( models.Model ):
-    code = models.ForeignKey( _("Code"), DispatchMaster )
+    code = models.ForeignKey(DispatchMaster ,verbose_name=_("Code"))
     document_code = models.CharField( _("Document code "), max_length = 2 )
     si_record_id = models.CharField( _("SI record id"), max_length = 25, blank = True, null = True )
     origin_id = models.CharField( _("Origin id"), max_length = 23, blank = True )

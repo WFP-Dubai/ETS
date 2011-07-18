@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
     "http://www.w3.org/TR/html4/strict.dtd"
     >
+{% load i18n %}   
 <html lang="en">
 <head>
     <title>{% trans "ETS oPt" %}  {%block title%}{{section.title}}{%endblock%}</title>
@@ -82,8 +83,7 @@ function disableEnterKey(e)
 <div class="content">
     <h1>{% trans "Page unavailable" %}</h1>
 
-    <p>{% trans "Sorry, but the requested page is unavailable due to a
-    server hiccup." %}</p>
+    <p>{% trans "Sorry, but the requested page is unavailable due to a server hiccup." %}</p>
 
     <p>{% trans "Our engineers have been notified, so check back later." %}</p>
 <br>

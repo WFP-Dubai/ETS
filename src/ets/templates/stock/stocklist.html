@@ -1,15 +1,16 @@
 {% extends "base_template.html"%}
-{%block title%}{% trans Stock List %}{%endblock%}
+{% load i18n %}
+{%block title%}{% trans "Stock List" %}{%endblock%}
 {%block content %}
 <table id='toplist'>
     <thead>
         <tr>
-        <th>{% trans Warehouse %}</th>
-        <th>{% trans Commodity %}</th>
-        <th>{% trans SI %}</th>
-        <th>{% trans Items %}</th>
-        <th>{% trans MT Net %}</th>
-        <th>{% trans Quality %}</th></tr>
+        <th>{% trans "Warehouse" %}</th>
+        <th>{% trans "Commodity" %}</th>
+        <th>{% trans "SI" %}</th>
+        <th>{% trans "Items" %}</th>
+        <th>{% trans "MT Net" %}</th>
+        <th>{% trans "Quality" %}</th></tr>
         </thead>
     {% for item in stocklist%}
    

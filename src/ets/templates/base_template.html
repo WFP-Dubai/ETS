@@ -4,7 +4,7 @@
 {% load i18n %}    
 <html lang="en">
 <head>
-    <title>{% blocktrans %} ETS {%block title%}{{section.title}}{%endblock%} - {{COMPAS_STATION}} {% endblocktrans %}</title>
+    <title>{% trans "ETS" %} {%block title%}{{section.title}}{%endblock%} - {{COMPAS_STATION}}</title>
     <style type="text/css" title="currentStyle">
         @import "{{MEDIA_URL}}/css/demo_page.css";
         @import "{{MEDIA_URL}}/css/demo_table.css";
@@ -52,7 +52,7 @@ function disableEnterKey(e)
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
-    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{% blocktrans %} {{ message }} {% endblocktrans %}</li>
+    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}> {{ message }} </li>
     {% endfor %}
 </ul>
 {% endif %}
@@ -80,7 +80,7 @@ function disableEnterKey(e)
 <br>
 <div class='footer'>
 {% if user.is_authenticated %}
-  {% trans  "Logged in as:" %}<span class="highlight">{% blocktrans %} {{ user.username }} {% endblocktrans %}</span>.
+  {% trans  "Logged in as:" %}<span class="highlight">{{ user.username }} </span>.
 {% else %}
 
   {% trans "Please log in." %} <a href='{%url django.contrib.auth.views.login%}?next={%url select_action%}'>{% trans "login" %}</a>

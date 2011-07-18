@@ -1,4 +1,5 @@
 {% extends "base_template.html"%}
+{% load i18n %}
 {%block content %}
 <h3>{% trans "Submitted Receipt & Validated Waybills to Compas" %}</h3>
 <a href='{% url waybill_validate_receipt_form %}'>{% trans "Back to List" %}</a>
