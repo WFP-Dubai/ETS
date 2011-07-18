@@ -59,7 +59,7 @@ class Places( models.Model ):
     
     
 class Waybill( models.Model ):
-    transaction_type_choice = ( 
+    TRANSACTION_TYPES = ( 
                         ( u'WIT', _(u'WFP Internal') ),
                         ( u'DEL',_( u'Delivery' )),
                         ( u'SWA', _(u'Swap' )),
@@ -74,7 +74,7 @@ class Waybill( models.Model ):
                         ( u'SHU', _(u'Shunting' )),
                         ( u'COS', _(u'Costal Transshipment' )),
                 )
-    transport_type = ( 
+    TRANSPORT_TYPES = ( 
                         ( u'02', _(u'Road' )),
                         ( u'01', _(u'Rail' )),
                         ( u'04', _(u'Air' )),
@@ -84,15 +84,15 @@ class Waybill( models.Model ):
 #                        (u'O', _(u'Other Please Specify'))
                 )
 
-    ltiNumber = models.CharField( _("LTI number"),max_length = 20 )
+    ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Way bill number"), max_length = 20 )
-    dateOfLoading = models.DateField( _("Date of loading"),null = True, blank = True )
-    dateOfDispatch = models.DateField( _("Date od dispatch"),null = True, blank = True )
-    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = transaction_type_choice )
-    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = transport_type )
+    dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
+    dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
+    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
+    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = TRANSPORT_TYPES )
     #Dispatcher
-    dispatchRemarks = models.CharField(_("Dispatch Remark"), max_length = 200 )
-    dispatcherName = models.TextField( _("Diapatcher Name"),blank = True, null = True )
+    dispatchRemarks = models.CharField(_("Dispatch Remarks"), max_length = 200, blank=True)
+    dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
     dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
     dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
     #Transporter
@@ -101,7 +101,7 @@ class Waybill( models.Model ):
     transportDriverName = models.TextField(_("Transport Driver Name"), blank = True )
     transportDriverLicenceID = models.TextField(_("Transport Driver LicenceID "), blank = True )
     transportVehicleRegistration = models.TextField(_("Transport Vehicle Registration "), blank = True )
-    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"),blank = True )
+    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"), blank=True )
     transportDispachSigned = models.BooleanField( _("Transport Dispach Signed"),blank = True )
     transportDispachSignedTimestamp = models.DateTimeField( _("Transport Dispach Signed Timestamp"),null = True, blank = True )
     transportDeliverySigned = models.BooleanField( _("Transport Delivery Signed"),blank = True )
