@@ -15,12 +15,12 @@ def read(fname):
 install_requires = [
         'setuptools',
         'Django == 1.3',
-        'httplib2',
+        #'httplib2',
         'south',
         'django-rosetta',
         'django-extensions', #'python-keyczar', 'pyasn1',
         'django-debug-toolbar',
-        'hashlib',
+        #'hashlib',
         'django-audit-log',
         'cx_Oracle',
         'simplejson >= 2.1.0',
@@ -30,7 +30,7 @@ install_requires = [
 extras_require = dict(
     test=[
         'coverage', #checks code coverage by tests 
-        #'windmill', #browser tests
+        'windmill', #browser tests
     ]
 )
 
