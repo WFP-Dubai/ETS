@@ -15,34 +15,14 @@ def read(fname):
 install_requires = [
         'setuptools',
         'Django == 1.3',
-        #'django-mailer', #asynchronous mail systembannerbs
-#        'django-uni-form >= 0.7.0', #div-based forms
-        #'django-endless-pagination',
-        #'sorl-thumbnail',
-        #'Pil',
         'httplib2',
-        #'lxml == 2.2.6', 'BeautifulSoup',
-#        'pytz',
-#        'django-timezones',
-        #'django-mptt >= 0.4.0',
-        'south', #creates migrations
-        #'tabs',
-        #'django-countries',
-        #'django-autoslug',
-        #'pytils',
-        #'django-native-tags==0.5.0',
+        'south',
         'django-rosetta',
         'django-extensions', #'python-keyczar', 'pyasn1',
-        #'pygments',
-        #'django-logicaldelete',
-        #'pysolr',
         'django-debug-toolbar',
-        #'pysolr',
-        #'django-ajax-selects',
         'hashlib',
-        #'django-floppyforms==0.4.5',
         'django-audit-log',
-        #'cx_Oracle',
+        'cx_Oracle',
         'simplejson >= 2.1.0',
 ]
 
@@ -62,9 +42,7 @@ dependency_links = [
         'http://dist.plone.org/thirdparty/',
         'http://pypi.pinaxproject.com/',
         'http://dist.repoze.org',
-        'http://downloads.sourceforge.net/project/cx-oracle/5.1/cx_Oracle-5.1.tar.gz?r=http%3A%2F%2Fcx-oracle.sourceforge.net%2F&ts=1310462337&use_mirror=space',
-#        'http://code.google.com/p/keyczar/downloads/list',
-#        'http://code.google.com/p/django-ajax-selects/downloads/list',
+        #'http://downloads.sourceforge.net/project/cx-oracle/5.1/cx_Oracle-5.1.tar.gz?r=http%3A%2F%2Fcx-oracle.sourceforge.net%2F&ts=1310462337&use_mirror=space',
 ]
 
 #Execute function to handle setuptools functionality
@@ -72,7 +50,8 @@ setup(name="WFP-ETS",
             version="0.1",
             description="ETS",
             author="WFP",
-            packages = ['ets'],
+            packages=find_packages('src'),
+            package_dir={'': 'src'},
             include_package_data=True,
             zip_safe=False,
             install_requires=install_requires,

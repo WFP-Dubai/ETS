@@ -24,8 +24,29 @@ Development environment
 
 Change directory to project's root.
 
-Specific settings
------------------
+Oracle client
+-------------
+
+1. Download following packages::
+
+  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-basic-10.2.0.4.0-macosx-x64.zip
+  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-jdbc-10.2.0.4.0-macosx-x64.zip
+  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sqlplus-10.2.0.4.0-macosx-x64.zip
+  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sdk-10.2.0.4.0-macosx-x64.zip
+    
+2. Unzip the packages into a single directory such as "instantclient".
+3. Set the library loading path in your environment to the directory in Step 2 ("instantclient").
+4. Create symlink for the library::
+  
+  cd <instantclient>
+  ln -s libclntsh.dylib.10.1 libclntsh.dylib
+   
+4. Set environment variables::
+  
+  echo "export PATH=<instantclient directory>:$PATH" >> ~/.profile
+  echo "export DYLD_LIBRARY_PATH=<instantclient directory>:$DYLD_LIBRARY_PATH" >> ~/.profile
+   
+5. Restart terminal and start your application.
 
 Build project
 -------------

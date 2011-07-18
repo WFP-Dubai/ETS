@@ -1,0 +1,10 @@
+{% extends "base_template.html"%}
+{%block title %}{% trans Select Action %}{%endblock%}
+{%block content %}
+<form action='{%url ets.waybill.views.get_wb_stock%}'>
+{{ form.as_p }}
+<input type="submit" value="Download" />
+</form>
+<a href='{%url ets.waybill.views.get_all_data_download%}'>{% trans General Data %}</a>
+
+{%endblock%}

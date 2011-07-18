@@ -1,0 +1,23 @@
+{% extends "base_template.html"%}
+{%load extra_tags%}
+{%block title %}Select Action{%endblock%}
+{%block content %}
+ {% if user.is_authenticated %} 
+Select an action:
+<ul>
+{%if myprofile.isDispatcher%}<li><a href='{% url listOfLtis myprofile.warehouses.origin_wh_code %}'>Create & Dispatch Waybill</a></li>{%endif%}
+{%if myprofile.isReciever%}<li><a href='{% url waybill_reception_list %}'>Receive Waybill</a></li>{%endif%}
+{%if myprofile.isCompasUser%}<li><a href='waybill/validate'>Validate Waybill</a></li>
+    <li><a href='{% url import_ltis %}'>Update DB</a>{%endif%}
+{%if myprofile.superUser%}<li><a href='{% url waybill_search %}'>Reset waybills</a>{%endif%}
+{%if myprofile.readerUser or myprofile.superUser%}<li><a href='{% url ltis %}'>View LTIs</a>{%endif%}
+{%if myprofile.superUser%}<li><a href="{% url select_report %}">Reports</a>{%endif%}
+<li><a href="{% url select_data %}">Download Data</a>
+<li><form action='{% url waybill_search %}'><input type="text" name="wbnumber"/><input type="submit" value="Search Waybill"></form>
+<li>&nbsp;{%if myprofile.isReciever%}<li>Scan Waybill --><form method='POST' action='{% url deserialize %}'><input type="text" name="wbdata"/>{% csrf_token %}<input type="submit" value="Receive Scanned Waybill" /></form></li>{%endif%}
+</ul>
+{%else%}
+Please log in <a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>login</a>
+{%endif%}
+{%print_tag%}
+{%endblock%}

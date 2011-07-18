@@ -1,0 +1,37 @@
+#show print
+body{
+
+	font-size: 9px;
+
+}
+.wb_head{color:white;background-color:black;}
+.centric h1{ font-weight: bold; text-align: center;}
+.centric p{font-size: small; text-align: center;}
+table {
+	max-width: 850px;
+	min-width: 850px;
+	width: 850px;
+}
+img{position: relative; left: 20px; text-align: right;}
+.right{ position: absolute; right: 20px; text-align: right;}
+.centric{display: inline-block; position: relative; left:200px; text-align: center; }
+.hidden{
+	display: none;
+	visibility: hidden;
+}
+.shown{
+	display:inherit;
+	visibility: visible;
+}
+.the_forms{
+	display: inline;
+}
+</style>
+<style type="text/css">
+#original_lable, #copy_lable{
+
+	font-weight: bold;
+
+	font-size: x-large;
+
+}
