@@ -6,7 +6,18 @@
 
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="myTable">
     <thead>
-        <tr><th>{% trans "LTI" %}</th><th>{% trans "Waybill Number" %}</th><th>{% trans "Origin" %}</th><th>{% trans "Consignee" %}</th><th>{% trans "Delivery Location" %}</th><th>{% trans "Dispatch" %}</th><th>{% trans "Validated" %}</th><th>{% trans "Received" %}</th><th>{% trans "Validated" %}</th><th>{% trans "Compas Updated" %}</th><th>&nbsp;</th></tr>
+        <tr><th>{% trans "LTI" %}</th>
+        <th>{% trans "Waybill Number" %}</th>
+        <th>{% trans "Origin" %}</th>
+        <th>{% trans "Consignee" %}</th>
+        <th>{% trans "Delivery Location" %}</th>
+        <th>{% trans "Dispatch" %}</th>
+        <th>{% trans "Validated" %}</th>
+        <th>{% trans "Received" %}</th>
+        <th>{% trans "Validated" %}</th>
+        <th>{% trans "Compas Updated" %}</th>
+        <th>&nbsp;</th>
+        </tr>
         </thead>
 
 
@@ -32,7 +43,7 @@
 <br>
 {%if error_message %}
 <pre>
-<div>{% blocktrans %} {{error_message}} {% endblocktrans %}
+<div>{{error_message}}
 </div></pre>
 {%endif%}
 {%endblock%}

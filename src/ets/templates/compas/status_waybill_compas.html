@@ -5,7 +5,19 @@
 <a href='{%url ets.waybill.views.waybill_validate_dispatch_form%}'>{% trans "Back to List" %}</a>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="myTable">
     <thead>
-        <tr><th>{% trans "LTI" %}</th><th>{% trans "Waybill Number" %}</th><th>{% trans "Origin" %}</th><th>{% trans "Consignee" %}</th><th>{% trans "Delivery Location" %}</th><th>{% trans "Dispatch" %}</th><th>{% trans "Validated" %}</th><th>{% trans "Received" %}</th><th>{% trans "Validated" %}</th><th>{% trans "Compas Updated" %}</th><th>&nbsp;</th></tr>
+        <tr>
+        <th>{% trans "LTI" %}</th>
+        <th>{% trans "Waybill Number" %}</th>
+        <th>{% trans "Origin" %}</th>
+        <th>{% trans "Consignee" %}</th>
+        <th>{% trans "Delivery Location" %}</th>
+        <th>{% trans "Dispatch" %}</th>
+        <th>{% trans "Validated" %}</th>
+        <th>{% trans "Received" %}</th>
+        <th>{% trans "Validated" %}</th>
+        <th>{% trans "Compas Updated" %}</th>
+        <th>&nbsp;</th>
+        </tr>
         </thead>
 
 
@@ -15,7 +27,7 @@
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
              <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
-                      <td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
+             <td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
              <td>{%if waybill.waybillValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
              <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
              <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>

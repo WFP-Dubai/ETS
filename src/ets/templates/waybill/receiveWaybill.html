@@ -28,7 +28,11 @@
  {{ formset.management_form }}
  <table cellpadding="1" cellspacing="0" border="1" class="x" id="example">
     <thead>
-        <tr><th>{% trans "Items" %}</th><th>{% trans "Dispatched" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th><th>{% trans "Good" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% trans "Units" %}{%endif%}</th><th>{% trans "Damaged" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% "trans Units" %}{%endif%}</th><th>{% trans "Lost" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% trans "Units" %}{%endif%}</th><th></th>
+        <tr><th>{% trans "Items" %}</th>
+        <th>{% trans "Dispatched" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}MT{%else%}Units{%endif%}</th>
+        <th>{% trans "Good" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% trans "Units" %}{%endif%}</th>
+        <th>{% trans "Damaged" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% "trans Units" %}{%endif%}</th>
+        <th>{% trans "Lost" %}<br>{%if formset.forms.0.instance.siNo.is_bulk%}{% trans "MT" %}{%else%}{% trans "Units" %}{%endif%}</th><th></th>
         </thead>
 
     {% for sform in formset.forms %}
