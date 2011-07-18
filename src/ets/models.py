@@ -309,7 +309,12 @@ class Waybill( models.Model ):
         """
         #waybill = Waybill.objects.get( id = wb_id )
         return base64.b64encode( zlib.compress( simplejson.dumps( self.serialize(), use_decimal=True ) ) )
-            
+    
+    def decompress(self, data):
+        data = string.replace( data, ' ', '+' )
+        zippedData = base64.b64decode( data )
+        return zlib.decompress( zippedData )
+    
 #### Compas Tables Imported
 
 
@@ -563,17 +568,21 @@ class EpicStock( models.Model ):
         return self.origin_id[7:]
     
     @classmethod    
-    def update():
+    def update(cls):
         """
         Executes Imports of Stock
         """
-        originalStock = EpicStock.objects.using( 'compas' )
+        originalStock = cls.objects.using( 'compas' )
         for myrecord in originalStock:
             myrecord.save( using = 'default' )
-            
-        EpicStock.objects.exclude(pk__in=originalStock.values_list('pk', flat=True))\
-                         .update(number_of_units=0)
-
+        
+        EpicStock.objects.exclude(pk__in=tuple(originalStock.values_list('pk', flat=True))).update(number_of_units=0)
+        #===============================================================================================================
+        # for item in EpicStock.objects.all():
+        #    if item not in originalStock:
+        #        item.number_of_units = 0
+        #        item.save()
+        #===============================================================================================================
 
 class EpicLossDamages( models.Model ):
     type = models.CharField(_("Type"), max_length = 1 )

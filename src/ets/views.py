@@ -16,16 +16,16 @@ from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
 from django.contrib import messages
 
-from ets.waybill.compas import compas_write
-from ets.waybill.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
-from ets.waybill.forms import WaybillValidationFormset, WarehouseForm
-from ets.waybill.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
-from ets.waybill.models import LtiWithStock, EpicLossDamages, LoadingDetail
-from ets.waybill.models import Places, EpicPerson, EpicStock, DispatchPoint
-from ets.waybill.tools import restant_si 
-from ets.waybill.tools import import_setup, import_lti, track_compas_update
-from ets.waybill.tools import un64unZip, viewLog 
-from ets.waybill.tools import serialized_all_items
+from ets.compas import compas_write
+from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
+from ets.forms import WaybillValidationFormset, WarehouseForm
+from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
+from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
+from ets.models import Places, EpicPerson, EpicStock, DispatchPoint
+from ets.tools import restant_si 
+from ets.tools import import_setup, import_lti, track_compas_update
+from ets.tools import un64unZip, viewLog 
+from ets.tools import serialized_all_items
 from django.utils.translation import ungettext as _
 
 
