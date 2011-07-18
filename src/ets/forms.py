@@ -7,6 +7,8 @@ from django import forms
 from django.utils.translation import ugettext_lazy as _
 from ets import models as ets_models
 
+UNDEFINED_MESSAGE = "N/A"
+
 class WarehouseForm( forms.Form ):
     warehouse = forms.ModelChoiceField( queryset = ets_models.DispatchPoint.objects.filter( ACTIVE_START_DATE__lt = datetime.date.today() ) )
 
@@ -17,54 +19,21 @@ class WaybillForm( ModelForm ):
     # dateOfDispatch = forms.DateField(_("Date of Dispatch"))
     # transportType = forms.CharField(_("Transport Type"), widget = forms.Select( choices = Waybill.transport_type ) )
     # transactionType = forms.CharField(_("Transaction Type"), widget = forms.Select( choices = Waybill.transaction_type_choice ) )
-    #===================================================================================================================
-
-    #===================================================================================================================
     # dispatchRemarks = forms.CharField(_("Dispatch Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # ltiNumber = forms.CharField(_("LTI Number"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportContractor = forms.CharField(_("Transport Contractor"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportSubContractor = forms.CharField(_("Transport SubContractor"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportDriverName = forms.CharField(_("Transport DriverName"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportDriverLicenceID = forms.CharField(_("Transport DriverLicenceID"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportVehicleRegistration = forms.CharField(_("Transport Vehicle Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # dispatcherName = forms.CharField(_("Dispatcher Name"), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # dispatcherTitle = forms.CharField(_("Dispatcher Title"), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # transportTrailerRegistration = forms.CharField(_("Transport Trailer Registration "), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Places.objects.all() )
-    #===================================================================================================================
-    #===================================================================================================================
     # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
     #===================================================================================================================
 
@@ -137,29 +106,13 @@ class WaybillForm( ModelForm ):
 class WaybillRecieptForm( ModelForm ):
     #===================================================================================================================
     # recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"))
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientStartDischargeDate = forms.DateField(_("Recipient Start Discharge Date"))
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientEndDischargeDate = forms.DateField(_("Recipient End Discharge Date"))
-    #===================================================================================================================
-    #===================================================================================================================
     # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
-    #===================================================================================================================
-    #===================================================================================================================
     # invalidated = forms.CharField(_("Invalidated "), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
-    #===================================================================================================================
     # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
     #===================================================================================================================
     
@@ -233,19 +186,23 @@ class WaybillRecieptForm( ModelForm ):
 #=======================================================================================================================
 
 class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
+    
     def append_non_form_error( self, message ):
         errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
         errors.append( message )
         raise forms.ValidationError( errors )
+    
     def clean( self ):
         count = 0
         for form in self.forms:
             if form.is_bound:
+                #TODO: remove try..except or specify error types
                 try:
                     if form.cleaned_data.get( 'numberUnitsLoaded' ):
                         count += 1
                 except:
                     pass
+        
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
 
@@ -253,51 +210,82 @@ class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
 class WaybillFullForm( ModelForm ):
 
 
-    dateOfDispatch = forms.DateField(_("date Of Dispatch"), required = False )
-    dateOfLoading = forms.DateField(_("date Of Loading"), required = False )
-    dispatchRemarks = forms.CharField(_("dispatch Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    dispatcherName = forms.CharField(_("dispatcher Name"), widget = forms.HiddenInput(), required = False )
-    dispatcherTitle = forms.CharField(_("dispatcher Title"), widget = forms.HiddenInput(), required = False )
-    invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
-    ltiNumber = forms.CharField(_("LTI Number"), widget = forms.HiddenInput(), required = False )
-    recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"), required = False )
-    recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput(), required = False )
-    recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput(), required = False )
-    recipientEndDischargeDate = forms.DateField(_("Recipient End DischargeDate"), required = False )
-    recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput(), required = False )
-    recipientName = forms.CharField(_("Recipient Name"), widget = forms.HiddenInput(), required = False )
-    recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    recipientSignedTimestamp = forms.DateTimeField(_("Recipient Signed Timestamp"), widget = forms.HiddenInput(), required = False )
-    recipientStartDischargeDate = forms.DateField(_("Recipient Start DischargeDate"), required = False )
-    recipientTitle = forms.CharField(_("Recipient Title"), widget = forms.HiddenInput(), required = False )
-    transactionType = forms.CharField(_("Transaction Type"), widget = forms.Select( choices = Waybill.TRANSACTION_TYPES ) )
-    transportContractor = forms.CharField(_("Transport Contractor"), widget = forms.HiddenInput(), required = False )
-    transportDeliverySigned = forms.CharField(_("Transport Delivery Signed"), widget = forms.HiddenInput(), required = False )
-    transportDeliverySignedTimestamp = forms.DateTimeField(_("Transport Delivery SignedTimestamp"), widget = forms.HiddenInput(), required = False )
-    transportDispachSigned = forms.CharField(_("Transport DispachSigned"), widget = forms.HiddenInput(), required = False )
-    transportDispachSignedTimestamp = forms.DateTimeField( _(""),widget = forms.HiddenInput(), required = False )
-    transportDriverLicenceID = forms.CharField(_("Transport Driver LicenceID"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    transportDriverName = forms.CharField(_("Transport DriverName"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    transportSubContractor = forms.CharField(_("Transport SubContractor"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    transportTrailerRegistration = forms.CharField(_("Transport Trailer Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    transportType = forms.CharField(_("Transport Type"), widget = forms.Select( choices = Waybill.TRANSPORT_TYPES ) )
-    transportVehicleRegistration = forms.CharField(_("Transport Vehicle Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput(), required = False )
-    auditComment = forms.CharField(_("Audit Comment"), widget = forms.Textarea, required = True )
+    #===================================================================================================================
+    # dateOfDispatch = forms.DateField(_("date Of Dispatch"), required = False )
+    # dateOfLoading = forms.DateField(_("date Of Loading"), required = False )
+    # dispatchRemarks = forms.CharField(_("dispatch Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # dispatcherName = forms.CharField(_("dispatcher Name"), widget = forms.HiddenInput(), required = False )
+    # dispatcherTitle = forms.CharField(_("dispatcher Title"), widget = forms.HiddenInput(), required = False )
+    # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
+    # ltiNumber = forms.CharField(_("LTI Number"), widget = forms.HiddenInput(), required = False )
+    # recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"), required = False )
+    # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput(), required = False )
+    # recipientEndDischargeDate = forms.DateField(_("Recipient End DischargeDate"), required = False )
+    # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput(), required = False )
+    # recipientName = forms.CharField(_("Recipient Name"), widget = forms.HiddenInput(), required = False )
+    # recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # recipientSignedTimestamp = forms.DateTimeField(_("Recipient Signed Timestamp"), widget = forms.HiddenInput(), required = False )
+    # recipientStartDischargeDate = forms.DateField(_("Recipient Start DischargeDate"), required = False )
+    # recipientTitle = forms.CharField(_("Recipient Title"), widget = forms.HiddenInput(), required = False )
+    # transactionType = forms.CharField(_("Transaction Type"), widget = forms.Select( choices = Waybill.TRANSACTION_TYPES ) )
+    # transportContractor = forms.CharField(_("Transport Contractor"), widget = forms.HiddenInput(), required = False )
+    # transportDeliverySigned = forms.CharField(_("Transport Delivery Signed"), widget = forms.HiddenInput(), required = False )
+    # transportDeliverySignedTimestamp = forms.DateTimeField(_("Transport Delivery SignedTimestamp"), widget = forms.HiddenInput(), required = False )
+    # transportDispachSigned = forms.CharField(_("Transport DispachSigned"), widget = forms.HiddenInput(), required = False )
+    # transportDispachSignedTimestamp = forms.DateTimeField( _(""),widget = forms.HiddenInput(), required = False )
+    # transportDriverLicenceID = forms.CharField(_("Transport Driver LicenceID"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # transportDriverName = forms.CharField(_("Transport DriverName"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # transportSubContractor = forms.CharField(_("Transport SubContractor"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # transportTrailerRegistration = forms.CharField(_("Transport Trailer Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # transportType = forms.CharField(_("Transport Type"), widget = forms.Select( choices = Waybill.TRANSPORT_TYPES ) )
+    # transportVehicleRegistration = forms.CharField(_("Transport Vehicle Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
+    # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput(), required = False )
+    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.Textarea, required = True )
+    #===================================================================================================================
+    
+    def __init__(self, **kwargs):
+        self.fields['auditComment'].required = True
+    
     class Meta:
         model = ets_models.Waybill
-
+        widgets = {
+            'dispatchRemarks': forms.TextInput( attrs = {'size':'40'} ),
+            'ltiNumber': forms.HiddenInput,
+            'transportContractor': forms.HiddenInput,
+            'transportSubContractor': forms.TextInput( attrs = {'size':'40'} ),
+            'transportDriverName': forms.TextInput( attrs = {'size':'40'} ),
+            'transportDriverLicenceID': forms.TextInput( attrs = {'size':'40'} ),
+            'transportVehicleRegistration': forms.TextInput( attrs = {'size':'40'} ),
+            'dispatcherName': forms.HiddenInput,
+            'dispatcherTitle': forms.HiddenInput,
+            'transportTrailerRegistration': forms.TextInput( attrs = {'size':'40'} ),
+            'transportDeliverySigned': forms.HiddenInput,
+            'transportDeliverySignedTimestamp': forms.HiddenInput,
+            'transportDispachSigned': forms.HiddenInput,
+            'transportDispachSignedTimestamp': forms.HiddenInput,
+            'recipientName': forms.HiddenInput,
+            'recipientTitle': forms.HiddenInput,
+            'recipientLocation': forms.HiddenInput,
+            'recipientConsingee': forms.HiddenInput,
+            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
+            'recipientSignedTimestamp': forms.HiddenInput,
+            'waybillNumber': forms.HiddenInput,
+            'invalidated': forms.HiddenInput,
+            'auditComment': forms.Textarea,
+        }
+    
     def thisDispName( self ):
         try:
             name = ets_models.EpicPerson.objects.get( person_pk = self.instance.dispatcherName )
-        except:
-            name = 'N/A'
+        except ets_models.EpicPerson.DoesNotExist:
+            name = UNDEFINED_MESSAGE
         return name
+    
     def thisRecName( self ):
         try:
             name = ets_models.EpicPerson.objects.get( person_pk = self.instance.recipientName )
-        except:
-            name = 'N/A'
+        except ets_models.EpicPerson.DoesNotExist:
+            name = UNDEFINED_MESSAGE
         return name
 
 class WaybillValidationFormset( BaseModelFormSet ):
@@ -305,15 +293,13 @@ class WaybillValidationFormset( BaseModelFormSet ):
         issue = ''
         super( WaybillValidationFormset, self ).clean()
         for form in self.forms:
-            if form.check_lines():
-                pass
-            else:
+            if not form.check_lines():
+                #TODO: Refactor it
                 valid = False
                 issue += ' WB: ' + str( form )
                 raise form.ValidationError( _("You have an error") )
-            if valid:
-                pass
-            else:
+            
+            if not valid:
                 print issue
 
 
@@ -330,4 +316,8 @@ class LoadingDetailDispatchForm( ModelForm ):
 class LoadingDetailRecieptForm( ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 'unitsDamagedReason', )
+        fields = ( 
+            'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 
+            'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 
+            'unitsDamagedReason', 
+        )
