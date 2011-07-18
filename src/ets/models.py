@@ -743,7 +743,7 @@ class ReceptionPoint( models.Model ):
 
 class UserProfile( models.Model ):
     user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Ware houses"), blank = True, null = True, verbose_name = 'Dispatch Warehouse' )
+    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Dispatch Warehouse"), blank = True, null = True )
     receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points"), blank = True, null = True )
     isCompasUser = models.BooleanField(_("Is Compas User"), 'Is Compas User' )
     isDispatcher = models.BooleanField(_("Is Dispatcher"), 'Is Dispatcher' )
@@ -766,7 +766,7 @@ User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )
 
 
 class SiTracker( models.Model ):
-    LTI = models.OneToOneField(_("LTI"), LtiOriginal, primary_key = True )
+    LTI = models.OneToOneField(LtiOriginal, verbose_name=_("LTI"), primary_key = True )
     number_units_left = models.DecimalField(_("Number units left"), decimal_places = 3, max_digits = 10 )
     number_units_start = models.DecimalField(_("Number units start"), decimal_places = 3, max_digits = 10 )
 
