@@ -77,7 +77,13 @@ function disableEnterKey(e)
 <div class="header">
 <span style="font-weight:bold">{% trans "WFP oPt Electronic Tracking System - eWaybill" %}</span>
 </div>
-<div class="menu"><a href='{% url select_action %}'>{% trans "home" %}</a> {% if user.is_authenticated %} <a href='{% url django.contrib.auth.views.logout %}?next=/'>{% trans "Logout" %}</a>{% else %}{% trans "Please log in." %} <a href='{% url django.contrib.auth.views.login %}?next=/'>{% trans "login" %}</a>{% endif %}</div>
+<div class="menu">
+	<a href='{% url select_action %}'>{% trans "home" %}</a> 
+	{% if user.is_authenticated %}
+	 <a href='{% url django.contrib.auth.views.logout %}?next=/'>{% trans "Logout" %}</a>
+	{% else %}{% trans "Please log in." %} 
+	<a href='{% url django.contrib.auth.views.login %}?next=/'>{% trans "login" %}</a>{% endif %}
+</div>
 
 <br>
 <div class="content">

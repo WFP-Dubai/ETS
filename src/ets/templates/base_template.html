@@ -46,7 +46,13 @@ function disableEnterKey(e)
 <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill - {{COMPAS_STATION}} {% endblocktrans %}</span>
 </div>
 
-<div class="menu"><a href='{% url select_action %}'>{% trans "home" %}</a> {% if user.is_authenticated %} <a href='{% url django.contrib.auth.views.logout %}?next={% url select_action %}'>{% trans "Logout" %}</a>{% else %} {% trans "Please log in." %} <a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>{% trans "login" %}</a>{% endif %}</div>
+<div class="menu">
+	<a href='{% url select_action %}'>{% trans "home" %}</a>
+	{% if user.is_authenticated %}
+	<a href='{% url django.contrib.auth.views.logout %}?next={% url select_action %}'>{% trans "Logout" %}</a>
+	{% else %} {% trans "Please log in." %}
+	<a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>{% trans "login" %}</a>{% endif %}
+</div>
 
 <br>
 {% if messages %}
