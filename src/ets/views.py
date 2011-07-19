@@ -517,7 +517,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             return cause
     
     class LoadingDetailRecForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField(_("order item"), queryset = current_items, label = 'Commodity' )
+        order_item = forms.ModelChoiceField(queryset = current_items, label = 'Commodity' )
         for itm in ModelChoiceIterator( order_item ):
             print itm
         numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
@@ -526,8 +526,8 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
         comm_cats = []
         for item in  current_items :
             comm_cats.append( item.lti_line.comm_category_code )
-        unitsLostReason = LRModelChoiceField(_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
+        unitsLostReason = LRModelChoiceField(label =_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
+        unitsDamagedReason = LRModelChoiceField(label =_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
         class Meta:
             model = LoadingDetail
             fields = ( 'wbNumber', 'order_item', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason',
@@ -986,7 +986,7 @@ def dispatch_report_wh( request, wh, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
 
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'),
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'),
                            **{'Content-Disposition': 'attachment; filename=list-%s-%s.csv' % (wh, datetime.date.today())})
 
 
@@ -1004,7 +1004,7 @@ def receipt_report_wh( request, loc, cons, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
     
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'),
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'),
                            **{'Content-Disposition': 'attachment; filename=receipt-%s-%s.csv' % (loc, datetime.date.today())})
     
 
@@ -1022,7 +1022,7 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
 
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'))
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'))
 
 
 #=======================================================================================================================
