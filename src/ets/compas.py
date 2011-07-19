@@ -166,14 +166,18 @@ class compas_write:
                 print 'Issue with data1'
 
                 the_waybill = Waybill.objects.get( id = waybill_id )
-                self.ErrorMessages = '_('Problem with data of Waybill') %s: %s \n' % ( the_waybill, str( errorObj.code ) )
+                msg = _('Problem with data of Waybill')
+                msg1 = " %s: %s \n" % ( the_waybill, str( errorObj.code ) )
+                self.ErrorMessages = "%s %s" % (msg,msg1)
 
                 return False
         except Exception as e:
             print 'Issue with data2'
             the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
             print self.ErrorMessages
-            self.ErrorMessages = '_('Problem with data of Waybill') %s \n' % ( the_waybill ) + self.ErrorMessages
+            msg = _('Problem with data of Waybill')
+            msg1 = " %s \n" % ( the_waybill ) + self.ErrorMessages
+            self.ErrorMessages = "%s %s" %(msg, msg1)
             return False
 
 
@@ -266,7 +270,9 @@ class compas_write:
             print 'Issue with data'
 
             the_waybill = Waybill.objects.get( id = waybill_id )
-            self.ErrorMessages =' _('Problem with data of Waybill') %s \n' % ( the_waybill )
+            msg = _('Problem with data of Waybill')
+            msg1 = "%s \n" %( the_waybill )
+            self.ErrorMessages = "%s %s" %(msg, msg1)
 
             return False
 
