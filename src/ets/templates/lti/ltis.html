@@ -21,7 +21,7 @@
 		    </td>
 		    <td>{{lti.consegnee_name}}
 		    </td>
-		    <td><a href='../info/{{lti.code}}'>{% trans "select" %}</a>
+		    <td><a href='{% url lti_detail_url lti.code %}'>{% trans "select" %}</a>
 		    </td>
 		</tr>
 	{% endfor%}

@@ -28,8 +28,8 @@
                  <td>{%if waybill.waybillValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
                  <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%}</td>
                  <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" {%else%}{% trans "N" %}{%endif%}  </td>
-                 <td>{%if not user.profile.superUser%}<a href='{%if  user.profile.isDispatcher%}{%url ets.waybill.views.waybill_view waybill.id%}{%else%}{%url ets.waybill.views.waybill_view_reception waybill.id%}{%endif%}'>{% trans "View WB" %}</a>{%endif%}
-             {%if user.profile.superUser%} <a href='{%url ets.waybill.views.waybill_validate_form_update waybill.id%}'>{% trans "Edit" %}</a>{%endif%}</td>
+                 <td>{%if not user.profile.superUser%}<a href='{% if  user.profile.isDispatcher %}{% url waybill_view waybill.id %}{%else%}{% url waybill_view_reception waybill.id %}{%endif%}'>{% trans "View WB" %}</a>{%endif%}
+             {%if user.profile.superUser%} <a href='{% url waybill_validate_form_update waybill.id %}'>{% trans "Edit" %}</a>{%endif%}</td>
 
      </tr>
 {% endfor%}
