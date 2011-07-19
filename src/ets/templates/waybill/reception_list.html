@@ -20,7 +20,7 @@
              <td>{{waybill.consegnee_name}}</td>
              <td>{{waybill.destination_loc_name}}</td>
              <td>{{waybill.dateOfDispatch}}</td>
-             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>{% trans "Select" %}</a></td>
+             <td><a href='{% url waybill_reception waybill.id %}'>{% trans "Select" %}</a></td>
     </tr>
    {%else%}
        {%if myprofile.isAllReceiver %}
@@ -32,7 +32,7 @@
              <td>{{waybill.consegnee_name}}</td>
              <td>{{waybill.destination_loc_name}}</td>
              <td>{{waybill.dateOfDispatch}}</td>
-             <td><a href='{%url ets.waybill.views.waybill_reception waybill.id%}'>{% trans "Select" %}</a></td>
+             <td><a href='{% url waybill_reception waybill.id %}'>{% trans "Select" %}</a></td>
     </tr>{%endif%}
         {%endif%}
     {%endif%}

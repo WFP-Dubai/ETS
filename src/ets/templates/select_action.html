@@ -12,7 +12,7 @@
 {%if myprofile.isReciever%}
 <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
 {%endif%}
-{%if myprofile.isCompasUser%}<li><a href='waybill/validate'>{% trans "Validate Waybill" %}</a></li>
+{%if myprofile.isCompasUser%}<li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
                              <li><a href='{% url import_ltis %}'>{% trans "Update DB" %}</a>
                              {%endif%}
 {%if myprofile.superUser%}

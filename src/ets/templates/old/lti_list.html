@@ -1,9 +1,10 @@
 {% extends "base_template.html"%}
+{%load extra_tags%}
 {%block content %}
 <ul>
     {% for wh in dispatch_list%}
   ','origin_wh_name
-  <li><a href='list/{{wh}}'>  {{wh.origin_wh_name}} {{wh.origin_loc_name}}</a></li>
+  <li><a href='{% url listOfLtis wh %}'>  {{wh.origin_wh_name}} {{wh.origin_loc_name}}</a></li>
     {% endfor%}
 </ul>
     
