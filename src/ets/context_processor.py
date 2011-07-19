@@ -10,7 +10,6 @@ def common( context ):
     # return the value you want as a dictionnary. you may add multiple values in there.
     return {
         'COMPAS_STATION': settings.COMPAS_STATION, 
-        'IN_PRODUCTION': settings.IN_PRODUCTION, 
-        'MEDIA_URL': settings.MEDIA_URL, 
+        'IN_PRODUCTION': settings.IN_PRODUCTION,  
         'myprofile': users_profile
     }
