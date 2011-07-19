@@ -385,14 +385,14 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
     comm_cats = [item.comm_category_code for item in current_lti if item]
     
     class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField(_("order item"), queryset = current_items, label = 'Commodity' )
+        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
         numberUnitsLoaded = forms.CharField(_("number of units loaded"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
 
-        unitsLostReason = LRModelChoiceField(_("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
+        unitsLostReason = LRModelChoiceField(label = _("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
+        unitsDamagedReason = LRModelChoiceField(label = _("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
 
         class Meta:
             model = LoadingDetail

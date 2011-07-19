@@ -334,7 +334,7 @@ class Waybill( models.Model ):
         @param self: the Waybill instance
         @return: a string containing the waybill identifier.
         """
-        return '%04d' % (settings.WAYBILL_LETTER, self.pk)
+        return '%s%04d' % (settings.WAYBILL_LETTER, self.pk)
     
     def compress(self):
         """
