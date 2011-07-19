@@ -33,8 +33,8 @@
              <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
              <td>{%if waybill.waybillRecSentToCompas%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%} </td>
              <td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{% url waybill_view waybill.id %}'>{% trans "View Dispatch" %}</a>{%endif%}
-                     {%if profile.isReciever or profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>{% trans "View Reciept" %}</a>{%endif%}
-                     {%if profile.isCompasUser%} <a href='{%url ets.waybill.views.waybill_view_reception waybill.id%}'>{% trans "View Full" %}</a>{%endif%}
+                     {%if profile.isReciever or profile.isCompasUser%} <a href='{% url waybill_view_reception waybill.id %}'>{% trans "View Reciept" %}</a>{%endif%}
+                     {%if profile.isCompasUser%} <a href='{% url waybill_view_reception waybill.id %}'>{% trans "View Full" %}</a>{%endif%}
 
              </td>
     </tr>

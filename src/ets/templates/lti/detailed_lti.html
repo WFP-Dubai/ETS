@@ -31,7 +31,7 @@ border-color: black;
 </table>
 <br>{%if user.profile.isDispatcher%}{%if detailed.0.origin_location_code == user.profile.warehouses.origin_location_code%}
     {%if moreWBs%}
-<a href='{%url ets.waybill.views.waybillCreate detailed.0.code%}'>{% trans "Create New Waybill" %}</a><br>
+<a href='{% url waybillCreate detailed.0.code %}'>{% trans "Create New Waybill" %}</a><br>
 {%endif%}{%endif%}{%endif%}
 <br>
 {% trans "Items in LTI:" %}
@@ -61,7 +61,7 @@ border-color: black;
 <table class='bordered' >
 {%for wb in listOfWaybills%}
     <tr><td colspan="3"  class='itemhead bordered'>{% trans "WB:" %}{{wb}} </td>
-    <td class='bordered'><a href='{%url ets.waybill.views.waybill_view wb.id%}?viewonly=true'> {% trans "View Waybill" %}</a></td></tr>
+    <td class='bordered'><a href='{% url waybill_view wb.id %}?viewonly=true'> {% trans "View Waybill" %}</a></td></tr>
     <tr class='itemhead'><td></td>
     <td class='bordered'>{% trans "Commodity" %}</td>
     <td class='bordered'>{% trans "SI" %}</td>

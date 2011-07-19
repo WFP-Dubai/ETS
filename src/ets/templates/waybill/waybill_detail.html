@@ -146,7 +146,7 @@
         return confirm("{% trans 'Are you sure that you want to remove waybill' %} {{form.instance.waybillNumber}}")
       }
 </SCRIPT>
-<form action="{%url ets.waybill.views.invalidate_waybill form.instance.id%}"  onSubmit="return confirmAction()">
+<form action="{% url invalidate_waybill form.instance.id %}"  onSubmit="return confirmAction()">
 <input type="submit" value="{% trans 'INVALIDATE' %} "> 
 </form></td>
     </tr>
