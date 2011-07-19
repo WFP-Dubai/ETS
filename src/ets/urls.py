@@ -97,9 +97,9 @@ urlpatterns = patterns("ets.views",
     ( r'^stock/synchro/download/', "get_synchronize_stock" ),
     ( r'^lti/synchro/download/', "get_synchronize_lti" ),
     # Additional data
-    ( r'^all/synchro/download/file/', "get_all_data_download", name="get_all_data_download" ),
+    ( r'^all/synchro/download/file/', "get_all_data_download",{},name="get_all_data_download" ),
     ( r'^all/synchro/download/', "get_all_data" ),
-    ( r'^all/download/stock_ets/', "get_wb_stock", name="get_wb_stock" ),
+    ( r'^all/download/stock_ets/', "get_wb_stock",{},name="get_wb_stock" ),
     
     ( r'^accounts/profile', "profile" ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
