@@ -41,7 +41,6 @@ def select_action( request, **kwargs ):
     Template: /waybill/templates/select_action.html
     Gives the loggedin user a choise of possible actions sepending on roles
     """
-    print "!"*100
     return direct_to_template(request, **kwargs)
     
 

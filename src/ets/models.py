@@ -74,6 +74,12 @@ class Place( models.Model ):
     
     
 class Waybill( models.Model ):
+    """
+    Main model in the system. Tracks waybills.
+    
+    
+    """
+    
     TRANSACTION_TYPES = ( 
                         ( u'WIT', _(u'WFP Internal') ),
                         ( u'DEL',_( u'Delivery' )),
@@ -105,11 +111,13 @@ class Waybill( models.Model ):
     dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
     transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
     transportType = models.CharField(_("Transport Type"), max_length = 10, choices = TRANSPORT_TYPES )
+    
     #Dispatcher
     dispatchRemarks = models.CharField(_("Dispatch Remarks"), max_length = 200, blank=True)
     dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
     dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
     dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
+    
     #Transporter
     transportContractor = models.TextField(_("Transport Contarctor"), blank = True )
     transportSubContractor = models.TextField(_("Transport Sub contarctor"), blank = True )
@@ -132,7 +140,7 @@ class Waybill( models.Model ):
     containerOneRemarksReciept = models.CharField( _("Container OneRemarks Reciept"), max_length = 40, blank = True )
     containerTwoRemarksReciept = models.CharField(_("Container TwoRemarks Reciept"), max_length = 40, blank = True )
 
-    #Reciver
+    #Receiver
     recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True )
     recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
     recipientName = models.CharField( _("Recipient Name"), max_length = 100, blank = True )
@@ -154,13 +162,14 @@ class Waybill( models.Model ):
     waybillProcessedForPayment = models.BooleanField(_("Waybill Processed ForPayment"))
     invalidated = models.BooleanField(_("Invalidated"))
     auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
+    
     audit_log = AuditLog()
 
     def  __unicode__( self ):
-            return self.waybillNumber
+        return self.waybillNumber
 
     def mydesc( self ):
-            return self.waybillNumber
+        return self.waybillNumber
 
     def errors( self ):
         try:
