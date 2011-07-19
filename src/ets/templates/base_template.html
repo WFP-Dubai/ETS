@@ -6,14 +6,14 @@
 <head>
     <title>{% trans "ETS" %} {%block title%}{{section.title}}{%endblock%} - {{COMPAS_STATION}}</title>
     <style type="text/css" title="currentStyle">
-        @import "{{MEDIA_URL}}/css/demo_page.css";
-        @import "{{MEDIA_URL}}/css/demo_table.css";
+        @import "{{STATIC_URL}}css/demo_page.css";
+        @import "{{STATIC_URL}}css/demo_table.css";
     </style>
     <link rel="stylesheet" type="text/css" href="{{MEDIA_URL}}/css/base.css" />
-    <link type="text/css" href="{{MEDIA_URL}}/css/smoothness/jquery-ui-1.8.2.custom.css" rel="Stylesheet" />
-    <script type="text/javascript" src="{{MEDIA_URL}}/js/jquery-1.4.3.min.js"></script>
-    <script type="text/javascript" src="{{MEDIA_URL}}/js/jquery-ui-1.8.2.custom.min.js"></script>
-    <script   type="text/javascript" src="{{MEDIA_URL}}/js/jquery.dataTables.min.js"></script>
+    <link type="text/css" href="{{STATIC_URL}}css/smoothness/jquery-ui-1.8.2.custom.css" rel="Stylesheet" />
+    <script type="text/javascript" src="{{STATIC_URL}}js/jquery-1.4.3.min.js"></script>
+    <script type="text/javascript" src="{{STATIC_URL}}js/jquery-ui-1.8.2.custom.min.js"></script>
+    <script   type="text/javascript" src="{{STATIC_URL}}js/jquery.dataTables.min.js"></script>
     <script language="JavaScript">
 
 function disableEnterKey(e)
