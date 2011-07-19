@@ -1,22 +1,15 @@
 
-import datetime
 import zlib, base64, string
 
-from django.db import models#, connection
-#from django.contrib import admin
-#from django.forms import ModelForm, ModelChoiceField
+from django.db import models
 from django.contrib.auth.models import User
-#from django.forms.models import inlineformset_factory
 from django.db.models import Sum
 from django.core import serializers
-#from django.forms.models import model_to_dict
 from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
-#from django.template.defaultfilters import stringfilter
-#from audit_log.models.fields import LastUserField
 from audit_log.models.managers import AuditLog
 
 name = "1234"

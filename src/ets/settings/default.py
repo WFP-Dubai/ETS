@@ -28,6 +28,12 @@ ALL_DB = {
         'USER': '',
         'PASSWORD': '',
     },
+    'dev_compas': {
+        'NAME': 'compas',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'USER': '',
+        'PASSWORD': '',
+    },
     'default_tc_pak': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'wb_pak',
@@ -136,7 +142,7 @@ ALL_DB = {
 
 DATABASES = {
     "default": ALL_DB['default'],
-    "compas": ALL_DB["compas_test_pak"],
+    "compas": ALL_DB["dev_compas"],
 }
 
 LANGUAGE_CODE = 'en'
@@ -168,10 +174,6 @@ SITE_ID = 1
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'jxb_km(q=efo^64b)@o09ii!1c1z&pzo(3r-o(np&$n8qphao3'
 
-STATICFILES_DIRS = (
-    os.path.join( PROJECT_ROOT, 'static' ),
-)
-
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     ('django.template.loaders.cached.Loader', (
@@ -189,7 +191,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     
-    #'audit_log.middleware.UserLoggingMiddleware',
+    'audit_log.middleware.UserLoggingMiddleware',
     
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 
@@ -203,7 +205,6 @@ INSTALLED_APPS = (
     #own
     'ets',
     
-    
     # builtin
     'django.contrib.auth',
     'django.contrib.admin',
@@ -216,23 +217,9 @@ INSTALLED_APPS = (
     
     #external
     'django_extensions',
-    #'ajax_select',
-    #'uni_form',
-    #'endless_pagination',
-    #'sorl.thumbnail',
-    #'tabs',
-    #'mptt',
     'south',
-    #'oembed',
-    #'oembed.contrib',
-    #'mailer',
-    #'autoslug',
-    #'native_tags',
     'rosetta',
-    #'django_countries',
     'debug_toolbar',
-    #'logicaldelete',
-    #'floppyforms',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

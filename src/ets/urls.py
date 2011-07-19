@@ -102,9 +102,14 @@ urlpatterns = patterns("ets.views",
     ( r'^all/download/stock_ets/', "get_wb_stock" ),
     
     ( r'^accounts/profile', "profile" ),
+    
+)
+
+urlpatterns += patterns('',
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
-    ( r'^admin/', include( admin.site.urls ) ),
+    ( r'^rosetta/', include('rosetta.urls') ),
+    ( r'^admin/', include( admin.site.urls ) ),                    
 )
 
 if settings.DEBUG:

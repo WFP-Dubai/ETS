@@ -2,7 +2,7 @@
 from .default import *
 
 DATABASES['default'] = ALL_DB['default']
-DATABASES['compas'] = ALL_DB['compas_test_pak']
+DATABASES['compas'] = ALL_DB['dev_compas']
 
 COMPAS_STATION = u'ISBX002'
 

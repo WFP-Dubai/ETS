@@ -625,14 +625,14 @@ def serialized_all_items():
 #                        myline.save()
 #=======================================================================================================================
 
-#=======================================================================================================================
-# def sync_lti_stock():
-#    all_stock = EpicStock.objects.all()
-#    all_ltis = LtiOriginal.objects.all()
-#    for lti_item in all_ltis:
-#        for item in lti_item.stock_items():
-#            the_match, created = LtiWithStock.objects.get_or_create( lti_line = lti_item, stock_item = item , lti_code = lti_item.code )
-#=======================================================================================================================
+def sync_lti_stock():
+    #all_stock = ets_models.EpicStock.objects.all()
+    all_ltis = ets_models.LtiOriginal.objects.all()
+    for lti_item in all_ltis:
+        for item in lti_item.stock_items():
+            ets_models.LtiWithStock.objects.get_or_create( lti_line = lti_item, 
+                                                           stock_item = item , 
+                                                           lti_code = lti_item.code )
 
 #=======================================================================================================================
 # def coi_for_lti_item( lti_line ):
