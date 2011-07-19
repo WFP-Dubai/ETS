@@ -514,7 +514,7 @@ def import_lti():
     ## TODO: Fix so ltis imported are not expired
     original = ets_models.LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = settings.MAX_DATE )
     if not settings.DISABLE_EXPIERED_LTI:
-        original = original.filter( expiry_date_gt = datetime.date.today() )
+        original = original.filter( expiry_date__gt = datetime.date.today() )
     
     # log each item
     for myrecord in original:
