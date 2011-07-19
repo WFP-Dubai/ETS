@@ -4,7 +4,7 @@
 {% block title %}{{ title }} | {% trans 'ETS Admin Site' %}{% endblock %}
 
 {% block branding %}
-<h1 id="site-name"><img src='{{STATIC_URL}}images/epic_logo_small.png' ><br/>{% trans 'ETS administration' %}</h1>
+<h1 id="site-name"><img src='{{ STATIC_URL }}images/epic_logo_small.png' ><br/>{% trans 'ETS administration' %}</h1>
 <a href='{% url select_action %}'>{% trans 'Back to ETS for' %} {{COMPAS_STATION}}</a>
 
 {% endblock %}
