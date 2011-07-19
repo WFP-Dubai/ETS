@@ -3,11 +3,11 @@
     "pk": "ISBX002", 
     "model": "ets.place", 
     "fields": {
-      "name": "PAKISTAN COUNTRY OFFICE", 
-      "reporting_code": "HQX0001", 
-      "organization_id": "", 
-      "geo_point_code": "ISBX", 
-      "country_code": "586", 
+      "name": "PAKISTAN COUNTRY OFFICE",
+      "reporting_code": "HQX0001",
+      "organization_id": "",
+      "geo_point_code": "ISBX",
+      "country_code": "586",
       "geo_name": "ISLAMABAD_CAP"
     }
   }, 

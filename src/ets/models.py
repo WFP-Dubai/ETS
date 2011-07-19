@@ -21,35 +21,56 @@ try:
 except ImportError:
     pass
 
-# Create your models here.
 class Place( models.Model ):
+    """
+    Location model.
+    
+    >>> place = Place.objects.get_or_create(org_code="test", name="The best place in the world", 
+    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+    ...                      reporting_code="SOME_CODE", )
+    >>> place
+    <Place: The best place in the world>
+    >>> #Validation
+    >>> Place().full_clean()
+    Traceback (most recent call last):
+    ...
+    ValidationError: {'name': [u'This field cannot be blank.'], 'org_code': [u'This field cannot be blank.'], 'reporting_code': [u'This field cannot be blank.'], 'geo_point_code': [u'This field cannot be blank.'], 'country_code': [u'This field cannot be blank.'], 'geo_name': [u'This field cannot be blank.']}
+    """
+
     org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
     name = models.CharField(_("Name"), max_length = 100 )
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
     geo_name = models.CharField(_("Geo name"), max_length = 100 )
     country_code = models.CharField( _("Country code"),max_length = 3 )
     reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
-    organization_id = models.CharField( _("Organization id"),max_length = 20 )
-
-    def __unicode__( self ):
-        return self.name
+    organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
 
     class Meta:
         db_table = u'epic_geo'
+        ordering = ('name',)
+        verbose_name=_("place")
+        verbose_name_plural = _("places")
+
+    def __unicode__( self ):
+        return self.name
 
     @classmethod
     def update(cls):
         """
         Executes Imports of Place
+        
+        >>> place, created = Place.objects.using('compas').get_or_create(org_code="completely_unique_code", 
+        ...                      name="The best place in the world", 
+        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+        ...                      reporting_code="SOME_CODE", )
+        >>> Place.update()
+        >>> Place.objects.using('default').get(pk="completely_unique_code")
+        <Place: The best place in the world>
+        >>> #Try Repeating
+        >>> Place.update()
         """
-        #TODO: omit try...except
-        for country in settings.COUNTRIES:
-            try:
-                for the_geo in cls.objects.using( 'compas' ).filter( COUNTRY_CODE = country ):
-                    the_geo.save( using = 'default' )
-            except:
-                pass
-        return True
+        for the_geo in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
+            the_geo.save( using = 'default' )
     
     
 class Waybill( models.Model ):
