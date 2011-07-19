@@ -11,6 +11,5 @@ def common( context ):
     return {
         'COMPAS_STATION': settings.COMPAS_STATION, 
         'IN_PRODUCTION': settings.IN_PRODUCTION, 
-        'MEDIA_URL': settings.MEDIA_URL, 
         'myprofile': users_profile
     }
