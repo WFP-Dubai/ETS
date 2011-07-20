@@ -9,6 +9,7 @@ from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
 
 from audit_log.models.managers import AuditLog
 
@@ -773,6 +774,7 @@ class UserProfile( models.Model ):
     isReciever = models.BooleanField(_("Is Reciever"))
     isAllReceiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') )
     compasUser = models.ForeignKey( EpicPerson, verbose_name = _('Use this Compas User'), 
+                                    related_name="profiles",
                                     help_text = _('Select the corrisponding user from Compas'), 
                                     blank = True, null = True)
     superUser = models.BooleanField(_("Super User"), help_text = _('This user has Full Privileges to edit Waybills even after Signatures'))
@@ -786,8 +788,15 @@ class UserProfile( models.Model ):
         else:
             return "%s's profile" % self.user.username
 
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+post_save.connect(create_user_profile, sender=User)
+
 #: XXX: Correct it 
-User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )[0] )
+#User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )[0] )
 
 
 class SiTracker( models.Model ):
