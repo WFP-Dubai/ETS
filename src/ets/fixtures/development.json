@@ -22,7 +22,7 @@
       "superUser": true, 
       "isReciever": true, 
       "isAllReceiver": false, 
-      "warehouses": 24, 
+      "warehouses": 1, 
       "action_user": 1, 
       "action_date": "2011-05-30 10:09:01", 
       "isDispatcher": true, 
@@ -31,7 +31,7 @@
       "action_type": "U", 
       "compasUser": "ISBX0020000586", 
       "readerUser": false, 
-      "receptionPoints": 11
+      "receptionPoints": 1
     }
   },
   {
@@ -41,10 +41,10 @@
       "superUser": true, 
       "isReciever": true, 
       "isAllReceiver": false, 
-      "warehouses": 24, 
+      "warehouses": 1, 
       "isDispatcher": true, 
       "isCompasUser": true, 
-      "receptionPoints": 11, 
+      "receptionPoints": 1, 
       "compasUser": "ISBX0020000586", 
       "readerUser": false
     }
@@ -486,7 +486,7 @@
     }
   }, 
   {
-    "pk": 72, 
+    "pk": 1, 
     "model": "ets.waybillauditlogentry", 
     "fields": {
       "waybillNumber": "A0009", 
@@ -501,7 +501,7 @@
       "transportDeliverySignedTimestamp": null, 
       "recipientDistance": null, 
       "recipientName": "", 
-      "id": 9, 
+      "id": 1, 
       "auditComment": "Print Dispatch Original", 
       "dispatcherSigned": true, 
       "waybillProcessedForPayment": false, 
@@ -543,7 +543,7 @@
     }
   }, 
   {
-    "pk": 9, 
+    "pk": 1, 
     "model": "ets.waybill", 
     "fields": {
       "waybillNumber": "A0009", 
@@ -565,7 +565,7 @@
       "containerTwoSealNumber": "", 
       "transportDeliverySigned": false, 
       "containerTwoRemarksReciept": "", 
-      "ltiNumber": "ISBX002110025381P", 
+      "ltiNumber": "QANX0010010128226P", 
       "containerOneRemarksReciept": "", 
       "transportDispachSignedTimestamp": "2011-06-12 13:12:43", 
       "transactionType": "WIT", 
@@ -582,7 +582,7 @@
       "containerOneSealNumber": "", 
       "waybillValidated": false, 
       "transportType": "02", 
-      "destinationWarehouse": "CCBJ004", 
+      "destinationWarehouse": "OE7X001", 
       "recipientLocation": "SUKKHUR", 
       "waybillRecSentToCompas": false, 
       "transportDriverName": "", 
@@ -599,9 +599,9 @@
     "pk": 1, 
     "model": "ets.ltiwithstock", 
     "fields": {
-      "lti_line": "ISBX002000000000000001007HQX0001000000000000995247", 
-      "lti_code": "ISBX002110025393P", 
-      "stock_item": "I2EX020ISBX0020001033101CERCERWHF<O>586"
+      "lti_line": "QANX001000000000000005217HQX0001000000000000984141", 
+      "lti_code": "QANX0010010128226P", 
+      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15586"
     }
   }, 
   {
@@ -611,6 +611,44 @@
       "lti_line": "ISBX002000000000000001007HQX0001000000000000995247", 
       "lti_code": "ISBX002110025393P", 
       "stock_item": "I2EX020ISBX0020001033101CERCERWHFBG09586"
+    }
+  },
+  {
+    "pk": 1, 
+    "model": "ets.loadingdetail", 
+    "fields": {
+      "numberUnitsGood": "0.000", 
+      "unitsDamagedType": null, 
+      "unitsLostReason": null, 
+      "numberUnitsLost": "0.000", 
+      "wbNumber": 1, 
+      "overloadedUnits": false, 
+      "numberUnitsLoaded": "5.000", 
+      "order_item": 1, 
+      "unitsDamagedReason": null, 
+      "unitsLostType": null, 
+      "loadingDetailSentToCompas": false, 
+      "overOffloadUnits": false, 
+      "numberUnitsDamaged": "0.000"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "ets.loadingdetail", 
+    "fields": {
+      "numberUnitsGood": "0.000", 
+      "unitsDamagedType": null, 
+      "unitsLostReason": null, 
+      "numberUnitsLost": "0.000", 
+      "wbNumber": 1, 
+      "overloadedUnits": false, 
+      "numberUnitsLoaded": "10.000", 
+      "order_item": 1, 
+      "unitsDamagedReason": null, 
+      "unitsLostType": null, 
+      "loadingDetailSentToCompas": false, 
+      "overOffloadUnits": false, 
+      "numberUnitsDamaged": "0.000"
     }
   }
 ]

@@ -4,19 +4,19 @@
 {%block content %}
 <table>
 <tr>
-<td>{%if user.profile.isDispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.profile.warehouses.origin_wh_name}} </td>
-<td><a href='{% url dispatch_report_wh user.profile.warehouses.origin_wh_code %}'>{% trans "download" %}</a>{%endif%}</td>
+<td>{%if user.get_profile.isDispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.get_profile.warehouses.origin_wh_name}} </td>
+<td><a href='{% url dispatch_report_wh user.get_profile.warehouses.origin_wh_code %}'>{% trans "download" %}</a>{%endif%}</td>
 </tr>
 <tr>
-<td>{%if user.profile.isReciever%}{% trans "Warehouse Reciept Report" %}{{user.profile.receptionPoints.LOC_NAME}} </td>
-<td><a href='{% url receipt_report_wh user.profile.receptionPoints.LOCATION_CODE  user.profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a>{%endif%}</td>
+<td>{%if user.get_profile.isReciever%}{% trans "Warehouse Reciept Report" %}{{user.get_profile.receptionPoints.LOC_NAME}} </td>
+<td><a href='{% url receipt_report_wh user.get_profile.receptionPoints.LOCATION_CODE  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a>{%endif%}</td>
 </tr>
 <tr>
-<td>{%if user.profile.superUser%}{% trans "Full LTI Report" %} </td>
+<td>{%if user.get_profile.superUser%}{% trans "Full LTI Report" %} </td>
 <td><a href='{% url ltis_report %}'>{% trans "download" %}</a>{%endif%}</td>
 </tr>
-<tr><td>{% trans "Recipient Report: All items for" %} {{user.profile.receptionPoints.consegnee_name}} </td>
-<td><a href='{% url receipt_report_cons  user.profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a></td>
+<tr><td>{% trans "Recipient Report: All items for" %} {{user.get_profile.receptionPoints.consegnee_name}} </td>
+<td><a href='{% url receipt_report_cons  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a></td>
 </tr>
 </table>
 

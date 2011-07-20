@@ -4,7 +4,7 @@
 {%block content %}
 {% trans "Select an action:" %}
 <ul>
-{%if user.profile.isCompasUser%}
+{%if user.get_profile.isCompasUser%}
 <li><a href='{% url waybill_validate_dispatch_form %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
 <li><a href='{% url waybill_validate_receipt_form %}'>{% trans "Validate Received Waybill" %}</a></li>
 {%endif%}

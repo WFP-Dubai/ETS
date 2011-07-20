@@ -356,7 +356,8 @@ def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template
 
 
 @login_required
-def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all(), template='waybill/waybill_detail.html'):
+def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all(), 
+                                  template='waybill/waybill_detail.html'):
     """
     Admin Edit waybill
     waybill/validate/(.*)
@@ -405,7 +406,9 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
 
     LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
                                        fk_name = "wbNumber", extra = 0 )
-    qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, organization_id = current_lti[0].consegnee_code )
+    
+    qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, 
+                               organization_id = current_lti[0].consegnee_code )
     if len( qs ) == 0:
         qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
 
@@ -434,11 +437,10 @@ def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='wayb
     ## TODO: remove dependency of zippedWB
     try:
         waybill_instance = queryset.get(id = wb_id)
+        extra_lines = 5 - waybill_instance.loadingdetail_set.select_related().count()
         zippedWB = waybill_instance.compress()
         lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
-        extra_lines = 5 - waybill_instance.loadingdetail_set.select_related().count()
         my_empty = [''] * extra_lines
-        
         try:
             disp_person_object = EpicPerson.objects.get( person_pk = waybill_instance.dispatcherName )
         except:
@@ -500,9 +502,8 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
     current_wb = get_object_or_404(queryset, id = wb_code )
     current_lti = current_wb.ltiNumber
     current_items = LtiWithStock.objects.filter( lti_code = current_lti )
-    if  request.user.profile.isReciever or request.user.profile.superUser or request.user.profile.compasUser:
-        pass
-    else:
+    profile = request.user.get_profile()
+    if not (profile.isReciever or profile.superUser or profile.compasUser):
         return redirect( "waybill_view", wb_code)
     
 #    current_wb.auditComment = 'Receipt Action'
@@ -588,22 +589,24 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
                     raise forms.ValidationError( myerror )
             return cleaned
     LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailRecForm, fk_name = "wbNumber", extra = 0 )
-
+    
+    profile = request.user.get_profile()
+    
     if request.method == 'POST':
 
         form = WaybillRecieptForm( request.POST, instance = current_wb )
 
         formset = LDFormSet( request.POST, instance = current_wb )
         if form.is_valid() and formset.is_valid():
-            form.recipientTitle = request.user.profile.compasUser.title
-            form.recipientName = request.user.profile.compasUser.person_pk
+            form.recipientTitle = profile.compasUser.title
+            form.recipientName = profile.compasUser.person_pk
             wb_new = form.save()
-            wb_new.recipientTitle = request.user.profile.compasUser.title
-            wb_new.recipientName = request.user.profile.compasUser.person_pk
+            wb_new.recipientTitle = profile.compasUser.title
+            wb_new.recipientName = profile.compasUser.person_pk
             wb_new.auditComment = 'Receipt Action'
             wb_new.save()
             formset.save()
-            return HttpResponseRedirect( '../viewwb_reception/' + str( current_wb.id ) ) #
+            return redirect('waybill_view_reception', current_wb.id)
         else:
             print( formset.errors )
             print( form.errors )
@@ -611,8 +614,8 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
         if current_wb.recipientArrivalDate:
             form = WaybillRecieptForm( instance = current_wb )
             #form.instance.auditComment= 'Receipt Action'
-            form.recipientTitle = request.user.profile.compasUser.title
-            form.recipientName = request.user.profile.compasUser.last_name + ', ' + request.user.profile.compasUser.first_name
+            form.recipientTitle = profile.compasUser.title
+            form.recipientName = "%s, %s" % (profile.compasUser.last_name, profile.compasUser.first_name)
             #form.auditComment = 'Receipt Action'
         else:
             form = WaybillRecieptForm( instance = current_wb,
@@ -620,8 +623,8 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
                 'recipientArrivalDate':datetime.date.today(),
                 'recipientStartDischargeDate':datetime.date.today(),
                 'recipientEndDischargeDate':datetime.date.today(),
-                'recipientName':       request.user.profile.compasUser.last_name + ', ' + request.user.profile.compasUser.first_name,
-                'recipientTitle':       request.user.profile.compasUser.title,
+                'recipientName': "%s, %s" % (profile.compasUser.last_name, profile.compasUser.first_name),
+                'recipientTitle': profile.compasUser.title,
                 #'auditComment': 'Receipt Action',
             }
         )
@@ -635,29 +638,31 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
 
 
 @login_required
-def waybill_search( request, template='waybill/list_waybills.html' ):
-    search_string = ''
-    isSuperUser = False
-    try:
-        search_string = request.GET['wbnumber']
-    except:
-        pass
+def waybill_search( request, template='waybill/list_waybills.html', 
+                    param_name='wbnumber', consegnee_code='W200000475' ):
+    
+    search_string = request.GET.get(param_name, '')
 
-    found_wb = Waybill.objects.filter( invalidated = False ).filter( waybillNumber__icontains = search_string )
+    found_wb = Waybill.objects.filter( invalidated=False, waybillNumber__icontains=search_string )
     my_valid_wb = []
-
-    if request.user.profile != '' :
-        for waybill in found_wb:
-            if request.user.profile.isCompasUser or request.user.profile.readerUser or ( request.user.profile.warehouses and waybill.origin_wh_code == request.user.profile.warehouses.origin_wh_code ) or ( request.user.profile.receptionPoints and  waybill.consegnee_code == request.user.profile.receptionPoints.consegnee_code and waybill.destination_loc_name == request.user.profile.receptionPoints.LOC_NAME ) or ( request.user.profile.isAllReceiver and waybill.consegnee_code == 'W200000475' ):
-                my_valid_wb.append( waybill.id )
-
-    if request.user.profile.superUser or request.user.profile.readerUser or request.user.profile.isCompasUser:
-        isSuperUser = True
+    
+    profile = request.user.get_profile()
+    
+    #TODO: Insert all these condition in query set
+    for waybill in found_wb:
+        if profile.isCompasUser or profile.readerUser or (
+            profile.warehouses and waybill.origin_wh_code == profile.warehouses.origin_wh_code 
+        ) or ( 
+            profile.receptionPoints 
+            and waybill.consegnee_code == profile.receptionPoints.consegnee_code 
+            and waybill.destination_loc_name == profile.receptionPoints.LOC_NAME 
+        ) or ( profile.isAllReceiver and waybill.consegnee_code == consegnee_code ):
+            my_valid_wb.append( waybill.id )
 
     return direct_to_template( request, template, {
         'waybill_list': found_wb, 
         'my_wb': my_valid_wb, 
-        'isSuperUser': isSuperUser
+        'isSuperUser': profile.superUser or profile.readerUser or profile.isCompasUser
     })
 
 
@@ -665,13 +670,12 @@ def waybill_search( request, template='waybill/list_waybills.html' ):
 @login_required
 def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
     # TODO: Fix COI_CODE selector possibly with hirarchical list of lti's
-    c_sis = []
     current_lti = LtiOriginal.objects.filter( code = lti_code )
     current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    for lti in current_lti:
-        c_sis.append( lti.si_code )
-
-    #current_stock = EpicStock.in_stock_objects.filter( si_code__in = c_sis ).filter( wh_code = current_lti[0].origin_wh_code )
+    #===================================================================================================================
+    # c_sis = [lti.si_code for lti in current_lti]
+    # current_stock = EpicStock.in_stock_objects.filter( si_code__in = c_sis ).filter( wh_code = current_lti[0].origin_wh_code )
+    #===================================================================================================================
 
     class LoadingDetailDispatchForm( forms.ModelForm ):
         order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
@@ -704,7 +708,10 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
     LDFormSet = inlineformset_factory( Waybill, LoadingDetail, form = LoadingDetailDispatchForm, 
                                        fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, 
                                        extra = 5, max_num = 5 )
+    
     current_wh = ''
+    profile = request.user.get_profile()
+    
     if request.method == 'POST':
         form = WaybillForm( request.POST )
         form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
@@ -717,21 +724,23 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
                 subform.wbNumber = wb_new
                 subform.save()
             wb_new.save()
-            return HttpResponseRedirect( '../viewwb/' + str( wb_new.id ) )
+            return redirect("waybill_view", wb_new.id)
         else:
             print( formset.errors )
             print( form.errors )
             print( formset.non_form_errors )
     else:
-        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name ).filter( organization_id = current_lti[0].consegnee_code )
+        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, 
+                                   organization_id = current_lti[0].consegnee_code )
         if len( qs ) == 0:
             qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
         else:
             current_wh = qs[0]
+            
         form = WaybillForm( 
             initial = {
-                    'dispatcherName':      request.user.profile.compasUser.person_pk,
-                    'dispatcherTitle':      request.user.profile.compasUser.title,
+                    'dispatcherName':      profile.compasUser.person_pk,
+                    'dispatcherTitle':      profile.compasUser.title,
                     'ltiNumber':         current_lti[0].code,
                     'dateOfLoading':     datetime.date.today(),
                     'dateOfDispatch':    datetime.date.today(),
@@ -946,7 +955,7 @@ def viewLogView( request, template='status.html' ):
     return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
 
 def profile( request, template='status.html' ):
-    return direct_to_template(template, {'status': request.user.get_profile()})
+    return direct_to_template(request, template, {'status': request.user.get_profile()})
 
 
 def expand_response(response, **headers):

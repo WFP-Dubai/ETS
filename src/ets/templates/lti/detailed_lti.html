@@ -29,7 +29,7 @@ border-color: black;
 	<tr><td>{% trans "Contractor:" %} {{detailed.0.transport_name}}</td></tr>
 	
 </table>
-<br>{%if user.profile.isDispatcher%}{%if detailed.0.origin_location_code == user.profile.warehouses.origin_location_code%}
+<br>{%if user.get_profile.isDispatcher%}{%if detailed.0.origin_location_code == user.get_profile.warehouses.origin_location_code%}
     {%if moreWBs%}
 <a href='{% url waybillCreate detailed.0.code %}'>{% trans "Create New Waybill" %}</a><br>
 {%endif%}{%endif%}{%endif%}
