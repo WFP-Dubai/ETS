@@ -1,0 +1,34 @@
+{% extends "base_template.html"%}
+{% load i18n %}
+{%block title%}{% trans "Stock List" %}{%endblock%}
+{%block content %}
+<table id='toplist'>
+    <thead>
+        <tr>
+        <th>{% trans "Warehouse" %}</th>
+        <th>{% trans "Commodity" %}</th>
+        <th>{% trans "SI" %}</th>
+        <th>{% trans "Items" %}</th>
+        <th>{% trans "MT Net" %}</th>
+        <th>{% trans "Quality" %}</th></tr>
+        </thead>
+    {% for item in stocklist%}
+   
+         <tr style="{%if item.qualitycode != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
+             <td>{%ifchanged%}{{item.wh_name}}{%endifchanged%}</td>
+             <td>{%ifchanged%}{{item.cmmname}}{%endifchanged%}</td>
+             <td>{%ifchanged%}{{item.si_code}}{%endifchanged%}</td>
+             <td>{{item.number_of_units}}</td>
+             <td>{%if item.packagename == 'BULK'%}{{item.quantity_net}}{%endif%}</td>
+             <th>{%if item.qualitycode != 'G'%}{{item.qualitydescr}}{%endif%}</th>
+             
+         </tr>
+
+    {% endfor%}
+</table>
+<script charset="utf-8">
+$(document).ready(function() {
+                $('#toplist').dataTable();
+} );
+</script>
+{%endblock%}

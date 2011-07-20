@@ -1,0 +1,12 @@
+{% extends "base_template.html"%}
+{%load extra_tags%}
+{%block content %}
+{{status|safe}}
+
+{% endblock content %}
+
+        <script type="text/javascript" >
+            jQuery(function() {
+               jQuery("#id_birthDate").datepicker({ dateFormat: 'dd/mm/yy' });
+            });
+        </script>

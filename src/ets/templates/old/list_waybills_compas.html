@@ -1,0 +1,68 @@
+{% extends "base_template.html"%}
+{% load i18n %}
+{%block content %}
+<h3>{% trans "Submitted Dispatch & Validated Waybills to Compas" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr>
+            <th>{% trans "LTI" %}</th
+            ><th>{% trans "Waybill Number" %}</th>
+            <th>{% trans "Origin" %}</th>
+            <th>{% trans "Consignee" %}</th>
+            <th>{% trans "Delivery Location" %}</th>
+            <th>{% trans "Dispatch" %}</th>
+            <th>{% trans "Validated" %}</th>
+            <th>{% trans "Received" %}</th>
+            <th>{% trans "Validated" %}</th>
+            <th>{% trans "Compas Updated" %}</th>
+            <th> </th>
+        </tr>
+        </thead>
+{% for waybill in waybill_list%}
+
+<tr>
+             <td>{{waybill.ltiNumber}}</td>
+             <td>{{waybill.waybillNumber}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
+             <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
+             <td>{%if waybill.dispatcherSigned%}{{waybill.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
+             <td>{%if waybill.waybillValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
+             <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
+             <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
+              <td>{%if waybill.waybillSentToCompas%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%} </td>
+             <td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{% url waybill_view waybill.id %}'>{% trans "View Dispatch" %}</a>{%endif%}
+                     {%if profile.isReciever or profile.isCompasUser%} <a href='{% url waybill_view_reception waybill.id %}'>{% trans "View Reciept" %}</a>{%endif%}
+                     {%if profile.isCompasUser%} <a href='{% url waybill_view_reception waybill.id %}'>{% trans "View Full" %}</a>{%endif%}
+             </td>
+    </tr>x
+{% endfor%}
+</table>
+<br/>
+{%if error_message %}
+<pre>
+<br>
+<div>{{error_message}}</div>
+{%endif%}
+<br>
+{%endblock%}
+
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+                $('#example').dataTable( {                "aoColumns": [ 
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "bSearchable": false},
+        ] });
+} );
+</script>
+{%endblock extra-header%}
