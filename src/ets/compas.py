@@ -1,4 +1,3 @@
-import cx_Oracle
 import datetime #@Reimport 
 
 from django.conf import settings #@Reimport
@@ -9,14 +8,14 @@ from ets import models as ets_models
 from ets.tools import removeNonAsciiChars
 
 class compas_write:
+    
     ErrorMessages = ''
     ErrorCodes = ''
     ConnectionString = settings.DATABASES[u'compas'][u'USER'] + '/' + settings.DATABASES[u'compas'][u'PASSWORD'] + u'@//' + settings.DATABASES[u'compas'][u'HOST'] + u':1521/' + settings.COMPAS_STATION
 
 
-
-
     def write_dispatch_waybill_compas( self, waybill_id ):
+        import cx_Oracle
         try:
             db = cx_Oracle.Connection( self.ConnectionString )
             cursor = db.cursor()
@@ -185,6 +184,7 @@ class compas_write:
 
 
     def write_receipt_waybill_compas( self, waybill_id ):
+        import cx_Oracle
         try:
             db = cx_Oracle.Connection( self.ConnectionString )
             cursor = db.cursor()

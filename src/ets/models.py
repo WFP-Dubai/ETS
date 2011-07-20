@@ -27,7 +27,7 @@ class Place( models.Model ):
     """
     Location model.
     
-    >>> place = Place.objects.get_or_create(org_code="test", name="The best place in the world", 
+    >>> place, c = Place.objects.get_or_create(org_code="test", name="The best place in the world", 
     ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
     ...                      reporting_code="SOME_CODE", )
     >>> place

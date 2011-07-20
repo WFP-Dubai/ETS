@@ -3,8 +3,8 @@ import ets.models
 from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.admin import UserAdmin
-from django.utils.functional import curry
-from django.utils.translation import ugettext_lazy as _
+#from django.utils.functional import curry
+#from django.utils.translation import ugettext_lazy as _
 
 class UserProfileInline( admin.StackedInline ):
     model = ets.models.UserProfile
@@ -18,6 +18,7 @@ class UserProfileInline( admin.StackedInline ):
             if db_field.name == "receptionPoints":
                 kwargs["queryset"] = ets.models.ReceptionPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
             return super( UserProfileInline, self ).formfield_for_foreignkey( db_field, request, **kwargs )
+    
     def get_formset( self, request, obj = None, **kwargs ):
         if  obj:
             self.extra = 1
