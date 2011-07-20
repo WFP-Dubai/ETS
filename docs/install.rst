@@ -55,6 +55,9 @@ Production server
 Oracle client
 -------------
 
+Mac OS X
+~~~~~~~~
+
 1. Download following packages::
 
   http://download.oracle.com/otn/mac/instantclient/10204/instantclient-basic-10.2.0.4.0-macosx-x64.zip
