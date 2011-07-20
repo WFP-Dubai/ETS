@@ -18,3 +18,6 @@ TEMPLATE_LOADERS = (
     'django.template.loaders.eggs.Loader',
   ),
 )
+
+DISABLE_EXPIERED_LTI = DEBUG
+TEMPLATE_DEBUG = DEBUG

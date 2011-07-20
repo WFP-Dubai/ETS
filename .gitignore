@@ -6,6 +6,7 @@
 
 #local settings
 ets/settings/local.py
+src/ets/settings/local.py
 
 #Eclipse's specific
 .project

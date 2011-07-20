@@ -26,7 +26,7 @@ from ets.tools import restant_si
 from ets.tools import import_setup, import_lti, track_compas_update
 from ets.tools import un64unZip, viewLog 
 from ets.tools import serialized_all_items
-from django.utils.translation import ungettext as _
+from django.utils.translation import ugettext as _
 
 
 def prep_req( request ):
@@ -140,7 +140,7 @@ def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
         if item.items_left > 0:
             lti_more_wb = True
     
-    return direct_to_template( template, {
+    return direct_to_template( request,template, {
         'detailed': detailed_lti, 
         'lti_id': lti_code, 
         'listOfWaybills': listOfWaybills, 
@@ -166,7 +166,7 @@ def dispatch( request ):
 # @login_required
 # def waybill_create( request, lti_pk, queryset=LtiOriginal.objects.all(), template='detailed_waybill.html' ):
 #    try:
-#        return direct_to_template( template, {
+#        return direct_to_template( request, template, {
 #            'detailed': queryset.get( lti_pk = lti_pk ), 
 #            'lti_id': lti_pk,
 #        })
@@ -305,7 +305,7 @@ def singleWBReceiptToCompas( request, wb_id, queryset=Waybill.objects.all(), tem
         error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
     
     # add field to say compas error/add logging Change to use messages....
-    return direct_to_template( template, {
+    return direct_to_template( request,template, {
         'waybill': waybill,
         'error_message': error_message,
         'error_codes': error_codes,
@@ -329,7 +329,7 @@ def receiptToCompas( request, template='compas/list_waybills_compas_received.htm
             error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
             error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
     
-    return direct_to_template( template, {
+    return direct_to_template( request,template, {
         'waybill_list': list_waybills, 
         'error_message': error_message, 
         'error_codes': error_codes,
@@ -340,7 +340,7 @@ def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template
     #first mark waybill invalidate, then zero the stock usage for each line and update the si table
     current_wb = get_object_or_404(queryset, id = wb_id )
     current_wb.invalidate_waybill_action()
-    return direct_to_template( template, {'status': 'Waybill %s has now been Removed' % current_wb.waybillNumber})
+    return direct_to_template( request,template, {'status': 'Waybill %s has now been Removed' % current_wb.waybillNumber})
 
 
 #=======================================================================================================================
@@ -385,14 +385,14 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
     comm_cats = [item.comm_category_code for item in current_lti if item]
     
     class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField(_("order item"), queryset = current_items, label = 'Commodity' )
+        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
         numberUnitsLoaded = forms.CharField(_("number of units loaded"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
 
-        unitsLostReason = LRModelChoiceField(_("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
+        unitsLostReason = LRModelChoiceField(label = _("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
+        unitsDamagedReason = LRModelChoiceField(label = _("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
 
         class Meta:
             model = LoadingDetail
@@ -423,7 +423,7 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
 
         formset = LDFormSet( instance = current_wb )
     
-    return direct_to_template( template, {
+    return direct_to_template( request,template, {
         'form': form, 'lti_list': current_lti, 
         'formset': formset, 'audit': current_audit
     })
@@ -453,7 +453,7 @@ def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='wayb
         print e
         return redirect( "select_action" )
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'object': waybill_instance,
         'LtiOriginal': lti_detail_items,
         'disp_person': disp_person_object,
@@ -484,7 +484,7 @@ def waybill_view_reception( request, wb_id, template='waybill/print/waybill_deta
     except:
         pass
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'object': waybill_instance,
         'LtiOriginal': lti_detail_items,
         'disp_person': disp_person_object,
@@ -517,7 +517,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             return cause
     
     class LoadingDetailRecForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField(_("order item"), queryset = current_items, label = 'Commodity' )
+        order_item = forms.ModelChoiceField(queryset = current_items, label = 'Commodity' )
         for itm in ModelChoiceIterator( order_item ):
             print itm
         numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
@@ -526,8 +526,8 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
         comm_cats = []
         for item in  current_items :
             comm_cats.append( item.lti_line.comm_category_code )
-        unitsLostReason = LRModelChoiceField(_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
+        unitsLostReason = LRModelChoiceField(label =_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
+        unitsDamagedReason = LRModelChoiceField(label =_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
         class Meta:
             model = LoadingDetail
             fields = ( 'wbNumber', 'order_item', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason',
@@ -627,7 +627,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
         )
         formset = LDFormSet( instance = current_wb )
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'form': form, 
         'lti_list': current_lti, 
         'formset': formset
@@ -654,7 +654,7 @@ def waybill_search( request, template='waybill/list_waybills.html' ):
     if request.user.profile.superUser or request.user.profile.readerUser or request.user.profile.isCompasUser:
         isSuperUser = True
 
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'waybill_list': found_wb, 
         'my_wb': my_valid_wb, 
         'isSuperUser': isSuperUser
@@ -746,7 +746,7 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
         form.fields["destinationWarehouse"].queryset = qs
 
         formset = LDFormSet()
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'form': form, 
         'lti_list':current_lti, 
         'formset':formset
@@ -802,7 +802,7 @@ def waybill_edit( request, wb_id, template='waybill/createWaybill.html' ):
         form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
         formset = LDFormSet( instance = current_wb )
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'form': form, 
         'lti_list':current_lti, 
         'formset':formset
@@ -848,7 +848,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
     waybills = Waybill.objects.filter( invalidated = False, waybillValidated = False, dispatcherSigned = True )
     formset = ValidateFormset( queryset = waybills )
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'formset': formset, 
         'validatedWB': validatedWB
     })
@@ -881,7 +881,7 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
     waybills = Waybill.objects.filter( invalidated = False ).filter( waybillReceiptValidated = False ).filter( recipientSigned = True ).filter( waybillValidated = True )
     formset = ValidateFormset( queryset = waybills )
 
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'formset': formset, 
         'validatedWB': validatedWB
     })
@@ -892,7 +892,7 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
 def serialize( request, wb_code, template='blank.html', queryset=Waybill.objects.all() ):
     waybill = get_object_or_404(queryset, id = wb_code )
     
-    return direct_to_template( template, {
+    return direct_to_template( request, template, {
         'status': waybill.serialize(), 
         'ziped': waybill.compress(), 
         'wb_code': wb_code,
@@ -943,7 +943,7 @@ def deserialize( request ):
 #=======================================================================================================================
 
 def viewLogView( request, template='status.html' ):
-    return direct_to_template( template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
+    return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
 
 def profile( request, template='status.html' ):
     return direct_to_template(template, {'status': request.user.get_profile()})
@@ -986,7 +986,7 @@ def dispatch_report_wh( request, wh, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
 
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'),
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'),
                            **{'Content-Disposition': 'attachment; filename=list-%s-%s.csv' % (wh, datetime.date.today())})
 
 
@@ -1004,7 +1004,7 @@ def receipt_report_wh( request, loc, cons, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
     
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'),
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'),
                            **{'Content-Disposition': 'attachment; filename=receipt-%s-%s.csv' % (loc, datetime.date.today())})
     
 
@@ -1022,7 +1022,7 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
 
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'))
+    return expand_response(direct_to_template(request,template, {'ltis': listIt}, mimetype = 'text/csv'))
 
 
 #=======================================================================================================================
