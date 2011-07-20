@@ -1,0 +1,34 @@
+{% extends "base_template.html"%}
+{% load i18n %}
+{%block content %}
+<h3>{% trans "LTIs" %}</h3>
+    <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+    <thead>
+        <tr>
+        <th>{% trans "LTI" %}</th>
+        <th>{% trans "Date" %}</th>
+        <th>{% trans "Origin" %}</th>
+        <th>{% trans "Destination" %}</th>
+        <th>{% trans "Dest Location" %}</th>
+        <th>{% trans "Action" %}</th>
+        </tr>
+        </thead>
+{% for lti in ltis%}
+    <tr>
+        <td>{{lti.code}}</td><td>{{lti.lti_date}}</td><td>{{lti.origin_loc_name}}</td>
+        <td>{{lti.destination_loc_name}}</td>
+        <td>{{lti.consegnee_name}}</td>
+        <td><a href='{% url lti_detail_url lti.code %}'>{% trans "select" %}</a>
+        </td>
+    </tr>
+{% endfor%}
+
+    </table>
+{%endblock%}
+{%block extra-header%}
+<script charset="utf-8">
+$(document).ready(function() {
+                $('#example').dataTable();
+} );
+</script>
+{%endblock extra-header%}
