@@ -166,10 +166,8 @@ class compas_write:
                 return False
             else:
                 print 'Issue with data1'
-                
                 the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
                 self.ErrorMessages = _("Problem with data of Waybill  %(waybill)s: %(errorcode)s \n") % {"waybill": the_waybill,"errorcode": errorObj.code }
-
                 return False
         except Exception as e:
             print 'Issue with data2'

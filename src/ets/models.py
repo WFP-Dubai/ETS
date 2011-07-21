@@ -108,7 +108,7 @@ class Waybill( models.Model ):
                 )
 
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
-    waybillNumber = models.CharField(_("Way bill number"), max_length = 20 )
+    waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
     dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
     dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
     transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
@@ -133,23 +133,23 @@ class Waybill( models.Model ):
     transportDeliverySignedTimestamp = models.DateTimeField( _("Transport Delivery Signed Timestamp"),null = True, blank = True )
 
     #Container        
-    containerOneNumber = models.CharField(_("Container OneNumber"), max_length = 40, blank = True )
-    containerTwoNumber = models.CharField( _("Container TwoNumber"), max_length = 40, blank = True )
-    containerOneSealNumber = models.CharField(_("Container OneSeal Number"), max_length = 40, blank = True )
-    containerTwoSealNumber = models.CharField(_("Container TwoSeal Number"), max_length = 40, blank = True )
-    containerOneRemarksDispatch = models.CharField( _("Container OneRemarks Dispatch"), max_length = 40, blank = True )
-    containerTwoRemarksDispatch = models.CharField( _("Container TwoRemarks Dispatch"), max_length = 40, blank = True )
-    containerOneRemarksReciept = models.CharField( _("Container OneRemarks Reciept"), max_length = 40, blank = True )
-    containerTwoRemarksReciept = models.CharField(_("Container TwoRemarks Reciept"), max_length = 40, blank = True )
+    containerOneNumber = models.CharField(_("Container One Number"), max_length = 40, blank = True )
+    containerTwoNumber = models.CharField( _("Container Two Number"), max_length = 40, blank = True )
+    containerOneSealNumber = models.CharField(_("Container One Seal Number"), max_length = 40, blank = True )
+    containerTwoSealNumber = models.CharField(_("Container Two Seal Number"), max_length = 40, blank = True )
+    containerOneRemarksDispatch = models.CharField( _("Container One Remarks Dispatch"), max_length = 40, blank = True )
+    containerTwoRemarksDispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length = 40, blank = True )
+    containerOneRemarksReciept = models.CharField( _("Container One Remarks Reciept"), max_length = 40, blank = True )
+    containerTwoRemarksReciept = models.CharField(_("Container Two Remarks Reciept"), max_length = 40, blank = True )
 
     #Receiver
     recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True )
     recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
     recipientName = models.CharField( _("Recipient Name"), max_length = 100, blank = True )
     recipientTitle = models.CharField(_("Recipient Title "), max_length = 100, blank = True )
-    recipientArrivalDate = models.DateField( _("Recipient ArrivalDate"), null = True, blank = True )
-    recipientStartDischargeDate = models.DateField( _("Recipient Start DischargeDate"), null = True, blank = True )
-    recipientEndDischargeDate = models.DateField( _("Recipient End DischargeDate"), null = True, blank = True )
+    recipientArrivalDate = models.DateField( _("Recipient Arrival Date"), null = True, blank = True )
+    recipientStartDischargeDate = models.DateField( _("Recipient Start Discharge Date"), null = True, blank = True )
+    recipientEndDischargeDate = models.DateField( _("Recipient End Discharge Date"), null = True, blank = True )
     recipientDistance = models.IntegerField(_("Recipient Distance"), blank = True, null = True )
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
@@ -159,9 +159,9 @@ class Waybill( models.Model ):
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
     waybillReceiptValidated = models.BooleanField( _("Waybill Receipt Validated"))
-    waybillSentToCompas = models.BooleanField(_("Waybill SentToCompas"))
-    waybillRecSentToCompas = models.BooleanField(_("Waybill RecSentToCompas"))
-    waybillProcessedForPayment = models.BooleanField(_("Waybill Processed ForPayment"))
+    waybillSentToCompas = models.BooleanField(_("Waybill Sent To Compas"))
+    waybillRecSentToCompas = models.BooleanField(_("Waybill Reciept Sent to Compas"))
+    waybillProcessedForPayment = models.BooleanField(_("Waybill Processed For Payment"))
     invalidated = models.BooleanField(_("Invalidated"))
     auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
     
@@ -655,7 +655,7 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("WB Number"))
+    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"))
     order_item = models.ForeignKey( LtiWithStock,verbose_name =_("Order item") )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
     numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
@@ -666,8 +666,8 @@ class LoadingDetail( models.Model ):
     unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),related_name = 'LD_DamagedType', blank = True, null = True )
     unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), related_name = 'LD_LossType', blank = True, null = True )
     overloadedUnits = models.BooleanField(_("overloaded Units"))
-    loadingDetailSentToCompas = models.BooleanField(_("loading Detail SentTo Compas "))
-    overOffloadUnits = models.BooleanField(_("over Off load Units"))
+    loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "))
+    overOffloadUnits = models.BooleanField(_("over offloaded Units"))
 
     audit_log = AuditLog()
 
@@ -829,7 +829,7 @@ class CompasLogger( models.Model ):
     action = models.CharField(_("Action"), max_length = 50, blank = True )
     errorRec = models.CharField(_("Error Record"), max_length = 2000, blank = True )
     errorDisp = models.CharField(_("Error Disp"), max_length = 2000, blank = True )
-    wb = models.ForeignKey( Waybill, verbose_name=_("Way Bill"), blank = True, primary_key = True )
+    wb = models.ForeignKey( Waybill, verbose_name=_("Waybill"), blank = True, primary_key = True )
     lti = models.CharField(_("LTI"), max_length = 50, blank = True )
     data_in = models.CharField(_("Data in"), max_length = 5000, blank = True )
     data_out = models.CharField(_("Data out"), max_length = 5000, blank = True )
