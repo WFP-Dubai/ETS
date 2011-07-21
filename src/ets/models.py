@@ -446,7 +446,7 @@ class LtiOriginal( models.Model ):
 
     def restore_si( self, units ):
         self.sitracker.update_units_restore( units )
-        return self.items_left()
+        return self.items_left
 
     def packaging( self ):
         pack = 'Unknown'
@@ -800,7 +800,7 @@ post_save.connect(create_user_profile, sender=User)
 
 
 class SiTracker( models.Model ):
-    LTI = models.OneToOneField(LtiOriginal, verbose_name=_("LTI"), primary_key = True )
+    LTI = models.OneToOneField(LtiOriginal, verbose_name=_("LTI"), primary_key = True, related_name="sitracker" )
     number_units_left = models.DecimalField(_("Number units left"), decimal_places = 3, max_digits = 10 )
     number_units_start = models.DecimalField(_("Number units start"), decimal_places = 3, max_digits = 10 )
 

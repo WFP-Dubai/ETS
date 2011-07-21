@@ -341,7 +341,9 @@ def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template
     #first mark waybill invalidate, then zero the stock usage for each line and update the si table
     current_wb = get_object_or_404(queryset, id = wb_id )
     current_wb.invalidate_waybill_action()
-    return direct_to_template( request,template, {'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}})
+    return direct_to_template( request, template, {
+        'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
+    })
 
 
 #=======================================================================================================================
