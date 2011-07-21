@@ -63,6 +63,7 @@ def do_print_tag( parser, token ):
 
 class PrintTagNode( template.Node ):
     def render( self, context ):
+        #TODO: remove such try...except and prints
         try:
             logfile = 'tagfile.tag'
             FILE = open( logfile )

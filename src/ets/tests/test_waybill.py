@@ -10,7 +10,7 @@ from django.http import HttpResponseNotAllowed
 from django.utils.datastructures import MultiValueDictKeyError 
 from django.contrib.auth.forms import AuthenticationForm
 
-from ..models import Waybill, LtiOriginal
+from ..models import Waybill, LtiOriginal, EpicStock, DispatchPoint
 from ..forms import WaybillRecieptForm, WaybillForm
 
 class UnathenticatedTestCase(TestCase):
@@ -58,6 +58,8 @@ class ClientWaybillTestCase(TestCase):
         self.user = User.objects.get(username="admin")
         self.waybill = Waybill.objects.get(pk=1)
         self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
+        self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
+        self.dispatch_point = DispatchPoint.objects.get(pk=1)
      
     #===================================================================================================================
     # def tearDown(self):
@@ -150,15 +152,17 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_finalize_receipt', args=(self.waybill.pk,)))
         self.assertEqual(response.status_code, 302) 
              
-    def test_singleWBDispatchToCompas(self):
-        """ets.views.singleWBDispatchToCompas"""
-        response = self.client.get(reverse('singleWBDispatchToCompas', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 302) 
-        
-    def test_singleWBReceiptToCompas(self):
-        """ets.views.singleWBReceiptToCompas"""
-        response = self.client.get(reverse('singleWBReceiptToCompas', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
+    # def test_singleWBDispatchToCompas(self):
+    #    """ets.views.singleWBDispatchToCompas"""
+    #    response = self.client.get(reverse('singleWBDispatchToCompas', args=(self.waybill.pk,)))
+    #    self.assertEqual(response.status_code, 302) 
+    #    
+    # def test_singleWBReceiptToCompas(self):
+    #    """ets.views.singleWBReceiptToCompas"""
+    #    response = self.client.get(reverse('singleWBReceiptToCompas', args=(self.waybill.pk,)))
+    #    self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
         
     def test_receiptToCompas(self):
         """ets.views.receiptToCompas"""
@@ -244,23 +248,23 @@ class ClientWaybillTestCase(TestCase):
         
     def test_get_synchronize_stock(self):
         """ets.views.get_synchronize_stock"""
-        response = self.client.get(reverse('get_synchronize_stock'))
+        response = self.client.get(reverse('get_synchronize_stock', args=(self.stock.wh_code,)))
         self.assertEqual(response.status_code, 200)  
         
     def test_get_synchronize_lti(self):
         """ets.views.get_synchronize_lti"""
-        response = self.client.get(reverse('get_synchronize_lti'))
+        response = self.client.get(reverse('get_synchronize_lti', args=(self.lti.origin_wh_code,)))
         self.assertEqual(response.status_code, 200) 
          
     def test_get_wb_stock(self):
         """ets.views.get_wb_stock"""
-        response = self.client.get(reverse('get_wb_stock'))
+        response = self.client.get(reverse('get_wb_stock'), data={'warehouse': self.dispatch_point.pk})
         self.assertEqual(response.status_code, 200)  
         
     def test_get_synchronize_waybill(self):
         """ets.views.get_synchronize_waybill"""
-        response = self.client.get(reverse('get_synchronize_waybill'))
-        self.assertEqual(response.status_code, 200)  
+        response = self.client.get(reverse('get_synchronize_waybill', args=(self.waybill.destinationWarehouse.pk,)))
+        self.assertEqual(response.status_code, 200)
         
         
     def test_get_synchronize_waybill2(self):

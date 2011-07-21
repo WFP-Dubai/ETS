@@ -91,11 +91,11 @@ urlpatterns = patterns("ets.views",
     
     # download services
     ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),
-    ( r'^waybill/synchro/download/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
+    ( r'^waybill/synchro/download/([-\w]+)/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
     ( r'^waybill/synchro/download2/', "get_synchronize_waybill2", {}, "get_synchronize_waybill2" ),
 
-    ( r'^stock/synchro/download/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
-    ( r'^lti/synchro/download/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
+    ( r'^stock/synchro/download/([-\w]+)/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
+    ( r'^lti/synchro/download/([-\w]+)/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
     # Additional data
     ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
     ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
