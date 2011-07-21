@@ -9,7 +9,7 @@ from django.contrib.auth.models import User
 
 from django.contrib.auth.forms import AuthenticationForm
 
-from ..models import Waybill, LtiOriginal, EpicStock
+from ..models import Waybill, LtiOriginal, EpicStock, DispatchPoint
 from ..forms import WaybillRecieptForm, WaybillForm
 
 class UnathenticatedTestCase(TestCase):
@@ -58,6 +58,7 @@ class ClientWaybillTestCase(TestCase):
         self.waybill = Waybill.objects.get(pk=1)
         self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
+        self.dispatch_point = DispatchPoint.objects.get(pk=1)
      
     #===================================================================================================================
     # def tearDown(self):
@@ -249,7 +250,7 @@ class ClientWaybillTestCase(TestCase):
          
     def test_get_wb_stock(self):
         """ets.views.get_wb_stock"""
-        response = self.client.get(reverse('get_wb_stock'))
+        response = self.client.get(reverse('get_wb_stock', args=(self.dispatch_point.pk,)))
         self.assertEqual(response.status_code, 200)  
         
     def test_get_synchronize_waybill(self):

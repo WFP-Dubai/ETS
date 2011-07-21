@@ -1161,8 +1161,8 @@ def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.a
                         content_type="application/json; charset=utf-8")
     
 
-def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
-    warehouse = get_object_or_404(queryset, pk = request.GET['warehouse'])
+def get_wb_stock( request, warehouse_pk, queryset=DispatchPoint.objects.all() ):
+    warehouse = get_object_or_404(queryset, pk = warehouse_pk)
     filename = 'stock-data-%s-%s-%s.json' % (warehouse.origin_wh_code, settings.COMPAS_STATION, datetime.date.today())
     
     return expand_response(HttpResponse(warehouse.serialize(), content_type="application/json; charset=utf-8"),
