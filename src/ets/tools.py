@@ -644,3 +644,11 @@ def sync_lti_stock():
 # def coi_for_lti_code( lti_code ):
 #    return LtiWithStock.objects.filter( lti_code = lti_code )
 #=======================================================================================================================
+
+def default_json_dump(obj):
+    if hasattr(obj, 'isoformat'):
+        return obj.isoformat()
+#    elif isinstance(obj, ...):
+#        return ...
+    else:
+        raise TypeError, 'Object of type %s with value of %s is not JSON serializable' % (type(obj), repr(obj))

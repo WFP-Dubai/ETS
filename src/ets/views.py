@@ -16,6 +16,7 @@ from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
 from django.contrib import messages
 from django.views.decorators.http import require_POST
+from django.utils.translation import ugettext as _
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
@@ -25,9 +26,8 @@ from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
 from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
 from ets.tools import restant_si 
 from ets.tools import import_setup, import_lti, track_compas_update
-from ets.tools import un64unZip, viewLog 
+from ets.tools import un64unZip, viewLog, default_json_dump
 from ets.tools import serialized_all_items
-from django.utils.translation import ugettext as _
 
 
 def prep_req( request ):
@@ -1144,20 +1144,20 @@ def get_synchronize_stock( request ):
 
 
 @csrf_exempt
-def get_synchronize_lti( request ):
+def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
     '''
     This method is called by the offline application.
     The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
     '''
 
-    warehouse_code = request.GET['warehouse_code']
+    #warehouse_code = request.GET['warehouse_code']
 
 #        from waybill.models import LtiOriginal    
-    ltis_list = LtiOriginal.objects.filter( origin_wh_code = warehouse_code )
+    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
 
     #from kiowa.db.utils import instance_as_dict
 
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True), 
+    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
                         content_type="application/json; charset=utf-8")
     
 
