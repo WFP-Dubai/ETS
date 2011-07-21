@@ -109,7 +109,8 @@ urlpatterns += patterns('',
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
     ( r'^rosetta/', include('rosetta.urls') ),
-    ( r'^admin/', include( admin.site.urls ) ),                    
+    ( r'^admin/', include( admin.site.urls ) ),
+    (r'^api/', include('ets.api.urls')),                    
 )
 
 if settings.DEBUG:
