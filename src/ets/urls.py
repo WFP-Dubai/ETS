@@ -32,10 +32,10 @@ urlpatterns = patterns("ets.views",
         'template': 'select_action.html',
     }, "select_action" ),
     
-    ( r'^waybill/viewlog/', "viewLogView" ),
+    ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
-    ( r'^waybill/dispatch/$', "dispatch" ),
+    ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(.*)/$', "waybill_edit", {}, "waybill_edit" ),
     ( r'^waybill/edit/$', "waybill_edit" ),
     ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
@@ -61,9 +61,9 @@ urlpatterns = patterns("ets.views",
     #===================================================================================================================
     ( r'^waybill/viewwb_reception/(.*)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
     ( r'^waybill/viewwb/(.*)/$', "waybill_view", {}, "waybill_view" ),
-    ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas" ),
-    ( r'^waybill/commit_to_compas_dispatch_one/(.*)/$', "singleWBDispatchToCompas" ),
-    ( r'^waybill/commit_to_compas_receipt_one/(.*)/$', "singleWBReceiptToCompas" ),
+    ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
+    ( r'^waybill/commit_to_compas_dispatch_one/(.*)/$', "singleWBDispatchToCompas", {}, "singleWBDispatchToCompas" ),
+    ( r'^waybill/commit_to_compas_receipt_one/(.*)/$', "singleWBReceiptToCompas", {}, "singleWBReceiptToCompas" ),
     #===================================================================================================================
     # ( r'^waybill/reset_waybill/$', waybill_search),
     #===================================================================================================================
@@ -86,22 +86,22 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/report/dispatch/(.*)/$', "dispatch_report_wh",{},"dispatch_report_wh" ),
     ( r'^waybill/report/receipt/(.*)/(.*)/$', "receipt_report_wh", {}, "receipt_report_wh" ),
     ( r'^waybill/report/receipt/(.*)/$', "receipt_report_cons", {}, "receipt_report_cons" ),
-    ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr" ),
-    ( r'^waybill/synchro/upload/', "post_synchronize_waybill" ),
+    ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
+    ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     
     # download services
     ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),
-    ( r'^waybill/synchro/download/', "get_synchronize_waybill" ),
-    ( r'^waybill/synchro/download2/', "get_synchronize_waybill2" ),
+    ( r'^waybill/synchro/download/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
+    ( r'^waybill/synchro/download2/', "get_synchronize_waybill2", {}, "get_synchronize_waybill2" ),
 
-    ( r'^stock/synchro/download/', "get_synchronize_stock" ),
-    ( r'^lti/synchro/download/', "get_synchronize_lti" ),
+    ( r'^stock/synchro/download/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
+    ( r'^lti/synchro/download/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
     # Additional data
     ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
-    ( r'^all/synchro/download/', "get_all_data" ),
+    ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
     ( r'^all/download/stock_ets/', "get_wb_stock", {}, "get_wb_stock" ),
     
-    ( r'^accounts/profile', "profile" ),
+    ( r'^accounts/profile', "profile", {}, "profile" ),
     
 )
 
