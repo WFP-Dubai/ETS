@@ -184,7 +184,6 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_validate_receipt_form'))
         self.assertEqual(response.status_code, 200)     
         
-        
     def test_deserialize(self):
         """ets.views.deserialize"""
         #Test with get request
@@ -195,7 +194,9 @@ class ClientWaybillTestCase(TestCase):
         self.assertRaises(MultiValueDictKeyError, lambda: self.client.post(reverse('deserialize')))
         
         #Test with post parameters
-        response_par = self.client.post(reverse('deserialize'), data={'wbdata': self.waybill.pk,})        
+        data = self.waybill.serialize()
+        response = self.client.post(reverse('deserialize'), data={'wbdata': data,})
+        self.assertEqual(response.status_code, 302)
         
     def test_viewLogView(self):
         """ets.views.viewLogView"""
