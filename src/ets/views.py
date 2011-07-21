@@ -1180,19 +1180,19 @@ def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
 
 
 @csrf_exempt
-def get_synchronize_waybill( request ):
+def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
     '''
     This method is called by the offline application.
     The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
     '''
 
-    warehouse_code = request.GET['warehouse_code']
+    #warehouse_code = request.GET['']
 
     #from waybill.models import Waybill    
-    waybills_list = Waybill.objects.filter( destinationWarehouse__pk = warehouse_code )
+    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
     #from kiowa.db.utils import instance_as_dict
     
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True), 
+    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
                         content_type="application/json; charset=utf-8")
     
 

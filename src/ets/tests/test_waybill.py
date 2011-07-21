@@ -254,8 +254,8 @@ class ClientWaybillTestCase(TestCase):
         
     def test_get_synchronize_waybill(self):
         """ets.views.get_synchronize_waybill"""
-        response = self.client.get(reverse('get_synchronize_waybill'))
-        self.assertEqual(response.status_code, 200)  
+        response = self.client.get(reverse('get_synchronize_waybill', args=(self.waybill.destinationWarehouse.pk,)))
+        self.assertEqual(response.status_code, 200)
         
         
     def test_get_synchronize_waybill2(self):
