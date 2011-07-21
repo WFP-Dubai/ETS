@@ -250,7 +250,7 @@ class ClientWaybillTestCase(TestCase):
          
     def test_get_wb_stock(self):
         """ets.views.get_wb_stock"""
-        response = self.client.get(reverse('get_wb_stock', args=(self.dispatch_point.pk,)))
+        response = self.client.get(reverse('get_wb_stock'), data={'warehouse': self.dispatch_point.pk})
         self.assertEqual(response.status_code, 200)  
         
     def test_get_synchronize_waybill(self):

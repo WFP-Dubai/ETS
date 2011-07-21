@@ -99,7 +99,7 @@ urlpatterns = patterns("ets.views",
     # Additional data
     ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
     ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
-    ( r'^all/download/stock_ets/([-\w]+)/', "get_wb_stock", {}, "get_wb_stock" ),
+    ( r'^all/download/stock_ets/', "get_wb_stock", {}, "get_wb_stock" ),
     
     ( r'^accounts/profile', "profile", {}, "profile" ),
     

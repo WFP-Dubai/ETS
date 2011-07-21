@@ -982,7 +982,7 @@ def ltis_report( request, template='reporting/list_ltis.txt' ):
             myList = ['', line.lti_line]
             listIt.append( myList )
 
-    return expand_response(direct_to_template(template, {'ltis': listIt}, mimetype = 'text/csv'),
+    return expand_response(direct_to_template(request, template, {'ltis': listIt}, mimetype = 'text/csv'),
                            **{'Content-Disposition': 'attachment; filename=list-%s.csv' % datetime.date.today()})
 
 def dispatch_report_wh( request, wh, template='reporting/list_ltis.txt' ):
@@ -1163,8 +1163,8 @@ def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.a
                         content_type="application/json; charset=utf-8")
     
 
-def get_wb_stock( request, warehouse_pk, queryset=DispatchPoint.objects.all() ):
-    warehouse = get_object_or_404(queryset, pk = warehouse_pk)
+def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
+    warehouse = get_object_or_404(queryset, pk = request.REQUEST['warehouse'])
     filename = 'stock-data-%s-%s-%s.json' % (warehouse.origin_wh_code, settings.COMPAS_STATION, datetime.date.today())
     
     return expand_response(HttpResponse(warehouse.serialize(), content_type="application/json; charset=utf-8"),

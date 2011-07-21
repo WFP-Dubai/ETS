@@ -37,9 +37,11 @@ def track_compas_update(file_name = 'tagfile.tag'):
 #=======================================================================================================================
 
 def viewLog(logfile = 'logg.txt'):
-    with open( logfile, "r" ) as f:
-        return f.read()
-
+    try:
+        with open( logfile, "r" ) as f:
+            return f.read()
+    except IOError, msg:
+        return msg
 
 #=======================================================================================================================
 # def printlistitem( list, index ):
