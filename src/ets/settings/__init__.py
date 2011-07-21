@@ -14,7 +14,7 @@ try:
         '/Users/carlander/projects/epic/ets': 'tobymp',
     }
     config_module = __import__( '%s' % configs[current_server], globals(), locals(), 'ets' )
-    print config_module
+    #print config_module
     for setting in dir( config_module ):
         if setting == setting.upper():
             locals()[setting] = getattr( config_module, setting )

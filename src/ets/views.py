@@ -109,15 +109,15 @@ def import_ltis( request ):
     add tag to say when last done
     """
 
-    print 'Import Persons'
+    #print 'Import Persons'
     EpicPerson.update()
-    print 'Import GEO'
+    #print 'Import GEO'
     Place.update()
-    print 'Import Stock'
+    #print 'Import Stock'
     EpicStock.update()
-    print 'Import Setup'
+    #print 'Import Setup'
     import_setup()
-    print 'Import LTIs'
+    #print 'Import LTIs'
     import_lti()
     status = 'Import Finished'
     track_compas_update()
@@ -438,6 +438,7 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
 @login_required
 def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='waybill/print/waybill_detail_view.html' ):
     ## TODO: remove dependency of zippedWB
+    #TODO: remove these try...except blocks
     try:
         waybill_instance = queryset.get(id = wb_id)
         extra_lines = 5 - waybill_instance.loadingdetail_set.select_related().count()
@@ -522,8 +523,10 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
     
     class LoadingDetailRecForm( forms.ModelForm ):
         order_item = forms.ModelChoiceField(queryset = current_items, label = 'Commodity' )
-        for itm in ModelChoiceIterator( order_item ):
-            print itm
+        #===============================================================================================================
+        # for itm in ModelChoiceIterator( order_item ):
+        #    print itm
+        #===============================================================================================================
         numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
         numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
@@ -611,6 +614,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             formset.save()
             return redirect('waybill_view_reception', current_wb.id)
         else:
+            #TODO: we should show these error to user, not print them
             print( formset.errors )
             print( form.errors )
     else:
@@ -1228,10 +1232,12 @@ def get_synchronize_waybill2( request ):
     data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
 
     ## testing it to see deser
-    print data
-    for deserialized_object in serializers.deserialize( "json", data ):
-
-        print deserialized_object
+#=======================================================================================================================
+#    print data
+#    for deserialized_object in serializers.deserialize( "json", data ):
+# 
+#        print deserialized_object
+#=======================================================================================================================
 
     response = HttpResponse( data, mimetype = 'application/json' )
 
@@ -1239,13 +1245,13 @@ def get_synchronize_waybill2( request ):
 
 @csrf_exempt
 def get_all_data( request ):
-    print 'See'
+    #print 'See'
     return HttpResponse(serialized_all_items(), 
                         content_type="application/json; charset=utf-8")
 
 @csrf_exempt
 def get_all_data_download( request ):
-    print 'Donwload'
+    #print 'Donwload'
     return expand_response(HttpResponse(serialized_all_items(), content_type='text/csv'),
                            **{'Content-Disposition': 'attachment; filename=data-%s-%s.csv' % 
                               (settings.COMPAS_STATION, datetime.date.today())})

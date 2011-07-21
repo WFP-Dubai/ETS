@@ -151,15 +151,17 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_finalize_receipt', args=(self.waybill.pk,)))
         self.assertEqual(response.status_code, 302) 
              
-    def test_singleWBDispatchToCompas(self):
-        """ets.views.singleWBDispatchToCompas"""
-        response = self.client.get(reverse('singleWBDispatchToCompas', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 302) 
-        
-    def test_singleWBReceiptToCompas(self):
-        """ets.views.singleWBReceiptToCompas"""
-        response = self.client.get(reverse('singleWBReceiptToCompas', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
+    # def test_singleWBDispatchToCompas(self):
+    #    """ets.views.singleWBDispatchToCompas"""
+    #    response = self.client.get(reverse('singleWBDispatchToCompas', args=(self.waybill.pk,)))
+    #    self.assertEqual(response.status_code, 302) 
+    #    
+    # def test_singleWBReceiptToCompas(self):
+    #    """ets.views.singleWBReceiptToCompas"""
+    #    response = self.client.get(reverse('singleWBReceiptToCompas', args=(self.waybill.pk,)))
+    #    self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
         
     def test_receiptToCompas(self):
         """ets.views.receiptToCompas"""

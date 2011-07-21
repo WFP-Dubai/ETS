@@ -302,6 +302,7 @@ class WaybillValidationFormset( BaseModelFormSet ):
                 raise form.ValidationError( _("You have an error") )
             
             if not valid:
+                ##TODO: cleanup such things
                 print issue
 
 
