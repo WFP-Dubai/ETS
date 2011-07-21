@@ -1128,18 +1128,18 @@ def post_synchronize_waybill( request ):
 
 
 @csrf_exempt
-def get_synchronize_stock( request ):
+def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
     '''
     This method is called by the offline application.
     The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
     '''
 
-    warehouse_code = request.GET['warehouse_code']
-    stocks_list = EpicStock.objects.filter( wh_code = warehouse_code )
+    #warehouse_code = request.GET['']
+    stocks_list = queryset.filter( wh_code = warehouse_code )
 
     #from kiowa.db.utils import instance_as_dict
 
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True), 
+    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
                         content_type="application/json; charset=utf-8")
 
 
