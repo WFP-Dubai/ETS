@@ -6,7 +6,8 @@ from django.core.urlresolvers import reverse
 from django.test.client import Client
 from django.test import TestCase
 from django.contrib.auth.models import User
-
+from django.http import HttpResponseNotAllowed
+from django.utils.datastructures import MultiValueDictKeyError 
 from django.contrib.auth.forms import AuthenticationForm
 
 from ..models import Waybill, LtiOriginal
@@ -182,10 +183,15 @@ class ClientWaybillTestCase(TestCase):
         
     def test_deserialize(self):
         """ets.views.deserialize"""
-        #Test without post parameters 
-        response = self.client.post(reverse('deserialize'))
+        #Test with get request
+        response = self.client.get(reverse('deserialize'))
+        self.assertTrue(isinstance(response, HttpResponseNotAllowed))
         
-        self.assertEqual(response.status_code, 302) 
+        #Test without post parameters 
+        self.assertRaises(MultiValueDictKeyError, lambda: self.client.post(reverse('deserialize')))
+        
+        #Test with post parameters
+        response_par = self.client.post(reverse('deserialize'), data={'wbdata': self.waybill.pk,})        
         
     def test_viewLogView(self):
         """ets.views.viewLogView"""
