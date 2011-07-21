@@ -169,17 +169,6 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('invalidate_waybill', args=(self.waybill.pk,)))
         self.assertEqual(response.status_code, 200)
         
-    def test_waybill_validate_form_update(self):
-        """ets.views.waybill_validate_form_update"""
-        response = self.client.get(reverse('waybill_validate_form_update', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 200) 
-        
-    def test_waybill_view(self):
-        """ets.views.waybill_view"""
-        response = self.client.get(reverse('waybill_view', args=(self.waybill.pk,)))
-        self.assertEqual(response.status_code, 200) 
-       
-       
     def test_waybill_view_reception(self):
         """ets.views.waybill_view_reception"""
         response = self.client.get(reverse('waybill_view_reception', args=(self.waybill.pk,)))
@@ -193,7 +182,9 @@ class ClientWaybillTestCase(TestCase):
         
     def test_deserialize(self):
         """ets.views.deserialize"""
-        response = self.client.get(reverse('deserialize'))
+        #Test without post parameters 
+        response = self.client.post(reverse('deserialize'))
+        
         self.assertEqual(response.status_code, 302) 
         
     def test_viewLogView(self):
@@ -233,10 +224,12 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('select_data'))
         self.assertEqual(response.status_code, 200) 
         
-    def test_barcode_qr(self):
-        """ets.views.barcode_qr"""
-        response = self.client.get(reverse('barcode_qr', args=(self.waybill,) ))
-        self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
+    # def test_barcode_qr(self):
+    #    """ets.views.barcode_qr"""
+    #    response = self.client.get(reverse('barcode_qr', args=(self.waybill.pk,) ))
+    #    self.assertEqual(response.status_code, 200) 
+    #===================================================================================================================
         
     def test_post_synchronize_waybill(self):
         """ets.views.post_synchronize_waybill"""

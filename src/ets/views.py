@@ -15,6 +15,7 @@ from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
 from django.contrib import messages
+from django.views.decorators.http import require_POST
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
@@ -907,8 +908,9 @@ def serialize( request, wb_code, template='blank.html', queryset=Waybill.objects
         'wb_code': wb_code,
     })
 
-## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB 
+## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required
+@require_POST
 def deserialize( request ):
     waybillnumber = ''
     wb_data = request.POST['wbdata']
@@ -1055,7 +1057,7 @@ def select_data( request, template='reporting/select_data.html', form_class=Ware
     context = not form.is_valid() and {'form': form, } or {}
     return direct_to_template(request, template, context)
 
-def barcode_qr( request, wb ):
+def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
 #    import sys
 #    if sys.platform == 'darwin':
 #        from qrencode import Encoder
@@ -1065,8 +1067,12 @@ def barcode_qr( request, wb ):
 #        response = HttpResponse( mimetype = "image/png" )
 #        im.save( response, "PNG" )
 #    else:
+    
+    waybill = get_object_or_404(queryset, pk=waybill_pk)
+
     import subprocess
-    myz = wb.compress()
+    myz = waybill.compress()
+    print myz
     mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
     image = mydata.communicate()[0]
     #print mydata.communicate()
