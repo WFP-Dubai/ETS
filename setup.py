@@ -24,6 +24,7 @@ install_requires = [
         'django-audit-log',
         #'cx_Oracle',
         'simplejson >= 2.1.0',
+        'django-piston',
 ]
 
 #Extra dependencies for test purposes

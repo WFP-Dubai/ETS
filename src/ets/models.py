@@ -10,7 +10,6 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.db import connection
 
 from audit_log.models.managers import AuditLog
 
