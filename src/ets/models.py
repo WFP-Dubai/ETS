@@ -663,7 +663,7 @@ class LtiWithStock( models.Model ):
 
 class LoadingDetail( models.Model ):
     wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"), related_name="loading_details")
-    order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item") )
+    order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
                                             null = False, max_digits = 10, decimal_places = 3 )
     numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, 
