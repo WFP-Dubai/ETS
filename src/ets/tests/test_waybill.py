@@ -281,7 +281,12 @@ class ClientWaybillTestCase(TestCase):
     def test_get_all_data_download(self):
         """ets.views.get_all_data_download"""
         response = self.client.get(reverse('get_all_data_download'))
-        self.assertEqual(response.status_code, 200)   
+        self.assertEqual(response.status_code, 200)  
+               
+    def waybill_validate_dispatch_form(self):
+        """ets.views.waybill_validate_dispatch_form"""
+        response = self.client.get(reverse("waybill_validate_dispatch_form"))
+        self.assertEqual(response.status_code, 200)     
                                                     
 #=======================================================================================================================
 #    
