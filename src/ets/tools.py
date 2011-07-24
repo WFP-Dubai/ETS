@@ -4,6 +4,7 @@ import zlib, base64, string
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import serializers
+
 #from django.core.urlresolvers import reverse
 #from django.db import connections
 #from django.forms.models import model_to_dict
@@ -63,10 +64,14 @@ def un64unZip( data ):
     >>> un64unZip(data)
     asdfa
     """
+    
     data = string.replace( data, ' ', '+' )
-    zippedData = base64.b64decode( data )
-    return zlib.decompress( zippedData )
-
+    try:
+       zippedData = base64.b64decode( data )
+       return zlib.decompress( base64.b64decode( data ) )
+    except:
+       return 1
+            
 
 #=======================================================================================================================
 # def serialize_wb( wb_id ):
