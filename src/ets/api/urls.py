@@ -26,7 +26,7 @@ waybill_resource = Resource(WaybillHandler)
 urlpatterns = patterns('',
     
     (r'^waybill/$', waybill_resource, {}, "api_waybill"),
-    (r'^waybill/(?P<waybill_pk>\d+)/$', waybill_resource, {}, "api_waybill"),
+    (r'^waybill/(?P<id>\d+)/$', waybill_resource, {}, "api_waybill"),
     
     #===================================================================================================================
     # url(r'^api/history/id/(?P<object_id>\d+)/$', history_id, name="history_id"),

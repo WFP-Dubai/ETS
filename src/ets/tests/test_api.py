@@ -22,6 +22,7 @@ class ApiTestCase(TestCase):
         self.dispatch_point = DispatchPoint.objects.get(pk=1)
         self.maxDiff = None
         self.waybill_dict = {
+            'compas': 'ISBX002',
             "waybillNumber": "A0009",
             "transportVehicleRegistration": "",
             "transportContractor": "HAMAYOON AND CO",
@@ -84,7 +85,7 @@ class ApiTestCase(TestCase):
     #    "Hook method for deconstructing the test fixture after testing it."
     #===================================================================================================================
     
-    def test_waybill_list(self):
+    def test_read_waybills(self):
         response = self.client.get(reverse('api_waybill'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], "application/json; charset=utf-8")
@@ -93,8 +94,8 @@ class ApiTestCase(TestCase):
         self.assertTrue(isinstance(data, list))
         self.assertDictEqual(data[0], self.waybill_dict)
     
-    def test_one_waybill(self):
-        response = self.client.get(reverse('api_waybill', kwargs={'waybill_pk': self.waybill.pk}))
+    def test_read_waybill(self):
+        response = self.client.get(reverse('api_waybill', kwargs={'id': self.waybill.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], "application/json; charset=utf-8")
         
@@ -102,7 +103,9 @@ class ApiTestCase(TestCase):
         self.assertTrue(isinstance(data, dict))
         self.assertDictEqual(data, self.waybill_dict)
         
-        
+    def test_create_waybill(self):
+        #response = self.client.get(reverse, data)
+        pass
         
 
         

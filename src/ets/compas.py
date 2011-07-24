@@ -24,7 +24,7 @@ class compas_write:
             empty = u''
             # gather wb info
             the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
-            lineItems = the_waybill.loadingdetail_set.select_related()
+            lineItems = the_waybill.loading_details.select_related()
             LTI = lineItems[0].order_item.lti_item
             DISPATCH_PERSON = ets_models.EpicPerson.objects.get( person_pk = the_waybill.dispatcherName )
             # make dispatch remarks::::
@@ -191,7 +191,7 @@ class compas_write:
             self.ErrorMessages = ''
             self.ErrorCodes = ''
             the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
-            lineItems = the_waybill.loadingdetail_set.select_related()
+            lineItems = the_waybill.loading_details.select_related()
             WB_CODE = the_waybill.waybillNumber
             receiverPerson = ets_models.EpicPerson.objects.get( person_pk = the_waybill.recipientName )
             recPersonOUC = receiverPerson.org_unit_code

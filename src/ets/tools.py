@@ -89,7 +89,7 @@ def un64unZip( data ):
 #    waybill_to_serialize = Waybill.objects.get( id = wb_id )
 # 
 #    # Add related LoadingDetais to serialized representation
-#    loadingdetails_to_serialize = waybill_to_serialize.loadingdetail_set.select_related()
+#    loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
 #    
 #    # Add related LtiOriginals to serialized representation
 #    # Add related EpicStocks to serialized representation
@@ -133,7 +133,7 @@ def un64unZip( data ):
 # 
 #    # Add related LoadingDetais to serialized representation
 # 
-#    loading_details = waybill.loadingdetail_set.select_related()
+#    loading_details = waybill.loading_details.select_related()
 #    ld_list = []
 #    from structures import loadingdetail_named2positional_dict
 #    for l in loading_details:
@@ -238,7 +238,7 @@ def restant_si( lti_code ):
                 for lti in detailed_lti if not ets_models.RemovedLtis.objects.filter( lti = lti.lti_pk )]
 
     for wb in listOfWaybills:
-        for loading in wb.loadingdetail_set.select_related():
+        for loading in wb.loading_details.select_related():
             for si in listOfSI:
                 if si.SINumber == loading.order_item.lti_line.si_code:
                     si.reduce_current( loading.numberUnitsLoaded )

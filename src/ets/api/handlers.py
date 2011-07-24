@@ -7,6 +7,7 @@
 #import httplib, logging
 
 from piston.handler import BaseHandler
+from piston.utils import rc
 
 from ..models import Waybill, Place
 
@@ -23,23 +24,22 @@ class WaybillHandler(BaseHandler):
     model = Waybill
     #fields = (('user', ("username",)), 'ltiNumber', 'waybillNumber')
 #    exclude = ('resource_uri',)
-
-    def read(self, request, waybill_pk=None):
-        """
-        **URL** : */api/history/*
-        This Method is used to retrieve all Waybill objects existing in database.
-        It can be useful for initial database loading without any filtering.
-
-        **URL** : */api/history/(P<waybill_pk>)*
-        In this case handler returns specific waybill with waybill_pk
-        
-        """
-        
-        if waybill_pk:
-            return self.model.objects.get(pk=waybill_pk)
+    
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            
+            waybill = self.model(**data)
+            waybill.save()
+            
+            for place_data in data['destinationWarehouse']:
+                Place(destinationWarehouse=waybill, content=place_data['content']).save()
+                
+            return rc.CREATED
         else:
-            return self.model.objects.all()
-
+            super(WaybillHandler, self).create(request)
+    
+    
 #    @staticmethod
 #    def resource_uri(*args, **kwargs):
 #        return ('history', [])

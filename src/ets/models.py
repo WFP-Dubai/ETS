@@ -42,7 +42,7 @@ class Place( models.Model ):
     name = models.CharField(_("Name"), max_length = 100 )
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
     geo_name = models.CharField(_("Geo name"), max_length = 100 )
-    country_code = models.CharField( _("Country code"),max_length = 3 )
+    country_code = models.CharField( _("Country code"), max_length = 3 )
     reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
     organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
 
@@ -163,6 +163,8 @@ class Waybill( models.Model ):
     waybillProcessedForPayment = models.BooleanField(_("Waybill Processed For Payment"))
     invalidated = models.BooleanField(_("Invalidated"))
     auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
+    
+    compas = models.CharField(_("Compas Station"), max_length=100, default=settings.COMPAS_STATION)
     
     audit_log = AuditLog()
 
@@ -292,7 +294,7 @@ class Waybill( models.Model ):
 #    lti_date = property( lti_date )
     
     def invalidate_waybill_action( self ):
-        for lineitem in self.loadingdetail_set.select_related():
+        for lineitem in self.loading_details.select_related():
             lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
             lineitem.numberUnitsLoaded = 0
             lineitem.save()
@@ -316,7 +318,7 @@ class Waybill( models.Model ):
         #waybill_to_serialize = Waybill.objects.get( id = wb_id )
     
         # Add related LoadingDetais to serialized representation
-        loadingdetails_to_serialize = self.loadingdetail_set.all().select_related('order_item')
+        loadingdetails_to_serialize = self.loading_details.all().select_related('order_item')
         
         # Add related LtiOriginals to serialized representation
         # Add related EpicStocks to serialized representation
@@ -647,8 +649,8 @@ class EpicLossDamages( models.Model ):
 
 
 class LtiWithStock( models.Model ):
-    lti_line = models.ForeignKey( LtiOriginal,verbose_name = _("LTI Line") )
-    stock_item = models.ForeignKey( EpicStock,verbose_name = _("Stock Item"))
+    lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line") )
+    stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"))
     lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
     
     def  __unicode__( self ):
@@ -660,16 +662,24 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"))
-    order_item = models.ForeignKey( LtiWithStock,verbose_name =_("Order item") )
-    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
-    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), related_name = 'LD_LossType', blank = True, null = True )
+    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"), related_name="loading_details")
+    order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item") )
+    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
+                                            null = False, max_digits = 10, decimal_places = 3 )
+    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, 
+                                          null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, 
+                                          null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, 
+                                             null = True, max_digits = 10, decimal_places = 3 )
+    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), 
+                                         related_name = 'LD_LostReason', blank = True, null = True )
+    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), 
+                                            related_name = 'LD_DamagedReason', blank = True, null = True )
+    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),
+                                          related_name = 'LD_DamagedType', blank = True, null = True )
+    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), 
+                                       related_name = 'LD_LossType', blank = True, null = True )
     overloadedUnits = models.BooleanField(_("overloaded Units"))
     loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "))
     overOffloadUnits = models.BooleanField(_("over offloaded Units"))
