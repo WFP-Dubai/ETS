@@ -1,5 +1,5 @@
 {% extends "api/docs/doc_base.html" %}
-{% load markup docs %}
+{% load markup %}
 {% block content %}
 <div class="section">
     <h1>Welcome to cj&#8217;s API documentation!</h1>
@@ -29,7 +29,6 @@
     </div>
     {% endfor %}
 </div>
-    {% load_doc "api.rst" %}
 {% endblock %}
 
 {% block index %}

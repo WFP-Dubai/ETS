@@ -214,6 +214,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.databrowse',
     'django.contrib.staticfiles',
+    'django.contrib.markup',
+    'django.contrib.humanize',
     
     #external
     'django_extensions',

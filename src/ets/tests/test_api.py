@@ -20,18 +20,8 @@ class ApiTestCase(TestCase):
         self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
         self.dispatch_point = DispatchPoint.objects.get(pk=1)
-     
-    #===================================================================================================================
-    # def tearDown(self):
-    #    "Hook method for deconstructing the test fixture after testing it."
-    #===================================================================================================================
-    
-    def test_index(self):
-        response = self.client.get(reverse('api_waybill'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response['Content-Type'], "application/json; charset=utf-8")
         self.maxDiff = None
-        self.assertDictEqual(simplejson.loads(response.content)[0], {
+        self.waybill_dict = {
             "waybillNumber": "A0009",
             "transportVehicleRegistration": "",
             "transportContractor": "HAMAYOON AND CO",
@@ -87,7 +77,33 @@ class ApiTestCase(TestCase):
             "containerTwoNumber": "",
             "waybillReceiptValidated": False,
             "transportTrailerRegistration": ""
-        })
+        }
+     
+    #===================================================================================================================
+    # def tearDown(self):
+    #    "Hook method for deconstructing the test fixture after testing it."
+    #===================================================================================================================
+    
+    def test_waybill_list(self):
+        response = self.client.get(reverse('api_waybill'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], "application/json; charset=utf-8")
+        
+        data = simplejson.loads(response.content)
+        self.assertTrue(isinstance(data, list))
+        self.assertDictEqual(data[0], self.waybill_dict)
+    
+    def test_one_waybill(self):
+        response = self.client.get(reverse('api_waybill', kwargs={'waybill_pk': self.waybill.pk}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], "application/json; charset=utf-8")
+        
+        data = simplejson.loads(response.content)
+        self.assertTrue(isinstance(data, dict))
+        self.assertDictEqual(data, self.waybill_dict)
+        
+        
+        
 
         
     #===================================================================================================================

@@ -918,6 +918,7 @@ def serialize( request, wb_code, template='blank.html', queryset=Waybill.objects
 @login_required
 @require_POST
 def deserialize( request ):
+    #TODO: rewrite in with a form
     waybillnumber = ''
     wb_data = request.POST['wbdata']
     wb_serialized = ''

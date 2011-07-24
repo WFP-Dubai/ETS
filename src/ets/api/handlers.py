@@ -24,14 +24,21 @@ class WaybillHandler(BaseHandler):
     #fields = (('user', ("username",)), 'ltiNumber', 'waybillNumber')
 #    exclude = ('resource_uri',)
 
-    def read(self, request):
+    def read(self, request, waybill_pk=None):
         """
-        Method **read** of **Waybill** handler used to retrieve all Waybill objects existing in database.
+        **URL** : */api/history/*
+        This Method is used to retrieve all Waybill objects existing in database.
         It can be useful for initial database loading without any filtering.
 
-        **URL** : */api/history/*
+        **URL** : */api/history/(P<waybill_pk>)*
+        In this case handler returns specific waybill with waybill_pk
+        
         """
-        return self.model.objects.all()
+        
+        if waybill_pk:
+            return self.model.objects.get(pk=waybill_pk)
+        else:
+            return self.model.objects.all()
 
 #    @staticmethod
 #    def resource_uri(*args, **kwargs):

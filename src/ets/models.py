@@ -638,6 +638,12 @@ class EpicLossDamages( models.Model ):
         if length_c > 20:
             cause = "%s...%s" % (cause[0:20], cause[length_c:])
         return cause
+    
+    @classmethod
+    def update(cls):
+        reasons = cls.objects.using( 'compas' ).all()
+        for myrecord in reasons:
+            myrecord.save( using = 'default' )
 
 
 class LtiWithStock( models.Model ):

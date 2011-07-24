@@ -25,6 +25,7 @@ install_requires = [
         #'cx_Oracle',
         'simplejson >= 2.1.0',
         'django-piston',
+        'docutils',
 ]
 
 #Extra dependencies for test purposes
