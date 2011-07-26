@@ -5,7 +5,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
-#from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 #from django.forms.formsets import BaseFormSet
 from django.forms.models import inlineformset_factory, modelformset_factory, ModelChoiceIterator, model_to_dict
 from django.http import HttpResponse, HttpResponseRedirect
@@ -600,7 +600,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
     
     if request.method == 'POST':
 
-        form = WaybillRecieptForm( request.POST, instance = current_wb )
+        form = WaybillRecieptForm( data=request.POST, instance = current_wb )
 
         formset = LDFormSet( request.POST, instance = current_wb )
         if form.is_valid() and formset.is_valid():
@@ -921,12 +921,20 @@ def deserialize( request ):
     waybillnumber = ''
     wb_data = request.POST['wbdata']
     wb_serialized = ''
-    if wb_data[0] == '[':
-        wb_serialized = wb_data
-    else:
-        wb_serialized = un64unZip( wb_data )
     
+    if wb_data[0] == '[':
+        
+        wb_serialized = wb_data
+    else:   
+        wb_serialized = un64unZip( wb_data )
+        if wb_serialized is not None:
+            wb_serialized = eval(wb_serialized)
+        else:
+            messages.error(request, _('Data Incorrect!!!'))
+            return redirect(reverse('select_action')) 
+ 
     for obj in serializers.deserialize( "json", wb_serialized ):
+        
         if type( obj.object ) is Waybill:
             waybillnumber = obj.object.id
     

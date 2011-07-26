@@ -198,6 +198,11 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.post(reverse('deserialize'), data={'wbdata': data,})
         self.assertEqual(response.status_code, 302)
         
+        #Test with compressed data
+        data = self.waybill.compress()
+        response = self.client.post(reverse('deserialize'), data={'wbdata': data,})
+        self.assertEqual(response.status_code, 302)
+        
     def test_viewLogView(self):
         """ets.views.viewLogView"""
         response = self.client.get(reverse('viewLogView'))
