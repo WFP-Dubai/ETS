@@ -8,7 +8,7 @@ import piston.authentication
 from piston.resource import Resource
 from piston.doc import documentation_view
 
-from .handlers import WaybillHandler 
+from .handlers import WaybillHandler, NewWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
@@ -17,6 +17,7 @@ from .handlers import WaybillHandler
 #AUTHENTICATORS = [permhttpauth, ]
 
 waybill_resource = Resource(WaybillHandler)
+new_waybill_resource = Resource(NewWaybillHandler)
 
 #history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
 #history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)
@@ -25,9 +26,10 @@ waybill_resource = Resource(WaybillHandler)
 
 urlpatterns = patterns('',
     
-    (r'^waybill/$', waybill_resource, {}, "api_waybill"),
-    (r'^waybill/(?P<id>\d+)/$', waybill_resource, {}, "api_waybill"),
+    (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
+    (r'^waybill/(?P<id>\d+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     
+    (r'^new/$', new_waybill_resource, { 'emitter_format': 'json' }, "api_new_waybill"),
     #===================================================================================================================
     # url(r'^api/history/id/(?P<object_id>\d+)/$', history_id, name="history_id"),
     # url(r'^api/history/date/(?P<date>\d{4}-\d{2}-\d{2})/$', history_date, name="history_date"),

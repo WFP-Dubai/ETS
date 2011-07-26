@@ -5,7 +5,7 @@ from django.test import TestCase
 from django.utils import simplejson
 from django.contrib.auth.models import User
 
-from ..models import Waybill, LtiOriginal, EpicStock, DispatchPoint
+from ..models import Waybill, LtiOriginal, EpicStock, DispatchPoint, urllib2
 
 class ApiTestCase(TestCase):
     
@@ -103,9 +103,25 @@ class ApiTestCase(TestCase):
         self.assertTrue(isinstance(data, dict))
         self.assertDictEqual(data, self.waybill_dict)
         
-    def test_create_waybill(self):
-        #response = self.client.get(reverse, data)
-        pass
+    def test_send_new(self):
+        
+        #MonkeyPatch of urlopen
+        def dummy_urlopen(request, timeout):
+            
+            class DummyFile(object):
+                def read(self):
+                    return "Created"
+            
+            return DummyFile()
+        
+        urllib2.urlopen = dummy_urlopen
+        
+        self.assertEqual(self.waybill.status, Waybill.NEW)
+        Waybill.send_new()
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        
+    def test_get_informed(self):
+        
         
 
         

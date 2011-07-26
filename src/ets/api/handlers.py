@@ -43,3 +43,23 @@ class WaybillHandler(BaseHandler):
 #    @staticmethod
 #    def resource_uri(*args, **kwargs):
 #        return ('history', [])
+
+
+
+class NewWaybillHandler(BaseHandler):
+
+    allowed_methods = ('GET', 'POST')
+    model = Waybill
+    #fields = (('user', ("username",)), 'ltiNumber', 'waybillNumber')
+#    exclude = ('resource_uri',)
+    
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            
+            print "data --> ", data
+                
+            return rc.CREATED
+        else:
+            super(NewWaybillHandler, self).create(request)
+    

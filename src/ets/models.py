@@ -1,5 +1,6 @@
 
-import zlib, base64, string
+import zlib, base64, string, urllib2
+from urllib import urlencode
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -13,8 +14,11 @@ from django.db.models.signals import post_save
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
+from piston.emitters import Emitter
 
 name = "1234"
+DEFAULT_TIMEOUT = 10
+COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
 
 # like a normal ForeignKey.
 try:
@@ -110,16 +114,21 @@ class Waybill( models.Model ):
     SENT = 2
     INFORMED = 3
     DELIVERED = 4
+    COMPLETE = 5
     
     STATUSES = (
         (NEW, _("New")),
         (SENT, _("Sent")),
         (INFORMED, _("Informed")),
         (DELIVERED, _("Delivered")),
+        (COMPLETE, _("Complete")),
     )
     
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (instance.compas, instance.waybillNumber), unique=True)
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
+                            instance.dispatch_warehouse.org_code, 
+                            instance.waybillNumber
+                         ), unique=True)
     
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
@@ -133,6 +142,8 @@ class Waybill( models.Model ):
     dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
     dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
     dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
+    dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Original Warehouse"), 
+                                            default=COMPAS_STATION, related_name="dispatch_waybills")
     
     #Transporter
     transportContractor = models.TextField(_("Transport Contarctor"), blank = True )
@@ -168,7 +179,8 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), blank = True )
+    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
+                                              related_name="recipient_waybills" )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
@@ -178,8 +190,6 @@ class Waybill( models.Model ):
     waybillProcessedForPayment = models.BooleanField(_("Waybill Processed For Payment"))
     invalidated = models.BooleanField(_("Invalidated"))
     auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
-    
-    compas = models.CharField(_("Compas Station"), max_length=100, default=getattr(settings, 'COMPAS_STATION', ''), blank=True )
     
     audit_log = AuditLog()
 
@@ -373,6 +383,104 @@ class Waybill( models.Model ):
         data = string.replace( data, ' ', '+' )
         zippedData = base64.b64decode( data )
         return zlib.decompress( zippedData )
+    
+    def update_status(self, status):
+        if self.status > status:
+            raise RuntimeError("You can not decrease status to %s" % status)
+        
+        self.status = status
+        self.save()
+        
+        
+    @classmethod    
+    def send_new(cls):
+        """Sents new waybills to central server""" 
+        DATA_URL = "http://localhost:8000/api/new/"
+        waybils = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
+        data = "\n".join(waybill.serialize() for waybill in waybils)
+        try:
+            response = urllib2.urlopen(urllib2.Request(DATA_URL, data, {
+                'Content-Type': 'application/json'
+            }), timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            if response.read() == 'Created':
+                waybils.update(status=cls.SENT)
+
+    
+    @classmethod
+    def get_informed(cls):
+        """Dispatcher reads the server for new informed waybills"""
+        DATA_URL = "http://localhost:8000/api/informed/%s/"
+        for waybill in cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION):
+                
+            try:
+                response = urllib2.urlopen(DATA_URL % waybill.pk, timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                print "code --> ", response.code
+                if response.code == 200:
+                    waybill.update_status(cls.INFORMED)
+    
+    
+    @classmethod
+    def get_delivered(cls):
+        """Dispatcher reads the server for delivered waybills"""
+        DATA_URL = "http://localhost:8000/api/delivered/%s/"
+        for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
+            try:
+                response = urllib2.urlopen(DATA_URL % waybill.pk, timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                print "code --> ", response.code
+                data = simplejson.loads(response.read())
+                print "data --> ", data
+                #waybill = cls.objects.get(pk=data['pk'])
+                #assign here all data from recepient
+    
+    @classmethod    
+    def get_receiving(cls):
+        """
+        Receiver reads the server for new waybills, that we are expecting to receive 
+        and update status of such waybills to 'informed'.
+        """ 
+        DATA_URL = "http://localhost:8000/api/receiving/"
+        try:
+            response = urllib2.urlopen(DATA_URL, timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            print "code --> ", response.code
+            
+            for data in simplejson.loads(response.read()):
+                #Create a waybill here
+                waybill=1
+                
+    @classmethod
+    def send_informed(cls):
+        DATA_URL = "http://localhost:8000/api/informed/"
+        waybills = cls.filter(status=cls.NEW, destinationWarehouse__pk=COMPAS_STATION)
+        try:
+            response = urllib2.urlopen(DATA_URL, data=simplejson.dumps(waybills), timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            cls.objects.filter(pk__in=waybills).update(status=cls.INFORMED)
+    
+    @classmethod
+    def send_delivered(cls):
+        """Receiver updates status of 'delivered' waybills"""
+        DATA_URL = "http://localhost:8000/api/delivered/"
+        waybills = cls.filter(status=cls.DELIVERED, destinationWarehouse__pk=COMPAS_STATION)
+        try:
+            response = urllib2.urlopen(DATA_URL, data=simplejson.dumps(waybills), timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            cls.objects.filter(pk__in=waybills).update(status=cls.COMPLETE)
     
 #### Compas Tables Imported
 
@@ -576,7 +684,7 @@ class EpicPerson( models.Model ):
         Executes Imports of LTIs Persons
         """
     
-        for my_person in cls.objects.using( 'compas' ).filter( org_unit_code = settings.COMPAS_STATION ):
+        for my_person in cls.objects.using( 'compas' ).filter( org_unit_code = COMPAS_STATION ):
             my_person.save( using = 'default' )
 
 class StockManager( models.Manager ):
