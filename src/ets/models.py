@@ -106,6 +106,19 @@ class Waybill( models.Model ):
 #                        (u'O', _(u'Other Please Specify'))
                 )
     
+    NEW = 1
+    SENT = 2
+    INFORMED = 3
+    DELIVERED = 4
+    
+    STATUSES = (
+        (NEW, _("New")),
+        (SENT, _("Sent")),
+        (INFORMED, _("Informed")),
+        (DELIVERED, _("Delivered")),
+    )
+    
+    status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (instance.compas, instance.waybillNumber), unique=True)
     
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
