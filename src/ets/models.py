@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 
 from audit_log.models.managers import AuditLog
+from autoslug.fields import AutoSlugField
 
 name = "1234"
 
@@ -78,7 +79,6 @@ class Waybill( models.Model ):
     """
     Main model in the system. Tracks waybills.
     
-    
     """
     
     TRANSACTION_TYPES = ( 
@@ -105,7 +105,9 @@ class Waybill( models.Model ):
                         ( u'07', _(u'Multi-mode' )),
 #                        (u'O', _(u'Other Please Specify'))
                 )
-
+    
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (instance.compas, instance.waybillNumber), unique=True)
+    
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
     dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
@@ -164,7 +166,7 @@ class Waybill( models.Model ):
     invalidated = models.BooleanField(_("Invalidated"))
     auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
     
-    compas = models.CharField(_("Compas Station"), max_length=100, default=settings.COMPAS_STATION)
+    compas = models.CharField(_("Compas Station"), max_length=100, default=getattr(settings, 'COMPAS_STATION', ''), blank=True )
     
     audit_log = AuditLog()
 

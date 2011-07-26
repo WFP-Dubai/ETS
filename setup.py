@@ -26,6 +26,7 @@ install_requires = [
         'simplejson >= 2.1.0',
         'django-piston',
         'docutils',
+        'django-autoslug',
 ]
 
 #Extra dependencies for test purposes

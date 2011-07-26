@@ -223,6 +223,7 @@ INSTALLED_APPS = (
     'rosetta',
     'debug_toolbar',
     'piston',
+    'autoslug',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
