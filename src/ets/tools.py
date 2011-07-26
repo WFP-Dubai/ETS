@@ -67,10 +67,9 @@ def un64unZip( data ):
     
     data = string.replace( data, ' ', '+' )
     try:
-       zippedData = base64.b64decode( data )
-       return zlib.decompress( base64.b64decode( data ) )
-    except:
-       return 1
+        return zlib.decompress( base64.b64decode( data ) )
+    except (zlib.error, TypeError):
+        pass
             
 
 #=======================================================================================================================

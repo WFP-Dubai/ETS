@@ -927,11 +927,11 @@ def deserialize( request ):
         wb_serialized = wb_data
     else:   
         wb_serialized = un64unZip( wb_data )
-        if ( wb_serialized != 1):
-           wb_serialized = eval(wb_serialized)
+        if wb_serialized is not None:
+            wb_serialized = eval(wb_serialized)
         else:
-           messages.error( request, ' Data Incorrect!!! ' )
-           return redirect(reverse('select_action')) 
+            messages.error(request, _('Data Incorrect!!!'))
+            return redirect(reverse('select_action')) 
  
     for obj in serializers.deserialize( "json", wb_serialized ):
         
