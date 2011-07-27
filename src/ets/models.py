@@ -1,6 +1,7 @@
 
 import zlib, base64, string, urllib2
-from urllib import urlencode
+#from urllib import urlencode
+from itertools import chain
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -398,7 +399,10 @@ class Waybill( models.Model ):
         """Sents new waybills to central server"""
         DATA_URL = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
         waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
-        data = "\n".join(waybill.serialize() for waybill in waybills)
+        load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
+        
+        data = serializers.serialize( 'json', chain(waybills, load_details ))
+        
         if data:
             try:
                 response = urllib2.urlopen(urllib2.Request(DATA_URL, data, {
