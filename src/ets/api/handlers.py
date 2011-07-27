@@ -5,6 +5,7 @@
 
 #from django.http import Http404
 #import httplib, logging
+from django.core import serializers
 
 from piston.handler import BaseHandler
 from piston.utils import rc
@@ -28,6 +29,7 @@ class WaybillHandler(BaseHandler):
     def create(self, request):
         if request.content_type:
             data = request.data
+            print "data --> ", data
             
             waybill = self.model(**data)
             waybill.save()
@@ -57,8 +59,9 @@ class NewWaybillHandler(BaseHandler):
         if request.content_type:
             data = request.data
             
-            print "data --> ", data
-                
+            for obj in serializers.deserialize('python', data):
+                obj.save()
+            
             return rc.CREATED
         else:
             super(NewWaybillHandler, self).create(request)

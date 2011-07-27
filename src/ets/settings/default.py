@@ -27,12 +27,14 @@ ALL_DB = {
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
+        'HOST': 'localhost',
     },
     'dev_compas': {
         'NAME': 'compas',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
+        'HOST': 'localhost',
     },
     'default_tc_pak': {
         'ENGINE': 'django.db.backends.mysql',

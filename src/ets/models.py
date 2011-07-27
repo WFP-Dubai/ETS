@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -19,6 +20,7 @@ from piston.emitters import Emitter
 name = "1234"
 DEFAULT_TIMEOUT = 10
 COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
+API_DOMAIN = "http://localhost:8000"
 
 # like a normal ForeignKey.
 try:
@@ -391,22 +393,22 @@ class Waybill( models.Model ):
         self.status = status
         self.save()
         
-        
     @classmethod    
     def send_new(cls):
-        """Sents new waybills to central server""" 
-        DATA_URL = "http://localhost:8000/api/new/"
-        waybils = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
-        data = "\n".join(waybill.serialize() for waybill in waybils)
-        try:
-            response = urllib2.urlopen(urllib2.Request(DATA_URL, data, {
-                'Content-Type': 'application/json'
-            }), timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.read() == 'Created':
-                waybils.update(status=cls.SENT)
+        """Sents new waybills to central server"""
+        DATA_URL = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
+        waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
+        data = "\n".join(waybill.serialize() for waybill in waybills)
+        if data:
+            try:
+                response = urllib2.urlopen(urllib2.Request(DATA_URL, data, {
+                    'Content-Type': 'application/json'
+                }), timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                if response.read() == 'Created':
+                    waybills.update(status=cls.SENT)
 
     
     @classmethod
@@ -461,6 +463,7 @@ class Waybill( models.Model ):
                 
     @classmethod
     def send_informed(cls):
+        """Receiver updates status of receiving waybill to 'informed'"""
         DATA_URL = "http://localhost:8000/api/informed/"
         waybills = cls.filter(status=cls.NEW, destinationWarehouse__pk=COMPAS_STATION)
         try:

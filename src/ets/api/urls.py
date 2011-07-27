@@ -29,7 +29,7 @@ urlpatterns = patterns('',
     (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     (r'^waybill/(?P<id>\d+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     
-    (r'^new/$', new_waybill_resource, { 'emitter_format': 'json' }, "api_new_waybill"),
+    (r'^new/$', new_waybill_resource, { 'emitter_format': 'django' }, "api_new_waybill"),
     #===================================================================================================================
     # url(r'^api/history/id/(?P<object_id>\d+)/$', history_id, name="history_id"),
     # url(r'^api/history/date/(?P<date>\d{4}-\d{2}-\d{2})/$', history_date, name="history_date"),
