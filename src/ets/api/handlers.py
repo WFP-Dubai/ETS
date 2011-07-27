@@ -52,8 +52,6 @@ class NewWaybillHandler(BaseHandler):
 
     allowed_methods = ('GET', 'POST')
     model = Waybill
-    #fields = (('user', ("username",)), 'ltiNumber', 'waybillNumber')
-#    exclude = ('resource_uri',)
     
     def create(self, request):
         if request.content_type:
@@ -65,4 +63,13 @@ class NewWaybillHandler(BaseHandler):
             return rc.CREATED
         else:
             super(NewWaybillHandler, self).create(request)
+
+class InformedWaybillHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = Waybill
+    fields = ('pk',)
     
+    def read(self, request, *args, **kwargs):
+        obj = super(InformedWaybillHandler, self).read(request, *args, **kwargs)
+        return obj.status == obj.INFORMED and obj

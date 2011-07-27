@@ -397,15 +397,16 @@ class Waybill( models.Model ):
     @classmethod    
     def send_new(cls):
         """Sents new waybills to central server"""
-        DATA_URL = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
+        url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
+        
         waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
         load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
+        places = Place.objects.filter(models.Q(dispatch_waybills__in=waybills) | models.Q(recipient_waybills__in=waybills))
         
-        data = serializers.serialize( 'json', chain(waybills, load_details ))
-        
+        data = serializers.serialize( 'json', chain(places, waybills, load_details ))
         if data:
             try:
-                response = urllib2.urlopen(urllib2.Request(DATA_URL, data, {
+                response = urllib2.urlopen(urllib2.Request(url, data, {
                     'Content-Type': 'application/json'
                 }), timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
@@ -418,15 +419,14 @@ class Waybill( models.Model ):
     @classmethod
     def get_informed(cls):
         """Dispatcher reads the server for new informed waybills"""
-        DATA_URL = "http://localhost:8000/api/informed/%s/"
-        for waybill in cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION):
-                
+        
+        for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
+            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"id": waybill.pk}))
             try:
-                response = urllib2.urlopen(DATA_URL % waybill.pk, timeout=DEFAULT_TIMEOUT)
+                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
                 print err
             else:
-                print "code --> ", response.code
                 if response.code == 200:
                     waybill.update_status(cls.INFORMED)
     
