@@ -73,3 +73,14 @@ class InformedWaybillHandler(BaseHandler):
     def read(self, request, *args, **kwargs):
         obj = super(InformedWaybillHandler, self).read(request, *args, **kwargs)
         return obj.status == obj.INFORMED and obj
+
+
+class DeliveredWaybillHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = Waybill
+    #fields = ('pk',)
+    
+    def read(self, request, *args, **kwargs):
+        obj = super(DeliveredWaybillHandler, self).read(request, *args, **kwargs)
+        return obj.status == obj.DELIVERED and [obj]

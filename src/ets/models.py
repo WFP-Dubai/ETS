@@ -419,7 +419,6 @@ class Waybill( models.Model ):
     @classmethod
     def get_informed(cls):
         """Dispatcher reads the server for new informed waybills"""
-        
         for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
             url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"id": waybill.pk}))
             try:
@@ -434,18 +433,17 @@ class Waybill( models.Model ):
     @classmethod
     def get_delivered(cls):
         """Dispatcher reads the server for delivered waybills"""
-        DATA_URL = "http://localhost:8000/api/delivered/%s/"
         for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
+            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"id": waybill.pk}))
             try:
-                response = urllib2.urlopen(DATA_URL % waybill.pk, timeout=DEFAULT_TIMEOUT)
+                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
                 print err
             else:
-                print "code --> ", response.code
-                data = simplejson.loads(response.read())
-                print "data --> ", data
-                #waybill = cls.objects.get(pk=data['pk'])
-                #assign here all data from recepient
+                if response.code == 200:
+                    for obj in serializers.deserialize('xml', response.read()):
+                        obj.save()
+                
     
     @classmethod    
     def get_receiving(cls):

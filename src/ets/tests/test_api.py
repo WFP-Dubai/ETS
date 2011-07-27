@@ -142,6 +142,19 @@ class ApiEmptyServerTestCase(TestCase):
         response = self.client.get(reverse("api_informed_waybill", kwargs={"id": 1}))
         self.assertContains(response, '"pk": 1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
+    
+    def test_get_delivered(self):
+        #Create objects
+        self.create_objects()
+        #Change status of first one
+        Waybill.objects.filter(pk=1).update(status=Waybill.DELIVERED)
+        original = Waybill.objects.get(pk=1)
+        
+        response = self.client.get(reverse("api_delivered_waybill", kwargs={"id": 1}))
+        self.assertEqual(response["Content-Type"], "text/xml; charset=utf-8")
+        
+        waybill = serializers.deserialize('xml', response.content).next().object
+        self.assertEqual(waybill, original)
         
         
 class ApiClientTestCase(ApiServerTestCase):
@@ -181,7 +194,88 @@ class ApiClientTestCase(ApiServerTestCase):
         
         Waybill.get_informed()
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+    
+    def test_get_delivered(self):
+        #MonkeyPatch of urlopen
+        def dummy_urlopen(request, timeout):
+            
+            class DummyResponse(object):
+                code = 200
+                
+                #=======================================================================================================
+                # def __getitem__(self, name):
+                #    if name == 'Content-Type':
+                #        return "application/json; charset=utf-8"
+                #    else:
+                #        raise AttributeError("There is no item with name %s" % name)
+                #=======================================================================================================
+                
+                def read(self):
+                    return """<?xml version="1.0" encoding="utf-8"?>
+<django-objects version="1.0">
+ <object pk="1" model="ets.waybill">
+  <field type="IntegerField" name="status">4</field>
+  <field type="SlugField" name="slug">isbx002a0009</field>
+  <field type="CharField" name="ltiNumber">QANX0010010128226P</field>
+  <field type="CharField" name="waybillNumber">A0009</field>
+  <field type="DateField" name="dateOfLoading">2011-06-12</field>
+  <field type="DateField" name="dateOfDispatch">2011-06-12</field>
+  <field type="CharField" name="transactionType">WIT</field>
+  <field type="CharField" name="transportType">02</field>
+  <field type="CharField" name="dispatchRemarks"></field>
+  <field type="TextField" name="dispatcherName">ISBX0020000586</field>
+  <field type="TextField" name="dispatcherTitle">LOGISTICS OFFICER</field>
+  <field type="BooleanField" name="dispatcherSigned">True</field>
+  <field to="ets.place" name="dispatch_warehouse" rel="ManyToOneRel">ISBX002</field>
+  <field type="TextField" name="transportContractor">HAMAYOON AND CO</field>
+  <field type="TextField" name="transportSubContractor"></field>
+  <field type="TextField" name="transportDriverName"></field>
+  <field type="TextField" name="transportDriverLicenceID"></field>
+  <field type="TextField" name="transportVehicleRegistration"></field>
+  <field type="TextField" name="transportTrailerRegistration"></field>
+  <field type="BooleanField" name="transportDispachSigned">True</field>
+  <field type="DateTimeField" name="transportDispachSignedTimestamp">2011-06-12 13:12:43</field>
+  <field type="BooleanField" name="transportDeliverySigned">False</field>
+  <field type="DateTimeField" name="transportDeliverySignedTimestamp"><None></None></field>
+  <field type="CharField" name="containerOneNumber"></field>
+  <field type="CharField" name="containerTwoNumber"></field>
+  <field type="CharField" name="containerOneSealNumber"></field>
+  <field type="CharField" name="containerTwoSealNumber"></field>
+  <field type="CharField" name="containerOneRemarksDispatch"></field>
+  <field type="CharField" name="containerTwoRemarksDispatch"></field>
+  <field type="CharField" name="containerOneRemarksReciept"></field>
+  <field type="CharField" name="containerTwoRemarksReciept"></field>
+  <field type="CharField" name="recipientLocation">SUKKHUR</field>
+  <field type="CharField" name="recipientConsingee">WORLD FOOD PROGRAMME</field>
+  <field type="CharField" name="recipientName"></field>
+  <field type="CharField" name="recipientTitle"></field>
+  <field type="DateField" name="recipientArrivalDate"><None></None></field>
+  <field type="DateField" name="recipientStartDischargeDate"><None></None></field>
+  <field type="DateField" name="recipientEndDischargeDate"><None></None></field>
+  <field type="IntegerField" name="recipientDistance"><None></None></field>
+  <field type="TextField" name="recipientRemarks"></field>
+  <field type="BooleanField" name="recipientSigned">False</field>
+  <field type="DateTimeField" name="recipientSignedTimestamp"><None></None></field>
+  <field to="ets.place" name="destinationWarehouse" rel="ManyToOneRel">OE7X001</field>
+  <field type="BooleanField" name="waybillValidated">False</field>
+  <field type="BooleanField" name="waybillReceiptValidated">False</field>
+  <field type="BooleanField" name="waybillSentToCompas">False</field>
+  <field type="BooleanField" name="waybillRecSentToCompas">False</field>
+  <field type="BooleanField" name="waybillProcessedForPayment">False</field>
+  <field type="BooleanField" name="invalidated">False</field>
+  <field type="TextField" name="auditComment">Print Dispatch Original</field>
+ </object>
+</django-objects>
+"""
+            
+            return DummyResponse()
         
+        urllib2.urlopen = dummy_urlopen
+        
+        self.waybill.update_status(Waybill.INFORMED)
+        
+        Waybill.get_delivered()
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
 
 
     #===================================================================================================================
