@@ -11,6 +11,10 @@ from django.core.management import call_command
 from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
 
+def get_fixture_text(file_name):
+    return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
+
+
 class ApiServerTestCase(TestCase):
     
     #multi_db = True
@@ -157,7 +161,7 @@ class ApiEmptyServerTestCase(TestCase):
         
         self.assertEqual(Waybill.objects.count(), 0)
         
-        serialized_data = open(os.path.join(os.path.dirname(__file__), '../fixtures/test_sync.json')).read()
+        serialized_data = get_fixture_text('test_sync.json')
 
         response = self.client.post(reverse("api_new_waybill"), data=serialized_data, content_type="application/json")
         self.assertEqual(response.content, "Created")
@@ -183,7 +187,7 @@ class ApiEmptyServerTestCase(TestCase):
                 #=======================================================================================================
                 
                 def read(self):
-                    return open(os.path.join(os.path.dirname(__file__), '../fixtures/test_sync.json')).read()
+                    return get_fixture_text('test_sync.json')
             
             return DummyResponse()
         
@@ -223,6 +227,21 @@ class ApiEmptyServerTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+    
+    def test_send_delivered(self):
+        #Create objects
+        self.create_objects()
+        
+        self.assertNotEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+        
+        #Provide content-type
+        response = self.client.put(reverse("api_delivered_waybill"), 
+                                   data=get_fixture_text('test_delivered_sync.json'), 
+                                   content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+        
         
 class ApiClientTestCase(ApiServerTestCase):
         
@@ -302,65 +321,7 @@ class ApiClientTestCase(ApiServerTestCase):
                 #=======================================================================================================
                 
                 def read(self):
-                    return """[
- {
-  "pk": 1,
-  "model": "ets.waybill",
-  "fields": {
-   "waybillNumber": "A0009",
-   "invalidated": false,
-   "transportVehicleRegistration": "",
-   "transportContractor": "HAMAYOON AND CO",
-   "dispatchRemarks": "",
-   "dateOfDispatch": "2011-06-12",
-   "recipientArrivalDate": null,
-   "recipientConsingee": "WORLD FOOD PROGRAMME",
-   "transportSubContractor": "",
-   "transportDeliverySignedTimestamp": null,
-   "recipientDistance": null,
-   "recipientName": "",
-   "containerTwoSealNumber": "",
-   "auditComment": "Print Dispatch Original",
-   "dispatcherSigned": true,
-   "waybillProcessedForPayment": false,
-   "recipientSignedTimestamp": null,
-   "dispatcherTitle": "LOGISTICS OFFICER",
-   "containerOneSealNumber": "",
-   "transportDeliverySigned": false,
-   "containerTwoRemarksReciept": "",
-   "ltiNumber": "QANX0010010128226P",
-   "containerOneRemarksReciept": "",
-   "transportDispachSignedTimestamp": "2011-06-12 13:12:43",
-   "transactionType": "WIT",
-   "status": 4,
-   "containerTwoRemarksDispatch": "",
-   "recipientSigned": false,
-   "transportDispachSigned": true,
-   "dateOfLoading": "2011-06-12",
-   "recipientEndDischargeDate": null,
-   "recipientRemarks": "",
-   "waybillSentToCompas": false,
-   "recipientStartDischargeDate": null,
-   "containerOneRemarksDispatch": "",
-   "slug": "isbx002a0009",
-   "waybillValidated": false,
-   "transportType": "02",
-   "dispatch_warehouse": "ISBX002",
-   "destinationWarehouse": "OE7X001",
-   "recipientLocation": "SUKKHUR",
-   "waybillRecSentToCompas": false,
-   "transportDriverName": "",
-   "dispatcherName": "ISBX0020000586",
-   "transportDriverLicenceID": "",
-   "containerOneNumber": "",
-   "recipientTitle": "",
-   "containerTwoNumber": "",
-   "waybillReceiptValidated": false,
-   "transportTrailerRegistration": ""
-  }
- }
-]
-"""
+                    return get_fixture_text('test_delivered_sync.json')
             
             return DummyResponse()
         
@@ -370,3 +331,26 @@ class ApiClientTestCase(ApiServerTestCase):
         
         Waybill.get_delivered()
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+    
+    def test_update_delivered(self):
+        #MonkeyPatch of urlopen
+        def dummy_urlopen(request, timeout):
+            
+            class DummyResponse(object):
+                code = 200
+                
+                def read(self):
+                    return "OK"
+            
+            return DummyResponse()
+        
+        urllib2.urlopen = dummy_urlopen
+        
+        old_compas = ets.models.COMPAS_STATION
+        ets.models.COMPAS_STATION = "OE7X001"
+        
+        Waybill.objects.filter(pk=1).update(status=Waybill.DELIVERED)
+        Waybill.send_delivered()
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.COMPLETE)
+        
+        ets.models.COMPAS_STATION = old_compas

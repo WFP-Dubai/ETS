@@ -68,7 +68,6 @@ class InformedWaybillHandler(BaseHandler):
         obj = super(InformedWaybillHandler, self).read(request, *args, **kwargs)
         return obj.status == obj.INFORMED and obj
     
-    @transaction.commit_on_success
     def update(self, request):
         if hasattr(request, 'data'):
             self.model.objects.filter(pk__in=request.data, status__lt=self.model.INFORMED)\
@@ -80,13 +79,22 @@ class InformedWaybillHandler(BaseHandler):
 
 class DeliveredWaybillHandler(BaseHandler):
 
-    allowed_methods = ('GET',)
+    allowed_methods = ('GET', 'PUT')
     model = Waybill
     #fields = ('pk',)
     
     def read(self, request, *args, **kwargs):
         obj = super(DeliveredWaybillHandler, self).read(request, *args, **kwargs)
         return obj.status == obj.DELIVERED and [obj]
+    
+    def update(self, request):
+        if hasattr(request, 'data') and request.data:
+            for obj in serializers.deserialize('python', request.data):
+                obj.save()
+ 
+            return rc.ALL_OK
+        else:
+            return rc.BAD_REQUEST
 
 
 class DjangoJsonEmitter(DjangoEmitter):

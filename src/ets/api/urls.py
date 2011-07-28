@@ -45,6 +45,7 @@ urlpatterns = patterns('',
     (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 
         'emitter_format': 'django_json' 
     }, "api_delivered_waybill"),
+    (r'^delivered/$', delivered_waybill_resource, { 'emitter_format': 'django_json' }, "api_delivered_waybill"),
     
     (r'^docs/$', documentation_view),
 
