@@ -1,0 +1,54 @@
+{% extends "api/docs/doc_base.html" %}
+{% load markup %}
+{% block content %}
+<div class="section">
+    <h1>Welcome to cj&#8217;s API documentation!</h1>
+    <p>Here is a short API usage overview.</p>
+    {% for doc in docs %}
+    <div class="section" id="{{ doc.name|cut:"Handler"|slugify }}">
+        <h2>{{ doc.name|cut:"Handler" }} <a title="Permalink to this headline" href="#{{ doc.name|cut:"Handler"|slugify }}" class="headerlink">¶</a></h2>
+        <p>{{ doc.get_doc|default:""|restructuredtext }}</p>
+{#        <p>URL: <b>{{ doc.get_resource_uri_template }}</b></p>#}
+        <p>Accepted methods:
+            {% for meth in doc.allowed_methods %}
+                <b>{{ meth }}</b>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </p>
+        <dl>
+        {% for method in doc.get_all_methods %}
+            <dt>
+                method <i>{{ method.name }}</i>({{ method.signature }}){% if method.stale %} <i>- inherited</i>{% else %}:{% endif %}
+            </dt>
+            {% if method.doc %}
+                <dd>
+                        {{ method.doc|default:""|restructuredtext }}
+                <dd>
+            {% endif %}
+        {% endfor %}
+        </dl>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block index %}
+    <h3><a href="#">Table Of Contents</a></h3>
+        <ul>
+            <li>
+                <a class="reference internal" href="#">Available handlers:</a>
+                <ul>
+                    {% for doc in docs %}
+                    <li>
+                        <a class="reference internal" href="#{{ doc.name|cut:"Handler"|slugify }}">{{ doc.name|cut:"Handler" }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
+            </li>
+        </ul>
+{#        <ul>#}
+{#            <li>#}
+{#                <a class="reference internal" href="#general">General info</a>#}
+{#            </li>#}
+{#        </ul>#}
+
+{% endblock %}
