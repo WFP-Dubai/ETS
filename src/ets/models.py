@@ -393,21 +393,20 @@ class Waybill( models.Model ):
         
         self.status = status
         self.save()
-        
+    
+    
     @classmethod    
     def send_new(cls):
         """Sents new waybills to central server"""
         url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
         
         waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
-        load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
-        places = Place.objects.filter(models.Q(dispatch_waybills__in=waybills) | models.Q(recipient_waybills__in=waybills))
         
-        data = serializers.serialize( 'json', chain(places, waybills, load_details ))
+        data = serializers.serialize( 'json', sync_data(waybills), indent=True)
         if data:
             try:
                 response = urllib2.urlopen(urllib2.Request(url, data, {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'text/json; charset=utf-8'
                 }), timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
                 print err
@@ -441,7 +440,7 @@ class Waybill( models.Model ):
                 print err
             else:
                 if response.code == 200:
-                    for obj in serializers.deserialize('xml', response.read()):
+                    for obj in serializers.deserialize('json', response.read()):
                         obj.save()
                 
     
@@ -451,17 +450,15 @@ class Waybill( models.Model ):
         Receiver reads the server for new waybills, that we are expecting to receive 
         and update status of such waybills to 'informed'.
         """ 
-        DATA_URL = "http://localhost:8000/api/receiving/"
+        url = "%s%s" % (API_DOMAIN, reverse("api_receiving_waybill", kwargs={'destination': COMPAS_STATION}))
         try:
-            response = urllib2.urlopen(DATA_URL, timeout=DEFAULT_TIMEOUT)
+            response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
         except (urllib2.HTTPError, urllib2.URLError) as err:
             print err
         else:
-            print "code --> ", response.code
-            
-            for data in simplejson.loads(response.read()):
-                #Create a waybill here
-                waybill=1
+            if response.code == 200:
+                for obj in serializers.deserialize('json', response.read()):
+                    obj.save()
                 
     @classmethod
     def send_informed(cls):
@@ -777,8 +774,8 @@ class EpicLossDamages( models.Model ):
 
 
 class LtiWithStock( models.Model ):
-    lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line") )
-    stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"))
+    lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line"), related_name="ltistockrel" )
+    stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"), related_name="ltistockrel")
     lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
     
     def  __unicode__( self ):
@@ -1091,3 +1088,11 @@ class DispatchDetail( models.Model ):
 
 
 
+def sync_data(waybills):
+    load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
+    lti_stocks = LtiWithStock.objects.filter(loading_details__in=load_details)
+    stocks = EpicStock.objects.filter(ltistockrel__in=lti_stocks)
+    ltis = LtiOriginal.objects.filter(ltistockrel__in=lti_stocks)
+    places = Place.objects.filter(models.Q(dispatch_waybills__in=waybills) | models.Q(recipient_waybills__in=waybills))
+    
+    return chain(places, waybills, load_details, lti_stocks, stocks, ltis)

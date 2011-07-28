@@ -8,7 +8,8 @@ import piston.authentication
 from piston.resource import Resource
 from piston.doc import documentation_view
 
-from .handlers import WaybillHandler, NewWaybillHandler, InformedWaybillHandler, DeliveredWaybillHandler
+from .handlers import WaybillHandler, NewWaybillHandler, InformedWaybillHandler 
+from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
@@ -21,6 +22,8 @@ new_waybill_resource = Resource(NewWaybillHandler)
 informed_waybill_resource = Resource(InformedWaybillHandler)
 delivered_waybill_resource = Resource(DeliveredWaybillHandler)
 
+receiving_waybill_resource = Resource(ReceivingWaybillHandler)
+
 #history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
 #history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)
 #history_user = Resource(HistoryUserHandler, authentication=AUTHENTICATORS)
@@ -31,15 +34,13 @@ urlpatterns = patterns('',
     (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     (r'^waybill/(?P<id>\d+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     
-    (r'^new/$', new_waybill_resource, { 'emitter_format': 'django' }, "api_new_waybill"),
+    (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
+    (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
+        'emitter_format': 'django_json' 
+    }, "api_receiving_waybill"),
     (r'^informed/(?P<id>\d+)/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
-    (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 'emitter_format': 'django' }, "api_delivered_waybill"),
-    #===================================================================================================================
-    # url(r'^api/history/id/(?P<object_id>\d+)/$', history_id, name="history_id"),
-    # url(r'^api/history/date/(?P<date>\d{4}-\d{2}-\d{2})/$', history_date, name="history_date"),
-    # url(r'^api/history/user/(?P<username>[\w.@+-]+)/$', history_user, name="history_user"),
-    #===================================================================================================================
-
+    (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 'emitter_format': 'django_json' }, "api_delivered_waybill"),
+    
     (r'^docs/$', documentation_view),
 
 )
