@@ -14,9 +14,7 @@ import ets.models
 def get_fixture_text(file_name):
     return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
 
-
-class ApiServerTestCase(TestCase):
-    
+class TestDevelopmentMixin(object):
     #multi_db = True
     fixtures = ["development.json", ]
     
@@ -95,11 +93,9 @@ class ApiServerTestCase(TestCase):
             "waybillReceiptValidated": False,
             "transportTrailerRegistration": ""
         }
-     
-    #===================================================================================================================
-    # def tearDown(self):
-    #    "Hook method for deconstructing the test fixture after testing it."
-    #===================================================================================================================
+    
+
+class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
     def test_read_waybills(self):
         response = self.client.get(reverse("api_waybill"))
@@ -243,7 +239,7 @@ class ApiEmptyServerTestCase(TestCase):
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
         
         
-class ApiClientTestCase(ApiServerTestCase):
+class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
     def test_send_new(self):
         
