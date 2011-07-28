@@ -18,9 +18,9 @@
 <tr>
              <td>{{waybill.ltiNumber}}</td>
              <td>{{waybill.waybillNumber}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.origin_loc_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.consegnee_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.destination_loc_name}}</td>
               <td>{% trans "Dispatch" %}</td>
     </tr>
 {% endfor%}
@@ -29,9 +29,9 @@
 <tr>
              <td>{{waybill.ltiNumber}}</td>
              <td>{{waybill.waybillNumber}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.origin_loc_name}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.consegnee_name}}</td>
-             <td>{{waybill.loadingdetail_set.select_related.0.siNo.destination_loc_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.origin_loc_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.consegnee_name}}</td>
+             <td>{{waybill.loading_details.select_related.0.siNo.destination_loc_name}}</td>
               <td>{% trans "Receipt" %}</td>
              
     </tr>

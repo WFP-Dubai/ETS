@@ -27,12 +27,14 @@ ALL_DB = {
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
+        'HOST': 'localhost',
     },
     'dev_compas': {
         'NAME': 'compas',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
+        'HOST': 'localhost',
     },
     'default_tc_pak': {
         'ENGINE': 'django.db.backends.mysql',
@@ -214,12 +216,16 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.databrowse',
     'django.contrib.staticfiles',
+    'django.contrib.markup',
+    'django.contrib.humanize',
     
     #external
     'django_extensions',
     'south',
     'rosetta',
     'debug_toolbar',
+    'piston',
+    'autoslug',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

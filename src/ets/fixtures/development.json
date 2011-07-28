@@ -528,7 +528,7 @@
       "containerOneSealNumber": "", 
       "waybillValidated": false, 
       "transportType": "02", 
-      "destinationWarehouse": "CCBJ004", 
+      "destinationWarehouse": "OE7X001", 
       "recipientLocation": "SUKKHUR", 
       "waybillRecSentToCompas": false, 
       "transportDriverName": "", 
@@ -608,9 +608,9 @@
     "pk": 2, 
     "model": "ets.ltiwithstock", 
     "fields": {
-      "lti_line": "ISBX002000000000000001007HQX0001000000000000995247", 
-      "lti_code": "ISBX002110025393P", 
-      "stock_item": "I2EX020ISBX0020001033101CERCERWHFBG09586"
+      "lti_line": "QANX001000000000000005217HQX0001000000000000988849", 
+      "lti_code": "QANX0010010128226P", 
+      "stock_item": "KARX027ISBX0020000849901CERCERWHF<O>586"
     }
   },
   {

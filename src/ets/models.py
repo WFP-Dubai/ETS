@@ -1,19 +1,28 @@
 
-import zlib, base64, string
+import zlib, base64, string, urllib2
+#from urllib import urlencode
+from itertools import chain
 
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django.db import transaction
 
 from audit_log.models.managers import AuditLog
+from autoslug.fields import AutoSlugField
+from piston.emitters import Emitter
 
 name = "1234"
+DEFAULT_TIMEOUT = 10
+COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
+API_DOMAIN = "http://localhost:8000"
 
 # like a normal ForeignKey.
 try:
@@ -42,7 +51,7 @@ class Place( models.Model ):
     name = models.CharField(_("Name"), max_length = 100 )
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
     geo_name = models.CharField(_("Geo name"), max_length = 100 )
-    country_code = models.CharField( _("Country code"),max_length = 3 )
+    country_code = models.CharField( _("Country code"), max_length = 3 )
     reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
     organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
 
@@ -78,7 +87,6 @@ class Waybill( models.Model ):
     """
     Main model in the system. Tracks waybills.
     
-    
     """
     
     TRANSACTION_TYPES = ( 
@@ -105,7 +113,27 @@ class Waybill( models.Model ):
                         ( u'07', _(u'Multi-mode' )),
 #                        (u'O', _(u'Other Please Specify'))
                 )
-
+    
+    NEW = 1
+    SENT = 2
+    INFORMED = 3
+    DELIVERED = 4
+    COMPLETE = 5
+    
+    STATUSES = (
+        (NEW, _("New")),
+        (SENT, _("Sent")),
+        (INFORMED, _("Informed")),
+        (DELIVERED, _("Delivered")),
+        (COMPLETE, _("Complete")),
+    )
+    
+    status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
+                            instance.dispatch_warehouse.org_code, 
+                            instance.waybillNumber
+                         ), unique=True)
+    
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
     dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
@@ -118,6 +146,8 @@ class Waybill( models.Model ):
     dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
     dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
     dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
+    dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Original Warehouse"), 
+                                            default=COMPAS_STATION, related_name="dispatch_waybills")
     
     #Transporter
     transportContractor = models.TextField(_("Transport Contarctor"), blank = True )
@@ -153,7 +183,8 @@ class Waybill( models.Model ):
     recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
     recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
     recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), blank = True )
+    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
+                                              related_name="recipient_waybills" )
 
     #Extra Fields
     waybillValidated = models.BooleanField( _("Waybill Validated"))
@@ -292,7 +323,7 @@ class Waybill( models.Model ):
 #    lti_date = property( lti_date )
     
     def invalidate_waybill_action( self ):
-        for lineitem in self.loadingdetail_set.select_related():
+        for lineitem in self.loading_details.select_related():
             lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
             lineitem.numberUnitsLoaded = 0
             lineitem.save()
@@ -316,7 +347,7 @@ class Waybill( models.Model ):
         #waybill_to_serialize = Waybill.objects.get( id = wb_id )
     
         # Add related LoadingDetais to serialized representation
-        loadingdetails_to_serialize = self.loadingdetail_set.all().select_related('order_item')
+        loadingdetails_to_serialize = self.loading_details.all().select_related('order_item')
         
         # Add related LtiOriginals to serialized representation
         # Add related EpicStocks to serialized representation
@@ -356,6 +387,118 @@ class Waybill( models.Model ):
         data = string.replace( data, ' ', '+' )
         zippedData = base64.b64decode( data )
         return zlib.decompress( zippedData )
+    
+    def update_status(self, status):
+        if self.status > status:
+            raise RuntimeError("You can not decrease status to %s" % status)
+        
+        self.status = status
+        self.save()
+    
+    
+    @classmethod
+    def send_new(cls):
+        """Sents new waybills to central server"""
+        url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
+        
+        waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
+        
+        data = serializers.serialize( 'json', sync_data(waybills), indent=True)
+        if data:
+            try:
+                response = urllib2.urlopen(urllib2.Request(url, data, {
+                    'Content-Type': 'application/json'
+                }), timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                if response.read() == 'Created':
+                    waybills.update(status=cls.SENT)
+
+    
+    @classmethod
+    def get_informed(cls):
+        """Dispatcher reads the server for new informed waybills"""
+        for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
+            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"id": waybill.pk}))
+            try:
+                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                if response.code == 200:
+                    waybill.update_status(cls.INFORMED)
+    
+    
+    @classmethod
+    def get_delivered(cls):
+        """Dispatcher reads the server for delivered waybills"""
+        for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
+            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"id": waybill.pk}))
+            try:
+                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
+            except (urllib2.HTTPError, urllib2.URLError) as err:
+                print err
+            else:
+                if response.code == 200:
+                    for obj in serializers.deserialize('json', response.read()):
+                        obj.save()
+                
+    
+    @classmethod
+    def get_receiving(cls):
+        """
+        Receiver reads the server for new waybills, that we are expecting to receive 
+        and update status of such waybills to 'informed'.
+        """ 
+        url = "%s%s" % (API_DOMAIN, reverse("api_receiving_waybill", kwargs={'destination': COMPAS_STATION}))
+        try:
+            response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            if response.code == 200:
+                for obj in serializers.deserialize('json', response.read()):
+                    obj.save()
+                
+    @classmethod
+    def send_informed(cls):
+        """Receiver updates status of receiving waybill to 'informed'"""
+        waybills = cls.objects.filter(status=cls.SENT, destinationWarehouse__pk=COMPAS_STATION)
+        url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill"))
+        
+        request = urllib2.Request(url, simplejson.dumps(tuple(waybills.values_list('pk', flat=True))), {
+            'Content-Type': 'application/json'
+        })
+        request.get_method = lambda: 'PUT'
+        
+        try:
+            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            if response.code == 200:
+                waybills.update(status=cls.INFORMED)
+    
+    @classmethod
+    def send_delivered(cls):
+        """Receiver sends 'delivered' waybills to the central server"""
+        waybills = cls.objects.filter(status=cls.DELIVERED, destinationWarehouse__pk=COMPAS_STATION)
+        url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill"))
+        data = serializers.serialize( 'json', waybills, indent=True)
+        
+        request = urllib2.Request(url, data, {
+            'Content-Type': 'application/json'
+        })
+        request.get_method = lambda: 'PUT'
+        
+        try:
+            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
+        except (urllib2.HTTPError, urllib2.URLError) as err:
+            print err
+        else:
+            if response.code == 200:
+                waybills.update(status=cls.COMPLETE)
     
 #### Compas Tables Imported
 
@@ -559,7 +702,7 @@ class EpicPerson( models.Model ):
         Executes Imports of LTIs Persons
         """
     
-        for my_person in cls.objects.using( 'compas' ).filter( org_unit_code = settings.COMPAS_STATION ):
+        for my_person in cls.objects.using( 'compas' ).filter( org_unit_code = COMPAS_STATION ):
             my_person.save( using = 'default' )
 
 class StockManager( models.Manager ):
@@ -638,11 +781,17 @@ class EpicLossDamages( models.Model ):
         if length_c > 20:
             cause = "%s...%s" % (cause[0:20], cause[length_c:])
         return cause
+    
+    @classmethod
+    def update(cls):
+        reasons = cls.objects.using( 'compas' ).all()
+        for myrecord in reasons:
+            myrecord.save( using = 'default' )
 
 
 class LtiWithStock( models.Model ):
-    lti_line = models.ForeignKey( LtiOriginal,verbose_name = _("LTI Line") )
-    stock_item = models.ForeignKey( EpicStock,verbose_name = _("Stock Item"))
+    lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line"), related_name="ltistockrel" )
+    stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"), related_name="ltistockrel")
     lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
     
     def  __unicode__( self ):
@@ -654,16 +803,24 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"))
-    order_item = models.ForeignKey( LtiWithStock,verbose_name =_("Order item") )
-    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, null = False, max_digits = 10, decimal_places = 3 )
-    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), related_name = 'LD_LossType', blank = True, null = True )
+    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"), related_name="loading_details")
+    order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
+    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
+                                            null = False, max_digits = 10, decimal_places = 3 )
+    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, 
+                                          null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, 
+                                          null = True, max_digits = 10, decimal_places = 3 )
+    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, 
+                                             null = True, max_digits = 10, decimal_places = 3 )
+    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), 
+                                         related_name = 'LD_LostReason', blank = True, null = True )
+    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), 
+                                            related_name = 'LD_DamagedReason', blank = True, null = True )
+    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),
+                                          related_name = 'LD_DamagedType', blank = True, null = True )
+    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), 
+                                       related_name = 'LD_LossType', blank = True, null = True )
     overloadedUnits = models.BooleanField(_("overloaded Units"))
     loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "))
     overOffloadUnits = models.BooleanField(_("over offloaded Units"))
@@ -947,3 +1104,11 @@ class DispatchDetail( models.Model ):
 
 
 
+def sync_data(waybills):
+    load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
+    lti_stocks = LtiWithStock.objects.filter(loading_details__in=load_details)
+    stocks = EpicStock.objects.filter(ltistockrel__in=lti_stocks)
+    ltis = LtiOriginal.objects.filter(ltistockrel__in=lti_stocks)
+    places = Place.objects.filter(models.Q(dispatch_waybills__in=waybills) | models.Q(recipient_waybills__in=waybills))
+    
+    return chain(places, waybills, load_details, lti_stocks, stocks, ltis)

@@ -66,7 +66,7 @@ border-color: black;
     <td class='bordered'>{% trans "Commodity" %}</td>
     <td class='bordered'>{% trans "SI" %}</td>
     <td class='bordered'>{%if detailed.0.is_bulk%}{% trans "MT" %}{%else%}{% trans "Units" %}{%endif%}{% trans "dispatched" %}</td></tr>
-    {%for loading in wb.loadingdetail_set.select_related %}
+    {%for loading in wb.loading_details.select_related %}
         <tr class='bordered'>
         <td class='bordered'>&nbsp;</td>
         <td class='bordered'>&nbsp;{{loading.order_item.stock_item.cmmname}}&nbsp; </td>

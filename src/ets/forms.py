@@ -117,7 +117,7 @@ class WaybillRecieptForm( ModelForm ):
     #===================================================================================================================
     
     def __init__(self, **kwargs):
-        super(WaybillRecieptForm,self).__init__(**kwargs)
+        super(WaybillRecieptForm, self).__init__(**kwargs)
         self.fields['recipientArrivalDate'].required = True
         self.fields['recipientStartDischargeDate'].required = True
         self.fields['recipientEndDischargeDate'].required = True

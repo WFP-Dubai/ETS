@@ -192,7 +192,7 @@ def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
     current_wb.dispatcherSigned = True
     current_wb.auditComment = _('Print Dispatch Original')
     
-    for lineitem in current_wb.loadingdetail_set.select_related():
+    for lineitem in current_wb.loading_details.select_related():
         lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
     
     current_wb.save()
@@ -349,7 +349,7 @@ def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template
 #=======================================================================================================================
 # def invalidate_waybill_action( wb_id ):
 #    current_wb = Waybill.objects.get( id = wb_id )
-#    for lineitem in current_wb.loadingdetail_set.select_related():
+#    for lineitem in current_wb.loading_details.select_related():
 #        lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
 #        lineitem.numberUnitsLoaded = 0
 #        lineitem.save()
@@ -441,7 +441,7 @@ def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='wayb
     #TODO: remove these try...except blocks
     try:
         waybill_instance = queryset.get(id = wb_id)
-        extra_lines = 5 - waybill_instance.loadingdetail_set.select_related().count()
+        extra_lines = 5 - waybill_instance.loading_details.select_related().count()
         zippedWB = waybill_instance.compress()
         lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
         my_empty = [''] * extra_lines
@@ -477,7 +477,7 @@ def waybill_view_reception( request, wb_id, template='waybill/print/waybill_deta
     try:
         waybill_instance = Waybill.objects.get( id = wb_id )
         lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
-        number_of_lines = waybill_instance.loadingdetail_set.select_related().count()
+        number_of_lines = waybill_instance.loading_details.select_related().count()
         my_empty = [''] * (5 - number_of_lines)
         zippedWB = waybill_instance.compress()
     except:
@@ -853,7 +853,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
                         waybill.waybillValidated = False
                         messages.add_message( request, messages.ERROR, issue )
                         create_or_update(waybill, request.user, errorMessage)
-                except:
+                except: #Indicate here the error
                         waybill.auditComment = _('Tried to Validate Dispatch')
                         issue = _('Problems with Stock on WB:  ') + str( waybill )
                         waybill.waybillValidated = False
@@ -918,6 +918,7 @@ def serialize( request, wb_code, template='blank.html', queryset=Waybill.objects
 @login_required
 @require_POST
 def deserialize( request ):
+    #TODO: rewrite in with a form
     waybillnumber = ''
     wb_data = request.POST['wbdata']
     wb_serialized = ''
@@ -985,8 +986,8 @@ def ltis_report( request, template='reporting/list_ltis.txt' ):
     items = LtiWithStock.objects.filter( lti_line__in = ltis )
     listIt = []
     for line in items:
-        if line.loadingdetail_set.select_related():
-            for x in line.loadingdetail_set.select_related():
+        if line.loading_details.select_related():
+            for x in line.loading_details.select_related():
                 myList = []
                 myList = [x, line.lti_line]
                 listIt.append( myList )
@@ -1002,8 +1003,8 @@ def dispatch_report_wh( request, wh, template='reporting/list_ltis.txt' ):
     items = LtiWithStock.objects.filter( lti_line__in = ltis )
     listIt = []
     for line in items:
-        if line.loadingdetail_set.select_related():
-            for x in line.loadingdetail_set.select_related():
+        if line.loading_details.select_related():
+            for x in line.loading_details.select_related():
                 myList = []
                 myList = [x, line.lti_line]
                 listIt.append( myList )
@@ -1020,8 +1021,8 @@ def receipt_report_wh( request, loc, cons, template='reporting/list_ltis.txt' ):
     items = LtiWithStock.objects.filter( lti_line__in = ltis )
     listIt = []
     for line in items:
-        if line.loadingdetail_set.select_related():
-            for x in line.loadingdetail_set.select_related():
+        if line.loading_details.select_related():
+            for x in line.loading_details.select_related():
                 myList = []
                 myList = [x, line.lti_line]
                 listIt.append( myList )
@@ -1038,8 +1039,8 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
     items = LtiWithStock.objects.filter( lti_line__in = ltis )
     listIt = []
     for line in items:
-        if line.loadingdetail_set.select_related():
-            for x in line.loadingdetail_set.select_related():
+        if line.loading_details.select_related():
+            for x in line.loading_details.select_related():
                 myList = []
                 myList = [x, line.lti_line]
                 listIt.append( myList )
@@ -1225,7 +1226,7 @@ def get_synchronize_waybill2( request ):
     #from waybill.models import Waybill    
     waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
     for waybill_to_serialize in waybills_list:
-        loadingdetails_to_serialize = waybill_to_serialize.loadingdetail_set.select_related()
+        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
         # Add related LtiOriginals to serialized representation
         ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
         # Add related EpicStocks to serialized representation

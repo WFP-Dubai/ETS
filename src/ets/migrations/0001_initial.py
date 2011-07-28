@@ -16,23 +16,26 @@ class Migration(SchemaMigration):
             ('geo_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3)),
             ('reporting_code', self.gf('django.db.models.fields.CharField')(max_length=7)),
-            ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
         ))
         db.send_create_signal('ets', ['Place'])
 
         # Adding model 'WaybillAuditLogEntry'
         db.create_table('ets_waybillauditlogentry', (
             ('id', self.gf('django.db.models.fields.IntegerField')(db_index=True, blank=True)),
+            ('status', self.gf('django.db.models.fields.IntegerField')(default=1)),
+            ('slug', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=50, populate_from=None, db_index=True)),
             ('ltiNumber', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('waybillNumber', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('dateOfLoading', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('dateOfDispatch', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('transactionType', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('transportType', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('dispatchRemarks', self.gf('django.db.models.fields.CharField')(max_length=200)),
+            ('dispatchRemarks', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
             ('dispatcherName', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('dispatcherTitle', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('dispatcherSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('dispatch_warehouse', self.gf('django.db.models.fields.related.ForeignKey')(default=u'ISBX002', related_name='_auditlog_dispatch_waybills', to=orm['ets.Place'])),
             ('transportContractor', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('transportSubContractor', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('transportDriverName', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -62,7 +65,7 @@ class Migration(SchemaMigration):
             ('recipientRemarks', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('recipientSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('recipientSignedTimestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Place'], blank=True)),
+            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(related_name='_auditlog_recipient_waybills', to=orm['ets.Place'])),
             ('waybillValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillReceiptValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillSentToCompas', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -80,16 +83,19 @@ class Migration(SchemaMigration):
         # Adding model 'Waybill'
         db.create_table('ets_waybill', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('status', self.gf('django.db.models.fields.IntegerField')(default=1)),
+            ('slug', self.gf('autoslug.fields.AutoSlugField')(unique=True, max_length=50, populate_from=None, unique_with=(), db_index=True)),
             ('ltiNumber', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('waybillNumber', self.gf('django.db.models.fields.CharField')(max_length=20)),
             ('dateOfLoading', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('dateOfDispatch', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('transactionType', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('transportType', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('dispatchRemarks', self.gf('django.db.models.fields.CharField')(max_length=200)),
+            ('dispatchRemarks', self.gf('django.db.models.fields.CharField')(max_length=200, blank=True)),
             ('dispatcherName', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('dispatcherTitle', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('dispatcherSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('dispatch_warehouse', self.gf('django.db.models.fields.related.ForeignKey')(default=u'ISBX002', related_name='dispatch_waybills', to=orm['ets.Place'])),
             ('transportContractor', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('transportSubContractor', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('transportDriverName', self.gf('django.db.models.fields.TextField')(blank=True)),
@@ -119,7 +125,7 @@ class Migration(SchemaMigration):
             ('recipientRemarks', self.gf('django.db.models.fields.TextField')(blank=True)),
             ('recipientSigned', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('recipientSignedTimestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Place'], blank=True)),
+            ('destinationWarehouse', self.gf('django.db.models.fields.related.ForeignKey')(related_name='recipient_waybills', to=orm['ets.Place'])),
             ('waybillValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillReceiptValidated', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('waybillSentToCompas', self.gf('django.db.models.fields.BooleanField')(default=False)),
@@ -240,8 +246,8 @@ class Migration(SchemaMigration):
         # Adding model 'LoadingDetailAuditLogEntry'
         db.create_table('ets_loadingdetailauditlogentry', (
             ('id', self.gf('django.db.models.fields.IntegerField')(db_index=True, blank=True)),
-            ('wbNumber', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Waybill'])),
-            ('order_item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.LtiWithStock'])),
+            ('wbNumber', self.gf('django.db.models.fields.related.ForeignKey')(related_name='_auditlog_loading_details', to=orm['ets.Waybill'])),
+            ('order_item', self.gf('django.db.models.fields.related.ForeignKey')(related_name='_auditlog_loading_details', to=orm['ets.LtiWithStock'])),
             ('numberUnitsLoaded', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=10, decimal_places=3)),
             ('numberUnitsGood', self.gf('django.db.models.fields.DecimalField')(default=0, null=True, max_digits=10, decimal_places=3, blank=True)),
             ('numberUnitsLost', self.gf('django.db.models.fields.DecimalField')(default=0, null=True, max_digits=10, decimal_places=3, blank=True)),
@@ -263,8 +269,8 @@ class Migration(SchemaMigration):
         # Adding model 'LoadingDetail'
         db.create_table('ets_loadingdetail', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('wbNumber', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Waybill'])),
-            ('order_item', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.LtiWithStock'])),
+            ('wbNumber', self.gf('django.db.models.fields.related.ForeignKey')(related_name='loading_details', to=orm['ets.Waybill'])),
+            ('order_item', self.gf('django.db.models.fields.related.ForeignKey')(related_name='loading_details', to=orm['ets.LtiWithStock'])),
             ('numberUnitsLoaded', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=10, decimal_places=3)),
             ('numberUnitsGood', self.gf('django.db.models.fields.DecimalField')(default=0, null=True, max_digits=10, decimal_places=3, blank=True)),
             ('numberUnitsLost', self.gf('django.db.models.fields.DecimalField')(default=0, null=True, max_digits=10, decimal_places=3, blank=True)),
@@ -310,7 +316,7 @@ class Migration(SchemaMigration):
             ('isDispatcher', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('isReciever', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('isAllReceiver', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('compasUser', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.EpicPerson'], null=True, blank=True)),
+            ('compasUser', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='_auditlog_profiles', null=True, to=orm['ets.EpicPerson'])),
             ('superUser', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('readerUser', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -329,7 +335,7 @@ class Migration(SchemaMigration):
             ('isDispatcher', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('isReciever', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('isAllReceiver', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('compasUser', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.EpicPerson'], null=True, blank=True)),
+            ('compasUser', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='profiles', null=True, to=orm['ets.EpicPerson'])),
             ('superUser', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('readerUser', self.gf('django.db.models.fields.BooleanField')(default=False)),
         ))
@@ -337,7 +343,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'SiTracker'
         db.create_table('ets_sitracker', (
-            ('LTI', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['ets.LtiOriginal'], unique=True, primary_key=True)),
+            ('LTI', self.gf('django.db.models.fields.related.OneToOneField')(related_name='sitracker', unique=True, primary_key=True, to=orm['ets.LtiOriginal'])),
             ('number_units_left', self.gf('django.db.models.fields.DecimalField')(max_digits=10, decimal_places=3)),
             ('number_units_start', self.gf('django.db.models.fields.DecimalField')(max_digits=10, decimal_places=3)),
         ))
@@ -701,14 +707,14 @@ class Migration(SchemaMigration):
             'numberUnitsGood': ('django.db.models.fields.DecimalField', [], {'default': '0', 'null': 'True', 'max_digits': '10', 'decimal_places': '3', 'blank': 'True'}),
             'numberUnitsLoaded': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '10', 'decimal_places': '3'}),
             'numberUnitsLost': ('django.db.models.fields.DecimalField', [], {'default': '0', 'null': 'True', 'max_digits': '10', 'decimal_places': '3', 'blank': 'True'}),
-            'order_item': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.LtiWithStock']"}),
+            'order_item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'loading_details'", 'to': "orm['ets.LtiWithStock']"}),
             'overOffloadUnits': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'overloadedUnits': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'unitsDamagedReason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'LD_DamagedReason'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsDamagedType': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'LD_DamagedType'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsLostReason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'LD_LostReason'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsLostType': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'LD_LossType'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
-            'wbNumber': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Waybill']"})
+            'wbNumber': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'loading_details'", 'to': "orm['ets.Waybill']"})
         },
         'ets.loadingdetailauditlogentry': {
             'Meta': {'ordering': "('-action_date',)", 'object_name': 'LoadingDetailAuditLogEntry'},
@@ -722,14 +728,14 @@ class Migration(SchemaMigration):
             'numberUnitsGood': ('django.db.models.fields.DecimalField', [], {'default': '0', 'null': 'True', 'max_digits': '10', 'decimal_places': '3', 'blank': 'True'}),
             'numberUnitsLoaded': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '10', 'decimal_places': '3'}),
             'numberUnitsLost': ('django.db.models.fields.DecimalField', [], {'default': '0', 'null': 'True', 'max_digits': '10', 'decimal_places': '3', 'blank': 'True'}),
-            'order_item': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.LtiWithStock']"}),
+            'order_item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_loading_details'", 'to': "orm['ets.LtiWithStock']"}),
             'overOffloadUnits': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'overloadedUnits': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'unitsDamagedReason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_LD_DamagedReason'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsDamagedType': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_LD_DamagedType'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsLostReason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_LD_LostReason'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
             'unitsLostType': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_LD_LossType'", 'null': 'True', 'to': "orm['ets.EpicLossDamages']"}),
-            'wbNumber': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Waybill']"})
+            'wbNumber': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_loading_details'", 'to': "orm['ets.Waybill']"})
         },
         'ets.ltioriginal': {
             'Meta': {'object_name': 'LtiOriginal', 'db_table': "u'epic_lti'"},
@@ -777,13 +783,13 @@ class Migration(SchemaMigration):
             'packageShortName': ('django.db.models.fields.CharField', [], {'max_length': '10'})
         },
         'ets.place': {
-            'Meta': {'object_name': 'Place', 'db_table': "u'epic_geo'"},
+            'Meta': {'ordering': "('name',)", 'object_name': 'Place', 'db_table': "u'epic_geo'"},
             'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
             'geo_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'geo_point_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'org_code': ('django.db.models.fields.CharField', [], {'max_length': '7', 'primary_key': 'True'}),
-            'organization_id': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'organization_id': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
             'reporting_code': ('django.db.models.fields.CharField', [], {'max_length': '7'})
         },
         'ets.receptionpoint': {
@@ -800,14 +806,14 @@ class Migration(SchemaMigration):
             'lti': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.LtiOriginal']", 'primary_key': 'True'})
         },
         'ets.sitracker': {
-            'LTI': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['ets.LtiOriginal']", 'unique': 'True', 'primary_key': 'True'}),
+            'LTI': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'sitracker'", 'unique': 'True', 'primary_key': 'True', 'to': "orm['ets.LtiOriginal']"}),
             'Meta': {'object_name': 'SiTracker'},
             'number_units_left': ('django.db.models.fields.DecimalField', [], {'max_digits': '10', 'decimal_places': '3'}),
             'number_units_start': ('django.db.models.fields.DecimalField', [], {'max_digits': '10', 'decimal_places': '3'})
         },
         'ets.userprofile': {
             'Meta': {'object_name': 'UserProfile'},
-            'compasUser': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.EpicPerson']", 'null': 'True', 'blank': 'True'}),
+            'compasUser': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'profiles'", 'null': 'True', 'to': "orm['ets.EpicPerson']"}),
             'isAllReceiver': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'isCompasUser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'isDispatcher': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -824,7 +830,7 @@ class Migration(SchemaMigration):
             'action_id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'action_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'action_user': ('audit_log.models.fields.LastUserField', [], {'related_name': "'_userprofile_audit_log_entry'", 'null': 'True', 'to': "orm['auth.User']"}),
-            'compasUser': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.EpicPerson']", 'null': 'True', 'blank': 'True'}),
+            'compasUser': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_profiles'", 'null': 'True', 'to': "orm['ets.EpicPerson']"}),
             'isAllReceiver': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'isCompasUser': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'isDispatcher': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -848,8 +854,9 @@ class Migration(SchemaMigration):
             'containerTwoSealNumber': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
             'dateOfDispatch': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'dateOfLoading': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Place']", 'blank': 'True'}),
-            'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'recipient_waybills'", 'to': "orm['ets.Place']"}),
+            'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'dispatch_warehouse': ('django.db.models.fields.related.ForeignKey', [], {'default': "u'ISBX002'", 'related_name': "'dispatch_waybills'", 'to': "orm['ets.Place']"}),
             'dispatcherName': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dispatcherSigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'dispatcherTitle': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -867,6 +874,8 @@ class Migration(SchemaMigration):
             'recipientSignedTimestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'recipientStartDischargeDate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'recipientTitle': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'slug': ('autoslug.fields.AutoSlugField', [], {'unique': 'True', 'max_length': '50', 'populate_from': 'None', 'unique_with': '()', 'db_index': 'True'}),
+            'status': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'transactionType': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'transportContractor': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'transportDeliverySigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
@@ -903,8 +912,9 @@ class Migration(SchemaMigration):
             'containerTwoSealNumber': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
             'dateOfDispatch': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'dateOfLoading': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Place']", 'blank': 'True'}),
-            'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
+            'destinationWarehouse': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_recipient_waybills'", 'to': "orm['ets.Place']"}),
+            'dispatchRemarks': ('django.db.models.fields.CharField', [], {'max_length': '200', 'blank': 'True'}),
+            'dispatch_warehouse': ('django.db.models.fields.related.ForeignKey', [], {'default': "u'ISBX002'", 'related_name': "'_auditlog_dispatch_waybills'", 'to': "orm['ets.Place']"}),
             'dispatcherName': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'dispatcherSigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'dispatcherTitle': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -922,6 +932,8 @@ class Migration(SchemaMigration):
             'recipientSignedTimestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'recipientStartDischargeDate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'recipientTitle': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
+            'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'populate_from': 'None', 'db_index': 'True'}),
+            'status': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'transactionType': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'transportContractor': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
             'transportDeliverySigned': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
