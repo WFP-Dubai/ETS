@@ -13,6 +13,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django.db import transaction
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -395,7 +396,7 @@ class Waybill( models.Model ):
         self.save()
     
     
-    @classmethod    
+    @classmethod
     def send_new(cls):
         """Sents new waybills to central server"""
         url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
@@ -406,7 +407,7 @@ class Waybill( models.Model ):
         if data:
             try:
                 response = urllib2.urlopen(urllib2.Request(url, data, {
-                    'Content-Type': 'text/json; charset=utf-8'
+                    'Content-Type': 'application/json; charset=utf-8'
                 }), timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
                 print err
@@ -444,7 +445,7 @@ class Waybill( models.Model ):
                         obj.save()
                 
     
-    @classmethod    
+    @classmethod
     def get_receiving(cls):
         """
         Receiver reads the server for new waybills, that we are expecting to receive 
@@ -463,14 +464,21 @@ class Waybill( models.Model ):
     @classmethod
     def send_informed(cls):
         """Receiver updates status of receiving waybill to 'informed'"""
-        DATA_URL = "http://localhost:8000/api/informed/"
-        waybills = cls.filter(status=cls.NEW, destinationWarehouse__pk=COMPAS_STATION)
+        waybills = cls.objects.filter(status=cls.SENT, destinationWarehouse__pk=COMPAS_STATION)
+        url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill"))
+        
+        request = urllib2.Request(url, simplejson.dumps(tuple(waybills.values_list('pk', flat=True))), {
+            'Content-Type': 'application/json'
+        })
+        request.get_method = lambda: 'PUT'
+        
         try:
-            response = urllib2.urlopen(DATA_URL, data=simplejson.dumps(waybills), timeout=DEFAULT_TIMEOUT)
+            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
         except (urllib2.HTTPError, urllib2.URLError) as err:
             print err
         else:
-            cls.objects.filter(pk__in=waybills).update(status=cls.INFORMED)
+            if response.code == 200:
+                waybills.update(status=cls.INFORMED)
     
     @classmethod
     def send_delivered(cls):

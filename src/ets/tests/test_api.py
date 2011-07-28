@@ -8,7 +8,8 @@ from django.core import serializers
 from django.utils import simplejson
 from django.core.management import call_command
 
-from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, urllib2, LtiWithStock
+from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
+import ets.models
 
 class ApiServerTestCase(TestCase):
     
@@ -121,7 +122,7 @@ class ApiServerTestCase(TestCase):
         response = self.client.get(reverse("api_receiving_waybill", 
                                            kwargs={"destination": self.waybill.destinationWarehouse.pk}))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "text/json; charset=utf-8")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
         #Check iterator and existence of waybill in result
         self.assertTrue(self.waybill in (obj.object for obj in serializers.deserialize('json', response.content)))
@@ -131,10 +132,11 @@ class ApiServerTestCase(TestCase):
         Waybill.objects.filter(pk=1).update(status=Waybill.DELIVERED)
         
         response = self.client.get(reverse("api_delivered_waybill", kwargs={"id": 1}))
-        self.assertEqual(response["Content-Type"], "text/json; charset=utf-8")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
         waybill = serializers.deserialize('json', response.content).next().object
         self.assertEqual(waybill, self.waybill)
+    
     
 class ApiEmptyServerTestCase(TestCase):
     
@@ -206,6 +208,21 @@ class ApiEmptyServerTestCase(TestCase):
         self.assertContains(response, '"pk": 1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
     
+    def test_update_informed(self):
+        #Create objects
+        self.create_objects()
+        
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        
+        #Bad request
+        response = self.client.put(reverse("api_informed_waybill"))
+        self.assertEqual(response.status_code, 400)
+        
+        #Provide content-type
+        response = self.client.put(reverse("api_informed_waybill"), data='[1]', content_type="application/json")
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
         
 class ApiClientTestCase(ApiServerTestCase):
         
@@ -215,6 +232,7 @@ class ApiClientTestCase(ApiServerTestCase):
         def dummy_urlopen(request, timeout):
             
             class DummyResponse(object):
+                code = 201
                 def read(self):
                     return "Created"
             
@@ -244,6 +262,29 @@ class ApiClientTestCase(ApiServerTestCase):
         
         Waybill.get_informed()
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+    
+    def test_update_informed(self):
+        #MonkeyPatch of urlopen
+        def dummy_urlopen(request, timeout):
+            
+            class DummyResponse(object):
+                code = 200
+                
+                def read(self):
+                    return "OK"
+            
+            return DummyResponse()
+        
+        urllib2.urlopen = dummy_urlopen
+        
+        old_compas = ets.models.COMPAS_STATION
+        ets.models.COMPAS_STATION = "OE7X001"
+        
+        Waybill.objects.filter(pk=1).update(status=Waybill.SENT)
+        Waybill.send_informed()
+        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+        
+        ets.models.COMPAS_STATION = old_compas
     
     def test_get_delivered(self):
         #MonkeyPatch of urlopen

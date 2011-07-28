@@ -38,8 +38,13 @@ urlpatterns = patterns('',
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
         'emitter_format': 'django_json' 
     }, "api_receiving_waybill"),
+                       
     (r'^informed/(?P<id>\d+)/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
-    (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 'emitter_format': 'django_json' }, "api_delivered_waybill"),
+    (r'^informed/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
+    
+    (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 
+        'emitter_format': 'django_json' 
+    }, "api_delivered_waybill"),
     
     (r'^docs/$', documentation_view),
 
