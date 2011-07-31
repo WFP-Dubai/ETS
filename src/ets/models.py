@@ -115,13 +115,15 @@ class Waybill( models.Model ):
                 )
     
     NEW = 1
-    SENT = 2
-    INFORMED = 3
-    DELIVERED = 4
-    COMPLETE = 5
+    SIGNED = 2
+    SENT = 3
+    INFORMED = 4
+    DELIVERED = 5
+    COMPLETE = 6
     
     STATUSES = (
         (NEW, _("New")),
+        (SIGNED, _("Signed")),
         (SENT, _("Sent")),
         (INFORMED, _("Informed")),
         (DELIVERED, _("Delivered")),
@@ -401,7 +403,7 @@ class Waybill( models.Model ):
         """Sents new waybills to central server"""
         url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
         
-        waybills = cls.objects.filter(status=cls.NEW, dispatch_warehouse__pk=COMPAS_STATION)
+        waybills = cls.objects.filter(status=cls.SIGNED, dispatch_warehouse__pk=COMPAS_STATION)
         
         data = serializers.serialize( 'json', sync_data(waybills), indent=True)
         if data:

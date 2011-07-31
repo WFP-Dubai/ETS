@@ -255,7 +255,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.NEW)
+        Waybill.objects.filter(pk=1).update(status=Waybill.SIGNED)
         Waybill.send_new()
         self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
         
