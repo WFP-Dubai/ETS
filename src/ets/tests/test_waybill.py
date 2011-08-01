@@ -73,7 +73,7 @@ class WaybillTestCase(TestCase):
     def test_compress(self):
         """Checks methods compress of waybill instance"""
         data = self.waybill.compress()
-        self.assertTrue(data.startswith('eJztWG1zokgQ/iuUn5MUoEaTbyioVFRcILvZu'))
+        self.assertTrue(isinstance(data, str))
 
 
 class ClientWaybillTestCase(TestCase):

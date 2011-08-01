@@ -144,8 +144,8 @@ class Waybill( models.Model ):
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
                             COMPAS_STATION, instance.created.strftime('%y'), LETTER_CODE
-                         ), unique=True, slugify=capitalize_slug(slugify), 
-                         primary_key=True)
+                         ), unique=True, slugify=capitalize_slug(slugify),
+                         sep='', primary_key=True)
     
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
@@ -844,7 +844,7 @@ class EpicLossDamages( models.Model ):
 class LtiWithStock( models.Model ):
     slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
                             instance.lti_line.pk, instance.stock_item.pk
-                         ), unique=True, primary_key=True)
+                         ), sep='', unique=True, primary_key=True)
     
     lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line"), related_name="ltistockrel" )
     stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"), related_name="ltistockrel")
@@ -860,7 +860,7 @@ class LtiWithStock( models.Model ):
 
 class LoadingDetail( models.Model ):
     wbNumber = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
-    slug = AutoSlugField(populate_from='wbNumber', unique=True, primary_key=True)
+    slug = AutoSlugField(populate_from='wbNumber', unique=True, sep='', primary_key=True)
     
     order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
