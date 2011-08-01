@@ -36,10 +36,6 @@ urlpatterns = patterns("ets.views",
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
-    #===================================================================================================================
-    # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
-    #===================================================================================================================
-    ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
     #( r'^waybill/edit/$', "waybill_edit" ),
@@ -104,6 +100,11 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/report/receipt/(.*)/$', "receipt_report_cons", {}, "receipt_report_cons" ),
     ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
     ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
+    
+    #===================================================================================================================
+    # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
+    #===================================================================================================================
+    ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
     
     # download services
     ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),

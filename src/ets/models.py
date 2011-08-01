@@ -842,6 +842,10 @@ class EpicLossDamages( models.Model ):
 
 
 class LtiWithStock( models.Model ):
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
+                            instance.lti_line.pk, instance.stock_item.pk
+                         ), unique=True, primary_key=True)
+    
     lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line"), related_name="ltistockrel" )
     stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"), related_name="ltistockrel")
     lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
@@ -855,8 +859,9 @@ class LtiWithStock( models.Model ):
 
 
 class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"), related_name="loading_details")
-    #slug = AutoSlugField(populate_from='wbNumber', unique=True, primary_key=True)
+    wbNumber = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
+    slug = AutoSlugField(populate_from='wbNumber', unique=True, primary_key=True)
+    
     order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
                                             null = False, max_digits = 10, decimal_places = 3 )

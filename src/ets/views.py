@@ -55,10 +55,8 @@ def listOfLtis( request, origin, template='lti/ltis.html'):
     Shows the LTIs that are in a specific warehouse
     """
     
-    if settings.DISABLE_EXPIERED_LTI:
-        date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date()
-    else:
-        date_check = datetime.date.today()
+    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
+                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
 
     ltis = LtiOriginal.objects.values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date' , 'expiry_date' )\
                               .distinct().filter( expiry_date__gt = date_check, origin_wh_code = origin )
@@ -82,10 +80,9 @@ def ltis( request, template='lti/ltis_all_qs.html' ):
     template:
     /ets/waybill/templates/ltis.html
     """
-    if settings.DISABLE_EXPIERED_LTI:
-        date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date()
-    else:
-        date_check = datetime.date.today()
+    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
+                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
+    
     removedLtis = RemovedLtis.objects.all()
     
     ltis = LtiOriginal.objects.exclude( pk__in = removedLtis ).filter( expiry_date__gt = date_check )\
@@ -761,22 +758,17 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
 
 
 @login_required
-def waybill_edit( request, waybill_pk, template='waybill/createWaybill.html' ):
-    #TODO: Remove this try...except
-    try:
-        current_wb = Waybill.objects.get(pk = waybill_pk)
-        lti_code = current_wb.ltiNumber
-        current_lti = LtiOriginal.objects.filter( code = lti_code )
-        current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    except Exception as e:
-        print e
-        current_wb = ''
+def waybill_edit( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/createWaybill.html' ):
+    current_wb = get_object_or_404(queryset, pk=waybill_pk)
+    lti_code = current_wb.ltiNumber
+    current_lti = LtiOriginal.objects.filter( code = lti_code )
+    current_items = LtiWithStock.objects.filter( lti_code = lti_code )
     
     class LoadingDetailDispatchForm( forms.ModelForm ):
         order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
         class Meta:
             model = LoadingDetail
-            fields = ( 'id', 'order_item', 'numberUnitsLoaded', 'wbNumber', 'overloadedUnits' )
+            fields = ( 'order_item', 'numberUnitsLoaded', 'wbNumber', 'overloadedUnits' )
         def clean( self ):
             try:
                 cleaned = self.cleaned_data
@@ -797,7 +789,9 @@ def waybill_edit( request, waybill_pk, template='waybill/createWaybill.html' ):
                     self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
                     self._errors['numberUnitsLoaded'].append( myerror )
                     raise forms.ValidationError( myerror )
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, extra = 5, max_num = 5 )
+    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
+                                       fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, 
+                                       extra = 5, max_num = 5 )
     if request.method == 'POST':
         form = WaybillForm( request.POST, instance = current_wb )
         formset = LDFormSet( request.POST, instance = current_wb )
@@ -812,8 +806,8 @@ def waybill_edit( request, waybill_pk, template='waybill/createWaybill.html' ):
     
     return direct_to_template( request, template, {
         'form': form, 
-        'lti_list':current_lti, 
-        'formset':formset
+        'lti_list': current_lti, 
+        'formset': formset,
     })
 
 

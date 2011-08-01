@@ -6,6 +6,13 @@ from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
 
+
+class WaybillAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
+    
+admin.site.register( ets.models.Waybill, WaybillAdmin )
+
+
 class UserProfileInline( admin.StackedInline ):
     model = ets.models.UserProfile
     verbose_name_plural = 'User Profile'

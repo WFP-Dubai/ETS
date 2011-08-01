@@ -45,7 +45,7 @@
         </thead>
     	{% for sform in formset.forms %}
     	<tr>
-    	  	<td>{{ sform.id }}{{forloop.counter}}</td>
+    	  	<td>{{ sform.slug }}{{forloop.counter}}</td>
     	  	<td>{{ sform.order_item }}</td>
     	  	<td>{{ sform.numberUnitsLoaded }} {%for error in sform.numberUnitsLoaded.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}</td>
     	  	<td>{{ sform.overloadedUnits}}</td>

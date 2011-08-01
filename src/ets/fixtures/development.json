@@ -470,7 +470,7 @@
     }
   }, 
   {
-    "pk": "ISBX002000000000000001011HQX0001000000000000995247", 
+    "pk": "QANX001000000000000005217HQX0001000000000000988849", 
     "model": "ets.sitracker", 
     "fields": {
       "number_units_left": "11527.000", 
@@ -541,7 +541,7 @@
     }
   }, 
   {
-    "pk": 1, 
+    "pk": "QANX001000000000000005217HQX0001000000000000984141KARX025KARX0010000944801MIXMIXHEBCG15586", 
     "model": "ets.ltiwithstock", 
     "fields": {
       "lti_line": "QANX001000000000000005217HQX0001000000000000984141", 
@@ -550,7 +550,7 @@
     }
   }, 
   {
-    "pk": 2, 
+    "pk": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
     "model": "ets.ltiwithstock", 
     "fields": {
       "lti_line": "QANX001000000000000005217HQX0001000000000000988849", 
@@ -559,7 +559,7 @@
     }
   },
   {
-    "pk": 1, 
+    "pk": "isbx00211a", 
     "model": "ets.loadingdetail", 
     "fields": {
       "numberUnitsGood": "0.000", 
@@ -569,7 +569,7 @@
       "wbNumber": "ISBX00211A", 
       "overloadedUnits": false, 
       "numberUnitsLoaded": "5.000", 
-      "order_item": 1, 
+      "order_item": "QANX001000000000000005217HQX0001000000000000984141KARX025KARX0010000944801MIXMIXHEBCG15586", 
       "unitsDamagedReason": null, 
       "unitsLostType": null, 
       "loadingDetailSentToCompas": false, 
@@ -578,7 +578,7 @@
     }
   }, 
   {
-    "pk": 2, 
+    "pk": "isbx00211a1", 
     "model": "ets.loadingdetail", 
     "fields": {
       "numberUnitsGood": "0.000", 
@@ -588,7 +588,7 @@
       "wbNumber": "ISBX00211A", 
       "overloadedUnits": false, 
       "numberUnitsLoaded": "10.000", 
-      "order_item": 1, 
+      "order_item": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
       "unitsDamagedReason": null, 
       "unitsLostType": null, 
       "loadingDetailSentToCompas": false, 
