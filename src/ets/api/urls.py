@@ -32,17 +32,17 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 urlpatterns = patterns('',
     
     (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
-    (r'^waybill/(?P<id>\d+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
+    (r'^waybill/(?P<slug>[-\w]+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
         'emitter_format': 'django_json' 
     }, "api_receiving_waybill"),
                        
-    (r'^informed/(?P<id>\d+)/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
+    (r'^informed/(?P<slug>[-\w]+)/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
     (r'^informed/$', informed_waybill_resource, { 'emitter_format': 'json' }, "api_informed_waybill"),
     
-    (r'^delivered/(?P<id>\d+)/$', delivered_waybill_resource, { 
+    (r'^delivered/(?P<slug>[-\w]+)/$', delivered_waybill_resource, { 
         'emitter_format': 'django_json' 
     }, "api_delivered_waybill"),
     (r'^delivered/$', delivered_waybill_resource, { 'emitter_format': 'django_json' }, "api_delivered_waybill"),

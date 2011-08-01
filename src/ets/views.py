@@ -24,6 +24,7 @@ from ets.forms import WaybillValidationFormset, WarehouseForm
 from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
 from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
 from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
+from ets.models import COMPAS_STATION
 from ets.tools import restant_si 
 from ets.tools import import_setup, import_lti, track_compas_update
 from ets.tools import un64unZip, viewLog, default_json_dump
@@ -177,7 +178,7 @@ def dispatch( request ):
 
 
 @login_required
-def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
+def waybill_finalize_dispatch( request, waybill_pk, queryset):
     """
     View: waybill_finalize_dispatch
     URL: /waybill/dispatch
@@ -185,25 +186,22 @@ def waybill_finalize_dispatch( request, wb_id, queryset=Waybill.objects.all() ):
     called when user pushes Print Original on dispatch
     Redirects to Lti Details
     """
-    current_wb = get_object_or_404(queryset, id = wb_id)
-
-    current_wb.transportDispachSigned = True
-    current_wb.transportDispachSignedTimestamp = datetime.datetime.now()
-    current_wb.dispatcherSigned = True
-    current_wb.auditComment = _('Print Dispatch Original')
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.dispatch_sign(False)
     
-    for lineitem in current_wb.loading_details.select_related():
+    for lineitem in waybill.loading_details.select_related():
         lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
     
-    current_wb.save()
-    messages.add_message( request, messages.INFO, 
-                          _('Waybill %(waybill)s Dispatch Signed') % {"waybill": current_wb.waybillNumber})
+    waybill.save()
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
+        "waybill": waybill.pk
+    })
     
-    return redirect( "lti_detail_url", current_wb.ltiNumber)
+    return redirect( "lti_detail_url", waybill.ltiNumber)
 
 
 @login_required
-def waybill_finalize_receipt( request, wb_id ):
+def waybill_finalize_receipt( request, waybill_pk, queryset):
     """
     View: waybill_finalize_receipt 
     URL:/waybill/receipt/
@@ -211,20 +209,13 @@ def waybill_finalize_receipt( request, wb_id ):
     Redirects to Lti Details
     Called when user pushes Print Original on Receipt
     """
-    try:
-        current_wb = Waybill.objects.get( id = wb_id )
-        current_wb.recipientSigned = True
-        current_wb.transportDeliverySignedTimestamp = datetime.datetime.now()
-        current_wb.recipientSignedTimestamp = datetime.datetime.now()
-        current_wb.transportDeliverySigned = True
-        current_wb.auditComment = _('Print Dispatch Receipt')
-        current_wb.save()
-        
-        messages.add_message( request, messages.INFO, 
-                              _('Waybill %(waybill)s Receipt Signed') % { 'waybill': current_wb.waybillNumber})
-    except:
-        pass
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.receipt_sign()
     
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
+        'waybill': waybill.pk,
+    })
+
     return redirect( "waybill_reception_list" )
 
 
@@ -244,17 +235,17 @@ def create_or_update(waybill, user, error_message):
     return compas_logger
 
 @login_required
-def singleWBDispatchToCompas( request, wb_id, queryset=Waybill.objects.all() ):
+def singleWBDispatchToCompas( request, waybill_pk, queryset=Waybill.objects.all() ):
     """
     View: singleWBDispatchToCompas
     URL: 
     
     Sends a single Dipatch into compas
     """
-    waybill = get_object_or_404(queryset, id = wb_id )
+    waybill = get_object_or_404(queryset, pk = waybill_pk )
     the_compas = compas_write()
     error_message, error_codes = '', ''
-    if the_compas.write_dispatch_waybill_compas( wb_id ):
+    if the_compas.write_dispatch_waybill_compas( waybill_pk ):
         CompasLogger.objects.filter( wb = waybill ).delete()
         
         waybill.waybillSentToCompas = True
@@ -280,7 +271,7 @@ def singleWBDispatchToCompas( request, wb_id, queryset=Waybill.objects.all() ):
 
 
 @login_required
-def singleWBReceiptToCompas( request, wb_id, queryset=Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
+def singleWBReceiptToCompas( request, waybill_pk, queryset=Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
     """
     View: singleWBReceiptToCompas
     URL: ...
@@ -288,10 +279,10 @@ def singleWBReceiptToCompas( request, wb_id, queryset=Waybill.objects.all(), tem
     Sends a single Receipt into compas
     """
     #profile = getMyProfile(request)
-    waybill = get_object_or_404(queryset, id = wb_id )
+    waybill = get_object_or_404(queryset, pk = waybill_pk )
     the_compas = compas_write()
     error_message, error_codes = '', ''
-    if  the_compas.write_receipt_waybill_compas( waybill.id ):
+    if  the_compas.write_receipt_waybill_compas( waybill.pk ):
         CompasLogger.objects.filter( wb = waybill ).delete()
 
         waybill.waybillRecSentToCompas = True
@@ -323,7 +314,7 @@ def receiptToCompas( request, template='compas/list_waybills_compas_received.htm
     
     for waybill in list_waybills:
         # call compas and read return
-        if the_compas.write_receipt_waybill_compas( waybill.id ):
+        if the_compas.write_receipt_waybill_compas( waybill.pk ):
             waybill.waybillRecSentToCompas = True
             waybill.save()
         else:
@@ -337,9 +328,9 @@ def receiptToCompas( request, template='compas/list_waybills_compas_received.htm
     })
 
 
-def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template='status.html' ):
+def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
     #first mark waybill invalidate, then zero the stock usage for each line and update the si table
-    current_wb = get_object_or_404(queryset, id = wb_id )
+    current_wb = get_object_or_404(queryset, pk = waybill_pk )
     current_wb.invalidate_waybill_action()
     return direct_to_template( request, template, {
         'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
@@ -359,14 +350,14 @@ def invalidate_waybill( request, wb_id, queryset=Waybill.objects.all(), template
 
 
 @login_required
-def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all(), 
+def waybill_validate_form_update( request, waybill_pk, queryset, 
                                   template='waybill/waybill_detail.html'):
     """
     Admin Edit waybill
     waybill/validate/(.*)
     waybill/waybill_detail.html
     """
-    current_wb = get_object_or_404( queryset, id = wb_id )
+    current_wb = get_object_or_404(queryset, pk = waybill_pk)
     
     lti_code = current_wb.ltiNumber
     current_lti = LtiOriginal.objects.filter( code = lti_code )
@@ -436,11 +427,11 @@ def waybill_validate_form_update( request, wb_id, queryset=Waybill.objects.all()
 
 
 @login_required
-def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='waybill/print/waybill_detail_view.html' ):
+def waybill_view( request, waybill_pk, queryset, template='waybill/print/waybill_detail_view.html' ):
     ## TODO: remove dependency of zippedWB
     #TODO: remove these try...except blocks
     try:
-        waybill_instance = queryset.get(id = wb_id)
+        waybill_instance = queryset.get(pk = waybill_pk)
         extra_lines = 5 - waybill_instance.loading_details.select_related().count()
         zippedWB = waybill_instance.compress()
         lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
@@ -470,12 +461,12 @@ def waybill_view( request, wb_id, queryset=Waybill.objects.all(), template='wayb
 
 
 @login_required
-def waybill_view_reception( request, wb_id, template='waybill/print/waybill_detail_view_reception.html' ):
+def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill_detail_view_reception.html' ):
     ## TODO: remove dependency of zippedWB
     
     zippedWB = ''
     try:
-        waybill_instance = Waybill.objects.get( id = wb_id )
+        waybill_instance = Waybill.objects.get( pk = waybill_pk )
         lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
         number_of_lines = waybill_instance.loading_details.select_related().count()
         my_empty = [''] * (5 - number_of_lines)
@@ -501,14 +492,14 @@ def waybill_view_reception( request, wb_id, template='waybill/print/waybill_deta
 
 
 @login_required
-def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
+def waybill_reception( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
     # get the LTI info
-    current_wb = get_object_or_404(queryset, id = wb_code )
+    current_wb = get_object_or_404(queryset, pk = waybill_pk )
     current_lti = current_wb.ltiNumber
     current_items = LtiWithStock.objects.filter( lti_code = current_lti )
     profile = request.user.get_profile()
     if not (profile.isReciever or profile.superUser or profile.compasUser):
-        return redirect( "waybill_view", wb_code)
+        return redirect( "waybill_view", waybill_pk=waybill_pk)
     
 #    current_wb.auditComment = 'Receipt Action'
 #    current_wb.save()
@@ -612,7 +603,7 @@ def waybill_reception( request, wb_code, queryset=Waybill.objects.all(), templat
             wb_new.auditComment = 'Receipt Action'
             wb_new.save()
             formset.save()
-            return redirect('waybill_view_reception', current_wb.id)
+            return redirect('waybill_view_reception', waybill_pk=current_wb.pk)
         else:
             #TODO: we should show these error to user, not print them
             print( formset.errors )
@@ -664,7 +655,7 @@ def waybill_search( request, template='waybill/list_waybills.html',
             and waybill.consegnee_code == profile.receptionPoints.consegnee_code 
             and waybill.destination_loc_name == profile.receptionPoints.LOC_NAME 
         ) or ( profile.isAllReceiver and waybill.consegnee_code == consegnee_code ):
-            my_valid_wb.append( waybill.id )
+            my_valid_wb.append( waybill.pk )
 
     return direct_to_template( request, template, {
         'waybill_list': found_wb, 
@@ -731,7 +722,7 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
                 subform.wbNumber = wb_new
                 subform.save()
             wb_new.save()
-            return redirect("waybill_view", wb_new.id)
+            return redirect("waybill_view", waybill_pk=wb_new.pk)
         else:
             print( formset.errors )
             print( form.errors )
@@ -770,9 +761,10 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
 
 
 @login_required
-def waybill_edit( request, wb_id, template='waybill/createWaybill.html' ):
+def waybill_edit( request, waybill_pk, template='waybill/createWaybill.html' ):
+    #TODO: Remove this try...except
     try:
-        current_wb = Waybill.objects.get( id = wb_id )
+        current_wb = Waybill.objects.get(pk = waybill_pk)
         lti_code = current_wb.ltiNumber
         current_lti = LtiOriginal.objects.filter( code = lti_code )
         current_items = LtiWithStock.objects.filter( lti_code = lti_code )
@@ -812,7 +804,7 @@ def waybill_edit( request, wb_id, template='waybill/createWaybill.html' ):
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
             formset.save()
-            return redirect("waybill_view", wb_new.id )
+            return redirect("waybill_view", waybill_pk=wb_new.pk)
     else:
         form = WaybillForm( instance = current_wb )
         form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
@@ -871,8 +863,9 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
 
 @login_required
 def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
-    ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillReceiptValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillReceiptValidated = True ).filter( waybillRecSentToCompas = False ).filter( waybillSentToCompas = True )
+    ValidateFormset = modelformset_factory( Waybill, fields = ( 'waybillReceiptValidated', ), extra = 0 )
+    validatedWB = Waybill.objects.filter(invalidated=False, waybillReceiptValidated=True, 
+                                        waybillRecSentToCompas=False, waybillSentToCompas=True)
     errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
     if request.method == 'POST':
         formset = ValidateFormset( request.POST )
@@ -894,7 +887,8 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
                     
             formset.save()
 
-    waybills = Waybill.objects.filter( invalidated = False ).filter( waybillReceiptValidated = False ).filter( recipientSigned = True ).filter( waybillValidated = True )
+    waybills = Waybill.objects.filter( invalidated = False, waybillReceiptValidated = False, 
+                                       recipientSigned = True, waybillValidated = True )
     formset = ValidateFormset( queryset = waybills )
 
     return direct_to_template( request, template, {
@@ -903,16 +897,18 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
     })
 
 
-# Shows a page with the Serialized Waybill in comressed & uncompressed format
-@login_required
-def serialize( request, wb_code, template='blank.html', queryset=Waybill.objects.all() ):
-    waybill = get_object_or_404(queryset, id = wb_code )
-    
-    return direct_to_template( request, template, {
-        'status': waybill.serialize(), 
-        'ziped': waybill.compress(), 
-        'wb_code': wb_code,
-    })
+#=======================================================================================================================
+# # Shows a page with the Serialized Waybill in comressed & uncompressed format
+# @login_required
+# def serialize( request, waybill_pk, template='blank.html', queryset=Waybill.objects.all() ):
+#    waybill = get_object_or_404(queryset, pk = waybill_pk )
+#    
+#    return direct_to_template( request, template, {
+#        'status': waybill.serialize(), 
+#        'ziped': waybill.compress(), 
+#        'wb_code': waybill_pk,
+#    })
+#=======================================================================================================================
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required
@@ -937,7 +933,7 @@ def deserialize( request ):
     for obj in serializers.deserialize( "json", wb_serialized ):
         
         if type( obj.object ) is Waybill:
-            waybillnumber = obj.object.id
+            waybillnumber = obj.object.pk
     
     return redirect(waybill_reception, waybillnumber )
 

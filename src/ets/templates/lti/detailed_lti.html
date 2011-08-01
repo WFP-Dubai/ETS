@@ -61,7 +61,7 @@ border-color: black;
 <table class='bordered' >
 {%for wb in listOfWaybills%}
     <tr><td colspan="3"  class='itemhead bordered'>{% trans "WB:" %}{{wb}} </td>
-    <td class='bordered'><a href='{% url waybill_view wb.id %}?viewonly=true'> {% trans "View Waybill" %}</a></td></tr>
+    <td class='bordered'><a href='{{ wb.get_absolute_url }}?viewonly=true'> {% trans "View Waybill" %}</a></td></tr>
     <tr class='itemhead'><td></td>
     <td class='bordered'>{% trans "Commodity" %}</td>
     <td class='bordered'>{% trans "SI" %}</td>

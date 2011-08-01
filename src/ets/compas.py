@@ -14,7 +14,7 @@ class compas_write:
     ConnectionString = settings.DATABASES[u'compas'][u'USER'] + '/' + settings.DATABASES[u'compas'][u'PASSWORD'] + u'@//' + settings.DATABASES[u'compas'][u'HOST'] + u':1521/' + settings.COMPAS_STATION
 
 
-    def write_dispatch_waybill_compas( self, waybill_id ):
+    def write_dispatch_waybill_compas( self, waybill_pk ):
         import cx_Oracle
         try:
             db = cx_Oracle.Connection( self.ConnectionString )
@@ -23,7 +23,7 @@ class compas_write:
             self.ErrorCodes = u''
             empty = u''
             # gather wb info
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
+            the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
             lineItems = the_waybill.loading_details.select_related()
             LTI = lineItems[0].order_item.lti_item
             DISPATCH_PERSON = ets_models.EpicPerson.objects.get( person_pk = the_waybill.dispatcherName )
@@ -166,14 +166,14 @@ class compas_write:
                 return False
             else:
                 print 'Issue with data1'
-                the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
+                the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
                 self.ErrorMessages = _("Problem with data of Waybill  %(waybill)s: %(errorcode)s \n") % {"waybill": the_waybill,"errorcode": errorObj.code }
                 return False
         except Exception as e:
             print 'Issue with data2'
             print self.ErrorMessages
             
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
+            the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
             
             self.ErrorMessages = _("Problem with data of Waybill %(waybill)s \n %(errormsg)s") % { "waybill": the_waybill, "errormsg":self.ErrorMessages }
             
@@ -181,7 +181,7 @@ class compas_write:
 
 
 
-    def write_receipt_waybill_compas( self, waybill_id ):
+    def write_receipt_waybill_compas( self, waybill_pk ):
         import cx_Oracle
         try:
             db = cx_Oracle.Connection( self.ConnectionString )
@@ -190,7 +190,7 @@ class compas_write:
             all_ok = True
             self.ErrorMessages = ''
             self.ErrorCodes = ''
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
+            the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
             lineItems = the_waybill.loading_details.select_related()
             WB_CODE = the_waybill.waybillNumber
             receiverPerson = ets_models.EpicPerson.objects.get( person_pk = the_waybill.recipientName )
@@ -269,7 +269,7 @@ class compas_write:
         except:
             print 'Issue with data'
 
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_id )
+            the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
            
             self.ErrorMessages = _('Problem with data of Waybill %(waybill)s \n') % { "waybill": the_waybill }
 

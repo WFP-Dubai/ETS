@@ -24,10 +24,11 @@
   }
  },
  {
-  "pk": 1,
+  "pk": "ISBX00211A",
   "model": "ets.waybill",
   "fields": {
    "waybillNumber": "A0009",
+   "dispatch_warehouse": "ISBX002",
    "invalidated": false,
    "transportVehicleRegistration": "",
    "transportContractor": "HAMAYOON AND CO",
@@ -62,7 +63,6 @@
    "waybillSentToCompas": false,
    "recipientStartDischargeDate": null,
    "containerOneRemarksDispatch": "",
-   "slug": "isbx002a0009",
    "waybillValidated": false,
    "transportType": "02",
    "dispatch_warehouse": "ISBX002",
@@ -87,7 +87,7 @@
    "unitsDamagedType": null,
    "unitsLostReason": null,
    "numberUnitsLost": "0",
-   "wbNumber": 1,
+   "wbNumber": "ISBX00211A",
    "overloadedUnits": false,
    "numberUnitsLoaded": "5",
    "order_item": 1,
@@ -106,7 +106,7 @@
    "unitsDamagedType": null,
    "unitsLostReason": null,
    "numberUnitsLost": "0",
-   "wbNumber": 1,
+   "wbNumber": "ISBX00211A",
    "overloadedUnits": false,
    "numberUnitsLoaded": "10",
    "order_item": 1,

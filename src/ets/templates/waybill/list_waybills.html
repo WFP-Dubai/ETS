@@ -19,7 +19,7 @@
         </tr>
         </thead>
 {% for waybill in waybill_list%}
-{%if waybill.id in my_wb%}
+{%if waybill.pk in my_wb%}
 
 <tr {%if waybill.hasError %}style='color:red;'{%endif%}>
              <td>{{waybill.ltiNumber}}</td>
@@ -33,8 +33,8 @@
              <td>{%if waybill.waybillValidated%}{% trans "D" %}{%else%}-{%endif%}/{%if waybill.waybillReceiptValidated%}{% trans "R" %}{%else%}-{%endif%}</td>
              <td>{%if waybill.waybillSentToCompas%}D{%else%}-{%endif%}/{%if waybill.waybillRecSentToCompas%}{% trans "R" %}{%else%}-{%endif%}</td>
 {%endif%}
-             <td>{%if not myprofile.superUser%}<a href='{%if  myprofile.isDispatcher%}{% url waybill_view waybill.id %}{%else%}{% url waybill_view_reception waybill.id %}{%endif%}'>{% trans "View WB" %}</a>{%endif%}
-             {%if myprofile.superUser%} <a href='{% url waybill_validate_form_update waybill.id %}'>{% trans "Edit" %}</a>{%endif%}
+             <td>{%if not myprofile.superUser%}<a href='{% if myprofile.isDispatcher %}{{ waybill.get_absolute_url }}{%else%}{% url waybill_view_reception waybill_pk=waybill.pk %}{%endif%}'>{% trans "View WB" %}</a>{%endif%}
+             {%if myprofile.superUser%} <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>{%endif%}
              </td>
     </tr>
 {%endif%}

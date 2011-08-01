@@ -234,7 +234,7 @@ TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'ets.context_processor.common'
 )
 
-TEST_RUNNER = "ets.tests.coverage_runner.run_tests"
+TEST_RUNNER = 'ets.tests.coverage_runner.CaverageTestSuiteRunner'
 COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 
 LOGIN_REDIRECT_URL = '/'

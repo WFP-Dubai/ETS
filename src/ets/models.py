@@ -2,6 +2,8 @@
 import zlib, base64, string, urllib2
 #from urllib import urlencode
 from itertools import chain
+from functools import wraps
+from datetime import date, datetime
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -10,7 +12,7 @@ from django.core import serializers
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.utils import simplejson
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.db import transaction
@@ -18,10 +20,12 @@ from django.db import transaction
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from piston.emitters import Emitter
+from autoslug.settings import slugify
 
 name = "1234"
 DEFAULT_TIMEOUT = 10
 COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
+LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 API_DOMAIN = "http://localhost:8000"
 
 # like a normal ForeignKey.
@@ -30,6 +34,14 @@ try:
     add_introspection_rules([], ['^audit_log\.models\.fields\.LastUserField'])
 except ImportError:
     pass
+
+def capitalize_slug(func):
+    @wraps(func)
+    def wrapper(value):
+        slug = func(value)
+        return slug.upper()
+    
+    return wrapper
 
 class Place( models.Model ):
     """
@@ -130,14 +142,17 @@ class Waybill( models.Model ):
         (COMPLETE, _("Complete")),
     )
     
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
+                            COMPAS_STATION, instance.created.strftime('%y'), LETTER_CODE
+                         ), unique=True, slugify=capitalize_slug(slugify), 
+                         primary_key=True)
+    
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
-                            instance.dispatch_warehouse.org_code, 
-                            instance.waybillNumber
-                         ), unique=True)
     
     ltiNumber = models.CharField( _("LTI number"), max_length = 20)
     waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
+    created = models.DateTimeField(_("created date/time"), default=datetime.now)
+    
     dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
     dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
     transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
@@ -201,6 +216,10 @@ class Waybill( models.Model ):
 
     def  __unicode__( self ):
         return self.waybillNumber
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ('waybill_view', (), {'waybill_pk': self.pk})
 
     def mydesc( self ):
         return self.waybillNumber
@@ -332,6 +351,37 @@ class Waybill( models.Model ):
         self.invalidated = True
         self.save()
     
+    def dispatch_sign(self, commit=True):
+        """
+        Signs the waybill as ready to be sent and sets special status SIGNED. 
+        After this system sends it to central server.
+        """
+        self.transportDispachSigned = True
+        self.transportDispachSignedTimestamp = datetime.now()
+        self.dispatcherSigned = True
+        self.auditComment = ugettext('Print Dispatch Original')
+        
+        self.update_status(self.SIGNED)
+        
+        if commit:
+            self.save()
+    
+    def receipt_sign(self, commit=True):
+        """
+        Signs the waybill as delivered and sets special status DELIVERED. 
+        After this system sends it to central server.
+        """
+        self.recipientSigned = True
+        self.transportDeliverySignedTimestamp = datetime.now()
+        self.recipientSignedTimestamp = datetime.now()
+        self.transportDeliverySigned = True
+        self.auditComment = ugettext('Print Dispatch Receipt')
+        
+        self.update_status(self.DELIVERED)
+        
+        if commit:
+            self.save()
+    
     def serialize(self):
         """
         This method serializes the Waybill with related LoadingDetails, LtiOriginals and EpicStocks.
@@ -422,7 +472,7 @@ class Waybill( models.Model ):
     def get_informed(cls):
         """Dispatcher reads the server for new informed waybills"""
         for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"id": waybill.pk}))
+            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"slug": waybill.slug}))
             try:
                 response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
@@ -436,7 +486,7 @@ class Waybill( models.Model ):
     def get_delivered(cls):
         """Dispatcher reads the server for delivered waybills"""
         for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"id": waybill.pk}))
+            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"slug": waybill.slug}))
             try:
                 response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
             except (urllib2.HTTPError, urllib2.URLError) as err:
@@ -806,6 +856,7 @@ class LtiWithStock( models.Model ):
 
 class LoadingDetail( models.Model ):
     wbNumber = models.ForeignKey( Waybill ,verbose_name = _("Waybill Number"), related_name="loading_details")
+    #slug = AutoSlugField(populate_from='wbNumber', unique=True, primary_key=True)
     order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
     numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
                                             null = False, max_digits = 10, decimal_places = 3 )

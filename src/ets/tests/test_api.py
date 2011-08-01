@@ -22,14 +22,14 @@ class TestDevelopmentMixin(object):
         "Hook method for setting up the test fixture before exercising it."
         self.client.login(username="admin", password="admin")
         self.user = User.objects.get(username="admin")
-        self.waybill = Waybill.objects.get(pk=1)
         self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
         self.dispatch_point = DispatchPoint.objects.get(pk=1)
         self.maxDiff = None
         self.waybill_dict = {
-            'slug': 'isbx002a0009',
+            'slug': 'ISBX00211A',
             'status': 1,
+            'created': '2011-06-12 05:36:54',
             'dispatch_warehouse': {
                 'country_code': '586',
                 'geo_name': 'ISLAMABAD_CAP',
@@ -94,6 +94,9 @@ class TestDevelopmentMixin(object):
             "transportTrailerRegistration": ""
         }
     
+    def get_waybill(self):
+        return Waybill.objects.get(pk="ISBX00211A")
+    
 
 class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
@@ -107,7 +110,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         self.assertDictEqual(data[0], self.waybill_dict)
     
     def test_read_waybill(self):
-        response = self.client.get(reverse("api_waybill", kwargs={"id": self.waybill.pk}))
+        response = self.client.get(reverse("api_waybill", kwargs={"slug": self.get_waybill().pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
@@ -117,25 +120,25 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
     def test_get_receiving(self):
         #Change status of first one
-        Waybill.objects.filter(pk=1).update(status=Waybill.SENT)
+        self.get_waybill().update_status(status=Waybill.SENT)
         
         response = self.client.get(reverse("api_receiving_waybill", 
-                                           kwargs={"destination": self.waybill.destinationWarehouse.pk}))
+                                           kwargs={"destination": self.get_waybill().destinationWarehouse.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
         #Check iterator and existence of waybill in result
-        self.assertTrue(self.waybill in (obj.object for obj in serializers.deserialize('json', response.content)))
+        self.assertTrue(self.get_waybill() in (obj.object for obj in serializers.deserialize('json', response.content)))
     
     def test_get_delivered(self):
         #Change status of first one
-        Waybill.objects.filter(pk=1).update(status=Waybill.DELIVERED)
+        self.get_waybill().update_status(status=Waybill.DELIVERED)
         
-        response = self.client.get(reverse("api_delivered_waybill", kwargs={"id": 1}))
+        response = self.client.get(reverse("api_delivered_waybill", kwargs={"slug": self.get_waybill().pk}))
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
         waybill = serializers.deserialize('json', response.content).next().object
-        self.assertEqual(waybill, self.waybill)
+        self.assertEqual(waybill, self.get_waybill())
     
     
 class ApiEmptyServerTestCase(TestCase):
@@ -153,6 +156,9 @@ class ApiEmptyServerTestCase(TestCase):
         #    obj.save()
         #===============================================================================================================
     
+    def get_waybill(self):
+        return Waybill.objects.all()[0]
+    
     def test_send_new(self):
         
         self.assertEqual(Waybill.objects.count(), 0)
@@ -163,8 +169,8 @@ class ApiEmptyServerTestCase(TestCase):
         self.assertEqual(response.content, "Created")
         
         self.assertEqual(Waybill.objects.count(), 1)
-        self.assertEqual(Waybill.objects.get(pk=1).loading_details.count(), 2)
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().loading_details.count(), 2)
+        self.assertEqual(self.get_waybill().status, Waybill.SENT)
     
     def test_get_receiving(self):
         
@@ -189,46 +195,47 @@ class ApiEmptyServerTestCase(TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        #self.waybill.update_status(Waybill.INFORMED)
+        #self.get_waybill().update_status(Waybill.INFORMED)
         
         self.assertEqual(Waybill.objects.count(), 0)
         Waybill.get_receiving()
         
         self.assertEqual(Waybill.objects.count(), 1)
-        self.assertEqual(Waybill.objects.get(pk=1).loading_details.count(), 2)
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().loading_details.count(), 2)
+        self.assertEqual(self.get_waybill().status, Waybill.SENT)
     
     def test_get_informed(self):
         #Create objects
         self.create_objects()
         #Change status of first one
-        Waybill.objects.filter(pk=1).update(status=Waybill.INFORMED)
+        waybill = self.get_waybill()
+        waybill.update_status(status=Waybill.INFORMED)
         
-        response = self.client.get(reverse("api_informed_waybill", kwargs={"id": 1}))
-        self.assertContains(response, '"pk": 1', status_code=200)
+        response = self.client.get(reverse("api_informed_waybill", kwargs={"slug": waybill.slug}))
+        self.assertContains(response, '"pk": "ISBX00211A"', status_code=200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
     
     def test_update_informed(self):
         #Create objects
         self.create_objects()
         
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        self.get_waybill().update_status(Waybill.SENT)
         
         #Bad request
         response = self.client.put(reverse("api_informed_waybill"))
         self.assertEqual(response.status_code, 400)
         
         #Provide content-type
-        response = self.client.put(reverse("api_informed_waybill"), data='[1]', content_type="application/json")
+        response = self.client.put(reverse("api_informed_waybill"), data='["ISBX00211A"]', content_type="application/json")
         self.assertEqual(response.status_code, 200)
         
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
     
     def test_send_delivered(self):
         #Create objects
         self.create_objects()
         
-        self.assertNotEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+        self.assertNotEqual(self.get_waybill().status, Waybill.DELIVERED)
         
         #Provide content-type
         response = self.client.put(reverse("api_delivered_waybill"), 
@@ -236,7 +243,7 @@ class ApiEmptyServerTestCase(TestCase):
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+        self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
         
         
 class ApiClientTestCase(TestDevelopmentMixin, TestCase):
@@ -255,9 +262,9 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        Waybill.objects.filter(pk=1).update(status=Waybill.SIGNED)
+        self.get_waybill().update_status(Waybill.SIGNED)
         Waybill.send_new()
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().status, Waybill.SENT)
         
     def test_get_informed(self):
         #MonkeyPatch of urlopen
@@ -273,10 +280,10 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.waybill.update_status(Waybill.SENT)
+        self.get_waybill().update_status(Waybill.SENT)
         
         Waybill.get_informed()
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
     
     def test_update_informed(self):
         #MonkeyPatch of urlopen
@@ -295,9 +302,9 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         old_compas = ets.models.COMPAS_STATION
         ets.models.COMPAS_STATION = "OE7X001"
         
-        Waybill.objects.filter(pk=1).update(status=Waybill.SENT)
+        self.get_waybill().update_status(Waybill.SENT)
         Waybill.send_informed()
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
         
         ets.models.COMPAS_STATION = old_compas
     
@@ -323,10 +330,10 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.waybill.update_status(Waybill.INFORMED)
+        self.get_waybill().update_status(Waybill.INFORMED)
         
         Waybill.get_delivered()
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.DELIVERED)
+        self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
     
     def test_update_delivered(self):
         #MonkeyPatch of urlopen
@@ -345,8 +352,8 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         old_compas = ets.models.COMPAS_STATION
         ets.models.COMPAS_STATION = "OE7X001"
         
-        Waybill.objects.filter(pk=1).update(status=Waybill.DELIVERED)
+        self.get_waybill().update_status(Waybill.DELIVERED)
         Waybill.send_delivered()
-        self.assertEqual(Waybill.objects.get(pk=1).status, Waybill.COMPLETE)
+        self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
         
         ets.models.COMPAS_STATION = old_compas

@@ -11,14 +11,14 @@
 </head>
 <body>
 <span class="hidden_print">
-<form class="the_forms" method="get" action="{% url waybill_reception object.id %}">
+<form class="the_forms" method="get" action="{% url waybill_reception waybill_pk=object.pk %}">
 <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" name="Print Copy" id='PrintCopy'>{% trans "Print Copy" %}</button>
 {%if not object.recipientSigned  and not user.get_profile.readerUser%}
 <input type="submit" value="{% trans 'Edit' %}" name="Edit" id='Edit'/>
 {%endif%}
 </form>
 {%if not object.recipientSigned  and not user.get_profile.readerUser%}
-<form class="the_forms" name="printoriginal" id="printoriginal" method="get" action="{%url waybill_finalize_receipt object.id%}">
+<form class="the_forms" name="printoriginal" id="printoriginal" method="get" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
 <input type="submit" onclick="javascript: original_lable.className='shown'; copy_lable.className='hidden'; print()" name="Print Original" id='Print1' value='Print Original'></form>
 {%endif%}
 {%if 'receive' in  request.META.HTTP_REFERER%}

@@ -15,7 +15,7 @@
              <td>{%if waybill.recipientSigned%}{% trans "X" %}{%else%}{% trans "N" %}{%endif%} </td>
              <td>{%if waybill.waybillValidated%}{% trans "X" %}{%else%}{% trans "N" %}{%endif%}  </td>
               <td>{%if waybill.waybillProcessedForPayment%}{% trans "X" %}{%else%}{% trans "N" %}{%endif%} </td>
-             <td><a href='{% url waybill_validate_form_update waybill.id %}'>{% trans "Select" %}</a></td>
+             <td><a href='{% url waybill_validate_form_update waybill=waybill.pk %}'>{% trans "Select" %}</a></td>
     </tr>
 
 {% endfor%}
