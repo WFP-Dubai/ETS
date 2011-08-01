@@ -130,7 +130,7 @@ class ClientWaybillTestCase(TestCase):
             'invalidated': 'False',
             'ltiNumber': u'QANX0010010128226P',
             'recipientConsingee': u'DEPARTMENT OF EDUCATION AFGHANISTAN',
-            'recipientLocation': u'QANDAHAR CITY',
+            'recipientLocation': u'DADU',
             'transportContractor': u' MUSLIM TRANSPORT',
             'waybillNumber': 'N/A'
         })

@@ -6,9 +6,16 @@ from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
 
+class LoadingDetailsInline(admin.TabularInline):
+    model = ets.models.LoadingDetail
+    extra = 0
 
 class WaybillAdmin(admin.ModelAdmin):
     list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
+    readonly_fields = ('created',)
+    list_filter = ('status', 'created',)
+    search_fields = ('pk',)
+    inlines = (LoadingDetailsInline,)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 

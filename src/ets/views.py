@@ -60,7 +60,6 @@ def listOfLtis( request, origin, template='lti/ltis.html'):
 
     ltis = LtiOriginal.objects.values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date' , 'expiry_date' )\
                               .distinct().filter( expiry_date__gt = date_check, origin_wh_code = origin )
-
     still_ltis = []
     for lti in ltis:
         for item in restant_si( lti['code'] ):

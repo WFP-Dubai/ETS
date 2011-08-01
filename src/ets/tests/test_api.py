@@ -82,7 +82,7 @@ class TestDevelopmentMixin(object):
                 "country_code": "586",
                 "geo_name": "THARPARKAR"
             },
-            "recipientLocation": "SUKKHUR",
+            'recipientLocation': 'SUKKHUR',
             "waybillRecSentToCompas": False,
             "transportDriverName": "",
             "dispatcherName": "ISBX0020000586",

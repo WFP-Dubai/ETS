@@ -123,13 +123,13 @@
       "quantity_net": "1.750", 
       "consegnee_code": "DOEAF", 
       "quantity_gross": "1.762", 
-      "commodity_code": "MSCSAL", 
-      "destination_loc_name": "QANDAHAR CITY", 
+      "commodity_code": "MIXHEB", 
+      "destination_loc_name": "DADU", 
       "requested_dispatch_date": "2010-11-03", 
       "transport_name": " MUSLIM TRANSPORT", 
       "unit_weight_net": "50.000", 
       "transport_ouc": "ISBX001", 
-      "origin_wh_code": "QANX002", 
+      "origin_wh_code": "AT9X002", 
       "lti_id": "QANX001000000000000005217", 
       "number_of_units": "35", 
       "unit_weight_gross": "50.330", 
@@ -143,7 +143,7 @@
       "origintype_desc": "Warehouse", 
       "transport_code": "M001", 
       "origin_type": "2", 
-      "si_code": "82930203"
+      "si_code": "00009448"
     }
   }, 
   {
@@ -158,13 +158,13 @@
       "quantity_net": "176.700", 
       "consegnee_code": "DOEAF", 
       "quantity_gross": "177.089", 
-      "commodity_code": "CERWHE", 
-      "destination_loc_name": "QANDAHAR CITY", 
+      "commodity_code": "CERWHF", 
+      "destination_loc_name": "DADU", 
       "requested_dispatch_date": "2010-11-03", 
       "transport_name": " MUSLIM TRANSPORT", 
       "unit_weight_net": "50.000", 
       "transport_ouc": "ISBX001", 
-      "origin_wh_code": "QANX002", 
+      "origin_wh_code": "AT9X002", 
       "lti_id": "QANX001000000000000005217", 
       "number_of_units": "3534", 
       "unit_weight_gross": "50.110", 
@@ -178,7 +178,42 @@
       "origintype_desc": "Warehouse", 
       "transport_code": "M001", 
       "origin_type": "2", 
-      "si_code": "00001859"
+      "si_code": "00008499"
+    }
+  }, 
+  {
+    "pk": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
+    "model": "ets.ltioriginal", 
+    "fields": {
+      "origin_location_code": "AT9X", 
+      "origin_loc_name": "ABBOTABAD", 
+      "origin_wh_name": "ABBOTABAD WAREHOUSE", 
+      "origin_wh_code": "AT9X002",
+      "destination_location_code": "QANX",
+      "destination_loc_name": "DADU",
+      "si_record_id": "HQX0001000000000000988849",
+      "si_code": "00008505", 
+      "code": "QANX0010010128226R",
+      "lti_id": "QANX001000000000000005223", 
+      "quantity_net": "176.700", 
+      "consegnee_code": "DOEAF", 
+      "quantity_gross": "177.089", 
+      "commodity_code": "CERWHE", 
+      "requested_dispatch_date": "2010-11-03", 
+      "transport_name": " MUSLIM TRANSPORT", 
+      "unit_weight_net": "50.000", 
+      "transport_ouc": "ISBX001", 
+      "number_of_units": "3", 
+      "unit_weight_gross": "5.110", 
+      "comm_category_code": "CER", 
+      "expiry_date": "2011-11-14", 
+      "project_wbs_element": "200063.1", 
+      "cmmname": "WHEAT", 
+      "lti_date": "2010-12-05", 
+      "consegnee_name": "DEPARTMENT OF EDUCATION AFGHANISTAN", 
+      "origintype_desc": "Warehouse", 
+      "transport_code": "M001", 
+      "origin_type": "2"
     }
   }, 
   {
@@ -306,7 +341,7 @@
       "si_code": "00009448", 
       "quantity_net": "0.010", 
       "origin_id": "KARX0010000944801", 
-      "wh_code": "KARX025", 
+      "wh_code": "AT9X002", 
       "packagename": "CARTON, FIBREBOARD, 100 X 100 GRM BAG", 
       "comm_category_code": "MIX", 
       "wh_country": "PAKISTAN", 
@@ -333,7 +368,7 @@
       "si_code": "00008499", 
       "quantity_net": "0.000", 
       "origin_id": "ISBX0020000849901", 
-      "wh_code": "KARX027", 
+      "wh_code": "AT9X002", 
       "packagename": "OTHER (To be replaced with proper code)", 
       "comm_category_code": "CER", 
       "wh_country": "PAKISTAN", 
@@ -360,7 +395,7 @@
       "si_code": "00008505", 
       "quantity_net": "24.750", 
       "origin_id": "ISBX0020000850501", 
-      "wh_code": "KARX027", 
+      "wh_code": "AT9X002", 
       "packagename": "SACK,WOVEN,POLYPROPYLENE, 50 KGS NET", 
       "comm_category_code": "CER", 
       "wh_country": "PAKISTAN", 
@@ -478,7 +513,7 @@
     }
   }, 
   {
-    "pk": "ISBX002000000000000001014HQX0001000000000000995247", 
+    "pk": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
     "model": "ets.sitracker", 
     "fields": {
       "number_units_left": "35441.000", 
@@ -556,6 +591,15 @@
       "lti_line": "QANX001000000000000005217HQX0001000000000000988849", 
       "lti_code": "QANX0010010128226P", 
       "stock_item": "KARX027ISBX0020000849901CERCERWHF<O>586"
+    }
+  },
+  {
+    "pk": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
+    "model": "ets.ltiwithstock", 
+    "fields": {
+      "lti_line": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
+      "lti_code": "QANX0010010128226R", 
+      "stock_item": "KARX027ISBX0020000850501CERCERWHESK01586"
     }
   },
   {
