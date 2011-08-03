@@ -1061,26 +1061,28 @@ def select_data( request, template='reporting/select_data.html', form_class=Ware
     context = not form.is_valid() and {'form': form, } or {}
     return direct_to_template(request, template, context)
 
-def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
-#    import sys
-#    if sys.platform == 'darwin':
-#        from qrencode import Encoder
-#        enc = Encoder()
-#        myz = wb_compress( wb )
-#        im = enc.encode( myz, { 'width': 350 } )
-#        response = HttpResponse( mimetype = "image/png" )
-#        im.save( response, "PNG" )
-#    else:
-    
-    waybill = get_object_or_404(queryset, pk=waybill_pk)
-
-    import subprocess
-    myz = waybill.compress()
-    print myz
-    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
-    image = mydata.communicate()[0]
-    #print mydata.communicate()
-    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
+# def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
+# #    import sys
+# #    if sys.platform == 'darwin':
+# #        from qrencode import Encoder
+# #        enc = Encoder()
+# #        myz = wb_compress( wb )
+# #        im = enc.encode( myz, { 'width': 350 } )
+# #        response = HttpResponse( mimetype = "image/png" )
+# #        im.save( response, "PNG" )
+# #    else:
+#    
+#    waybill = get_object_or_404(queryset, pk=waybill_pk)
+# 
+#    import subprocess
+#    myz = waybill.compress()
+#    print myz
+#    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
+#    image = mydata.communicate()[0]
+#    #print mydata.communicate()
+#    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
 
 @csrf_exempt
 def post_synchronize_waybill( request ):
