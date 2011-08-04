@@ -3,7 +3,7 @@ import zlib, base64, string, urllib2
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import date, datetime
+from datetime import datetime
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -15,11 +15,9 @@ from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.db import transaction
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
-from piston.emitters import Emitter
 from autoslug.settings import slugify
 
 #name = "1234"
@@ -392,9 +390,10 @@ class DeliveryItem(models.Model):
     commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
     commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank = True) #cmmname
     
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits = 7, decimal_places = 0)
+
     quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3)
     quantity_gross = models.DecimalField(_("Quantity Gross"), max_digits = 11, decimal_places = 3)
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits = 7, decimal_places = 0)
     unit_weight_net = models.DecimalField(_("Unit Weight Net"), max_digits = 8, decimal_places = 3, 
                                           blank = True, null = True)
     unit_weight_gross = models.DecimalField(_("Unit Weight Gross"), max_digits = 8, decimal_places = 3, 
@@ -423,63 +422,61 @@ class OrderItem(DeliveryItem):
         else:
             return u"%s -  %.0f " % ( self.commodity_name, self.items_left )
 
-    def stock_items(self):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                         si_code = self.si_code, 
-                                         commodity_code = self.commodity_code 
-                                         ).order_by( '-number_of_units' )
+    def get_stock_items(self):
+        """Retrieves stock items for current order item through warehouse"""
+        return StockItem.objects.filter(warehouse__orders__items=self,
+                                        project_number=self.order.project_number,
+                                        si_code = self.si_code, 
+                                        commodity_code = self.commodity_code,
+                                        ).order_by('-number_of_units')
     
-    @property
-    def total_stock( self ):
-        return self.stock_items().aggregate(units_count=Sum('number_of_units'))['units_count']
+    @staticmethod
+    def sum_number( queryset ):
+        return queryset.aggregate(units_count=Sum('number_of_units'))['units_count']
     
-    @property
-    def items_left( self ):
-        order_item = LtiWithStock.objects.filter( lti_line = self )
-        used = 0
-        for lines in order_item:
-            wblines = LoadingDetail.objects.filter( order_item = lines )
-            for line in wblines:
-                if line.invalid == False and line.wbNumber.dispatcherSigned == True:
-                    used += line.numberUnitsLoaded
+    def get_similar_dispatches(self):
+        """Returns all loading details with such item within any orders"""
+        return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
+                                            waybill__project_number=self.order.project_number,
+                                            si_code = self.si_code, 
+                                            commodity_code = self.commodity_code
+                                            ).order_by('-waybill__dispatch_date')
+    
+    def get_order_dispatches(self):
+        """Returns dispatches of current order"""
+        return self.get_similar_dispatches().filter(waybill__order=self.order.pk, waybill__invalidated=False)
+    
+    
+    def get_available_stocks(self):
+        """Calculates available stocks"""
+        return self.sum_number(self.get_stock_items()) - self.sum_number(self.get_similar_dispatches())
         
-        if self.is_bulk:
-            return self.quantity_net - used
-        else:
-            return self.number_of_units - used
+        
+    def items_left( self ):
+        """Calculates number of such items supposed to be delivered in this order"""
+        return self.number_of_units - self.sum_number(self.get_order_dispatches())
     
-    def packaging( self ):
-        pack = 'Unknown'
-        try:
-            mypkg = self.stock_items()
-            pack = str( mypkg[0].packagename )
-        except:
-            pass
-        return pack
-    
-    @property
-    def is_bulk( self ):
-        return self.packaging() == 'BULK'
-    
-    def coi_code( self ):
-        stock_items_qs = self.stock_items()
-        if stock_items_qs.count() > 0:
-            return str( stock_items_qs[0].coi_code() )
-        else:
-            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                                       si_code = self.si_code, 
-                                                       comm_category_code = self.comm_category_code 
-                                                       ).order_by( '-number_of_units' )
-            if stock_items_qs.count() > 0:
-                return str( stock_items_qs[0].coi_code() )
-            else:
-                stock_items_qs = EpicStock.objects.filter( si_code = self.si_code, 
-                                                           comm_category_code = self.comm_category_code 
-                                                           ).order_by( '-number_of_units' )
-                if stock_items_qs.count() > 0:
-                    return str( stock_items_qs[0].coi_code() )
-                else:
-                    return 'No Stock '
+    #===================================================================================================================
+    # def coi_code( self ):
+    #    stock_items_qs = self.stock_items()
+    #    if stock_items_qs.count() > 0:
+    #        return str( stock_items_qs[0].coi_code() )
+    #    else:
+    #        stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code, 
+    #                                                   si_code = self.si_code, 
+    #                                                   comm_category_code = self.comm_category_code 
+    #                                                   ).order_by( '-number_of_units' )
+    #        if stock_items_qs.count() > 0:
+    #            return str( stock_items_qs[0].coi_code() )
+    #        else:
+    #            stock_items_qs = EpicStock.objects.filter( si_code = self.si_code, 
+    #                                                       comm_category_code = self.comm_category_code 
+    #                                                       ).order_by( '-number_of_units' )
+    #            if stock_items_qs.count() > 0:
+    #                return str( stock_items_qs[0].coi_code() )
+    #            else:
+    #                return 'No Stock '
+    #===================================================================================================================
     
 class Waybill( models.Model ):
     """
@@ -531,7 +528,7 @@ class Waybill( models.Model ):
     
     #Data from order
     #order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
-    order_code = models.CharField( _("order code"), max_length = 20)
+    order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     transport_name = models.CharField(_("Transport Name"), max_length = 30)
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="waybills")
@@ -557,7 +554,7 @@ class Waybill( models.Model ):
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)
     dispatcher_person = models.ForeignKey(CompasUser, verbose_name=_("Dispatch person"), related_name="dispatch_waybills") #dispatcherName
     #dispatcher_title = models.TextField(_("Dispatcher Title")) #dispatcherTitle
-    dispatcher_signed = models.BooleanField(_("Dispatcher Signed"), default=False)
+    #dispatcher_signed = models.BooleanField(_("Dispatcher Signed"), default=False)
     #dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Place of dispatch"), 
     #                                        default=COMPAS_STATION, related_name="dispatch_waybills")
     
@@ -659,66 +656,6 @@ class Waybill( models.Model ):
                 return False
         return True
 
-    #===================================================================================================================
-    # @property
-    # def is_bulk( self ):
-    #    return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def consegnee_name( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
-    #    except:
-    #        pass
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def origin_wh_code( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_code
-    #    except:
-    #        return None
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def origin_loc_name( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_loc_name
-    #    except:
-    #        return None
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def destination_loc_name( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_loc_name
-    #    except:
-    #        return None
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def consegnee_code( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_code
-    #    except:
-    #        return None
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # @property
-    # def origin_wh_name( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_name
-    #    except:
-    #        return None
-    #===================================================================================================================
-
     @property
     def hasError( self ):
         myerror = self.errors()
@@ -728,25 +665,6 @@ class Waybill( models.Model ):
         except:
             return None
 
-    #===================================================================================================================
-    # @property
-    # def destination_location_code( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
-    #    except:
-    #        return None
-    #===================================================================================================================
-
-
-    #===================================================================================================================
-    # def lti_date( self ):
-    #    try:
-    #        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].lti_date
-    #    except:
-    #        return None
-    # lti_date = property( lti_date )
-    #===================================================================================================================
-    
     def invalidate_waybill_action( self ):
         for lineitem in self.loading_details.select_related():
             lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
@@ -966,23 +884,30 @@ class LoadingDetail( DeliveryItem ):
     
     package = models.CharField(_("Package"), max_length=10)
     
-    #order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
-    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
-                                            null = False, max_digits = 10, decimal_places = 3 )
-    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, 
-                                          null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, 
-                                          null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, 
-                                             null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey( LossDamageType, verbose_name = _("units Lost Reason"), 
-                                         related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey( LossDamageType, verbose_name = _("units Damaged Reason"), 
-                                            related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey( LossDamageType, verbose_name = _("units Damaged Type"),
-                                          related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey( LossDamageType, verbose_name = _("units LostType "), 
-                                       related_name = 'LD_LossType', blank = True, null = True )
+#    number_units_loaded = models.DecimalField(_("number Units Loaded"), default=0, 
+#                                              max_digits=10, decimal_places=3 ) #numberUnitsLoaded
+    
+    #Number of delivered units
+    number_units_good = models.DecimalField(_("number Units Good"), default=0, 
+                                            max_digits=10, decimal_places=3) #numberUnitsGood
+    number_units_lost = models.DecimalField(_("number Units Lost"), default=0, 
+                                            max_digits=10, decimal_places=3 ) #numberUnitsLost
+    number_units_damaged = models.DecimalField(_("number Units Damaged"), default=0, 
+                                               max_digits=10, decimal_places=3 ) #numberUnitsDamaged
+    
+    #Reasons
+    units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Lost Reason"), 
+                                           related_name='lost_reason', #LD_LostReason 
+                                           blank=True, null=True ) #unitsLostReason
+    units_damaged_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Damaged Reason"), 
+                                            related_name='damage_reason', #LD_DamagedReason 
+                                            blank=True, null=True ) #unitsDamagedReason
+    units_damaged_type = models.ForeignKey( LossDamageType, verbose_name=_("units Damaged Type"),
+                                          related_name='damage_type', #LD_DamagedType 
+                                          blank=True, null=True ) #unitsDamagedType
+    units_lost_type = models.ForeignKey( LossDamageType, verbose_name=_("units LostType "), 
+                                       related_name='loss_type', #LD_LossType 
+                                       blank=True, null=True ) #unitsLostType
     
     overloadedUnits = models.BooleanField(_("overloaded Units"), default=False)
     loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "), default=False)
@@ -1039,12 +964,14 @@ class LoadingDetail( DeliveryItem ):
     def calculate_total_received_net( self ):
         return self.calculate_net_received_good() + self.calculate_net_received_damaged()
 
-    @property
-    def invalid( self ):
-        return self.wbNumber.invalidated
+    #===================================================================================================================
+    # @property
+    # def invalid( self ):
+    #    return self.wbNumber.invalidated
+    #===================================================================================================================
 
     def  __unicode__( self ):
-        return "%s - %s - %s" % (self.waybill, self.si_code, self.order_item.lti_code)
+        return "%s - %s - %s" % (self.waybill, self.si_code, self.number_of_units)
 
 
 class UserProfile( models.Model ):
