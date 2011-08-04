@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
-from ets.forms import WaybillValidationFormset, WarehouseForm
+from ets.forms import WaybillValidationFormset, WarehouseChoiceForm
 from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
 from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
 from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
@@ -1056,7 +1056,7 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
 #    return render_to_response( 'reporting/select_report.html', context_instance = RequestContext( request ) )
 #=======================================================================================================================
 
-def select_data( request, template='reporting/select_data.html', form_class=WarehouseForm ):
+def select_data( request, template='reporting/select_data.html', form_class=WarehouseChoiceForm ):
     form = form_class( request.POST or None )
     context = not form.is_valid() and {'form': form, } or {}
     return direct_to_template(request, template, context)

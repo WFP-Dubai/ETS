@@ -127,16 +127,27 @@ class Place( models.Model ):
         >>> #Try Repeating
         >>> Place.update()
         """
-        for the_geo in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
-            the_geo.save( using = 'default' )
+        for place in cls.objects.using( 'compas' ).all(): #filter( country_code__in = settings.COUNTRIES ):
+            place.save( using = 'default' )
 
 
 class Warehouse( models.Model ):
-    "Dispatch warehouse"
+    """
+    Dispatch warehouse. Data based
+    
+    >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", 
+    ...                      name="The best place in the world", 
+    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+    ...                      reporting_code="SOME_CODE", )
+    >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", title="Perfect warehouse", 
+    ...                      place=place, start_date=datetime.now())
+    >>> wh
+    <Warehouse: test_wh - The best place in the world - Perfect warehouse>
+    """
     code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
     title = models.CharField(_("title"),  max_length = 50, blank = True ) #origin_wh_name
     place = models.ForeignKey(Place, verbose_name=_("place"), related_name="warehouses") #origin_location_code
-    start_date = models.DateField(_("start date"), null = True, blank = True )
+    start_date = models.DateField(_("start date"), null=True, blank=True)
 
     class Meta:
         ordering = ('place__name', 'title',)
@@ -205,9 +216,97 @@ class EpicStock( models.Model ):
     
     class Meta:
         db_table = u'epic_stock'
-        managed = False
-
-
+        #managed = False
+    
+    @classmethod 
+    def update(cls):
+        """
+        Executes Imports of Stock
+        
+        >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", defaults = dict( 
+        ...                      name="The best place in the world", 
+        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+        ...                      reporting_code="SOME_CODE"))
+        >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", defaults=dict(title="Perfect warehouse", 
+        ...                      place=place, start_date=datetime.now()))
+        >>> stock, c = EpicStock.objects.using('compas').get_or_create(origin_id='123', defaults=dict(
+        ...                     wh_code="test_wh", project_wbs_element="1", si_code="123", 
+        ...                     commodity_code='bear', number_of_units=50, quantity_net="0.5",
+        ...                     package_code='C', packagename="T", qualitycode="1", qualitydescr="cool bear",
+        ...                     quantity_gross="1242.5", allocation_code='UAE', wh_pk='1'))
+        
+        Create new stock item
+        >>> StockItem.objects.get(pk='123')
+        Traceback (most recent call last):
+        ...
+        DoesNotExist: StockItem matching query does not exist.
+        >>> EpicStock.update()
+        >>> StockItem.objects.get(pk='123')
+        <StockItem: Perfect warehouse-bear-50>
+        
+        Check BULK modifications
+        >>> bulk_epic_stock, c = EpicStock.objects.using('compas').get_or_create(origin_id='1234', defaults=dict(
+        ...                     wh_code="test_wh", project_wbs_element="1", si_code="123", 
+        ...                     commodity_code='wheat1', number_of_units=1, quantity_net="1000",
+        ...                     package_code='C', packagename="BULK", qualitycode="1", qualitydescr="cool wheaty",
+        ...                     quantity_gross="1242.5", allocation_code='UAE'))
+        >>> EpicStock.update()
+        >>> bulk_stock = StockItem.objects.get(pk='1234')
+        >>> bulk_stock.number_of_units
+        1000
+        >>> int(bulk_stock.quantity_net)
+        1
+        
+        Update changed stock
+        >>> stock.number_of_units = 500
+        >>> stock.save()
+        >>> EpicStock.update()
+        >>> StockItem.objects.get(pk='123')
+        <StockItem: Perfect warehouse-bear-500>
+        
+        Test deletion
+        >>> stock.delete()
+        >>> EpicStock.update()
+        >>> StockItem.objects.get(pk='123')
+        <StockItem: Perfect warehouse-bear-0>
+        """
+        now = datetime.now()
+        
+        for stock in cls.objects.using( 'compas' ):
+            
+            #Check package type. If 'BULK' then modify number and weight
+            number_of_units, quantity_net = (stock.quantity_net, 1) \
+                                            if stock.packagename == 'BULK' and stock.quantity_net \
+                                            else (stock.number_of_units, stock.quantity_net)
+            
+            defaults = {
+                'warehouse': Warehouse.objects.get(pk=stock.wh_code),
+                'project_number': stock.project_wbs_element,
+                'si_code': stock.si_code,
+                'commodity_code': stock.commodity_code,
+                'number_of_units': number_of_units,
+                'quantity_net': quantity_net,
+                'package_code': stock.package_code,
+                'package_name': stock.packagename,
+                'quality_code': stock.qualitycode,
+                'quality_description': stock.qualitydescr,
+                'quantity_gross': stock.quantity_gross,
+                'allocation_code': stock.allocation_code,
+                'updated': now
+            }
+            
+            item, created = StockItem.objects.get_or_create(origin_id=stock.origin_id, defaults=defaults)
+            
+            if not created:
+                for field_name, field_value in defaults.iteritems():
+                    if getattr(item, field_name) != field_value:
+                        setattr(item, field_name, field_value)
+                
+                item.save()
+        
+        StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
+        
+            
 class StockManager( models.Manager ):
     
     def get_existing_units( self ):
@@ -215,6 +314,8 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, editable=False, primary_key=True)
+    
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
     project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
@@ -231,7 +332,8 @@ class StockItem( models.Model ):
     number_of_units = models.IntegerField(_("Number of units"))
     
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, editable=False)
+    
+    updated = models.DateTimeField(_("update date"), default=datetime.now)
     
     objects = StockManager()
 
@@ -242,7 +344,7 @@ class StockItem( models.Model ):
         verbose_name_plural = _("stocks")
 
     def  __unicode__( self ):
-        return "%s\t%s\t%s" % (self.warehouse.title, self.commodity_name, self.number_of_units)
+        return "%s-%s-%s" % (self.warehouse.title, self.commodity_code, self.number_of_units)
         
     #===================================================================================================================
     # def coi_code( self ):
@@ -255,20 +357,6 @@ class StockItem( models.Model ):
         except PackagingDescriptionShort.DoesNotExist:
             return self.package_name
     
-    @classmethod    
-    def update(cls):
-        """
-        Executes Imports of Stock
-        """
-        originalStock = cls.objects.using( 'compas' )
-        for myrecord in originalStock:
-            myrecord.save( using = 'default' )
-        
-        for item in cls.objects.all():
-            if item not in originalStock:
-                item.number_of_units = 0
-                item.save()
-
 
 class PackagingDescriptionShort( models.Model ):
     code = models.CharField(_("Package Code"), primary_key=True, max_length=5)
