@@ -419,8 +419,8 @@ class LtiOriginal( models.Model ):
     #Consignee
     destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
     destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
-    consignee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
-    consignee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    consegnee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
+    consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
     
     requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
     project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
@@ -445,25 +445,71 @@ class LtiOriginal( models.Model ):
         Imports all LTIs from COMPAS
         
         Create test data
-        >>> 
+        >>> place = Place.objects.get_or_create(org_code="UAE123", defaults = dict( 
+        ...                      name="The best place in the world", 
+        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+        ...                      reporting_code="SOME_CODE"))[0]
+        >>> place2 = Place.objects.get_or_create(org_code="DNIPRO", defaults = dict( 
+        ...                      name="Home Sweet Home", 
+        ...                      geo_point_code = 'UA', geo_name="Ukraine", country_code="380", 
+        ...                      reporting_code="REPUA"))[0]
+        >>> lti = LtiOriginal.objects.using('compas').get_or_create(lti_pk='123df', defaults={
+        ...     "origin_location_code": "UAE123",
+        ...     "si_record_id": "UAE123",
+        ...     "origin_loc_name": "Dubai",
+        ...     "code": "UAE1",
+        ...     "destination_location_code": "DNIPRO",
+        ...     "destination_loc_name": "Home Sweet Home", 
+        ...     "quantity_net": "1.75",
+        ...     "consegnee_code": "DOEAF",
+        ...     "quantity_gross": "1.762",
+        ...     "commodity_code": "MSCSAL",
+        ...     "requested_dispatch_date": "2011-11-03",
+        ...     "transport_name": "MUSLIM TRANSPORT",
+        ...     "unit_weight_net": "50",
+        ...     "transport_ouc": "ISBX001",
+        ...     "origin_wh_code": "QANX002",
+        ...     "lti_id": "QANX001000000000000005217",
+        ...     "number_of_units": "35",
+        ...     "unit_weight_gross": "50.33",
+        ...     "comm_category_code": "MSC",
+        ...     "expiry_date": "2011-11-15",
+        ...     "project_wbs_element": "200063.1",
+        ...     "cmmname": "IODISED SALT",
+        ...     "lti_date": "2010-11-02",
+        ...     "consegnee_name": "DEPARTMENT OF EDUCATION UKRAINE",
+        ...     "origintype_desc": "Warehouse",
+        ...     "transport_code": "M001",
+        ...     "origin_type": "2",
+        ...     "si_code": "82930203"
+        ... })[0]
+        >>> LtiOriginal.objects.using('compas').count()
+        1
+        >>> LtiOriginal.update()
+        >>> Warehouse.objects.get(pk='QANX002')
+        <Warehouse: QANX002 - The best place in the world - >
+        >>> Consignee.objects.get(pk='DOEAF')
+        <Consignee: Home Sweet Home - DEPARTMENT OF EDUCATION UKRAINE>
+        >>> Order.objects.get(pk='UAE1')
+        <Order: UAE1>
+        >>> OrderItem.objects.get(pk='123df')
+        <OrderItem: IODISED SALT -  35 >
         """
         now = datetime.now()
 
-        original = cls.objects.using('compas').filter(expiry_date__lt=now, 
-                                                      requested_dispatch_date__gt = settings.MAX_DATE )
+        original = cls.objects.using('compas').filter(requested_dispatch_date__gt = settings.MAX_DATE)
         if not settings.DISABLE_EXPIERED_LTI:
             original = original.filter( expiry_date__gt = now )
         
         for lti in original:
-            
             #Create Warehouse
             warehouse = Warehouse.objects.get_or_create(code=lti.origin_wh_code, 
                                                         title=lti.origin_wh_name, 
-                                                        place=Place.objects.get(pk=lti.origin_wh_code))[0]
+                                                        place=Place.objects.get(pk=lti.origin_location_code))[0]
             
             #Create Consignee
-            consignee = Consignee.objects.get_or_create(code=lti.consignee_code, 
-                                                        title=lti.consignee_name, 
+            consignee = Consignee.objects.get_or_create(code=lti.consegnee_code, 
+                                                        title=lti.consegnee_name, 
                                                         place=Place.objects.get(pk=lti.destination_location_code))[0]
             
             #Create Order
@@ -483,7 +529,7 @@ class LtiOriginal( models.Model ):
             
             rows = Order.objects.filter(code=lti.code).update(**defaults)
             if not rows:
-                order = Order.objects.get_or_create(code=lti.code, **defaults)
+                order = Order.objects.create(code=lti.code, **defaults)
             
             #Create order item
             defaults = {
@@ -501,7 +547,7 @@ class LtiOriginal( models.Model ):
             
             rows = OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
             if not rows:
-                order = OrderItem.objects.get_or_create(lti_pk=lti.lti_pk, **defaults)
+                order = OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
             
 
 class Order(models.Model):
@@ -572,9 +618,9 @@ class OrderItem(DeliveryItem):
     
     def  __unicode__( self ):
         if self.removed:
-            return u"Void %s -  %.0f " % ( self.commodity_name, self.items_left )
+            return u"Void %s -  %.0f " % ( self.commodity_name, self.items_left() )
         else:
-            return u"%s -  %.0f " % ( self.commodity_name, self.items_left )
+            return u"%s -  %.0f " % ( self.commodity_name, self.items_left() )
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
@@ -586,7 +632,7 @@ class OrderItem(DeliveryItem):
     
     @staticmethod
     def sum_number( queryset ):
-        return queryset.aggregate(units_count=Sum('number_of_units'))['units_count']
+        return queryset.aggregate(units_count=Sum('number_of_units'))['units_count'] or 0
     
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
@@ -598,7 +644,7 @@ class OrderItem(DeliveryItem):
     
     def get_order_dispatches(self):
         """Returns dispatches of current order"""
-        return self.get_similar_dispatches().filter(waybill__order=self.order.pk, waybill__invalidated=False)
+        return self.get_similar_dispatches().filter(waybill__order_code=self.order.pk, waybill__invalidated=False)
     
     
     def get_available_stocks(self):
