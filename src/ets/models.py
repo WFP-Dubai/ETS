@@ -295,15 +295,11 @@ class EpicStock( models.Model ):
                 'updated': now
             }
             
-            item, created = StockItem.objects.get_or_create(origin_id=stock.origin_id, defaults=defaults)
-            
-            if not created:
-                for field_name, field_value in defaults.iteritems():
-                    if getattr(item, field_name) != field_value:
-                        setattr(item, field_name, field_value)
-                
-                item.save()
+            rows = StockItem.objects.filter(origin_id=stock.origin_id).update(**defaults)
+            if not rows:
+                StockItem.objects.create(origin_id=stock.origin_id, **defaults)
         
+        #Flush empty stocks
         StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
         
             
@@ -332,8 +328,7 @@ class StockItem( models.Model ):
     number_of_units = models.IntegerField(_("Number of units"))
     
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
-    
-    updated = models.DateTimeField(_("update date"), default=datetime.now)
+    updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
     objects = StockManager()
 
@@ -414,14 +409,19 @@ class LtiOriginal( models.Model ):
     transport_name = models.CharField(_("Transport Name"), max_length = 30, db_column = 'TRANSPORT_NAME' )
     origin_type = models.CharField(_("Origin Type"), max_length = 1, db_column = 'ORIGIN_TYPE' )
     origintype_desc = models.CharField(_("Origin Type Desc"), max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
+    
+    #Warehouse
     origin_location_code = models.CharField( _("Origin location code"),max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
     origin_loc_name = models.CharField(_("Origin location name"), max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
     origin_wh_code = models.CharField( _("Origin warehouse code"),max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
     origin_wh_name = models.CharField( _("Origin warehouse name"),max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
+    
+    #Consignee
     destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
     destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
-    consegnee_code = models.CharField(_("Consegnee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
-    consegnee_name = models.CharField(_("Consegnee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    consignee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
+    consignee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    
     requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
     project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
     si_record_id = models.CharField( _("SI Record ID "),max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
@@ -437,8 +437,72 @@ class LtiOriginal( models.Model ):
 
     class Meta:
         db_table = u'epic_lti'
-        managed = False
+        #managed = False
+    
+    @classmethod
+    def update(cls):
+        """
+        Imports all LTIs from COMPAS
+        
+        Create test data
+        >>> 
+        """
+        now = datetime.now()
 
+        original = cls.objects.using('compas').filter(expiry_date__lt=now, 
+                                                      requested_dispatch_date__gt = settings.MAX_DATE )
+        if not settings.DISABLE_EXPIERED_LTI:
+            original = original.filter( expiry_date__gt = now )
+        
+        for lti in original:
+            
+            #Create Warehouse
+            warehouse = Warehouse.objects.get_or_create(code=lti.origin_wh_code, 
+                                                        title=lti.origin_wh_name, 
+                                                        place=Place.objects.get(pk=lti.origin_wh_code))[0]
+            
+            #Create Consignee
+            consignee = Consignee.objects.get_or_create(code=lti.consignee_code, 
+                                                        title=lti.consignee_name, 
+                                                        place=Place.objects.get(pk=lti.destination_location_code))[0]
+            
+            #Create Order
+            defaults = {
+                'created': lti.lti_date,
+                'expiry': lti.expiry_date,
+                'dispatch_date': lti.requested_dispatch_date,
+                'transport_code': lti.transport_code,
+                'transport_ouc': lti.transport_ouc,
+                'transport_name': lti.transport_name,
+                'origin_type': lti.origin_type,
+                'project_number': lti.project_wbs_element,
+                'warehouse': warehouse,
+                'consignee': consignee,
+                'updated': now,
+            }
+            
+            rows = Order.objects.filter(code=lti.code).update(**defaults)
+            if not rows:
+                order = Order.objects.get_or_create(code=lti.code, **defaults)
+            
+            #Create order item
+            defaults = {
+                'order': order,
+                'si_code': lti.si_code,
+                'comm_category_code': lti.comm_category_code,
+                'commodity_code': lti.commodity_code,
+                'commodity_name': lti.cmmname,
+                'number_of_units': lti.number_of_units,
+                'quantity_net': lti.quantity_net,
+                'quantity_gross': lti.quantity_gross,
+                'unit_weight_net': lti.unit_weight_net,
+                'unit_weight_gross': lti.unit_weight_gross,
+            }
+            
+            rows = OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
+            if not rows:
+                order = OrderItem.objects.get_or_create(lti_pk=lti.lti_pk, **defaults)
+            
 
 class Order(models.Model):
     """Delivery order"""
@@ -446,8 +510,8 @@ class Order(models.Model):
     code = models.CharField(_("Code"), max_length=40, primary_key=True)
     
     created = models.DateField(_("Created date")) #lti_date
-    expiry = models.DateField(_("expire date"), blank = True, null = True)
-    dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True)
+    expiry = models.DateField(_("expire date"), blank=True, null=True) #expiry_date
+    dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True)
     
     transport_code = models.CharField(_("Transport Code"), max_length = 4, editable=False)
     transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, editable=False)
@@ -459,6 +523,8 @@ class Order(models.Model):
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="orders")
     consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="orders")
+    
+    updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
     class Meta:
         verbose_name = _("order")
@@ -494,8 +560,8 @@ class DeliveryItem(models.Model):
 class OrderItem(DeliveryItem):
     """Order item with commodity and counters"""
     
+    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, editable=False, primary_key=True)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
-    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, editable=False)
     removed = models.DateField(_("removed date"), blank=True, null=True)
     
     class Meta:
