@@ -46,38 +46,6 @@ def capitalize_slug(func):
 # Models based on compas Views & Tables
 #=======================================================================================================================
 
-class CompasUser( models.Model ):
-    """Compas user. We import them directly from compas Oracle using database view"""
-    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
-    title = models.CharField(_("title"), max_length=50, blank=True)
-    last_name = models.CharField(_("last name"), max_length=30)
-    first_name = models.CharField(_("first name"), max_length=25)
-    org_unit_code = models.CharField(_("organization's unit code"), max_length=13)
-    code = models.CharField(_("code"), max_length=7)
-    type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
-    organization_id = models.CharField(_("organization identifier"), max_length=12)
-    document_number = models.CharField(_("document number"), max_length=25, blank=True)
-    e_mail_address = models.CharField(_("e_mail address"), max_length=100, blank=True)
-    mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
-    official_tel_number = models.CharField(_("official telephone number"), max_length=20, blank=True)
-    fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
-    effective_date = models.DateField(_("effective date"), null=True, blank=True)
-    expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
-    location_code = models.CharField(_("location code"), max_length = 10)
-
-    class Meta:
-        db_table = u'epic_persons'
-        verbose_name = 'COMPAS User'
-
-    def  __unicode__( self ):
-        return "%s, %s" % (self.last_name, self.first_name)
-    
-    @classmethod
-    def update(cls):
-        for my_person in cls.objects.using( 'compas' ).all():#.filter( org_unit_code = COMPAS_STATION ):
-            my_person.save( using = 'default' )
-
-
 class Place( models.Model ):
     """
     Location model.
@@ -129,6 +97,39 @@ class Place( models.Model ):
         """
         for place in cls.objects.using( 'compas' ).all(): #filter( country_code__in = settings.COUNTRIES ):
             place.save( using = 'default' )
+
+
+class CompasPerson( models.Model ):
+    """Compas CompasPerson. We import them directly from compas Oracle using database view"""
+    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
+    title = models.CharField(_("title"), max_length=50, blank=True)
+    last_name = models.CharField(_("last name"), max_length=30)
+    first_name = models.CharField(_("first name"), max_length=25)
+    org_unit_code = models.CharField(_("organization's unit code"), max_length=13)
+    code = models.CharField(_("code"), max_length=7)
+    type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
+    organization_id = models.CharField(_("organization identifier"), max_length=12)
+    document_number = models.CharField(_("document number"), max_length=25, blank=True)
+    e_mail_address = models.CharField(_("e_mail address"), max_length=100, blank=True)
+    mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
+    official_tel_number = models.CharField(_("official telephone number"), max_length=20, blank=True)
+    fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
+    effective_date = models.DateField(_("effective date"), null=True, blank=True)
+    expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
+    location_code = models.ForeignKey(Place, verbose_name="place", related_name="persons")
+
+    class Meta:
+        db_table = u'epic_persons'
+        verbose_name = 'COMPAS User'
+
+    def  __unicode__( self ):
+        return "%s, %s" % (self.last_name, self.first_name)
+    
+    @classmethod
+    def update(cls):
+        for my_person in cls.objects.using( 'compas' ).all():#.filter( org_unit_code = COMPAS_STATION ):
+            my_person.save( using = 'default' )
+
 
 
 class Warehouse( models.Model ):
@@ -752,7 +753,8 @@ class Waybill( models.Model ):
     
     #Dispatcher
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)
-    dispatcher_person = models.ForeignKey(CompasUser, verbose_name=_("Dispatch person"), related_name="dispatch_waybills") #dispatcherName
+    dispatcher_person = models.ForeignKey(CompasPerson, verbose_name=_("Dispatch person"), 
+                                          related_name="dispatch_waybills") #dispatcherName
     #dispatcher_title = models.TextField(_("Dispatcher Title")) #dispatcherTitle
     #dispatcher_signed = models.BooleanField(_("Dispatcher Signed"), default=False)
     #dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Place of dispatch"), 
@@ -784,7 +786,8 @@ class Waybill( models.Model ):
     #recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True ) #recipientLocation
     #recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
     #recipient_name = models.CharField( _("Recipient Name"), max_length=100, blank=True) #recipientName
-    recipient_person =  models.ForeignKey(CompasUser, verbose_name=_("Recipient person"), related_name="recipient_waybills") #recipientName
+    recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
+                                          related_name="recipient_waybills") #recipientName
     #recipient_title = models.CharField(_("Recipient Title "), max_length=100, blank=True) #recipientTitle
     recipient_arrival_date = models.DateField(_("Recipient Arrival Date"), null=True, blank=True) #recipientArrivalDate
     recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), null=True, blank=True) #recipientStartDischargeDate
@@ -1182,7 +1185,7 @@ class UserProfile( models.Model ):
     isDispatcher = models.BooleanField(_("Is Dispatcher"), default=False)
     isReciever = models.BooleanField(_("Is Reciever"), default=False)
     isAllReceiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') )
-    compasUser = models.ForeignKey( CompasUser, verbose_name = _('Use this Compas User'), 
+    compasUser = models.ForeignKey( CompasPerson, verbose_name = _('Use this Compas Person'), 
                                     related_name="profiles",
                                     help_text = _('Select the corrisponding user from Compas'), 
                                     blank = True, null = True)
