@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
-from ets.forms import WaybillValidationFormset, WarehouseForm
+from ets.forms import WaybillValidationFormset, WarehouseChoiceForm
 from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
 from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
 from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
@@ -1056,31 +1056,33 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
 #    return render_to_response( 'reporting/select_report.html', context_instance = RequestContext( request ) )
 #=======================================================================================================================
 
-def select_data( request, template='reporting/select_data.html', form_class=WarehouseForm ):
+def select_data( request, template='reporting/select_data.html', form_class=WarehouseChoiceForm ):
     form = form_class( request.POST or None )
     context = not form.is_valid() and {'form': form, } or {}
     return direct_to_template(request, template, context)
 
-def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
-#    import sys
-#    if sys.platform == 'darwin':
-#        from qrencode import Encoder
-#        enc = Encoder()
-#        myz = wb_compress( wb )
-#        im = enc.encode( myz, { 'width': 350 } )
-#        response = HttpResponse( mimetype = "image/png" )
-#        im.save( response, "PNG" )
-#    else:
-    
-    waybill = get_object_or_404(queryset, pk=waybill_pk)
-
-    import subprocess
-    myz = waybill.compress()
-    print myz
-    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
-    image = mydata.communicate()[0]
-    #print mydata.communicate()
-    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
+# def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
+# #    import sys
+# #    if sys.platform == 'darwin':
+# #        from qrencode import Encoder
+# #        enc = Encoder()
+# #        myz = wb_compress( wb )
+# #        im = enc.encode( myz, { 'width': 350 } )
+# #        response = HttpResponse( mimetype = "image/png" )
+# #        im.save( response, "PNG" )
+# #    else:
+#    
+#    waybill = get_object_or_404(queryset, pk=waybill_pk)
+# 
+#    import subprocess
+#    myz = waybill.compress()
+#    print myz
+#    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
+#    image = mydata.communicate()[0]
+#    #print mydata.communicate()
+#    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
 
 @csrf_exempt
 def post_synchronize_waybill( request ):

@@ -98,7 +98,9 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/report/dispatch/(.*)/$', "dispatch_report_wh",{},"dispatch_report_wh" ),
     ( r'^waybill/report/receipt/(.*)/(.*)/$', "receipt_report_wh", {}, "receipt_report_wh" ),
     ( r'^waybill/report/receipt/(.*)/$', "receipt_report_cons", {}, "receipt_report_cons" ),
-    ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
+    #===================================================================================================================
+    # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
+    #===================================================================================================================
     ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     
     #===================================================================================================================
