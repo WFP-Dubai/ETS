@@ -19,6 +19,7 @@ from django.db.models.signals import post_save
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
+from .country import COUNTRY_CHOICES
 
 #name = "1234"
 DEFAULT_TIMEOUT = 10
@@ -123,7 +124,7 @@ class Location(models.Model):
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
-    country = models.CharField( _("Country code"), max_length=3)
+    country = models.CharField( _("Country code"), max_length=3, choices=COUNTRY_CHOICES)
 
 class Organization(models.Model):
     """Consignee organization"""
