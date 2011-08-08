@@ -86,15 +86,33 @@ class Place( models.Model ):
         """
         Executes Imports of Place
         
+        #Let's try update place without organization identifier
         >>> place, created = Place.objects.using('compas').get_or_create(org_code="completely_unique_code", 
         ...                      name="The best place in the world", 
         ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE", )
+        ...                      reporting_code="SOME_CODE")
         >>> Place.update()
-        >>> Place.objects.using('default').get(pk="completely_unique_code")
-        <Place: The best place in the world>
-        >>> #Try Repeating
+        >>> Location.objects.using('default').get(pk="TEST")
+        <Location: 586 Dubai>
+        >>> warehouse = Warehouse.objects.get(pk='completely_unique_code')
+        >>> warehouse
+        <Warehouse: completely_unique_code - Dubai - The best place in the world>
+        >>> warehouse.organization is None
+        True
+        
+        #Try with organization and same location
+        >>> place, created = Place.objects.using('compas').get_or_create(org_code="another_place_code", 
+        ...                      name="The best place in the world", 
+        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+        ...                      reporting_code="SOME_CODE", organization_id='WFP')
         >>> Place.update()
+        >>> warehouse = Warehouse.objects.get(pk='another_place_code')
+        >>> warehouse
+        <Warehouse: another_place_code - Dubai - The best place in the world>
+        >>> warehouse.organization
+        <Consignee: WFP>
+        >>> warehouse.location
+        <Location: 586 Dubai>
         """
         for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
             
@@ -102,21 +120,23 @@ class Place( models.Model ):
             location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
                 'name': place.geo_name,
                 'country': place.country_code,
+                'compas': place.reporting_code,
             })[0]
             
-            organization = Organization.objects.get_or_create(id=place.organization_id)[0]\
+            #Create consignee organization
+            organization = Consignee.objects.get_or_create(code=place.organization_id)[0]\
                             if place.organization_id else None
             
-            #Update consignee
+            #Update warehouse
             defaults = {
                 'location': location,
                 'organization': organization,
                 'name': place.name,
             }
             
-            rows = Consignee.objects.filter(code=place.org_code).update(**defaults)
+            rows = Warehouse.objects.filter(code=place.org_code).update(**defaults)
             if not rows:
-                Consignee.objects.create(code=place.org_code, **defaults)
+                Warehouse.objects.create(code=place.org_code, **defaults)
             
 
 class Location(models.Model):
@@ -125,32 +145,67 @@ class Location(models.Model):
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
     country = models.CharField( _("Country code"), max_length=3, choices=COUNTRY_CHOICES)
-
-class Organization(models.Model):
+    compas = models.CharField(_("COMPAS station"), max_length=7)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('location')
+        verbose_name_plural = _("locations")
+    
+    def __unicode__(self):
+        return "%s %s" % (self.country, self.name)
+    
+class Consignee(models.Model):
     """Consignee organization"""
     
-    id = models.CharField(_("Organization id"), max_length=20, primary_key=True)
+    code = models.CharField(_("Organization identifier"), max_length=20, primary_key=True)
     name = models.CharField(_("Name"), max_length = 100, blank=True)
-
-class Consignee(models.Model):
-    """Consignee itself."""
     
-    code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
-    name = models.CharField(_("Name"), max_length = 100)
-    location = models.ForeignKey(Location, verbose_name=_("Location"), related_name="consignees")
-    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="consignees", 
-                                     blunk=True, null=True)
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('consignee')
+        verbose_name_plural = _("consignees")
+    
+    def __unicode__(self):
+        return self.name or self.pk
+
+class Warehouse( models.Model ):
+    """
+    Dispatch warehouse. Data based
+    
+    >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", 
+    ...                      name="The best place in the world", 
+    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
+    ...                      reporting_code="SOME_CODE", )
+    >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", title="Perfect warehouse", 
+    ...                      place=place, start_date=datetime.now())
+    >>> wh
+    <Warehouse: test_wh - The best place in the world - Perfect warehouse>
+    """
+    code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
+    name = models.CharField(_("name"),  max_length = 50, blank = True ) #origin_wh_name
+    location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
+    organization = models.ForeignKey(Consignee, verbose_name=_("Organization"), related_name="warehouses", 
+                                     blank=True, null=True)
     start_date = models.DateField(_("start date"), null=True, blank=True)
-        
+    
+    
     class Meta:
         ordering = ('name',)
         order_with_respect_to = 'location'
-        verbose_name = _('consignee')
-        verbose_name_plural = _("consignees")
-
-    def  __unicode__( self ):
-        return self.name
+        verbose_name = _('warehouse')
+        verbose_name_plural = _("warehouses")
         
+    def  __unicode__( self ):
+        return "%s - %s - %s" % (self.code, self.location.name, self.name)
+    
+    #===================================================================================================================
+    # def serialize(self):
+    #    #wh = DispatchPoint.objects.get( id = warehouse )
+    #    return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
+    #                                        + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
+    #===================================================================================================================
+
     
 class CompasPerson( models.Model ):
     """Compas CompasPerson. We import them directly from compas Oracle using database view"""
@@ -183,42 +238,6 @@ class CompasPerson( models.Model ):
     def update(cls):
         for my_person in cls.objects.using( 'compas' ).all():#.filter( org_unit_code = COMPAS_STATION ):
             my_person.save( using = 'default' )
-
-
-
-class Warehouse( models.Model ):
-    """
-    Dispatch warehouse. Data based
-    
-    >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", 
-    ...                      name="The best place in the world", 
-    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-    ...                      reporting_code="SOME_CODE", )
-    >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", title="Perfect warehouse", 
-    ...                      place=place, start_date=datetime.now())
-    >>> wh
-    <Warehouse: test_wh - The best place in the world - Perfect warehouse>
-    """
-    code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
-    title = models.CharField(_("title"),  max_length = 50, blank = True ) #origin_wh_name
-    location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
-    start_date = models.DateField(_("start date"), null=True, blank=True)
-
-    class Meta:
-        ordering = ('title',)
-        order_with_respect_to = 'location'
-        verbose_name = _('dispatch warehouse')
-        verbose_name_plural = _("warehouses")
-        
-    def  __unicode__( self ):
-        return "%s - %s - %s" % (self.code, self.location.name, self.title)
-    
-    #===================================================================================================================
-    # def serialize(self):
-    #    #wh = DispatchPoint.objects.get( id = warehouse )
-    #    return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
-    #                                        + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
-    #===================================================================================================================
 
 
 class EpicStock( models.Model ):
@@ -540,15 +559,14 @@ class LtiOriginal( models.Model ):
             original = original.filter( expiry_date__gt = now )
         
         for lti in original:
-            #Create Warehouse
-            warehouse = Warehouse.objects.get_or_create(code=lti.origin_wh_code, 
-                                                        title=lti.origin_wh_name, 
-                                                        place=Place.objects.get(pk=lti.origin_location_code))[0]
             
-            #Create Consignee
-            consignee = Consignee.objects.get_or_create(code=lti.consegnee_code, 
-                                                        title=lti.consegnee_name, 
-                                                        place=Place.objects.get(pk=lti.destination_location_code))[0]
+            #Update Consignee
+            # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
+            consignee = Consignee.get(pk=lti.consegnee_code)
+            
+            if not consignee.name:
+                consignee.name = lti.consegnee_name
+                consignee.save()
             
             #Create Order
             defaults = {
@@ -560,8 +578,9 @@ class LtiOriginal( models.Model ):
                 'transport_name': lti.transport_name,
                 'origin_type': lti.origin_type,
                 'project_number': lti.project_wbs_element,
-                'warehouse': warehouse,
+                'warehouse': Warehouse.objects.get(code=lti.origin_wh_code),
                 'consignee': consignee,
+                'location': Location.objects.get(pk=lti.destination_location_code),
                 'updated': now,
             }
             
@@ -605,9 +624,9 @@ class Order(models.Model):
     
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="orders")
-    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="orders")
-    location = models.ForeignKey(Location, verbose_name=_("Location"), related_name="orders")
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("dispatch warehouse"), related_name="orders")
+    consignee = models.ForeignKey(Consignee, verbose_name=_("consignee"), related_name="orders")
+    location = models.ForeignKey(Location, verbose_name=_("consignee's location"), related_name="orders")
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
