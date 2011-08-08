@@ -171,7 +171,7 @@
       "destination_location_code": "ISBX", 
       "quantity_net": "1.750", 
       "consegnee_code": "DOEAF", 
-      "consegnee_name": "ISLAMABAD CITY OFFICE", 
+      "consegnee_name": "First consignee in our system", 
       "quantity_gross": "1.762", 
       "destination_loc_name": "ISLAMABAD_CAP", 
       "requested_dispatch_date": "2011-11-03", 

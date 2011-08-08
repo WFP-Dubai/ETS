@@ -652,8 +652,9 @@ class Waybill( models.Model ):
     order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     transport_name = models.CharField(_("Transport Name"), max_length = 30)
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="waybills")
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="waybills")
     consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="waybills")
+    location = models.ForeignKey(Location, verbose_name=_("Receipt Location"), related_name="waybills")
     
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
@@ -854,18 +855,6 @@ class Waybill( models.Model ):
         return serializers.serialize( 'json', [self] + list( loadingdetails_to_serialize ) 
                                       + list( ltis_to_serialize ) + list( stocks_to_serialize ) )
         
-    #===================================================================================================================
-    # def new_waybill_no(self):
-    #    """
-    #    This method gives a waybill identifier for the waybill instance param, chaining the warehouse identifier char with the sequence of the table.
-    #    Note: Different offliner app installation must have different warehouse identifier char.
-    #    # TODO: Make waybill id = code
-    #    @param self: the Waybill instance
-    #    @return: a string containing the waybill identifier.
-    #    """
-    #    return '%s%04d' % (settings.WAYBILL_LETTER, self.pk)
-    #===================================================================================================================
-    
     def compress(self):
         """
         This method compress the Waybill using zipBase64 algorithm.
@@ -1099,8 +1088,12 @@ class LoadingDetail( DeliveryItem ):
 
 class UserProfile( models.Model ):
     user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    dispatch_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Dispatch Warehouse"), blank=True, null=True)
-    reception_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Reception warehouse"), blank=True, null=True)
+    
+    dispatch_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Dispatch Warehouse"), 
+                                            blank=True, null=True, related_name="dispatcher_profiles")
+    reception_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Reception warehouse"), 
+                                             blank=True, null=True, related_name="receipient_profiles")
+    
     is_compas_user = models.BooleanField(_('Is Compas User'), default=False) #isCompasUser
     is_dispatcher = models.BooleanField(_("Is Dispatcher"), default=False) #isDispatcher
     is_reciever = models.BooleanField(_("Is Reciever"), default=False) #isReciever

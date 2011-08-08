@@ -65,6 +65,14 @@ class CommandTestCase(TestCase):
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)
         
         """Update orders"""
-        self.assertEqual(ets.models.Order.objects.count(), 1)
-        self.assertEqual(ets.models.Order.objects.all()[0].items.count(), 1)
+        order = ets.models.Order.objects.all()[0]
+        self.assertEqual(order.warehouse, warehouse)
+        self.assertEqual(order.location, ets.models.Location.objects.get(pk='ISBX'))
+        self.assertEqual(order.consignee, ets.models.Consignee.objects.get(pk='DOEAF'))
+        
+        #Test updated consignee's name
+        self.assertEqual(ets.models.Consignee.objects.get(pk='DOEAF').name, 'First consignee in our system')
+        
+        #Test order items
+        self.assertEqual(order.items.count(), 1)
         
