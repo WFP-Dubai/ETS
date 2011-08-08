@@ -1,10 +1,12 @@
 from django.contrib import admin
-import ets.models
 from django.contrib.auth.models import User
 import datetime
 from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
+
+import ets.models
+
 
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail

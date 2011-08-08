@@ -95,10 +95,62 @@ class Place( models.Model ):
         >>> #Try Repeating
         >>> Place.update()
         """
-        for place in cls.objects.using( 'compas' ).all(): #filter( country_code__in = settings.COUNTRIES ):
-            place.save( using = 'default' )
+        for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
+            
+            #Create location
+            location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
+                'name': place.geo_name,
+                'country': place.country_code,
+            })[0]
+            
+            organization = Organization.objects.get_or_create(id=place.organization_id)[0]\
+                            if place.organization_id else None
+            
+            #Update consignee
+            defaults = {
+                'location': location,
+                'organization': organization,
+                'name': place.name,
+            }
+            
+            rows = Consignee.objects.filter(code=place.org_code).update(**defaults)
+            if not rows:
+                Consignee.objects.create(code=place.org_code, **defaults)
+            
 
+class Location(models.Model):
+    """Location model. City or region"""
+    
+    code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
+    name = models.CharField(_("Name"), max_length=100)
+    country = models.CharField( _("Country code"), max_length=3)
 
+class Organization(models.Model):
+    """Consignee organization"""
+    
+    id = models.CharField(_("Organization id"), max_length=20, primary_key=True)
+    name = models.CharField(_("Name"), max_length = 100, blank=True)
+
+class Consignee(models.Model):
+    """Consignee itself."""
+    
+    code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
+    name = models.CharField(_("Name"), max_length = 100)
+    location = models.ForeignKey(Location, verbose_name=_("Location"), related_name="consignees")
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="consignees", 
+                                     blunk=True, null=True)
+    start_date = models.DateField(_("start date"), null=True, blank=True)
+        
+    class Meta:
+        ordering = ('name',)
+        order_with_respect_to = 'location'
+        verbose_name = _('consignee')
+        verbose_name_plural = _("consignees")
+
+    def  __unicode__( self ):
+        return self.name
+        
+    
 class CompasPerson( models.Model ):
     """Compas CompasPerson. We import them directly from compas Oracle using database view"""
     person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
@@ -116,7 +168,8 @@ class CompasPerson( models.Model ):
     fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
     effective_date = models.DateField(_("effective date"), null=True, blank=True)
     expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
-    location_code = models.ForeignKey(Place, verbose_name="place", related_name="persons")
+    location = models.ForeignKey(Location, verbose_name=_("location"), 
+                                 related_name="persons", db_column='location_code')
 
     class Meta:
         db_table = u'epic_persons'
@@ -147,18 +200,17 @@ class Warehouse( models.Model ):
     """
     code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
     title = models.CharField(_("title"),  max_length = 50, blank = True ) #origin_wh_name
-    place = models.ForeignKey(Place, verbose_name=_("place"), related_name="warehouses") #origin_location_code
+    location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
     start_date = models.DateField(_("start date"), null=True, blank=True)
 
     class Meta:
-        ordering = ('place__name', 'title',)
-        order_with_respect_to = 'place'
+        ordering = ('title',)
+        order_with_respect_to = 'location'
         verbose_name = _('dispatch warehouse')
         verbose_name_plural = _("warehouses")
-        unique_together = ('place', 'code')
         
     def  __unicode__( self ):
-        return "%s - %s - %s" % (self.code, self.place.name, self.title)
+        return "%s - %s - %s" % (self.code, self.location.name, self.title)
     
     #===================================================================================================================
     # def serialize(self):
@@ -166,23 +218,6 @@ class Warehouse( models.Model ):
     #    return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
     #                                        + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
     #===================================================================================================================
-
-class Consignee( models.Model ):
-    """Consignee warehouse"""
-    code = models.CharField(_("code"), max_length = 12, primary_key=True) #consegnee_code
-    title = models.CharField(_("title"), max_length = 80) #consegnee_name
-    place = models.ForeignKey(Place, verbose_name=_("place"), related_name="consignees") #LOCATION_CODE
-    start_date = models.DateField(_("start date"), null = True, blank = True)
-    
-    def  __unicode__( self ):
-        return "%s - %s" % (self.place.name, self.title)
-        
-    class Meta:
-        ordering = ('place__name', 'title')
-        order_with_respect_to = 'place'
-        verbose_name = _('consignee')
-        verbose_name_plural = _("consignees")
-        unique_together = ('place', 'code')
 
 
 class EpicStock( models.Model ):
@@ -392,9 +427,8 @@ class LossDamageType( models.Model ):
     
     @classmethod
     def update(cls):
-        reasons = cls.objects.using( 'compas' ).all()
-        for myrecord in reasons:
-            myrecord.save( using = 'default' )
+        for myrecord in cls.objects.using('compas').all():
+            myrecord.save(using='default')
 
 
 class LtiOriginal( models.Model ):
@@ -417,9 +451,11 @@ class LtiOriginal( models.Model ):
     origin_wh_code = models.CharField( _("Origin warehouse code"),max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
     origin_wh_name = models.CharField( _("Origin warehouse name"),max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
     
-    #Consignee
+    #Location
     destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
     destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
+    
+    #Organization
     consegnee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
     consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
     
@@ -569,7 +605,8 @@ class Order(models.Model):
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="orders")
-    consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="orders")
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="orders")
+    location = models.ForeignKey(Location, verbose_name=_("Location"), related_name="orders")
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
