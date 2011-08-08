@@ -24,6 +24,7 @@ from .country import COUNTRY_CHOICES
 #name = "1234"
 DEFAULT_TIMEOUT = 10
 API_DOMAIN = "http://localhost:8000"
+BULK_NAME = "BULK"
 
 COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
@@ -240,7 +241,7 @@ class EpicStock( models.Model ):
         #managed = False
     
     def is_bulk(self):
-        return self.packagename == 'BULK' and self.quantity_net
+        return self.packagename == BULK_NAME and self.quantity_net
     
     @classmethod 
     def update(cls):
@@ -413,60 +414,7 @@ class LtiOriginal( models.Model ):
     
     @classmethod
     def update(cls):
-        """
-        Imports all LTIs from COMPAS
-        
-        Create test data
-        >>> place = Place.objects.get_or_create(org_code="UAE123", defaults = dict( 
-        ...                      name="The best place in the world", 
-        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE"))[0]
-        >>> place2 = Place.objects.get_or_create(org_code="DNIPRO", defaults = dict( 
-        ...                      name="Home Sweet Home", 
-        ...                      geo_point_code = 'UA', geo_name="Ukraine", country_code="380", 
-        ...                      reporting_code="REPUA"))[0]
-        >>> lti = LtiOriginal.objects.using('compas').get_or_create(lti_pk='123df', defaults={
-        ...     "origin_location_code": "UAE123",
-        ...     "si_record_id": "UAE123",
-        ...     "origin_loc_name": "Dubai",
-        ...     "code": "UAE1",
-        ...     "destination_location_code": "DNIPRO",
-        ...     "destination_loc_name": "Home Sweet Home", 
-        ...     "quantity_net": "1.75",
-        ...     "consegnee_code": "DOEAF",
-        ...     "quantity_gross": "1.762",
-        ...     "commodity_code": "MSCSAL",
-        ...     "requested_dispatch_date": "2011-11-03",
-        ...     "transport_name": "MUSLIM TRANSPORT",
-        ...     "unit_weight_net": "50",
-        ...     "transport_ouc": "ISBX001",
-        ...     "origin_wh_code": "QANX002",
-        ...     "lti_id": "QANX001000000000000005217",
-        ...     "number_of_units": "35",
-        ...     "unit_weight_gross": "50.33",
-        ...     "comm_category_code": "MSC",
-        ...     "expiry_date": "2011-11-15",
-        ...     "project_wbs_element": "200063.1",
-        ...     "cmmname": "IODISED SALT",
-        ...     "lti_date": "2010-11-02",
-        ...     "consegnee_name": "DEPARTMENT OF EDUCATION UKRAINE",
-        ...     "origintype_desc": "Warehouse",
-        ...     "transport_code": "M001",
-        ...     "origin_type": "2",
-        ...     "si_code": "82930203"
-        ... })[0]
-        >>> LtiOriginal.objects.using('compas').count()
-        1
-        >>> LtiOriginal.update()
-        >>> Warehouse.objects.get(pk='QANX002')
-        <Warehouse: QANX002 - The best place in the world - >
-        >>> Consignee.objects.get(pk='DOEAF')
-        <Consignee: Home Sweet Home - DEPARTMENT OF EDUCATION UKRAINE>
-        >>> Order.objects.get(pk='UAE1')
-        <Order: UAE1>
-        >>> OrderItem.objects.get(pk='123df')
-        <OrderItem: IODISED SALT -  35 >
-        """
+        """Imports all LTIs from COMPAS"""
         now = datetime.now()
 
         original = cls.objects.using('compas').filter(requested_dispatch_date__gt = settings.MAX_DATE)
@@ -477,7 +425,7 @@ class LtiOriginal( models.Model ):
             
             #Update Consignee
             # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
-            consignee = Consignee.get(pk=lti.consegnee_code)
+            consignee = Consignee.objects.get(pk=lti.consegnee_code)
             
             if not consignee.name:
                 consignee.name = lti.consegnee_name

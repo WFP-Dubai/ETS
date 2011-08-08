@@ -157,5 +157,40 @@
       "number_of_units": 1, 
       "wh_country": "PAKISTAN" 
     }
+  },
+  {
+    "pk": "QANX001000000000000005217HQX0001000000000000984141", 
+    "model": "ets.ltioriginal", 
+    "fields": {
+      "origin_location_code": "ISBX", 
+      "origin_wh_code": "ISBX002", 
+      "origin_wh_name": "PAKISTAN COUNTRY OFFICE", 
+      "si_record_id": "HQX0001000000000000984141", 
+      "origin_loc_name": "ISLAMABAD_CAP", 
+      "code": "OURLITORDER", 
+      "destination_location_code": "ISBX", 
+      "quantity_net": "1.750", 
+      "consegnee_code": "DOEAF", 
+      "consegnee_name": "ISLAMABAD CITY OFFICE", 
+      "quantity_gross": "1.762", 
+      "destination_loc_name": "ISLAMABAD_CAP", 
+      "requested_dispatch_date": "2011-11-03", 
+      "transport_name": "MUSLIM TRANSPORT", 
+      "unit_weight_net": "50.000",
+      "transport_ouc": "ISBX001", 
+      "lti_id": "QANX001000000000000005217", 
+      "number_of_units": "35", 
+      "unit_weight_gross": "50.330", 
+      "commodity_code": "BEER", 
+      "comm_category_code": "MIX", 
+      "cmmname": "COOL UKRAINIAN BEER", 
+      "expiry_date": "2011-11-14", 
+      "project_wbs_element": "1", 
+      "lti_date": "2010-11-02", 
+      "origintype_desc": "Warehouse", 
+      "transport_code": "M001", 
+      "origin_type": "2", 
+      "si_code": "123"
+    }
   }
 ]

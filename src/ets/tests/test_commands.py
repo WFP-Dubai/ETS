@@ -29,7 +29,7 @@ class CommandTestCase(TestCase):
         
         call_command('sync_compas', nodelete=True)
         
-        #test place's update method
+        """Test place's update method"""
         self.assertEqual(ets.models.Location.objects.count(), 2)
         self.assertEqual(ets.models.Warehouse.objects.count(), 3)
         self.assertEqual(ets.models.Consignee.objects.count(), 1)
@@ -45,7 +45,7 @@ class CommandTestCase(TestCase):
         #test loss and damage types. The same story. It's stupid :)
         self.assertEqual(ets.models.LossDamageType.objects.count(), 3)
         
-        #test stock update
+        """test stock update"""
         self.assertEqual(ets.models.StockItem.objects.count(), 2)
         stock_item = ets.models.StockItem.objects.get(pk='testme0124')
         
@@ -63,4 +63,8 @@ class CommandTestCase(TestCase):
         ets.models.EpicStock.update()
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)
+        
+        """Update orders"""
+        self.assertEqual(ets.models.Order.objects.count(), 1)
+        self.assertEqual(ets.models.Order.objects.all()[0].items.count(), 1)
         
