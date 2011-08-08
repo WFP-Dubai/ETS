@@ -35,4 +35,127 @@
       "geo_name": "THARPARKAR"
     }
   },
+  {
+    "pk": "ISBX0020000586", 
+    "model": "ets.compasperson", 
+    "fields": {
+      "warehouse": "ISBX002", 
+      "first_name": "RIAZ", 
+      "code": "0000586", 
+      "title": "LOGISTICS OFFICER", 
+      "document_number": "", 
+      "official_tel_number": "92 51-272589", 
+      "mobile_phone_number": "92 320-268658", 
+      "fax_number": "9251-827149", 
+      "organization_id": "DOEAF", 
+      "last_name": "LODHI", 
+      "e_mail_address": "RIAZ.LODHI@WFP.ORG", 
+      "effective_date": null, 
+      "type_of_document": "", 
+      "location_code": "ISBX", 
+      "expiry_date": null
+    }
+  }, 
+  {
+    "pk": "ISBX0020000613", 
+    "model": "ets.compasperson", 
+    "fields": {
+      "warehouse": "ISBX003", 
+      "first_name": "DIDIER", 
+      "code": "0000613", 
+      "title": "REGIONAL LOGISTICS COORDINATOR", 
+      "document_number": "", 
+      "official_tel_number": "92-51-272589", 
+      "mobile_phone_number": "92 320-266722", 
+      "fax_number": "92-51-827149", 
+      "organization_id": "DOEAF", 
+      "location_code": "ISBX", 
+      "last_name": "FRISCH", 
+      "e_mail_address": "DIDIER.FRISCH@WFP.ORG", 
+      "effective_date": null, 
+      "type_of_document": "", 
+      "expiry_date": null
+    }
+  },
+  {
+    "pk": "LMIX", 
+    "model": "ets.lossdamagetype", 
+    "fields": {
+      "cause": "VARIANCE IN WEIGHT", 
+      "type": "L", 
+      "comm_category_code": "MIX"
+    }
+  }, 
+  {
+    "pk": "LSED", 
+    "model": "ets.lossdamagetype", 
+    "fields": {
+      "cause": "PROCESSING/TRANSFORMATION OF COMMODITY", 
+      "type": "L", 
+      "comm_category_code": "SED"
+    }
+  }, 
+  {
+    "pk": "DMIX", 
+    "model": "ets.lossdamagetype", 
+    "fields": {
+      "cause": "WET BY GASOIL", 
+      "type": "D", 
+      "comm_category_code": "MIX"
+    }
+  },
+  {
+    "pk": "KARX025KARX0010000944801MIXMIXHEBCG15586", 
+    "model": "ets.epicstock", 
+    "fields": {
+      "origin_id": "testme0123",
+      "project_wbs_element": "1", 
+      "si_code": "123", 
+      "si_record_id": "HQX0001000000000000995798", 
+      "quantity_gross": "0.011", 
+      "qualitydescr": "Good", 
+      "quantity_net": "0.010", 
+      "wh_code": "ISBX002", 
+      "package_code": "CG15", 
+      "packagename": "CARTON, FIBREBOARD, 100 X 100 GRM BAG", 
+      "comm_category_code": "MIX", 
+      "commodity_code": "BEER", 
+      "cmmname": "COOL UKRAINIAN BEER",
+      "wh_location": "KARACHI", 
+      "reference_number": "0080007004", 
+      "wh_regional": "OMB", 
+      "qualitycode": "G", 
+      "wh_name": "KICT", 
+      "allocation_code": "586", 
+      "number_of_units": 50, 
+      "wh_country": "PAKISTAN" 
+    }
+  },
+  {
+    "pk": "KARX025KARX0010000944801MIXMIXHEBCG15587", 
+    "model": "ets.epicstock", 
+    "fields": {
+      "origin_id": "testme0124",
+      "project_wbs_element": "1", 
+      "si_code": "123", 
+      "si_record_id": "HQX0001000000000000995795", 
+      "quantity_gross": "0.015", 
+      "qualitydescr": "Good", 
+      "quantity_net": "1000", 
+      "wh_code": "ISBX002", 
+      "package_code": "BG16",
+      "packagename": "BULK", 
+      "comm_category_code": "SED", 
+      "commodity_code": "wheet", 
+      "cmmname": "WHEET",
+      "wh_location": "KARACHI", 
+      "reference_number": "0080007004", 
+      "wh_regional": "OMB", 
+      "qualitycode": "G", 
+      "wh_name": "KICT", 
+      "allocation_code": "586", 
+      "number_of_units": 1, 
+      "wh_country": "PAKISTAN" 
+    }
+  }
 ]

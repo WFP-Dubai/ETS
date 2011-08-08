@@ -51,17 +51,6 @@ class Place( models.Model ):
     """
     Location model.
     Model based on compas Views & Tables
-    
-    >>> place, c = Place.objects.get_or_create(org_code="test", name="The best place in the world", 
-    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-    ...                      reporting_code="SOME_CODE", )
-    >>> place
-    <Place: The best place in the world>
-    >>> #Validation
-    >>> Place().full_clean()
-    Traceback (most recent call last):
-    ...
-    ValidationError: {'name': [u'This field cannot be blank.'], 'org_code': [u'This field cannot be blank.'], 'reporting_code': [u'This field cannot be blank.'], 'geo_point_code': [u'This field cannot be blank.'], 'country_code': [u'This field cannot be blank.'], 'geo_name': [u'This field cannot be blank.']}
     """
 
     org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
@@ -83,37 +72,7 @@ class Place( models.Model ):
 
     @classmethod
     def update(cls):
-        """
-        Executes Imports of Place
-        
-        #Let's try update place without organization identifier
-        >>> place, created = Place.objects.using('compas').get_or_create(org_code="completely_unique_code", 
-        ...                      name="The best place in the world", 
-        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE")
-        >>> Place.update()
-        >>> Location.objects.using('default').get(pk="TEST")
-        <Location: 586 Dubai>
-        >>> warehouse = Warehouse.objects.get(pk='completely_unique_code')
-        >>> warehouse
-        <Warehouse: completely_unique_code - Dubai - The best place in the world>
-        >>> warehouse.organization is None
-        True
-        
-        #Try with organization and same location
-        >>> place, created = Place.objects.using('compas').get_or_create(org_code="another_place_code", 
-        ...                      name="The best place in the world", 
-        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE", organization_id='WFP')
-        >>> Place.update()
-        >>> warehouse = Warehouse.objects.get(pk='another_place_code')
-        >>> warehouse
-        <Warehouse: another_place_code - Dubai - The best place in the world>
-        >>> warehouse.organization
-        <Consignee: WFP>
-        >>> warehouse.location
-        <Location: 586 Dubai>
-        """
+        """Executes Imports of Place"""
         for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
             
             #Create location
@@ -213,10 +172,8 @@ class CompasPerson( models.Model ):
     title = models.CharField(_("title"), max_length=50, blank=True)
     last_name = models.CharField(_("last name"), max_length=30)
     first_name = models.CharField(_("first name"), max_length=25)
-    org_unit_code = models.CharField(_("organization's unit code"), max_length=13)
     code = models.CharField(_("code"), max_length=7)
     type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
-    organization_id = models.CharField(_("organization identifier"), max_length=12)
     document_number = models.CharField(_("document number"), max_length=25, blank=True)
     e_mail_address = models.CharField(_("e_mail address"), max_length=100, blank=True)
     mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
@@ -224,20 +181,28 @@ class CompasPerson( models.Model ):
     fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
     effective_date = models.DateField(_("effective date"), null=True, blank=True)
     expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
-    location = models.ForeignKey(Location, verbose_name=_("location"), 
-                                 related_name="persons", db_column='location_code')
+    
+    warehouse = models.CharField(_("warehouse"), max_length=13, db_column='org_unit_code')
+
+    #Dummy fields
+    organization_id = models.CharField(_("organization identifier"), max_length=12, editable=False)
+    location_code = models.CharField(_("location"), max_length=10, editable=False)
 
     class Meta:
         db_table = u'epic_persons'
-        verbose_name = 'COMPAS User'
-
+        ordering = ('code',)
+        verbose_name = _('COMPAS User')
+        verbose_name_plural = _("COMPAS users")
+    
     def  __unicode__( self ):
         return "%s, %s" % (self.last_name, self.first_name)
     
     @classmethod
     def update(cls):
-        for my_person in cls.objects.using( 'compas' ).all():#.filter( org_unit_code = COMPAS_STATION ):
-            my_person.save( using = 'default' )
+        warehouses = Warehouse.objects.values_list('pk', flat=True)
+        for my_person in cls.objects.using('compas')\
+                .filter(warehouse__in=tuple(warehouses)):
+            my_person.save(using='default')
 
 
 class EpicStock( models.Model ):
@@ -274,65 +239,19 @@ class EpicStock( models.Model ):
         db_table = u'epic_stock'
         #managed = False
     
+    def is_bulk(self):
+        return self.packagename == 'BULK' and self.quantity_net
+    
     @classmethod 
     def update(cls):
-        """
-        Executes Imports of Stock
+        """Executes Imports of Stock"""
         
-        >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", defaults = dict( 
-        ...                      name="The best place in the world", 
-        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE"))
-        >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", defaults=dict(title="Perfect warehouse", 
-        ...                      place=place, start_date=datetime.now()))
-        >>> stock, c = EpicStock.objects.using('compas').get_or_create(origin_id='123', defaults=dict(
-        ...                     wh_code="test_wh", project_wbs_element="1", si_code="123", 
-        ...                     commodity_code='bear', number_of_units=50, quantity_net="0.5",
-        ...                     package_code='C', packagename="T", qualitycode="1", qualitydescr="cool bear",
-        ...                     quantity_gross="1242.5", allocation_code='UAE', wh_pk='1'))
-        
-        Create new stock item
-        >>> StockItem.objects.get(pk='123')
-        Traceback (most recent call last):
-        ...
-        DoesNotExist: StockItem matching query does not exist.
-        >>> EpicStock.update()
-        >>> StockItem.objects.get(pk='123')
-        <StockItem: Perfect warehouse-bear-50>
-        
-        Check BULK modifications
-        >>> bulk_epic_stock, c = EpicStock.objects.using('compas').get_or_create(origin_id='1234', defaults=dict(
-        ...                     wh_code="test_wh", project_wbs_element="1", si_code="123", 
-        ...                     commodity_code='wheat1', number_of_units=1, quantity_net="1000",
-        ...                     package_code='C', packagename="BULK", qualitycode="1", qualitydescr="cool wheaty",
-        ...                     quantity_gross="1242.5", allocation_code='UAE'))
-        >>> EpicStock.update()
-        >>> bulk_stock = StockItem.objects.get(pk='1234')
-        >>> bulk_stock.number_of_units
-        1000
-        >>> int(bulk_stock.quantity_net)
-        1
-        
-        Update changed stock
-        >>> stock.number_of_units = 500
-        >>> stock.save()
-        >>> EpicStock.update()
-        >>> StockItem.objects.get(pk='123')
-        <StockItem: Perfect warehouse-bear-500>
-        
-        Test deletion
-        >>> stock.delete()
-        >>> EpicStock.update()
-        >>> StockItem.objects.get(pk='123')
-        <StockItem: Perfect warehouse-bear-0>
-        """
         now = datetime.now()
         
         for stock in cls.objects.using( 'compas' ):
             
             #Check package type. If 'BULK' then modify number and weight
-            number_of_units, quantity_net = (stock.quantity_net, 1) \
-                                            if stock.packagename == 'BULK' and stock.quantity_net \
+            number_of_units, quantity_net = (stock.quantity_net, 1) if stock.is_bulk() \
                                             else (stock.number_of_units, stock.quantity_net)
             
             defaults = {
@@ -347,7 +266,6 @@ class EpicStock( models.Model ):
                 'quality_code': stock.qualitycode,
                 'quality_description': stock.qualitydescr,
                 'quantity_gross': stock.quantity_gross,
-                'allocation_code': stock.allocation_code,
                 'updated': now
             }
             
@@ -366,7 +284,7 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, editable=False, primary_key=True)
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
@@ -383,7 +301,6 @@ class StockItem( models.Model ):
     quantity_gross = models.DecimalField(_("Quantity gross"), max_digits=12, decimal_places=3, blank=True, null=True)
     number_of_units = models.IntegerField(_("Number of units"))
     
-    allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
     objects = StockManager()
@@ -397,10 +314,8 @@ class StockItem( models.Model ):
     def  __unicode__( self ):
         return "%s-%s-%s" % (self.warehouse.title, self.commodity_code, self.number_of_units)
         
-    #===================================================================================================================
-    # def coi_code( self ):
-    #    return self.origin_id[7:]
-    #===================================================================================================================
+    def coi_code(self):
+        return self.origin_id[7:]
     
     def packaging_description( self ):
         try:
@@ -844,7 +759,7 @@ class Waybill( models.Model ):
     #recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
     #recipient_name = models.CharField( _("Recipient Name"), max_length=100, blank=True) #recipientName
     recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
-                                          related_name="recipient_waybills") #recipientName
+                                          related_name="recipient_waybills", blank=True, null=True) #recipientName
     #recipient_title = models.CharField(_("Recipient Title "), max_length=100, blank=True) #recipientTitle
     recipient_arrival_date = models.DateField(_("Recipient Arrival Date"), null=True, blank=True) #recipientArrivalDate
     recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), null=True, blank=True) #recipientStartDischargeDate

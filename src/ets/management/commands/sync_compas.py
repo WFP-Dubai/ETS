@@ -19,12 +19,14 @@ class Command(BaseCommand):
         #Update persons
         ets.models.CompasPerson.update()
         
+        #Update loss/damage types
+        ets.models.LossDamageType.update()
+
+        #Update stocks
+        ets.models.EpicStock.update()
+
         #Update orders
         ets.models.LtiOriginal.update()
         
-        #Update stocks
-        ets.models.EpicStock.update()
         
-        #Update loss/damage types
-        ets.models.LossDamageType.update()
         
