@@ -22,4 +22,4 @@ class CommandTestCase(TestCase):
     
     def test_sync_compas(self):
         call_command('sync_compas', nodelete=True)
-            
+        

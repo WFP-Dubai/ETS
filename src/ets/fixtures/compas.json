@@ -1,14 +1,14 @@
 [
   {
-    "pk": "ISBX002", 
+    "pk": "completely_unique_code", 
     "model": "ets.place", 
     "fields": {
-      "name": "PAKISTAN COUNTRY OFFICE",
-      "reporting_code": "HQX0001",
+      "name": "The best place in the world",
+      "reporting_code": "RELATED_COMPASS",
       "organization_id": "",
-      "geo_point_code": "ISBX",
+      "geo_point_code": "TEST",
       "country_code": "586",
-      "geo_name": "ISLAMABAD_CAP"
+      "geo_name": "Dubai"
     }
   }, 
   {

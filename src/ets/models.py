@@ -119,7 +119,7 @@ class Place( models.Model ):
             location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
                 'name': place.geo_name,
                 'country': place.country_code,
-                'reporting_code': place.reporting_code,
+                'compas': place.reporting_code,
             })[0]
             
             #Create consignee organization
@@ -143,7 +143,7 @@ class Location(models.Model):
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
-    reporting_code = models.CharField(_("Reporting code"), max_length=7)
+    compas = models.CharField(_("COMPAS station"), max_length=7)
     country = models.CharField( _("Country code"), max_length=3)
     
     class Meta:
