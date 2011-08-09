@@ -447,9 +447,7 @@ class LtiOriginal( models.Model ):
                 'updated': now,
             }
             
-            rows = Order.objects.filter(code=lti.code).update(**defaults)
-            if not rows:
-                order = Order.objects.create(code=lti.code, **defaults)
+            order = Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
             
             #Create order item
             defaults = {
@@ -467,7 +465,7 @@ class LtiOriginal( models.Model ):
             
             rows = OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
             if not rows:
-                order = OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
+                OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
             
 
 class Order(models.Model):
@@ -988,13 +986,11 @@ class Waybill( models.Model ):
 class LoadingDetail( DeliveryItem ):
     """Item of waybill"""
     waybill = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
-    slug = AutoSlugField(populate_from=waybill, unique=True, sep='', primary_key=True)
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
+    origin_id = models.CharField(_("Origin stock identifier"), max_length=23)
     package = models.CharField(_("Package"), max_length=10)
-    
-#    number_units_loaded = models.DecimalField(_("number Units Loaded"), default=0, 
-#                                              max_digits=10, decimal_places=3 ) #numberUnitsLoaded
-    
+        
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 
                                             max_digits=10, decimal_places=3) #numberUnitsGood
@@ -1017,9 +1013,9 @@ class LoadingDetail( DeliveryItem ):
                                        related_name='loss_type', #LD_LossType 
                                        blank=True, null=True ) #unitsLostType
     
-    overloadedUnits = models.BooleanField(_("overloaded Units"), default=False)
-    loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "), default=False)
-    overOffloadUnits = models.BooleanField(_("over offloaded Units"), default=False)
+    overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
+    loading_detail_sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
+    over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
     audit_log = AuditLog()
 
