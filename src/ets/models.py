@@ -158,6 +158,10 @@ class Warehouse( models.Model ):
         
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.code, self.location.name, self.name)
+
+    @classmethod
+    def get_warehouses(cls, location, organization=None):
+        return cls.objects.filter(location=location).filter(organization=organization)       
     
     #===================================================================================================================
     # def serialize(self):
