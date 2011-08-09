@@ -162,8 +162,8 @@ class Warehouse( models.Model ):
 
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        #return cls.objects.filter(location=location).filter( Q(organization=organization) | Q(organization='None') )
-        return cls.objects.filter(location=location).filter(organization=organization)      
+        return cls.objects.filter(location=location).filter( Q(organization=organization) | Q(organization__isnull=True) )
+        #return cls.objects.filter(location=location).filter(organization=organization)      
     
     #===================================================================================================================
     # def serialize(self):

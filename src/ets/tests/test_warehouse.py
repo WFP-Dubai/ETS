@@ -14,7 +14,7 @@ class GetWarehouseTestCase(TestCase):
         location = Location.objects.get(pk="OE7X")
         warehouses = Warehouse.get_warehouses(location=location)
         self.assertEqual(warehouses.count(),1)
-        #self.assertEqual(warehouses[0].name="EDO OFFICE MEHTI")
+        self.assertEqual(warehouses[0].name, "EDO OFFICE MEHTI")
         location = Location.objects.get(code="ISBX")
         ogranization = Consignee.objects.get(code="DOEAF")
         warehouses = Warehouse.get_warehouses(location=location, organization=ogranization)
