@@ -1129,29 +1129,6 @@ class CompasLogger( models.Model ):
     class Meta:
         db_table = u'loggercompas'
 
-class SIWithRestant:
-    SINumber = ''
-    StartAmount = 0.0
-    CurrentAmount = 0.0
-    CommodityName = ''
-    InStock = 0
-    COI_Code = ''
-
-    def __init__( self, SINumber, StartAmount, CommodityName ):
-        self.SINumber = SINumber
-        self.StartAmount = StartAmount
-        self.CurrentAmount = StartAmount
-        self.CommodityName = CommodityName
-
-    def reduce_current( self, reduce ):
-        self.CurrentAmount = self.CurrentAmount - reduce
-        
-    def get_current_amount( self ):
-        return self.CurrentAmount
-    
-    def get_start_amount( self ):
-        return self.StartAmount
-
 
 # TODO: Importing of old waybills....
 class DispatchMaster( models.Model ):

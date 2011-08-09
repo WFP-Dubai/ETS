@@ -7,13 +7,14 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.urlresolvers import reverse
 #from django.forms.formsets import BaseFormSet
-from django.forms.models import inlineformset_factory, modelformset_factory, ModelChoiceIterator, model_to_dict
-from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.models import inlineformset_factory, modelformset_factory, model_to_dict
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
+from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
@@ -21,12 +22,9 @@ from django.utils.translation import ugettext as _
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
 from ets.forms import WaybillValidationFormset, WarehouseChoiceForm
-from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
-from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
-from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
+import ets.models
 from ets.models import COMPAS_STATION
-from ets.tools import restant_si 
-from ets.tools import import_setup, import_lti, track_compas_update
+from ets.tools import restant_si, track_compas_update
 from ets.tools import un64unZip, viewLog, default_json_dump
 from ets.tools import serialized_all_items
 
@@ -35,66 +33,40 @@ def prep_req( request ):
 
     return {'user': request.user}
 
-@login_required
-def select_action( request, **kwargs ):
-    """
-    View: select_action 
-    URL: /
-    Template: /waybill/templates/select_action.html
-    Gives the loggedin user a choise of possible actions sepending on roles
-    """
-    return direct_to_template(request, **kwargs)
-    
 
 @login_required
-def listOfLtis( request, origin, template='lti/ltis.html'):
+def order_list(request, warehouse_pk=None, template='order/list.html', 
+               queryset=ets.models.Order.objects.all().order_by('-created'), 
+               extra_context=None):
     """
-    View: listOfLtis 
-    URL: /waybill/list/{{warehouse}}
-    Template: /ets/waybill/templates/ltis.html
-    Shows the LTIs that are in a specific warehouse
-    """
-    
-    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
-                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
+    Template: /ets/waybill/templates/order/list.html
 
-    ltis = LtiOriginal.objects.values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date' , 'expiry_date' )\
-                              .distinct().filter( expiry_date__gt = date_check, origin_wh_code = origin )
-    still_ltis = []
-    for lti in ltis:
-        for item in restant_si( lti['code'] ):
-            if item.CurrentAmount > 0 and lti not in still_ltis:
-                still_ltis.append( lti )
+    URL: /orders/
+    Shows all orders
 
-    return direct_to_template(request, template, {'ltis': still_ltis})
-
-## Show all ltis 
-@login_required
-def ltis( request, template='lti/ltis_all_qs.html' ):
+    URL: /orders/{{warehouse}}/
+    Shows the orders that are in a specific warehouse
+    
     """
-    View:
-    ltis
-    URL: /waybill/list
-    Shows all the LTIs
-    template:
-    /ets/waybill/templates/ltis.html
-    """
-    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
-                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
     
-    removedLtis = RemovedLtis.objects.all()
+    if warehouse_pk:
+        queryset = queryset.filter(warehouse__pk=warehouse_pk)
+        
+    #TODO: Exclude delivered orders
+    #===================================================================================================================
+    # still_ltis = []
+    # for lti in ltis:
+    #    for si in LtiOriginal.objects.filter( code = lti['code'] ):
+    #        if si.items_left > 0 and lti not in still_ltis:
+    #            still_ltis.append( lti )
+    #===================================================================================================================
     
-    ltis = LtiOriginal.objects.exclude( pk__in = removedLtis ).filter( expiry_date__gt = date_check )\
-                              .values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date', 
-                                       'requested_dispatch_date', 'origin_loc_name' , 'expiry_date' )\
-                              .distinct().order_by( '-lti_date' )
-    still_ltis = []
-    for lti in ltis:
-        for si in LtiOriginal.objects.filter( code = lti['code'] ):
-            if si.items_left > 0 and lti not in still_ltis:
-                still_ltis.append( lti )
+    extra = {
+        'warehouse_pk': warehouse_pk,
+    }
+    apply_extra_context(extra_context or {}, extra)
     
-    return direct_to_template(request, template , {'ltis': still_ltis})
+    return object_list(request, queryset=queryset, template_name=template, extra_context=extra)
 
 
 def import_ltis( request ):
@@ -120,7 +92,7 @@ def import_ltis( request ):
     track_compas_update()
     messages.add_message( request, messages.INFO, status )
 
-    return redirect("select_action")
+    return redirect("index")
 
 def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
     """
@@ -155,9 +127,9 @@ def dispatch( request ):
     Redirects to Lti Details.
     """
     try:
-        return redirect( "listOfLtis", request.user.get_profile().warehouses.origin_wh_code )
+        return redirect( "orders", order_pk=request.user.get_profile().warehouses.origin_wh_code )
     except:
-        return redirect( "select_action" )
+        return redirect( "index" )
 
 #### Waybill Views
 #=======================================================================================================================
@@ -169,7 +141,7 @@ def dispatch( request ):
 #            'lti_id': lti_pk,
 #        })
 #    except:
-#        return redirect( "select_action" )
+#        return redirect( "index" )
 #=======================================================================================================================
 
 
@@ -444,7 +416,7 @@ def waybill_view( request, waybill_pk, queryset, template='waybill/print/waybill
 
     except Exception as e:
         print e
-        return redirect( "select_action" )
+        return redirect( "index" )
     
     return direct_to_template( request, template, {
         'object': waybill_instance,
@@ -468,7 +440,7 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
         my_empty = [''] * (5 - number_of_lines)
         zippedWB = waybill_instance.compress()
     except:
-        return redirect( "select_action" )
+        return redirect( "index" )
     
     rec_person_object, disp_person_object = '', ''
     try:
@@ -921,7 +893,7 @@ def deserialize( request ):
             wb_serialized = eval(wb_serialized)
         else:
             messages.error(request, _('Data Incorrect!!!'))
-            return redirect(reverse('select_action')) 
+            return redirect(reverse('index')) 
  
     for obj in serializers.deserialize( "json", wb_serialized ):
         

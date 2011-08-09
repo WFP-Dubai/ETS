@@ -239,7 +239,7 @@ def restant_si( lti_code ):
     listOfWaybills = ets_models.Waybill.objects.filter( invalidated = False, ltiNumber = lti_code, waybillSentToCompas = False )
 
     listOfSI = [ets_models.SIWithRestant( lti.si_code, lti.is_bulk and lti.quantity_net or lti.number_of_units, lti.cmmname ) 
-                for lti in detailed_lti if not ets_models.RemovedLtis.objects.filter( lti = lti.lti_pk )]
+                for lti in detailed_lti]
 
     for wb in listOfWaybills:
         for loading in wb.loading_details.select_related():

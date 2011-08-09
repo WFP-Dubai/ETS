@@ -7,7 +7,7 @@
 {% trans "Select an action:" %}
 <ul>
 {%if myprofile.isDispatcher%}
-<li><a href='{% url listOfLtis myprofile.warehouses.origin_wh_code %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
+<li><a href='{% url orders warehouse_pk=myprofile.warehouses.origin_wh_code %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
 {%endif%}
 {%if myprofile.isReciever%}
 <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
@@ -30,7 +30,7 @@
 {%endif%}
 </ul>
 {%else%}
-{% trans "Please log in" %} <a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>{% trans "login" %}</a>
+{% trans "Please log in" %} <a href='{% url django.contrib.auth.views.login %}?next={% url index %}'>{% trans "login" %}</a>
 {%endif%}
 {%print_tag%}
 {%endblock%}

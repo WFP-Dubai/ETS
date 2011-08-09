@@ -47,11 +47,11 @@ function disableEnterKey(e)
 </div>
 
 <div class="menu">
-	<a href='{% url select_action %}'>{% trans "home" %}</a>
+	<a href='{% url index %}'>{% trans "home" %}</a>
 	{% if user.is_authenticated %}
-	<a href='{% url django.contrib.auth.views.logout %}?next={% url select_action %}'>{% trans "Logout" %}</a>
+	<a href='{% url django.contrib.auth.views.logout %}?next={% url index %}'>{% trans "Logout" %}</a>
 	{% else %} {% trans "Please log in." %}
-	<a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>{% trans "login" %}</a>{% endif %}
+	<a href='{% url django.contrib.auth.views.login %}?next={% url index %}'>{% trans "login" %}</a>{% endif %}
 </div>
 
 <br>
@@ -89,7 +89,7 @@ function disableEnterKey(e)
   {% trans  "Logged in as:" %}<span class="highlight">{{ user.username }} </span>.
 {% else %}
 
-  {% trans "Please log in." %} <a href='{% url django.contrib.auth.views.login %}?next={% url select_action %}'>{% trans "login" %}</a>
+  {% trans "Please log in." %} <a href='{% url django.contrib.auth.views.login %}?next={% url index %}'>{% trans "login" %}</a>
 
 {% endif %}
 </div>

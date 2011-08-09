@@ -3,6 +3,7 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, include, handler404, handler500
 from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
+from django.views.generic.simple import direct_to_template
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -30,20 +31,21 @@ info_dict_waybill_reception = {
 
 urlpatterns = patterns("ets.views",
                         
-    ( r'^$', "select_action", {
-        'template': 'select_action.html',
-    }, "select_action" ),
+    ( r'^$', login_required(direct_to_template), {
+        'template': 'index.html',
+    }, "index" ),
+    
+    ( r'^orders/(?P<warehouse_pk>[-\w]+)/$', "order_list", {}, "orders" ),
+    ( r'^orders/$', "order_list", {}, "orders"),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
-    #( r'^waybill/edit/$', "waybill_edit" ),
     ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
     ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
     ( r'^waybill/info/(.*)/$', "lti_detail_url", {}, "lti_detail_url" ),
-    ( r'^waybill/list/(.*)/$', "listOfLtis", {}, "listOfLtis" ),
-    ( r'^waybill/list/$', "ltis", {}, "ltis"),
+    
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
@@ -62,9 +64,6 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
-    #===================================================================================================================
-    # ( r'^waybill/viewwb_reception_edit/(.*)/$', waybill_view_reception ),
-    #===================================================================================================================
     ( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
     ( r'^waybill/viewwb/(?P<waybill_pk>[-\w]+)/$', "waybill_view", {
         'queryset': Waybill.objects.all(),
@@ -74,9 +73,6 @@ urlpatterns = patterns("ets.views",
       {}, "singleWBDispatchToCompas" ),
     ( r'^waybill/commit_to_compas_receipt_one/(?P<waybill_pk>[-\w]+)/$', "singleWBReceiptToCompas", 
       {}, "singleWBReceiptToCompas" ),
-    #===================================================================================================================
-    # ( r'^waybill/reset_waybill/$', waybill_search),
-    #===================================================================================================================
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {

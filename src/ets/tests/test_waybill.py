@@ -42,10 +42,10 @@ class UnathenticatedTestCase(TestCase):
     
     def test_login_form(self):
         #Check login
-        response = self.client.get(reverse('select_action'))
+        response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 302)
         
-        response = self.client.get(reverse('select_action'), follow=True)
+        response = self.client.get(reverse('index'), follow=True)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(isinstance(response.context['form'], AuthenticationForm))
 
@@ -96,8 +96,18 @@ class ClientWaybillTestCase(TestCase):
     #===================================================================================================================
     
     def test_index(self):
-        response = self.client.get(reverse('select_action'))
+        response = self.client.get(reverse('index'))
         self.assertEqual(response.status_code, 200)
+    
+    def test_order_list(self):
+        """ets.views.order_list"""
+        response = self.client.get(reverse('orders'))
+        self.assertEqual(response.status_code, 200)
+
+        #Provide dispatch warehouse
+        response = self.client.get(reverse('orders', kwargs={'warehouse_pk': self.lti.origin_wh_code}))
+        self.assertEqual(response.status_code, 200)
+    
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
@@ -151,16 +161,6 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_validate_form_update', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
-        
-    def test_listOfLtis(self):
-        """ets.views.listOfLtis"""
-        response = self.client.get(reverse('listOfLtis',args=(self.lti.origin_wh_code,)))
-        self.assertEqual(response.status_code, 200)
-    
-    def test_ltis(self):
-        """ets.views.ltis"""
-        response = self.client.get(reverse('ltis'))
-        self.assertEqual(response.status_code, 200)
         
     def test_import_ltis(self):
         """ets.views.import_ltis"""
