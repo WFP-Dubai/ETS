@@ -1,45 +1,50 @@
 {% extends "base_template.html"%}
 {% load i18n %}
-{%block content %}
-<h3>{% trans "Warehouse:" %}{{user.get_profile.warehouses.origin_wh_name}}</h3>
-    <table cellpadding="0" cellspacing="0" border="0" class="display" id="example" summary="LTIs">
-    <thead><tr>
-    <th>{% trans "LTI" %}</th>
-    <th>{% trans "Date" %}</th>
-    <th>{% trans "Destination" %}</th>
-    <th>{% trans "Dest Location" %}</th>
-    <th>{% trans "Action " %}</th>
-    </tr></thead>
-	{% for lti in ltis%}
-		<tr>
-		    <td>
-		        {{lti.code}} 
-		    </td>
-		    <td>{{lti.lti_date}}</td>
-		    
-		    <td>{{lti.destination_loc_name}}
-		    </td>
-		    <td>{{lti.consegnee_name}}
-		    </td>
-		    <td><a href='{% url lti_detail_url lti.code %}'>{% trans "select" %}</a>
-		    </td>
-		</tr>
-	{% endfor%}
+
+{% block content %}
+
+<h3>{% trans "Orders" %} {% if warehouse_pk %} to warehouse: {{ warehouse_pk }}{% endif %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="listing">
+<thead>
+  <tr>
+  <th>{% trans "Code" %}</th>
+  <th>{% trans "Date" %}</th>
+  <th>{% trans "Dispatch Warehouse" %}</th>
+  <th>{% trans "Destination" %}</th>
+  <th>{% trans "Consignee" %}</th>
+  <th>{% trans "Action" %}</th>
+  </tr>
+</thead>
+<tbody>
+  {% for order in object_list %}
+  <tr>
+    <td>{{ order.code }}</td>
+    <td>{{ order.created }}</td>
+    <td>{{ order.warehouse }}</td>
+    <td>{{ order.location }}</td>
+    <td>{{ order.consignee }}</td>
+    <td><a href='{{ order.get_absolute_url }}'>{% trans "select" %}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
 </table>
-{%endblock%}
-{%block extra-header%}
+
+{% endblock %}
+
+{% block script %}
 <script charset="utf-8" type="text/javascript">
 $(document).ready(function() {
-                $('#example').dataTable({
-		"aaSorting": [[ 0, "asc" ]],
-		"aoColumns": [
-			null,
-			null,
-			null,
-			null,
-			null
-		]
-	} );
-} );
+    $('#listing').dataTable({
+        "aaSorting": [[ 0, "asc" ]],
+        "aoColumns": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+    });
+});
 </script>
-{%endblock extra-header%}
+{% endblock %}

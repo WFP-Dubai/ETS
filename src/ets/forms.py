@@ -66,37 +66,23 @@ class WaybillRecieptForm( ModelForm ):
     
     def __init__(self, **kwargs):
         super(WaybillRecieptForm, self).__init__(**kwargs)
-        self.fields['recipientArrivalDate'].required = True
-        self.fields['recipientStartDischargeDate'].required = True
-        self.fields['recipientEndDischargeDate'].required = True
+        self.fields['recipient_arrival_date'].required = True
+        self.fields['recipient_start_discharge_date'].required = True
+        self.fields['recipient_end_discharge_date'].required = True
         
     class Meta:
         model = ets_models.Waybill
         fields = (
-            'waybillNumber',
-            'recipientLocation',
-            'recipientConsingee',
-            'recipientArrivalDate',
-            'recipientStartDischargeDate',
-            'recipientEndDischargeDate',
-            'recipientDistance',
-            'recipientRemarks',
-            'recipientSigned',
-            'recipientSignedTimestamp',
-            'transportDeliverySigned',
-            'containerOneRemarksReciept',
-            'containerTwoRemarksReciept',
-            'invalidated',
-            'auditComment',
+            'recipient_arrival_date',
+            'recipient_start_discharge_date',
+            'recipient_end_discharge_date',
+            'recipient_distance',
+            'recipient_remarks',
+            'recipient_signed_date',
+            'transport_delivery_signed_date',
+            'container_one_remarks_reciept',
+            'container_two_remarks_reciept',
         )
-        widgets = {
-            'waybillNumber': forms.HiddenInput,
-            'recipientLocation': forms.HiddenInput,
-            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'recipientConsingee': forms.HiddenInput,
-            'invalidated': forms.HiddenInput,
-            'auditComment': forms.HiddenInput,
-        }
 
 class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
     
@@ -191,14 +177,14 @@ class MyModelChoiceField( forms.ModelChoiceField ):
 class LoadingDetailDispatchForm( ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'order_item', 'numberUnitsLoaded' )
+        fields = ( 'number_of_units', )#'order_item', )
 
 
 class LoadingDetailRecieptForm( ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
         fields = ( 
-            'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 
-            'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 
-            'unitsDamagedReason', 
+            'number_of_units', 'number_units_good', 
+            'number_units_lost', 'number_units_damaged', 'units_lost_reason', 
+            'units_damaged_reason', 
         )

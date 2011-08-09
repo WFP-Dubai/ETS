@@ -203,7 +203,7 @@ def create_or_update(waybill, user, error_message):
     return compas_logger
 
 @login_required
-def singleWBDispatchToCompas( request, waybill_pk, queryset=Waybill.objects.all() ):
+def singleWBDispatchToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all() ):
     """
     View: singleWBDispatchToCompas
     URL: 
@@ -239,7 +239,7 @@ def singleWBDispatchToCompas( request, waybill_pk, queryset=Waybill.objects.all(
 
 
 @login_required
-def singleWBReceiptToCompas( request, waybill_pk, queryset=Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
+def singleWBReceiptToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
     """
     View: singleWBReceiptToCompas
     URL: ...
@@ -460,7 +460,7 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
 
 
 @login_required
-def waybill_reception( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
+def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
     # get the LTI info
     current_wb = get_object_or_404(queryset, pk = waybill_pk )
     current_lti = current_wb.ltiNumber
@@ -729,7 +729,7 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
 
 
 @login_required
-def waybill_edit( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/createWaybill.html' ):
+def waybill_edit( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/createWaybill.html' ):
     current_wb = get_object_or_404(queryset, pk=waybill_pk)
     lti_code = current_wb.ltiNumber
     current_lti = LtiOriginal.objects.filter( code = lti_code )
@@ -1105,41 +1105,45 @@ def post_synchronize_waybill( request ):
     return response
 
 
-@csrf_exempt
-def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
-    '''
+#=======================================================================================================================
+# @csrf_exempt
+# def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
+#    '''
+# 
+#    #warehouse_code = request.GET['']
+#    stocks_list = queryset.filter( wh_code = warehouse_code )
+# 
+#    #from kiowa.db.utils import instance_as_dict
+# 
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
 
-    #warehouse_code = request.GET['']
-    stocks_list = queryset.filter( wh_code = warehouse_code )
 
-    #from kiowa.db.utils import instance_as_dict
-
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
-
-
-@csrf_exempt
-def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
-    '''
-
-    #warehouse_code = request.GET['warehouse_code']
-
-#        from waybill.models import LtiOriginal    
-    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
-
-    #from kiowa.db.utils import instance_as_dict
-
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
+# @csrf_exempt
+# def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
+#    '''
+# 
+#    #warehouse_code = request.GET['warehouse_code']
+# 
+# #        from waybill.models import LtiOriginal    
+#    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
+# 
+#    #from kiowa.db.utils import instance_as_dict
+# 
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
     
 
-def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
+def get_wb_stock( request, queryset=ets.models.Warehouse.objects.all() ):
     warehouse = get_object_or_404(queryset, pk = request.REQUEST['warehouse'])
     filename = 'stock-data-%s-%s-%s.json' % (warehouse.origin_wh_code, settings.COMPAS_STATION, datetime.date.today())
     
@@ -1157,63 +1161,67 @@ def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
     
 
 
-@csrf_exempt
-def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-    '''
-
-    #warehouse_code = request.GET['']
-
-    #from waybill.models import Waybill    
-    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
-    #from kiowa.db.utils import instance_as_dict
-    
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
-    
-
-def get_synchronize_waybill2( request ):
-    '''
-    This method is called by the offline application.
-    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-    '''
-    try:
-        warehouse_code = request.GET['warehouse_code']
-    except:
-        warehouse_code = 'CCBJ004'
-    ld = []
-    ltis = []
-    stck = []
-    #from waybill.models import Waybill    
-    waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
-    for waybill_to_serialize in waybills_list:
-        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
-        # Add related LtiOriginals to serialized representation
-        ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
-        # Add related EpicStocks to serialized representation
-        stocks_to_serialize = []
-        for lti in ltis_to_serialize:
-            for s in lti.stock_items():
-                stocks_to_serialize.append( s )
-        ld += loadingdetails_to_serialize
-        ltis += ltis_to_serialize
-        stck += stocks_to_serialize
-
-    data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
-
-    ## testing it to see deser
 #=======================================================================================================================
-#    print data
-#    for deserialized_object in serializers.deserialize( "json", data ):
+# @csrf_exempt
+# def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
+#    '''
 # 
-#        print deserialized_object
+#    #warehouse_code = request.GET['']
+# 
+#    #from waybill.models import Waybill    
+#    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
+#    #from kiowa.db.utils import instance_as_dict
+#    
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
 #=======================================================================================================================
+    
 
-    response = HttpResponse( data, mimetype = 'application/json' )
-
-    return response
+#=======================================================================================================================
+# def get_synchronize_waybill2( request ):
+#    '''
+#    This method is called by the offline application.
+#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
+#    '''
+#    try:
+#        warehouse_code = request.GET['warehouse_code']
+#    except:
+#        warehouse_code = 'CCBJ004'
+#    ld = []
+#    ltis = []
+#    stck = []
+#    #from waybill.models import Waybill    
+#    waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
+#    for waybill_to_serialize in waybills_list:
+#        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
+#        # Add related LtiOriginals to serialized representation
+#        ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
+#        # Add related EpicStocks to serialized representation
+#        stocks_to_serialize = []
+#        for lti in ltis_to_serialize:
+#            for s in lti.stock_items():
+#                stocks_to_serialize.append( s )
+#        ld += loadingdetails_to_serialize
+#        ltis += ltis_to_serialize
+#        stck += stocks_to_serialize
+# 
+#    data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
+# 
+#    ## testing it to see deser
+# #=======================================================================================================================
+# #    print data
+# #    for deserialized_object in serializers.deserialize( "json", data ):
+# # 
+# #        print deserialized_object
+# #=======================================================================================================================
+# 
+#    response = HttpResponse( data, mimetype = 'application/json' )
+# 
+#    return response
+#=======================================================================================================================
 
 @csrf_exempt
 def get_all_data( request ):

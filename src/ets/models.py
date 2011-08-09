@@ -498,6 +498,10 @@ class Order(models.Model):
     
     def  __unicode__(self):
         return self.code
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ('lti_detail_url', (self.pk,), {})
 
 
 class DeliveryItem(models.Model):
@@ -707,7 +711,7 @@ class Waybill( models.Model ):
     recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), null=True, blank=True) #recipientStartDischargeDate
     recipient_end_discharge_date = models.DateField(_("Recipient End Discharge Date"), null=True, blank=True) #recipientEndDischargeDate
     recipient_distance = models.IntegerField(_("Recipient Distance"), blank=True, null=True) #recipientDistance
-    recipient_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
+    recipient_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
     #recipient_signed = models.BooleanField(_("Recipient Signed"), default=True) #recipientSigned
     recipient_signed_date = models.DateTimeField(_("Recipient Signed Date"), null=True, blank=True) #recipientSignedTimestamp
     destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")

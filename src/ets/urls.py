@@ -50,12 +50,12 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
     ( r'^waybill/print_original/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_dispatch", {
-        'queryset': Waybill.objects.filter(status=Waybill.NEW, dispatch_warehouse__pk=COMPAS_STATION),
+        'queryset': Waybill.objects.filter(status=Waybill.NEW, warehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_dispatch" ),
     ( r'^waybill/receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {}, "waybill_reception" ),
     ( r'^waybill/receive/$', "object_list", {
         "template_name": 'waybill/reception_list.html',
-        "queryset": Waybill.objects.filter( invalidated = False, recipientSigned = False ),
+        "queryset": Waybill.objects.filter(invalidated=False, recipient_signed_date__isnull=True),
     }, "waybill_reception_list" ),
     ( r'^waybill/test/$', 'object_list', info_dict_lti ),
     ( r'^waybill/validate/$', "direct_to_template", {'template': 'selectValidateAction.html'}, "waybill_validate_action" ),
@@ -76,8 +76,8 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
-            'waybill_list': Waybill.objects.filter( invalidated = False, waybillSentToCompas = True ).all, 
-            'waybill_list_rec': Waybill.objects.filter( invalidated = False, waybillRecSentToCompas = True ).all,
+            'waybill_list': Waybill.objects.filter(invalidated=False, sent_compas=True).all, 
+            'waybill_list_rec': Waybill.objects.filter(invalidated=False, rec_sent_compas=True).all,
     }}, "compass_waybill" ),
     ( r'^waybill/invalidate_waybill/(?P<waybill_pk>[-\w]+)/$', "invalidate_waybill",{
         'queryset': Waybill.objects.all(),
@@ -106,11 +106,13 @@ urlpatterns = patterns("ets.views",
     
     # download services
     ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),
-    ( r'^waybill/synchro/download/([-\w]+)/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
-    ( r'^waybill/synchro/download2/', "get_synchronize_waybill2", {}, "get_synchronize_waybill2" ),
-
-    ( r'^stock/synchro/download/([-\w]+)/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
-    ( r'^lti/synchro/download/([-\w]+)/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
+#=======================================================================================================================
+#    ( r'^waybill/synchro/download/([-\w]+)/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
+#    ( r'^waybill/synchro/download2/', "get_synchronize_waybill2", {}, "get_synchronize_waybill2" ),
+# 
+#    ( r'^stock/synchro/download/([-\w]+)/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
+#    ( r'^lti/synchro/download/([-\w]+)/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
+#=======================================================================================================================
     # Additional data
     ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
     ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
