@@ -4,12 +4,13 @@ from django.core.management import call_command
 
 from ets.models import Warehouse, Location, Consignee
 
-class GetWarehouseTestCase(TestCase):
+class WarehouseTestCase(TestCase):
     
     multi_db = True
     fixtures = ('compas.json',)
     
-    def test_get_warhouses(self):
+    def test_get_warehouses(self):
+        """Check method get_warehouses for model Warehouse"""
         call_command('sync_compas', nodelete=True)
         location = Location.objects.get(pk="OE7X")
         warehouses = Warehouse.get_warehouses(location=location)
