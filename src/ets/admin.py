@@ -13,7 +13,8 @@ class LoadingDetailsInline(admin.TabularInline):
     extra = 0
 
 class WaybillAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
+    #list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
+    list_display = ('pk', 'status', 'dispatch_date', 'warehouse')
     readonly_fields = ('created',)
     list_filter = ('status', 'created',)
     search_fields = ('pk',)
@@ -49,8 +50,10 @@ class StockInline(admin.TabularInline):
     extra = 0
 
 class WarehouseAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'title', 'place', 'start_date',)
-    list_filter = ('place', 'start_date')
+    #list_display = ('pk', 'title', 'place', 'start_date',)
+    list_display = ('pk', 'name', 'location', 'start_date',)
+    list_filter = ('location', 'start_date')
+    #list_filter = ('place', 'start_date')
     date_hierarchy = 'start_date'
     search_fields = ('pk', 'title', 'place__name',)
     inlines = (StockInline,)
@@ -87,12 +90,13 @@ class UserProfileInline( admin.StackedInline ):
 class UserAdmin( UserAdmin ):
     inlines = (UserProfileInline, )
 
-admin.site.unregister( User )
+#admin.site.unregister( User )
 admin.site.register( User, UserAdmin )
 
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
-    list_display = ( 'pk', 'description')
+    list_display = ( 'code', 'description')
+    #list_display = ( 'pk', 'description')
     list_filter = list_display
 
 admin.site.register( ets.models.PackagingDescriptionShort, PackagingDescriptonShortAdmin )
