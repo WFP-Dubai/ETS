@@ -1,6 +1,6 @@
 from django.contrib import admin
-from django.contrib.auth.models import User
 import datetime
+from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
@@ -14,7 +14,7 @@ class LoadingDetailsInline(admin.TabularInline):
 
 class WaybillAdmin(admin.ModelAdmin):
     #list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
-    list_display = ('pk', 'status', 'dispatch_date', 'warehouse')
+    list_display = ('pk', 'status', 'order_code', 'dispatch_date', 'warehouse', 'destination')
     readonly_fields = ('created',)
     list_filter = ('status', 'created',)
     search_fields = ('pk',)
