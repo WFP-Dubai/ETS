@@ -646,22 +646,16 @@ class Waybill( models.Model ):
         (COMPLETE, _("Complete")),
     )
     
-    
-    #Data from order
-    #order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
-    order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
-    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
-    transport_name = models.CharField(_("Transport Name"), max_length = 30)
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
-    #consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="waybills")
-    #location = models.ForeignKey(Location, verbose_name=_("Receipt Location"), related_name="waybills")
-    
-    
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
                             COMPAS_STATION, instance.created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
+    
+    #Data from order
+    order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
+    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
+    transport_name = models.CharField(_("Transport Name"), max_length = 30) #transport_name
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
     
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
@@ -670,8 +664,8 @@ class Waybill( models.Model ):
     loading_date = models.DateField(_("Date of loading"), blank=True, null=True) #dateOfLoading
     dispatch_date = models.DateField( _("Date of dispatch"), blank=True, null=True) #dateOfDispatch
     
-    transaction_type = models.CharField( _("Transaction Type"), max_length=10, choices=TRANSACTION_TYPES )
-    transport_type = models.CharField(_("Transport Type"), max_length=10, choices=TRANSPORT_TYPES )
+    transaction_type = models.CharField( _("Transaction Type"), max_length=10, choices=TRANSACTION_TYPES ) #transactionType
+    transport_type = models.CharField(_("Transport Type"), max_length=10, choices=TRANSPORT_TYPES ) #transportType
     
     #Dispatcher
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)
@@ -718,6 +712,7 @@ class Waybill( models.Model ):
     recipient_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     #recipient_signed = models.BooleanField(_("Recipient Signed"), default=True) #recipientSigned
     recipient_signed_date = models.DateTimeField(_("Recipient Signed Date"), null=True, blank=True) #recipientSignedTimestamp
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     #===================================================================================================================
     # destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
     #                                          related_name="recipient_waybills" )
