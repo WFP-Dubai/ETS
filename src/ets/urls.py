@@ -11,9 +11,9 @@ from ets.models import LtiOriginal, Waybill, EpicStock
 
 COMPAS_STATION = getattr(settings, "COMPAS_STATION", '')
 
-databrowse.site.register( Waybill )
-databrowse.site.register( EpicStock )
-databrowse.site.register( LtiOriginal )
+#databrowse.site.register( Waybill )
+#databrowse.site.register( EpicStock )
+#databrowse.site.register( LtiOriginal )
 
 info_dict_lti = {
     'queryset': LtiOriginal.objects.all()
