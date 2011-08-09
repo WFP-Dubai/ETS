@@ -652,9 +652,10 @@ class Waybill( models.Model ):
     order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     transport_name = models.CharField(_("Transport Name"), max_length = 30)
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="waybills")
-    consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="waybills")
-    location = models.ForeignKey(Location, verbose_name=_("Receipt Location"), related_name="waybills")
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
+    #consignee = models.ForeignKey(Consignee, verbose_name=_("Consignee"), related_name="waybills")
+    #location = models.ForeignKey(Location, verbose_name=_("Receipt Location"), related_name="waybills")
     
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
