@@ -54,7 +54,7 @@ class ReceivingWaybillHandler(BaseHandler):
     
     def read(self, request, destination):
         """Finds all sent waybills to provided destination"""
-        return sync_data(self.model.objects.filter(status=self.model.SENT, destinationWarehouse__pk=destination))
+        return sync_data(self.model.objects.filter(status=self.model.SENT, destination__pk=destination))
 
 
 
