@@ -15,6 +15,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
+from django.db.models import Q
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -158,6 +159,10 @@ class Warehouse( models.Model ):
         
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.code, self.location.name, self.name)
+
+    @classmethod
+    def get_warehouses(cls, location, organization=None):
+        return cls.objects.filter(location=location).filter( Q(organization=organization) | Q(organization__isnull=True) )   
     
     #===================================================================================================================
     # def serialize(self):
