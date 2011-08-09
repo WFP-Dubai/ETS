@@ -4,7 +4,7 @@ from django.conf.urls.defaults import patterns
 
 #from django.core.urlresolvers import reverse
 
-import piston.authentication
+#import piston.authentication
 from piston.resource import Resource
 from piston.doc import documentation_view
 

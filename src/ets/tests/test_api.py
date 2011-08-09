@@ -1,5 +1,6 @@
 ### -*- coding: utf-8 -*- ####################################################
 import os
+import urllib2
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -8,23 +9,30 @@ from django.core import serializers
 from django.utils import simplejson
 from django.core.management import call_command
 
-from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
+#from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
+from ..models import Waybill, LtiOriginal, EpicStock, Warehouse
+from ets.utils import update_compas
+from ets.api import client
 
-def get_fixture_text(file_name):
-    return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
+#def get_fixture_text(file_name):
+#    return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
 
 class TestDevelopmentMixin(object):
-    #multi_db = True
-    fixtures = ["development.json", ]
+    
+    multi_db = True
     
     def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
+        "Hook method for setting up the test fixture before exercising it."        
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
+        update_compas()
+        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+
         self.client.login(username="admin", password="admin")
         self.user = User.objects.get(username="admin")
         self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
-        self.dispatch_point = DispatchPoint.objects.get(pk=1)
+        self.dispatch_point = Warehouse.objects.get(pk=1)
         self.maxDiff = None
         self.waybill_dict = {
             'slug': 'ISBX00211A',
@@ -198,7 +206,7 @@ class ApiEmptyServerTestCase(TestCase):
         #self.get_waybill().update_status(Waybill.INFORMED)
         
         self.assertEqual(Waybill.objects.count(), 0)
-        Waybill.get_receiving()
+        client.get_receiving()
         
         self.assertEqual(Waybill.objects.count(), 1)
         self.assertEqual(self.get_waybill().loading_details.count(), 2)
@@ -263,7 +271,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         urllib2.urlopen = dummy_urlopen
         
         self.get_waybill().update_status(Waybill.SIGNED)
-        Waybill.send_new()
+        client.send_new()
         self.assertEqual(self.get_waybill().status, Waybill.SENT)
         
     def test_get_informed(self):
@@ -282,7 +290,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         self.get_waybill().update_status(Waybill.SENT)
         
-        Waybill.get_informed()
+        client.get_informed()
         self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
     
     def test_update_informed(self):
@@ -303,7 +311,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         ets.models.COMPAS_STATION = "OE7X001"
         
         self.get_waybill().update_status(Waybill.SENT)
-        Waybill.send_informed()
+        client.send_informed()
         self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
         
         ets.models.COMPAS_STATION = old_compas
@@ -332,7 +340,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         self.get_waybill().update_status(Waybill.INFORMED)
         
-        Waybill.get_delivered()
+        client.get_delivered()
         self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
     
     def test_update_delivered(self):
@@ -353,7 +361,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         ets.models.COMPAS_STATION = "OE7X001"
         
         self.get_waybill().update_status(Waybill.DELIVERED)
-        Waybill.send_delivered()
+        client.send_delivered()
         self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
         
         ets.models.COMPAS_STATION = old_compas
