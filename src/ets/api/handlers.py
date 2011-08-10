@@ -21,10 +21,12 @@ class PlaceHandler(BaseHandler):
     exclude = ('_state',)
 
 
-class WaybillHandler(BaseHandler):
-
-    allowed_methods = ('GET',)
-    model = Waybill
+#===============================================================================
+# class WaybillHandler(BaseHandler):
+# 
+#    allowed_methods = ('GET',)
+#    model = Waybill
+#===============================================================================
 
 
 class NewWaybillHandler(BaseHandler):
@@ -54,7 +56,7 @@ class ReceivingWaybillHandler(BaseHandler):
     
     def read(self, request, destination):
         """Finds all sent waybills to provided destination"""
-        return sync_data(self.model.objects.filter(status=self.model.SENT, destinationWarehouse__pk=destination))
+        return sync_data(self.model.objects.filter(status=self.model.SENT, destination__pk=destination))
 
 
 

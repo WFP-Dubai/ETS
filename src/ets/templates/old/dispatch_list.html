@@ -8,15 +8,15 @@
         </thead>
     {% for wh in dispatch_list%}
             {%if wh.3 == profile.warehouses.origin_wh_code%}
-<tr><td><a href='{% url listOfLtis wh.3 %}'> {{wh.2}}</a></td></tr>
+<tr><td><a href='{% url orders warehouse_pk=wh.3 %}'> {{wh.2}}</a></td></tr>
             {%endif%}
     {% endfor%}
 </table>
 {%endblock%}
-{%block extra-header%}
+{%block script%}
 <script charset="utf-8">
 $(document).ready(function() {
                 $('#example').dataTable( { });
 } );
 </script>
-{%endblock extra-header%}
+{%endblock script%}
