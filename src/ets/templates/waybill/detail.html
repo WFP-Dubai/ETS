@@ -37,13 +37,16 @@
 
 {% if not object.invalidated %}
     <table cellpadding="0" cellspacing="0" border="0px" >
-            {% include 'waybill/print/wb_header.html'%}
+        {% include 'waybill/print/wb_header.html'%}
         {% include 'waybill/print/wb_loading.html'%}
-        {%if not object.recipientSigned%}
+        
+        {% comment %}
+        {% if not object.recipientSigned %}
         {% include 'waybill/print/wb_receipt_empty.html'%}
-        {%else%}
-        {% include 'waybill/print/wb_receipt.html'%}
+        {% else %}
+        {% include 'waybill/print/wb_receipt.html' %}
         {%endif%}
+        {% endcomment %}
     </table>
     {%else%}
 {% trans "Waybill has been Deleted!!!" %}    
