@@ -71,6 +71,7 @@ def get_receiving():
             
 def send_informed():
     """Receiver updates status of receiving waybill to 'informed'"""
+    
     waybills = Waybill.objects.filter(status=Waybill.SENT, destination__pk=COMPAS_STATION)
     url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill"))
     
