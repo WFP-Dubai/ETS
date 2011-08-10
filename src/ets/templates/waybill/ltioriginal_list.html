@@ -4,7 +4,7 @@
 
 <ul>
 {% for lti in object_list%}
-    <li><a href='{% url order_detail lti.code %}'>{{lti.code}} -{{lti.si_code}}- {{lti.destination_loc_name}} - {{lti.lti_date}}</a></li>
+    <li><a href='{% url order_detail object_id=lti.code %}'>{{lti.code}} -{{lti.si_code}}- {{lti.destination_loc_name}} - {{lti.lti_date}}</a></li>
 {% endfor%}
 </ul>
 {%endblock%}

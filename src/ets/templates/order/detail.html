@@ -64,7 +64,7 @@
   {% for waybill in object.get_waybills %}
       <tr>
         <td colspan="3"  class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
-        <td class='bordered'><a href='{{ waybill.get_absolute_url }}?viewonly=true'>{% trans "View Waybill" %}</a></td>
+        <td class='bordered'><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
       </tr>
       <tr class='itemhead'>
         <td></td>

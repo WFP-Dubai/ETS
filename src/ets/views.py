@@ -28,6 +28,8 @@ from ets.tools import restant_si, track_compas_update
 from ets.tools import un64unZip, viewLog, default_json_dump
 from ets.tools import serialized_all_items
 
+LOADING_LINES = 5
+
 
 def prep_req( request ):
 
@@ -64,6 +66,18 @@ def order_list(request, warehouse_pk=None, template='order/list.html',
     apply_extra_context(extra_context or {}, extra)
     
     return object_list(request, queryset=queryset, template_name=template, extra_context=extra)
+
+@login_required
+def waybill_view(request, waybill_pk, queryset, template):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
+    
+    return direct_to_template( request, template, {
+        'object': waybill,
+        'extra_lines': my_empty,
+        'editable': waybill.is_editable(request.user),
+    })
+
 
 #=======================================================================================================================
 # def import_ltis( request ):
@@ -369,40 +383,6 @@ def waybill_validate_form_update( request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_view( request, waybill_pk, queryset, template='waybill/print/waybill_detail_view.html' ):
-    ## TODO: remove dependency of zippedWB
-    #TODO: remove these try...except blocks
-    try:
-        waybill_instance = queryset.get(pk = waybill_pk)
-        extra_lines = 5 - waybill_instance.loading_details.select_related().count()
-        zippedWB = waybill_instance.compress()
-        lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
-        my_empty = [''] * extra_lines
-        try:
-            disp_person_object = EpicPerson.objects.get( person_pk = waybill_instance.dispatcherName )
-        except:
-            disp_person_object = ''
-            
-        try:
-            rec_person_object = EpicPerson.objects.get( person_pk = waybill_instance.recipientName )
-        except:
-            rec_person_object = ''
-
-    except Exception as e:
-        print e
-        return redirect( "index" )
-    
-    return direct_to_template( request, template, {
-        'object': waybill_instance,
-        'LtiOriginal': lti_detail_items,
-        'disp_person': disp_person_object,
-        'rec_person': rec_person_object,
-        'extra_lines': my_empty,
-        'zippedWB': zippedWB,
-    })
-
-
-@login_required
 def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill_detail_view_reception.html' ):
     ## TODO: remove dependency of zippedWB
     
@@ -441,7 +421,7 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
     current_items = LtiWithStock.objects.filter( lti_code = current_lti )
     profile = request.user.get_profile()
     if not (profile.is_reciever or profile.super_user or profile.compasUser):
-        return redirect( "waybill_view", waybill_pk=waybill_pk)
+        return redirect(current_wb.get_absolute_url())
     
 #    current_wb.auditComment = 'Receipt Action'
 #    current_wb.save()
@@ -664,7 +644,7 @@ def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
                 subform.wbNumber = wb_new
                 subform.save()
             wb_new.save()
-            return redirect("waybill_view", waybill_pk=wb_new.pk)
+            return redirect(wb_new.get_absolute_url())
         else:
             print( formset.errors )
             print( form.errors )
@@ -743,7 +723,7 @@ def waybill_edit( request, waybill_pk, queryset=ets.models.Waybill.objects.all()
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
             formset.save()
-            return redirect("waybill_view", waybill_pk=wb_new.pk)
+            return redirect(wb_new)
     else:
         form = WaybillForm( instance = current_wb )
         form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )

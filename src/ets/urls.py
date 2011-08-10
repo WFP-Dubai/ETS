@@ -47,6 +47,12 @@ urlpatterns = patterns("ets.views",
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
+    #Waybill view                   
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
+        'queryset': ets.models.Waybill.objects.all(),
+        "template_name": 'waybill/detail.html',
+    }, "waybill_view" ),
+    
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
@@ -75,9 +81,6 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
     ( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
-    ( r'^waybill/viewwb/(?P<waybill_pk>[-\w]+)/$', "waybill_view", {
-        'queryset': Waybill.objects.all(),
-    }, "waybill_view" ),
     ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
     ( r'^waybill/commit_to_compas_dispatch_one/(?P<waybill_pk>[-\w]+)/$', "singleWBDispatchToCompas", 
       {}, "singleWBDispatchToCompas" ),
