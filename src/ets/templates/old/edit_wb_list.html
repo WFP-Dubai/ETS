@@ -28,9 +28,9 @@
                  <td>{%if waybill.waybillValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
                  <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%}</td>
                  <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
-                 <td>{%if not user.get_profile.superUser%}
+                 <td>{%if not user.get_profile.super_user%}
                  <a href='{% if  user.get_profile.isDispatcher %}{{ waybill.get_absolute_url }} {%else%}{% url waybill_view_reception waybill_pk=waybill.pk %}{%endif%}'>{% trans "View WB" %}</a>{%endif%}
-             {%if user.get_profile.superUser%} <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>{%endif%}</td>
+             {%if user.get_profile.super_user%} <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>{%endif%}</td>
 
      </tr>
 {% endfor%}

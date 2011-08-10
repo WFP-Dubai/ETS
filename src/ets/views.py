@@ -466,7 +466,7 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
     current_lti = current_wb.ltiNumber
     current_items = LtiWithStock.objects.filter( lti_code = current_lti )
     profile = request.user.get_profile()
-    if not (profile.isReciever or profile.superUser or profile.compasUser):
+    if not (profile.is_reciever or profile.super_user or profile.compasUser):
         return redirect( "waybill_view", waybill_pk=waybill_pk)
     
 #    current_wb.auditComment = 'Receipt Action'
@@ -616,7 +616,7 @@ def waybill_search( request, template='waybill/list_waybills.html',
     
     #TODO: Insert all these condition in query set
     for waybill in found_wb:
-        if profile.isCompasUser or profile.readerUser or (
+        if profile.isCompasUser or profile.reader_user or (
             profile.warehouses and waybill.origin_wh_code == profile.warehouses.origin_wh_code 
         ) or ( 
             profile.receptionPoints 
@@ -628,7 +628,7 @@ def waybill_search( request, template='waybill/list_waybills.html',
     return direct_to_template( request, template, {
         'waybill_list': found_wb, 
         'my_wb': my_valid_wb, 
-        'isSuperUser': profile.superUser or profile.readerUser or profile.isCompasUser
+        'isSuperUser': profile.super_user or profile.reader_user or profile.isCompasUser
     })
 
 
