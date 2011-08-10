@@ -5,3 +5,20 @@ color:black;
 font-weight: bold;
 color: red;
 }
+
+
+/* Order detail */
+.itemhead{
+    background-color: #0ee6ff;
+}
+
+.bordered{
+border-collapse: collapse;
+border-color: black;
+    border-width: 1px;
+    border-style: solid;
+}
+
+table.summary {
+  width: 800px;
+}

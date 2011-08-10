@@ -34,7 +34,7 @@
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
-      "order_code": "QANX001000000000000005217HQX0001000000000000984141",
+      "order_code": "OURLITORDER",
       "project_number": "1",
       "transport_name": "MUSLIM TRANSPORT",
       "warehouse": "ISBX002",
@@ -101,6 +101,8 @@
       "si_code": "123",
       "comm_category_code": "MIX",
       "commodity_code": "BEER",
+      "commodity_name": "COOL UKRAINIAN BEER",
+      
       "number_of_units": 35,
       "quantity_net": "1.750",
       "quantity_gross": "1.762",

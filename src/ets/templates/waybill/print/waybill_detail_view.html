@@ -19,7 +19,7 @@
 <input type="submit" onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" name="Print Original" id='Print1' value='Print Original'></form>
 {%endif%}
 {%if 'create' in  request.META.HTTP_REFERER%}
-<a href="{% url lti_detail_url object.ltiNumber %}">{% trans "Back to Dispatch" %}</a>
+<a href="{% url order_detail object.ltiNumber %}">{% trans "Back to Dispatch" %}</a>
 {%else%}
 {%if request.META.HTTP_REFERER != ''%}<a href='{{request.META.HTTP_REFERER}}'>{% trans "Back" %}</a>{%endif%}
 {%endif%}

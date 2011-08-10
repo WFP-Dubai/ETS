@@ -506,9 +506,11 @@ class Order(models.Model):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('lti_detail_url', (self.pk,), {})
-
-
+        return ('order_detail', (), {'object_id': self.pk})
+    
+    def get_waybills(self):
+        return Waybill.objects.filter(order_code=self.pk, invalidated=False)
+    
 class DeliveryItem(models.Model):
     """Order item for delivery"""
     
@@ -566,13 +568,14 @@ class OrderItem(DeliveryItem):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
                                             waybill__project_number=self.order.project_number,
+                                            waybill__invalidated=False,
                                             si_code = self.si_code, 
                                             commodity_code = self.commodity_code
                                             ).order_by('-waybill__dispatch_date')
     
     def get_order_dispatches(self):
         """Returns dispatches of current order"""
-        return self.get_similar_dispatches().filter(waybill__order_code=self.order.pk, waybill__invalidated=False)
+        return self.get_similar_dispatches().filter(waybill__order_code=self.order.pk)
     
     
     def get_available_stocks(self):
@@ -1076,7 +1079,10 @@ class LoadingDetail( DeliveryItem ):
 
     def calculate_total_received_net( self ):
         return self.calculate_net_received_good() + self.calculate_net_received_damaged()
-
+    
+    def get_coi_code(self):
+        return self.origin_id[7:]
+    
     #===================================================================================================================
     # @property
     # def invalid( self ):
@@ -1096,7 +1102,7 @@ class UserProfile( models.Model ):
                                              blank=True, null=True, related_name="receipient_profiles")
     
     is_compas_user = models.BooleanField(_('Is Compas User'), default=False) #isCompasUser
-    is_dispatcher = models.BooleanField(_("Is Dispatcher"), default=False) #isDispatcher
+    is_dispatcher = models.BooleanField(_("Is Dispatcher"), default=False) #is_dispatcher
     is_reciever = models.BooleanField(_("Is Reciever"), default=False) #is_reciever
     is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
     compas_person = models.ForeignKey( CompasPerson, verbose_name = _('Use this Compas Person'), 

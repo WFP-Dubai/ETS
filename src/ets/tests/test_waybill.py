@@ -74,6 +74,7 @@ class ClientWaybillTestCase(TestCase):
         self.client.login(username='admin', password='admin')
         self.user = User.objects.get(username="admin")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        self.order = ets.models.Order.objects.get(pk='OURLITORDER')
         #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
         #self.dispatch_point = DispatchPoint.objects.get(pk=1)
@@ -108,6 +109,11 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('orders', kwargs={'warehouse_pk': settings.COMPAS_STATION}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
+    
+    def test_order_detail(self):
+        """Order's detail page"""
+        response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
+        self.assertEqual(response.status_code, 200)
     
     
     def test_waybill_reception(self):
@@ -166,16 +172,6 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_validate_form_update', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
-        
-    def test_import_ltis(self):
-        """ets.views.import_ltis"""
-        response = self.client.get(reverse('import_ltis'))
-        self.assertEqual(response.status_code, 302)
-    
-    def test_lti_detail_url(self):
-        """ets.views.lti_detail_url"""
-        response = self.client.get(reverse('lti_detail_url', args=(self.lti.code,)))
-        self.assertEqual(response.status_code, 200)  
         
     def test_dispatch(self):
         """ets.views.dispatch"""       

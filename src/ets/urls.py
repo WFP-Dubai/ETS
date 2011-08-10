@@ -4,11 +4,13 @@ from django.conf.urls.defaults import patterns, include, handler404, handler500
 from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
+from django.views.generic.list_detail import object_detail
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
 from ets.models import LtiOriginal, Waybill, EpicStock
+import ets.models
 
 COMPAS_STATION = getattr(settings, "COMPAS_STATION", '')
 
@@ -35,16 +37,24 @@ urlpatterns = patterns("ets.views",
         'template': 'index.html',
     }, "index" ),
     
+    #Order list
     ( r'^orders/(?P<warehouse_pk>[-\w]+)/$', "order_list", {}, "orders" ),
     ( r'^orders/$', "order_list", {}, "orders"),
+    
+    #Order detail
+    ( r'^order/(?P<object_id>[-\w]+)/$', login_required(object_detail), {
+        'queryset': ets.models.Order.objects.all(),
+        'template_name': 'order/detail.html',
+    }, "order_detail" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
     ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
-    ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
-    ( r'^waybill/info/(.*)/$', "lti_detail_url", {}, "lti_detail_url" ),
+    #===================================================================================================================
+    # ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
+    #===================================================================================================================
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),

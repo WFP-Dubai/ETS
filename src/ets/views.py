@@ -39,14 +39,11 @@ def order_list(request, warehouse_pk=None, template='order/list.html',
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
-    Template: /ets/waybill/templates/order/list.html
-
     URL: /orders/
     Shows all orders
 
-    URL: /orders/{{warehouse}}/
+    URL: /orders/{{ warehouse }}/
     Shows the orders that are in a specific warehouse
-    
     """
     
     if warehouse_pk:
@@ -68,55 +65,32 @@ def order_list(request, warehouse_pk=None, template='order/list.html',
     
     return object_list(request, queryset=queryset, template_name=template, extra_context=extra)
 
-
-def import_ltis( request ):
-    """
-    View: import_ltis 
-    URL: /waybill/import
-    Template: /ets/waybill/templates/status.html
-    Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
-    add tag to say when last done
-    """
-
-    #print 'Import Persons'
-    EpicPerson.update()
-    #print 'Import GEO'
-    Place.update()
-    #print 'Import Stock'
-    EpicStock.update()
-    #print 'Import Setup'
-    import_setup()
-    #print 'Import LTIs'
-    import_lti()
-    status = 'Import Finished'
-    track_compas_update()
-    messages.add_message( request, messages.INFO, status )
-
-    return redirect("index")
-
-def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
-    """
-    View: lti_detail_url 
-    URL: /waybill/info/(lti_code)
-    Template: /ets/waybill/templates/lti/detailed_lti.html
-    Show detail of LTI and link to create waybill
-    """
-    detailed_lti = LtiOriginal.objects.filter( code = lti_code )
-    listOfWaybills = Waybill.objects.filter( invalidated = False, ltiNumber = lti_code )
-    listOfSI_withDeduction = restant_si( lti_code )
-    
-    lti_more_wb = False
-    for item in detailed_lti:
-        if item.items_left > 0:
-            lti_more_wb = True
-    
-    return direct_to_template( request,template, {
-        'detailed': detailed_lti, 
-        'lti_id': lti_code, 
-        'listOfWaybills': listOfWaybills, 
-        'listOfSI_withDeduction': listOfSI_withDeduction, 
-        'moreWBs':lti_more_wb
-    })
+#=======================================================================================================================
+# def import_ltis( request ):
+#    """
+#    View: import_ltis 
+#    URL: /waybill/import
+#    Template: /ets/waybill/templates/status.html
+#    Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
+#    add tag to say when last done
+#    """
+# 
+#    #print 'Import Persons'
+#    EpicPerson.update()
+#    #print 'Import GEO'
+#    Place.update()
+#    #print 'Import Stock'
+#    EpicStock.update()
+#    #print 'Import Setup'
+#    import_setup()
+#    #print 'Import LTIs'
+#    import_lti()
+#    status = 'Import Finished'
+#    track_compas_update()
+#    messages.add_message( request, messages.INFO, status )
+# 
+#    return redirect("index")
+#=======================================================================================================================
 
 @login_required
 def dispatch( request ):
@@ -165,7 +139,7 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
         "waybill": waybill.pk
     })
     
-    return redirect( "lti_detail_url", waybill.ltiNumber)
+    return redirect( "order_detail", waybill.ltiNumber)
 
 
 @login_required

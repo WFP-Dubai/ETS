@@ -22,7 +22,6 @@
   
   {% if myprofile.is_compas_user %}
   <li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
-  <li><a href='{% url import_ltis %}'>{% trans "Update DB" %}</a></li>
   {% endif %}
 
   {% if myprofile.super_user %}

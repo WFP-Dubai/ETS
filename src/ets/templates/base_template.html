@@ -46,25 +46,7 @@
 </ul>
 {% endif %}
 <div class="content">
-{%block content %}
-<table>
-<tr><th>{% trans "Test" %}</th><th>{% trans "Table" %}<th></tr>
-<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
-<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
-<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
-<tr><td>{% trans "data one" %}</td><td>{% trans "data two" %}</td>
-</table>
-<form>
-<label>{% trans "Item One" %}</label><input type="text" />
-<label>{% trans "Select" %}</label><select><option>{% trans "test" %}</option></select>
-<label>{% trans "button" %}</label><input type="submit"/>
-
-</form>
-<label>{% trans "List" %}</label>
-<ul><li>{% trans "one" %}</li><li>{% trans "two" %}</li></ul>
-<p>{% trans "This is a paragraph" %}</p>
-
-{%endblock%}
+{% block content %}{% endblock%}
 </div>
 <br>
 <div class='footer'>

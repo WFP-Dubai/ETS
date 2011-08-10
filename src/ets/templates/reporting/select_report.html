@@ -4,7 +4,7 @@
 {%block content %}
 <table>
 <tr>
-<td>{%if user.get_profile.isDispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.get_profile.warehouses.origin_wh_name}} </td>
+<td>{%if user.get_profile.is_dispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.get_profile.warehouses.origin_wh_name}} </td>
 <td><a href='{% url dispatch_report_wh user.get_profile.warehouses.origin_wh_code %}'>{% trans "download" %}</a>{%endif%}</td>
 </tr>
 <tr>
