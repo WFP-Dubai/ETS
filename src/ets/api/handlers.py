@@ -21,10 +21,12 @@ class PlaceHandler(BaseHandler):
     exclude = ('_state',)
 
 
-class WaybillHandler(BaseHandler):
-
-    allowed_methods = ('GET',)
-    model = Waybill
+#===============================================================================
+# class WaybillHandler(BaseHandler):
+# 
+#    allowed_methods = ('GET',)
+#    model = Waybill
+#===============================================================================
 
 
 class NewWaybillHandler(BaseHandler):

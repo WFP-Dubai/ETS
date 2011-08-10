@@ -1121,8 +1121,9 @@ class DispatchDetail( models.Model ):
 
 def sync_data(waybills):
     load_details = LoadingDetail.objects.filter(waybill__in=waybills)
-    warehouses = Warehouse.objects.filter(waybills__in=waybills)
-    consignees = Consignee.objects.filter(waybills__in=waybills)
-    places = Place.objects.filter(models.Q(warehouses__in=warehouses) | models.Q(consignees__in=consignees))
+    #warehouses = Warehouse.objects.filter(dispatch_waybills__in=waybills)
+    #consignees = Consignee.objects.filter(receipt_waybills__in=waybills)
+    #places = Place.objects.filter(models.Q(warehouses__in=warehouses) | models.Q(consignees__in=consignees))
     
-    return chain(places, waybills, load_details, warehouses, consignees)
+    #return chain(places, waybills, load_details, warehouses, consignees)
+    return chain(waybills, load_details)

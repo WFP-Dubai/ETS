@@ -78,7 +78,6 @@ def send_informed():
         'Content-Type': 'application/json'
     })
     request.get_method = lambda: 'PUT'
-    
     try:
         response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
     except (urllib2.HTTPError, urllib2.URLError) as err:
