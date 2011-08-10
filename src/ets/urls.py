@@ -50,7 +50,7 @@ urlpatterns = patterns("ets.views",
     #Waybill view                   
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
-        "template_name": 'waybill/detail.html',
+        "template": 'waybill/detail.html',
     }, "waybill_view" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),

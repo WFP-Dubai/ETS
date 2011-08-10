@@ -23,7 +23,7 @@ from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
 from ets.forms import WaybillValidationFormset, WarehouseChoiceForm
 import ets.models
-from ets.models import COMPAS_STATION
+from ets.models import Waybill
 from ets.tools import restant_si, track_compas_update
 from ets.tools import un64unZip, viewLog, default_json_dump
 from ets.tools import serialized_all_items
@@ -558,31 +558,32 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
 
 
 @login_required
-def waybill_search( request, template='waybill/list_waybills.html', 
-                    param_name='wbnumber', consegnee_code='W200000475' ):
+def waybill_search( request, template='waybill/print/list_waybills.html', 
+                    param_name='wbnumber'):
+#                    param_name='wbnumber', consegnee_code='W200000475' ):
     
     search_string = request.GET.get(param_name, '')
 
-    found_wb = Waybill.objects.filter( invalidated=False, waybillNumber__icontains=search_string )
+    found_wb = Waybill.objects.filter( invalidated=False, order_code__icontains=search_string )
     my_valid_wb = []
     
     profile = request.user.get_profile()
     
     #TODO: Insert all these condition in query set
     for waybill in found_wb:
-        if profile.isCompasUser or profile.reader_user or (
-            profile.warehouses and waybill.origin_wh_code == profile.warehouses.origin_wh_code 
+        if profile.is_compas_user or profile.reader_user or (
+            profile.dispatch_warehouse and waybill.warehouse == profile.dispatch_warehouse
         ) or ( 
-            profile.receptionPoints 
-            and waybill.consegnee_code == profile.receptionPoints.consegnee_code 
-            and waybill.destination_loc_name == profile.receptionPoints.LOC_NAME 
-        ) or ( profile.isAllReceiver and waybill.consegnee_code == consegnee_code ):
+            profile.reception_warehouse 
+            and waybill.destination.organization == profile.reception_warehouse.organization 
+            and waybill.destination.location == profile.reception_warehouse.location ):
+#        ) or ( profile.is_all_receiver and waybill.consegnee_code == consegnee_code ):
             my_valid_wb.append( waybill.pk )
 
     return direct_to_template( request, template, {
         'waybill_list': found_wb, 
         'my_wb': my_valid_wb, 
-        'isSuperUser': profile.super_user or profile.reader_user or profile.isCompasUser
+        'is_user': profile.super_user or profile.reader_user or profile.is_compas_user
     })
 
 
