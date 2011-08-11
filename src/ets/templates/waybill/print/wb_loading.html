@@ -21,7 +21,7 @@
                 <td><sup style="font-size:x-small;">{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date }}</td>
             </tr>
             <tr>
-                <td><sup style="font-size:x-small;">{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination}}</td>
+                <td><sup style="font-size:x-small;">{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination.name }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Allocation Destination" %}:</sup><br>{{ object.destination.location.name }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Consignee" %}</sup><br>{{ object.destination.organization }}</td>
                 
@@ -110,7 +110,7 @@
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Name" %}:</small>{{disp_person}}</td>
+          <td><small style="font-size:x-small;">{% trans "Name" %}:</small>{{ object.dispatcher_person }}</td>
           <td colspan="2">
             <small style="font-size:x-small;">{% trans "Transport Subcontractor" %}:</small>
             {{ object.transport_sub_contractor }}

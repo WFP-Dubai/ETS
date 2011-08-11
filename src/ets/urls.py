@@ -50,14 +50,14 @@ urlpatterns = patterns("ets.views",
     #Waybill view                   
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
-        "template_name": 'waybill/detail.html',
+        "template": 'waybill/detail.html',
     }, "waybill_view" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
-    ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
+    ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     #===================================================================================================================
     # ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
     #===================================================================================================================
