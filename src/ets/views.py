@@ -557,7 +557,7 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
 
 
 @login_required
-def waybill_search( request, template='waybill/list_waybills.html', 
+def waybill_search( request, template='waybill/list.html', 
                     param_name='wbnumber'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
     search_string = request.GET.get(param_name, '')
