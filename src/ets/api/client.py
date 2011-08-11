@@ -16,7 +16,7 @@ def send_new():
     url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
     
     waybills = Waybill.objects.filter(status=Waybill.SIGNED, warehouse__pk=COMPAS_STATION)
-    
+
     data = serializers.serialize( 'json', sync_data(waybills), indent=True)
     if data:
         try:
