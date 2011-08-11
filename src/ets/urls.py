@@ -57,7 +57,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
-    ( r'^waybill/findwb/$', "waybill_search", {}, "waybill_search" ),
+    ( r'^search/$', 'waybill_search', {}, "waybill_search" ),
     #===================================================================================================================
     # ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
     #===================================================================================================================
