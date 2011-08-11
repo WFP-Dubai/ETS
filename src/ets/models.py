@@ -742,7 +742,7 @@ class Waybill( models.Model ):
     
     @models.permalink
     def get_absolute_url(self):
-        return ('waybill_view', (), {'slug': self.slug})
+        return ('waybill_view', (), {'waybill_pk': self.pk})
     
     def is_editable(self, user):
         return self.status < self.SIGNED and not user.get_profile().reader_user

@@ -49,7 +49,7 @@
         
         {%for lineitem in object.loading_details.all %}
           <tr style="font-size:small; text-align:right;">
-            <td style="text-align:left;"><span>{% trans "ID" %}{{ forloop.counter }}. {{ lineitem.get_coi_code }}</span></td>
+            <td style="text-align:left;"><span>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.get_coi_code }}</span></td>
             <td>{{ lineitem.number_units_good }}</td>
             <td>{{ lineitem.calculate_net_received_good|floatformat:3}}</td>
             <td style="text-align:center;">
@@ -107,7 +107,7 @@
                                         
         {%for lineitem in extra_lines%}
           <tr  style="font-size:small;">
-              <td>{% trans ID %} {{ forloop.counter|add:object.loading_details.count }}.</td>
+              <td>{% trans 'ID' %} {{ forloop.counter|add:object.loading_details.count }}.</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
@@ -122,7 +122,7 @@
 
           <tr>
               <td colspan="10">
-                <sup>{% trans "Reciptient Remarks" %}</sup>{{ object.recipient_remarks }}
+                <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.recipient_remarks }}
                 {% if object.container_one_remarks_reciept%}
                   <p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
                 {%endif%}
@@ -142,7 +142,7 @@
 			<tr>
 				<td>
 					<p style="font-size: x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
-					<p>{% trans "Name, signature and stamp:" %}</p>
+					<p style="font-size: x-small">{% trans "Name, signature and stamp:" %}</p>
 				  {% if object.recipient_signed_date %}
             <p style='font-size:14px'>{{ object.recipient_person }}</p>
             <p>{% trans "Date:" %}{{ object.recipient_signed_date }}</p>
@@ -152,7 +152,7 @@
 			  </td>
 		    <td>
           <p style="font-size: x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
-          <p>{% trans "Name, signature and stamp" %}</p>
+          <p style="font-size: x-small">{% trans "Name, signature and stamp" %}</p>
 	        {% if object.recipient_signed_date %}
 				  <p style='font-size:14px'>{{ object.transport_driver_name|upper}}</p>
           <p>{% trans "Date:" %} {{ object.recipient_signed_date }}</p>
