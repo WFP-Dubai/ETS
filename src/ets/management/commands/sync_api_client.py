@@ -1,4 +1,6 @@
-django.core.management.base import BaseCommand
+### -*- coding: utf-8 -*- ####################################################
+
+from django.core.management.base import BaseCommand
 
 from ets.api.client import *
 
