@@ -105,3 +105,13 @@ class DjangoJsonEmitter(DjangoEmitter):
         return super(DjangoJsonEmitter, self).render(request, 'json')
         
 Emitter.register('django_json', DjangoJsonEmitter, 'application/json; charset=utf-8')
+
+
+class DjangoCSVEmitter(DjangoEmitter):
+    """
+    Emitter for the Django csv format.
+    """
+    def render(self, request):
+        return super(DjangoCSVEmitter, self).render(request, 'csv')
+    
+Emitter.register('django_csv', DjangoCSVEmitter, 'application/csv; charset=utf-8')

@@ -31,8 +31,8 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 
 urlpatterns = patterns('',
     
-    (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
-    (r'^waybill/(?P<slug>[-\w]+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
+    (r'^waybill/$', waybill_resource, { 'emitter_format': 'csv' }, "api_waybill"),
+    (r'^waybill/(?P<slug>[-\w]+)/$', waybill_resource, { 'emitter_format': 'csv' }, "api_waybill"),),
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
