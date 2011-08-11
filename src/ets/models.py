@@ -1104,3 +1104,7 @@ def sync_data(waybills):
     
     #return chain(places, waybills, load_details, warehouses, consignees)
     return chain(waybills, load_details)
+
+def csv_sync_waybill(waybill):
+    load_details = LoadingDetail.objects.filter(waybill=waybill)
+    return chain(waybill, load_details)

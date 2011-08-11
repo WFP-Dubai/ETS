@@ -7,12 +7,13 @@
 #import httplib, logging
 from django.core import serializers
 from django.db import transaction
+from django.db.models import Sum, Count
 
 from piston.handler import BaseHandler
 from piston.utils import rc
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, Place, sync_data
+from ..models import Waybill, Place, sync_data, csv_sync_waybill
 
 class PlaceHandler(BaseHandler):
 
@@ -27,6 +28,25 @@ class PlaceHandler(BaseHandler):
 #    allowed_methods = ('GET',)
 #    model = Waybill
 #===============================================================================
+
+class ReadCSVAllWaybillsHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = Waybill
+    
+    def read(self, request):
+        """Finds all sent waybills to provided destination"""
+        return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
+    
+
+class ReadCSVWaybillHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = Waybill
+    
+    def read(self, request, waybill):
+        """Finds all sent waybills to provided destination"""
+        return csv_sync_waybill(self.model.objects.get(waybill=waybill))
 
 
 class NewWaybillHandler(BaseHandler):
@@ -107,3 +127,13 @@ class DjangoJsonEmitter(DjangoEmitter):
         return super(DjangoJsonEmitter, self).render(request, 'json')
         
 Emitter.register('django_json', DjangoJsonEmitter, 'application/json; charset=utf-8')
+
+
+class DjangoCSVEmitter(DjangoEmitter):
+    """
+    Emitter for the Django csv format.
+    """
+    def render(self, request):
+        return super(DjangoCSVEmitter, self).render(request, 'csv')
+    
+Emitter.register('django_csv', DjangoCSVEmitter, 'application/csv; charset=utf-8')
