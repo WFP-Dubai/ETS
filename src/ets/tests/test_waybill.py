@@ -313,7 +313,7 @@ class WaybillTestCase(TestCase):
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
-        self.waybill.update_status(Waybill.INFORMED)
+        self.waybill.update_status(ets.models.Waybill.INFORMED)
         
         response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)

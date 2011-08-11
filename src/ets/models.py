@@ -1,5 +1,5 @@
 
-import zlib, base64, string, urllib2
+import zlib, base64, string
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
@@ -10,7 +10,6 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
@@ -866,111 +865,6 @@ class Waybill( models.Model ):
         self.status = status
         self.save()
     
-    
-    @classmethod
-    def send_new(cls):
-        """Sents new waybills to central server"""
-        url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
-        
-        waybills = cls.objects.filter(status=cls.SIGNED, dispatch_warehouse__pk=COMPAS_STATION)
-        
-        data = serializers.serialize( 'json', sync_data(waybills), indent=True)
-        if data:
-            try:
-                response = urllib2.urlopen(urllib2.Request(url, data, {
-                    'Content-Type': 'application/json'
-                }), timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.read() == 'Created':
-                    waybills.update(status=cls.SENT)
-
-    
-    @classmethod
-    def get_informed(cls):
-        """Dispatcher reads the server for new informed waybills"""
-        for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"slug": waybill.slug}))
-            try:
-                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.code == 200:
-                    waybill.update_status(cls.INFORMED)
-    
-    
-    @classmethod
-    def get_delivered(cls):
-        """Dispatcher reads the server for delivered waybills"""
-        for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"slug": waybill.slug}))
-            try:
-                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.code == 200:
-                    for obj in serializers.deserialize('json', response.read()):
-                        obj.save()
-                
-    
-    @classmethod
-    def get_receiving(cls):
-        """
-        Receiver reads the server for new waybills, that we are expecting to receive 
-        and update status of such waybills to 'informed'.
-        """ 
-        url = "%s%s" % (API_DOMAIN, reverse("api_receiving_waybill", kwargs={'destination': COMPAS_STATION}))
-        try:
-            response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                for obj in serializers.deserialize('json', response.read()):
-                    obj.save()
-                
-    @classmethod
-    def send_informed(cls):
-        """Receiver updates status of receiving waybill to 'informed'"""
-        waybills = cls.objects.filter(status=cls.SENT, destinationWarehouse__pk=COMPAS_STATION)
-        url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill"))
-        
-        request = urllib2.Request(url, simplejson.dumps(tuple(waybills.values_list('pk', flat=True))), {
-            'Content-Type': 'application/json'
-        })
-        request.get_method = lambda: 'PUT'
-        
-        try:
-            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                waybills.update(status=cls.INFORMED)
-    
-    @classmethod
-    def send_delivered(cls):
-        """Receiver sends 'delivered' waybills to the central server"""
-        waybills = cls.objects.filter(status=cls.DELIVERED, destinationWarehouse__pk=COMPAS_STATION)
-        url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill"))
-        data = serializers.serialize( 'json', waybills, indent=True)
-        
-        request = urllib2.Request(url, data, {
-            'Content-Type': 'application/json'
-        })
-        request.get_method = lambda: 'PUT'
-        
-        try:
-            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                waybills.update(status=cls.COMPLETE)
-    
 
 class LoadingDetail( DeliveryItem ):
     """Item of waybill"""
@@ -1204,8 +1098,9 @@ class DispatchDetail( models.Model ):
 
 def sync_data(waybills):
     load_details = LoadingDetail.objects.filter(waybill__in=waybills)
-    warehouses = Warehouse.objects.filter(waybills__in=waybills)
-    consignees = Consignee.objects.filter(waybills__in=waybills)
-    places = Place.objects.filter(models.Q(warehouses__in=warehouses) | models.Q(consignees__in=consignees))
+    #warehouses = Warehouse.objects.filter(dispatch_waybills__in=waybills)
+    #consignees = Consignee.objects.filter(receipt_waybills__in=waybills)
+    #places = Place.objects.filter(models.Q(warehouses__in=warehouses) | models.Q(consignees__in=consignees))
     
-    return chain(places, waybills, load_details, warehouses, consignees)
+    #return chain(places, waybills, load_details, warehouses, consignees)
+    return chain(waybills, load_details)
