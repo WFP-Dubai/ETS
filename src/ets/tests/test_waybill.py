@@ -40,7 +40,7 @@ class WaybillTestCase(TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
-        self.waybill = Waybill.objects.all()[0]
+        self.waybill = ets.models.Waybill.objects.all()[0]
     
     #===================================================================================================================
     # def test_slug(self):
@@ -328,7 +328,7 @@ class ClientWaybillTestCase(TestCase):
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
-        self.waybill.update_status(Waybill.INFORMED)
+        self.waybill.update_status(ets.models.Waybill.INFORMED)
         
         response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)
