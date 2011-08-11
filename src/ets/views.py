@@ -78,6 +78,21 @@ def waybill_view(request, waybill_pk, queryset, template):
         'editable': waybill.is_editable(request.user),
     })
 
+@login_required
+def waybill_finalize_dispatch( request, waybill_pk, queryset):
+    """
+    called when user pushes Print Original on dispatch
+    Redirects to order details
+    """
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.dispatch_sign(True)
+    
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
+        "waybill": waybill.pk
+    })
+    
+    return redirect( "order_detail", waybill.order_code)
+
 
 #=======================================================================================================================
 # def import_ltis( request ):
@@ -131,30 +146,6 @@ def dispatch( request ):
 #    except:
 #        return redirect( "index" )
 #=======================================================================================================================
-
-
-@login_required
-def waybill_finalize_dispatch( request, waybill_pk, queryset):
-    """
-    View: waybill_finalize_dispatch
-    URL: /waybill/dispatch
-    Templet:None
-    called when user pushes Print Original on dispatch
-    Redirects to Lti Details
-    """
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.dispatch_sign(False)
-    
-    for lineitem in waybill.loading_details.select_related():
-        lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
-    
-    waybill.save()
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
-        "waybill": waybill.pk
-    })
-    
-    return redirect( "order_detail", waybill.ltiNumber)
-
 
 @login_required
 def waybill_finalize_receipt( request, waybill_pk, queryset):

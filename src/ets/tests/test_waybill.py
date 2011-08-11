@@ -104,6 +104,14 @@ class WaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
     
+    def test_waybill_finalize_dispatch(self):
+        """ets.views.waybill_finalize_dispatch"""
+        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
+        self.assertEqual(response.status_code, 302)
+        
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        self.assertEqual(waybill.status, waybill.SIGNED)
+    
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
         from ..forms import WaybillRecieptForm
@@ -301,12 +309,6 @@ class WaybillTestCase(TestCase):
         """ets.views.waybill_validate_dispatch_form"""
         response = self.client.get(reverse("waybill_validate_dispatch_form"))
         self.assertEqual(response.status_code, 200)     
-    
-    def test_waybill_finalize_dispatch(self):
-        """ets.views.waybill_finalize_dispatch"""
-        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        self.assertEqual(response.status_code, 302) 
-    
     
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""

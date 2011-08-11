@@ -53,6 +53,10 @@ urlpatterns = patterns("ets.views",
         "template": 'waybill/detail.html',
     }, "waybill_view" ),
     
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
+        'queryset': Waybill.objects.filter(status=Waybill.NEW, warehouse__pk=COMPAS_STATION),
+    }, "waybill_finalize_dispatch" ),
+    
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/dispatch/$', "dispatch", {}, "dispatch" ),
@@ -65,9 +69,6 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
-    ( r'^waybill/print_original/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_dispatch", {
-        'queryset': Waybill.objects.filter(status=Waybill.NEW, warehouse__pk=COMPAS_STATION),
-    }, "waybill_finalize_dispatch" ),
     ( r'^waybill/receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {}, "waybill_reception" ),
     ( r'^waybill/receive/$', "object_list", {
         "template_name": 'waybill/reception_list.html',

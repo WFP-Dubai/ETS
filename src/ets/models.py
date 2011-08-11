@@ -666,6 +666,7 @@ class Waybill( models.Model ):
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     transport_name = models.CharField(_("Transport Name"), max_length = 30) #transport_name
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
@@ -709,11 +710,9 @@ class Waybill( models.Model ):
     container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
 
     #Receiver
-    #recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True ) #recipientLocation
-    #recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
-    #recipient_name = models.CharField( _("Recipient Name"), max_length=100, blank=True) #recipientName
     recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
                                           related_name="recipient_waybills", blank=True, null=True) #recipientName
+    #recipient_name = models.CharField( _("Recipient Name"), max_length=100, blank=True) #recipientName
     #recipient_title = models.CharField(_("Recipient Title "), max_length=100, blank=True) #recipientTitle
     recipient_arrival_date = models.DateField(_("Recipient Arrival Date"), null=True, blank=True) #recipientArrivalDate
     recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), null=True, blank=True) #recipientStartDischargeDate
@@ -722,7 +721,6 @@ class Waybill( models.Model ):
     recipient_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
     #recipient_signed = models.BooleanField(_("Recipient Signed"), default=True) #recipientSigned
     recipient_signed_date = models.DateTimeField(_("Recipient Signed Date"), null=True, blank=True) #recipientSignedTimestamp
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     #===================================================================================================================
     # destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
     #                                          related_name="recipient_waybills" )
@@ -1052,7 +1050,7 @@ class LoadingDetail( DeliveryItem ):
 
     def calculate_gross_received_lost( self ):
         return ( self.number_units_lost * self.unit_weight_gross ) / 1000
-
+    
     def calculate_total_received_units( self ):
         return self.number_units_good + self.number_units_damaged
 
