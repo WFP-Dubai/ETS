@@ -1,18 +1,82 @@
-x{
+/* BASIC STYLES*/
+
+body {
+    background-color: rgb(235,235,235);
+}
+
+.header {
+    text-align: center; 
+    padding-right: 1px; 
+    padding-left: 1px; 
+    padding-bottom: 2px; 
+    padding-top: 2px; 
+    border-bottom-width: 2px; 
+    border-bottom-style: solid; 
+    font-family: sans-serif; 
+    color: rgb(235,235,235);
+    font-size: 13px;
+    background-color: red;
+}
+
+.footer {
+    font-size: 10px;
+    font-family: sans-serif; 
+    border-top-width: 1px; 
+    border-top-style: solid; 
+    border-top: black;
+    text-align: right;
+}
+    
+.content {
+    font-family: Helvetica, Verdana, Arial, sans-serif; 
+    color: rgb(15,15,15);
+    padding: 15px 0px 15px 0px;
+    border: 1px;
+}
+
+.highlight {
+    color: black;
+    background-color: rgb(235,235,235);
+}
+
+.menu { 
+    font-weight: bold; 
+    font-family: serif; 
+    text-shadow: 1px 1px 1px; 
+    text-align: right;
+}
+
+a,a.visited {
+    color:rgb(45,45,45); 
+}
+
+li { 
+    list-style-type: none; 
+}
+
+.dataTables_wrapper {
+    min-height:0px
+}
+
+.display thead tr th {
+    text-align: left;
+}
+
+x {
 color:black;
 }
-.error{
+.error {
 font-weight: bold;
 color: red;
 }
 
 
 /* Order detail */
-.itemhead{
+.itemhead {
     background-color: #0ee6ff;
 }
 
-.bordered{
+.bordered {
 border-collapse: collapse;
 border-color: black;
     border-width: 1px;
@@ -21,4 +85,3 @@ border-color: black;
 
 table.summary {
   width: 800px;
-}
