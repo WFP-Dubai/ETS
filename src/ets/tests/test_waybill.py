@@ -40,7 +40,7 @@ class WaybillTestCase(TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
-        self.waybill = Waybill.objects.all()[0]
+        self.waybill = ets.models.Waybill.objects.all()[0]
     
     #===================================================================================================================
     # def test_slug(self):

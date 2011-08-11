@@ -561,13 +561,14 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
 def waybill_search( request, template='waybill/print/list_waybills.html', 
                     param_name='wbnumber'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
-    
+    print '1111111'
     search_string = request.GET.get(param_name, '')
 
     found_wb = Waybill.objects.filter( invalidated=False, order_code__icontains=search_string )
     my_valid_wb = []
     
     profile = request.user.get_profile()
+    
     
     #TODO: Insert all these condition in query set
     for waybill in found_wb:
