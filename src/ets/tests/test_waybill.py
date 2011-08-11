@@ -129,7 +129,9 @@ class ClientWaybillTestCase(TestCase):
     
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
-        response = self.client.get(reverse('waybill_search'))
+        from ..forms import WaybillSearchForm
+        response = self.client.get(reverse('waybill_search', args=(WaybillSearchForm,)))
+        #response = self.client.get(reverse('waybill_search'))
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['waybill_list']), (self.waybill,))
         self.assertTupleEqual(tuple(response.context['my_wb']), (self.waybill.pk,))
