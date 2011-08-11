@@ -91,7 +91,7 @@ def send_delivered():
     """Receiver sends 'delivered' waybills to the central server"""
     waybills = Waybill.objects.filter(status=Waybill.DELIVERED, destination__pk=COMPAS_STATION)
     url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill"))
-    data = serializers.serialize( 'json', waybills, indent=True)
+    data = serializers.serialize( 'json', sync_data(waybills), indent=True)
     
     request = urllib2.Request(url, data, {
         'Content-Type': 'application/json'
