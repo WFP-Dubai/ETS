@@ -121,19 +121,6 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
 #    return redirect("index")
 #=======================================================================================================================
 
-@login_required
-def dispatch( request ):
-    """
-    View: dispatch 
-    URL: /waybill/dispatch
-    Template: None
-    Redirects to Lti Details.
-    """
-    try:
-        return redirect( "orders", order_pk=request.user.get_profile().warehouses.origin_wh_code )
-    except:
-        return redirect( "index" )
-
 #### Waybill Views
 #=======================================================================================================================
 # @login_required

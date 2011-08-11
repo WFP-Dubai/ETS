@@ -104,7 +104,7 @@ class Location(models.Model):
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
-    country = models.CharField( _("Country code"), max_length=3, choices=COUNTRY_CHOICES)
+    country = models.CharField( _("Country"), max_length=3, choices=COUNTRY_CHOICES)
     compas = models.CharField(_("COMPAS station"), max_length=7)
     
     class Meta:
@@ -187,7 +187,7 @@ class CompasPerson( models.Model ):
     effective_date = models.DateField(_("effective date"), null=True, blank=True)
     expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
     
-    warehouse = models.CharField(_("warehouse"), max_length=13, db_column='org_unit_code')
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("warehouse"), db_column='org_unit_code')
 
     #Dummy fields
     organization_id = models.CharField(_("organization identifier"), max_length=12, editable=False)
@@ -317,7 +317,7 @@ class StockItem( models.Model ):
         verbose_name_plural = _("stocks")
 
     def  __unicode__( self ):
-        return "%s-%s-%s" % (self.warehouse.title, self.commodity_code, self.number_of_units)
+        return "%s-%s-%s" % (self.warehouse.name, self.commodity_code, self.number_of_units)
         
     def coi_code(self):
         return self.origin_id[7:]
