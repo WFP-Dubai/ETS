@@ -1,10 +1,29 @@
 ### -*- coding: utf-8 -*- ####################################################
 
 import os
+from functools import wraps
+
 from django.conf import settings
 
 from windmill.authoring import djangotest
 
+
+def change_settings(func, **kwargs):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        old_settings = {}
+        for name, value in kwargs:
+            old_settings[name] = getattr(settings, name)
+            setattr(settings, value)
+            
+        result = func(*args, **kwargs)
+        
+        for name, value in kwargs:
+            setattr(settings, old_settings[name])
+        
+        return result
+    
+    return wrapper
 
 
 class WindmillMixin(object):

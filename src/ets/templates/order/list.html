@@ -1,0 +1,51 @@
+{% extends "base_template.html"%}
+{% load i18n %}
+
+{% block content %}
+
+<h3>{% trans "Orders" %} {% if warehouse_pk %} to warehouse: {{ warehouse_pk }}{% endif %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="listing">
+<thead>
+  <tr>
+  <th>{% trans "Code" %}</th>
+  <th>{% trans "Date" %}</th>
+  <th>{% trans "Dispatch Warehouse" %}</th>
+  <th>{% trans "Destination" %}</th>
+  <th>{% trans "Consignee" %}</th>
+  <th>{% trans "Action" %}</th>
+  </tr>
+</thead>
+<tbody>
+  {% for order in object_list %}
+  <tr>
+    <td>{{ order.code }}</td>
+    <td>{{ order.created }}</td>
+    <td>{{ order.warehouse }}</td>
+    <td>{{ order.location }}</td>
+    <td>{{ order.consignee }}</td>
+    <td><a href='{{ order.get_absolute_url }}'>{% trans "select" %}</a>
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8" type="text/javascript">
+$(document).ready(function() {
+    $('#listing').dataTable({
+        "aaSorting": [[ 0, "asc" ]],
+        "aoColumns": [
+          null,
+          null,
+          null,
+          null,
+          null
+        ]
+    });
+});
+</script>
+{% endblock %}

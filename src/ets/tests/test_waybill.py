@@ -11,11 +11,10 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseNotAllowed
 from django.utils.datastructures import MultiValueDictKeyError 
 from django.contrib.auth.forms import AuthenticationForm
+from django.core.management import call_command
 
-from ..models import Waybill, LtiOriginal, EpicStock, DispatchPoint
-from ..forms import WaybillRecieptForm, WaybillForm
 import ets.models
-import ets.urls
+from ets.utils import update_compas
 
 def change_settings(func, **kwargs):
     @wraps(func)
@@ -35,28 +34,13 @@ def change_settings(func, **kwargs):
     return wrapper
 
 
-class UnathenticatedTestCase(TestCase):
-    
-    #multi_db = True
-    fixtures = ['development.json', ]
-    
-    def test_login_form(self):
-        #Check login
-        response = self.client.get(reverse('select_action'))
-        self.assertEqual(response.status_code, 302)
-        
-        response = self.client.get(reverse('select_action'), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(isinstance(response.context['form'], AuthenticationForm))
-
-
 class WaybillTestCase(TestCase):
     
     fixtures = ['development.json', ]
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
-        self.waybill = Waybill.objects.all()[0]
+        self.waybill = ets.models.Waybill.objects.all()[0]
     
     #===================================================================================================================
     # def test_slug(self):
@@ -78,29 +62,64 @@ class WaybillTestCase(TestCase):
 
 class ClientWaybillTestCase(TestCase):
     
-    #multi_db = True
-    fixtures = ['development.json', ]
+    multi_db = True
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
+        
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
+        update_compas()
+        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+        
         self.client.login(username='admin', password='admin')
         self.user = User.objects.get(username="admin")
-        self.waybill = Waybill.objects.get(pk="ISBX00211A")
-        self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
-        self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
-        self.dispatch_point = DispatchPoint.objects.get(pk=1)
+        self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        self.order = ets.models.Order.objects.get(pk='OURLITORDER')
+        #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
+        #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
+        #self.dispatch_point = DispatchPoint.objects.get(pk=1)
      
     #===================================================================================================================
     # def tearDown(self):
     #    "Hook method for deconstructing the test fixture after testing it."
     #===================================================================================================================
     
-    def test_index(self):
-        response = self.client.get(reverse('select_action'))
+    def test_login_form(self):
+        self.client.logout()
+        #Check login
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 302)
+        
+        response = self.client.get(reverse('index'), follow=True)
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], AuthenticationForm))
+    
+    def test_index(self):
+        """ tests index direct_to_template page """
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_order_list(self):
+        """ets.views.order_list"""
+        response = self.client.get(reverse('orders'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+
+        #Provide dispatch warehouse
+        response = self.client.get(reverse('orders', kwargs={'warehouse_pk': settings.COMPAS_STATION}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+    
+    def test_order_detail(self):
+        """Order's detail page"""
+        response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
+        self.assertEqual(response.status_code, 200)
+    
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
+        from ..forms import WaybillRecieptForm
+        
         response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
         
@@ -114,9 +133,11 @@ class ClientWaybillTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['waybill_list']), (self.waybill,))
         self.assertTupleEqual(tuple(response.context['my_wb']), (self.waybill.pk,))
-        
+         
     def test_create_waybill(self):
         """ets.views.waybillCreate test"""
+        from ..forms import WaybillForm
+        
         response = self.client.get(reverse('waybillCreate', args=(self.lti.code,)))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
@@ -151,26 +172,6 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_validate_form_update', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
-        
-    def test_listOfLtis(self):
-        """ets.views.listOfLtis"""
-        response = self.client.get(reverse('listOfLtis',args=(self.lti.origin_wh_code,)))
-        self.assertEqual(response.status_code, 200)
-    
-    def test_ltis(self):
-        """ets.views.ltis"""
-        response = self.client.get(reverse('ltis'))
-        self.assertEqual(response.status_code, 200)
-        
-    def test_import_ltis(self):
-        """ets.views.import_ltis"""
-        response = self.client.get(reverse('import_ltis'))
-        self.assertEqual(response.status_code, 302)
-    
-    def test_lti_detail_url(self):
-        """ets.views.lti_detail_url"""
-        response = self.client.get(reverse('lti_detail_url', args=(self.lti.code,)))
-        self.assertEqual(response.status_code, 200)  
         
     def test_dispatch(self):
         """ets.views.dispatch"""       
