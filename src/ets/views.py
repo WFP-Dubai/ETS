@@ -557,13 +557,13 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
 
 
 @login_required
-def waybill_search( request, form_class, template='waybill/list.html'):
+def waybill_search( request, form_class=WaybillSearchForm, template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
-    
+
     form = form_class(request.POST or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    
-    found_wb = ets.models.Waybill.objects.filter( invalidated=False, order_code__icontains=search_string )
+
+    found_wb = ets.models.Waybill.objects.filter( invalidated=False, pk__icontains=search_string )
     my_valid_wb = []
     
     profile = request.user.get_profile()
