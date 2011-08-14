@@ -14,7 +14,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.db.models import Q
+from django.db.models import Q, F
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -161,7 +161,12 @@ class Warehouse( models.Model ):
 
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        return cls.objects.filter(location=location).filter( Q(organization=organization) | Q(organization__isnull=True) )   
+        queryset = cls.objects.filter(location=location)
+        objects = queryset.filter(organization=organization)
+        if not objects.exists():
+            objects = queryset.filter(organization__isnull=True)
+        
+        return objects
     
     #===================================================================================================================
     # def serialize(self):
@@ -510,6 +515,15 @@ class Order(models.Model):
     def get_waybills(self):
         return Waybill.objects.filter(order_code=self.pk, invalidated=False)
     
+    def get_stock_items(self):
+        """Retrieves stock items for current order through warehouse"""
+        return StockItem.objects.filter(warehouse__orders=self,
+                                        project_number=F('project_number'),
+                                        si_code = F('warehouse__orders__items__si_code'), 
+                                        commodity_code = F('warehouse__orders__items__commodity_code'),
+                                        ).order_by('-warehouse__orders__items__number_of_units')
+    
+    
 class DeliveryItem(models.Model):
     """Order item for delivery"""
     
@@ -755,20 +769,20 @@ class Waybill( models.Model ):
     
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
-        if self.dateOfDispatch and self.dateOfLoading \
-        and self.dateOfLoading > self.dateOfDispatch:
+        if self.dispatch_date and self.loading_date \
+        and self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
     
-        if self.recipientArrivalDate and self.dateOfDispatch \
-         and self.recipientArrivalDate < self.dateOfDispatch:
+        if self.recipient_arrival_date and self.dispatch_date \
+         and self.recipient_arrival_date < self.dispatch_date:
             raise ValidationError(_("Cargo arrived before being dispatched"))
 
-        if self.recipientStartDischargeDate and self.recipientArrivalDate \
-        and self.recipientStartDischargeDate < self.recipientArrivalDate:
+        if self.recipient_start_discharge_date and self.recipient_arrival_date \
+        and self.recipient_start_discharge_date < self.recipient_arrival_date:
             raise ValidationError(_("Cargo Discharge started before Arrival?"))
 
-        if self.recipientStartDischargeDate and self.recipientEndDischargeDate \
-        and self.recipientEndDischargeDate < self.recipientStartDischargeDate:
+        if self.recipient_start_discharge_date and self.recipient_end_discharge_date \
+        and self.recipient_end_discharge_date < self.recipient_start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
 
     

@@ -21,9 +21,11 @@ def removeNonAsciiChars( s ):
 #    pass
 #=======================================================================================================================
 
-def track_compas_update(file_name = 'tagfile.tag'):
-    with open( file_name, "w" ) as f:
-        f.write( str( datetime.datetime.now() ) )
+#=======================================================================================================================
+# def track_compas_update(file_name = 'tagfile.tag'):
+#    with open( file_name, "w" ) as f:
+#        f.write( str( datetime.datetime.now() ) )
+#=======================================================================================================================
 
 #=======================================================================================================================
 # def readTag():
@@ -230,24 +232,26 @@ def un64unZip( data ):
 #    return deserialized_content
 #=======================================================================================================================
 
-def restant_si( lti_code ):
-    """
-    TODO: write method definition
-    """
-    listExl = ets_models.RemovedLtis.objects.all()
-    detailed_lti = ets_models.LtiOriginal.objects.filter( code = lti_code ).exclude( pk__in = listExl )
-    listOfWaybills = ets_models.Waybill.objects.filter( invalidated = False, ltiNumber = lti_code, waybillSentToCompas = False )
-
-    listOfSI = [ets_models.SIWithRestant( lti.si_code, lti.is_bulk and lti.quantity_net or lti.number_of_units, lti.cmmname ) 
-                for lti in detailed_lti]
-
-    for wb in listOfWaybills:
-        for loading in wb.loading_details.select_related():
-            for si in listOfSI:
-                if si.SINumber == loading.order_item.lti_line.si_code:
-                    si.reduce_current( loading.numberUnitsLoaded )
-
-    return listOfSI
+#=======================================================================================================================
+# def restant_si( lti_code ):
+#    """
+#    TODO: write method definition
+#    """
+#    listExl = ets_models.RemovedLtis.objects.all()
+#    detailed_lti = ets_models.LtiOriginal.objects.filter( code = lti_code ).exclude( pk__in = listExl )
+#    listOfWaybills = ets_models.Waybill.objects.filter( invalidated = False, ltiNumber = lti_code, waybillSentToCompas = False )
+# 
+#    listOfSI = [ets_models.SIWithRestant( lti.si_code, lti.is_bulk and lti.quantity_net or lti.number_of_units, lti.cmmname ) 
+#                for lti in detailed_lti]
+# 
+#    for wb in listOfWaybills:
+#        for loading in wb.loading_details.select_related():
+#            for si in listOfSI:
+#                if si.SINumber == loading.order_item.lti_line.si_code:
+#                    si.reduce_current( loading.numberUnitsLoaded )
+# 
+#    return listOfSI
+#=======================================================================================================================
 
 
 #=======================================================================================================================
@@ -582,15 +586,17 @@ def restant_si( lti_code ):
 #=======================================================================================================================
 
 
-def serialized_all_items():
-    wh_disp_list = ets_models.DispatchPoint.objects.all()
-    wh_rec_list = ets_models.ReceptionPoint.objects.all()
-    users_list = User.objects.all()
-    profiles_list = ets_models.UserProfile.objects.all()
-    persons_list = ets_models.EpicPerson.objects.all()
-    place_list = ets_models.Place.objects.all()
-    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( place_list ) + list( persons_list ) )
-    return data
+#=======================================================================================================================
+# def serialized_all_items():
+#    wh_disp_list = ets_models.DispatchPoint.objects.all()
+#    wh_rec_list = ets_models.ReceptionPoint.objects.all()
+#    users_list = User.objects.all()
+#    profiles_list = ets_models.UserProfile.objects.all()
+#    persons_list = ets_models.EpicPerson.objects.all()
+#    place_list = ets_models.Place.objects.all()
+#    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( place_list ) + list( persons_list ) )
+#    return data
+#=======================================================================================================================
 
 
 #=======================================================================================================================

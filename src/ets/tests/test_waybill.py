@@ -103,25 +103,6 @@ class WaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
     
-    def test_waybill_finalize_dispatch(self):
-        """ets.views.waybill_finalize_dispatch"""
-        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        self.assertEqual(response.status_code, 302)
-        
-        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
-        self.assertEqual(waybill.status, waybill.SIGNED)
-    
-    def test_waybill_reception(self):
-        """ets.views.waybill_reception test"""
-        from ..forms import WaybillRecieptForm
-        
-        response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
-        
-        self.assertTrue(isinstance(response.context['form'], WaybillRecieptForm))
-        self.assertEqual(response.context['form'].instance, self.waybill)
-        #TODO: Append more tests for this view and form inside it.
-    
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
         #from ..forms import WaybillSearchForm
@@ -146,10 +127,10 @@ class WaybillTestCase(TestCase):
         
          
     def test_create_waybill(self):
-        """ets.views.waybillCreate test"""
+        """ets.views.waybill_create test"""
         from ..forms import WaybillForm
         
-        response = self.client.get(reverse('waybillCreate', args=(self.lti.code,)))
+        response = self.client.get(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
         self.assertTrue(isinstance(response.context['form'], WaybillForm))
@@ -166,6 +147,25 @@ class WaybillTestCase(TestCase):
             'transportContractor': u' MUSLIM TRANSPORT',
             'waybillNumber': 'N/A'
         })
+
+    def test_waybill_finalize_dispatch(self):
+        """ets.views.waybill_finalize_dispatch"""
+        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
+        self.assertEqual(response.status_code, 302)
+        
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        self.assertEqual(waybill.status, waybill.SIGNED)
+    
+    def test_waybill_reception(self):
+        """ets.views.waybill_reception test"""
+        from ..forms import WaybillRecieptForm
+        
+        response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
+        self.assertEqual(response.status_code, 200)
+        
+        self.assertTrue(isinstance(response.context['form'], WaybillRecieptForm))
+        self.assertEqual(response.context['form'].instance, self.waybill)
+        #TODO: Append more tests for this view and form inside it.
     
     def test_waybill_edit(self):
         """ets.views.waybill_edit"""

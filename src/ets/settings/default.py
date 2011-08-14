@@ -226,6 +226,7 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'piston',
     'autoslug',
+    'uni_form',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

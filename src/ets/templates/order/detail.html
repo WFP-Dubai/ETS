@@ -32,7 +32,7 @@
 
 <br>
 {% if user.get_profile.is_dispatcher and user.get_profile.warehouse == object.warehouse %}
-<a href='{% url waybillCreate object.code %}'>{% trans "Create New Waybill" %}</a><br>
+<a href='{% url waybill_create order_pk=object.pk %}'>{% trans "Create New Waybill" %}</a><br>
 {% endif %}
 <br>
 

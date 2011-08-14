@@ -1,23 +1,26 @@
 {% extends "base_template.html"%}
-{% load i18n %}
-{%block title %}{% trans "Waybill Creation" %} {%endblock%}
-{%block content %}
-<style type="text/css">
-.ul-inline ul, .ul-inline ul li{border-width: 1px; display: inline; padding: 0px;}
-.ul-inline{margin: 2px; border-color: black; border-style: none; border-width: 1px;}
-</style>
+{% load i18n uni_form_tags %}
+
+{% block title %}{% trans "Waybill Creation" %} {% endblock %}
+
+{% block content %}
+
+<div class="form">
+
+<form method="POST" action="" class="uniForm">{% csrf_token %}
+    {% uni_form form form.helper %}
+    {% uni_form formset formset.helper %}
+    <div class="buttonHolder">
+         <input type="submit" name="add" value="{% trans 'Create Waybill' %}"/>
+    </div>
+</form>
+
+{% comment %}
 <form action="" method=POST id="delform">
-{{form.invalidated}}
 {% if item.errors %}
    <span class='error'>{% trans "Review Form, as there is information missing" %}</span>
 {% endif %}
-<div class="form">
-    <div>
-        <span><strong>{% trans "LTI:" %}</strong> {{lti_list.0.code}}{{form.ltiNumber}}</span>
-    </div>{%if form.instance.waybillNumber%}
-    <div>
-        <span><strong>{% trans "Waybill Nr:" %}</strong> {{form.instance.waybillNumber}}</span>
-    </div>{%endif%} {{form.waybillNumber}}
+    
     <div>
         <span><strong>{% trans "Date of Loading:" %}</strong> {{form.dateOfLoading}} <span class='error'>{%for error in form.dateOfLoading.errors%} {{error|escape}}{%endfor%}</span></span>
         <span><strong>{% trans "Date of Dispatch:" %} </strong>{{form.dateOfDispatch}}<span class='error'>{%for error in form.dateOfDispatch.errors%} {{error|escape}}{%endfor%}</span></span>
@@ -32,10 +35,10 @@
         </tr>
         
     </table>
-    <strong>{% trans "Recipient Location:" %}</strong>    {{form.recipientLocation}} {{form.recipientConsingee}}        {{lti_list.0.destination_loc_name}}
-    <br><strong>{% trans "Consignee :" %}</strong> {{lti_list.0.consegnee_name}}
-    <br>
+    
     <strong>{% trans "Destination Warehouse:" %}</strong> {{form.destinationWarehouse}}{%for error in form.destinationWarehouse.errors%}<span class='error'> {{error|escape}}</span>{%endfor%}
+    
+    
     {{ formset.management_form }}
     <br><br>
     {%if formset.non_form_errors%} <span class='error'>{{formset.non_form_errors}}</span>{%endif%}
@@ -72,26 +75,26 @@
  	<strong>{% trans "Container 2: Number:" %}</strong>{{form.containerTwoNumber}}<strong>{% trans "Seal:" %}</strong>{{form.containerTwoSealNumber}}<strong> {% trans "Remarks:" %}</strong>{{form.containerTwoRemarksDispatch}}
 
 
-<input type="submit" value="{% trans 'Save & Print' %}"> {% csrf_token %}
+<input type="submit" value="{% trans 'Save & Print' %}"> 
 </form>
+{% endcomment %}
 </div>
-{%endblock%}
-{%block script%}
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
 <script charset="utf-8" type="text/javascript">
-
-
 $(document).ready(function() {
-                $('#id_dateOfDispatch').datepicker({ dateFormat: 'yy-mm-dd' });
-                $('#id_dateOfLoading').datepicker({ dateFormat: 'yy-mm-dd' });                
-                $('#example').dataTable( {
-                "bPaginate": false,
-        "bLengthChange": false,
-        "bFilter": false,
-        "bSort": false,
-        "bInfo": false,
-        "bAutoWidth": false 
-                });
-} );
-
+  $('#{{ form.dispatch_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#{{ form.loading_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });                
+  /*$('#example').dataTable( {
+    "bPaginate": false,
+    "bLengthChange": false,
+    "bFilter": false,
+    "bSort": false,
+    "bInfo": false,
+    "bAutoWidth": false 
+  });*/
+});
 </script>
-{%endblock script%}
+{% endblock %}

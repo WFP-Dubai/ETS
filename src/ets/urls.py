@@ -50,7 +50,8 @@ urlpatterns = patterns("ets.views",
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
-    #Waybill view                   
+    #Waybill view
+    ( r'^waybill/create/(?P<order_pk>[-\w]+)/$', "waybill_create", {}, "waybill_create" ),
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
@@ -61,7 +62,6 @@ urlpatterns = patterns("ets.views",
     }, "waybill_finalize_dispatch" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
-    ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
