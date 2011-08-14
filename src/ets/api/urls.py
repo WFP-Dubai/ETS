@@ -32,8 +32,17 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 
 
 urlpatterns = patterns('',
-
+                       
+    
+    (r'^waybills/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/(?P<slug>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^waybills/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^waybills/(?P<warehouse>[-\w]+)/(?P<slug>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^waybills/(?P<destination>[-\w]+)/(?P<slug>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"), 
+    (r'^waybills/(?P<warehouse>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^waybills/(?P<destination>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),                 
+    (r'^waybills/(?P<slug>[-\w]+)/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
     (r'^waybills/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    
     (r'^loading-details/$', loading_details_resource, { 'emitter_format': 'csv' }, "api_loading_details"),
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),

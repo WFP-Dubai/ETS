@@ -48,6 +48,8 @@ class ReadCSVWaybillHandler(BaseHandler):
         if slug:
             mas.append('%s=%s'% 'slug','slug')
         filter_str = ', '.join(mas)
+        print "111"
+        print slug
         print filter_str
         if filter_str:
             return self.model.objects.filter(filter_str).values_list()
