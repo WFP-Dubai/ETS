@@ -31,7 +31,7 @@
              <td>{%if form.instance.dispatcherSigned%}{{form.instance.transportDispachSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending"  %}{%endif%}</td>
               <td>{%if form.instance.recipientSigned%}{{form.instance.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%}</td>
              <td>{{ form.waybillReceiptValidated }} {%if form.instance.hasError%}<span onMouseUp="alert('{{form.instance.errors.errorRec|escapejs}}')"><span style='color:red;'>{% trans "Error!" %}</span></span>{%endif%}</td>
-             <td><a href='{{ form.instance.get_absolute_url }}'>{% trans "View" %}</a>{%if myprofile.superUser%} <a href='{% url waybill_validate_form_update waybill_pk=form.instance.pk %}'>{% trans "Edit" %}</a>{%endif%}</td>
+             <td><a href='{{ form.instance.get_absolute_url }}'>{% trans "View" %}</a>{%if myprofile.super_user%} <a href='{% url waybill_validate_form_update waybill_pk=form.instance.pk %}'>{% trans "Edit" %}</a>{%endif%}</td>
     </tr>
 
     {% endfor %}
@@ -77,7 +77,7 @@
 
 {%endblock%}
 
-{%block extra-header%}
+{%block script%}
 <script charset="utf-8">
 $(document).ready(function() {
                 $('#example').dataTable( {
@@ -98,4 +98,4 @@ $(document).ready(function() {
                 });
 } );
 </script>
-{%endblock extra-header%}
+{%endblock script%}

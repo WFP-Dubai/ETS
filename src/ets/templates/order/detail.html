@@ -1,0 +1,87 @@
+{% extends "base_template.html"%}
+{% load i18n %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block content %}
+<table class="summary">
+	<tr>
+    <td>{% trans "Code" %}: {{ object.pk }}</td>
+  	<td>{% trans "Created" %}: {{ object.created }}</td>
+  </tr>
+	
+	<tr>
+    <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
+  	<td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
+  </tr>
+	
+	<tr>
+    <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.pk }}</td>
+  </tr>
+	
+	<tr>
+    <td>{% trans "Project Number" %}: {{ object.project_number }}</td>
+    <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
+    <td>{% trans "Location:" %} {{ object.location }}</td>
+  </tr>
+	
+	<tr>
+    <td>{% trans "Contractor:" %} {{ object.transport_name }}</td>
+  </tr>
+</table>
+
+<br>
+{% if user.get_profile.is_dispatcher and user.get_profile.warehouse == object.warehouse %}
+<a href='{% url waybillCreate object.code %}'>{% trans "Create New Waybill" %}</a><br>
+{% endif %}
+<br>
+
+{% trans "Order items:" %}
+<table class='bordered' >
+    <tr class='itemhead'>
+      <th class='bordered'>{% trans "Commodity" %}</th>
+      <th>{% trans "SI" %}</th>
+      <th class='bordered'>{% trans "Number Of Units" %}</th>
+      <th class='bordered'>{% trans "To Be Dispatched" %}</th>
+      <th  class='bordered'>{% trans "Stock In Warehouse" %}</th>
+    </tr>
+    
+    {% for item in object.items.all %}
+      <tr class='bordered'>
+        <td class='bordered'>{{ item.commodity_name }}&nbsp;</td>
+        <td class='bordered'>&nbsp;{{ item.si_code }}&nbsp;</td>
+        <td class='bordered' align="right">{{ item.number_of_units }}</td>
+        <td class='bordered' align="right">{{ item.items_left }}</td>
+        <td class='bordered' align="right"> {{ item.get_available_stocks }}</td>
+      </tr>
+    {% endfor %}
+</table>
+
+<br>
+{% if object.get_waybills.count %}
+  {% trans "Current Waybills:" %}<br>
+  <table class='bordered' >
+  {% for waybill in object.get_waybills %}
+      <tr>
+        <td colspan="3"  class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
+        <td class='bordered'><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
+      </tr>
+      <tr class='itemhead'>
+        <td></td>
+        <td class='bordered'>{% trans "Commodity" %}</td>
+        <td class='bordered'>{% trans "SI" %}</td>
+        <td class='bordered'>{% trans "Already dispatched" %}</td>
+      </tr>
+      {% for loading in waybill.loading_details.all %}
+        <tr class='bordered'>
+          <td class='bordered'>&nbsp;</td>
+          <td class='bordered'>&nbsp;{{ loading.commodity_name}}&nbsp;</td>
+          <td class='bordered' >&nbsp;{{ loading.get_coi_code }}&nbsp;</td>
+          <td class='bordered' align="right">{{ loading.number_of_units }}</td>
+        </tr>
+      {% endfor %}
+  {% endfor %}
+  </table>
+{% endif %}
+
+{% endblock %}

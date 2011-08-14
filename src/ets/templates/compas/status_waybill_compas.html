@@ -32,8 +32,8 @@
              <td>{%if waybill.recipientSigned%}{{waybill.recipientSignedTimestamp|date:"Y/m/d"}}{%else%}{% trans "Pending" %}{%endif%} </td>
              <td>{%if waybill.waybillReceiptValidated%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%}  </td>
               <td>{%if waybill.waybillSentToCompas%}{% trans "Y" %}{%else%}{% trans "N" %}{%endif%} </td>
-             <td>{%if profile.isDispatcher or profile.isCompasUser%}<a href='{{ waybill.get_absolute_url }}'>{% trans "View Dispatch" %}</a>{%endif%}
-                     {%if profile.isReciever or profile.isCompasUser%} <a href='{% url waybill_view_reception waybill_pk=waybill.pk %}'>{% trans "View Reciept" %}</a>{%endif%}
+             <td>{%if profile.is_dispatcher or profile.isCompasUser%}<a href='{{ waybill.get_absolute_url }}'>{% trans "View Dispatch" %}</a>{%endif%}
+                     {%if profile.is_reciever or profile.isCompasUser%} <a href='{% url waybill_view_reception waybill_pk=waybill.pk %}'>{% trans "View Reciept" %}</a>{%endif%}
                      {%if profile.isCompasUser%} <a href='{% url waybill_view_reception waybill_pk=waybill.pk %}'>{% trans "View Full" %}</a>{%endif%}
              </td>
     </tr>
@@ -47,7 +47,7 @@
 {%endif%}
 {%endblock%}
 
-{%block extra-header%}
+{%block script%}
 <script charset="utf-8">
 $(document).ready(function() {
                 $('#myTable').dataTable( {
@@ -66,4 +66,4 @@ $(document).ready(function() {
         ] });
 } );
 </script>
-{%endblock extra-header%}
+{%endblock script%}

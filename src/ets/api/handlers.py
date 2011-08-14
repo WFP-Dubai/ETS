@@ -2,17 +2,21 @@
 
 #from datetime import datetime
 #from decimal import Decimal
+import csv
+import cStringIO
+
 
 #from django.http import Http404
 #import httplib, logging
 from django.core import serializers
 from django.db import transaction
+from django.db.models import Q, Sum, Count
 
 from piston.handler import BaseHandler
-from piston.utils import rc
+from piston.utils import rc, Mimer
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, Place, sync_data
+from ..models import Waybill, Place, sync_data, csv_sync_waybill
 
 class PlaceHandler(BaseHandler):
 
@@ -21,10 +25,35 @@ class PlaceHandler(BaseHandler):
     exclude = ('_state',)
 
 
-class WaybillHandler(BaseHandler):
+#===============================================================================
+# class WaybillHandler(BaseHandler):
+# 
+#    allowed_methods = ('GET',)
+#    model = Waybill
+#===============================================================================
+
+class ReadCSVAllWaybillsHandler(BaseHandler):
 
     allowed_methods = ('GET',)
     model = Waybill
+    
+    def read(self, request, warehouse="", destination=""):
+        """Finds all sent waybills to provided destination"""
+        #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
+        if warehouse or destination:
+            return self.model.objects.filter(Q(warehouse__in=warehouse) | Q(destination__in=destination)).values_list()
+        else:
+            return self.model.objects.values_list()
+        
+
+class ReadCSVWaybillHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = Waybill
+    
+    def read(self, request, slug):
+        """Finds all sent waybills to provided destination"""
+        return csv_sync_waybill(self.model.objects.get(slug=slug))
 
 
 class NewWaybillHandler(BaseHandler):
@@ -54,7 +83,7 @@ class ReceivingWaybillHandler(BaseHandler):
     
     def read(self, request, destination):
         """Finds all sent waybills to provided destination"""
-        return sync_data(self.model.objects.filter(status=self.model.SENT, destinationWarehouse__pk=destination))
+        return sync_data(self.model.objects.filter(status=self.model.SENT, destination__pk=destination))
 
 
 
@@ -102,6 +131,20 @@ class DjangoJsonEmitter(DjangoEmitter):
     Emitter for the Django serialized json format.
     """
     def render(self, request):
+
         return super(DjangoJsonEmitter, self).render(request, 'json')
         
 Emitter.register('django_json', DjangoJsonEmitter, 'application/json; charset=utf-8')
+
+
+class CSVEmitter(Emitter):
+    """
+    Emitter that returns CSV.
+    """
+    def render(self, request):
+        result = cStringIO.StringIO()
+        writer = csv.writer(result)
+        writer.writerows(self.construct())
+        return result.getvalue()
+        
+Emitter.register('csv', CSVEmitter, 'application/csv')

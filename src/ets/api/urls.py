@@ -4,12 +4,12 @@ from django.conf.urls.defaults import patterns
 
 #from django.core.urlresolvers import reverse
 
-import piston.authentication
+#import piston.authentication
 from piston.resource import Resource
 from piston.doc import documentation_view
 
-from .handlers import WaybillHandler, NewWaybillHandler, InformedWaybillHandler 
-from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler
+from .handlers import NewWaybillHandler, InformedWaybillHandler , ReadCSVAllWaybillsHandler
+from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler, ReadCSVWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
@@ -17,7 +17,9 @@ from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler
 
 #AUTHENTICATORS = [permhttpauth, ]
 
-waybill_resource = Resource(WaybillHandler)
+all_waybill_resource = Resource(ReadCSVAllWaybillsHandler)
+one_waybill_resource = Resource(ReadCSVWaybillHandler)
+
 new_waybill_resource = Resource(NewWaybillHandler)
 informed_waybill_resource = Resource(InformedWaybillHandler)
 delivered_waybill_resource = Resource(DeliveredWaybillHandler)
@@ -30,9 +32,9 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 
 
 urlpatterns = patterns('',
-    
-    (r'^waybill/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
-    (r'^waybill/(?P<slug>[-\w]+)/$', waybill_resource, { 'emitter_format': 'json' }, "api_waybill"),
+
+    (r'^waybill/(?P<slug>[-\w]+)/$', one_waybill_resource, { 'emitter_format': 'csv' }, "api_waybill"),
+    (r'^waybill/$', all_waybill_resource, { 'emitter_format': 'csv' }, "api_waybills"),
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
