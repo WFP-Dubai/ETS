@@ -35,8 +35,8 @@
   <li><a href="{% url select_data %}">{% trans "Download Data" %}</a></li>
   
   <li>
-    <form action='{% url waybill_search %}'>
-      <input type="text" name="wbnumber"/>
+    <form method='POST' action='{% url waybill_search %}'>
+      {{ form.as_p }}
       <input type="submit" value="{% trans 'Search Waybill' %}">
     </form>
   </li>

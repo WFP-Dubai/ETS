@@ -12,6 +12,9 @@ UNDEFINED_MESSAGE = "N/A"
 class WarehouseChoiceForm( forms.Form ):
     warehouse = forms.ModelChoiceField( queryset = ets_models.Warehouse.objects.filter( start_date__lt = datetime.date.today() ) )
 
+class WaybillSearchForm( forms.Form ):
+    q = forms.CharField(required=False, label=_('Waybill code'))
+
 class WaybillForm( ModelForm ):
     
     class Meta:
@@ -188,3 +191,4 @@ class LoadingDetailRecieptForm( ModelForm ):
             'number_units_lost', 'number_units_damaged', 'units_lost_reason', 
             'units_damaged_reason', 
         )
+

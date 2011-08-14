@@ -4,7 +4,6 @@ import datetime
 from functools import wraps
 
 from django.core.urlresolvers import reverse
-from django.test.client import Client
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -125,11 +124,27 @@ class WaybillTestCase(TestCase):
     
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
-        response = self.client.get(reverse('waybill_search'))
+        #from ..forms import WaybillSearchForm
+        # Empty search query
+        response = self.client.post(reverse('waybill_search'))
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['waybill_list']), (self.waybill,))
         self.assertTupleEqual(tuple(response.context['my_wb']), (self.waybill.pk,))
+        #=======================================================================
+        # form = WaybillSearchForm({ 'q' : 'ISBX00211A'})
+        # response = self.client.post(reverse('waybill_search'), data={'form': form, 'q': 'ISBX00211A'})
+        #=======================================================================
+        # Search query with existing waybill code  
+        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A'})
+        self.assertEqual(response.status_code, 200)
+        self.assertTupleEqual(tuple(response.context['waybill_list']), (self.waybill,))
+        self.assertTupleEqual(tuple(response.context['my_wb']), (self.waybill.pk,))
+        # Search query with not existing waybill code 
+        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A1'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.context['waybill_list']), 0)
         
+         
     def test_create_waybill(self):
         """ets.views.waybillCreate test"""
         from ..forms import WaybillForm

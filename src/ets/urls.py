@@ -9,6 +9,7 @@ from django.views.generic.list_detail import object_detail
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
+from ets.forms import WaybillSearchForm
 from ets.models import LtiOriginal, Waybill, EpicStock
 import ets.models
 
@@ -35,7 +36,9 @@ urlpatterns = patterns("ets.views",
                         
     ( r'^$', login_required(direct_to_template), {
         'template': 'index.html',
-    }, "index" ),
+        'extra_context': {
+            'form': WaybillSearchForm,
+    }}, "index" ),
     
     #Order list
     ( r'^orders/(?P<warehouse_pk>[-\w]+)/$', "order_list", {}, "orders" ),
@@ -61,9 +64,6 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/create/(.*)/$', "waybillCreate", {}, "waybillCreate" ),
     ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
-    #===================================================================================================================
-    # ( r'^waybill/import/$', "import_ltis", {}, "import_ltis" ),
-    #===================================================================================================================
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
