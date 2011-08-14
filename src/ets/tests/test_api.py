@@ -301,3 +301,20 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
         
         ets.api.client.COMPAS_STATION = old_compas
+
+
+class ApiCSVTestCase(TestDevelopmentMixin, TestCase):
+    
+    def test_all_waybills(self):
+        
+        #MonkeyPatch of urlopen
+        def dummy_urlopen(request, timeout):
+            
+            class DummyResponse(object):
+                code = 201
+                def read(self):
+                    return "Created"
+            
+            return DummyResponse()
+        
+    def test_one_waybill(self):

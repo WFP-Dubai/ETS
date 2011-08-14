@@ -2,6 +2,9 @@
 
 #from datetime import datetime
 #from decimal import Decimal
+import csv
+import cStringIO
+
 
 #from django.http import Http404
 #import httplib, logging
@@ -10,7 +13,7 @@ from django.db import transaction
 from django.db.models import Sum, Count
 
 from piston.handler import BaseHandler
-from piston.utils import rc
+from piston.utils import rc, Mimer
 from piston.emitters import Emitter, DjangoEmitter
 
 from ..models import Waybill, Place, sync_data, csv_sync_waybill
@@ -36,17 +39,18 @@ class ReadCSVAllWaybillsHandler(BaseHandler):
     
     def read(self, request):
         """Finds all sent waybills to provided destination"""
-        return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
-    
+        #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
+        return self.model.objects.all().values_list()
+        
 
 class ReadCSVWaybillHandler(BaseHandler):
 
     allowed_methods = ('GET',)
     model = Waybill
     
-    def read(self, request, waybill):
+    def read(self, request, slug):
         """Finds all sent waybills to provided destination"""
-        return csv_sync_waybill(self.model.objects.get(waybill=waybill))
+        return csv_sync_waybill(self.model.objects.get(slug=slug))
 
 
 class NewWaybillHandler(BaseHandler):
@@ -124,16 +128,23 @@ class DjangoJsonEmitter(DjangoEmitter):
     Emitter for the Django serialized json format.
     """
     def render(self, request):
+
         return super(DjangoJsonEmitter, self).render(request, 'json')
         
 Emitter.register('django_json', DjangoJsonEmitter, 'application/json; charset=utf-8')
 
 
-class DjangoCSVEmitter(DjangoEmitter):
+class CSVEmitter(Emitter):
     """
-    Emitter for the Django csv format.
+    Emitter that returns CSV.
     """
     def render(self, request):
-        return super(DjangoCSVEmitter, self).render(request, 'csv')
-    
-Emitter.register('django_csv', DjangoCSVEmitter, 'application/csv; charset=utf-8')
+        print type(self.construct())
+        for i in self.construct():
+            print i
+        result = cStringIO.StringIO()
+        writer = csv.writer(result)
+        writer.writerows(self.construct())
+        return result.getvalue()
+        
+Emitter.register('csv', CSVEmitter, 'application/csv')
