@@ -8,7 +8,7 @@ from django.conf.urls.defaults import patterns
 from piston.resource import Resource
 from piston.doc import documentation_view
 
-from .handlers import NewWaybillHandler, InformedWaybillHandler , ReadCSVAllWaybillsHandler
+from .handlers import NewWaybillHandler, InformedWaybillHandler , ReadCSVLoadingDetailHandler
 from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler, ReadCSVWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
@@ -17,8 +17,8 @@ from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler, ReadCSVW
 
 #AUTHENTICATORS = [permhttpauth, ]
 
-all_waybill_resource = Resource(ReadCSVAllWaybillsHandler)
-one_waybill_resource = Resource(ReadCSVWaybillHandler)
+waybills_resource = Resource(ReadCSVWaybillHandler)
+loading_details_resource = Resource(ReadCSVLoadingDetailHandler)
 
 new_waybill_resource = Resource(NewWaybillHandler)
 informed_waybill_resource = Resource(InformedWaybillHandler)
@@ -33,8 +33,8 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 
 urlpatterns = patterns('',
 
-    (r'^waybill/(?P<slug>[-\w]+)/$', one_waybill_resource, { 'emitter_format': 'csv' }, "api_waybill"),
-    (r'^waybill/$', all_waybill_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^waybills/$', waybills_resource, { 'emitter_format': 'csv' }, "api_waybills"),
+    (r'^loading-details/$', loading_details_resource, { 'emitter_format': 'csv' }, "api_loading_details"),
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 

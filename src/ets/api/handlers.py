@@ -16,7 +16,7 @@ from piston.handler import BaseHandler
 from piston.utils import rc, Mimer
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, Place, sync_data, csv_sync_waybill
+from ..models import Waybill, LoadingDetail, Place, sync_data
 
 class PlaceHandler(BaseHandler):
 
@@ -32,28 +32,54 @@ class PlaceHandler(BaseHandler):
 #    model = Waybill
 #===============================================================================
 
-class ReadCSVAllWaybillsHandler(BaseHandler):
-
-    allowed_methods = ('GET',)
-    model = Waybill
-    
-    def read(self, request, warehouse="", destination=""):
-        """Finds all sent waybills to provided destination"""
-        #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
-        if warehouse or destination:
-            return self.model.objects.filter(Q(warehouse__in=warehouse) | Q(destination__in=destination)).values_list()
-        else:
-            return self.model.objects.values_list()
-        
-
 class ReadCSVWaybillHandler(BaseHandler):
 
     allowed_methods = ('GET',)
     model = Waybill
     
-    def read(self, request, slug):
+    def read(self, request, slug="", warehouse="", destination=""):
         """Finds all sent waybills to provided destination"""
-        return csv_sync_waybill(self.model.objects.get(slug=slug))
+        #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
+        mas = []
+        if warehouse: 
+            mas.append('%s=%s'% 'warehouse','warehouse')
+        if destination:
+            mas.append('%s=%s'% 'destination','destination')
+        if slug:
+            mas.append('%s=%s'% 'slug','slug')
+        filter_str = ', '.join(mas)
+        print filter_str
+        if filter_str:
+            return self.model.objects.filter(filter_str).values_list()
+        else:
+            return self.model.objects.values_list()
+        
+
+class ReadCSVLoadingDetailHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = LoadingDetail
+    
+    def read(self, request, waybill="", warehouse="", destination=""):
+        """Finds all sent waybills to provided destination"""
+        mas = []
+        if warehouse: 
+            mas.append('%s=%s'% 'warehouse','warehouse')
+        if destination:
+            mas.append('%s=%s'% 'destination','destination')
+        if waybill:
+            mas.append('%s=%s'% 'waybill','waybill')
+        filter_str = ', '.join(mas)
+        if filter_str:
+            load_details = self.model.objects.filter(filter_str).values_list()
+        else:
+            load_details = self.model.objects.values_list()
+        result = []
+        for detail in load_details:
+            waybills_data = Waybill.objects.filter(pk=detail['waybill']).values_list()[0]
+            result.append(waybills_data + detail)
+        return load_details    
+            
 
 
 class NewWaybillHandler(BaseHandler):

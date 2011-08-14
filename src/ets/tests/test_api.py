@@ -301,4 +301,12 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
         
         ets.api.client.COMPAS_STATION = old_compas
+        
+    def test_get_waybills(self):
+
+        waybill = Waybill.objects.all()[0]
+        response = self.client.get(reverse("api_waybills", slug=waybill.slug))
+        #response = self.client.get(reverse("api_waybills"))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
 
