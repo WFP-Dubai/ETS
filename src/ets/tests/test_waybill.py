@@ -4,7 +4,6 @@ import datetime
 from functools import wraps
 
 from django.core.urlresolvers import reverse
-from django.test.client import Client
 from django.test import TestCase
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -36,32 +35,6 @@ def change_settings(func, **kwargs):
 
 class WaybillTestCase(TestCase):
     
-    fixtures = ['development.json', ]
-    
-    def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
-        self.waybill = ets.models.Waybill.objects.all()[0]
-    
-    #===================================================================================================================
-    # def test_slug(self):
-    #    """Tests slug"""
-    #    self.assertEqual(self.waybill.slug, u'ISBX00211A')
-    #===================================================================================================================
-        
-    
-    def test_serialize(self):
-        """Checks methods serialize of waybill instance"""
-        data = self.waybill.serialize()
-        self.assertTrue(data.startswith('[{"pk": "ISBX00211A", "model": "ets.waybill", "fields": {"waybillNumber": "A0009",'))
-    
-    def test_compress(self):
-        """Checks methods compress of waybill instance"""
-        data = self.waybill.compress()
-        self.assertTrue(isinstance(data, str))
-
-
-class ClientWaybillTestCase(TestCase):
-    
     multi_db = True
     
     def setUp(self):
@@ -83,6 +56,16 @@ class ClientWaybillTestCase(TestCase):
     # def tearDown(self):
     #    "Hook method for deconstructing the test fixture after testing it."
     #===================================================================================================================
+    
+    def test_serialize(self):
+        """Checks methods serialize of waybill instance"""
+        data = self.waybill.serialize()
+        self.assertTrue(data.startswith('[{"pk": "ISBX00211A", "model": "ets.waybill", "fields": {"dispatcher_person": "ISBX0020000586"'))
+    
+    def test_compress(self):
+        """Checks methods compress of waybill instance"""
+        data = self.waybill.compress()
+        self.assertTrue(isinstance(data, str))
     
     def test_login_form(self):
         self.client.logout()
@@ -115,6 +98,18 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
         self.assertEqual(response.status_code, 200)
     
+    def test_waybill_view(self):
+        """ets.views.waybill_view test"""
+        response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))
+        self.assertEqual(response.status_code, 200)
+    
+    def test_waybill_finalize_dispatch(self):
+        """ets.views.waybill_finalize_dispatch"""
+        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
+        self.assertEqual(response.status_code, 302)
+        
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        self.assertEqual(waybill.status, waybill.SIGNED)
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
@@ -171,11 +166,6 @@ class ClientWaybillTestCase(TestCase):
             'transportContractor': u' MUSLIM TRANSPORT',
             'waybillNumber': 'N/A'
         })
-    
-    def test_waybill_view(self):
-        """ets.views.waybill_view test"""
-        response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
     
     def test_waybill_edit(self):
         """ets.views.waybill_edit"""
@@ -335,16 +325,10 @@ class ClientWaybillTestCase(TestCase):
         response = self.client.get(reverse("waybill_validate_dispatch_form"))
         self.assertEqual(response.status_code, 200)     
     
-    def test_waybill_finalize_dispatch(self):
-        """ets.views.waybill_finalize_dispatch"""
-        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        self.assertEqual(response.status_code, 302) 
-    
-    
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
-        self.waybill.update_status(Waybill.INFORMED)
+        self.waybill.update_status(ets.models.Waybill.INFORMED)
         
         response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)

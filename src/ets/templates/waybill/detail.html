@@ -1,15 +1,16 @@
-{%load extra_tags%}
+{% load extra_tags %}
 {% load i18n %}
 
 {% block style %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="print" />
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="all"/>
 {% endblock %}
 
-{% block title}{% blocktrans %}Waybill: {{ object }}{% endblocktrans %}{% endblock %}
+{% block title %}{% blocktrans %}Waybill: {{ object }}{% endblocktrans %}{% endblock %}
 
 {% block content %}
 
-<span class="hidden_print">
+<div class="hidden_print">
   <form class="the_forms" method="get" action="{% url waybill_edit waybill_pk=object.pk %}">
     <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" 
       name="Print Copy" id='PrintCopy'
@@ -33,17 +34,14 @@
 {% else %}
 {% if request.META.HTTP_REFERER %}<a href='{{ request.META.HTTP_REFERER }}'>{% trans "Back" %}</a>{% endif %}
 {% endif %}
-</span>
+</div>
 
 {% if not object.invalidated %}
     <table cellpadding="0" cellspacing="0" border="0px" >
-            {% include 'waybill/print/wb_header.html'%}
+        {% include 'waybill/print/wb_header.html'%}
         {% include 'waybill/print/wb_loading.html'%}
-        {%if not object.recipientSigned%}
-        {% include 'waybill/print/wb_receipt_empty.html'%}
-        {%else%}
-        {% include 'waybill/print/wb_receipt.html'%}
-        {%endif%}
+        
+        {% include 'waybill/print/wb_receipt.html' %}
     </table>
     {%else%}
 {% trans "Waybill has been Deleted!!!" %}    

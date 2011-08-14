@@ -36,6 +36,11 @@ class OrderAdmin(admin.ModelAdmin):
 
 admin.site.register( ets.models.Order, OrderAdmin )
 
+class OrderInline(admin.TabularInline):
+    model = ets.models.Order
+    extra = 0
+    
+
 class StockAdmin(admin.ModelAdmin):
     list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'commodity_code', 
                     'package_code', 'number_of_units', 'quantity_net')
@@ -49,6 +54,10 @@ class StockInline(admin.TabularInline):
     model = ets.models.StockItem
     extra = 0
 
+class PersonInline(admin.TabularInline):
+    model = ets.models.CompasPerson
+    extra = 0
+
 class WarehouseAdmin(admin.ModelAdmin):
     #list_display = ('pk', 'title', 'place', 'start_date',)
     list_display = ('pk', 'name', 'location', 'start_date',)
@@ -56,7 +65,7 @@ class WarehouseAdmin(admin.ModelAdmin):
     #list_filter = ('place', 'start_date')
     date_hierarchy = 'start_date'
     search_fields = ('pk', 'title', 'place__name',)
-    inlines = (StockInline,)
+    inlines = (PersonInline, StockInline, OrderInline)
     
 admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
@@ -65,21 +74,20 @@ class WarehouseInline(admin.TabularInline):
     model = ets.models.Warehouse
     extra = 0
 
-class ConsigneeInline(admin.TabularInline):
-    model = ets.models.Consignee
-    extra = 0
-
-class PersonInline(admin.TabularInline):
-    model = ets.models.CompasPerson
-    extra = 0
-
-class PlaceAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'geo_point_code', 'geo_name', 'country_code', 'reporting_code',)
-    list_filter = ('country_code',)
+class ConsigneeAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name',)
     search_fields = list_display
-    inlines = (PersonInline, WarehouseInline, ConsigneeInline)
-    
-admin.site.register( ets.models.Place, PlaceAdmin )
+    inlines = (WarehouseInline, OrderInline)
+
+admin.site.register( ets.models.Consignee, ConsigneeAdmin )
+
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'country', 'compas')
+    search_fields = list_display
+    inlines = (WarehouseInline, OrderInline)
+    list_filter = ('country',)
+
+admin.site.register( ets.models.Location, LocationAdmin )
 
 class UserProfileInline( admin.StackedInline ):
     model = ets.models.UserProfile
