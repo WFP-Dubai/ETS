@@ -32,7 +32,7 @@ receiving_waybill_resource = Resource(ReceivingWaybillHandler)
 
 
 urlpatterns = patterns('',
-    
+
     (r'^waybill/(?P<slug>[-\w]+)/$', one_waybill_resource, { 'emitter_format': 'csv' }, "api_waybill"),
     (r'^waybill/$', all_waybill_resource, { 'emitter_format': 'csv' }, "api_waybills"),
     
