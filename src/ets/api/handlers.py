@@ -10,7 +10,7 @@ import cStringIO
 #import httplib, logging
 from django.core import serializers
 from django.db import transaction
-from django.db.models import Sum, Count
+from django.db.models import Q, Sum, Count
 
 from piston.handler import BaseHandler
 from piston.utils import rc, Mimer
@@ -37,10 +37,13 @@ class ReadCSVAllWaybillsHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = Waybill
     
-    def read(self, request):
+    def read(self, request, warehouse="", destination=""):
         """Finds all sent waybills to provided destination"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
-        return self.model.objects.all().values_list()
+        if warehouse or destination:
+            return self.model.objects.filter(Q(warehouse__in=warehouse) | Q(destination__in=destination)).values_list()
+        else:
+            return self.model.objects.values_list()
         
 
 class ReadCSVWaybillHandler(BaseHandler):
@@ -139,22 +142,9 @@ class CSVEmitter(Emitter):
     Emitter that returns CSV.
     """
     def render(self, request):
-        print type(self.construct())
-        for i in self.construct():
-            print i
         result = cStringIO.StringIO()
         writer = csv.writer(result)
         writer.writerows(self.construct())
         return result.getvalue()
         
 Emitter.register('csv', CSVEmitter, 'application/csv')
-
-
-class DjangoCSVEmitter(DjangoEmitter):
-    """
-    Emitter for the Django csv format.
-    """
-    def render(self, request):
-        return super(DjangoCSVEmitter, self).render(request, 'csv')
-    
-Emitter.register('django_csv', DjangoCSVEmitter, 'application/csv; charset=utf-8')
