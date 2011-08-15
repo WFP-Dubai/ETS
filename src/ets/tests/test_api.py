@@ -305,9 +305,34 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
     def test_get_waybills(self):
 
         waybill = Waybill.objects.all()[0]
-        print waybill.slug
-        response = self.client.get(reverse("api_waybills"), {'slug': waybill.slug, } ) #data={'slug': waybill.slug},
-        #response = self.client.get(reverse("api_waybills"))
+        # All waybills
+        response = self.client.get(reverse("api_waybills"))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        # One wabill
+        response = self.client.get(reverse("api_waybills_slug", kwargs={"slug": waybill.slug}))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Waybills with destination and warehouse
+        response = self.client.get(reverse("api_waybills_warehouse_destination", kwargs={"warehouse": waybill.warehouse.code, "destination": waybill.destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        
+    def test_get_loading_details(self):
 
+        waybill = Waybill.objects.all()[0]
+        # All Loading details
+        response = self.client.get(reverse("api_loading_details"))
+        self.assertContains(response, 'ISBX00211A1', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Loading details for one waybill
+        response = self.client.get(reverse("api_loading_details_waybill", kwargs={"waybill": waybill.slug}))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Loading details for some destination and some warehouse
+        response = self.client.get(reverse("api_loading_details_warehouse_destination", kwargs={"warehouse": waybill.warehouse.code, "destination": waybill.destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        

@@ -40,23 +40,31 @@ class ReadCSVWaybillHandler(BaseHandler):
     def read(self, request, slug="", warehouse="", destination=""):
         """Finds all sent waybills to provided destination"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
-        mas = []
+        filter_arg = {}
         if warehouse: 
-            mas.append('%s=%s'% 'warehouse','warehouse')
+            filter_arg['warehouse__code'] = warehouse
         if destination:
-            mas.append('%s=%s'% 'destination','destination')
+            filter_arg['destination__code'] = destination
         if slug:
-            mas.append('%s=%s'% 'slug','slug')
-        filter_str = ', '.join(mas)
-        print "111"
-        print slug
-        print filter_str
-        if filter_str:
-            return self.model.objects.filter(filter_str).values_list()
+            filter_arg['slug'] = slug
+        #=======================================================================
+        # if filter_arg:
+        #    return self.model.objects.filter(**filter_arg).values_list()
+        # else:
+        #    return self.model.objects.values_list()
+        #=======================================================================
+        if filter_arg:
+            waybills =  self.model.objects.filter(**filter_arg).values()
         else:
-            return self.model.objects.values_list()
+            waybills =  self.model.objects.values()
+        result = []
+        result.append(waybills[0].keys())
+        for waybill in waybills:
+            result.append(waybill.values())
+        return result
         
-
+        
+        
 class ReadCSVLoadingDetailHandler(BaseHandler):
 
     allowed_methods = ('GET',)
@@ -64,23 +72,24 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     
     def read(self, request, waybill="", warehouse="", destination=""):
         """Finds all sent waybills to provided destination"""
-        mas = []
+        filter_arg = {}
         if warehouse: 
-            mas.append('%s=%s'% 'warehouse','warehouse')
+            filter_arg['waybill__warehouse__code'] = warehouse
         if destination:
-            mas.append('%s=%s'% 'destination','destination')
+            filter_arg['waybill__destination__code'] = destination
         if waybill:
-            mas.append('%s=%s'% 'waybill','waybill')
-        filter_str = ', '.join(mas)
-        if filter_str:
-            load_details = self.model.objects.filter(filter_str).values_list()
+            filter_arg['waybill'] = waybill
+        if filter_arg:
+            load_details = self.model.objects.filter(**filter_arg).values()
         else:
-            load_details = self.model.objects.values_list()
+            load_details = self.model.objects.all().values()   
+        titles = load_details[0].keys()
         result = []
+        result.append(titles)
         for detail in load_details:
-            waybills_data = Waybill.objects.filter(pk=detail['waybill']).values_list()[0]
-            result.append(waybills_data + detail)
-        return load_details    
+            waybills_data = Waybill.objects.filter(pk=detail['waybill_id']).values_list()[0]
+            result.append(list(waybills_data) + detail.values())       
+        return result    
             
 
 
