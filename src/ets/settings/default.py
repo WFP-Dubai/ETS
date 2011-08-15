@@ -227,6 +227,7 @@ INSTALLED_APPS = (
     'piston',
     'autoslug',
     'uni_form',
+    'logicaldelete',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

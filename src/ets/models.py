@@ -19,6 +19,9 @@ from django.db.models import Q, F
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
+import logicaldelete.models as ld_models 
+
+
 from .country import COUNTRY_CHOICES
 
 #name = "1234"
@@ -599,7 +602,7 @@ class OrderItem(models.Model):
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
     
     
-class Waybill( models.Model ):
+class Waybill( ld_models.Model ):
     """
     Main model in the system. Tracks delivery.
     
@@ -647,7 +650,7 @@ class Waybill( models.Model ):
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            COMPAS_STATION, instance.created.strftime('%y'), LETTER_CODE
+                            COMPAS_STATION, instance.date_created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     
@@ -661,7 +664,6 @@ class Waybill( models.Model ):
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
     #Dates
-    created = models.DateTimeField(_("created date/time"), default=datetime.now)
     loading_date = models.DateField(_("Date of loading"), blank=True, null=True) #dateOfLoading
     dispatch_date = models.DateField( _("Date of dispatch"), blank=True, null=True) #dateOfDispatch
     
@@ -729,6 +731,8 @@ class Waybill( models.Model ):
     audit_comment = models.TextField(_("Audit Comment"), blank=True) #auditComment
     
     audit_log = AuditLog()
+
+    objects = ld_models.managers.LogicalDeletedManager()
 
     def  __unicode__( self ):
         return self.slug

@@ -15,8 +15,8 @@ class LoadingDetailsInline(admin.TabularInline):
 class WaybillAdmin(admin.ModelAdmin):
     #list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
     list_display = ('pk', 'status', 'order_code', 'dispatch_date', 'warehouse', 'destination')
-    readonly_fields = ('created',)
-    list_filter = ('status', 'created',)
+    readonly_fields = ('date_created',)
+    list_filter = ('status', 'date_created',)
     search_fields = ('pk',)
     inlines = (LoadingDetailsInline,)
     

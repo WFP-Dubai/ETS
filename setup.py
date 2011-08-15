@@ -28,6 +28,7 @@ install_requires = [
         'docutils',
         'django-autoslug',
         'django-uni-form >= 0.7.0', #div-based forms
+        'django-logicaldelete',
 ]
 
 #Extra dependencies for test purposes
