@@ -1,6 +1,8 @@
 ### -*- coding: utf-8 -*- ####################################################
 import os
 import urllib2
+import csv
+import StringIO
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -20,7 +22,7 @@ def get_fixture_text(file_name):
     return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
 
 class TestDevelopmentMixin(object):
-    
+
     multi_db = True
     
     def setUp(self):
@@ -304,35 +306,42 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
     def test_get_waybills(self):
 
-        waybill = Waybill.objects.all()[0]
+        waybills = Waybill.objects.all()
         # All waybills
         response = self.client.get(reverse("api_waybills"))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # One wabill
-        response = self.client.get(reverse("api_waybills_slug", kwargs={"slug": waybill.slug}))
+        response = self.client.get(reverse("api_waybills", kwargs={"slug": waybills[0].slug}))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['slug'], waybills[0].slug)
         # Waybills with destination and warehouse
-        response = self.client.get(reverse("api_waybills_warehouse_destination", kwargs={"warehouse": waybill.warehouse.code, "destination": waybill.destination.code}))
+        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": waybills[0].warehouse.code, "destination": waybills[0].destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        
         
     def test_get_loading_details(self):
 
         waybill = Waybill.objects.all()[0]
         # All Loading details
         response = self.client.get(reverse("api_loading_details"))
+        print response
         self.assertContains(response, 'ISBX00211A1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for one waybill
-        response = self.client.get(reverse("api_loading_details_waybill", kwargs={"waybill": waybill.slug}))
+        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": waybill.slug}))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for some destination and some warehouse
-        response = self.client.get(reverse("api_loading_details_warehouse_destination", kwargs={"warehouse": waybill.warehouse.code, "destination": waybill.destination.code}))
+        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": waybill.warehouse.code, "destination": waybill.destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        
         

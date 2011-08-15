@@ -3,7 +3,8 @@
 #from datetime import datetime
 #from decimal import Decimal
 import csv
-import cStringIO
+import StringIO
+from types import DictType
 
 
 #from django.http import Http404
@@ -47,23 +48,11 @@ class ReadCSVWaybillHandler(BaseHandler):
             filter_arg['destination__code'] = destination
         if slug:
             filter_arg['slug'] = slug
-        #=======================================================================
-        # if filter_arg:
-        #    return self.model.objects.filter(**filter_arg).values_list()
-        # else:
-        #    return self.model.objects.values_list()
-        #=======================================================================
         if filter_arg:
-            waybills =  self.model.objects.filter(**filter_arg).values()
+            return self.model.objects.filter(**filter_arg).values()
         else:
-            waybills =  self.model.objects.values()
-        result = []
-        result.append(waybills[0].keys())
-        for waybill in waybills:
-            result.append(waybill.values())
-        return result
-        
-        
+            return self.model.objects.values()
+             
         
 class ReadCSVLoadingDetailHandler(BaseHandler):
 
@@ -82,14 +71,13 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
         if filter_arg:
             load_details = self.model.objects.filter(**filter_arg).values()
         else:
-            load_details = self.model.objects.all().values()   
-        titles = load_details[0].keys()
+            load_details = self.model.objects.all().values()         
         result = []
-        result.append(titles)
         for detail in load_details:
-            waybills_data = Waybill.objects.filter(pk=detail['waybill_id']).values_list()[0]
-            result.append(list(waybills_data) + detail.values())       
-        return result    
+            waybills_data = Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
+            waybills_data.update(detail)
+            result.append(waybills_data)  
+        return result
             
 
 
@@ -179,9 +167,19 @@ class CSVEmitter(Emitter):
     Emitter that returns CSV.
     """
     def render(self, request):
-        result = cStringIO.StringIO()
-        writer = csv.writer(result)
-        writer.writerows(self.construct())
+        result = StringIO.StringIO()
+        if type(self.construct()[0]) is DictType:
+            fieldnames = self.construct()[0].keys()
+            dict_writer = csv.DictWriter(result, fieldnames)
+            header = {}
+            for field in fieldnames:
+                header[field] = field
+            dict_writer.writerow(header)
+            dict_writer.writerows(self.construct())
+        else: 
+            writer = csv.writer(result)
+            writer.writerows(self.construct())
         return result.getvalue()
+        
         
 Emitter.register('csv', CSVEmitter, 'application/csv')
