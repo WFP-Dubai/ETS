@@ -183,8 +183,6 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
             obj = loading_form.save(commit=False)
             stock_item = loading_form.cleaned_data.get('stock_item')
             if stock_item:
-                print "stock_item --> ", stock_item
-                
                 obj.origin_id = stock_item.pk
                 obj.si_code = stock_item.si_code
                 

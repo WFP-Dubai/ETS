@@ -665,8 +665,10 @@ class Waybill( models.Model ):
     loading_date = models.DateField(_("Date of loading"), blank=True, null=True) #dateOfLoading
     dispatch_date = models.DateField( _("Date of dispatch"), blank=True, null=True) #dateOfDispatch
     
-    transaction_type = models.CharField( _("Transaction Type"), max_length=10, choices=TRANSACTION_TYPES ) #transactionType
-    transport_type = models.CharField(_("Transport Type"), max_length=10, choices=TRANSPORT_TYPES ) #transportType
+    transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
+                                         choices=TRANSACTION_TYPES, default=u'WIT') #transactionType
+    transport_type = models.CharField(_("Transport Type"), max_length=10, 
+                                      choices=TRANSPORT_TYPES, default=u'02') #transportType
     
     #Dispatcher
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)

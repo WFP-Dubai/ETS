@@ -48,9 +48,9 @@ class WaybillTestCase(TestCase):
         self.user = User.objects.get(username="admin")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')
+        self.warehouse = ets.models.Warehouse.objects.get(pk="ISBX002")
         #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
-        #self.dispatch_point = DispatchPoint.objects.get(pk=1)
      
     #===================================================================================================================
     # def tearDown(self):
@@ -128,25 +128,42 @@ class WaybillTestCase(TestCase):
          
     def test_create_waybill(self):
         """ets.views.waybill_create test"""
-        from ..forms import WaybillForm
+        from ..forms import DispatchWaybillForm
         
         response = self.client.get(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}))
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(self.lti in response.context['lti_list'])
-        self.assertTrue(isinstance(response.context['form'], WaybillForm))
-        self.assertEqual(response.context['form'].initial, {
-            'dateOfDispatch': datetime.date.today(),
-            'dateOfLoading': datetime.date.today(),
-            'destinationWarehouse': '',
-            'dispatcherName': u'ISBX0020000586',
-            'dispatcherTitle': u'LOGISTICS OFFICER',
-            'invalidated': 'False',
-            'ltiNumber': u'QANX0010010128226P',
-            'recipientConsingee': u'DEPARTMENT OF EDUCATION AFGHANISTAN',
-            'recipientLocation': u'DADU',
-            'transportContractor': u' MUSLIM TRANSPORT',
-            'waybillNumber': 'N/A'
+        
+        #Check form
+        form = response.context['form']
+        self.assertTrue(isinstance(form, DispatchWaybillForm))
+        #Check that destination has only one possible choice
+        self.assertEqual(tuple(form.fields['destination'].queryset.all()), 
+                         (ets.models.Warehouse.objects.get(pk="ISBX003"),))
+        
+        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data={
+            'loading_date': self.order.dispatch_date,
+            'dispatch_date': self.order.dispatch_date,
+            'destination': 'ISBX003',
+            'transaction_type': u'WIT',
+            'transport_type': u'02',
+            'dispatch_remarks': 'You are funny guys!',
+            'transport_sub_contractor': 'Arpaso',
+            'transport_driver_name': 'Ahmed',
+            'transport_driver_licence': 'KE23455',
+            'transport_vehicle_registration': 'BG2345',
+            
+            'item-0-stock_item': 'testme0123',
+            'item-0-number_of_units': '12',
+            
+            'item-TOTAL_FORMS': 5,
+            'item-INITIAL_FORMS': 0,
+            'item-MAX_NUM_FORMS': 5,
         })
+        self.assertEqual(response.status_code, 302)
+        
+        #check created waybill and loading details
+        waybill = ets.models.Waybill.objects.all()[1]
+        self.assertEqual(waybill.loading_details.count(), 1)
 
     def test_waybill_finalize_dispatch(self):
         """ets.views.waybill_finalize_dispatch"""
