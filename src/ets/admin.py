@@ -42,8 +42,8 @@ class OrderInline(admin.TabularInline):
     
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'commodity_code', 
-                    'package_code', 'number_of_units', 'quantity_net')
+    list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'comm_category_code', 'commodity_name', 
+                    'package_name', 'number_of_units', 'unit_weight_net')
     readonly_fields = ('updated',)
     list_filter = ('warehouse',)
     search_fields = ('pk', 'warehouse__title', 'project_number', 'si_code', 'commodity_code', 'package_code',)

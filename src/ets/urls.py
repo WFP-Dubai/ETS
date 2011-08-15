@@ -51,7 +51,7 @@ urlpatterns = patterns("ets.views",
     }, "order_detail" ),
     
     #Waybill view
-    ( r'^waybill/create/(?P<order_pk>[-\w]+)/$', "waybill_create", {}, "waybill_create" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',

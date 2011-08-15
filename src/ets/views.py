@@ -16,6 +16,7 @@ from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
+from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 
@@ -122,6 +123,7 @@ def waybill_search( request, form_class=WaybillSearchForm, template='waybill/lis
 
 
 @login_required
+@transaction.commit_on_success
 def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_form=LoadingDetailDispatchForm,
                    queryset=ets.models.Order.objects.all(), template='waybill/create.html' ):
     """Creates a Waybill"""
@@ -131,24 +133,26 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
     class FormsetForm( formset_form ):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))
         
-        def clean( self ):
-            try:
-                cleaned = self.cleaned_data
-                stock_item = cleaned.get("stock_item")
-                units = cleaned.get( "number_of_units" )
-                overloaded = cleaned.get('overloaded_units')
-                max_items = order_item.lti_line.items_left
-                if units > max_items + self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
-                    myerror = "Overloaded!"
-                    self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                    self._errors['numberUnitsLoaded'].append( myerror )
-                    raise forms.ValidationError( myerror )
-                return cleaned
-            except:
-                    myerror = "Value error!"
-                    self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                    self._errors['numberUnitsLoaded'].append( myerror )
-                    raise forms.ValidationError( myerror )
+        #===============================================================================================================
+        # def clean( self ):
+        #    try:
+        #        cleaned = self.cleaned_data
+        #        stock_item = cleaned.get("stock_item")
+        #        units = cleaned.get( "number_of_units" )
+        #        overloaded = cleaned.get('overloaded_units')
+        #        max_items = order_item.lti_line.items_left
+        #        if units > max_items + self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
+        #            myerror = "Overloaded!"
+        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
+        #            self._errors['numberUnitsLoaded'].append( myerror )
+        #            raise forms.ValidationError( myerror )
+        #        return cleaned
+        #    except:
+        #            myerror = "Value error!"
+        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
+        #            self._errors['numberUnitsLoaded'].append( myerror )
+        #            raise forms.ValidationError( myerror )
+        #===============================================================================================================
         
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                                             form=FormsetForm, fk_name = "waybill", 
@@ -177,24 +181,25 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
         
         for loading_form in loading_formset:
             obj = loading_form.save(commit=False)
-            print "stock item --> ", obj.stock_item
-            stock_item = loading_form.cleaned_data['stock_item']
-            
-            obj.order_id = stock_item.pk
-            obj.si_code = stock_item.si_code
-            
-            obj.comm_category_code = stock_item.comm_category_code
-            obj.commodity_code = stock_item.commodity_code
-            obj.commodity_name = stock_item.commodity_name
-            
-            obj.quantity_net = stock_item.quantity_net
-            obj.quantity_gross = stock_item.quantity_gross
-            obj.unit_weight_net = stock_item.unit_weight_net
-            obj.unit_weight_gross = stock_item.unit_weight_gross
-            
-            obj.package = stock_item.packaging_description()
-            
-            obj.save()
+            stock_item = loading_form.cleaned_data.get('stock_item')
+            if stock_item:
+                print "stock_item --> ", stock_item
+                
+                obj.origin_id = stock_item.pk
+                obj.si_code = stock_item.si_code
+                
+                obj.comm_category_code = stock_item.comm_category_code
+                obj.commodity_code = stock_item.commodity_code
+                obj.commodity_name = stock_item.commodity_name
+                
+                obj.unit_weight_net = stock_item.unit_weight_net
+                obj.unit_weight_gross = stock_item.unit_weight_gross
+                
+                obj.package = stock_item.packaging_description()
+                
+                obj.waybill = waybill
+                
+                obj.save()
     
         messages.success(request, _("Waybill has been created."))
         return redirect(waybill)
@@ -202,6 +207,7 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
     return direct_to_template( request, template, {
         'form': form, 
         'formset': loading_formset,
+        'object': order,
     })
 
 #=======================================================================================================================

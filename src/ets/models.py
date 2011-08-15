@@ -44,6 +44,8 @@ def capitalize_slug(func):
     
     return wrapper
 
+TOTAL_WEIGHT_METRIC = 1000
+
 #=======================================================================================================================
 # Models based on compas Views & Tables
 #=======================================================================================================================
@@ -240,7 +242,7 @@ class EpicStock( models.Model ):
     qualitydescr = models.CharField(_("Quality descr "), max_length = 11, blank = True )
     quantity_net = models.DecimalField(_("Quantity net"), null = True, max_digits = 12, decimal_places = 3, blank = True )
     quantity_gross = models.DecimalField(_("Quantity gross"), null = True, max_digits = 12, decimal_places = 3, blank = True )
-    number_of_units = models.IntegerField(_("Number of units"))
+    number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     
     allocation_code = models.CharField(_("Allocation code"), max_length = 10 )
     reference_number = models.CharField( _("Reference number"),max_length = 50 )
@@ -261,7 +263,7 @@ class EpicStock( models.Model ):
         for stock in cls.objects.using( 'compas' ):
             
             #Check package type. If 'BULK' then modify number and weight
-            number_of_units, quantity_net = (stock.quantity_net, 1) if stock.is_bulk() \
+            number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
                                             else (stock.number_of_units, stock.quantity_net)
             
             defaults = {
@@ -269,13 +271,15 @@ class EpicStock( models.Model ):
                 'project_number': stock.project_wbs_element,
                 'si_code': stock.si_code,
                 'commodity_code': stock.commodity_code,
+                'comm_category_code': stock.comm_category_code,
+                'commodity_name': stock.cmmname,
                 'number_of_units': number_of_units,
-                'quantity_net': quantity_net,
                 'package_code': stock.package_code,
                 'package_name': stock.packagename,
                 'quality_code': stock.qualitycode,
                 'quality_description': stock.qualitydescr,
-                'quantity_gross': stock.quantity_gross,
+                'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
+                'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 'updated': now
             }
             
@@ -300,16 +304,20 @@ class StockItem( models.Model ):
     
     project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
     si_code = models.CharField(_("shipping instruction code"), max_length=8)
+    
+    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
     commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
+    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank=True) #cmmname
     
     package_code = models.CharField(_("Package code"), max_length=17)
     package_name = models.CharField(_("Package name"), max_length=50, blank=True)
     
     quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
     quality_description = models.CharField(_("Quality description "), max_length=11, blank=True) #qualitydescr
-    quantity_net = models.DecimalField(_("Quantity net"), max_digits=12, decimal_places=3, blank=True, null=True)
-    quantity_gross = models.DecimalField(_("Quantity gross"), max_digits=12, decimal_places=3, blank=True, null=True)
-    number_of_units = models.IntegerField(_("Number of units"))
+    
+    number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
@@ -333,6 +341,16 @@ class StockItem( models.Model ):
         except PackagingDescriptionShort.DoesNotExist:
             return self.package_name
     
+    #===================================================================================================================
+    # def number_of_units_ordered(self, order):
+    #    """Calculates maximum possible loading ordered amount"""
+    #    order.get_stock_items().filter()
+    #    return StockItem.objects.filter(warehouse__orders=self,
+    #                                    project_number=F('project_number'),
+    #                                    si_code = F('warehouse__orders__items__si_code'), 
+    #                                    commodity_code = F('warehouse__orders__items__commodity_code'),
+    #                                    ).order_by('-warehouse__orders__items__number_of_units')
+    #===================================================================================================================
 
 class PackagingDescriptionShort( models.Model ):
     code = models.CharField(_("Package Code"), primary_key=True, max_length=5)
@@ -411,9 +429,10 @@ class LtiOriginal( models.Model ):
     comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
     commodity_code = models.CharField(_("Commodity Code "), max_length = 18, db_column = 'COMMODITY_CODE' )
     cmmname = models.CharField(_("Commodity Name"), max_length = 100, blank = True, db_column = 'CMMNAME' )
+    
+    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 3, db_column = 'NUMBER_OF_UNITS' )
     quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
     quantity_gross = models.DecimalField( _("Quantity Gross"),max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
-    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
     unit_weight_net = models.DecimalField( _("Unit Weight Net"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
     unit_weight_gross = models.DecimalField( _("Unit Weight Gross"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
 
@@ -462,14 +481,9 @@ class LtiOriginal( models.Model ):
             defaults = {
                 'order': order,
                 'si_code': lti.si_code,
-                'comm_category_code': lti.comm_category_code,
                 'commodity_code': lti.commodity_code,
                 'commodity_name': lti.cmmname,
                 'number_of_units': lti.number_of_units,
-                'quantity_net': lti.quantity_net,
-                'quantity_gross': lti.quantity_gross,
-                'unit_weight_net': lti.unit_weight_net,
-                'unit_weight_gross': lti.unit_weight_gross,
             }
             
             rows = OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
@@ -524,34 +538,18 @@ class Order(models.Model):
                                         ).order_by('-warehouse__orders__items__number_of_units')
     
     
-class DeliveryItem(models.Model):
-    """Order item for delivery"""
-    
-    si_code = models.CharField( _("Shipping Order Code"), max_length = 8)
-    
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
-    commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank = True) #cmmname
-    
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits = 7, decimal_places = 0)
-
-    quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3)
-    quantity_gross = models.DecimalField(_("Quantity Gross"), max_digits = 11, decimal_places = 3)
-    unit_weight_net = models.DecimalField(_("Unit Weight Net"), max_digits = 8, decimal_places = 3, 
-                                          blank = True, null = True)
-    unit_weight_gross = models.DecimalField(_("Unit Weight Gross"), max_digits = 8, decimal_places = 3, 
-                                            blank = True, null = True)
-    
-    class Meta:
-        abstract = True
-
-
-class OrderItem(DeliveryItem):
+class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
     lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, editable=False, primary_key=True)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
-    removed = models.DateField(_("removed date"), blank=True, null=True)
+    
+    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
+    
+    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
+    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
+    
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
     
     class Meta:
         ordering = ('si_code',)
@@ -600,27 +598,6 @@ class OrderItem(DeliveryItem):
         """Calculates number of such items supposed to be delivered in this order"""
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
     
-    #===================================================================================================================
-    # def coi_code( self ):
-    #    stock_items_qs = self.stock_items()
-    #    if stock_items_qs.count() > 0:
-    #        return str( stock_items_qs[0].coi_code() )
-    #    else:
-    #        stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-    #                                                   si_code = self.si_code, 
-    #                                                   comm_category_code = self.comm_category_code 
-    #                                                   ).order_by( '-number_of_units' )
-    #        if stock_items_qs.count() > 0:
-    #            return str( stock_items_qs[0].coi_code() )
-    #        else:
-    #            stock_items_qs = EpicStock.objects.filter( si_code = self.si_code, 
-    #                                                       comm_category_code = self.comm_category_code 
-    #                                                       ).order_by( '-number_of_units' )
-    #            if stock_items_qs.count() > 0:
-    #                return str( stock_items_qs[0].coi_code() )
-    #            else:
-    #                return 'No Stock '
-    #===================================================================================================================
     
 class Waybill( models.Model ):
     """
@@ -880,12 +857,23 @@ class Waybill( models.Model ):
         self.save()
     
 
-class LoadingDetail( DeliveryItem ):
+class LoadingDetail( models.Model ):
     """Item of waybill"""
     waybill = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
+    #Stock data
     origin_id = models.CharField(_("Origin stock identifier"), max_length=23)
+    si_code = models.CharField( _("Shipping Order Code"), max_length = 8)
+    
+    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
+    commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
+    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank = True) #cmmname
+    
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits = 7, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    
     package = models.CharField(_("Package"), max_length=10)
         
     #Number of delivered units

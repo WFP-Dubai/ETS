@@ -40,7 +40,7 @@ class CommandTestCase(TestCase):
         stock_item = ets.models.StockItem.objects.get(pk='testme0124')
         
         #After import we've got net --> number_of_units and quantity_net == 1
-        self.assertTupleEqual((stock_item.number_of_units, stock_item.quantity_net), (1000, 1))
+        self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         
         #Update changed stock
         ets.models.EpicStock.objects.using('compas').filter(origin_id='testme0124').update(quantity_net=700)

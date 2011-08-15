@@ -1,2 +1,3 @@
 /django-audit-log
 /django-mailer
+/django-debug-toolbar

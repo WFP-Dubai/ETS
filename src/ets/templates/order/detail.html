@@ -30,12 +30,6 @@
   </tr>
 </table>
 
-<br>
-{% if user.get_profile.is_dispatcher and user.get_profile.warehouse == object.warehouse %}
-<a href='{% url waybill_create order_pk=object.pk %}'>{% trans "Create New Waybill" %}</a><br>
-{% endif %}
-<br>
-
 {% trans "Order items:" %}
 <table class='bordered' >
     <tr class='itemhead'>
@@ -70,7 +64,7 @@
         <td></td>
         <td class='bordered'>{% trans "Commodity" %}</td>
         <td class='bordered'>{% trans "SI" %}</td>
-        <td class='bordered'>{% trans "Already dispatched" %}</td>
+        <td class='bordered'>{% trans "Number of units" %}</td>
       </tr>
       {% for loading in waybill.loading_details.all %}
         <tr class='bordered'>
@@ -83,5 +77,11 @@
   {% endfor %}
   </table>
 {% endif %}
+
+<br>
+{% if user.get_profile.is_dispatcher and user.get_profile.dispatch_warehouse == object.warehouse %}
+<a href='{% url waybill_create order_pk=object.pk %}'>{% trans "Create New Waybill" %}</a><br>
+{% endif %}
+<br>
 
 {% endblock %}

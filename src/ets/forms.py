@@ -95,14 +95,14 @@ class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
         raise forms.ValidationError( errors )
     
     def clean( self ):
+        super(BaseLoadingDetailFormFormSet, self).clean()
         count = 0
         for form in self.forms:
             if not hasattr(form, 'cleaned_data'):
                 continue
 
-            if form.is_bound:
-                if getattr(form, 'cleaned_data', {}).get('number_of_units'):
-                    count += 1
+            if form.is_bound and getattr(form, 'cleaned_data', {}).get('number_of_units'):
+                count += 1
         
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
