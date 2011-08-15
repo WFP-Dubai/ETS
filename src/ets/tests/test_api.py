@@ -331,7 +331,6 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         waybill = Waybill.objects.all()[0]
         # All Loading details
         response = self.client.get(reverse("api_loading_details"))
-        print response
         self.assertContains(response, 'ISBX00211A1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for one waybill
