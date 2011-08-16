@@ -89,10 +89,9 @@ class ReadCSVStockItemsHandler(BaseHandler):
     
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
+        stock_items = self.model.objects.values()
         if warehouse: 
-            stock_items = self.model.objects.filter(warehouse=warehouse).values()
-        else:
-            stock_items = self.model.objects.values()
+            stock_items = stock_items.filter(warehouse=warehouse)            
         result = []
         for item in stock_items:
             stock_items_data = Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
