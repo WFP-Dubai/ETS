@@ -18,6 +18,7 @@ from piston.utils import rc, Mimer
 from piston.emitters import Emitter, DjangoEmitter
 
 from ..models import Waybill, LoadingDetail, Place, sync_data
+import ets.models
 
 class PlaceHandler(BaseHandler):
 
@@ -39,7 +40,7 @@ class ReadCSVWaybillHandler(BaseHandler):
     model = Waybill
     
     def read(self, request, slug="", warehouse="", destination=""):
-        """Finds all sent waybills to provided destination"""
+        """Return waybills in CSV"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
         filter_arg = {}
         if warehouse: 
@@ -60,7 +61,7 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     model = LoadingDetail
     
     def read(self, request, waybill="", warehouse="", destination=""):
-        """Finds all sent waybills to provided destination"""
+        """Return loadin details for waybills in CSV"""
         filter_arg = {}
         if warehouse: 
             filter_arg['waybill__warehouse__code'] = warehouse
@@ -78,7 +79,56 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             waybills_data.update(detail)
             result.append(waybills_data)  
         return result
+
+
+class ReadCSVOrdersHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.Order
+    
+    def read(self, request, code="", warehouse="", destination="", consignee=""):
+        """Return orders in CSV"""
+        filter_arg = {}
+        if warehouse: 
+            filter_arg['warehouse__code'] = warehouse
+        if destination:
+            filter_arg['consignee__warehouses__code'] = destination
+        if consignee:
+            filter_arg['consignee__code'] = consignee
+        if code:
+            filter_arg['code'] = code
+        if filter_arg:
+            return self.model.objects.filter(**filter_arg).values()
+        else:
+            return self.model.objects.values()
+        
             
+class ReadCSVOrderItemsHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.OrderItem
+    
+    def read(self, request, order="", warehouse="", destination="", consignee=""):
+        """Return order items in CSV"""
+        filter_arg = {}
+        if warehouse: 
+            filter_arg['order__warehouse__code'] = warehouse
+        if destination:
+            filter_arg['order__consignee__warehouses__code'] = destination
+        if consignee:
+            filter_arg['order__consignee__code'] = consignee
+        if order:
+            filter_arg['order'] = order
+        if filter_arg:
+            order_items = self.model.objects.filter(**filter_arg).values()
+        else:
+            order_items = self.model.objects.all().values()         
+        result = []
+        for item in order_items:
+            order_items_data = ets.models.Order.objects.filter(code=item['order_id']).values()[0]
+            order_items_data.update(item)
+            result.append(order_items_data)  
+        return result
 
 
 class NewWaybillHandler(BaseHandler):

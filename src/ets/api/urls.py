@@ -14,7 +14,7 @@ from piston.doc import documentation_view
 
 from .handlers import NewWaybillHandler, InformedWaybillHandler , ReadCSVLoadingDetailHandler
 from .handlers import DeliveredWaybillHandler, ReceivingWaybillHandler, ReadCSVWaybillHandler
-
+from .handlers import ReadCSVOrdersHandler, ReadCSVOrderItemsHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
@@ -32,10 +32,14 @@ def expand_response(view, headers):
 
 CSV_WAYBILLS_HEADERS = {'Content-Disposition': 'attachment; filename=waybills-%s.csv' % datetime.date.today() }
 CSV_LOADING_DETAILS_HEADERS = {'Content-Disposition': 'attachment; filename=loading-details-%s.csv' % datetime.date.today() }
+CSV_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.csv' % datetime.date.today() }
+CSV_ORDER_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=order-items-%s.csv' % datetime.date.today() }
 FORMAT_CSV = {'emitter_format': 'csv'}
 
 waybills_resource = Resource(ReadCSVWaybillHandler)
 loading_details_resource = Resource(ReadCSVLoadingDetailHandler)
+orders_resource = Resource(ReadCSVOrdersHandler)
+order_items_resource = Resource(ReadCSVOrderItemsHandler)
 
 new_waybill_resource = Resource(NewWaybillHandler)
 informed_waybill_resource = Resource(InformedWaybillHandler)
@@ -84,6 +88,42 @@ urlpatterns = patterns('',
         FORMAT_CSV, "api_loading_details"),
     (r'^loading_details/$', expand_response(loading_details_resource, CSV_LOADING_DETAILS_HEADERS), FORMAT_CSV, 
         "api_loading_details"),
+    
+    # For Order CSV API
+    (r'^orders/warehouse_destination_order/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/(?P<code>[-\w]+)/$', 
+        expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, "api_orders"),
+    (r'^orders/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$',  
+        expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, "api_orders"),
+    (r'^orders/warehouse_order/(?P<warehouse>[-\w]+)/(?P<code>[-\w]+)/$',  
+        expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, "api_orders"),
+    (r'^orders/destination_order/(?P<destination>[-\w]+)/(?P<code>[-\w]+)/$', 
+        expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, "api_orders"), 
+    (r'^orders/warehouse/(?P<warehouse>[-\w]+)/$',  expand_response(orders_resource, CSV_ORDERS_HEADERS), 
+        FORMAT_CSV, "api_orders"),
+    (r'^orders/destination/(?P<destination>[-\w]+)/$', expand_response(orders_resource, CSV_ORDERS_HEADERS), 
+        FORMAT_CSV, "api_orders"),                 
+    (r'^orders/(?P<code>[-\w]+)/$', expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, 
+        "api_orders"),
+    (r'^orders/$', expand_response(orders_resource, CSV_ORDERS_HEADERS), FORMAT_CSV, "api_orders"),
+    
+    # For OrderItem CSV API
+    (r'^order_items/warehouse_destination_order/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/(?P<order>[-\w]+)/$', 
+        expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"),
+    (r'^order_items/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', 
+        expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"),
+    (r'^order_items/warehouse_order/(?P<warehouse>[-\w]+)/(?P<order>[-\w]+)/$', 
+        expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"),
+    (r'^order_items/destination_order/(?P<destination>[-\w]+)/(?P<order>[-\w]+)/$', 
+        expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"), 
+    (r'^order_items/warehouse/(?P<warehouse>[-\w]+)/$', expand_response(order_items_resource, 
+        CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"),
+    (r'^order_items/destination/(?P<destination>[-\w]+)/$', expand_response(order_items_resource, 
+        CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, "api_order_items"),                 
+    (r'^order_items/(?P<order>[-\w]+)/$', expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), 
+        FORMAT_CSV, "api_order_items"),
+    (r'^order_items/$', expand_response(order_items_resource, CSV_ORDER_ITEMS_HEADERS), FORMAT_CSV, 
+        "api_order_items"),
+    
     
     (r'^new/$', new_waybill_resource, { 'emitter_format': 'django_json' }, "api_new_waybill"),
     (r'^receiving/(?P<destination>[-\w]+)/$', receiving_waybill_resource, { 
