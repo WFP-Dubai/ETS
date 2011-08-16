@@ -29,7 +29,6 @@
   "fields": {
    "waybillNumber": "A0009",
    "dispatch_warehouse": "ISBX002",
-   "invalidated": false,
    "transportVehicleRegistration": "",
    "transportContractor": "HAMAYOON AND CO",
    "dispatchRemarks": "",

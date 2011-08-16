@@ -168,7 +168,6 @@ class WaybillFullForm( ModelForm ):
             'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
             'recipientSignedTimestamp': forms.HiddenInput,
             'waybillNumber': forms.HiddenInput,
-            'invalidated': forms.HiddenInput,
             'auditComment': forms.Textarea,
         }
     

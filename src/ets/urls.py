@@ -71,7 +71,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {}, "waybill_reception" ),
     ( r'^waybill/receive/$', "object_list", {
         "template_name": 'waybill/reception_list.html',
-        "queryset": Waybill.objects.filter(invalidated=False, recipient_signed_date__isnull=True),
+        "queryset": Waybill.objects.filter(recipient_signed_date__isnull=True),
     }, "waybill_reception_list" ),
     ( r'^waybill/test/$', 'object_list', info_dict_lti ),
     ( r'^waybill/validate/$', "direct_to_template", {'template': 'selectValidateAction.html'}, "waybill_validate_action" ),
@@ -89,8 +89,8 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
-            'waybill_list': Waybill.objects.filter(invalidated=False, sent_compas=True).all, 
-            'waybill_list_rec': Waybill.objects.filter(invalidated=False, rec_sent_compas=True).all,
+            'waybill_list': Waybill.objects.filter(sent_compas=True).all, 
+            'waybill_list_rec': Waybill.objects.filter(rec_sent_compas=True).all,
     }}, "compass_waybill" ),
     ( r'^waybill/invalidate_waybill/(?P<waybill_pk>[-\w]+)/$', "invalidate_waybill",{
         'queryset': Waybill.objects.all(),

@@ -36,15 +36,11 @@
 {% endif %}
 </div>
 
-{% if not object.invalidated %}
-    <table cellpadding="0" cellspacing="0" border="0px" >
-        {% include 'waybill/print/wb_header.html'%}
-        {% include 'waybill/print/wb_loading.html'%}
-        
-        {% include 'waybill/print/wb_receipt.html' %}
-    </table>
-    {%else%}
-{% trans "Waybill has been Deleted!!!" %}    
-{%endif%}
+<table cellpadding="0" cellspacing="0" border="0px" >
+  {% include 'waybill/print/wb_header.html'%}
+  {% include 'waybill/print/wb_loading.html'%}
+  
+  {% include 'waybill/print/wb_receipt.html' %}
+</table>
 
 {% endblock %}

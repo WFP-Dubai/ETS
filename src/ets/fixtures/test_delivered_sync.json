@@ -43,7 +43,7 @@
 	  "recipient_arrival_date": "2011-06-15",
 	  "recipient_start_discharge_date": "2011-06-15",
 	  "recipient_end_discharge_date": "2011-06-16",
-	  "recipient_distance": '20000',
+	  "recipient_distance": "20000",
 	  "recipient_remarks": "All good",
 	  "recipient_signed_date": "2011-06-16",
 	  "destination": "ISBX003",
@@ -53,7 +53,6 @@
 	  "sent_compas": false,
 	  "rec_sent_compas": false,
 	  "processed_for_payment": false,
-	  "invalidated": false,
 	
 	  "audit_comment": "Print Dispatch Original" 
 	}

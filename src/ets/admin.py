@@ -5,6 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
 
+import logicaldelete.admin
+
 import ets.models
 
 
@@ -12,9 +14,9 @@ class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
 
-class WaybillAdmin(admin.ModelAdmin):
+class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     #list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
-    list_display = ('pk', 'status', 'order_code', 'dispatch_date', 'warehouse', 'destination')
+    list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
     readonly_fields = ('date_created',)
     list_filter = ('status', 'date_created',)
     search_fields = ('pk',)

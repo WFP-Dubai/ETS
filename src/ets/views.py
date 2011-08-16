@@ -93,13 +93,14 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
 
 
 @login_required
-def waybill_search( request, form_class=WaybillSearchForm, template='waybill/list.html'):
+def waybill_search( request, form_class=WaybillSearchForm, 
+                    queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
 
     form = form_class(request.POST or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
 
-    found_wb = ets.models.Waybill.objects.filter( invalidated=False, pk__icontains=search_string )
+    found_wb = queryset.filter(pk__icontains=search_string)
     my_valid_wb = []
     
     profile = request.user.get_profile()
@@ -355,8 +356,9 @@ def singleWBReceiptToCompas( request, waybill_pk, queryset=ets.models.Waybill.ob
 @login_required
 def receiptToCompas( request, template='compas/list_waybills_compas_received.html' ):
 
-    list_waybills = Waybill.objects.filter( invalidated = False, waybillReceiptValidated = True, 
-                                            waybillRecSentToCompas = False, waybillSentToCompas = True )
+    list_waybills = Waybill.objects.filter(waybillReceiptValidated = True, 
+                                           waybillRecSentToCompas = False, 
+                                           waybillSentToCompas = True )
     the_compas = compas_write()
     error_message, error_codes = '', ''
     
@@ -383,19 +385,6 @@ def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
     return direct_to_template( request, template, {
         'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
     })
-
-
-#=======================================================================================================================
-# def invalidate_waybill_action( wb_id ):
-#    current_wb = Waybill.objects.get( id = wb_id )
-#    for lineitem in current_wb.loading_details.select_related():
-#        lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
-#        lineitem.numberUnitsLoaded = 0
-#        lineitem.save()
-#    current_wb.invalidated = True
-#    current_wb.save()
-#=======================================================================================================================
-
 
 @login_required
 def waybill_validate_form_update( request, waybill_pk, queryset, 
@@ -742,7 +731,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
                         create_or_update(waybill, request.user, errorMessage)
 
             formset.save()
-    waybills = Waybill.objects.filter( invalidated = False, waybillValidated = False, dispatcherSigned = True )
+    waybills = Waybill.objects.filter( waybillValidated = False, dispatcherSigned = True )
     formset = ValidateFormset( queryset = waybills )
     
     return direct_to_template( request, template, {
@@ -753,7 +742,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
 @login_required
 def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
     ValidateFormset = modelformset_factory( Waybill, fields = ( 'waybillReceiptValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter(invalidated=False, waybillReceiptValidated=True, 
+    validatedWB = Waybill.objects.filter(waybillReceiptValidated=True, 
                                         waybillRecSentToCompas=False, waybillSentToCompas=True)
     errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
     if request.method == 'POST':
@@ -776,7 +765,7 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
                     
             formset.save()
 
-    waybills = Waybill.objects.filter( invalidated = False, waybillReceiptValidated = False, 
+    waybills = Waybill.objects.filter( waybillReceiptValidated = False, 
                                        recipientSigned = True, waybillValidated = True )
     formset = ValidateFormset( queryset = waybills )
 

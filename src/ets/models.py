@@ -135,18 +135,7 @@ class Consignee(models.Model):
         return self.name or self.pk
 
 class Warehouse( models.Model ):
-    """
-    Dispatch warehouse. Data based
-    
-    >>> place, created = Place.objects.get_or_create(org_code="completely_unique_code", 
-    ...                      name="The best place in the world", 
-    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-    ...                      reporting_code="SOME_CODE", )
-    >>> wh, c = Warehouse.objects.get_or_create(code="test_wh", title="Perfect warehouse", 
-    ...                      place=place, start_date=datetime.now())
-    >>> wh
-    <Warehouse: test_wh - The best place in the world - Perfect warehouse>
-    """
+    """ Warehouse. dispatch or recipient."""
     code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
     name = models.CharField(_("name"),  max_length = 50, blank = True ) #origin_wh_name
     location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
@@ -530,7 +519,7 @@ class Order(models.Model):
         return ('order_detail', (), {'object_id': self.pk})
     
     def get_waybills(self):
-        return Waybill.objects.filter(order_code=self.pk, invalidated=False)
+        return Waybill.objects.filter(order_code=self.pk)
     
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
@@ -582,7 +571,7 @@ class OrderItem(models.Model):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
                                             waybill__project_number=self.order.project_number,
-                                            waybill__invalidated=False,
+                                            waybill__date_removed__isnull=True,
                                             si_code = self.si_code, 
                                             commodity_code = self.commodity_code
                                             ).order_by('-waybill__dispatch_date')
@@ -726,7 +715,6 @@ class Waybill( ld_models.Model ):
     sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
     rec_sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
     processed_for_payment = models.BooleanField(_("Waybill Processed For Payment"), default=False) #waybillProcessedForPayment
-    invalidated = models.BooleanField(_("Invalidated"), default=False)
     
     audit_comment = models.TextField(_("Audit Comment"), blank=True) #auditComment
     
@@ -792,14 +780,6 @@ class Waybill( ld_models.Model ):
         except:
             return None
 
-    def invalidate_waybill_action( self ):
-        for lineitem in self.loading_details.select_related():
-            lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
-            lineitem.numberUnitsLoaded = 0
-            lineitem.save()
-        self.invalidated = True
-        self.save()
-    
     def dispatch_sign(self, commit=True):
         """
         Signs the waybill as ready to be sent by setting special status SIGNED. 

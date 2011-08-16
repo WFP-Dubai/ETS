@@ -84,7 +84,6 @@
       "sent_compas": false,
       "rec_sent_compas": false,
       "processed_for_payment": false,
-      "invalidated": false,
 
       "audit_comment": "Print Dispatch Original" 
     }
