@@ -1,5 +1,8 @@
 ### -*- coding: utf-8 -*- ####################################################
 import os
+import urllib2
+import csv
+import StringIO
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -8,91 +11,32 @@ from django.core import serializers
 from django.utils import simplejson
 from django.core.management import call_command
 
-from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
+#from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
+from ..models import Waybill, LtiOriginal, EpicStock, Warehouse, Waybill
+from ets.utils import update_compas
+from ets.api.client import *
+import ets.api.client
 
 def get_fixture_text(file_name):
     return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
 
 class TestDevelopmentMixin(object):
-    #multi_db = True
-    fixtures = ["development.json", ]
+
+    multi_db = True
     
     def setUp(self):
-        "Hook method for setting up the test fixture before exercising it."
+        "Hook method for setting up the test fixture before exercising it."        
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
+        update_compas()
+        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+
         self.client.login(username="admin", password="admin")
         self.user = User.objects.get(username="admin")
-        self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
-        self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
-        self.dispatch_point = DispatchPoint.objects.get(pk=1)
+        #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
+        #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
+        #self.dispatch_point = Warehouse.objects.get(pk=1)
         self.maxDiff = None
-        self.waybill_dict = {
-            'slug': 'ISBX00211A',
-            'status': 1,
-            'created': '2011-06-12 05:36:54',
-            'dispatch_warehouse': {
-                'country_code': '586',
-                'geo_name': 'ISLAMABAD_CAP',
-                'geo_point_code': 'ISBX',
-                'name': 'PAKISTAN COUNTRY OFFICE',
-                'org_code': 'ISBX002',
-                'reporting_code': 'HQX0001'},
-            "waybillNumber": "A0009",
-            "transportVehicleRegistration": "",
-            "transportContractor": "HAMAYOON AND CO",
-            "dispatchRemarks": "",
-            "dateOfDispatch": "2011-06-12",
-            "recipientArrivalDate": None,
-            "recipientConsingee": "WORLD FOOD PROGRAMME",
-            "transportSubContractor": "",
-            "transportDeliverySignedTimestamp": None,
-            "recipientDistance": None,
-            "recipientName": "",
-            "auditComment": "Print Dispatch Original",
-            "dispatcherSigned": True,
-            "waybillProcessedForPayment": False,
-            "recipientSignedTimestamp": None,
-            "dispatcherTitle": "LOGISTICS OFFICER",
-            "containerTwoSealNumber": "",
-            "transportDeliverySigned": False,
-            "containerTwoRemarksReciept": "",
-            "ltiNumber": "QANX0010010128226P",
-            "containerOneRemarksReciept": "",
-            "transportDispachSignedTimestamp": "2011-06-12 13:12:43",
-            "transactionType": "WIT",
-            "invalidated": False,
-            "containerTwoRemarksDispatch": "",
-            "recipientSigned": False,
-            "transportDispachSigned": True,
-            "dateOfLoading": "2011-06-12",
-            "recipientEndDischargeDate": None,
-            "recipientRemarks": "",
-            "waybillSentToCompas": False,
-            "recipientStartDischargeDate": None,
-            "containerOneRemarksDispatch": "",
-            "containerOneSealNumber": "",
-            "waybillValidated": False,
-            "transportType": "02",
-            "destinationWarehouse": {
-                "name": "EDO OFFICE MEHTI",
-                "org_code": "OE7X001",
-                "reporting_code": "KARX001",
-                #"organization_id": "",
-                "geo_point_code": "OE7X",
-                "country_code": "586",
-                "geo_name": "THARPARKAR"
-            },
-            'recipientLocation': 'SUKKHUR',
-            "waybillRecSentToCompas": False,
-            "transportDriverName": "",
-            "dispatcherName": "ISBX0020000586",
-            "transportDriverLicenceID": "",
-            "containerOneNumber": "",
-            "recipientTitle": "",
-            "containerTwoNumber": "",
-            "waybillReceiptValidated": False,
-            "transportTrailerRegistration": ""
-        }
     
     def get_waybill(self):
         return Waybill.objects.get(pk="ISBX00211A")
@@ -100,30 +44,34 @@ class TestDevelopmentMixin(object):
 
 class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
-    def test_read_waybills(self):
-        response = self.client.get(reverse("api_waybill"))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-        
-        data = simplejson.loads(response.content)
-        self.assertTrue(isinstance(data, list))
-        self.assertDictEqual(data[0], self.waybill_dict)
+    #===========================================================================
+    # def test_read_waybills(self):
+    #    response = self.client.get(reverse("api_waybill"))
+    #    self.assertEqual(response.status_code, 200)
+    #    self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
+    #    
+    #    data = simplejson.loads(response.content)
+    #    self.assertTrue(isinstance(data, list))
+    #    self.assertDictEqual(data[0], self.waybill_dict)
+    #===========================================================================
     
-    def test_read_waybill(self):
-        response = self.client.get(reverse("api_waybill", kwargs={"slug": self.get_waybill().pk}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-        
-        data = simplejson.loads(response.content)
-        self.assertTrue(isinstance(data, dict))
-        self.assertDictEqual(data, self.waybill_dict)
+    #===========================================================================
+    # def test_read_waybill(self):
+    #    response = self.client.get(reverse("api_waybill", kwargs={"slug": self.get_waybill().pk}))
+    #    self.assertEqual(response.status_code, 200)
+    #    self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
+    #    
+    #    data = simplejson.loads(response.content)
+    #    self.assertTrue(isinstance(data, dict))
+    #    self.assertDictEqual(data, self.waybill_dict)
+    #===========================================================================
     
     def test_get_receiving(self):
         #Change status of first one
         self.get_waybill().update_status(status=Waybill.SENT)
         
         response = self.client.get(reverse("api_receiving_waybill", 
-                                           kwargs={"destination": self.get_waybill().destinationWarehouse.pk}))
+                                           kwargs={"destination": self.get_waybill().destination.pk}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         
@@ -140,13 +88,75 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         waybill = serializers.deserialize('json', response.content).next().object
         self.assertEqual(waybill, self.get_waybill())
     
-    
+        
+    def test_get_waybills(self):
+
+        waybills = Waybill.objects.all()
+        # All waybills
+        response = self.client.get(reverse("api_waybills"))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # One wabill
+        response = self.client.get(reverse("api_waybills", kwargs={"slug": waybills[0].slug}))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['slug'], waybills[0].slug)
+        # Waybills with destination and warehouse
+        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": waybills[0].warehouse.code, 
+                                                                   "destination": waybills[0].destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        
+        
+    def test_get_loading_details(self):
+
+        waybills = Waybill.objects.all()
+        # All Loading details
+        response = self.client.get(reverse("api_loading_details"))
+        self.assertContains(response, 'ISBX00211A1', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Loading details for one waybill
+        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": waybills[0].slug}))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['order_code'], waybills[0].order_code)
+        # Loading details for some destination and some warehouse
+        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": waybills[0].warehouse.code, 
+                                                                          "destination": waybills[0].destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        
+    def test_get_stock_items(self):
+        
+        warehouse = Warehouse.objects.filter(code='ISBX002')
+        # All stock items
+        response = self.client.get(reverse("api_stock_items"))
+        self.assertContains(response, warehouse[0].code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Stock items for one warehouse
+        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse[0].code}))
+        self.assertContains(response, warehouse[0].code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['warehouse_id'], warehouse[0].code)
+
+
 class ApiEmptyServerTestCase(TestCase):
     
     fixtures = ()
     
     def create_objects(self):
-        call_command('loaddata', 'test_sync.json', **{
+        call_command('loaddata', 'development.json', **{
             'verbosity': 0,
             'commit': False,
             #'database': db
@@ -160,16 +170,16 @@ class ApiEmptyServerTestCase(TestCase):
         return Waybill.objects.all()[0]
     
     def test_send_new(self):
-        
+       
         self.assertEqual(Waybill.objects.count(), 0)
         
-        serialized_data = get_fixture_text('test_sync.json')
+        serialized_data = get_fixture_text('development.json')
 
         response = self.client.post(reverse("api_new_waybill"), data=serialized_data, content_type="application/json")
         self.assertEqual(response.content, "Created")
         
         self.assertEqual(Waybill.objects.count(), 1)
-        self.assertEqual(self.get_waybill().loading_details.count(), 2)
+        self.assertEqual(self.get_waybill().loading_details.count(), 1)
         self.assertEqual(self.get_waybill().status, Waybill.SENT)
     
     def test_get_receiving(self):
@@ -189,20 +199,18 @@ class ApiEmptyServerTestCase(TestCase):
                 #=======================================================================================================
                 
                 def read(self):
-                    return get_fixture_text('test_sync.json')
+                    return get_fixture_text('development.json')
             
             return DummyResponse()
         
         urllib2.urlopen = dummy_urlopen
         
-        #self.get_waybill().update_status(Waybill.INFORMED)
-        
         self.assertEqual(Waybill.objects.count(), 0)
-        Waybill.get_receiving()
+        get_receiving()
         
         self.assertEqual(Waybill.objects.count(), 1)
-        self.assertEqual(self.get_waybill().loading_details.count(), 2)
-        self.assertEqual(self.get_waybill().status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().loading_details.count(), 1)
+        #self.assertEqual(self.get_waybill().status, Waybill.SENT)
     
     def test_get_informed(self):
         #Create objects
@@ -236,7 +244,7 @@ class ApiEmptyServerTestCase(TestCase):
         self.create_objects()
         
         self.assertNotEqual(self.get_waybill().status, Waybill.DELIVERED)
-        
+
         #Provide content-type
         response = self.client.put(reverse("api_delivered_waybill"), 
                                    data=get_fixture_text('test_delivered_sync.json'), 
@@ -263,7 +271,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         urllib2.urlopen = dummy_urlopen
         
         self.get_waybill().update_status(Waybill.SIGNED)
-        Waybill.send_new()
+        send_new()
         self.assertEqual(self.get_waybill().status, Waybill.SENT)
         
     def test_get_informed(self):
@@ -282,7 +290,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         self.get_waybill().update_status(Waybill.SENT)
         
-        Waybill.get_informed()
+        get_informed()
         self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
     
     def test_update_informed(self):
@@ -299,14 +307,14 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        old_compas = ets.models.COMPAS_STATION
-        ets.models.COMPAS_STATION = "OE7X001"
+        old_compas = ets.api.client.COMPAS_STATION
+        ets.api.client.COMPAS_STATION = "ISBX003"
         
         self.get_waybill().update_status(Waybill.SENT)
-        Waybill.send_informed()
+        send_informed()
         self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
         
-        ets.models.COMPAS_STATION = old_compas
+        ets.api.client.COMPAS_STATION = old_compas
     
     def test_get_delivered(self):
         #MonkeyPatch of urlopen
@@ -332,7 +340,7 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         self.get_waybill().update_status(Waybill.INFORMED)
         
-        Waybill.get_delivered()
+        get_delivered()
         self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
     
     def test_update_delivered(self):
@@ -349,11 +357,11 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        old_compas = ets.models.COMPAS_STATION
-        ets.models.COMPAS_STATION = "OE7X001"
+        old_compas = ets.api.client.COMPAS_STATION
+        ets.api.client.COMPAS_STATION = "ISBX003"
         
         self.get_waybill().update_status(Waybill.DELIVERED)
-        Waybill.send_delivered()
+        send_delivered()
         self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
         
-        ets.models.COMPAS_STATION = old_compas
+        ets.api.client.COMPAS_STATION = old_compas

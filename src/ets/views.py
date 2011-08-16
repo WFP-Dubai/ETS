@@ -7,157 +7,234 @@ from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.urlresolvers import reverse
 #from django.forms.formsets import BaseFormSet
-from django.forms.models import inlineformset_factory, modelformset_factory, ModelChoiceIterator, model_to_dict
-from django.http import HttpResponse, HttpResponseRedirect
+from django.forms.models import inlineformset_factory, modelformset_factory, model_to_dict
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
+from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
+from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 
 from ets.compas import compas_write
-from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, WaybillForm
-from ets.forms import WaybillValidationFormset, WarehouseForm
-from ets.models import LtiOriginal, RemovedLtis, Waybill, CompasLogger 
-from ets.models import LtiWithStock, EpicLossDamages, LoadingDetail
-from ets.models import Place, EpicPerson, EpicStock, DispatchPoint
-from ets.models import COMPAS_STATION
-from ets.tools import restant_si 
-from ets.tools import import_setup, import_lti, track_compas_update
+from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
+from ets.forms import WaybillValidationFormset, WarehouseChoiceForm, WaybillSearchForm, LoadingDetailDispatchForm
+import ets.models
 from ets.tools import un64unZip, viewLog, default_json_dump
-from ets.tools import serialized_all_items
+
+LOADING_LINES = 5
 
 
 def prep_req( request ):
 
     return {'user': request.user}
 
-@login_required
-def select_action( request, **kwargs ):
-    """
-    View: select_action 
-    URL: /
-    Template: /waybill/templates/select_action.html
-    Gives the loggedin user a choise of possible actions sepending on roles
-    """
-    return direct_to_template(request, **kwargs)
-    
 
 @login_required
-def listOfLtis( request, origin, template='lti/ltis.html'):
+def order_list(request, warehouse_pk=None, template='order/list.html', 
+               queryset=ets.models.Order.objects.all().order_by('-created'), 
+               extra_context=None):
     """
-    View: listOfLtis 
-    URL: /waybill/list/{{warehouse}}
-    Template: /ets/waybill/templates/ltis.html
-    Shows the LTIs that are in a specific warehouse
+    URL: /orders/
+    Shows all orders
+
+    URL: /orders/{{ warehouse }}/
+    Shows the orders that are in a specific warehouse
     """
     
-    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
-                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
+    if warehouse_pk:
+        queryset = queryset.filter(warehouse__pk=warehouse_pk)
+        
+    #TODO: Exclude delivered orders
+    #===================================================================================================================
+    # still_ltis = []
+    # for lti in ltis:
+    #    for si in LtiOriginal.objects.filter( code = lti['code'] ):
+    #        if si.items_left > 0 and lti not in still_ltis:
+    #            still_ltis.append( lti )
+    #===================================================================================================================
+    
+    extra = {
+        'warehouse_pk': warehouse_pk,
+    }
+    apply_extra_context(extra_context or {}, extra)
+    
+    return object_list(request, queryset=queryset, template_name=template, extra_context=extra)
 
-    ltis = LtiOriginal.objects.values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date' , 'expiry_date' )\
-                              .distinct().filter( expiry_date__gt = date_check, origin_wh_code = origin )
-    still_ltis = []
-    for lti in ltis:
-        for item in restant_si( lti['code'] ):
-            if item.CurrentAmount > 0 and lti not in still_ltis:
-                still_ltis.append( lti )
-
-    return direct_to_template(request, template, {'ltis': still_ltis})
-
-## Show all ltis 
 @login_required
-def ltis( request, template='lti/ltis_all_qs.html' ):
-    """
-    View:
-    ltis
-    URL: /waybill/list
-    Shows all the LTIs
-    template:
-    /ets/waybill/templates/ltis.html
-    """
-    date_check = datetime.datetime.strptime( settings.MAX_DATE, '%Y-%m-%d' ).date() \
-                    if settings.DISABLE_EXPIERED_LTI else datetime.date.today()
+def waybill_view(request, waybill_pk, queryset, template):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
     
-    removedLtis = RemovedLtis.objects.all()
-    
-    ltis = LtiOriginal.objects.exclude( pk__in = removedLtis ).filter( expiry_date__gt = date_check )\
-                              .values( 'code', 'destination_loc_name', 'consegnee_name', 'lti_date', 
-                                       'requested_dispatch_date', 'origin_loc_name' , 'expiry_date' )\
-                              .distinct().order_by( '-lti_date' )
-    still_ltis = []
-    for lti in ltis:
-        for si in LtiOriginal.objects.filter( code = lti['code'] ):
-            if si.items_left > 0 and lti not in still_ltis:
-                still_ltis.append( lti )
-    
-    return direct_to_template(request, template , {'ltis': still_ltis})
-
-
-def import_ltis( request ):
-    """
-    View: import_ltis 
-    URL: /waybill/import
-    Template: /ets/waybill/templates/status.html
-    Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
-    add tag to say when last done
-    """
-
-    #print 'Import Persons'
-    EpicPerson.update()
-    #print 'Import GEO'
-    Place.update()
-    #print 'Import Stock'
-    EpicStock.update()
-    #print 'Import Setup'
-    import_setup()
-    #print 'Import LTIs'
-    import_lti()
-    status = 'Import Finished'
-    track_compas_update()
-    messages.add_message( request, messages.INFO, status )
-
-    return redirect("select_action")
-
-def lti_detail_url( request, lti_code, template='lti/detailed_lti.html' ):
-    """
-    View: lti_detail_url 
-    URL: /waybill/info/(lti_code)
-    Template: /ets/waybill/templates/lti/detailed_lti.html
-    Show detail of LTI and link to create waybill
-    """
-    detailed_lti = LtiOriginal.objects.filter( code = lti_code )
-    listOfWaybills = Waybill.objects.filter( invalidated = False, ltiNumber = lti_code )
-    listOfSI_withDeduction = restant_si( lti_code )
-    
-    lti_more_wb = False
-    for item in detailed_lti:
-        if item.items_left > 0:
-            lti_more_wb = True
-    
-    return direct_to_template( request,template, {
-        'detailed': detailed_lti, 
-        'lti_id': lti_code, 
-        'listOfWaybills': listOfWaybills, 
-        'listOfSI_withDeduction': listOfSI_withDeduction, 
-        'moreWBs':lti_more_wb
+    return direct_to_template( request, template, {
+        'object': waybill,
+        'extra_lines': my_empty,
+        'editable': waybill.is_editable(request.user),
     })
 
 @login_required
-def dispatch( request ):
+def waybill_finalize_dispatch( request, waybill_pk, queryset):
     """
-    View: dispatch 
-    URL: /waybill/dispatch
-    Template: None
-    Redirects to Lti Details.
+    called when user pushes Print Original on dispatch
+    Redirects to order details
     """
-    try:
-        return redirect( "listOfLtis", request.user.get_profile().warehouses.origin_wh_code )
-    except:
-        return redirect( "select_action" )
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.dispatch_sign(True)
+    
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
+        "waybill": waybill.pk
+    })
+    
+    return redirect( "order_detail", waybill.order_code)
+
+
+@login_required
+def waybill_search( request, form_class=WaybillSearchForm, 
+                    queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
+#                    param_name='wbnumber', consegnee_code='W200000475' ):
+
+    form = form_class(request.POST or None)
+    search_string = form.cleaned_data['q'] if form.is_valid() else ''
+
+    found_wb = queryset.filter(pk__icontains=search_string)
+    my_valid_wb = []
+    
+    profile = request.user.get_profile()
+    
+    #TODO: Insert all these condition in query set
+    for waybill in found_wb:
+        if profile.is_compas_user or profile.reader_user or (
+            profile.dispatch_warehouse and waybill.warehouse == profile.dispatch_warehouse
+        ) or ( 
+            profile.reception_warehouse 
+            and waybill.destination.organization == profile.reception_warehouse.organization 
+            and waybill.destination.location == profile.reception_warehouse.location ):
+#        ) or ( profile.is_all_receiver and waybill.consegnee_code == consegnee_code ):
+            my_valid_wb.append( waybill.pk )
+
+    return direct_to_template( request, template, {
+        'waybill_list': found_wb, 
+        'my_wb': my_valid_wb, 
+        'is_user': profile.super_user or profile.reader_user or profile.is_compas_user
+    })
+
+
+@login_required
+@transaction.commit_on_success
+def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_form=LoadingDetailDispatchForm,
+                   queryset=ets.models.Order.objects.all(), template='waybill/create.html' ):
+    """Creates a Waybill"""
+    
+    order = get_object_or_404(queryset, pk=order_pk)
+    
+    class FormsetForm( formset_form ):
+        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))
+        
+        #===============================================================================================================
+        # def clean( self ):
+        #    try:
+        #        cleaned = self.cleaned_data
+        #        stock_item = cleaned.get("stock_item")
+        #        units = cleaned.get( "number_of_units" )
+        #        overloaded = cleaned.get('overloaded_units')
+        #        max_items = order_item.lti_line.items_left
+        #        if units > max_items + self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
+        #            myerror = "Overloaded!"
+        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
+        #            self._errors['numberUnitsLoaded'].append( myerror )
+        #            raise forms.ValidationError( myerror )
+        #        return cleaned
+        #    except:
+        #            myerror = "Value error!"
+        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
+        #            self._errors['numberUnitsLoaded'].append( myerror )
+        #            raise forms.ValidationError( myerror )
+        #===============================================================================================================
+        
+    loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
+                                            form=FormsetForm, fk_name = "waybill", 
+                                            formset = BaseLoadingDetailFormFormSet, 
+                                            extra=5, max_num=5)\
+                                (request.POST or None, request.FILES or None, prefix='item')
+    
+    profile = request.user.get_profile()
+    
+    form = form_class(data=request.POST or None, files=request.FILES or None, initial={
+        'loading_date': order.dispatch_date,
+        'dispatch_date': order.dispatch_date,
+    })
+    
+    form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
+                                                              .exclude(pk=order.warehouse.pk)
+    
+    if form.is_valid() and loading_formset.is_valid():
+        waybill = form.save(False)
+        waybill.order_code = order.pk
+        waybill.project_number = order.project_number
+        waybill.transport_name = order.transport_name
+        waybill.warehouse = order.warehouse
+        waybill.dispatcher_person = profile.compas_person
+        waybill.save()
+        
+        for loading_form in loading_formset:
+            obj = loading_form.save(commit=False)
+            stock_item = loading_form.cleaned_data.get('stock_item')
+            if stock_item:
+                obj.origin_id = stock_item.pk
+                obj.si_code = stock_item.si_code
+                
+                obj.comm_category_code = stock_item.comm_category_code
+                obj.commodity_code = stock_item.commodity_code
+                obj.commodity_name = stock_item.commodity_name
+                
+                obj.unit_weight_net = stock_item.unit_weight_net
+                obj.unit_weight_gross = stock_item.unit_weight_gross
+                
+                obj.package = stock_item.packaging_description()
+                
+                obj.waybill = waybill
+                
+                obj.save()
+    
+        messages.success(request, _("Waybill has been created."))
+        return redirect(waybill)
+        
+    return direct_to_template( request, template, {
+        'form': form, 
+        'formset': loading_formset,
+        'object': order,
+    })
+
+#=======================================================================================================================
+# def import_ltis( request ):
+#    """
+#    View: import_ltis 
+#    URL: /waybill/import
+#    Template: /ets/waybill/templates/status.html
+#    Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
+#    add tag to say when last done
+#    """
+# 
+#    #print 'Import Persons'
+#    EpicPerson.update()
+#    #print 'Import GEO'
+#    Place.update()
+#    #print 'Import Stock'
+#    EpicStock.update()
+#    #print 'Import Setup'
+#    import_setup()
+#    #print 'Import LTIs'
+#    import_lti()
+#    status = 'Import Finished'
+#    track_compas_update()
+#    messages.add_message( request, messages.INFO, status )
+# 
+#    return redirect("index")
+#=======================================================================================================================
 
 #### Waybill Views
 #=======================================================================================================================
@@ -169,32 +246,8 @@ def dispatch( request ):
 #            'lti_id': lti_pk,
 #        })
 #    except:
-#        return redirect( "select_action" )
+#        return redirect( "index" )
 #=======================================================================================================================
-
-
-@login_required
-def waybill_finalize_dispatch( request, waybill_pk, queryset):
-    """
-    View: waybill_finalize_dispatch
-    URL: /waybill/dispatch
-    Templet:None
-    called when user pushes Print Original on dispatch
-    Redirects to Lti Details
-    """
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.dispatch_sign(False)
-    
-    for lineitem in waybill.loading_details.select_related():
-        lineitem.order_item.lti_line.reduce_si( lineitem.numberUnitsLoaded )
-    
-    waybill.save()
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
-        "waybill": waybill.pk
-    })
-    
-    return redirect( "lti_detail_url", waybill.ltiNumber)
-
 
 @login_required
 def waybill_finalize_receipt( request, waybill_pk, queryset):
@@ -231,7 +284,7 @@ def create_or_update(waybill, user, error_message):
     return compas_logger
 
 @login_required
-def singleWBDispatchToCompas( request, waybill_pk, queryset=Waybill.objects.all() ):
+def singleWBDispatchToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all() ):
     """
     View: singleWBDispatchToCompas
     URL: 
@@ -267,7 +320,7 @@ def singleWBDispatchToCompas( request, waybill_pk, queryset=Waybill.objects.all(
 
 
 @login_required
-def singleWBReceiptToCompas( request, waybill_pk, queryset=Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
+def singleWBReceiptToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
     """
     View: singleWBReceiptToCompas
     URL: ...
@@ -303,8 +356,9 @@ def singleWBReceiptToCompas( request, waybill_pk, queryset=Waybill.objects.all()
 @login_required
 def receiptToCompas( request, template='compas/list_waybills_compas_received.html' ):
 
-    list_waybills = Waybill.objects.filter( invalidated = False, waybillReceiptValidated = True, 
-                                            waybillRecSentToCompas = False, waybillSentToCompas = True )
+    list_waybills = Waybill.objects.filter(waybillReceiptValidated = True, 
+                                           waybillRecSentToCompas = False, 
+                                           waybillSentToCompas = True )
     the_compas = compas_write()
     error_message, error_codes = '', ''
     
@@ -331,19 +385,6 @@ def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
     return direct_to_template( request, template, {
         'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
     })
-
-
-#=======================================================================================================================
-# def invalidate_waybill_action( wb_id ):
-#    current_wb = Waybill.objects.get( id = wb_id )
-#    for lineitem in current_wb.loading_details.select_related():
-#        lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
-#        lineitem.numberUnitsLoaded = 0
-#        lineitem.save()
-#    current_wb.invalidated = True
-#    current_wb.save()
-#=======================================================================================================================
-
 
 @login_required
 def waybill_validate_form_update( request, waybill_pk, queryset, 
@@ -423,40 +464,6 @@ def waybill_validate_form_update( request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_view( request, waybill_pk, queryset, template='waybill/print/waybill_detail_view.html' ):
-    ## TODO: remove dependency of zippedWB
-    #TODO: remove these try...except blocks
-    try:
-        waybill_instance = queryset.get(pk = waybill_pk)
-        extra_lines = 5 - waybill_instance.loading_details.select_related().count()
-        zippedWB = waybill_instance.compress()
-        lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
-        my_empty = [''] * extra_lines
-        try:
-            disp_person_object = EpicPerson.objects.get( person_pk = waybill_instance.dispatcherName )
-        except:
-            disp_person_object = ''
-            
-        try:
-            rec_person_object = EpicPerson.objects.get( person_pk = waybill_instance.recipientName )
-        except:
-            rec_person_object = ''
-
-    except Exception as e:
-        print e
-        return redirect( "select_action" )
-    
-    return direct_to_template( request, template, {
-        'object': waybill_instance,
-        'LtiOriginal': lti_detail_items,
-        'disp_person': disp_person_object,
-        'rec_person': rec_person_object,
-        'extra_lines': my_empty,
-        'zippedWB': zippedWB,
-    })
-
-
-@login_required
 def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill_detail_view_reception.html' ):
     ## TODO: remove dependency of zippedWB
     
@@ -468,7 +475,7 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
         my_empty = [''] * (5 - number_of_lines)
         zippedWB = waybill_instance.compress()
     except:
-        return redirect( "select_action" )
+        return redirect( "index" )
     
     rec_person_object, disp_person_object = '', ''
     try:
@@ -488,14 +495,14 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
 
 
 @login_required
-def waybill_reception( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
+def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
     # get the LTI info
     current_wb = get_object_or_404(queryset, pk = waybill_pk )
     current_lti = current_wb.ltiNumber
     current_items = LtiWithStock.objects.filter( lti_code = current_lti )
     profile = request.user.get_profile()
-    if not (profile.isReciever or profile.superUser or profile.compasUser):
-        return redirect( "waybill_view", waybill_pk=waybill_pk)
+    if not (profile.is_reciever or profile.super_user or profile.compasUser):
+        return redirect(current_wb.get_absolute_url())
     
 #    current_wb.auditComment = 'Receipt Action'
 #    current_wb.save()
@@ -631,133 +638,10 @@ def waybill_reception( request, waybill_pk, queryset=Waybill.objects.all(), temp
     })
 
 
-@login_required
-def waybill_search( request, template='waybill/list_waybills.html', 
-                    param_name='wbnumber', consegnee_code='W200000475' ):
-    
-    search_string = request.GET.get(param_name, '')
-
-    found_wb = Waybill.objects.filter( invalidated=False, waybillNumber__icontains=search_string )
-    my_valid_wb = []
-    
-    profile = request.user.get_profile()
-    
-    #TODO: Insert all these condition in query set
-    for waybill in found_wb:
-        if profile.isCompasUser or profile.readerUser or (
-            profile.warehouses and waybill.origin_wh_code == profile.warehouses.origin_wh_code 
-        ) or ( 
-            profile.receptionPoints 
-            and waybill.consegnee_code == profile.receptionPoints.consegnee_code 
-            and waybill.destination_loc_name == profile.receptionPoints.LOC_NAME 
-        ) or ( profile.isAllReceiver and waybill.consegnee_code == consegnee_code ):
-            my_valid_wb.append( waybill.pk )
-
-    return direct_to_template( request, template, {
-        'waybill_list': found_wb, 
-        'my_wb': my_valid_wb, 
-        'isSuperUser': profile.superUser or profile.readerUser or profile.isCompasUser
-    })
-
-
-### Create Waybill 
-@login_required
-def waybillCreate( request, lti_code, template='waybill/createWaybill.html' ):
-    # TODO: Fix COI_CODE selector possibly with hirarchical list of lti's
-    current_lti = LtiOriginal.objects.filter( code = lti_code )
-    current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    #===================================================================================================================
-    # c_sis = [lti.si_code for lti in current_lti]
-    # current_stock = EpicStock.in_stock_objects.filter( si_code__in = c_sis ).filter( wh_code = current_lti[0].origin_wh_code )
-    #===================================================================================================================
-
-    class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
-        #coi_code = ModelChoiceField( queryset = current_stock )
-        overload = forms.BooleanField( required = False )
-
-        class Meta:
-            model = LoadingDetail
-            fields = ( 'order_item', 'numberUnitsLoaded', 'wbNumber', 'overloadedUnits', 'overOffloadUnits' )# , 'coi_code' )
-
-        def clean( self ):
-            try:
-                cleaned = self.cleaned_data
-                order_item = cleaned.get( "order_item" )
-                units = cleaned.get( "numberUnitsLoaded" )
-                overloaded = cleaned.get( 'overloadedUnits' )
-                max_items = order_item.lti_line.items_left
-                if units > max_items + self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
-                    myerror = "Overloaded!"
-                    self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                    self._errors['numberUnitsLoaded'].append( myerror )
-                    raise forms.ValidationError( myerror )
-                return cleaned
-            except:
-                    myerror = "Value error!"
-                    self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                    self._errors['numberUnitsLoaded'].append( myerror )
-                    raise forms.ValidationError( myerror )
-
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, form = LoadingDetailDispatchForm, 
-                                       fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, 
-                                       extra = 5, max_num = 5 )
-    
-    current_wh = ''
-    profile = request.user.get_profile()
-    
-    if request.method == 'POST':
-        form = WaybillForm( request.POST )
-        form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
-        formset = LDFormSet( request.POST )
-        if form.is_valid() and formset.is_valid():
-            wb_new = form.save()
-            instances = formset.save( commit = False )
-            wb_new.waybillNumber = wb_new.new_waybill_no()
-            for subform in instances:
-                subform.wbNumber = wb_new
-                subform.save()
-            wb_new.save()
-            return redirect("waybill_view", waybill_pk=wb_new.pk)
-        else:
-            print( formset.errors )
-            print( form.errors )
-            print( formset.non_form_errors )
-    else:
-        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, 
-                                   organization_id = current_lti[0].consegnee_code )
-        if len( qs ) == 0:
-            qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
-        else:
-            current_wh = qs[0]
-            
-        form = WaybillForm( 
-            initial = {
-                    'dispatcherName':      profile.compasUser.person_pk,
-                    'dispatcherTitle':      profile.compasUser.title,
-                    'ltiNumber':         current_lti[0].code,
-                    'dateOfLoading':     datetime.date.today(),
-                    'dateOfDispatch':    datetime.date.today(),
-                    'recipientLocation': current_lti[0].destination_loc_name,
-                    'recipientConsingee':current_lti[0].consegnee_name,
-                    'transportContractor': current_lti[0].transport_name,
-                    'invalidated':'False',
-                    'destinationWarehouse':current_wh,
-                    'waybillNumber':'N/A'
-                }
-        )
-        form.fields["destinationWarehouse"].queryset = qs
-
-        formset = LDFormSet()
-    return direct_to_template( request, template, {
-        'form': form, 
-        'lti_list':current_lti, 
-        'formset':formset
-    })
 
 
 @login_required
-def waybill_edit( request, waybill_pk, queryset=Waybill.objects.all(), template='waybill/createWaybill.html' ):
+def waybill_edit( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/createWaybill.html' ):
     current_wb = get_object_or_404(queryset, pk=waybill_pk)
     lti_code = current_wb.ltiNumber
     current_lti = LtiOriginal.objects.filter( code = lti_code )
@@ -791,13 +675,14 @@ def waybill_edit( request, waybill_pk, queryset=Waybill.objects.all(), template=
     LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
                                        fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, 
                                        extra = 5, max_num = 5 )
+
     if request.method == 'POST':
         form = WaybillForm( request.POST, instance = current_wb )
         formset = LDFormSet( request.POST, instance = current_wb )
         if form.is_valid() and formset.is_valid():
             wb_new = form.save()
             formset.save()
-            return redirect("waybill_view", waybill_pk=wb_new.pk)
+            return redirect(wb_new)
     else:
         form = WaybillForm( instance = current_wb )
         form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
@@ -846,7 +731,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
                         create_or_update(waybill, request.user, errorMessage)
 
             formset.save()
-    waybills = Waybill.objects.filter( invalidated = False, waybillValidated = False, dispatcherSigned = True )
+    waybills = Waybill.objects.filter( waybillValidated = False, dispatcherSigned = True )
     formset = ValidateFormset( queryset = waybills )
     
     return direct_to_template( request, template, {
@@ -857,7 +742,7 @@ def waybill_validate_dispatch_form( request, template='validate/validateForm.htm
 @login_required
 def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
     ValidateFormset = modelformset_factory( Waybill, fields = ( 'waybillReceiptValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter(invalidated=False, waybillReceiptValidated=True, 
+    validatedWB = Waybill.objects.filter(waybillReceiptValidated=True, 
                                         waybillRecSentToCompas=False, waybillSentToCompas=True)
     errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
     if request.method == 'POST':
@@ -880,7 +765,7 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
                     
             formset.save()
 
-    waybills = Waybill.objects.filter( invalidated = False, waybillReceiptValidated = False, 
+    waybills = Waybill.objects.filter( waybillReceiptValidated = False, 
                                        recipientSigned = True, waybillValidated = True )
     formset = ValidateFormset( queryset = waybills )
 
@@ -921,7 +806,7 @@ def deserialize( request ):
             wb_serialized = eval(wb_serialized)
         else:
             messages.error(request, _('Data Incorrect!!!'))
-            return redirect(reverse('select_action')) 
+            return redirect(reverse('index')) 
  
     for obj in serializers.deserialize( "json", wb_serialized ):
         
@@ -1056,31 +941,33 @@ def receipt_report_cons( request, cons, template='reporting/list_ltis.txt' ):
 #    return render_to_response( 'reporting/select_report.html', context_instance = RequestContext( request ) )
 #=======================================================================================================================
 
-def select_data( request, template='reporting/select_data.html', form_class=WarehouseForm ):
+def select_data( request, template='reporting/select_data.html', form_class=WarehouseChoiceForm ):
     form = form_class( request.POST or None )
     context = not form.is_valid() and {'form': form, } or {}
     return direct_to_template(request, template, context)
 
-def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
-#    import sys
-#    if sys.platform == 'darwin':
-#        from qrencode import Encoder
-#        enc = Encoder()
-#        myz = wb_compress( wb )
-#        im = enc.encode( myz, { 'width': 350 } )
-#        response = HttpResponse( mimetype = "image/png" )
-#        im.save( response, "PNG" )
-#    else:
-    
-    waybill = get_object_or_404(queryset, pk=waybill_pk)
-
-    import subprocess
-    myz = waybill.compress()
-    print myz
-    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
-    image = mydata.communicate()[0]
-    #print mydata.communicate()
-    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
+# def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
+# #    import sys
+# #    if sys.platform == 'darwin':
+# #        from qrencode import Encoder
+# #        enc = Encoder()
+# #        myz = wb_compress( wb )
+# #        im = enc.encode( myz, { 'width': 350 } )
+# #        response = HttpResponse( mimetype = "image/png" )
+# #        im.save( response, "PNG" )
+# #    else:
+#    
+#    waybill = get_object_or_404(queryset, pk=waybill_pk)
+# 
+#    import subprocess
+#    myz = waybill.compress()
+#    print myz
+#    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
+#    image = mydata.communicate()[0]
+#    #print mydata.communicate()
+#    return HttpResponse( image, mimetype = "Image/png" )
+#=======================================================================================================================
 
 @csrf_exempt
 def post_synchronize_waybill( request ):
@@ -1131,41 +1018,45 @@ def post_synchronize_waybill( request ):
     return response
 
 
-@csrf_exempt
-def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
-    '''
+#=======================================================================================================================
+# @csrf_exempt
+# def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
+#    '''
+# 
+#    #warehouse_code = request.GET['']
+#    stocks_list = queryset.filter( wh_code = warehouse_code )
+# 
+#    #from kiowa.db.utils import instance_as_dict
+# 
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
 
-    #warehouse_code = request.GET['']
-    stocks_list = queryset.filter( wh_code = warehouse_code )
 
-    #from kiowa.db.utils import instance_as_dict
-
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
-
-
-@csrf_exempt
-def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
-    '''
-
-    #warehouse_code = request.GET['warehouse_code']
-
-#        from waybill.models import LtiOriginal    
-    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
-
-    #from kiowa.db.utils import instance_as_dict
-
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
+# @csrf_exempt
+# def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
+#    '''
+# 
+#    #warehouse_code = request.GET['warehouse_code']
+# 
+# #        from waybill.models import LtiOriginal    
+#    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
+# 
+#    #from kiowa.db.utils import instance_as_dict
+# 
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
     
 
-def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
+def get_wb_stock( request, queryset=ets.models.Warehouse.objects.all() ):
     warehouse = get_object_or_404(queryset, pk = request.REQUEST['warehouse'])
     filename = 'stock-data-%s-%s-%s.json' % (warehouse.origin_wh_code, settings.COMPAS_STATION, datetime.date.today())
     
@@ -1183,63 +1074,67 @@ def get_wb_stock( request, queryset=DispatchPoint.objects.all() ):
     
 
 
-@csrf_exempt
-def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
-    '''
-    This method is called by the offline application.
-    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-    '''
-
-    #warehouse_code = request.GET['']
-
-    #from waybill.models import Waybill    
-    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
-    #from kiowa.db.utils import instance_as_dict
-    
-    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
-                        content_type="application/json; charset=utf-8")
-    
-
-def get_synchronize_waybill2( request ):
-    '''
-    This method is called by the offline application.
-    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-    '''
-    try:
-        warehouse_code = request.GET['warehouse_code']
-    except:
-        warehouse_code = 'CCBJ004'
-    ld = []
-    ltis = []
-    stck = []
-    #from waybill.models import Waybill    
-    waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
-    for waybill_to_serialize in waybills_list:
-        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
-        # Add related LtiOriginals to serialized representation
-        ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
-        # Add related EpicStocks to serialized representation
-        stocks_to_serialize = []
-        for lti in ltis_to_serialize:
-            for s in lti.stock_items():
-                stocks_to_serialize.append( s )
-        ld += loadingdetails_to_serialize
-        ltis += ltis_to_serialize
-        stck += stocks_to_serialize
-
-    data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
-
-    ## testing it to see deser
 #=======================================================================================================================
-#    print data
-#    for deserialized_object in serializers.deserialize( "json", data ):
+# @csrf_exempt
+# def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
+#    '''
+#    This method is called by the offline application.
+#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
+#    '''
 # 
-#        print deserialized_object
+#    #warehouse_code = request.GET['']
+# 
+#    #from waybill.models import Waybill    
+#    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
+#    #from kiowa.db.utils import instance_as_dict
+#    
+#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
+#                        content_type="application/json; charset=utf-8")
 #=======================================================================================================================
+    
 
-    response = HttpResponse( data, mimetype = 'application/json' )
-
-    return response
+#=======================================================================================================================
+# def get_synchronize_waybill2( request ):
+#    '''
+#    This method is called by the offline application.
+#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
+#    '''
+#    try:
+#        warehouse_code = request.GET['warehouse_code']
+#    except:
+#        warehouse_code = 'CCBJ004'
+#    ld = []
+#    ltis = []
+#    stck = []
+#    #from waybill.models import Waybill    
+#    waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
+#    for waybill_to_serialize in waybills_list:
+#        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
+#        # Add related LtiOriginals to serialized representation
+#        ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
+#        # Add related EpicStocks to serialized representation
+#        stocks_to_serialize = []
+#        for lti in ltis_to_serialize:
+#            for s in lti.stock_items():
+#                stocks_to_serialize.append( s )
+#        ld += loadingdetails_to_serialize
+#        ltis += ltis_to_serialize
+#        stck += stocks_to_serialize
+# 
+#    data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
+# 
+#    ## testing it to see deser
+# #=======================================================================================================================
+# #    print data
+# #    for deserialized_object in serializers.deserialize( "json", data ):
+# # 
+# #        print deserialized_object
+# #=======================================================================================================================
+# 
+#    response = HttpResponse( data, mimetype = 'application/json' )
+# 
+#    return response
+#=======================================================================================================================
 
 @csrf_exempt
 def get_all_data( request ):

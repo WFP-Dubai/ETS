@@ -1,58 +1,60 @@
 [
- {
-  "pk": "ISBX00211A",
-  "model": "ets.waybill",
-  "fields": {
-   "waybillNumber": "A0009",
-   "dispatch_warehouse": "ISBX002",
-   "invalidated": false,
-   "transportVehicleRegistration": "",
-   "transportContractor": "HAMAYOON AND CO",
-   "dispatchRemarks": "",
-   "dateOfDispatch": "2011-06-12",
-   "recipientArrivalDate": null,
-   "recipientConsingee": "WORLD FOOD PROGRAMME",
-   "transportSubContractor": "",
-   "transportDeliverySignedTimestamp": null,
-   "recipientDistance": null,
-   "recipientName": "",
-   "containerTwoSealNumber": "",
-   "auditComment": "Print Dispatch Original",
-   "dispatcherSigned": true,
-   "waybillProcessedForPayment": false,
-   "recipientSignedTimestamp": null,
-   "dispatcherTitle": "LOGISTICS OFFICER",
-   "containerOneSealNumber": "",
-   "transportDeliverySigned": false,
-   "containerTwoRemarksReciept": "",
-   "ltiNumber": "QANX0010010128226P",
-   "containerOneRemarksReciept": "",
-   "transportDispachSignedTimestamp": "2011-06-12 13:12:43",
-   "transactionType": "WIT",
-   "status": 5,
-   "containerTwoRemarksDispatch": "",
-   "recipientSigned": false,
-   "transportDispachSigned": true,
-   "dateOfLoading": "2011-06-12",
-   "recipientEndDischargeDate": null,
-   "recipientRemarks": "",
-   "waybillSentToCompas": false,
-   "recipientStartDischargeDate": null,
-   "containerOneRemarksDispatch": "",
-   "waybillValidated": false,
-   "transportType": "02",
-   "dispatch_warehouse": "ISBX002",
-   "destinationWarehouse": "OE7X001",
-   "recipientLocation": "SUKKHUR",
-   "waybillRecSentToCompas": false,
-   "transportDriverName": "",
-   "dispatcherName": "ISBX0020000586",
-   "transportDriverLicenceID": "",
-   "containerOneNumber": "",
-   "recipientTitle": "",
-   "containerTwoNumber": "",
-   "waybillReceiptValidated": false,
-   "transportTrailerRegistration": ""
+  {
+	"pk": "ISBX00211A", 
+	"model": "ets.waybill", 
+	"fields": {
+	  "order_code": "QANX001000000000000005217HQX0001000000000000984141",
+	  "project_number": "1",
+	  "transport_name": "MUSLIM TRANSPORT",
+	  "warehouse": "ISBX002",
+	  
+	  "status": 5,
+	  
+	  "date_created": "2011-06-12 05:36:54",
+	  "loading_date": "2011-06-12",
+	  "dispatch_date": "2011-06-12",
+	  
+	  "transaction_type": "WIT",
+	  "transport_type": "02",
+	  
+	  "dispatch_remarks": "",
+	  "dispatcher_person": "ISBX0020000586",
+	  
+	  "transport_sub_contractor": "", 
+	  "transport_driver_name": "Ahmed",
+	  "transport_driver_licence": "EG234454",
+	  "transport_vehicle_registration": "AE234454", 
+	  "transport_trailer_registration": "",
+	  
+	  "transport_dispach_signed_date": null,
+	  "transport_delivery_signed_date": null,
+	  
+	  "container_one_number": "",
+	  "container_two_number": "",
+	  "container_one_seal_number": "",
+	  "container_two_seal_number": "",
+	  "container_one_remarks_dispatch": "",
+	  "container_two_remarks_dispatch": "",
+	  "container_one_remarks_reciept": "",
+	  "container_two_remarks_reciept": "",
+	  
+	  "recipient_person": "ISBX0020000613",
+	  
+	  "recipient_arrival_date": "2011-06-15",
+	  "recipient_start_discharge_date": "2011-06-15",
+	  "recipient_end_discharge_date": "2011-06-16",
+	  "recipient_distance": "20000",
+	  "recipient_remarks": "All good",
+	  "recipient_signed_date": "2011-06-16",
+	  "destination": "ISBX003",
+	  
+	  "validated": false,
+	  "receipt_validated": true,
+	  "sent_compas": false,
+	  "rec_sent_compas": false,
+	  "processed_for_payment": false,
+	
+	  "audit_comment": "Print Dispatch Original" 
+	}
   }
- }
 ]

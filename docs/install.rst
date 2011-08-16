@@ -15,7 +15,7 @@ Dependencies
 Following names of package are called so in debian package system::
   
   sudo apt-get install python git-core python-dev python-setuptools gettext  
-
+  sudo easy_install -U zc.buildout
 
 .. _development-environment:  
 

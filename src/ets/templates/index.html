@@ -1,0 +1,56 @@
+{% extends "base_template.html"%}
+
+{% load i18n extra_tags %}
+
+{% block title %}{% trans "Select Action" %}{% endblock %}
+
+{% block content %} 
+{% trans "Select an action" %}:
+<ul>
+
+  {% if myprofile.is_dispatcher %}
+  <li><a href='{% url orders warehouse_pk=myprofile.dispatch_warehouse.pk %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
+  {% endif %}
+  
+  {% if myprofile.reader_user or myprofile.super_user %}
+  <li><a href='{% url orders %}'>{% trans "All Orders" %}</a></li>
+  {% endif %}
+  
+  {% if myprofile.is_reciever %}
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
+  {% endif %}
+  
+  {% if myprofile.is_compas_user %}
+  <li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
+  {% endif %}
+
+  {% if myprofile.super_user %}
+  <li><a href='{% url waybill_search %}'>{% trans "Reset waybills" %}</a></li>
+  {% endif %}
+
+  {% if myprofile.super_user %}
+  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
+  {% endif %}
+  
+  <li><a href="{% url select_data %}">{% trans "Download Data" %}</a></li>
+  
+  <li>
+    <form method='POST' action='{% url waybill_search %}'>
+      {{ form.as_p }}
+      <input type="submit" value="{% trans 'Search Waybill' %}">
+    </form>
+  </li>
+
+  <li>
+    {% trans "Scan Waybill -->" %}
+    <form method='POST' action='{% url deserialize %}'>
+      {% csrf_token %}
+      <input type="text" name="wbdata"/>
+      <input type="submit" value="{% trans 'Receive Scanned Waybill' %}" />
+    </form>
+  </li>
+
+</ul>
+
+{% print_tag %}
+{% endblock %}

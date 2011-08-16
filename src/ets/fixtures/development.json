@@ -17,627 +17,107 @@
   },
   {
     "pk": 1, 
-    "model": "ets.userprofileauditlogentry", 
-    "fields": {
-      "superUser": true, 
-      "isReciever": true, 
-      "isAllReceiver": false, 
-      "warehouses": 1, 
-      "action_user": 1, 
-      "action_date": "2011-05-30 10:09:01", 
-      "isDispatcher": true, 
-      "isCompasUser": true, 
-      "user": 1, 
-      "action_type": "U", 
-      "compasUser": "ISBX0020000586", 
-      "readerUser": false, 
-      "receptionPoints": 1
-    }
-  },
-  {
-    "pk": 1, 
     "model": "ets.userprofile", 
     "fields": {
-      "superUser": true, 
-      "isReciever": true, 
-      "isAllReceiver": false, 
-      "warehouses": 1, 
-      "isDispatcher": true, 
-      "isCompasUser": true, 
-      "receptionPoints": 1, 
-      "compasUser": "ISBX0020000586", 
-      "readerUser": false
-    }
-  },
-  {
-    "pk": 6, 
-    "model": "ets.compaslogger", 
-    "fields": {
-      "timestamp": "2011-06-12 08:41:25", 
-      "data_in": "", 
-      "errorRec": "", 
-      "errorDisp": "Problems with Stock, Not enough in Dispatch Warehouse", 
-      "user": 1, 
-      "action": "", 
-      "lti": "", 
-      "data_out": ""
-    }
-  }, 
-  {
-    "pk": "ISBX002", 
-    "model": "ets.place", 
-    "fields": {
-      "name": "PAKISTAN COUNTRY OFFICE",
-      "reporting_code": "HQX0001",
-      "organization_id": "",
-      "geo_point_code": "ISBX",
-      "country_code": "586",
-      "geo_name": "ISLAMABAD_CAP"
-    }
-  }, 
-  {
-    "pk": "OE7X001", 
-    "model": "ets.place", 
-    "fields": {
-      "name": "EDO OFFICE MEHTI", 
-      "reporting_code": "KARX001", 
-      "organization_id": "", 
-      "geo_point_code": "OE7X", 
-      "country_code": "586", 
-      "geo_name": "THARPARKAR"
-    }
-  }, 
-  {
-    "pk": "MK7X001", 
-    "model": "ets.place", 
-    "fields": {
-      "name": "EDO HEALTH MIRPUR KHAS", 
-      "reporting_code": "KARX001", 
-      "organization_id": "", 
-      "geo_point_code": "MK7X", 
-      "country_code": "586", 
-      "geo_name": "MIRPUR KHAS"
-    }
-  }, 
-  {
-    "pk": "DU7X001", 
-    "model": "ets.place", 
-    "fields": {
-      "name": "EDO HEALTH DADU", 
-      "reporting_code": "KARX001", 
-      "organization_id": "", 
-      "geo_point_code": "DU7X", 
-      "country_code": "586", 
-      "geo_name": "DADU"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000984141", 
-    "model": "ets.ltioriginal", 
-    "fields": {
-      "origin_location_code": "QD2X", 
-      "si_record_id": "HQX0001000000000000984141", 
-      "origin_loc_name": "QANDAHAR", 
-      "code": "QANX0010010128226P", 
-      "destination_location_code": "QANX", 
-      "quantity_net": "1.750", 
-      "consegnee_code": "DOEAF", 
-      "quantity_gross": "1.762", 
-      "commodity_code": "MIXHEB", 
-      "destination_loc_name": "DADU", 
-      "requested_dispatch_date": "2010-11-03", 
-      "transport_name": " MUSLIM TRANSPORT", 
-      "unit_weight_net": "50.000", 
-      "transport_ouc": "ISBX001", 
-      "origin_wh_code": "AT9X002", 
-      "lti_id": "QANX001000000000000005217", 
-      "number_of_units": "35", 
-      "unit_weight_gross": "50.330", 
-      "comm_category_code": "MSC", 
-      "origin_wh_name": "QANDAHAR_WH", 
-      "expiry_date": "2010-11-14", 
-      "project_wbs_element": "200063.1", 
-      "cmmname": "IODISED SALT", 
-      "lti_date": "2010-11-02", 
-      "consegnee_name": "DEPARTMENT OF EDUCATION AFGHANISTAN", 
-      "origintype_desc": "Warehouse", 
-      "transport_code": "M001", 
-      "origin_type": "2", 
-      "si_code": "00009448"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000988849", 
-    "model": "ets.ltioriginal", 
-    "fields": {
-      "origin_location_code": "QD2X", 
-      "si_record_id": "HQX0001000000000000988849", 
-      "origin_loc_name": "QANDAHAR", 
-      "code": "QANX0010010128226P", 
-      "destination_location_code": "QANX", 
-      "quantity_net": "176.700", 
-      "consegnee_code": "DOEAF", 
-      "quantity_gross": "177.089", 
-      "commodity_code": "CERWHF", 
-      "destination_loc_name": "DADU", 
-      "requested_dispatch_date": "2010-11-03", 
-      "transport_name": " MUSLIM TRANSPORT", 
-      "unit_weight_net": "50.000", 
-      "transport_ouc": "ISBX001", 
-      "origin_wh_code": "AT9X002", 
-      "lti_id": "QANX001000000000000005217", 
-      "number_of_units": "3534", 
-      "unit_weight_gross": "50.110", 
-      "comm_category_code": "CER", 
-      "origin_wh_name": "QANDAHAR_WH", 
-      "expiry_date": "2010-11-14", 
-      "project_wbs_element": "200063.1", 
-      "cmmname": "WHEAT", 
-      "lti_date": "2010-11-02", 
-      "consegnee_name": "DEPARTMENT OF EDUCATION AFGHANISTAN", 
-      "origintype_desc": "Warehouse", 
-      "transport_code": "M001", 
-      "origin_type": "2", 
-      "si_code": "00008499"
-    }
-  }, 
-  {
-    "pk": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
-    "model": "ets.ltioriginal", 
-    "fields": {
-      "origin_location_code": "AT9X", 
-      "origin_loc_name": "ABBOTABAD", 
-      "origin_wh_name": "ABBOTABAD WAREHOUSE", 
-      "origin_wh_code": "AT9X002",
-      "destination_location_code": "QANX",
-      "destination_loc_name": "DADU",
-      "si_record_id": "HQX0001000000000000988849",
-      "si_code": "00008505", 
-      "code": "QANX0010010128226R",
-      "lti_id": "QANX001000000000000005223", 
-      "quantity_net": "176.700", 
-      "consegnee_code": "DOEAF", 
-      "quantity_gross": "177.089", 
-      "commodity_code": "CERWHE", 
-      "requested_dispatch_date": "2010-11-03", 
-      "transport_name": " MUSLIM TRANSPORT", 
-      "unit_weight_net": "50.000", 
-      "transport_ouc": "ISBX001", 
-      "number_of_units": "3", 
-      "unit_weight_gross": "5.110", 
-      "comm_category_code": "CER", 
-      "expiry_date": "2011-11-14", 
-      "project_wbs_element": "200063.1", 
-      "cmmname": "WHEAT", 
-      "lti_date": "2010-12-05", 
-      "consegnee_name": "DEPARTMENT OF EDUCATION AFGHANISTAN", 
-      "origintype_desc": "Warehouse", 
-      "transport_code": "M001", 
-      "origin_type": "2"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005247HQX0001000000000000991768", 
-    "model": "ets.removedltis", 
-    "fields": {}
-  }, 
-  {
-    "pk": "QANX001000000000000005253HQX0001000000000000993059", 
-    "model": "ets.removedltis", 
-    "fields": {}
-  }, 
-  {
-    "pk": "ISBX0020000586", 
-    "model": "ets.epicperson", 
-    "fields": {
-      "first_name": "RIAZ", 
-      "code": "0000586", 
-      "title": "LOGISTICS OFFICER", 
-      "org_unit_code": "ISBX002", 
-      "document_number": "", 
-      "official_tel_number": "92 51-272589", 
-      "mobile_phone_number": "92 320-268658", 
-      "fax_number": "9251-827149", 
-      "organization_id": "WFP", 
-      "location_code": "ISBX", 
-      "last_name": "LODHI", 
-      "e_mail_address": "RIAZ.LODHI@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
-    }
-  }, 
-  {
-    "pk": "ISBX0020000613", 
-    "model": "ets.epicperson", 
-    "fields": {
-      "first_name": "DIDIER", 
-      "code": "0000613", 
-      "title": "REGIONAL LOGISTICS COORDINATOR", 
-      "org_unit_code": "ISBX002", 
-      "document_number": "", 
-      "official_tel_number": "92-51-272589", 
-      "mobile_phone_number": "92 320-266722", 
-      "fax_number": "92-51-827149", 
-      "organization_id": "WFP", 
-      "location_code": "ISBX", 
-      "last_name": "FRISCH", 
-      "e_mail_address": "DIDIER.FRISCH@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
-    }
-  }, 
-  {
-    "pk": "ISBX0020000614", 
-    "model": "ets.epicperson", 
-    "fields": {
-      "first_name": "MANSOOR", 
-      "code": "0000614", 
-      "title": "LOGISTICS ASSISTANT", 
-      "org_unit_code": "ISBX002", 
-      "document_number": "", 
-      "official_tel_number": "9251-827150 EXT 2420", 
-      "mobile_phone_number": "", 
-      "fax_number": "", 
-      "organization_id": "WFP", 
-      "location_code": "ISBX", 
-      "last_name": "MAHMOOD", 
-      "e_mail_address": "MAHMOOD.MANSOOR@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
-    }
-  }, 
-  {
-    "pk": "ISBX0020000615", 
-    "model": "ets.epicperson", 
-    "fields": {
-      "first_name": "HASHIM", 
-      "code": "0000615", 
-      "title": "COMPUTER OPERATOR", 
-      "org_unit_code": "ISBX002", 
-      "document_number": "", 
-      "official_tel_number": "9291-833301~6", 
-      "mobile_phone_number": "", 
-      "fax_number": "9291-833300", 
-      "organization_id": "WFP", 
-      "location_code": "PSHX", 
-      "last_name": "ALI", 
-      "e_mail_address": "HASHIM.ALI@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
-    }
-  }, 
-  {
-    "pk": "ISBX0020000616", 
-    "model": "ets.epicperson", 
-    "fields": {
-      "first_name": "ZULFIQAR", 
-      "code": "0000616", 
-      "title": "ASSISTANT LOGISTICS OFFICER", 
-      "org_unit_code": "ISBX002", 
-      "document_number": "", 
-      "official_tel_number": "9291-833331", 
-      "mobile_phone_number": "92 320-291893", 
-      "fax_number": "9291-833300", 
-      "organization_id": "WFP", 
-      "location_code": "PSHX", 
-      "last_name": "ALI", 
-      "e_mail_address": "ZULFIQAR.ALI@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
-    }
-  }, 
-  {
-    "pk": "KARX025KARX0010000944801MIXMIXHEBCG15586", 
-    "model": "ets.epicstock", 
-    "fields": {
-      "si_record_id": "HQX0001000000000000995798", 
-      "quantity_gross": "0.011", 
-      "qualitydescr": "Good", 
-      "si_code": "00009448", 
-      "quantity_net": "0.010", 
-      "origin_id": "KARX0010000944801", 
-      "wh_code": "AT9X002", 
-      "packagename": "CARTON, FIBREBOARD, 100 X 100 GRM BAG", 
-      "comm_category_code": "MIX", 
-      "wh_country": "PAKISTAN", 
-      "wh_location": "KARACHI", 
-      "reference_number": "0080007004", 
-      "wh_regional": "OMB", 
-      "qualitycode": "G", 
-      "wh_name": "KICT", 
-      "commodity_code": "MIXHEB", 
-      "package_code": "CG15", 
-      "allocation_code": "586", 
-      "number_of_units": 1, 
-      "project_wbs_element": "200177.1", 
-      "cmmname": "HIGH ENERGY BISCUITS"
-    }
-  }, 
-  {
-    "pk": "KARX027ISBX0020000849901CERCERWHF<O>586", 
-    "model": "ets.epicstock", 
-    "fields": {
-      "si_record_id": "HQX0001000000000000993719", 
-      "quantity_gross": "0.001", 
-      "qualitydescr": "Good", 
-      "si_code": "00008499", 
-      "quantity_net": "0.000", 
-      "origin_id": "ISBX0020000849901", 
-      "wh_code": "AT9X002", 
-      "packagename": "OTHER (To be replaced with proper code)", 
-      "comm_category_code": "CER", 
-      "wh_country": "PAKISTAN", 
-      "wh_location": "KARACHI", 
-      "reference_number": "4500034929-99", 
-      "wh_regional": "OMB", 
-      "qualitycode": "G", 
-      "wh_name": "WFP_WH PIPRI", 
-      "commodity_code": "CERWHF", 
-      "package_code": "<O>", 
-      "allocation_code": "586", 
-      "number_of_units": 0, 
-      "project_wbs_element": "200177.1", 
-      "cmmname": "WHEAT FLOUR"
-    }
-  }, 
-  {
-    "pk": "KARX027ISBX0020000850501CERCERWHESK01586", 
-    "model": "ets.epicstock", 
-    "fields": {
-      "si_record_id": "HQX0001000000000000993724", 
-      "quantity_gross": "24.899", 
-      "qualitydescr": "Good", 
-      "si_code": "00008505", 
-      "quantity_net": "24.750", 
-      "origin_id": "ISBX0020000850501", 
-      "wh_code": "AT9X002", 
-      "packagename": "SACK,WOVEN,POLYPROPYLENE, 50 KGS NET", 
-      "comm_category_code": "CER", 
-      "wh_country": "PAKISTAN", 
-      "wh_location": "KARACHI", 
-      "reference_number": "4500034929-05", 
-      "wh_regional": "OMB", 
-      "qualitycode": "G", 
-      "wh_name": "WFP_WH PIPRI", 
-      "commodity_code": "CERWHE", 
-      "package_code": "SK01", 
-      "allocation_code": "586", 
-      "number_of_units": 495, 
-      "project_wbs_element": "107680.1", 
-      "cmmname": "WHEAT"
-    }
-  }, 
-  {
-    "pk": 1, 
-    "model": "ets.epiclossdamages", 
-    "fields": {
-      "cause": "DETERIORATION OF PACKAGING MATERIALS", 
-      "type": "D", 
-      "comm_category_code": "BEV"
-    }
-  }, 
-  {
-    "pk": 2, 
-    "model": "ets.epiclossdamages", 
-    "fields": {
-      "cause": "INADEQUATE TRANSPORT", 
-      "type": "D", 
-      "comm_category_code": "BEV"
-    }
-  }, 
-  {
-    "pk": 1, 
-    "model": "ets.dispatchpoint", 
-    "fields": {
-      "origin_location_code": "AT9X", 
-      "origin_loc_name": "ABBOTABAD", 
-      "origin_wh_name": "ABBOTABAD WAREHOUSE", 
-      "origin_wh_code": "AT9X002", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": 2, 
-    "model": "ets.dispatchpoint", 
-    "fields": {
-      "origin_location_code": "1H1X", 
-      "origin_loc_name": "BAHAWAL PUR", 
-      "origin_wh_name": "BAHAWALPUR WH", 
-      "origin_wh_code": "1H1X002", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": 3, 
-    "model": "ets.dispatchpoint", 
-    "fields": {
-      "origin_location_code": "BQ3X", 
-      "origin_loc_name": "BAHAWALNAGAR", 
-      "origin_wh_name": "BAHAWALNAGAR_WH", 
-      "origin_wh_code": "BQ3X001", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": 2, 
-    "model": "ets.receptionpoint", 
-    "fields": {
-      "LOC_NAME": "ABBOTABAD", 
-      "LOCATION_CODE": "AT9X", 
-      "consegnee_name": "INTERNATIONAL RESCUE COMMITTEE_IRC", 
-      "consegnee_code": "IRC", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": 3, 
-    "model": "ets.receptionpoint", 
-    "fields": {
-      "LOC_NAME": "ABBOTABAD", 
-      "LOCATION_CODE": "AT9X", 
-      "consegnee_name": "WORLD FOOD PROGRAMME", 
-      "consegnee_code": "WFP", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": 1, 
-    "model": "ets.receptionpoint", 
-    "fields": {
-      "LOC_NAME": "ABBOTTABAD", 
-      "LOCATION_CODE": "AOBX", 
-      "consegnee_name": "WORLD FOOD PROGRAMME", 
-      "consegnee_code": "WFP", 
-      "ACTIVE_START_DATE": "9999-12-31"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000984141", 
-    "model": "ets.sitracker", 
-    "fields": {
-      "number_units_left": "5033.000", 
-      "number_units_start": "5033.000"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000988849", 
-    "model": "ets.sitracker", 
-    "fields": {
-      "number_units_left": "11527.000", 
-      "number_units_start": "11527.000"
-    }
-  }, 
-  {
-    "pk": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
-    "model": "ets.sitracker", 
-    "fields": {
-      "number_units_left": "35441.000", 
-      "number_units_start": "35442.000"
+      "super_user": true, 
+      "is_reciever": true, 
+      "is_all_receiver": false, 
+      "dispatch_warehouse": "ISBX002", 
+      "is_dispatcher": true, 
+      "is_compas_user": true, 
+      "reception_warehouse": "ISBX002", 
+      "compas_person": "ISBX0020000586", 
+      "reader_user": false
     }
   }, 
   {
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
-      "waybillNumber": "A0009", 
-      "transportVehicleRegistration": "", 
-      "transportContractor": "HAMAYOON AND CO", 
-      "dispatch_warehouse": "ISBX002",
-      "dispatchRemarks": "", 
-      "dateOfDispatch": "2011-06-12",
-      "created": "2011-06-12 05:36:54", 
-      "recipientArrivalDate": null, 
-      "recipientConsingee": "WORLD FOOD PROGRAMME", 
-      "transportSubContractor": "", 
-      "transportDeliverySignedTimestamp": null, 
-      "recipientDistance": null, 
-      "recipientName": "", 
-      "auditComment": "Print Dispatch Original", 
-      "dispatcherSigned": true, 
-      "waybillProcessedForPayment": false, 
-      "recipientSignedTimestamp": null, 
-      "dispatcherTitle": "LOGISTICS OFFICER", 
-      "containerTwoSealNumber": "", 
-      "transportDeliverySigned": false, 
-      "containerTwoRemarksReciept": "", 
-      "ltiNumber": "QANX0010010128226P", 
-      "containerOneRemarksReciept": "", 
-      "transportDispachSignedTimestamp": "2011-06-12 13:12:43", 
-      "transactionType": "WIT", 
-      "invalidated": false, 
-      "containerTwoRemarksDispatch": "", 
-      "recipientSigned": false, 
-      "transportDispachSigned": true, 
-      "dateOfLoading": "2011-06-12", 
-      "recipientEndDischargeDate": null, 
-      "recipientRemarks": "", 
-      "waybillSentToCompas": false, 
-      "recipientStartDischargeDate": null, 
-      "containerOneRemarksDispatch": "", 
-      "containerOneSealNumber": "", 
-      "waybillValidated": false, 
-      "transportType": "02", 
-      "destinationWarehouse": "OE7X001", 
-      "recipientLocation": "SUKKHUR", 
-      "waybillRecSentToCompas": false, 
-      "transportDriverName": "", 
-      "dispatcherName": "ISBX0020000586", 
-      "transportDriverLicenceID": "", 
-      "containerOneNumber": "", 
-      "recipientTitle": "", 
-      "containerTwoNumber": "", 
-      "waybillReceiptValidated": false, 
-      "transportTrailerRegistration": ""
+      "order_code": "OURLITORDER",
+      "project_number": "1",
+      "transport_name": "MUSLIM TRANSPORT",
+      "warehouse": "ISBX002",
+      
+      "status": 1,
+      
+      "date_created": "2011-06-12 05:36:54",
+      "loading_date": "2011-06-12",
+      "dispatch_date": "2011-06-12",
+      
+      "transaction_type": "WIT",
+      "transport_type": "02",
+      
+      "dispatch_remarks": "",
+      "dispatcher_person": "ISBX0020000586",
+      
+      "transport_sub_contractor": "", 
+      "transport_driver_name": "Ahmed",
+      "transport_driver_licence": "EG234454",
+      "transport_vehicle_registration": "AE234454", 
+      "transport_trailer_registration": "",
+      
+      "transport_dispach_signed_date": null,
+      "transport_delivery_signed_date": null,
+      
+      "container_one_number": "",
+      "container_two_number": "",
+      "container_one_seal_number": "",
+      "container_two_seal_number": "",
+      "container_one_remarks_dispatch": "",
+      "container_two_remarks_dispatch": "",
+      "container_one_remarks_reciept": "",
+      "container_two_remarks_reciept": "",
+      
+      "recipient_person": "",
+      
+      "recipient_arrival_date": null,
+      "recipient_start_discharge_date": null,
+      "recipient_end_discharge_date": null,
+      "recipient_distance": null,
+      "recipient_remarks": "",
+      "recipient_signed_date": null,
+      "destination": "ISBX003",
+      
+      "validated": false,
+      "receipt_validated": false,
+      "sent_compas": false,
+      "rec_sent_compas": false,
+      "processed_for_payment": false,
+
+      "audit_comment": "Print Dispatch Original" 
     }
   }, 
   {
-    "pk": "QANX001000000000000005217HQX0001000000000000984141KARX025KARX0010000944801MIXMIXHEBCG15586", 
-    "model": "ets.ltiwithstock", 
-    "fields": {
-      "lti_line": "QANX001000000000000005217HQX0001000000000000984141", 
-      "lti_code": "QANX0010010128226P", 
-      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15586"
-    }
-  }, 
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
-    "model": "ets.ltiwithstock", 
-    "fields": {
-      "lti_line": "QANX001000000000000005217HQX0001000000000000988849", 
-      "lti_code": "QANX0010010128226P", 
-      "stock_item": "KARX027ISBX0020000849901CERCERWHF<O>586"
-    }
-  },
-  {
-    "pk": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
-    "model": "ets.ltiwithstock", 
-    "fields": {
-      "lti_line": "AFASDFASDFA7SDFA9S9FASFS0GDFG3", 
-      "lti_code": "QANX0010010128226R", 
-      "stock_item": "KARX027ISBX0020000850501CERCERWHESK01586"
-    }
-  },
-  {
-    "pk": "isbx00211a", 
+    "pk": "ISBX00211A1", 
     "model": "ets.loadingdetail", 
     "fields": {
-      "numberUnitsGood": "0.000", 
-      "unitsDamagedType": null, 
-      "unitsLostReason": null, 
-      "numberUnitsLost": "0.000", 
-      "wbNumber": "ISBX00211A", 
-      "overloadedUnits": false, 
-      "numberUnitsLoaded": "5.000", 
-      "order_item": "QANX001000000000000005217HQX0001000000000000984141KARX025KARX0010000944801MIXMIXHEBCG15586", 
-      "unitsDamagedReason": null, 
-      "unitsLostType": null, 
-      "loadingDetailSentToCompas": false, 
-      "overOffloadUnits": false, 
-      "numberUnitsDamaged": "0.000"
-    }
-  }, 
-  {
-    "pk": "isbx00211a1", 
-    "model": "ets.loadingdetail", 
-    "fields": {
-      "numberUnitsGood": "0.000", 
-      "unitsDamagedType": null, 
-      "unitsLostReason": null, 
-      "numberUnitsLost": "0.000", 
-      "wbNumber": "ISBX00211A", 
-      "overloadedUnits": false, 
-      "numberUnitsLoaded": "10.000", 
-      "order_item": "QANX001000000000000005217HQX0001000000000000988849KARX027ISBX0020000849901CERCERWHF-O-586", 
-      "unitsDamagedReason": null, 
-      "unitsLostType": null, 
-      "loadingDetailSentToCompas": false, 
-      "overOffloadUnits": false, 
-      "numberUnitsDamaged": "0.000"
+      "waybill": "ISBX00211A",
+      
+      "origin_id": "testme0123",
+      "package": "CARTON, FIBREBOARD, 100 X 100 GRM BAG",
+      
+      "si_code": "123",
+      "comm_category_code": "MIX",
+      "commodity_code": "BEER",
+      "commodity_name": "COOL UKRAINIAN BEER",
+      
+      "number_of_units": 35,
+      "unit_weight_net": "50.000",
+      "unit_weight_gross": "50.330",
+      
+      "number_units_good": "0",
+      "number_units_lost": "0",
+      "number_units_damaged": "0",
+      
+      "units_lost_reason": null,
+      "units_damaged_reason": null,
+      "units_damaged_type": null,
+      "units_lost_type": null,
+      
+      "overloaded_units": false,
+      "loading_detail_sent_compas": false,
+      "over_offload_units": false
     }
   }
 ]

@@ -2,18 +2,12 @@
 
 from django.core.management.base import BaseCommand
 
+from ets.utils import update_compas
+
 
 class Command(BaseCommand):
 
-    help = 'Updates lti and stock.'
+    help = 'Synchronizes data with compas database'
 
-    requires_model_validation = False
-
-    #@transaction.commit_on_success
     def handle(self, *args, **options):
-
-        verbosity = int(options.get('verbosity', 1))
-        if verbosity >= 2:
-            print("Uploading data ...")
-
-    
+        update_compas()

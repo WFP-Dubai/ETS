@@ -1,112 +1,118 @@
 from django.contrib import admin
-import ets.models
-from django.contrib.auth.models import User
 import datetime
+from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 #from django.utils.translation import ugettext_lazy as _
+
+import logicaldelete.admin
+
+import ets.models
+
 
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
 
-class WaybillAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
-    readonly_fields = ('created',)
-    list_filter = ('status', 'created',)
+class WaybillAdmin(logicaldelete.admin.ModelAdmin):
+    #list_display = ('pk', 'status', 'ltiNumber', 'dateOfDispatch', 'dispatch_warehouse', 'destinationWarehouse')
+    list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
+    readonly_fields = ('date_created',)
+    list_filter = ('status', 'date_created',)
     search_fields = ('pk',)
     inlines = (LoadingDetailsInline,)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 
 
+class OrderItemInline(admin.TabularInline):
+    model = ets.models.OrderItem
+    extra = 0
+
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'warehouse', 'consignee', 'created', 'dispatch_date', 'expiry')
+    readonly_fields = ('created', 'updated')
+    list_filter = ('dispatch_date', 'origin_type')
+    search_fields = ('pk', 'origin_type', 'project_number')
+    inlines = (OrderItemInline,)
+
+admin.site.register( ets.models.Order, OrderAdmin )
+
+class OrderInline(admin.TabularInline):
+    model = ets.models.Order
+    extra = 0
+    
+
+class StockAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'comm_category_code', 'commodity_name', 
+                    'package_name', 'number_of_units', 'unit_weight_net')
+    readonly_fields = ('updated',)
+    list_filter = ('warehouse',)
+    search_fields = ('pk', 'warehouse__title', 'project_number', 'si_code', 'commodity_code', 'package_code',)
+
+admin.site.register( ets.models.StockItem, StockAdmin )
+
+class StockInline(admin.TabularInline):
+    model = ets.models.StockItem
+    extra = 0
+
+class PersonInline(admin.TabularInline):
+    model = ets.models.CompasPerson
+    extra = 0
+
+class WarehouseAdmin(admin.ModelAdmin):
+    #list_display = ('pk', 'title', 'place', 'start_date',)
+    list_display = ('pk', 'name', 'location', 'start_date',)
+    list_filter = ('location', 'start_date')
+    #list_filter = ('place', 'start_date')
+    date_hierarchy = 'start_date'
+    search_fields = ('pk', 'title', 'place__name',)
+    inlines = (PersonInline, StockInline, OrderInline)
+    
+admin.site.register( ets.models.Warehouse, WarehouseAdmin )
+
+
+class WarehouseInline(admin.TabularInline):
+    model = ets.models.Warehouse
+    extra = 0
+
+class ConsigneeAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name',)
+    search_fields = list_display
+    inlines = (WarehouseInline, OrderInline)
+
+admin.site.register( ets.models.Consignee, ConsigneeAdmin )
+
+class LocationAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'name', 'country', 'compas')
+    search_fields = list_display
+    inlines = (WarehouseInline, OrderInline)
+    list_filter = ('country',)
+
+admin.site.register( ets.models.Location, LocationAdmin )
+
 class UserProfileInline( admin.StackedInline ):
     model = ets.models.UserProfile
     verbose_name_plural = 'User Profile'
-
     extra = 0
 
-    def formfield_for_foreignkey( self, db_field, request, **kwargs ):
-            if db_field.name == "warehouses":
-                kwargs["queryset"] = ets.models.DispatchPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
-            if db_field.name == "receptionPoints":
-                kwargs["queryset"] = ets.models.ReceptionPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
-            return super( UserProfileInline, self ).formfield_for_foreignkey( db_field, request, **kwargs )
-    
-    def get_formset( self, request, obj = None, **kwargs ):
-        if  obj:
-            self.extra = 1
-        else:
-            self.extra = 0
-        return super( UserProfileInline, self ).get_formset( request, obj, **kwargs )
 
-class MyUserAdmin( UserAdmin ):
-    list_display = ( 'username', 'first_name', 'last_name', 'email' )
-    inlines = [UserProfileInline, ]
-    fieldsets = [
-                ( None, {'fields':[ 'username', 'password', 'first_name', 'last_name', 'email']} ),
-                ( 'Permissions', {'fields':[ 'is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions'], 'classes': ['collapse']} ),
-                ( 'Info', {'fields':['last_login', 'date_joined'], 'classes': ['collapse']} )
-    ]
+class UserAdmin( UserAdmin ):
+    inlines = (UserProfileInline, )
 
-
-class EpicPersonsAdmin( admin.ModelAdmin ):
-        list_display = ( 'last_name', 'first_name', 'title', 'location_code' )
-        list_filter = ( 'location_code', 'organization_id' )
-
-
-
-
-class DispatchPointAdmin( admin.ModelAdmin ):
-        list_display = ( 'origin_wh_name', 'origin_loc_name', 'origin_wh_code', 'ACTIVE_START_DATE' )
-        ordering = ( 'ACTIVE_START_DATE', 'origin_loc_name', )
-        list_filter = ( 'origin_loc_name', )
-        readonly_fields = ( 'origin_loc_name', 'origin_wh_code', 'origin_location_code', )
-        fieldsets = [
-            ( 'Info', {'fields':['origin_loc_name', 'origin_wh_code', 'origin_location_code']} ),
-            ( None, {'fields':['ACTIVE_START_DATE', 'origin_wh_name']} )
-        ]
-
-
-class ReceptionPointAdmin( admin.ModelAdmin ):
-        list_display = ( 'LOC_NAME', 'consegnee_name', 'consegnee_code', 'ACTIVE_START_DATE' )
-        ordering = ( 'ACTIVE_START_DATE', 'LOC_NAME', )
-        list_filter = ( 'consegnee_name', 'LOC_NAME', )
-        readonly_fields = ( 'LOC_NAME', 'consegnee_code', 'LOCATION_CODE', )
-        fieldsets = [
-            ( 'Info', {'fields':['LOC_NAME', 'consegnee_code', 'LOCATION_CODE']} ),
-            ( None, {'fields':['ACTIVE_START_DATE', 'consegnee_name']} )
-        ]
-
-class UserProfileAdmin( admin.ModelAdmin ):
-        list_display = ( 'user', 'warehouses', 'receptionPoints' )
-
-        def formfield_for_foreignkey( self, db_field, request, **kwargs ):
-            if db_field.name == "warehouses":
-                kwargs["queryset"] = ets.models.DispatchPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
-            if db_field.name == "receptionPoints":
-                kwargs["queryset"] = ets.models.ReceptionPoint.objects.filter( ACTIVE_START_DATE__lte = datetime.date.today() )
-
-            return super( UserProfileAdmin, self ).formfield_for_foreignkey( db_field, request, **kwargs )
-
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
-        list_display = ( 'packageCode', 'packageShortName')
-        list_filter = ( 'packageCode', 'packageShortName' )
+    list_display = ( 'code', 'description')
+    #list_display = ( 'pk', 'description')
+    list_filter = list_display
 
-
-class LoadingDetailAdmin( admin.ModelAdmin ):
-        list_display = ( 'waybillNumber', 'siNo' )
-
-
-admin.site.unregister( User )
-admin.site.register( User, MyUserAdmin )
-admin.site.register( ets.models.UserProfile, UserProfileAdmin )
-admin.site.register( ets.models.DispatchPoint, DispatchPointAdmin )
-admin.site.register( ets.models.ReceptionPoint, ReceptionPointAdmin )
-admin.site.register( ets.models.EpicPerson, EpicPersonsAdmin )
-#admin.site.register( LossesDamagesReason, LossesDamagesReasonAdmin )
-#admin.site.register( LossesDamagesType )
 admin.site.register( ets.models.PackagingDescriptionShort, PackagingDescriptonShortAdmin )
-#admin.site.register( EpicLossReason )
+
+class LossDamageTypeAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'type', 'comm_category_code', 'cause')
+    list_filter = ('type',)
+
+admin.site.register( ets.models.LossDamageType, LossDamageTypeAdmin )
