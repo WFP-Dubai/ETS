@@ -228,7 +228,7 @@ class ApiEmptyServerTestCase(TestCase):
         self.create_objects()
         
         self.assertNotEqual(self.get_waybill().status, Waybill.DELIVERED)
-        
+
         #Provide content-type
         response = self.client.put(reverse("api_delivered_waybill"), 
                                    data=get_fixture_text('test_delivered_sync.json'), 
