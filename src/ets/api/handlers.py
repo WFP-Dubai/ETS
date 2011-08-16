@@ -170,7 +170,7 @@ class CSVEmitter(Emitter):
         result = StringIO.StringIO()
         if type(self.construct()[0]) is DictType:
             fieldnames = self.construct()[0].keys()
-            dict_writer = csv.DictWriter(result, fieldnames)
+            dict_writer = csv.DictWriter(result, fieldnames, dialect='excel')
             header = {}
             for field in fieldnames:
                 header[field] = field
