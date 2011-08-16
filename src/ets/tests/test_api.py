@@ -133,6 +133,22 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        
+    def test_get_stock_items(self):
+        
+        warehouse = Warehouse.objects.filter(code='ISBX002')
+        # All stock items
+        response = self.client.get(reverse("api_stock_items"))
+        self.assertContains(response, warehouse[0].code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Stock items for one warehouse
+        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse[0].code}))
+        self.assertContains(response, warehouse[0].code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['warehouse_id'], warehouse[0].code)
 
 
 class ApiEmptyServerTestCase(TestCase):
