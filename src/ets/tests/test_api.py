@@ -117,7 +117,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         waybills = Waybill.objects.all()
         # All Loading details
         response = self.client.get(reverse("api_loading_details"))
-        self.assertContains(response, 'ISBX00211A1', status_code=200)
+        self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for one waybill
         response = self.client.get(reverse("api_loading_details", kwargs={"waybill": waybills[0].slug}))
@@ -228,7 +228,7 @@ class ApiEmptyServerTestCase(TestCase):
         self.create_objects()
         
         self.assertNotEqual(self.get_waybill().status, Waybill.DELIVERED)
-        
+        print "111111111"
         #Provide content-type
         response = self.client.put(reverse("api_delivered_waybill"), 
                                    data=get_fixture_text('test_delivered_sync.json'), 
