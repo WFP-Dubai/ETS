@@ -14,16 +14,18 @@ from django.db import transaction
 from django.db.models import Q, Sum, Count
 
 from piston.handler import BaseHandler
-from piston.utils import rc, Mimer
+from piston.utils import rc
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, LoadingDetail, Place, sync_data
+from ..models import Waybill, Warehouse, LoadingDetail, StockItem, sync_data
 
-class PlaceHandler(BaseHandler):
-
-    #allowed_methods = ('GET',)
-    model = Place
-    exclude = ('_state',)
+#=======================================================================================================================
+# class PlaceHandler(BaseHandler):
+# 
+#    #allowed_methods = ('GET',)
+#    model = Place
+#    exclude = ('_state',)
+#=======================================================================================================================
 
 
 #===============================================================================
@@ -78,7 +80,25 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             waybills_data.update(detail)
             result.append(waybills_data)  
         return result
+
             
+class ReadCSVStockItemsHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = StockItem
+    
+    def read(self, request, warehouse=""):
+        """Finds all sent waybills to provided destination"""
+        if warehouse: 
+            stock_items = self.model.objects.filter(warehouse=warehouse).values()
+        else:
+            stock_items = self.model.objects.values()
+        result = []
+        for item in stock_items:
+            stock_items_data = Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
+            stock_items_data.update(item)
+            result.append(stock_items_data)  
+        return result
 
 
 class NewWaybillHandler(BaseHandler):
