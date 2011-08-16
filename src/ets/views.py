@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core import serializers
 from django.core.urlresolvers import reverse
-#from django.forms.formsets import BaseFormSet
+from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory, modelformset_factory, model_to_dict
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -125,11 +125,15 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
 @login_required
 @transaction.commit_on_success
-def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_form=LoadingDetailDispatchForm,
-                   queryset=ets.models.Order.objects.all(), template='waybill/create.html' ):
+def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, formset_form=LoadingDetailDispatchForm,
+                   order_queryset=ets.models.Order.objects.all(),
+                   waybill_pk=None, waybill_queryset = ets.models.Waybill.objects.all(), 
+                   template='waybill/create.html' ):
     """Creates a Waybill"""
     
-    order = get_object_or_404(queryset, pk=order_pk)
+    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order_code=order_pk) if waybill_pk else None
+    
+    order = get_object_or_404(order_queryset, pk=order_pk)
     
     class FormsetForm( formset_form ):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))
@@ -154,16 +158,15 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
         #            self._errors['numberUnitsLoaded'].append( myerror )
         #            raise forms.ValidationError( myerror )
         #===============================================================================================================
-        
-    loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
-                                            form=FormsetForm, fk_name = "waybill", 
-                                            formset = BaseLoadingDetailFormFormSet, 
-                                            extra=5, max_num=5)\
+    
+    loading_formset = modelformset_factory(ets.models.LoadingDetail, 
+                                           form=FormsetForm,
+                                           formset = BaseLoadingDetailFormFormSet, 
+                                           extra=5, max_num=5,
+                                           can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, prefix='item')
     
-    profile = request.user.get_profile()
-    
-    form = form_class(data=request.POST or None, files=request.FILES or None, initial={
+    form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill, initial={
         'loading_date': order.dispatch_date,
         'dispatch_date': order.dispatch_date,
     })
@@ -177,29 +180,13 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
         waybill.project_number = order.project_number
         waybill.transport_name = order.transport_name
         waybill.warehouse = order.warehouse
-        waybill.dispatcher_person = profile.compas_person
+        waybill.dispatcher_person = request.user.get_profile().compas_person
         waybill.save()
         
-        for loading_form in loading_formset:
-            obj = loading_form.save(commit=False)
-            stock_item = loading_form.cleaned_data.get('stock_item')
-            if stock_item:
-                obj.origin_id = stock_item.pk
-                obj.si_code = stock_item.si_code
-                
-                obj.comm_category_code = stock_item.comm_category_code
-                obj.commodity_code = stock_item.commodity_code
-                obj.commodity_name = stock_item.commodity_name
-                
-                obj.unit_weight_net = stock_item.unit_weight_net
-                obj.unit_weight_gross = stock_item.unit_weight_gross
-                
-                obj.package = stock_item.packaging_description()
-                
-                obj.waybill = waybill
-                
-                obj.save()
-    
+        for details in loading_formset.save(False):
+            details.waybill = waybill
+            details.save()
+        
         messages.success(request, _("Waybill has been created."))
         return redirect(waybill)
         
@@ -207,7 +194,9 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm, formset_fo
         'form': form, 
         'formset': loading_formset,
         'object': order,
+        'waybill': waybill,
     })
+
 
 #=======================================================================================================================
 # def import_ltis( request ):
@@ -635,63 +624,6 @@ def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.
         'form': form, 
         'lti_list': current_lti, 
         'formset': formset
-    })
-
-
-
-
-@login_required
-def waybill_edit( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/createWaybill.html' ):
-    current_wb = get_object_or_404(queryset, pk=waybill_pk)
-    lti_code = current_wb.ltiNumber
-    current_lti = LtiOriginal.objects.filter( code = lti_code )
-    current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    
-    class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
-        class Meta:
-            model = LoadingDetail
-            fields = ( 'order_item', 'numberUnitsLoaded', 'wbNumber', 'overloadedUnits' )
-        def clean( self ):
-            try:
-                cleaned = self.cleaned_data
-
-                #order_item = cleaned.get( 'order_item' )
-                units = cleaned.get( "numberUnitsLoaded" )
-                overloaded = cleaned.get( 'overloadedUnits' )
-                max_items = self.instance.numberUnitsLoaded
-
-                if units > max_items + self.instance.numberUnitsLoaded and overloaded == False:
-                        myerror = "Overloaded!"
-                        self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                        self._errors['numberUnitsLoaded'].append( myerror )
-                        raise forms.ValidationError( myerror )
-                return cleaned
-            except Exception as e:
-                    myerror = "Value error!"
-                    self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-                    self._errors['numberUnitsLoaded'].append( myerror )
-                    raise forms.ValidationError( myerror )
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
-                                       fk_name = "wbNumber", formset = BaseLoadingDetailFormFormSet, 
-                                       extra = 5, max_num = 5 )
-
-    if request.method == 'POST':
-        form = WaybillForm( request.POST, instance = current_wb )
-        formset = LDFormSet( request.POST, instance = current_wb )
-        if form.is_valid() and formset.is_valid():
-            wb_new = form.save()
-            formset.save()
-            return redirect(wb_new)
-    else:
-        form = WaybillForm( instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
-        formset = LDFormSet( instance = current_wb )
-    
-    return direct_to_template( request, template, {
-        'form': form, 
-        'lti_list': current_lti, 
-        'formset': formset,
     })
 
 

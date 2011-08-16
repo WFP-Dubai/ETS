@@ -729,6 +729,12 @@ class Waybill( ld_models.Model ):
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
     
+    def get_order(self, default=None):
+        try:
+            return Order.objects.get(pk=self.order_code)
+        except Order.DoesNotExist:
+            return default
+    
     def is_editable(self, user):
         return self.status < self.SIGNED and not user.get_profile().reader_user
     
