@@ -30,7 +30,7 @@
 {% endif %}
 
 {% if editable %}
-  <form action="{% url waybill_delete waybill_pk=object.pk %}" 
+  <form action="{% url waybill_delete waybill_pk=object.pk redirect_to='index' %}" 
     class="the_forms" name="deletewaybill" id="deletewaybill" method="get"
   >
     <input type="submit" name="Delete Waybill" id='Delete' value='Delete Waybill' />

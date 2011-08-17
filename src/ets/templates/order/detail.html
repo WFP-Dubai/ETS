@@ -58,7 +58,7 @@
       </tr>
       <tr>
         {% if user.get_profile.is_dispatcher and user.get_profile.dispatch_warehouse == object.warehouse %}
-        <td class='bordered' align="center"><a href='{% url waybill_delete waybill_pk=waybill.pk %}'>
+        <td class='bordered' align="center"><a href='{% url waybill_delete waybill_pk=waybill.pk redirect_to="next" %}'>
               {% trans "Delete Waybill" %}</a></td>
         {% endif %}
       </tr>

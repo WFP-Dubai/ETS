@@ -100,7 +100,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/invalidate_waybill/(?P<waybill_pk>[-\w]+)/$', "invalidate_waybill",{
         'queryset': Waybill.objects.all(),
     },"invalidate_waybill" ),
-    (r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
+    (r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
     ( r'^waybill/view_stock/$', "direct_to_template", {
         "template": 'stock/stocklist.html',
         "extra_context": {

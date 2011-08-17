@@ -339,10 +339,13 @@ def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
 
 
 @login_required
-def waybill_delete(request, waybill_pk, redirect_to='index', queryset=ets.models.Waybill.objects.all()):
+def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.delete()
-    return redirect(redirect_to)
+    if redirect_to == 'next' :
+        return redirect(request.META['HTTP_REFERER'])
+    else:
+        return redirect(redirect_to)
         
 
 @login_required
