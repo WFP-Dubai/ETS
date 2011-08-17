@@ -198,46 +198,6 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, 
     })
 
 
-#=======================================================================================================================
-# def import_ltis( request ):
-#    """
-#    View: import_ltis 
-#    URL: /waybill/import
-#    Template: /ets/waybill/templates/status.html
-#    Executes Imports of LTIs, Persons, Stock, and updates SiTracker,
-#    add tag to say when last done
-#    """
-# 
-#    #print 'Import Persons'
-#    EpicPerson.update()
-#    #print 'Import GEO'
-#    Place.update()
-#    #print 'Import Stock'
-#    EpicStock.update()
-#    #print 'Import Setup'
-#    import_setup()
-#    #print 'Import LTIs'
-#    import_lti()
-#    status = 'Import Finished'
-#    track_compas_update()
-#    messages.add_message( request, messages.INFO, status )
-# 
-#    return redirect("index")
-#=======================================================================================================================
-
-#### Waybill Views
-#=======================================================================================================================
-# @login_required
-# def waybill_create( request, lti_pk, queryset=LtiOriginal.objects.all(), template='detailed_waybill.html' ):
-#    try:
-#        return direct_to_template( request, template, {
-#            'detailed': queryset.get( lti_pk = lti_pk ), 
-#            'lti_id': lti_pk,
-#        })
-#    except:
-#        return redirect( "index" )
-#=======================================================================================================================
-
 @login_required
 def waybill_finalize_receipt( request, waybill_pk, queryset):
     """
@@ -484,44 +444,28 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
 
 
 @login_required
-def waybill_reception( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='waybill/receiveWaybill.html' ):
-    # get the LTI info
-    current_wb = get_object_or_404(queryset, pk = waybill_pk )
-    current_lti = current_wb.ltiNumber
-    current_items = LtiWithStock.objects.filter( lti_code = current_lti )
+def waybill_reception(request, waybill_pk, 
+                      queryset=ets.models.Waybill.objects.all(), 
+                      template='waybill/receiveWaybill.html' ):
+    
+    waybill = get_object_or_404(queryset, pk=waybill_pk)
+    
     profile = request.user.get_profile()
-    if not (profile.is_reciever or profile.super_user or profile.compasUser):
-        return redirect(current_wb.get_absolute_url())
     
-#    current_wb.auditComment = 'Receipt Action'
-#    current_wb.save()
-    
-    class LRModelChoiceField( forms.ModelChoiceField ):
-        def label_from_instance( self, obj ):
-            cause = obj.cause
-            length_c = len( obj.cause ) - 10
-            if length_c > 20:
-                cause = obj.cause[0:20] + '...' + obj.cause[length_c:]
-            return cause
-    
-    class LoadingDetailRecForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField(queryset = current_items, label = 'Commodity' )
-        #===============================================================================================================
-        # for itm in ModelChoiceIterator( order_item ):
-        #    print itm
-        #===============================================================================================================
-        numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
+    class LoadingDetailRecForm(forms.ModelForm):
+        
+        class Meta:
+            model = ets.models.LoadingDetail
+            fields = ('origin_id', 'commodity_name', 'number_units_good', 'number_units_lost', 
+                      'number_units_damaged', 'units_lost_reason', 'units_damaged_reason', 
+                      'units_damaged_type', 'units_lost_type')
+        
         comm_cats = []
         for item in  current_items :
             comm_cats.append( item.lti_line.comm_category_code )
-        unitsLostReason = LRModelChoiceField(label =_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(label =_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
-        class Meta:
-            model = LoadingDetail
-            fields = ( 'wbNumber', 'order_item', 'numberUnitsGood', 'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason',
-                        'unitsDamagedReason', 'overloadedUnits', 'overOffloadUnits' )
+        units_lost_reason = LRModelChoiceField(label =_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
+        units_damaged_reason = LRModelChoiceField(label =_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
+
         def clean_unitsLostReason( self ):
             #cleaned_data = self.cleaned_data
             my_losses = self.cleaned_data.get( 'numberUnitsLost' )

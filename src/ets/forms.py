@@ -238,3 +238,10 @@ class LoadingDetailRecieptForm( ModelForm ):
             'units_damaged_reason', 
         )
 
+class LRModelChoiceField( forms.ModelChoiceField ):
+    def label_from_instance( self, obj ):
+        cause = obj.cause
+        length_c = len( obj.cause ) - 10
+        if length_c > 20:
+            cause = obj.cause[0:20] + '...' + obj.cause[length_c:]
+        return cause
