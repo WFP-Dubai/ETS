@@ -19,6 +19,8 @@ from django.contrib import messages
 from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
+from django.core.exceptions import ObjectDoesNotExist
+
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
@@ -334,6 +336,14 @@ def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
     return direct_to_template( request, template, {
         'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
     })
+
+
+@login_required
+def waybill_delete(request, waybill_pk, redirect_to='index', queryset=ets.models.Waybill.objects.all()):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.delete()
+    return redirect(redirect_to)
+        
 
 @login_required
 def waybill_validate_form_update( request, waybill_pk, queryset, 

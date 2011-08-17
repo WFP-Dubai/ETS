@@ -16,7 +16,8 @@
         <th>{% trans "Validated" %}</th>
         <th>{% trans "In Compas" %}</th>
       {% endif %}
-        <th>{% trans "Action" %}</th>
+      <th>{% trans "Action" %}</th>
+      <th>{% trans "Delete" %}</th>
     </tr>
   </thead>
   
@@ -58,10 +59,12 @@
             <a href='{% if myprofile.is_dispatcher %}{{ waybill.get_absolute_url }}{% else %}{% url waybill_view_reception waybill_pk=waybill.pk %}{% endif %}'>
              {% trans "View WB" %}
             </a>
-          {% endif %}
-          {% if myprofile.super_user %}
+          {% else %}
             <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>
           {% endif %}
+        </td>
+        <td>
+          <a href='{% url waybill_delete waybill_pk=waybill.pk redirect_to="index" %}'>{% trans "Delete" %}</a>   
         </td>
       </tr>
     {% endif %}

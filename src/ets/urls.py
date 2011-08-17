@@ -100,6 +100,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/invalidate_waybill/(?P<waybill_pk>[-\w]+)/$', "invalidate_waybill",{
         'queryset': Waybill.objects.all(),
     },"invalidate_waybill" ),
+    (r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
     ( r'^waybill/view_stock/$', "direct_to_template", {
         "template": 'stock/stocklist.html',
         "extra_context": {
@@ -141,7 +142,7 @@ urlpatterns += patterns('',
     ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
     ( r'^rosetta/', include('rosetta.urls') ),
     ( r'^admin/', include( admin.site.urls ) ),
-    (r'^api/', include('ets.api.urls')),                    
+    ( r'^api/', include('ets.api.urls')),                    
 )
 
 if settings.DEBUG:
