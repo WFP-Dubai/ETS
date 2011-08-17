@@ -13,7 +13,7 @@ from django.core.management import call_command
 
 #from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
-from ..models import Waybill, LtiOriginal, EpicStock, Warehouse, Waybill
+#from ..models import Waybill, LtiOriginal, EpicStock, Warehouse,
 from ets.utils import update_compas
 from ets.api.client import *
 import ets.api.client
@@ -39,7 +39,7 @@ class TestDevelopmentMixin(object):
         self.maxDiff = None
     
     def get_waybill(self):
-        return Waybill.objects.get(pk="ISBX00211A")
+        return ets.models.Waybill.objects.get(pk="ISBX00211A")
     
 
 class ApiServerTestCase(TestDevelopmentMixin, TestCase):
@@ -68,7 +68,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
     def test_get_receiving(self):
         #Change status of first one
-        self.get_waybill().update_status(status=Waybill.SENT)
+        self.get_waybill().update_status(status=ets.models.Waybill.SENT)
         
         response = self.client.get(reverse("api_receiving_waybill", 
                                            kwargs={"destination": self.get_waybill().destination.pk}))
@@ -80,7 +80,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
     def test_get_delivered(self):
         #Change status of first one
-        self.get_waybill().update_status(status=Waybill.DELIVERED)
+        self.get_waybill().update_status(status=ets.models.Waybill.DELIVERED)
         
         response = self.client.get(reverse("api_delivered_waybill", kwargs={"slug": self.get_waybill().pk}))
         self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
@@ -91,22 +91,21 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         
     def test_get_waybills(self):
 
-        waybills = Waybill.objects.all()
         # All waybills
         response = self.client.get(reverse("api_waybills"))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # One wabill
-        response = self.client.get(reverse("api_waybills", kwargs={"slug": waybills[0].slug}))
+        response = self.client.get(reverse("api_waybills", kwargs={"slug": self.get_waybill().slug}))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['slug'], waybills[0].slug)
+        self.assertEqual(item['slug'], self.get_waybill().slug)
         # Waybills with destination and warehouse
-        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": waybills[0].warehouse.code, 
-                                                                   "destination": waybills[0].destination.code}))
+        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": self.get_waybill().warehouse.code, 
+                                                                   "destination": self.get_waybill().destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
@@ -114,41 +113,85 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         
     def test_get_loading_details(self):
 
-        waybills = Waybill.objects.all()
         # All Loading details
         response = self.client.get(reverse("api_loading_details"))
         self.assertContains(response, 'ISBX00211A1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for one waybill
-        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": waybills[0].slug}))
+        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": self.get_waybill().slug}))
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['order_code'], waybills[0].order_code)
+        self.assertEqual(item['order_code'], self.get_waybill().order_code)
         # Loading details for some destination and some warehouse
-        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": waybills[0].warehouse.code, 
-                                                                          "destination": waybills[0].destination.code}))
+        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().warehouse.code, 
+                                                                    "destination": self.get_waybill().destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         
-    def test_get_stock_items(self):
-        
-        warehouse = Warehouse.objects.filter(code='ISBX002')
-        # All stock items
-        response = self.client.get(reverse("api_stock_items"))
-        self.assertContains(response, warehouse[0].code, status_code=200)
+    def test_get_orders(self):
+
+        order = ets.models.Order.objects.get(pk='OURLITORDER')
+        # All orders
+        response = self.client.get(reverse("api_orders"))
+        self.assertContains(response, 'OURLITORDER', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
-        # Stock items for one warehouse
-        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse[0].code}))
-        self.assertContains(response, warehouse[0].code, status_code=200)
+        # One order
+        response = self.client.get(reverse("api_orders", kwargs={"code": order.code}))
+        self.assertContains(response, 'OURLITORDER', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['warehouse_id'], warehouse[0].code)
+        self.assertEqual(item['code'], order.code)
+        # Orders with destination and warehouse
+        response = self.client.get(reverse("api_orders", kwargs={"warehouse": order.warehouse.code, 
+                                                        "destination": order.consignee.warehouses.all()[0].code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'DOEAF', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        
+        
+    def test_get_order_items(self):
+
+        order = ets.models.Order.objects.get(pk='OURLITORDER')
+        # All order items
+        response = self.client.get(reverse("api_order_items"))
+        self.assertContains(response, 'OURLITORDER', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Order items for one order
+        response = self.client.get(reverse("api_order_items", kwargs={"order": order.code}))
+        self.assertContains(response, 'OURLITORDER', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['code'], order.code)
+        # Order items for some destination and some warehouse
+        response = self.client.get(reverse("api_order_items", kwargs={"warehouse": order.warehouse.code, 
+                                                        "destination": order.consignee.warehouses.all()[0].code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'DOEAF', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        
+    def test_get_stock_items(self):
+        
+        warehouse = ets.models.Warehouse.objects.get(pk='ISBX002')
+        # All stock items
+        response = self.client.get(reverse("api_stock_items"))
+        self.assertContains(response, warehouse.code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Stock items for one warehouse
+        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse.code}))
+        self.assertContains(response, warehouse.code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['warehouse_id'], warehouse.code)
 
 
 class ApiEmptyServerTestCase(TestCase):
@@ -167,20 +210,20 @@ class ApiEmptyServerTestCase(TestCase):
         #===============================================================================================================
     
     def get_waybill(self):
-        return Waybill.objects.all()[0]
+        return ets.models.Waybill.objects.all()[0]
     
     def test_send_new(self):
        
-        self.assertEqual(Waybill.objects.count(), 0)
+        self.assertEqual(ets.models.Waybill.objects.count(), 0)
         
         serialized_data = get_fixture_text('development.json')
 
         response = self.client.post(reverse("api_new_waybill"), data=serialized_data, content_type="application/json")
         self.assertEqual(response.content, "Created")
         
-        self.assertEqual(Waybill.objects.count(), 1)
+        self.assertEqual(ets.models.Waybill.objects.count(), 1)
         self.assertEqual(self.get_waybill().loading_details.count(), 1)
-        self.assertEqual(self.get_waybill().status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.SENT)
     
     def test_get_receiving(self):
         
@@ -205,10 +248,10 @@ class ApiEmptyServerTestCase(TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.assertEqual(Waybill.objects.count(), 0)
+        self.assertEqual(ets.models.Waybill.objects.count(), 0)
         get_receiving()
         
-        self.assertEqual(Waybill.objects.count(), 1)
+        self.assertEqual(ets.models.Waybill.objects.count(), 1)
         self.assertEqual(self.get_waybill().loading_details.count(), 1)
         #self.assertEqual(self.get_waybill().status, Waybill.SENT)
     
@@ -217,7 +260,7 @@ class ApiEmptyServerTestCase(TestCase):
         self.create_objects()
         #Change status of first one
         waybill = self.get_waybill()
-        waybill.update_status(status=Waybill.INFORMED)
+        waybill.update_status(status=ets.models.Waybill.INFORMED)
         
         response = self.client.get(reverse("api_informed_waybill", kwargs={"slug": waybill.slug}))
         self.assertContains(response, '"pk": "ISBX00211A"', status_code=200)
@@ -227,7 +270,7 @@ class ApiEmptyServerTestCase(TestCase):
         #Create objects
         self.create_objects()
         
-        self.get_waybill().update_status(Waybill.SENT)
+        self.get_waybill().update_status(ets.models.Waybill.SENT)
         
         #Bad request
         response = self.client.put(reverse("api_informed_waybill"))
@@ -237,13 +280,13 @@ class ApiEmptyServerTestCase(TestCase):
         response = self.client.put(reverse("api_informed_waybill"), data='["ISBX00211A"]', content_type="application/json")
         self.assertEqual(response.status_code, 200)
         
-        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.INFORMED)
     
     def test_send_delivered(self):
         #Create objects
         self.create_objects()
         
-        self.assertNotEqual(self.get_waybill().status, Waybill.DELIVERED)
+        self.assertNotEqual(self.get_waybill().status, ets.models.Waybill.DELIVERED)
 
         #Provide content-type
         response = self.client.put(reverse("api_delivered_waybill"), 
@@ -251,7 +294,7 @@ class ApiEmptyServerTestCase(TestCase):
                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
         
-        self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.DELIVERED)
         
         
 class ApiClientTestCase(TestDevelopmentMixin, TestCase):
@@ -270,9 +313,9 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.get_waybill().update_status(Waybill.SIGNED)
+        self.get_waybill().update_status(ets.models.Waybill.SIGNED)
         send_new()
-        self.assertEqual(self.get_waybill().status, Waybill.SENT)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.SENT)
         
     def test_get_informed(self):
         #MonkeyPatch of urlopen
@@ -288,10 +331,10 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.get_waybill().update_status(Waybill.SENT)
+        self.get_waybill().update_status(ets.models.Waybill.SENT)
         
         get_informed()
-        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.INFORMED)
     
     def test_update_informed(self):
         #MonkeyPatch of urlopen
@@ -310,9 +353,9 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         old_compas = ets.api.client.COMPAS_STATION
         ets.api.client.COMPAS_STATION = "ISBX003"
         
-        self.get_waybill().update_status(Waybill.SENT)
+        self.get_waybill().update_status(ets.models.Waybill.SENT)
         send_informed()
-        self.assertEqual(self.get_waybill().status, Waybill.INFORMED)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.INFORMED)
         
         ets.api.client.COMPAS_STATION = old_compas
     
@@ -338,10 +381,10 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         
         urllib2.urlopen = dummy_urlopen
         
-        self.get_waybill().update_status(Waybill.INFORMED)
+        self.get_waybill().update_status(ets.models.Waybill.INFORMED)
         
         get_delivered()
-        self.assertEqual(self.get_waybill().status, Waybill.DELIVERED)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.DELIVERED)
     
     def test_update_delivered(self):
         #MonkeyPatch of urlopen
@@ -360,8 +403,8 @@ class ApiClientTestCase(TestDevelopmentMixin, TestCase):
         old_compas = ets.api.client.COMPAS_STATION
         ets.api.client.COMPAS_STATION = "ISBX003"
         
-        self.get_waybill().update_status(Waybill.DELIVERED)
+        self.get_waybill().update_status(ets.models.Waybill.DELIVERED)
         send_delivered()
-        self.assertEqual(self.get_waybill().status, Waybill.COMPLETE)
+        self.assertEqual(self.get_waybill().status, ets.models.Waybill.COMPLETE)
         
         ets.api.client.COMPAS_STATION = old_compas
