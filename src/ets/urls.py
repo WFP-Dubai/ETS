@@ -112,13 +112,9 @@ urlpatterns = patterns("ets.views",
         "extra_context": {
             'stocklist': EpicStock.objects.all,
     }}, "view_stock" ),
-    ( r'^waybill/report/ltis/$', "ltis_report", {}, "ltis_report" ),
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',
     }, "select_report" ),
-    ( r'^waybill/report/dispatch/(.*)/$', "dispatch_report_wh",{},"dispatch_report_wh" ),
-    ( r'^waybill/report/receipt/(.*)/(.*)/$', "receipt_report_wh", {}, "receipt_report_wh" ),
-    ( r'^waybill/report/receipt/(.*)/$', "receipt_report_cons", {}, "receipt_report_cons" ),
     #===================================================================================================================
     # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
     #===================================================================================================================
