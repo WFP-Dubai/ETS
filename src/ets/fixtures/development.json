@@ -119,5 +119,95 @@
       "loading_detail_sent_compas": false,
       "over_offload_units": false
     }
+  },
+  {
+    "pk": "ISBX00311A", 
+    "model": "ets.waybill", 
+    "fields": {
+      "order_code": "THEIRORDER",
+      "project_number": "2",
+      "transport_name": "MUSLIM TRANSPORT",
+      "warehouse": "ISBX003",
+      
+      "status": 4,
+      
+      "date_created": "2011-06-12 05:36:54",
+      "loading_date": "2011-06-12",
+      "dispatch_date": "2011-06-12",
+      
+      "transaction_type": "WIT",
+      "transport_type": "02",
+      
+      "dispatch_remarks": "That was long night",
+      "dispatcher_person": "ISBX0020000613",
+      
+      "transport_sub_contractor": "Arpaso", 
+      "transport_driver_name": "Ahmed",
+      "transport_driver_licence": "EG234454",
+      "transport_vehicle_registration": "AE234454", 
+      "transport_trailer_registration": "",
+      
+      "transport_dispach_signed_date": null,
+      "transport_delivery_signed_date": null,
+      
+      "container_one_number": "",
+      "container_two_number": "",
+      "container_one_seal_number": "",
+      "container_two_seal_number": "",
+      "container_one_remarks_dispatch": "",
+      "container_two_remarks_dispatch": "",
+      "container_one_remarks_reciept": "",
+      "container_two_remarks_reciept": "",
+      
+      "recipient_person": "",
+      
+      "recipient_arrival_date": null,
+      "recipient_start_discharge_date": null,
+      "recipient_end_discharge_date": null,
+      "recipient_distance": null,
+      "recipient_remarks": "",
+      "recipient_signed_date": null,
+      "destination": "ISBX002",
+      
+      "validated": false,
+      "receipt_validated": false,
+      "sent_compas": false,
+      "rec_sent_compas": false,
+      "processed_for_payment": false,
+
+      "audit_comment": "Print Dispatch Original" 
+    }
+  }, 
+  {
+    "pk": "ISBX00311A1", 
+    "model": "ets.loadingdetail", 
+    "fields": {
+      "waybill": "ISBX00311A",
+      
+      "origin_id": "anotherstock1234",
+      "package": "CARTON, FIBREBOARD, 100 X 100 GRM BAG",
+      
+      "si_code": "1234",
+      "comm_category_code": "MIX",
+      "commodity_code": "BEER",
+      "commodity_name": "COOL UKRAINIAN BEER",
+      
+      "number_of_units": 35,
+      "unit_weight_net": "50.000",
+      "unit_weight_gross": "50.330",
+      
+      "number_units_good": "0",
+      "number_units_lost": "0",
+      "number_units_damaged": "0",
+      
+      "units_lost_reason": null,
+      "units_damaged_reason": null,
+      "units_damaged_type": null,
+      "units_lost_type": null,
+      
+      "overloaded_units": false,
+      "loading_detail_sent_compas": false,
+      "over_offload_units": false
+    }
   }
 ]

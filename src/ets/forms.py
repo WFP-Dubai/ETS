@@ -2,6 +2,7 @@ import datetime
 
 from django.forms import ModelForm
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
+from django.forms.formsets import formset_factory, BaseFormSet
 from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext_lazy as _
@@ -79,20 +80,42 @@ class DispatchWaybillForm( ModelForm ):
 
 
 class LoadingDetailDispatchForm( forms.ModelForm ):
-    stock_item = forms.ModelChoiceField(queryset=ets_models.StockItem.objects.all(), label=_('Commodity'))
+    stock_item = forms.ModelChoiceField(queryset=ets_models.StockItem.objects.all(), 
+                                        label=_('Commodity'), required=True)
     overload = forms.BooleanField( required = False )
 
     class Meta:
         model = ets_models.LoadingDetail
         fields = ( 'number_of_units', 'overloaded_units', 'over_offload_units' )
-
-
-class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
     
-    def append_non_form_error( self, message ):
-        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
-        errors.append( message )
-        raise forms.ValidationError( errors )
+    def save(self, commit=True):
+        obj = super(LoadingDetailDispatchForm, self).save(commit=False)
+        stock_item = self.cleaned_data.get('stock_item')
+        if stock_item:
+            obj.origin_id = stock_item.pk
+            obj.si_code = stock_item.si_code
+            
+            obj.comm_category_code = stock_item.comm_category_code
+            obj.commodity_code = stock_item.commodity_code
+            obj.commodity_name = stock_item.commodity_name
+            
+            obj.unit_weight_net = stock_item.unit_weight_net
+            obj.unit_weight_gross = stock_item.unit_weight_gross
+            
+            obj.package = stock_item.packaging_description()
+        
+        if commit:
+            obj.save()
+        
+        return obj
+
+
+class BaseLoadingDetailFormFormSet(BaseModelFormSet):
+    
+#    def append_non_form_error( self, message ):
+#        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
+#        errors.append( message )
+#        raise forms.ValidationError( errors )
     
     def clean( self ):
         super(BaseLoadingDetailFormFormSet, self).clean()
@@ -111,7 +134,7 @@ class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
     
     # create the layout object
     helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units', 
-                                 'over_offload_units', 'overload', 'DELETE' )))
+                                 'over_offload_units', 'overload',)))
     helper.formset_tag = False
 
 
@@ -215,3 +238,10 @@ class LoadingDetailRecieptForm( ModelForm ):
             'units_damaged_reason', 
         )
 
+class LRModelChoiceField( forms.ModelChoiceField ):
+    def label_from_instance( self, obj ):
+        cause = obj.cause
+        length_c = len( obj.cause ) - 10
+        if length_c > 20:
+            cause = obj.cause[0:20] + '...' + obj.cause[length_c:]
+        return cause

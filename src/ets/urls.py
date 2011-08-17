@@ -50,19 +50,24 @@ urlpatterns = patterns("ets.views",
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
-    #Waybill view
-    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
+    #Waybill pages
+    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create_or_update", {}, "waybill_create" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_create_or_update", {
+        'template': 'waybill/edit.html',
+    }, "waybill_edit" ),
+    
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
     }, "waybill_view" ),
+    
+    
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
         'queryset': Waybill.objects.filter(status=Waybill.NEW, warehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_dispatch" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
-    ( r'^waybill/edit/(?P<waybill_pk>[-\w]+)/$', "waybill_edit", {}, "waybill_edit" ),
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
