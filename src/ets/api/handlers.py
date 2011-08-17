@@ -18,6 +18,7 @@ from piston.utils import rc
 from piston.emitters import Emitter, DjangoEmitter
 
 from ..models import Waybill, Warehouse, LoadingDetail, StockItem, sync_data
+import ets.models
 
 #=======================================================================================================================
 # class PlaceHandler(BaseHandler):
@@ -41,20 +42,19 @@ class ReadCSVWaybillHandler(BaseHandler):
     model = Waybill
     
     def read(self, request, slug="", warehouse="", destination=""):
-        """Finds all sent waybills to provided destination"""
+        """Return waybills in CSV"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
         filter_arg = {}
         if warehouse: 
-            filter_arg['warehouse__code'] = warehouse
+            filter_arg['warehouse__pk'] = warehouse
         if destination:
-            filter_arg['destination__code'] = destination
+            filter_arg['destination__pk'] = destination
         if slug:
             filter_arg['slug'] = slug
+        waybills = self.model.objects.values()
         if filter_arg:
-            return self.model.objects.filter(**filter_arg).values()
-        else:
-            return self.model.objects.values()
-             
+            waybills = waybills.filter(**filter_arg)
+        return waybills    
         
 class ReadCSVLoadingDetailHandler(BaseHandler):
 
@@ -62,18 +62,17 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     model = LoadingDetail
     
     def read(self, request, waybill="", warehouse="", destination=""):
-        """Finds all sent waybills to provided destination"""
+        """Return loadin details for waybills in CSV"""
         filter_arg = {}
         if warehouse: 
-            filter_arg['waybill__warehouse__code'] = warehouse
+            filter_arg['waybill__warehouse__pk'] = warehouse
         if destination:
-            filter_arg['waybill__destination__code'] = destination
+            filter_arg['waybill__destination__pk'] = destination
         if waybill:
             filter_arg['waybill'] = waybill
+        load_details = self.model.objects.all().values()
         if filter_arg:
-            load_details = self.model.objects.filter(**filter_arg).values()
-        else:
-            load_details = self.model.objects.all().values()         
+            load_details = load_details.filter(**filter_arg)          
         result = []
         for detail in load_details:
             waybills_data = Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
@@ -81,7 +80,57 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             result.append(waybills_data)  
         return result
 
+
+class ReadCSVOrdersHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.Order
+    
+    def read(self, request, code="", warehouse="", destination="", consignee=""):
+        """Return orders in CSV"""
+        filter_arg = {}
+        if warehouse: 
+            filter_arg['warehouse__pk'] = warehouse
+        if destination:
+            filter_arg['consignee__warehouses__pk'] = destination
+        if consignee:
+            filter_arg['consignee__pk'] = consignee
+        if code:
+            filter_arg['code'] = code
+        orders = self.model.objects.values()
+        if filter_arg:
+            orders = orders.filter(**filter_arg)
+        return orders
+        
             
+class ReadCSVOrderItemsHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.OrderItem
+    
+    def read(self, request, order="", warehouse="", destination="", consignee=""):
+        """Return order items in CSV"""
+        filter_arg = {}
+        if warehouse: 
+            filter_arg['order__warehouse__pk'] = warehouse
+        if destination:
+            filter_arg['order__consignee__warehouses__pk'] = destination
+        if consignee:
+            filter_arg['order__consignee__pk'] = consignee
+        if order:
+            filter_arg['order'] = order
+        order_items = self.model.objects.all().values()
+        if filter_arg:
+            order_items = order_items.filter(**filter_arg)                    
+        result = []
+        for item in order_items:
+            order_items_data = ets.models.Order.objects.filter(code=item['order_id']).values()[0]
+            order_items_data.update(item)
+            result.append(order_items_data)  
+        
+        return result
+        
+    
 class ReadCSVStockItemsHandler(BaseHandler):
 
     allowed_methods = ('GET',)
