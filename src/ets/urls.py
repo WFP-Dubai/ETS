@@ -54,6 +54,8 @@ urlpatterns = patterns("ets.views",
     ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create_or_update", {}, "waybill_create" ),
     ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_create_or_update", {
         'template': 'waybill/edit.html',
+        'queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED,
+                                                      warehouse__pk=COMPAS_STATION)
     }, "waybill_edit" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
@@ -70,10 +72,15 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
+    #Reception pages
+    ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
+       'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED), 
+                                          destination__pk=COMPAS_STATION),
+    }, "waybill_reception"),
+    
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
-    ( r'^waybill/receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {}, "waybill_reception" ),
     ( r'^waybill/receive/$', "object_list", {
         "template_name": 'waybill/reception_list.html',
         "queryset": Waybill.objects.filter(recipient_signed_date__isnull=True),

@@ -41,7 +41,6 @@
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>    
           <td><sup >{% trans "(L)oss or (D)amage" %}</sup></td>    
-          <td><sup>{% trans "Type (specify)" %}</sup></td>
           <td>{% trans "Reason" %}</td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>
@@ -80,14 +79,6 @@
               {% if lineitem.number_units_damaged %}D{% endif %}
             </td>
 
-            <td style="text-align:left;">&nbsp;<!-- type-->
-              {% if lineitem.number_units_lost %}
-                <p>L:{{ lineitem.units_lost_type }}</p>
-              {% endif %} 
-              {% if lineitem.number_units_damaged %}
-                <p>D:{{ lineitem.units_damaged_type }}</p> 
-              {% endif %}
-            </td>
             <td style="text-align:left;">&nbsp;<!--reason-->
               {% if lineitem.number_units_lost %}
                 L:{{ lineitem.units_lost_reason|truncatesmart:20 }} 

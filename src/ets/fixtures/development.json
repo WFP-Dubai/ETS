@@ -112,8 +112,6 @@
       
       "units_lost_reason": null,
       "units_damaged_reason": null,
-      "units_damaged_type": null,
-      "units_lost_type": null,
       
       "overloaded_units": false,
       "loading_detail_sent_compas": false,
@@ -202,8 +200,6 @@
       
       "units_lost_reason": null,
       "units_damaged_reason": null,
-      "units_damaged_type": null,
-      "units_lost_type": null,
       
       "overloaded_units": false,
       "loading_detail_sent_compas": false,

@@ -20,9 +20,12 @@ from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 
+from uni_form.helpers import FormHelper, Layout, HTML, Row
+
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
 from ets.forms import WaybillValidationFormset, WarehouseChoiceForm, WaybillSearchForm, LoadingDetailDispatchForm
+from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
 from ets.tools import un64unZip, viewLog, default_json_dump
 
@@ -125,10 +128,12 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
 @login_required
 @transaction.commit_on_success
-def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, formset_form=LoadingDetailDispatchForm,
-                   order_queryset=ets.models.Order.objects.all(),
-                   waybill_pk=None, waybill_queryset = ets.models.Waybill.objects.all(), 
-                   template='waybill/create.html' ):
+def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, 
+                             formset_form=LoadingDetailDispatchForm,
+                             formset_class=BaseLoadingDetailFormFormSet,
+                             order_queryset=ets.models.Order.objects.all(),
+                             waybill_pk=None, waybill_queryset = ets.models.Waybill.objects.all(), 
+                             template='waybill/create.html' ):
     """Creates a Waybill"""
     
     waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order_code=order_pk) if waybill_pk else None
@@ -161,7 +166,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, 
     
     loading_formset = modelformset_factory(ets.models.LoadingDetail, 
                                            form=FormsetForm,
-                                           formset = BaseLoadingDetailFormFormSet, 
+                                           formset = formset_class, 
                                            extra=5, max_num=5,
                                            can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, prefix='item')
@@ -215,6 +220,45 @@ def waybill_finalize_receipt( request, waybill_pk, queryset):
     })
 
     return redirect( "waybill_reception_list" )
+
+@login_required
+def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
+                      formset_form = LoadingDetailRecieptForm,
+                      formset_class = BaseRecieptFormFormSet,
+                      template='waybill/receive.html'):
+    
+    waybill = get_object_or_404(queryset, pk=waybill_pk)
+    
+    today = datetime.date.today()
+    
+    loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
+                                            form=formset_form, formset=formset_class, 
+                                            extra=0, max_num=5,
+                                            can_order=False, can_delete=False)\
+                                (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
+    
+    form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill, initial = {
+        'recipient_arrival_date': today,
+        'recipient_start_discharge_date': today,
+        'recipient_end_discharge_date': today,
+    })
+    
+    if form.is_valid() and loading_formset.is_valid():
+        waybill = form.save(False)
+        waybill.recipient_person = request.user.get_profile().compas_person
+        waybill.auditComment = 'Receipt Action'
+        waybill.save()
+        
+        loading_formset.save(True)
+        
+        return redirect(waybill)
+    
+    return direct_to_template(request, template, {
+        'form': form, 
+        'formset': loading_formset,
+        'waybill': waybill,
+    })
+
 
 
 def create_or_update(waybill, user, error_message):
@@ -327,7 +371,7 @@ def receiptToCompas( request, template='compas/list_waybills_compas_received.htm
     })
 
 
-def invalidate_waybill( request, waybill_pk, queryset, template='status.html' ):
+def invalidate_waybill(request, waybill_pk, queryset, template='status.html'):
     #first mark waybill invalidate, then zero the stock usage for each line and update the si table
     current_wb = get_object_or_404(queryset, pk = waybill_pk )
     current_wb.invalidate_waybill_action()
@@ -440,134 +484,6 @@ def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill
         'rec_person': rec_person_object,
         'extra_lines': my_empty,
         'zippedWB': zippedWB,
-    })
-
-
-@login_required
-def waybill_reception(request, waybill_pk, 
-                      queryset=ets.models.Waybill.objects.all(), 
-                      template='waybill/receiveWaybill.html' ):
-    
-    waybill = get_object_or_404(queryset, pk=waybill_pk)
-    
-    profile = request.user.get_profile()
-    
-    class LoadingDetailRecForm(forms.ModelForm):
-        
-        class Meta:
-            model = ets.models.LoadingDetail
-            fields = ('origin_id', 'commodity_name', 'number_units_good', 'number_units_lost', 
-                      'number_units_damaged', 'units_lost_reason', 'units_damaged_reason', 
-                      'units_damaged_type', 'units_lost_type')
-        
-        comm_cats = []
-        for item in  current_items :
-            comm_cats.append( item.lti_line.comm_category_code )
-        units_lost_reason = LRModelChoiceField(label =_("units lost reason"), queryset = EpicLossDamages.objects.filter( type = 'L' ).filter( comm_category_code__in = comm_cats ) , required = False )
-        units_damaged_reason = LRModelChoiceField(label =_("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D' ).filter( comm_category_code__in = comm_cats ) , required = False )
-
-        def clean_unitsLostReason( self ):
-            #cleaned_data = self.cleaned_data
-            my_losses = self.cleaned_data.get( 'numberUnitsLost' )
-            my_lr = self.cleaned_data.get( 'unitsLostReason' )
-            if  float( my_losses ) > 0 :
-                if my_lr == None:
-                    raise forms.ValidationError( _("You have forgotten to select the Loss Reason") )
-            return my_lr
-
-        def clean_unitsDamagedReason( self ):
-            my_damage = self.cleaned_data.get( 'numberUnitsDamaged' )
-            my_dr = self.cleaned_data.get( 'unitsDamagedReason' )
-            if float( my_damage ) > 0:
-                if my_dr == None:
-                    raise forms.ValidationError( _("You have forgotten to select the Damage Reason") )
-            return my_dr
-
-
-        def clean_unitsLostType( self ):
-            #cleaned_data = self.cleaned_data
-            my_losses = self.cleaned_data.get( 'numberUnitsLost' )
-            my_lr = self.cleaned_data.get( 'unitsLostType' )
-            if  float( my_losses ) > 0 :
-                if my_lr == None:
-                    raise forms.ValidationError( _("You have forgotten to select the Loss Type") )
-            return my_lr
-
-        def clean_unitsDamagedType( self ):
-            my_damage = self.cleaned_data.get( 'numberUnitsDamaged' )
-            my_dr = self.cleaned_data.get( 'unitsDamagedType' )
-
-            if float( my_damage ) > 0:
-                if my_dr == None:
-                    raise forms.ValidationError( _("You have forgotten to select the Damage Type") )
-            return my_dr
-
-
-        def clean( self ):
-            cleaned = self.cleaned_data
-            numberUnitsGood = float( cleaned.get( 'numberUnitsGood' ) )
-            loadedUnits = float( self.instance.numberUnitsLoaded )
-            damadgedUnits = float( cleaned.get( 'numberUnitsDamaged' ) )
-            lostUnits = float( cleaned.get( 'numberUnitsLost' ) )
-            totaloffload = float( numberUnitsGood + damadgedUnits + lostUnits )
-            if not cleaned.get( 'overOffloadUnits' ):
-                if not totaloffload == loadedUnits:
-                    myerror = ''
-                    if totaloffload > loadedUnits:
-                        myerror = _("%(loadedUnits).3f Units loaded but %(totaloffload).3f units accounted for") % {"loadedUnits" : loadedUnits, "totaloffload": totaloffload }
-                    if totaloffload < loadedUnits:
-                        myerror = _("%(loadedUnits).3f Units loaded but only %(totaloffload).3f units accounted for") % {"loadedUnits" : loadedUnits, "totaloffload" : totaloffload }
-                    self._errors['numberUnitsGood'] = self._errors.get( 'numberUnitsGood', [] )
-                    self._errors['numberUnitsGood'].append( myerror )
-                    raise forms.ValidationError( myerror )
-            return cleaned
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailRecForm, fk_name = "wbNumber", extra = 0 )
-    
-    profile = request.user.get_profile()
-    
-    if request.method == 'POST':
-
-        form = WaybillRecieptForm( data=request.POST, instance = current_wb )
-
-        formset = LDFormSet( request.POST, instance = current_wb )
-        if form.is_valid() and formset.is_valid():
-            form.recipientTitle = profile.compasUser.title
-            form.recipientName = profile.compasUser.person_pk
-            wb_new = form.save()
-            wb_new.recipientTitle = profile.compasUser.title
-            wb_new.recipientName = profile.compasUser.person_pk
-            wb_new.auditComment = 'Receipt Action'
-            wb_new.save()
-            formset.save()
-            return redirect('waybill_view_reception', waybill_pk=current_wb.pk)
-        else:
-            #TODO: we should show these error to user, not print them
-            print( formset.errors )
-            print( form.errors )
-    else:
-        if current_wb.recipientArrivalDate:
-            form = WaybillRecieptForm( instance = current_wb )
-            #form.instance.auditComment= 'Receipt Action'
-            form.recipientTitle = profile.compasUser.title
-            form.recipientName = "%s, %s" % (profile.compasUser.last_name, profile.compasUser.first_name)
-            #form.auditComment = 'Receipt Action'
-        else:
-            form = WaybillRecieptForm( instance = current_wb,
-            initial = {
-                'recipientArrivalDate':datetime.date.today(),
-                'recipientStartDischargeDate':datetime.date.today(),
-                'recipientEndDischargeDate':datetime.date.today(),
-                'recipientName': "%s, %s" % (profile.compasUser.last_name, profile.compasUser.first_name),
-                'recipientTitle': profile.compasUser.title,
-                #'auditComment': 'Receipt Action',
-            }
-        )
-        formset = LDFormSet( instance = current_wb )
-    
-    return direct_to_template( request, template, {
-        'form': form, 
-        'lti_list': current_lti, 
-        'formset': formset
     })
 
 

@@ -383,7 +383,10 @@ class LossDamageType( models.Model ):
     @classmethod
     def update(cls):
         for myrecord in cls.objects.using('compas').all():
-            myrecord.save(using='default')
+            if not cls.objects.filter(type=myrecord.type, 
+                                  comm_category_code=myrecord.comm_category_code, 
+                                  cause=myrecord.cause).count():
+                myrecord.save(using='default')
 
 
 class LtiOriginal( models.Model ):
@@ -761,7 +764,7 @@ class Waybill( ld_models.Model ):
         if self.recipient_start_discharge_date and self.recipient_end_discharge_date \
         and self.recipient_end_discharge_date < self.recipient_start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
-
+        
     
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
@@ -879,16 +882,12 @@ class LoadingDetail( models.Model ):
     #Reasons
     units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Lost Reason"), 
                                            related_name='lost_reason', #LD_LostReason 
-                                           blank=True, null=True ) #unitsLostReason
+                                           blank=True, null=True,
+                                           limit_choices_to={'type': LossDamageType.LOSS}) #unitsLostReason
     units_damaged_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Damaged Reason"), 
                                             related_name='damage_reason', #LD_DamagedReason 
-                                            blank=True, null=True ) #unitsDamagedReason
-    units_damaged_type = models.ForeignKey( LossDamageType, verbose_name=_("units Damaged Type"),
-                                          related_name='damage_type', #LD_DamagedType 
-                                          blank=True, null=True ) #unitsDamagedType
-    units_lost_type = models.ForeignKey( LossDamageType, verbose_name=_("units LostType "), 
-                                       related_name='loss_type', #LD_LossType 
-                                       blank=True, null=True ) #unitsLostType
+                                            blank=True, null=True,
+                                            limit_choices_to={'type': LossDamageType.DAMAGE}) #unitsDamagedReason
     
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     loading_detail_sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
@@ -950,7 +949,35 @@ class LoadingDetail( models.Model ):
     
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.waybill, self.si_code, self.number_of_units)
-
+    
+    def clean(self):
+        #Clean units_lost_reason
+        if self.number_units_lost:
+            if not self.units_lost_reason:
+                raise ValidationError(_("You must provide a loss reason"))
+        
+        #Clean units_damaged_reason
+        if self.number_units_damaged:
+            if not self.units_damaged_reason:
+                raise ValidationError(_("You must provide a damaged reason"))
+        
+        #clean number of items
+        if self.number_of_units \
+        and self.number_units_good is not None \
+        and self.number_units_damaged is not None \
+        and self.number_units_lost is not None \
+        and (self.number_of_units != self.number_units_good + self.number_units_damaged + self.number_units_lost):
+            raise ValidationError(_("%(loaded).3f Units loaded but %(offload).3f units accounted for") % {
+                    "loaded" : self.number_of_units, 
+                    "offload" : self.number_units_good + self.number_units_damaged + self.number_units_lost 
+            })
+            
+        #clean reasons
+        if self.units_damaged_reason and self.units_damaged_reason.comm_category_code != self.comm_category_code:
+            raise ValidationError(_("You have chosen wrong damaged reason for current commodity category"))
+        if self.units_lost_reason and self.units_lost_reason.comm_category_code != self.comm_category_code:
+            raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
+        
 
 class UserProfile( models.Model ):
     user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)

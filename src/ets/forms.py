@@ -1,13 +1,12 @@
 import datetime
 
-from django.forms import ModelForm
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
 from django.forms.formsets import formset_factory, BaseFormSet
 from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
 
-from uni_form.helpers import FormHelper, Layout, Fieldset, Row
+from uni_form.helpers import FormHelper, Layout, Fieldset, Row, HTML
 
 from ets import models as ets_models
 
@@ -20,7 +19,7 @@ class WaybillSearchForm( forms.Form ):
     q = forms.CharField(required=False, label=_('Waybill code'))
 
 
-class DispatchWaybillForm( ModelForm ):
+class DispatchWaybillForm( forms.ModelForm ):
     
     def __init__(self, **kwargs):
         super(DispatchWaybillForm, self).__init__(**kwargs)
@@ -58,18 +57,18 @@ class DispatchWaybillForm( ModelForm ):
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset('Date', Row('loading_date', 'dispatch_date')),
-        Fieldset('General',
+        Fieldset(ugettext('Date'), Row('loading_date', 'dispatch_date')),
+        Fieldset(ugettext('General'),
                 'destination',
                 Row('transaction_type', 'transport_type'),
                 'dispatch_remarks',
                  ),
-        Fieldset('Transport',
+        Fieldset(ugettext('Transport'),
                  'transport_sub_contractor',
                  Row('transport_driver_name', 'transport_driver_licence'),
                  Row('transport_vehicle_registration', 'transport_trailer_registration'),
                  ),
-        Fieldset('Container',
+        Fieldset(ugettext('Container'),
                  Row('container_one_number', 'container_one_seal_number', 'container_one_remarks_dispatch'),
                  Row('container_two_number', 'container_two_seal_number', 'container_two_remarks_dispatch'),
                  )
@@ -138,13 +137,18 @@ class BaseLoadingDetailFormFormSet(BaseModelFormSet):
     helper.formset_tag = False
 
 
-class WaybillRecieptForm( ModelForm ):
+class WaybillRecieptForm( forms.ModelForm ):
+    
+    required_fields = (
+        'recipient_arrival_date', 
+        'recipient_start_discharge_date', 
+        'recipient_end_discharge_date',
+        )
     
     def __init__(self, **kwargs):
         super(WaybillRecieptForm, self).__init__(**kwargs)
-        self.fields['recipient_arrival_date'].required = True
-        self.fields['recipient_start_discharge_date'].required = True
-        self.fields['recipient_end_discharge_date'].required = True
+        for field_name in self.required_fields:
+            self.fields[field_name].required = True
         
     class Meta:
         model = ets_models.Waybill
@@ -154,14 +158,64 @@ class WaybillRecieptForm( ModelForm ):
             'recipient_end_discharge_date',
             'recipient_distance',
             'recipient_remarks',
-            'recipient_signed_date',
-            'transport_delivery_signed_date',
+            #'recipient_signed_date',
+            #'transport_delivery_signed_date',
             'container_one_remarks_reciept',
             'container_two_remarks_reciept',
         )
+    
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(
+        Fieldset(ugettext('Dates'), Row('recipient_arrival_date', 'recipient_start_discharge_date', 'recipient_end_discharge_date')),
+        Fieldset(ugettext('Containers'), Row('container_one_remarks_reciept', 'container_two_remarks_reciept')),
+        Fieldset('', Row('recipient_distance', 'recipient_remarks')),
+    ))
+    
+    helper.form_tag = False
 
 
-class WaybillFullForm( ModelForm ):
+class LoadingDetailRecieptForm( forms.ModelForm ):
+    
+    def __init__(self, *args, **kwargs):
+        super(LoadingDetailRecieptForm, self).__init__(*args, **kwargs)
+        
+        for field_name in ('units_lost_reason', 'units_damaged_reason'):
+            self.fields[field_name].queryset = self.fields[field_name].queryset.filter(comm_category_code=self.instance.comm_category_code)
+        
+    
+    class Meta:
+        model = ets_models.LoadingDetail
+        fields = (
+            'origin_id', 'commodity_name',
+            'number_units_good', 
+            'number_units_lost', 'units_lost_reason',
+            'number_units_damaged', 'units_damaged_reason',
+        )
+        widgets = {
+            'number_units_good': forms.TextInput(attrs={'size': 5}),
+            'number_units_lost': forms.TextInput(attrs={'size': 5}),
+            'number_units_damaged': forms.TextInput(attrs={'size': 5}),
+        }
+
+
+class BaseRecieptFormFormSet(BaseInlineFormSet):
+    
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(
+        #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
+        Row(
+        'origin_id', 'commodity_name', 'number_units_good', 
+        'number_units_lost', 'units_lost_reason',
+        'number_units_damaged', 'units_damaged_reason',
+    )))
+    helper.formset_tag = False
+
+
+class WaybillFullForm( forms.ModelForm ):
 
     def __init__(self, **kwargs):
         super(WaybillFullForm,self).__init__(**kwargs)
@@ -227,21 +281,3 @@ class WaybillValidationFormset( BaseModelFormSet ):
 class MyModelChoiceField( forms.ModelChoiceField ):
     def label_from_instance( self, obj ):
         return "%s - %s" % ( obj.si_code , obj.cmmname )
-
-
-class LoadingDetailRecieptForm( ModelForm ):
-    class Meta:
-        model = ets_models.LoadingDetail
-        fields = ( 
-            'number_of_units', 'number_units_good', 
-            'number_units_lost', 'number_units_damaged', 'units_lost_reason', 
-            'units_damaged_reason', 
-        )
-
-class LRModelChoiceField( forms.ModelChoiceField ):
-    def label_from_instance( self, obj ):
-        cause = obj.cause
-        length_c = len( obj.cause ) - 10
-        if length_c > 20:
-            cause = obj.cause[0:20] + '...' + obj.cause[length_c:]
-        return cause
