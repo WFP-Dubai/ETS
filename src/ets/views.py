@@ -19,6 +19,8 @@ from django.contrib import messages
 from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
+from django.core.exceptions import ObjectDoesNotExist
+
 
 from uni_form.helpers import FormHelper, Layout, HTML, Row
 
@@ -378,6 +380,17 @@ def invalidate_waybill(request, waybill_pk, queryset, template='status.html'):
     return direct_to_template( request, template, {
         'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
     })
+
+
+@login_required
+def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.delete()
+    if redirect_to:
+        return redirect(redirect_to)
+    else:
+        return redirect(request.META['HTTP_REFERER'])
+        
 
 @login_required
 def waybill_validate_form_update( request, waybill_pk, queryset, 

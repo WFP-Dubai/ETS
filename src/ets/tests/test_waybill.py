@@ -250,7 +250,14 @@ class WaybillTestCase(TestCase):
         response = self.client.get(reverse('waybill_validate_form_update', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(self.lti in response.context['lti_list'])
-        
+     
+    def test_waybill_delete(self):
+        """ets.views.waybill_delete"""  
+        col = ets.models.Waybill.objects.all().count()     
+        response = self.client.get(reverse('waybill_delete', kwargs={'waybill_pk': self.waybill.pk,}))
+        self.assertEqual(response.status_code, 302)  
+        self.assertEqual(ets.models.Waybill.objects.all().count(), col-1)
+       
     def test_dispatch(self):
         """ets.views.dispatch"""       
         response = self.client.get(reverse('dispatch'))
