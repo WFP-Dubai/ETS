@@ -64,7 +64,7 @@
           {% endif %}
         </td>
         <td>
-          <a href='{% url waybill_delete waybill_pk=waybill.pk redirect_to="next" %}'>{% trans "Delete" %}</a>   
+          <a href='{% url waybill_delete waybill_pk=waybill.pk %}'>{% trans "Delete" %}</a>   
         </td>
       </tr>
     {% endif %}
