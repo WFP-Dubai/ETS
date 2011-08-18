@@ -853,8 +853,8 @@ class Waybill( ld_models.Model ):
     
 
 class LoadingDetail( models.Model ):
-    """Item of waybill"""
-    waybill = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
+    """Loading details related to dispatch waybill"""
+    waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
     #Stock data
@@ -1119,22 +1119,4 @@ class DispatchDetail( models.Model ):
 
 def sync_data(waybills):
     load_details = LoadingDetail.objects.filter(waybill__in=waybills)
-    #warehouses = Warehouse.objects.filter(dispatch_waybills__in=waybills)
-    #consignees = Consignee.objects.filter(receipt_waybills__in=waybills)
-    #places = Place.objects.filter(models.Q(warehouses__in=warehouses) | models.Q(consignees__in=consignees))
-    
-    #return chain(places, waybills, load_details, warehouses, consignees)
     return chain(waybills, load_details)
-
-#===============================================================================
-# def csv_sync_waybill(waybill):
-#    load_details = LoadingDetail.objects.filter(waybill=waybill).values_list()
-#    waybills_data = Waybill.objects.filter(pk=waybill).values_list()[0]
-#    print waybills_data
-#    result = []
-#    for detail in load_details:
-#        print detail
-#        result.append(waybills_data + detail)
-#    print result
-#    return result
-#===============================================================================
