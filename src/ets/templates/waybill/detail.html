@@ -29,6 +29,15 @@
   </form>
 {% endif %}
 
+{% if editable %}
+  <form action="{% url waybill_delete waybill_pk=object.pk redirect_to='index' %}" 
+    class="the_forms" name="deletewaybill" id="deletewaybill" method="get"
+  >
+    <input type="submit" name="Delete Waybill" id='Delete' value='Delete Waybill' />
+  </form>
+{% endif %}
+
+
 {% if 'create' in request.META.HTTP_REFERER %}
   <a href="{% url order_detail object_id=object.order_code %}">{% trans "Back to Dispatch" %}</a>
 {% else %}
