@@ -58,7 +58,6 @@
       "transport_trailer_registration": "",
       
       "transport_dispach_signed_date": null,
-      "transport_delivery_signed_date": null,
       
       "container_one_number": "",
       "container_two_number": "",
@@ -66,26 +65,12 @@
       "container_two_seal_number": "",
       "container_one_remarks_dispatch": "",
       "container_two_remarks_dispatch": "",
-      "container_one_remarks_reciept": "",
-      "container_two_remarks_reciept": "",
       
-      "recipient_person": "",
-      
-      "recipient_arrival_date": null,
-      "recipient_start_discharge_date": null,
-      "recipient_end_discharge_date": null,
-      "recipient_distance": null,
-      "recipient_remarks": "",
-      "recipient_signed_date": null,
       "destination": "ISBX003",
       
       "validated": false,
-      "receipt_validated": false,
       "sent_compas": false,
-      "rec_sent_compas": false,
-      "processed_for_payment": false,
-
-      "audit_comment": "Print Dispatch Original" 
+      "processed_for_payment": false
     }
   }, 
   {
@@ -146,7 +131,6 @@
       "transport_trailer_registration": "",
       
       "transport_dispach_signed_date": null,
-      "transport_delivery_signed_date": null,
       
       "container_one_number": "",
       "container_two_number": "",
@@ -154,26 +138,12 @@
       "container_two_seal_number": "",
       "container_one_remarks_dispatch": "",
       "container_two_remarks_dispatch": "",
-      "container_one_remarks_reciept": "",
-      "container_two_remarks_reciept": "",
       
-      "recipient_person": "",
-      
-      "recipient_arrival_date": null,
-      "recipient_start_discharge_date": null,
-      "recipient_end_discharge_date": null,
-      "recipient_distance": null,
-      "recipient_remarks": "",
-      "recipient_signed_date": null,
       "destination": "ISBX002",
       
       "validated": false,
-      "receipt_validated": false,
       "sent_compas": false,
-      "rec_sent_compas": false,
-      "processed_for_payment": false,
-
-      "audit_comment": "Print Dispatch Original" 
+      "processed_for_payment": false
     }
   }, 
   {

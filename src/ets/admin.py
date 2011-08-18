@@ -14,32 +14,31 @@ class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
 
+class ReceiptInline(admin.StackedInline):
+    model= ets.models.ReceiptWaybill
+    extra = 0
+
 class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     
     fieldsets = (
         (_('Order'), {'fields': ('order_code', 'project_number', 'transport_name', 'warehouse', 'destination')}),
-        (_("Status"), {'fields': ('status', 'validated', 'receipt_validated', 'sent_compas', 'rec_sent_compas', 
-                           'processed_for_payment', 'audit_comment')}),
+        (_("Status"), {'fields': ('status', 'validated', 'sent_compas', 'processed_for_payment',)}),
         (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
         (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
         (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
                                    'transport_driver_licence', 'transport_vehicle_registration', 
-                                   'transport_trailer_registration', 'transport_dispach_signed_date', 
-                                   'transport_delivery_signed_date')}),
+                                   'transport_trailer_registration', 'transport_dispach_signed_date',)}),
         (_('Container 1'), {'fields': ('container_one_number', 'container_one_seal_number', 
-                                       'container_one_remarks_dispatch', 'container_one_remarks_reciept')}),
+                                       'container_one_remarks_dispatch',)}),
         (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
-                                       'container_two_remarks_dispatch', 'container_two_remarks_reciept')}),
-        (_('Receipt'), {'fields': ('recipient_person', 'recipient_arrival_date', 'recipient_start_discharge_date', 
-                                   'recipient_end_discharge_date', 'recipient_distance', 'recipient_remarks',
-                                   'recipient_signed_date')}),
+                                       'container_two_remarks_dispatch',)}),
     )
     
     list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
     readonly_fields = ('date_created',)
     list_filter = ('status', 'date_created',)
     search_fields = ('pk',)
-    inlines = (LoadingDetailsInline,)
+    inlines = (LoadingDetailsInline, ReceiptInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 

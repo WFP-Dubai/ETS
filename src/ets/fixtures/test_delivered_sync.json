@@ -27,7 +27,6 @@
 	  "transport_trailer_registration": "",
 	  
 	  "transport_dispach_signed_date": null,
-	  "transport_delivery_signed_date": null,
 	  
 	  "container_one_number": "",
 	  "container_two_number": "",
@@ -53,8 +52,6 @@
 	  "sent_compas": false,
 	  "rec_sent_compas": false,
 	  "processed_for_payment": false,
-	
-	  "audit_comment": "Print Dispatch Original" 
 	}
   }
 ]

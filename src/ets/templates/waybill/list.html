@@ -51,7 +51,7 @@
           </td>
           <td>
             {% if waybill.sent_compas %}D{% else %}-{% endif %}/
-            {% if waybill.rec_sent_compas %}{% trans "R" %}{% else %}-{% endif %}
+            {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
           </td>
         {% endif %}
         <td>

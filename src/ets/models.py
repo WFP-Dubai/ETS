@@ -592,12 +592,11 @@ class OrderItem(models.Model):
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
-    
-    
+
+
 class Waybill( ld_models.Model ):
     """
-    Main model in the system. Tracks delivery.
-    
+    Base waybill abstract class
     """
     
     TRANSACTION_TYPES = ( 
@@ -651,6 +650,7 @@ class Waybill( ld_models.Model ):
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     transport_name = models.CharField(_("Transport Name"), max_length = 30) #transport_name
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
+    
     destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
@@ -668,22 +668,14 @@ class Waybill( ld_models.Model ):
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)
     dispatcher_person = models.ForeignKey(CompasPerson, verbose_name=_("Dispatch person"), 
                                           related_name="dispatch_waybills") #dispatcherName
-    #dispatcher_title = models.TextField(_("Dispatcher Title")) #dispatcherTitle
-    #dispatcher_signed = models.BooleanField(_("Dispatcher Signed"), default=False)
-    #dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Place of dispatch"), 
-    #                                        default=COMPAS_STATION, related_name="dispatch_waybills")
     
     #Transporter
-    #transport_contractor = models.TextField(_("Transport Contractor"), blank=True ) #transportContractor
     transport_sub_contractor = models.CharField(_("Transport Sub contractor"), max_length=40, blank=True) #transportSubContractor
     transport_driver_name = models.CharField(_("Transport Driver Name"), max_length=40) #transportDriverName
     transport_driver_licence = models.CharField(_("Transport Driver LicenceID "), max_length=40) #transportDriverLicenceID
     transport_vehicle_registration = models.CharField(_("Transport Vehicle Registration "), max_length=40) #transportVehicleRegistration
     transport_trailer_registration = models.CharField( _("Transport Trailer Registration"), max_length=40, blank=True) #transportTrailerRegistration
-    #transport_dispach_signed = models.BooleanField( _("Transport Dispatch Signed"), default=False) #transportDispachSigned
     transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
-    #transport_delivery_signed = models.BooleanField( _("Transport Delivery Signed"), default=False) #transportDeliverySigned
-    transport_delivery_signed_date = models.DateTimeField( _("Transport Delivery Signed Date"), null=True, blank=True ) #transportDeliverySignedTimestamp
 
     #Container        
     container_one_number = models.CharField(_("Container One Number"), max_length=40, blank=True) #containerOneNumber
@@ -692,34 +684,11 @@ class Waybill( ld_models.Model ):
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
     container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
     container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
-    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
-    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
-
-    #Receiver
-    recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
-                                          related_name="recipient_waybills", blank=True, null=True) #recipientName
-    #recipient_name = models.CharField( _("Recipient Name"), max_length=100, blank=True) #recipientName
-    #recipient_title = models.CharField(_("Recipient Title "), max_length=100, blank=True) #recipientTitle
-    recipient_arrival_date = models.DateField(_("Recipient Arrival Date"), null=True, blank=True) #recipientArrivalDate
-    recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), null=True, blank=True) #recipientStartDischargeDate
-    recipient_end_discharge_date = models.DateField(_("Recipient End Discharge Date"), null=True, blank=True) #recipientEndDischargeDate
-    recipient_distance = models.IntegerField(_("Recipient Distance"), blank=True, null=True) #recipientDistance
-    recipient_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
-    #recipient_signed = models.BooleanField(_("Recipient Signed"), default=True) #recipientSigned
-    recipient_signed_date = models.DateTimeField(_("Recipient Signed Date"), null=True, blank=True) #recipientSignedTimestamp
-    #===================================================================================================================
-    # destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
-    #                                          related_name="recipient_waybills" )
-    #===================================================================================================================
 
     #Extra Fields
     validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
-    receipt_validated = models.BooleanField( _("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
-    rec_sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
     processed_for_payment = models.BooleanField(_("Waybill Processed For Payment"), default=False) #waybillProcessedForPayment
-    
-    audit_comment = models.TextField(_("Audit Comment"), blank=True) #auditComment
     
     audit_log = AuditLog()
 
@@ -794,10 +763,7 @@ class Waybill( ld_models.Model ):
         Signs the waybill as ready to be sent by setting special status SIGNED. 
         After this system sends it to central server.
         """
-        #self.transportDispachSigned = True
         self.transport_dispach_signed_date = datetime.now()
-        #self.dispatcherSigned = True
-        self.audit_comment = ugettext('Print Dispatch Original')
         
         self.update_status(self.SIGNED)
         
@@ -809,11 +775,7 @@ class Waybill( ld_models.Model ):
         Signs the waybill as delivered by setting special status DELIVERED. 
         After this system sends it to central server.
         """
-        #self.recipientSigned = True
-        self.transport_delivery_signed_date = datetime.now()
         self.recipient_signed_date = datetime.now()
-        #self.transportDeliverySigned = True
-        self.audit_comment = ugettext('Print Dispatch Receipt')
         
         self.update_status(self.DELIVERED)
         
@@ -850,23 +812,42 @@ class Waybill( ld_models.Model ):
         
         self.status = status
         self.save()
-    
 
-class LoadingDetail( models.Model ):
+
+class ReceiptWaybill(ld_models.Model):
+    """Receipt data"""
+    waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
+    
+    recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
+                                          related_name="recipient_waybills") #recipientName
+    recipient_arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
+    recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
+    recipient_end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate
+    recipient_distance = models.IntegerField(_("Recipient Distance"), blank=True, null=True) #recipientDistance
+    recipient_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
+    recipient_signed_date = models.DateTimeField(_("Recipient Signed Date")) #recipientSignedTimestamp
+    
+    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
+    
+    validated = models.BooleanField( _("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
+    sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
+
+class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
     #Stock data
     origin_id = models.CharField(_("Origin stock identifier"), max_length=23)
-    si_code = models.CharField( _("Shipping Order Code"), max_length = 8)
+    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
     
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
-    commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank = True) #cmmname
+    comm_category_code = models.CharField(_("Commodity Category Code"), max_length=9)
+    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
+    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits = 7, decimal_places=3)
-    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, )
     unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
     
     package = models.CharField(_("Package"), max_length=10)
@@ -895,19 +876,21 @@ class LoadingDetail( models.Model ):
 
     audit_log = AuditLog()
 
-    def check_stock( self ):
-        stock = self.order_item.stock_item
-        if self.order_item.lti_line.is_bulk:
-            if self.numberUnitsLoaded <= stock.quantity_net:
-                return True
-        else:
-            if self.numberUnitsLoaded <= stock.number_of_units :
-                return True
-        
-        return False
-
-    def check_receipt_item( self ):
-        return True
+#=======================================================================================================================
+#    def check_stock( self ):
+#        stock = self.order_item.stock_item
+#        if self.order_item.lti_line.is_bulk:
+#            if self.numberUnitsLoaded <= stock.quantity_net:
+#                return True
+#        else:
+#            if self.numberUnitsLoaded <= stock.number_of_units :
+#                return True
+#        
+#        return False
+# 
+#    def check_receipt_item( self ):
+#        return True
+#=======================================================================================================================
     
     #===================================================================================================================
     # def get_stock_item( self ):
@@ -963,9 +946,9 @@ class LoadingDetail( models.Model ):
         
         #clean number of items
         if self.number_of_units \
-        and self.number_units_good is not None \
-        and self.number_units_damaged is not None \
-        and self.number_units_lost is not None \
+        and self.number_units_good \
+        and self.number_units_damaged \
+        and self.number_units_lost \
         and (self.number_of_units != self.number_units_good + self.number_units_damaged + self.number_units_lost):
             raise ValidationError(_("%(loaded).3f Units loaded but %(offload).3f units accounted for") % {
                     "loaded" : self.number_of_units, 

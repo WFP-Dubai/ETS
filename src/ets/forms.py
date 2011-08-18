@@ -139,27 +139,14 @@ class BaseLoadingDetailFormFormSet(BaseModelFormSet):
 
 class WaybillRecieptForm( forms.ModelForm ):
     
-    required_fields = (
-        'recipient_arrival_date', 
-        'recipient_start_discharge_date', 
-        'recipient_end_discharge_date',
-        )
-    
-    def __init__(self, **kwargs):
-        super(WaybillRecieptForm, self).__init__(**kwargs)
-        for field_name in self.required_fields:
-            self.fields[field_name].required = True
-        
     class Meta:
-        model = ets_models.Waybill
+        model = ets_models.ReceiptWaybill
         fields = (
             'recipient_arrival_date',
             'recipient_start_discharge_date',
             'recipient_end_discharge_date',
             'recipient_distance',
             'recipient_remarks',
-            #'recipient_signed_date',
-            #'transport_delivery_signed_date',
             'container_one_remarks_reciept',
             'container_two_remarks_reciept',
         )
