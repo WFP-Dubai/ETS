@@ -5,27 +5,23 @@
 
 {% block content %}
 <table class="summary">
-	<tr>
+  <tr>
     <td>{% trans "Code" %}: {{ object.pk }}</td>
   	<td>{% trans "Created" %}: {{ object.created }}</td>
   </tr>
-	
-	<tr>
+  <tr>
     <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
   	<td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
   </tr>
-	
-	<tr>
+  <tr>
     <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.pk }}</td>
-  </tr>
-	
-	<tr>
+  </tr>	
+  <tr>
     <td>{% trans "Project Number" %}: {{ object.project_number }}</td>
     <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
     <td>{% trans "Location:" %} {{ object.location }}</td>
   </tr>
-	
-	<tr>
+  <tr>
     <td>{% trans "Contractor:" %} {{ object.transport_name }}</td>
   </tr>
 </table>
@@ -56,9 +52,15 @@
   {% trans "Current Waybills:" %}<br>
   <table class='bordered' >
   {% for waybill in object.get_waybills %}
+      <tr >
+        <td colspan="3" rowspan="2" class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
+        <td class='bordered' align="center"><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
+      </tr>
       <tr>
-        <td colspan="3"  class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
-        <td class='bordered'><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
+        {% if user.get_profile.is_dispatcher and user.get_profile.dispatch_warehouse == object.warehouse %}
+        <td class='bordered' align="center"><a href='{% url waybill_delete waybill_pk=waybill.pk %}'>
+              {% trans "Delete Waybill" %}</a></td>
+        {% endif %}
       </tr>
       <tr class='itemhead'>
         <td></td>
