@@ -141,7 +141,6 @@ admin.site.register(User, UserAdmin)
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
     list_display = ( 'code', 'description')
-    #list_display = ( 'pk', 'description')
     list_filter = list_display
 
 admin.site.register( ets.models.PackagingDescriptionShort, PackagingDescriptonShortAdmin )

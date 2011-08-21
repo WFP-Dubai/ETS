@@ -348,6 +348,11 @@ class PackagingDescriptionShort( models.Model ):
     code = models.CharField(_("Package Code"), primary_key=True, max_length=5)
     description = models.CharField(_("Package Short Name"), max_length=10)
     
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _("Packaging")
+        verbose_name_plural = _("package descriptions")
+    
     def  __unicode__( self ):
         return "%s - %s" % (self.code, self.description)
 
@@ -693,7 +698,13 @@ class Waybill( ld_models.Model ):
     audit_log = AuditLog()
 
     objects = ld_models.managers.LogicalDeletedManager()
-
+    
+    class Meta:
+        ordering = ('slug',)
+        #order_with_respect_to = 'order'
+        verbose_name = _("waybill")
+        verbose_name_plural = _("waybills")
+    
     def  __unicode__( self ):
         return self.slug
     
@@ -817,6 +828,7 @@ class Waybill( ld_models.Model ):
 class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
     recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
                                           related_name="recipient_waybills") #recipientName
@@ -832,6 +844,13 @@ class ReceiptWaybill(models.Model):
     
     validated = models.BooleanField( _("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
+    
+    class Meta:
+        ordering = ('slug',)
+        order_with_respect_to = 'waybill'
+        verbose_name = _("reception")
+        verbose_name_plural = _("reception")
+    
 
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
@@ -875,6 +894,13 @@ class LoadingDetail(models.Model):
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
     audit_log = AuditLog()
+
+    class Meta:
+        ordering = ('slug',)
+        order_with_respect_to = 'waybill'
+        verbose_name = _("loading detail")
+        verbose_name_plural = _("waybill items")
+
 
 #=======================================================================================================================
 #    def check_stock( self ):
