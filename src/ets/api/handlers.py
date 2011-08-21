@@ -67,9 +67,7 @@ class ReadCSVWaybillHandler(BaseHandler):
         if filter_arg:
             waybills = waybills.filter(**filter_arg)
         titles = get_titles(self.model)
-        result = [titles]
-        result += waybills.values()
-        return result
+        return [titles] + list(waybills.values())
            
         
 class ReadCSVLoadingDetailHandler(BaseHandler):
@@ -119,10 +117,7 @@ class ReadCSVOrdersHandler(BaseHandler):
         if filter_arg:
             orders = orders.filter(**filter_arg)
         titles = get_titles(self.model)
-        result = [titles]
-        result += orders.values()
-        return result
-        
+        return [titles] + list(orders.values())
             
 class ReadCSVOrderItemsHandler(BaseHandler):
 
