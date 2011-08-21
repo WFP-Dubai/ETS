@@ -93,8 +93,8 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
 
         # All waybills
         response = self.client.get(reverse("api_waybills"))
-        self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        self.assertContains(response, 'ISBX00211A', status_code=200)
         # One wabill
         response = self.client.get(reverse("api_waybills", kwargs={"slug": self.get_waybill().slug}))
         self.assertContains(response, 'ISBX00211A', status_code=200)
@@ -124,7 +124,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['order_code'], self.get_waybill().order_code)
+        self.assertEqual(item['order code'], self.get_waybill().order_code)
         # Loading details for some destination and some warehouse
         response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().warehouse.code, 
                                                                     "destination": self.get_waybill().destination.code}))
@@ -146,7 +146,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['code'], order.code)
+        self.assertEqual(item['Code'], order.code)
         # Orders with destination and warehouse
         response = self.client.get(reverse("api_orders", kwargs={"warehouse": order.warehouse.code, 
                                                         "destination": order.consignee.warehouses.all()[0].code}))
@@ -169,7 +169,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['code'], order.code)
+        self.assertEqual(item['Code'], order.code)
         # Order items for some destination and some warehouse
         response = self.client.get(reverse("api_order_items", kwargs={"warehouse": order.warehouse.code, 
                                                         "destination": order.consignee.warehouses.all()[0].code}))
@@ -191,7 +191,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['warehouse_id'], warehouse.code)
+        self.assertEqual(item['Warehouse'], warehouse.code)
 
 
 class ApiEmptyServerTestCase(TestCase):

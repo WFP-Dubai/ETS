@@ -5,6 +5,7 @@
 import csv
 import StringIO
 from types import DictType
+import re
 
 
 #from django.http import Http404
@@ -12,12 +13,13 @@ from types import DictType
 from django.core import serializers
 from django.db import transaction
 from django.db.models import Q, Sum, Count
+from django.utils.html import escape
 
 from piston.handler import BaseHandler
 from piston.utils import rc
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, Warehouse, LoadingDetail, StockItem, sync_data
+from ..models import Waybill, Warehouse, sync_data
 import ets.models
 
 #=======================================================================================================================
@@ -35,11 +37,40 @@ import ets.models
 #    allowed_methods = ('GET',)
 #    model = Waybill
 #===============================================================================
+def get_titles1(model):
+    titles = {}
+    fields_name = {}
+    for field in model._meta.fields:
+        fields_name[field.name] = unicode(field.verbose_name)
+    for key in model.objects.values()[0].keys():
+        print key
+        match = re.search( r"([\w_]+)_id$", key )
+        print match
+        if match:
+            key_strip = match.group(1)
+        else:
+            key_strip = key
+        print key_strip
+        if (key_strip in fields_name.keys()):
+            titles[key] = fields_name[key_strip]
+    return titles
+
+def get_titles(model):
+    fields_name = {}
+    for field in model._meta.fields:
+        fields_name[field.name] = unicode(field.verbose_name)
+        if 'ForeignKey' in str(type(field)):
+            key = "%s%s" % (field.name, "_id")
+            fields_name[key] = unicode(field.verbose_name)
+    return fields_name   
+
 
 class ReadCSVWaybillHandler(BaseHandler):
 
     allowed_methods = ('GET',)
-    model = Waybill
+    model = ets.models.Waybill
+
+
     
     def read(self, request, slug="", warehouse="", destination=""):
         """Return waybills in CSV"""
@@ -54,12 +85,19 @@ class ReadCSVWaybillHandler(BaseHandler):
         waybills = self.model.objects.values()
         if filter_arg:
             waybills = waybills.filter(**filter_arg)
-        return waybills    
+        titles = get_titles(self.model)
+        result = []
+        result.append(titles)
+        for waybill in waybills.values():
+            result.append(waybill)
+        return result
+           
+        #return waybills    
         
 class ReadCSVLoadingDetailHandler(BaseHandler):
 
     allowed_methods = ('GET',)
-    model = LoadingDetail
+    model = ets.models.LoadingDetail
     
     def read(self, request, waybill="", warehouse="", destination=""):
         """Return loadin details for waybills in CSV"""
@@ -72,10 +110,13 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             filter_arg['waybill'] = waybill
         load_details = self.model.objects.all().values()
         if filter_arg:
-            load_details = load_details.filter(**filter_arg)          
+            load_details = load_details.filter(**filter_arg)    
+        titles = get_titles(self.model)
+        titles.update(get_titles(ets.models.Waybill))      
         result = []
+        result.append(titles)
         for detail in load_details:
-            waybills_data = Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
+            waybills_data = ets.models.Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
             waybills_data.update(detail)
             result.append(waybills_data)  
         return result
@@ -100,7 +141,12 @@ class ReadCSVOrdersHandler(BaseHandler):
         orders = self.model.objects.values()
         if filter_arg:
             orders = orders.filter(**filter_arg)
-        return orders
+        titles = get_titles(self.model)
+        result = []
+        result.append(titles)
+        for order in orders.values():
+            result.append(order)
+        return result
         
             
 class ReadCSVOrderItemsHandler(BaseHandler):
@@ -121,29 +167,34 @@ class ReadCSVOrderItemsHandler(BaseHandler):
             filter_arg['order'] = order
         order_items = self.model.objects.all().values()
         if filter_arg:
-            order_items = order_items.filter(**filter_arg)                    
+            order_items = order_items.filter(**filter_arg)    
+        titles = get_titles(self.model)
+        titles.update(get_titles(ets.models.Order))                     
         result = []
+        result.append(titles)
         for item in order_items:
             order_items_data = ets.models.Order.objects.filter(code=item['order_id']).values()[0]
             order_items_data.update(item)
-            result.append(order_items_data)  
-        
+            result.append(order_items_data)         
         return result
         
     
 class ReadCSVStockItemsHandler(BaseHandler):
 
     allowed_methods = ('GET',)
-    model = StockItem
+    model = ets.models.StockItem
     
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
         stock_items = self.model.objects.values()
         if warehouse: 
             stock_items = stock_items.filter(warehouse=warehouse)            
+        titles = get_titles(self.model)
+        titles.update(get_titles(ets.models.Warehouse))   
         result = []
+        result.append(titles)
         for item in stock_items:
-            stock_items_data = Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
+            stock_items_data = ets.models.Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
             stock_items_data.update(item)
             result.append(stock_items_data)  
         return result
@@ -235,14 +286,15 @@ class CSVEmitter(Emitter):
     Emitter that returns CSV.
     """
     def render(self, request):
+        print self.construct()
         result = StringIO.StringIO()
         if type(self.construct()[0]) is DictType:
             fieldnames = self.construct()[0].keys()
-            dict_writer = csv.DictWriter(result, fieldnames, dialect='excel')
-            header = {}
-            for field in fieldnames:
-                header[field] = field
-            dict_writer.writerow(header)
+            dict_writer = csv.DictWriter(result, fieldnames, dialect='excel', restval='')
+#            header = {}
+#            for field in fieldnames:
+#                header[field] = field
+#            dict_writer.writerow(header)
             dict_writer.writerows(self.construct())
         else: 
             writer = csv.writer(result)
