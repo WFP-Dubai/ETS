@@ -99,7 +99,7 @@
       "units_damaged_reason": null,
       
       "overloaded_units": false,
-      "loading_detail_sent_compas": false,
+      "sent_compas": false,
       "over_offload_units": false
     }
   },
@@ -172,7 +172,7 @@
       "units_damaged_reason": null,
       
       "overloaded_units": false,
-      "loading_detail_sent_compas": false,
+      "sent_compas": false,
       "over_offload_units": false
     }
   }

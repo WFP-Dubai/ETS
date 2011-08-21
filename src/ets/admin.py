@@ -10,13 +10,30 @@ import logicaldelete.admin
 import ets.models
 
 
-class LoadingDetailsInline(admin.TabularInline):
+class LoadingDetailsInline(admin.StackedInline):
     model = ets.models.LoadingDetail
     extra = 0
-
+    
+    fieldsets = (
+        (_("Stock"), {'fields': ('origin_id', 'si_code', 'comm_category_code', 'commodity_code', 'commodity_name', 
+                                 'package', 'unit_weight_net', 'unit_weight_gross',)}),
+        (_('Loading details'), {'fields': ('number_of_units', 'overloaded_units')}),
+        (_('Receipt details'), {'fields': ('number_units_good', 'number_units_lost', 'number_units_damaged', 
+                                           'units_lost_reason', 'units_damaged_reason')}),
+        (_('Utility information'), {'fields': ('sent_compas', 'over_offload_units')}),
+    )
+    
 class ReceiptInline(admin.StackedInline):
     model= ets.models.ReceiptWaybill
     extra = 0
+    
+    fieldsets = (
+        (_('Dates'), {'fields': ('recipient_arrival_date', 'recipient_start_discharge_date', 
+                                 'recipient_end_discharge_date', 'recipient_signed_date',)}),
+        (_("Reception details"), {'fields': ('recipient_person', 'recipient_distance', 'recipient_remarks',)}),
+        (_('Containers'), {'fields': ('container_one_remarks_reciept', 'container_two_remarks_reciept',)}),
+        (_("Utility information"), {'fields': ('validated', 'sent_compas')}),
+    )
 
 class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     
@@ -37,7 +54,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
     readonly_fields = ('date_created',)
     list_filter = ('status', 'date_created',)
-    search_fields = ('pk',)
+    search_fields = ('pk', 'order_code')
     inlines = (LoadingDetailsInline, ReceiptInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )

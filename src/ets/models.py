@@ -814,7 +814,7 @@ class Waybill( ld_models.Model ):
         self.save()
 
 
-class ReceiptWaybill(ld_models.Model):
+class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
     
@@ -871,7 +871,7 @@ class LoadingDetail(models.Model):
                                             limit_choices_to={'type': LossDamageType.DAMAGE}) #unitsDamagedReason
     
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
-    loading_detail_sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
+    sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
     audit_log = AuditLog()
