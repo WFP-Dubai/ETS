@@ -5,14 +5,14 @@
 import csv
 import StringIO
 from types import DictType
-import re
+from itertools import chain
 
 
 #from django.http import Http404
 #import httplib, logging
 from django.core import serializers
 from django.db import transaction
-from django.db.models import Q, Sum, Count
+from django.db.models import Q, Sum, Count, ForeignKey
 from django.utils.html import escape
 
 from piston.handler import BaseHandler
@@ -37,29 +37,12 @@ import ets.models
 #    allowed_methods = ('GET',)
 #    model = Waybill
 #===============================================================================
-def get_titles1(model):
-    titles = {}
-    fields_name = {}
-    for field in model._meta.fields:
-        fields_name[field.name] = unicode(field.verbose_name)
-    for key in model.objects.values()[0].keys():
-        print key
-        match = re.search( r"([\w_]+)_id$", key )
-        print match
-        if match:
-            key_strip = match.group(1)
-        else:
-            key_strip = key
-        print key_strip
-        if (key_strip in fields_name.keys()):
-            titles[key] = fields_name[key_strip]
-    return titles
 
 def get_titles(model):
     fields_name = {}
     for field in model._meta.fields:
         fields_name[field.name] = unicode(field.verbose_name)
-        if 'ForeignKey' in str(type(field)):
+        if ForeignKey == type(field):
             key = "%s%s" % (field.name, "_id")
             fields_name[key] = unicode(field.verbose_name)
     return fields_name   
@@ -70,8 +53,6 @@ class ReadCSVWaybillHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = ets.models.Waybill
 
-
-    
     def read(self, request, slug="", warehouse="", destination=""):
         """Return waybills in CSV"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
@@ -86,13 +67,10 @@ class ReadCSVWaybillHandler(BaseHandler):
         if filter_arg:
             waybills = waybills.filter(**filter_arg)
         titles = get_titles(self.model)
-        result = []
-        result.append(titles)
-        for waybill in waybills.values():
-            result.append(waybill)
+        result = [titles]
+        result += waybills.values()
         return result
            
-        #return waybills    
         
 class ReadCSVLoadingDetailHandler(BaseHandler):
 
@@ -113,8 +91,7 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             load_details = load_details.filter(**filter_arg)    
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Waybill))      
-        result = []
-        result.append(titles)
+        result = [titles]
         for detail in load_details:
             waybills_data = ets.models.Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
             waybills_data.update(detail)
@@ -142,10 +119,8 @@ class ReadCSVOrdersHandler(BaseHandler):
         if filter_arg:
             orders = orders.filter(**filter_arg)
         titles = get_titles(self.model)
-        result = []
-        result.append(titles)
-        for order in orders.values():
-            result.append(order)
+        result = [titles]
+        result += orders.values()
         return result
         
             
@@ -170,8 +145,7 @@ class ReadCSVOrderItemsHandler(BaseHandler):
             order_items = order_items.filter(**filter_arg)    
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Order))                     
-        result = []
-        result.append(titles)
+        result = [titles]
         for item in order_items:
             order_items_data = ets.models.Order.objects.filter(code=item['order_id']).values()[0]
             order_items_data.update(item)
@@ -191,8 +165,7 @@ class ReadCSVStockItemsHandler(BaseHandler):
             stock_items = stock_items.filter(warehouse=warehouse)            
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Warehouse))   
-        result = []
-        result.append(titles)
+        result = [titles]
         for item in stock_items:
             stock_items_data = ets.models.Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
             stock_items_data.update(item)
@@ -286,7 +259,6 @@ class CSVEmitter(Emitter):
     Emitter that returns CSV.
     """
     def render(self, request):
-        print self.construct()
         result = StringIO.StringIO()
         if type(self.construct()[0]) is DictType:
             fieldnames = self.construct()[0].keys()
