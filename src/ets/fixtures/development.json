@@ -132,7 +132,7 @@
       "transport_vehicle_registration": "AE234454", 
       "transport_trailer_registration": "",
       
-      "transport_dispach_signed_date": null,
+      "transport_dispach_signed_date": "2011-06-12 05:36:54",
       
       "container_one_number": "",
       "container_two_number": "",
@@ -180,7 +180,7 @@
       "dispatcher_person": "ISBX0020000613",
       "processed_for_payment": false,
       "dispatch_date": "2011-06-12",
-      "transport_dispach_signed_date": null,
+      "transport_dispach_signed_date": "2011-06-12 05:36:54",
       "validated": false,
       "transport_driver_licence": "EG234454",
       "transport_name": "MUSLIM TRANSPORT",
@@ -189,7 +189,7 @@
       "container_two_seal_number": "",
       "warehouse": "ISBX003",
       "transport_trailer_registration": "",
-      "status": 4,
+      "status": 5,
       "date_removed": null,
       "loading_date": "2011-06-12",
       "transport_driver_name": "Ahmed",

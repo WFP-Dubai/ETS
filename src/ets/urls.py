@@ -73,18 +73,21 @@ urlpatterns = patterns("ets.views",
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
     #Reception pages
+    ( r'^receive/$', "waybill_search", {
+        "template": 'waybill/list.html',
+        "queryset": Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
+    }, "waybill_reception_list" ),
+                       
     ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
        'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED), 
                                           destination__pk=COMPAS_STATION),
     }, "waybill_reception"),
+                       
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
-    ( r'^waybill/receive/$', "object_list", {
-        "template_name": 'waybill/reception_list.html',
-        "queryset": Waybill.objects.all(),
-    }, "waybill_reception_list" ),
+    
     ( r'^waybill/test/$', 'object_list', info_dict_lti ),
     ( r'^waybill/validate/$', "direct_to_template", {'template': 'selectValidateAction.html'}, "waybill_validate_action" ),
     ( r'^waybill/validate_dispatch/$', "waybill_validate_dispatch_form", {}, "waybill_validate_dispatch_form" ),

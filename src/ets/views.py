@@ -106,7 +106,6 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
     form = form_class(request.POST or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-
     found_wb = queryset.filter(pk__icontains=search_string)
     my_valid_wb = []
     
@@ -124,7 +123,7 @@ def waybill_search( request, form_class=WaybillSearchForm,
             my_valid_wb.append( waybill.pk )
 
     return direct_to_template( request, template, {
-        'waybill_list': found_wb, 
+        'object_list': found_wb, 
         'my_wb': my_valid_wb, 
         'is_user': profile.super_user or profile.reader_user or profile.is_compas_user
     })
