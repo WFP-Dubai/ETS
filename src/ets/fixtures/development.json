@@ -19,15 +19,8 @@
     "pk": 1, 
     "model": "ets.userprofile", 
     "fields": {
-      "super_user": true, 
-      "is_reciever": true, 
-      "is_all_receiver": false, 
-      "dispatch_warehouse": "ISBX002", 
-      "is_dispatcher": true, 
-      "is_compas_user": true, 
-      "reception_warehouse": "ISBX002", 
-      "compas_person": "ISBX0020000586", 
-      "reader_user": false
+      "officer": true, 
+      "compas_person": "ISBX0020000586" 
     }
   }, 
   {

@@ -1010,24 +1010,20 @@ class LoadingDetail(models.Model):
         
 
 class UserProfile( models.Model ):
-    user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
+    user = models.ForeignKey(User, unique = True, primary_key = True)#OneToOneField(User, primary_key = True)
     
-    dispatch_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Dispatch Warehouse"), 
-                                            blank=True, null=True, related_name="dispatcher_profiles")
-    reception_warehouse = models.ForeignKey( Warehouse, verbose_name=_("Reception warehouse"), 
-                                             blank=True, null=True, related_name="receipient_profiles")
+    compas_person = models.ForeignKey(CompasPerson, verbose_name = _('Use this Compas Person'),
+                                      related_name="profiles",
+                                      help_text = _('Select the corresponding user from Compas'), 
+                                      blank=True, null=True)
     
-    is_compas_user = models.BooleanField(_('Is Compas User'), default=False) #isCompasUser
-    is_dispatcher = models.BooleanField(_("Is Dispatcher"), default=False) #is_dispatcher
-    is_reciever = models.BooleanField(_("Is Reciever"), default=False) #is_reciever
-    is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
-    compas_person = models.ForeignKey( CompasPerson, verbose_name = _('Use this Compas Person'), 
-                                    related_name="profiles",
-                                    help_text = _('Select the corrisponding user from Compas'), 
-                                    blank=True, null=True)
-    super_user = models.BooleanField(_("Super User"), 
-            help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
-    reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
+    officer = models.BooleanField(_('Officer who can validate waybills'), default=False) #isCompasUser
+    #===================================================================================================================
+    # is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
+    # super_user = models.BooleanField(_("Super User"), 
+    #        help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
+    # reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
+    #===================================================================================================================
 
     audit_log = AuditLog()
     

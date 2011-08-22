@@ -10,7 +10,7 @@ from django.contrib import admin #@Reimport
 admin.autodiscover()
 
 from ets.forms import WaybillSearchForm
-from ets.models import LtiOriginal, Waybill, EpicStock
+from ets.models import Waybill
 import ets.models
 
 COMPAS_STATION = getattr(settings, "COMPAS_STATION", '')
@@ -19,18 +19,9 @@ COMPAS_STATION = getattr(settings, "COMPAS_STATION", '')
 #databrowse.site.register( EpicStock )
 #databrowse.site.register( LtiOriginal )
 
-info_dict_lti = {
-    'queryset': LtiOriginal.objects.all()
-}
 info_dict_waybill = {
     'queryset': Waybill.objects.all()
 }
-
-info_dict_waybill_reception = {
-    'queryset': Waybill.objects.all(),
-    'template_name': 'waybill/reception_list.html'
-}
-
 
 urlpatterns = patterns("ets.views",
                         
@@ -54,7 +45,7 @@ urlpatterns = patterns("ets.views",
     ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create_or_update", {}, "waybill_create" ),
     ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_create_or_update", {
         'template': 'waybill/edit.html',
-        'queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED,
+        'waybill_queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED,
                                                       warehouse__pk=COMPAS_STATION)
     }, "waybill_edit" ),
     
@@ -62,7 +53,6 @@ urlpatterns = patterns("ets.views",
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
     }, "waybill_view" ),
-    
     
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
@@ -74,10 +64,9 @@ urlpatterns = patterns("ets.views",
     
     #Reception pages
     ( r'^receive/$', "waybill_search", {
-        "template": 'waybill/list.html',
         "queryset": Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
     }, "waybill_reception_list" ),
-                       
+    
     ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
        'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED), 
                                           destination__pk=COMPAS_STATION),
@@ -85,22 +74,25 @@ urlpatterns = patterns("ets.views",
                        
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
-        'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#destinationWarehouse__pk=COMPAS_STATION),
+        'queryset': Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
     
-    ( r'^waybill/test/$', 'object_list', info_dict_lti ),
-    ( r'^waybill/validate/$', "direct_to_template", {'template': 'selectValidateAction.html'}, "waybill_validate_action" ),
+    ( r'^waybill/validate/$', "direct_to_template", {
+            'template': 'selectValidateAction.html'
+    }, "waybill_validate_action" ),
     ( r'^waybill/validate_dispatch/$', "waybill_validate_dispatch_form", {}, "waybill_validate_dispatch_form" ),
     ( r'^waybill/validate_receipt_form/$', "waybill_validate_receipt_form", {}, "waybill_validate_receipt_form" ),
     ( r'^waybill/validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
-    ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
-    ( r'^waybill/commit_to_compas_dispatch_one/(?P<waybill_pk>[-\w]+)/$', "singleWBDispatchToCompas", 
-      {}, "singleWBDispatchToCompas" ),
-    ( r'^waybill/commit_to_compas_receipt_one/(?P<waybill_pk>[-\w]+)/$', "singleWBReceiptToCompas", 
-      {}, "singleWBReceiptToCompas" ),
+    #===================================================================================================================
+    # ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
+    # ( r'^waybill/commit_to_compas_dispatch_one/(?P<waybill_pk>[-\w]+)/$', "singleWBDispatchToCompas", 
+    #  {}, "singleWBDispatchToCompas" ),
+    # ( r'^waybill/commit_to_compas_receipt_one/(?P<waybill_pk>[-\w]+)/$', "singleWBReceiptToCompas", 
+    #  {}, "singleWBReceiptToCompas" ),
+    #===================================================================================================================
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
