@@ -346,11 +346,6 @@ class WaybillTestCase(TestCase):
         self.assertEqual(response.status_code, 200) 
         
         
-    def test_select_data(self):
-        """ets.views.select_data"""
-        response = self.client.get(reverse('select_data'))
-        self.assertEqual(response.status_code, 200) 
-        
     #===================================================================================================================
     # def test_barcode_qr(self):
     #    """ets.views.barcode_qr"""

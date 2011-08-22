@@ -105,7 +105,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/view_stock/$', "direct_to_template", {
         "template": 'stock/stocklist.html',
         "extra_context": {
-            'stocklist': EpicStock.objects.all,
+            'stocklist': ets.models.EpicStock.objects.all,
     }}, "view_stock" ),
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',
@@ -119,25 +119,7 @@ urlpatterns = patterns("ets.views",
     # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
     #===================================================================================================================
     ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
-    
-    # download services
-    ( r'^waybill/data/select/$', "select_data", {}, "select_data" ),
-#=======================================================================================================================
-#    ( r'^waybill/synchro/download/([-\w]+)/', "get_synchronize_waybill", {}, "get_synchronize_waybill" ),
-#    ( r'^waybill/synchro/download2/', "get_synchronize_waybill2", {}, "get_synchronize_waybill2" ),
-# 
-#    ( r'^stock/synchro/download/([-\w]+)/', "get_synchronize_stock", {}, "get_synchronize_stock" ),
-#    ( r'^lti/synchro/download/([-\w]+)/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
-#=======================================================================================================================
-    # Additional data
-    #===================================================================================================================
-    # ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
-    # ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
-    # ( r'^all/download/stock_ets/', "get_wb_stock", {}, "get_wb_stock" ),
-    #===================================================================================================================
-    
-    ( r'^accounts/profile', "profile", {}, "profile" ),
-    
+        
 )
 
 urlpatterns += patterns('',

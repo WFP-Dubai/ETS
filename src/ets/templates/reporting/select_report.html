@@ -8,93 +8,92 @@
   <tr class='reports-title'>
     <td>{% trans "Orders reports" %}</td>
   </tr>
-  {%if user.get_profile.is_dispatcher%}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Dispatch Report for " %} {{ user.get_profile.dispatch_warehouse }} </td>
-    <td><a href='{% url api_order_items warehouse=user.get_profile.dispatch_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Dispatch Report for " %} {{ warehouse }} </td>
+    <td><a href='{% url api_order_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.is_reciever%}
+  {% endif %}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Reciept Report " %}{{ user.get_profile.reception_warehouse }} </td>
-    <td><a href='{% url api_order_items destination=user.get_profile.reception_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Reciept Report " %}{{ warehouse }}</td>
+    <td><a href='{% url api_order_items destination=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.super_user%}
+  {% endif %}
+  {% if user.is_superuser %}
   <tr>
     <td>{% trans "Full Orders Report" %} </td>
     <td><a href='{% url api_order_items %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
+  {% endif %}
   <tr>
-    <td>{% trans "Recipient Report: All items for" %} {{ user.get_profile.reception_warehouse.organization }} </td>
-    <td><a href='{% url api_order_items consignee=user.get_profile.reception_warehouse.organization.pk %}'>
+    <td>{% trans "Recipient Report: All items for" %} {{ warehouse.organization }}</td>
+    <td><a href='{% url api_order_items consignee=warehouse.organization.pk %}'>
       {% trans "download" %}</a>
     </td>
   </tr> 
   <tr class='reports-title'>
     <td>{% trans "Stock reports" %}</td>
   </tr>
-  {%if user.get_profile.is_dispatcher%}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Dispatch Stock Report: All items for" %} {{ user.get_profile.dispatch_warehouse }} </td>
-    <td><a href='{% url api_stock_items warehouse=user.get_profile.dispatch_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Dispatch Stock Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_stock_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.is_reciever%}
+  {% endif %}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Reciept Stock Report: All items for" %} {{ user.get_profile.reception_warehouse }} </td>
-    <td><a href='{% url api_stock_items warehouse=user.get_profile.reception_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Reciept Stock Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_stock_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.super_user%}
+  {% endif %}
+  {% if user.is_superuser %}
   <tr>
     <td>{% trans "Stock Report: All items for all warehouses" %} </td>
     <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
+  {% endif %}
   <tr class='reports-title'>
     <td>{% trans "Waybill reports" %}</td>
   </tr>
-  {%if user.get_profile.is_dispatcher%}
+  {% if user.get_profile.is_dispatcher %}
   <tr>
-    <td>{% trans "Warehouse Dispatch Waybill Report: All items for" %} {{ user.get_profile.dispatch_warehouse }} </td>
-    <td><a href='{% url api_waybills warehouse=user.get_profile.dispatch_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Dispatch Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_waybills warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.is_reciever%}
+  {% endif %}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Reciept Waybill Report: All items for" %} {{ user.get_profile.reception_warehouse }} </td>
-    <td><a href='{% url api_waybills destination=user.get_profile.reception_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Reciept Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_waybills destination=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.super_user%}
+  {% endif %}
+  {% if user.is_superuser %}
   <tr>
     <td>{% trans "Waybill Report: All items for all warehouses" %} </td>
     <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
+  {% endif %}
   <tr class='reports-title'>
     <td>{% trans "Detail Waybill reports" %}</td>
   </tr>
-  {%if user.get_profile.is_dispatcher%}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Dispatch Detail Waybill Report: All items for" %} {{ user.get_profile.dispatch_warehouse }} </td>
-    <td><a href='{% url api_loading_details warehouse=user.get_profile.dispatch_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Dispatch Detail Waybill Report: All items for" %} {{ warehouse }}</td>
+    <td><a href='{% url api_loading_details warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.is_reciever%}
+  {% endif %}
+  {% if warehouse %}
   <tr>
-    <td>{% trans "Warehouse Reciept Detail Waybill Report: All items for" %} {{ user.get_profile.reception_warehouse }} </td>
-    <td><a href='{% url api_loading_details destination=user.get_profile.reception_warehouse.pk %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Warehouse Reciept Detail Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_loading_details destination=warehouse.pk %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  {%if user.get_profile.super_user%}
+  {% endif %}
+  {% if user.is_superuser %}
   <tr>
     <td>{% trans "Detail Waybill Report: All items for all warehouses" %} </td>
     <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
   </tr>
-  {%endif%}
-  
+  {% endif %}
 </table>
-{%endblock%}
+{% endblock %}

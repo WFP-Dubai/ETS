@@ -12,9 +12,6 @@ from ets import models as ets_models
 
 UNDEFINED_MESSAGE = "N/A"
 
-class WarehouseChoiceForm( forms.Form ):
-    warehouse = forms.ModelChoiceField( queryset = ets_models.Warehouse.objects.filter( start_date__lt = datetime.date.today() ) )
-
 class WaybillSearchForm( forms.Form ):
     q = forms.CharField(required=False, label=_('Waybill code'))
 

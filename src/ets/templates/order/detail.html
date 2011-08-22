@@ -57,7 +57,7 @@
         <td class='bordered' align="center"><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
       </tr>
       <tr>
-        {% if user.get_profile.is_dispatcher and user.get_profile.dispatch_warehouse == object.warehouse %}
+        {% if warehouse == object.warehouse %}
         <td class='bordered' align="center"><a href='{% url waybill_delete waybill_pk=waybill.pk %}'>
               {% trans "Delete Waybill" %}</a></td>
         {% endif %}
@@ -81,7 +81,7 @@
 {% endif %}
 
 <br>
-{% if user.get_profile.is_dispatcher and user.get_profile.dispatch_warehouse == object.warehouse %}
+{% if warehouse == object.warehouse %}
 <a href='{% url waybill_create order_pk=object.pk %}'>{% trans "Create New Waybill" %}</a><br>
 {% endif %}
 <br>

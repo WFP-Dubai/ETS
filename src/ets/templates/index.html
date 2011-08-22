@@ -8,31 +8,26 @@
 {% trans "Select an action" %}:
 <ul>
 
-  {% if myprofile.is_dispatcher %}
-  <li><a href='{% url orders warehouse_pk=myprofile.dispatch_warehouse.pk %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
+  {% if myprofile.compas_person %}
+  <li><a href='{% url orders warehouse_pk=myprofile.compas_person.warehouse.pk %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
   {% endif %}
   
-  {% if myprofile.reader_user or myprofile.super_user %}
+  {% if user.is_superuser %}
   <li><a href='{% url orders %}'>{% trans "All Orders" %}</a></li>
   {% endif %}
-  
-  {% if myprofile.is_reciever %}
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
-  {% endif %}
   
-  {% if myprofile.is_compas_user %}
+  {% if myprofile.officer %}
   <li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
   {% endif %}
 
-  {% if myprofile.super_user %}
+  {% if user.is_superuser %}
   <li><a href='{% url waybill_search %}'>{% trans "Reset waybills" %}</a></li>
   {% endif %}
 
-  {% if myprofile.super_user %}
+  {% if user.is_superuser %}
   <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
   {% endif %}
-  
-  <li><a href="{% url select_data %}">{% trans "Download Data" %}</a></li>
   
   <li>
     <form method='POST' action='{% url waybill_search %}'>

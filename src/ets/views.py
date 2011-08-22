@@ -26,7 +26,7 @@ from uni_form.helpers import FormHelper, Layout, HTML, Row
 
 from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
-from ets.forms import WaybillValidationFormset, WarehouseChoiceForm, WaybillSearchForm, LoadingDetailDispatchForm
+from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
 from ets.tools import un64unZip, viewLog, default_json_dump
@@ -574,20 +574,10 @@ def deserialize( request ):
 def viewLogView( request, template='status.html' ):
     return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
 
-def profile( request, template='status.html' ):
-    return direct_to_template(request, template, {'status': request.user.get_profile()})
-
-
 def expand_response(response, **headers):
     for header, value in headers.items():
         response[header] = value
     return response
-
-
-def select_data( request, template='reporting/select_data.html', form_class=WarehouseChoiceForm ):
-    form = form_class( request.POST or None )
-    context = not form.is_valid() and {'form': form, } or {}
-    return direct_to_template(request, template, context)
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
