@@ -661,8 +661,8 @@ class Waybill( ld_models.Model ):
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
     #Dates
-    loading_date = models.DateField(_("Date of loading"), blank=True, null=True) #dateOfLoading
-    dispatch_date = models.DateField( _("Date of dispatch"), blank=True, null=True) #dateOfDispatch
+    loading_date = models.DateField(_("Date of loading"), default=datetime.now) #dateOfLoading
+    dispatch_date = models.DateField( _("Date of dispatch"), default=datetime.now) #dateOfDispatch
     
     transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
                                          choices=TRANSACTION_TYPES, default=u'WIT') #transactionType
@@ -670,7 +670,7 @@ class Waybill( ld_models.Model ):
                                       choices=TRANSPORT_TYPES, default=u'02') #transportType
     
     #Dispatcher
-    dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=200, blank=True)
+    dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=400, blank=True)
     dispatcher_person = models.ForeignKey(CompasPerson, verbose_name=_("Dispatch person"), 
                                           related_name="dispatch_waybills") #dispatcherName
     
@@ -729,22 +729,9 @@ class Waybill( ld_models.Model ):
     
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
-        if self.dispatch_date and self.loading_date \
-        and self.loading_date > self.dispatch_date:
+        if self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
-    
-        if self.recipient_arrival_date and self.dispatch_date \
-         and self.recipient_arrival_date < self.dispatch_date:
-            raise ValidationError(_("Cargo arrived before being dispatched"))
-
-        if self.recipient_start_discharge_date and self.recipient_arrival_date \
-        and self.recipient_start_discharge_date < self.recipient_arrival_date:
-            raise ValidationError(_("Cargo Discharge started before Arrival?"))
-
-        if self.recipient_start_discharge_date and self.recipient_end_discharge_date \
-        and self.recipient_end_discharge_date < self.recipient_start_discharge_date:
-            raise ValidationError(_("Cargo finished Discharge before Starting?"))
-        
+            
     
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
@@ -781,17 +768,15 @@ class Waybill( ld_models.Model ):
         if commit:
             self.save()
     
-    def receipt_sign(self, commit=True):
-        """
-        Signs the waybill as delivered by setting special status DELIVERED. 
-        After this system sends it to central server.
-        """
-        self.recipient_signed_date = datetime.now()
+    def get_receipt(self):
+        """Returns receipt instance if exists or None otherwise"""
+        try:
+            receipt = self.receipt
+        except ReceiptWaybill.DoesNotExist:
+            receipt = None
         
-        self.update_status(self.DELIVERED)
-        
-        if commit:
-            self.save()
+        return receipt
+    
     
     def serialize(self):
         """
@@ -800,8 +785,14 @@ class Waybill( ld_models.Model ):
         @param self: the Waybill instance
         @return the serialized json data.
         """
-    
-        return serializers.serialize( 'json', chain((self,), self.loading_details.all()))
+        
+        items = chain((self,), self.loading_details.all())
+        
+        receipt = self.get_receipt()
+        if receipt:
+            items = chain((receipt,), items)
+        
+        return serializers.serialize( 'json', items)
         
     def compress(self):
         """
@@ -830,14 +821,14 @@ class ReceiptWaybill(models.Model):
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
-    recipient_person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
+    person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
                                           related_name="recipient_waybills") #recipientName
-    recipient_arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
-    recipient_start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
-    recipient_end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate
-    recipient_distance = models.IntegerField(_("Recipient Distance"), blank=True, null=True) #recipientDistance
-    recipient_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
-    recipient_signed_date = models.DateTimeField(_("Recipient Signed Date")) #recipientSignedTimestamp
+    arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
+    start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
+    end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate
+    distance = models.IntegerField(_("Recipient Distance (km)"), blank=True, null=True) #recipientDistance
+    remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
+    signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
     
     container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
     container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
@@ -851,7 +842,37 @@ class ReceiptWaybill(models.Model):
         verbose_name = _("reception")
         verbose_name_plural = _("reception")
     
+    
+    def sign(self, commit=True):
+        """
+        Signs the waybill as delivered by setting special status DELIVERED. 
+        After this system sends it to central server.
+        """
+        self.signed_date = datetime.now()
+        
+        self.waybill.update_status(self.waybill.DELIVERED)
+        
+        if commit:
+            self.save()
+    
+    def clean(self):
+        """Validates Waybill instance. Checks different dates"""
+    
+        #===============================================================================================================
+        # if self.arrival_date \
+        # and self.arrival_date < self.waybill.dispatch_date:
+        #    raise ValidationError(_("Cargo arrived before being dispatched"))
+        #===============================================================================================================
 
+        if self.start_discharge_date and self.arrival_date \
+        and self.start_discharge_date < self.arrival_date:
+            raise ValidationError(_("Cargo Discharge started before Arrival?"))
+
+        if self.start_discharge_date and self.end_discharge_date \
+        and self.end_discharge_date < self.start_discharge_date:
+            raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+    
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
@@ -865,11 +886,12 @@ class LoadingDetail(models.Model):
     commodity_code = models.CharField(_("Commodity Code "), max_length=18)
     commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, )
     unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
-    
+
     package = models.CharField(_("Package"), max_length=10)
+
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
         
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 
@@ -880,11 +902,11 @@ class LoadingDetail(models.Model):
                                                max_digits=10, decimal_places=3 ) #numberUnitsDamaged
     
     #Reasons
-    units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Lost Reason"), 
+    units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("Lost Reason"), 
                                            related_name='lost_reason', #LD_LostReason 
                                            blank=True, null=True,
                                            limit_choices_to={'type': LossDamageType.LOSS}) #unitsLostReason
-    units_damaged_reason = models.ForeignKey( LossDamageType, verbose_name=_("units Damaged Reason"), 
+    units_damaged_reason = models.ForeignKey( LossDamageType, verbose_name=_("Damaged Reason"), 
                                             related_name='damage_reason', #LD_DamagedReason 
                                             blank=True, null=True,
                                             limit_choices_to={'type': LossDamageType.DAMAGE}) #unitsDamagedReason
@@ -900,6 +922,7 @@ class LoadingDetail(models.Model):
         order_with_respect_to = 'waybill'
         verbose_name = _("loading detail")
         verbose_name_plural = _("waybill items")
+        unique_together = ('waybill', 'origin_id')
 
 
 #=======================================================================================================================
@@ -972,9 +995,7 @@ class LoadingDetail(models.Model):
         
         #clean number of items
         if self.number_of_units \
-        and self.number_units_good \
-        and self.number_units_damaged \
-        and self.number_units_lost \
+        and (self.number_units_good or self.number_units_damaged or self.number_units_lost) \
         and (self.number_of_units != self.number_units_good + self.number_units_damaged + self.number_units_lost):
             raise ValidationError(_("%(loaded).3f Units loaded but %(offload).3f units accounted for") % {
                     "loaded" : self.number_of_units, 

@@ -92,7 +92,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
-    ( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
+    #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
     ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
     ( r'^waybill/commit_to_compas_dispatch_one/(?P<waybill_pk>[-\w]+)/$', "singleWBDispatchToCompas", 
       {}, "singleWBDispatchToCompas" ),
@@ -104,9 +104,7 @@ urlpatterns = patterns("ets.views",
             'waybill_list': Waybill.objects.filter(sent_compas=True).all, 
             'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas=True).all,
     }}, "compass_waybill" ),
-    ( r'^waybill/invalidate_waybill/(?P<waybill_pk>[-\w]+)/$', "invalidate_waybill",{
-        'queryset': Waybill.objects.all(),
-    },"invalidate_waybill" ),
+    
     ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
     ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
     ( r'^waybill/view_stock/$', "direct_to_template", {
@@ -137,9 +135,11 @@ urlpatterns = patterns("ets.views",
 #    ( r'^lti/synchro/download/([-\w]+)/', "get_synchronize_lti", {}, "get_synchronize_lti" ),
 #=======================================================================================================================
     # Additional data
-    ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
-    ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
-    ( r'^all/download/stock_ets/', "get_wb_stock", {}, "get_wb_stock" ),
+    #===================================================================================================================
+    # ( r'^all/synchro/download/file/', "get_all_data_download", {}, "get_all_data_download" ),
+    # ( r'^all/synchro/download/', "get_all_data", {}, "get_all_data" ),
+    # ( r'^all/download/stock_ets/', "get_wb_stock", {}, "get_wb_stock" ),
+    #===================================================================================================================
     
     ( r'^accounts/profile', "profile", {}, "profile" ),
     

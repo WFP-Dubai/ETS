@@ -78,6 +78,8 @@ def waybill_view(request, waybill_pk, queryset, template):
     return direct_to_template( request, template, {
         'object': waybill,
         'extra_lines': my_empty,
+        'items': waybill.loading_details.select_related(),
+        'items_count': waybill.loading_details.count(),
         'editable': waybill.is_editable(request.user),
     })
 
@@ -233,23 +235,24 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     
     today = datetime.date.today()
     
+    
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                                             form=formset_form, formset=formset_class, 
                                             extra=0, max_num=5,
                                             can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
     
-    form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill, initial = {
-        'recipient_arrival_date': today,
-        'recipient_start_discharge_date': today,
-        'recipient_end_discharge_date': today,
-    })
+    form = form_class(data=request.POST or None, files=request.FILES or None, initial = {
+        'arrival_date': today,
+        'start_discharge_date': today,
+        'end_discharge_date': today,
+    }, instance=waybill.get_receipt())
     
     if form.is_valid() and loading_formset.is_valid():
-        waybill = form.save(False)
-        waybill.recipient_person = request.user.get_profile().compas_person
-        waybill.auditComment = 'Receipt Action'
-        waybill.save()
+        receipt = form.save(False)
+        receipt.waybill = waybill
+        receipt.person = request.user.get_profile().compas_person
+        receipt.save()
         
         loading_formset.save(True)
         
@@ -372,20 +375,11 @@ def receiptToCompas( request, template='compas/list_waybills_compas_received.htm
         'error_codes': error_codes,
     })
 
-
-def invalidate_waybill(request, waybill_pk, queryset, template='status.html'):
-    #first mark waybill invalidate, then zero the stock usage for each line and update the si table
-    current_wb = get_object_or_404(queryset, pk = waybill_pk )
-    current_wb.invalidate_waybill_action()
-    return direct_to_template( request, template, {
-        'status': _('Waybill %(number)s has now been Removed') % {"number": current_wb.waybillNumber}
-    })
-
-
 @login_required
 def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.delete()
+    messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
     if redirect_to:
         return redirect(redirect_to)
     else:
@@ -470,37 +464,6 @@ def waybill_validate_form_update( request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_view_reception( request, waybill_pk, template='waybill/print/waybill_detail_view_reception.html' ):
-    ## TODO: remove dependency of zippedWB
-    
-    zippedWB = ''
-    try:
-        waybill_instance = Waybill.objects.get( pk = waybill_pk )
-        lti_detail_items = LtiOriginal.objects.filter( code = waybill_instance.ltiNumber )
-        number_of_lines = waybill_instance.loading_details.select_related().count()
-        my_empty = [''] * (5 - number_of_lines)
-        zippedWB = waybill_instance.compress()
-    except:
-        return redirect( "index" )
-    
-    rec_person_object, disp_person_object = '', ''
-    try:
-        disp_person_object = EpicPerson.objects.get( person_pk = waybill_instance.dispatcherName )
-        rec_person_object = EpicPerson.objects.get( person_pk = waybill_instance.recipientName )
-    except:
-        pass
-    
-    return direct_to_template( request, template, {
-        'object': waybill_instance,
-        'LtiOriginal': lti_detail_items,
-        'disp_person': disp_person_object,
-        'rec_person': rec_person_object,
-        'extra_lines': my_empty,
-        'zippedWB': zippedWB,
-    })
-
-
-@login_required
 def waybill_validate_dispatch_form( request, template='validate/validateForm.html' ):
     ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillValidated', ), extra = 0 )
     validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillValidated = True ).filter( waybillSentToCompas = False )
@@ -580,19 +543,6 @@ def waybill_validate_receipt_form( request, template='validate/validateReceiptFo
     })
 
 
-#=======================================================================================================================
-# # Shows a page with the Serialized Waybill in comressed & uncompressed format
-# @login_required
-# def serialize( request, waybill_pk, template='blank.html', queryset=Waybill.objects.all() ):
-#    waybill = get_object_or_404(queryset, pk = waybill_pk )
-#    
-#    return direct_to_template( request, template, {
-#        'status': waybill.serialize(), 
-#        'ziped': waybill.compress(), 
-#        'wb_code': waybill_pk,
-#    })
-#=======================================================================================================================
-
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required
 @require_POST
@@ -620,33 +570,6 @@ def deserialize( request ):
     
     return redirect(waybill_reception, waybillnumber )
 
-#=======================================================================================================================
-# ## Serialization of fixtures    
-# def fixtures_serialize():
-#    # serialise each of the fixtures 
-#    #     DispatchPoint
-#    dispatchPointsData = DispatchPoint.objects.all()
-#    receptionPointData = ReceptionPoint.objects.all()
-#    packagingDescriptonShort = PackagingDescriptionShort.objects.all()
-#    #lossesDamagesReason = LossesDamagesReason.objects.all()
-#    #lossesDamagesType = LossesDamagesType.objects.all()
-#    serialized_data = serializers.serialize( 'json', list( dispatchPointsData ) + list( receptionPointData ) + list( packagingDescriptonShort ) )
-#    init_file = open( 'waybill/fixtures/initial_data.json', 'w' )
-#    init_file.writelines( serialized_data )
-#    init_file.close()
-#=======================================================================================================================
-
-#=======================================================================================================================
-# def custom_show_toolbar( request ):
-#    return True
-#=======================================================================================================================
-
-#=======================================================================================================================
-# def view_stock( request, template='stock/stocklist.html' ):
-#    stocklist = EpicStock.objects.all()
-#    return render_to_response(template, {'stocklist':stocklist})
-#=======================================================================================================================
-
 def viewLogView( request, template='status.html' ):
     return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
 
@@ -659,23 +582,6 @@ def expand_response(response, **headers):
         response[header] = value
     return response
 
-
-
-#=======================================================================================================================
-#    response = HttpResponse( mimetype = 'text/csv' )
-# #    response['Content-Disposition'] = 'attachment; filename=list-' + str( datetime.date.today() ) + '.csv'
-#    t = loader.get_template( 'reporting/list_ltis.txt' )
-#    c = Context( {
-#            'ltis': listIt,
-#        } )
-#    response.write( t.render( c ) )
-#    return response
-#=======================================================================================================================
-
-#=======================================================================================================================
-# def select_report( request ):
-#    return render_to_response( 'reporting/select_report.html', context_instance = RequestContext( request ) )
-#=======================================================================================================================
 
 def select_data( request, template='reporting/select_data.html', form_class=WarehouseChoiceForm ):
     form = form_class( request.POST or None )
@@ -753,45 +659,6 @@ def post_synchronize_waybill( request ):
     response = HttpResponse( 'SYNCHRONIZATION_DONE' )
     return response
 
-
-#=======================================================================================================================
-# @csrf_exempt
-# def get_synchronize_stock( request, warehouse_code, queryset=EpicStock.objects.all() ):
-#    '''
-#    This method is called by the offline application.
-#    The stocks identified by the warehouse_code in request are serialized and sended to the offline application.
-#    '''
-# 
-#    #warehouse_code = request.GET['']
-#    stocks_list = queryset.filter( wh_code = warehouse_code )
-# 
-#    #from kiowa.db.utils import instance_as_dict
-# 
-#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in stocks_list], use_decimal=True, default=default_json_dump), 
-#                        content_type="application/json; charset=utf-8")
-#=======================================================================================================================
-
-
-#=======================================================================================================================
-# @csrf_exempt
-# def get_synchronize_lti( request, warehouse_code, queryset=LtiOriginal.objects.all() ):
-#    '''
-#    This method is called by the offline application.
-#    The ltis identified by the warehouse_code in request are serialized and sended to the offline application.
-#    '''
-# 
-#    #warehouse_code = request.GET['warehouse_code']
-# 
-# #        from waybill.models import LtiOriginal    
-#    ltis_list = queryset.filter( origin_wh_code = warehouse_code )
-# 
-#    #from kiowa.db.utils import instance_as_dict
-# 
-#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in ltis_list], use_decimal=True, default=default_json_dump), 
-#                        content_type="application/json; charset=utf-8")
-#=======================================================================================================================
-    
-
 def get_wb_stock( request, queryset=ets.models.Warehouse.objects.all() ):
     warehouse = get_object_or_404(queryset, pk = request.REQUEST['warehouse'])
     filename = 'stock-data-%s-%s-%s.json' % (warehouse.origin_wh_code, settings.COMPAS_STATION, datetime.date.today())
@@ -808,82 +675,22 @@ def get_wb_stock( request, queryset=ets.models.Warehouse.objects.all() ):
     # return response
     #===================================================================================================================
     
-
+#=======================================================================================================================
+# @csrf_exempt
+# def get_all_data( request ):
+#    #print 'See'
+#    return HttpResponse(serialized_all_items(), 
+#                        content_type="application/json; charset=utf-8")
+#=======================================================================================================================
 
 #=======================================================================================================================
 # @csrf_exempt
-# def get_synchronize_waybill( request, warehouse_code, queryset=Waybill.objects.all() ):
-#    '''
-#    This method is called by the offline application.
-#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-#    '''
-# 
-#    #warehouse_code = request.GET['']
-# 
-#    #from waybill.models import Waybill    
-#    waybills_list = queryset.filter( destinationWarehouse__pk = warehouse_code )
-#    #from kiowa.db.utils import instance_as_dict
-#    
-#    return HttpResponse(simplejson.dumps( [model_to_dict( element ) for element in waybills_list], use_decimal=True, default=default_json_dump), 
-#                        content_type="application/json; charset=utf-8")
+# def get_all_data_download( request ):
+#    #print 'Donwload'
+#    return expand_response(HttpResponse(serialized_all_items(), content_type='text/csv'),
+#                           **{'Content-Disposition': 'attachment; filename=data-%s-%s.csv' % 
+#                              (settings.COMPAS_STATION, datetime.date.today())})
 #=======================================================================================================================
-    
-
-#=======================================================================================================================
-# def get_synchronize_waybill2( request ):
-#    '''
-#    This method is called by the offline application.
-#    The waybills that has the destinationWarehause equal to warehouse_code in request are serialized and sended to the offline application.
-#    '''
-#    try:
-#        warehouse_code = request.GET['warehouse_code']
-#    except:
-#        warehouse_code = 'CCBJ004'
-#    ld = []
-#    ltis = []
-#    stck = []
-#    #from waybill.models import Waybill    
-#    waybills_list = Waybill.objects.filter( destinationWarehouse = warehouse_code )
-#    for waybill_to_serialize in waybills_list:
-#        loadingdetails_to_serialize = waybill_to_serialize.loading_details.select_related()
-#        # Add related LtiOriginals to serialized representation
-#        ltis_to_serialize = LtiOriginal.objects.filter( code = waybill_to_serialize.ltiNumber )
-#        # Add related EpicStocks to serialized representation
-#        stocks_to_serialize = []
-#        for lti in ltis_to_serialize:
-#            for s in lti.stock_items():
-#                stocks_to_serialize.append( s )
-#        ld += loadingdetails_to_serialize
-#        ltis += ltis_to_serialize
-#        stck += stocks_to_serialize
-# 
-#    data = serializers.serialize( 'json', list( waybills_list ) + list( ld ) + list( ltis ) + list( stck ) )
-# 
-#    ## testing it to see deser
-# #=======================================================================================================================
-# #    print data
-# #    for deserialized_object in serializers.deserialize( "json", data ):
-# # 
-# #        print deserialized_object
-# #=======================================================================================================================
-# 
-#    response = HttpResponse( data, mimetype = 'application/json' )
-# 
-#    return response
-#=======================================================================================================================
-
-@csrf_exempt
-def get_all_data( request ):
-    #print 'See'
-    return HttpResponse(serialized_all_items(), 
-                        content_type="application/json; charset=utf-8")
-
-@csrf_exempt
-def get_all_data_download( request ):
-    #print 'Donwload'
-    return expand_response(HttpResponse(serialized_all_items(), content_type='text/csv'),
-                           **{'Content-Disposition': 'attachment; filename=data-%s-%s.csv' % 
-                              (settings.COMPAS_STATION, datetime.date.today())})
     
     #===================================================================================================================
     # data = serialized_all_items()
@@ -892,9 +699,3 @@ def get_all_data_download( request ):
     # response.write( data )
     # return response
     #===================================================================================================================
-
-#=======================================================================================================================
-# def testing():
-#    print 'c'
-#    mylti = LtiOriginal.objects.filter( code = 'ISBX002110025392P' )
-#=======================================================================================================================

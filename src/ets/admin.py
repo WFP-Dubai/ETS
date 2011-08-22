@@ -28,9 +28,9 @@ class ReceiptInline(admin.StackedInline):
     extra = 0
     
     fieldsets = (
-        (_('Dates'), {'fields': ('recipient_arrival_date', 'recipient_start_discharge_date', 
-                                 'recipient_end_discharge_date', 'recipient_signed_date',)}),
-        (_("Reception details"), {'fields': ('recipient_person', 'recipient_distance', 'recipient_remarks',)}),
+        (_('Dates'), {'fields': ('arrival_date', 'start_discharge_date', 
+                                 'end_discharge_date', 'signed_date',)}),
+        (_("Reception details"), {'fields': ('person', 'distance', 'remarks',)}),
         (_('Containers'), {'fields': ('container_one_remarks_reciept', 'container_two_remarks_reciept',)}),
         (_("Utility information"), {'fields': ('validated', 'sent_compas')}),
     )
@@ -51,11 +51,34 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                        'container_two_remarks_dispatch',)}),
     )
     
+    add_fieldsets = (
+        (_('Order'), {'fields': ('order_code', 'project_number', 'transport_name', 'warehouse', 'destination')}),
+        (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
+        (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
+        (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
+                                   'transport_driver_licence', 'transport_vehicle_registration', 
+                                   'transport_trailer_registration', 'transport_dispach_signed_date',)}),
+        (_('Container 1'), {'fields': ('container_one_number', 'container_one_seal_number', 
+                                       'container_one_remarks_dispatch',)}),
+        (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
+                                       'container_two_remarks_dispatch',)}),
+    )
+    
     list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
     readonly_fields = ('date_created',)
     list_filter = ('status', 'date_created',)
     search_fields = ('pk', 'order_code')
     inlines = (LoadingDetailsInline, ReceiptInline)
+        
+    def get_fieldsets(self, request, obj=None):
+        if not obj:
+            return self.add_fieldsets
+        return super(UserAdmin, self).get_fieldsets(request, obj)
+    
+    def get_formsets(self, request, obj=None):
+        for inline in self.inline_instances:
+            if obj or inline.model is not ets.models.ReceiptWaybill:
+                yield inline.get_formset(request, obj)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 

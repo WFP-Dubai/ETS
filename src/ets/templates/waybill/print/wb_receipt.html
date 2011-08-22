@@ -5,20 +5,20 @@
         <table cellpadding="0" cellspacing="0" border="1px"  >
             <thead class="wb_head"><tr><th colspan="2">{% trans "Certification of Commodities Received" %}</th></tr></thead>
             <tr>
-                <td><small  style="font-size:x-small;">{% trans "Location:" %}</small>{{ object.recipient_person.warehouse.location }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Arrival Date:" %}   </small>{{ object.recipient_arrival_date|date }}</td>
+                <td><small  style="font-size:x-small;">{% trans "Location:" %}</small> {{ object.person.warehouse.location }}</td>
+                <td ><small style="font-size:x-small;">{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date }}</td>
             </tr>
             <tr>
-                <td><small style="font-size:x-small;">{% trans "Consignee:" %}</small>{{ object.recipient_person.warehouse.organization }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Start Discharge Date:" %}</small> {{ object.recipient_start_discharge_date|date }}</td>
+                <td><small style="font-size:x-small;">{% trans "Consignee:" %}</small> {{ object.person.warehouse.organization }}</td>
+                <td ><small style="font-size:x-small;">{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date }}</td>
             </tr>
             <tr>
-                <td><small style="font-size:x-small;">{% trans "Name:" %} </small>{{ object.recipient_person.name }}</td>
-                <td ><small style="font-size:x-small;">{% trans "End Discharge Date:" %}</small>{{ object.recipient_end_discharge_date|date }}</td>
+                <td><small style="font-size:x-small;">{% trans "Name:" %} </small> {{ object.person }}</td>
+                <td ><small style="font-size:x-small;">{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date }}</td>
             </tr>
             <tr>
-                <td><small style="font-size:x-small;">{% trans "Title:" %} </small>{{ object.recipient_person.title }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Distance in KM:" %}</small>{{ object.recipient_distance|floatformat:3 }}</td>
+                <td><small style="font-size:x-small;">{% trans "Title:" %} </small> {{ object.person.title }}</td>
+                <td ><small style="font-size:x-small;">{% trans "Distance in KM:" %}</small> {{ object.distance }}</td>
             </tr>
         </table>
     </td>
@@ -31,7 +31,7 @@
         <tr style="font-size:x-small;">
           <td><sup>{% trans "Receipt Condition" %}</sup></td>
           <td colspan="2"><sup>{% trans "Good" %}</sup></td>
-          <td colspan="5"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
+          <td colspan="4"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
           <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
         </tr>
         <tr style="font-size:x-small;">
@@ -46,11 +46,19 @@
           <td><sup>{% trans "Net MT" %}</sup></td>
         </tr>
         
-        {%for lineitem in object.loading_details.all %}
+        {% for lineitem in items %}
           <tr style="font-size:small; text-align:right;">
             <td style="text-align:left;"><span>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.get_coi_code }}</span></td>
-            <td>{{ lineitem.number_units_good }}</td>
-            <td>{{ lineitem.calculate_net_received_good|floatformat:3}}</td>
+            <td>&nbsp;
+              {% if lineitem.number_units_good %}
+                {{ lineitem.number_units_good|floatformat:3 }}
+              {% endif %}
+            </td>
+            <td>&nbsp;
+              {% if lineitem.number_units_good %}
+                {{ lineitem.calculate_net_received_good|floatformat:3}}
+              {% endif %}
+            </td>
             <td style="text-align:center;">
               {% if lineitem.number_units_lost %}
                 L:{{ lineitem.number_units_lost|floatformat:3 }}
@@ -87,19 +95,22 @@
                 D:{{ lineitem.units_damaged_reason|truncatesmart:20}} 
               {% endif %}
             </td>
-            <td>
-              {{ lineitem.calculate_total_received_units|floatformat:3 }}
+            <td>&nbsp;
+              {% if lineitem.calculate_total_received_units %}
+                {{ lineitem.calculate_total_received_units|floatformat:3 }}
+              {% endif %}
             </td>
-            <td>
-              {{lineitem.calculate_total_received_net|floatformat:3}}
+            <td>&nbsp;
+              {% if lineitem.calculate_total_received_net %}
+                {{ lineitem.calculate_total_received_net|floatformat:3 }}
+              {% endif %}
             </td>    
           </tr>
-        {%endfor%}
+        {% endfor %}
                                         
         {%for lineitem in extra_lines%}
           <tr  style="font-size:small;">
-              <td>{% trans 'ID' %} {{ forloop.counter|add:object.loading_details.count }}.</td>
-              <td>&nbsp;</td>
+              <td>{% trans 'ID' %} {{ forloop.counter|add:items_count }}.</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
@@ -113,7 +124,7 @@
 
           <tr>
               <td colspan="10">
-                <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.recipient_remarks }}
+                <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.remarks }}
                 {% if object.container_one_remarks_reciept%}
                   <p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
                 {%endif%}
@@ -134,9 +145,9 @@
 				<td>
 					<p style="font-size: x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
 					<p style="font-size: x-small">{% trans "Name, signature and stamp:" %}</p>
-				  {% if object.recipient_signed_date %}
-            <p style='font-size:14px'>{{ object.recipient_person }}</p>
-            <p>{% trans "Date:" %}{{ object.recipient_signed_date }}</p>
+				  {% if object.signed_date %}
+            <p style='font-size:14px'>{{ object.person }}</p>
+            <p>{% trans "Date:" %}{{ object.signed_date }}</p>
           {% endif %}
 					
 		      <p style="font-size: x-small">{% trans "Endorse this section with an official stamp" %}</p>
@@ -144,9 +155,9 @@
 		    <td>
           <p style="font-size: x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
           <p style="font-size: x-small">{% trans "Name, signature and stamp" %}</p>
-	        {% if object.recipient_signed_date %}
+	        {% if object.signed_date %}
 				  <p style='font-size:14px'>{{ object.transport_driver_name|upper}}</p>
-          <p>{% trans "Date:" %} {{ object.recipient_signed_date }}</p>
+          <p>{% trans "Date:" %} {{ object.signed_date }}</p>
           {%endif%}
 					<p style="font-size: x-small">{% trans "Endorse this section with an official stamp" %}</p>
 				</td>

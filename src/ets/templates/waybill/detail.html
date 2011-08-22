@@ -49,7 +49,7 @@
   {% include 'waybill/print/wb_header.html'%}
   {% include 'waybill/print/wb_loading.html'%}
   
-  {% include 'waybill/print/wb_receipt.html' %}
+  {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
 </table>
 
 {% endblock %}

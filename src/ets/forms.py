@@ -21,37 +21,18 @@ class WaybillSearchForm( forms.Form ):
 
 class DispatchWaybillForm( forms.ModelForm ):
     
-    def __init__(self, **kwargs):
-        super(DispatchWaybillForm, self).__init__(**kwargs)
-        self.fields['loading_date'].required = True
-        self.fields['dispatch_date'].required = True
-        
     class Meta:
         model = ets_models.Waybill
-        fields = (
-            'loading_date',
-            'dispatch_date',
-            'destination',
-            'transaction_type',
-            'transport_type',
-            'dispatch_remarks',
-            
-            'transport_sub_contractor',
-            'transport_driver_name',
-            'transport_driver_licence',
-            'transport_vehicle_registration',
-            'transport_trailer_registration',
-            
-            'container_one_number',
-            'container_two_number',
-            'container_one_seal_number',
-            'container_two_seal_number',
-            'container_one_remarks_dispatch',
-            'container_two_remarks_dispatch',
+        exclude = (
+            'order_code',
+            'project_number',
+            'transport_name',
+            'warehouse',
+            'status',
+            'validated',
+            'sent_compas',
+            'processed_for_payment',
         )
-        widgets = {
-            'dispatch_remarks': forms.TextInput( attrs = {'size':'40'} ),
-        }
     
     helper = FormHelper()
     
@@ -89,20 +70,20 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
     
     def save(self, commit=True):
         obj = super(LoadingDetailDispatchForm, self).save(commit=False)
-        stock_item = self.cleaned_data.get('stock_item')
-        if stock_item:
-            obj.origin_id = stock_item.pk
-            obj.si_code = stock_item.si_code
-            
-            obj.comm_category_code = stock_item.comm_category_code
-            obj.commodity_code = stock_item.commodity_code
-            obj.commodity_name = stock_item.commodity_name
-            
-            obj.unit_weight_net = stock_item.unit_weight_net
-            obj.unit_weight_gross = stock_item.unit_weight_gross
-            
-            obj.package = stock_item.packaging_description()
+        stock_item = self.cleaned_data['stock_item']
+    
+        obj.origin_id = stock_item.pk
+        obj.si_code = stock_item.si_code
         
+        obj.comm_category_code = stock_item.comm_category_code
+        obj.commodity_code = stock_item.commodity_code
+        obj.commodity_name = stock_item.commodity_name
+        
+        obj.unit_weight_net = stock_item.unit_weight_net
+        obj.unit_weight_gross = stock_item.unit_weight_gross
+        
+        obj.package = stock_item.packaging_description()
+    
         if commit:
             obj.save()
         
@@ -116,7 +97,7 @@ class BaseLoadingDetailFormFormSet(BaseModelFormSet):
 #        errors.append( message )
 #        raise forms.ValidationError( errors )
     
-    def clean( self ):
+    def clean(self):
         super(BaseLoadingDetailFormFormSet, self).clean()
         count = 0
         for form in self.forms:
@@ -141,23 +122,22 @@ class WaybillRecieptForm( forms.ModelForm ):
     
     class Meta:
         model = ets_models.ReceiptWaybill
-        fields = (
-            'recipient_arrival_date',
-            'recipient_start_discharge_date',
-            'recipient_end_discharge_date',
-            'recipient_distance',
-            'recipient_remarks',
-            'container_one_remarks_reciept',
-            'container_two_remarks_reciept',
+        exclude = (
+            'waybill',
+            'slug',
+            'validated',
+            'sent_compas',
+            'person',
+            'signed_date',
         )
     
     helper = FormHelper()
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset(ugettext('Dates'), Row('recipient_arrival_date', 'recipient_start_discharge_date', 'recipient_end_discharge_date')),
+        Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
         Fieldset(ugettext('Containers'), Row('container_one_remarks_reciept', 'container_two_remarks_reciept')),
-        Fieldset('', Row('recipient_distance', 'recipient_remarks')),
+        Fieldset('', Row('distance', 'remarks')),
     ))
     
     helper.form_tag = False
@@ -202,52 +182,10 @@ class BaseRecieptFormFormSet(BaseInlineFormSet):
     helper.formset_tag = False
 
 
-class WaybillFullForm( forms.ModelForm ):
-
-    def __init__(self, **kwargs):
-        super(WaybillFullForm,self).__init__(**kwargs)
-        self.fields['auditComment'].required = True
-    
+class WaybillFullForm(forms.ModelForm):
     class Meta:
         model = ets_models.Waybill
-        widgets = {
-            'dispatchRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'ltiNumber': forms.HiddenInput,
-            'transportContractor': forms.HiddenInput,
-            'transportSubContractor': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverName': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverLicenceID': forms.TextInput( attrs = {'size':'40'} ),
-            'transportVehicleRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'dispatcherName': forms.HiddenInput,
-            'dispatcherTitle': forms.HiddenInput,
-            'transportTrailerRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDeliverySigned': forms.HiddenInput,
-            'transportDeliverySignedTimestamp': forms.HiddenInput,
-            'transportDispachSigned': forms.HiddenInput,
-            'transportDispachSignedTimestamp': forms.HiddenInput,
-            'recipientName': forms.HiddenInput,
-            'recipientTitle': forms.HiddenInput,
-            'recipientLocation': forms.HiddenInput,
-            'recipientConsingee': forms.HiddenInput,
-            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'recipientSignedTimestamp': forms.HiddenInput,
-            'waybillNumber': forms.HiddenInput,
-            'auditComment': forms.Textarea,
-        }
     
-    def thisDispName( self ):
-        try:
-            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.dispatcherName )
-        except ets_models.EpicPerson.DoesNotExist:
-            name = UNDEFINED_MESSAGE
-        return name
-    
-    def thisRecName( self ):
-        try:
-            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.recipientName )
-        except ets_models.EpicPerson.DoesNotExist:
-            name = UNDEFINED_MESSAGE
-        return name
 
 class WaybillValidationFormset( BaseModelFormSet ):
     def clean( self ):
