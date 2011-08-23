@@ -1,7 +1,7 @@
 {% extends "base_template.html"%}
 {% load i18n %}
-{%block content %}
-<h3>{% trans "Validate Dispatch" %}</h3>
+{% block content %}
+<h3>{% block page_title %}{% trans "Validate Dispatch" %}{% endblock %}</h3>
 <form method="post" action="">{% csrf_token %}
     {{ formset.management_form }}
 
@@ -48,7 +48,7 @@
               {% endif %}
              </td>
              <td>
-              <a href="{{ form.intance.get_absolute_url }}">{% trans "View" %}</a> 
+              <a href="{{ form.intance.get_absolute_url }}">{% trans "View" %}</a>
               {% if user.is_superuser %}
                 <a href='{% url waybill_validate_form_update waybill_pk=form.instance.pk %}'>{% trans "Edit" %}</a>
               {% endif %}
@@ -61,7 +61,7 @@
 </form>
 
 <br>
-<h3>{% trans "Update To Compas" %}</h3>
+<h3>{% trans "Validated, but not sent to COMPAS" %}</h3>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
     <thead>
         <tr>

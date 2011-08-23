@@ -21,6 +21,7 @@ from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.contrib.auth.decorators import user_passes_test
 
 
 from uni_form.helpers import FormHelper, Layout, HTML, Row
@@ -38,6 +39,12 @@ LOADING_LINES = 5
 def prep_req( request ):
 
     return {'user': request.user}
+
+def superuser_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: u.is_superuser, **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 
 @login_required
@@ -450,8 +457,11 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_validate_dispatch_form(request, template='validate/validateForm.html', 
-            queryset=ets.models.Waybill.objects.filter(sent_compas=False, status__gte=ets.models.Waybill.SIGNED)):
+@superuser_required
+def waybill_validate_dispatch_form(request, template='validate/validate.html', 
+            queryset=ets.models.Waybill.objects.filter(sent_compas=False, 
+                                                       status__gte=ets.models.Waybill.SIGNED,
+                                                       warehouse=settings.COMPAS_STATION)):
     
     formset = modelformset_factory(ets.models.Waybill, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
