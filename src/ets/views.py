@@ -450,47 +450,20 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_validate_dispatch_form( request, template='validate/validateForm.html' ):
-    ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillValidated = True ).filter( waybillSentToCompas = False )
-    issue = ''
-    errorMessage = _('Problems with Stock, Not enough in Dispatch Warehouse')
-    if request.method == 'POST':
-        formset = ValidateFormset( request.POST, WaybillValidationFormset )
-        if  formset.is_valid() :
-            instances = formset.save( commit = False )
-            for waybill in instances:
-                try:
-                    if waybill.check_lines():
-                        waybill.auditComment = _('Validated Dispatch')
-                        try:
-                            errorlog = CompasLogger.objects.get( wb = waybill )
-                            errorlog.user = ''
-                            errorlog.errorDisp = ''
-                            errorlog.timestamp = datetime.datetime.now()
-                            errorlog.save()
-                        except:
-                            pass
-                    else:
-                        waybill.auditComment = _('Tried to Validate Dispatch')
-                        issue = _('Problems with Stock on WB:  ' )+ str( waybill )
-                        waybill.waybillValidated = False
-                        messages.add_message( request, messages.ERROR, issue )
-                        create_or_update(waybill, request.user, errorMessage)
-                except: #Indicate here the error
-                        waybill.auditComment = _('Tried to Validate Dispatch')
-                        issue = _('Problems with Stock on WB:  ') + str( waybill )
-                        waybill.waybillValidated = False
-                        messages.add_message( request, messages.ERROR, issue )
-                        create_or_update(waybill, request.user, errorMessage)
-
-            formset.save()
-    waybills = Waybill.objects.filter( waybillValidated = False, dispatcherSigned = True )
-    formset = ValidateFormset( queryset = waybills )
+def waybill_validate_dispatch_form(request, template='validate/validateForm.html', 
+            queryset=ets.models.Waybill.objects.filter(sent_compas=False, status__gte=ets.models.Waybill.SIGNED)):
     
-    return direct_to_template( request, template, {
+    formset = modelformset_factory(ets.models.Waybill, fields = ('validated',), extra=0)\
+                    (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
+                                  
+    if formset.is_valid():
+        formset.save(commit=True)
+        
+        return redirect(request.build_absolute_uri())
+    
+    return direct_to_template(request, template, {
         'formset': formset, 
-        'validatedWB': validatedWB
+        'validated_waybills': queryset.filter(validated=True),
     })
 
 @login_required

@@ -77,12 +77,9 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
     
-    ( r'^waybill/validate/$', "direct_to_template", {
-            'template': 'selectValidateAction.html'
-    }, "waybill_validate_action" ),
-    ( r'^waybill/validate_dispatch/$', "waybill_validate_dispatch_form", {}, "waybill_validate_dispatch_form" ),
-    ( r'^waybill/validate_receipt_form/$', "waybill_validate_receipt_form", {}, "waybill_validate_receipt_form" ),
-    ( r'^waybill/validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
+    ( r'^validate_dispatch/$', "waybill_validate_dispatch_form", {}, "waybill_validate_dispatch_form" ),
+    ( r'^validate_receipt_form/$', "waybill_validate_receipt_form", {}, "waybill_validate_receipt_form" ),
+    ( r'^validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
