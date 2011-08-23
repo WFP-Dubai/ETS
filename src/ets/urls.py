@@ -78,7 +78,7 @@ urlpatterns = patterns("ets.views",
     }, "waybill_finalize_receipt" ),
     
     ( r'^validate_dispatch/$', "waybill_validate", {
-        'template': 'validate/validate.html',
+        'template': 'validate/dispatch.html',
         'formset_model': ets.models.Waybill,
         'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
                                    status__gte=ets.models.Waybill.SIGNED,
