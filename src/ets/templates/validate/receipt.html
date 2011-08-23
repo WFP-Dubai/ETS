@@ -1,0 +1,16 @@
+{% extends "validate/validate.html" %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Validate Receipt" %}{% endblock %}
+
+{% block waybill-row %}
+{% with form.instance.waybill as waybill %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}
+
+{% block validated-item %}
+{% with waybill.waybill as waybill %}
+{{ block.super }}
+{% endwith %}
+{% endblock %}

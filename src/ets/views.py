@@ -46,6 +46,12 @@ def superuser_required(function=None, **kwargs):
         return actual_decorator(function)
     return actual_decorator
 
+def officer_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+
 
 @login_required
 def order_list(request, warehouse_pk=None, template='order/list.html', 
@@ -457,13 +463,11 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-@superuser_required
-def waybill_validate_dispatch_form(request, template='validate/validate.html', 
-            queryset=ets.models.Waybill.objects.filter(sent_compas=False, 
-                                                       status__gte=ets.models.Waybill.SIGNED,
-                                                       warehouse=settings.COMPAS_STATION)):
+@officer_required
+def waybill_validate(request, queryset, template, 
+            formset_model=ets.models.Waybill):
     
-    formset = modelformset_factory(ets.models.Waybill, fields = ('validated',), extra=0)\
+    formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
                                   
     if formset.is_valid():
@@ -475,42 +479,6 @@ def waybill_validate_dispatch_form(request, template='validate/validate.html',
         'formset': formset, 
         'validated_waybills': queryset.filter(validated=True),
     })
-
-@login_required
-def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
-    ValidateFormset = modelformset_factory( Waybill, fields = ( 'waybillReceiptValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter(waybillReceiptValidated=True, 
-                                        waybillRecSentToCompas=False, waybillSentToCompas=True)
-    errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
-    if request.method == 'POST':
-        formset = ValidateFormset( request.POST )
-        if  formset.is_valid():
-            instances = formset.save( commit = False )
-            for waybill in  instances:
-                if waybill.check_lines_receipt():
-                    waybill.auditComment = _('Validated Receipt')
-                    
-                    CompasLogger.objects.filter( wb = waybill )\
-                                .update(user = request.user, errorRec = '', timestamp = datetime.datetime.now())
-                    
-                else:
-                    waybill.auditComment = _('Tried to Validate Receipt')
-                    messages.add_message( request, messages.ERROR, 
-                                          _('Problems with Stock on WB: %(waybill)s') % {'waybill': waybill} )
-                    waybill.waybillReceiptValidated = False
-                    create_or_update(waybill, request.user, errorMessage)
-                    
-            formset.save()
-
-    waybills = Waybill.objects.filter( waybillReceiptValidated = False, 
-                                       recipientSigned = True, waybillValidated = True )
-    formset = ValidateFormset( queryset = waybills )
-
-    return direct_to_template( request, template, {
-        'formset': formset, 
-        'validatedWB': validatedWB
-    })
-
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required

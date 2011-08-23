@@ -77,11 +77,25 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
     
-    ( r'^validate_dispatch/$', "waybill_validate_dispatch_form", {}, "waybill_validate_dispatch_form" ),
-    ( r'^validate_receipt_form/$', "waybill_validate_receipt_form", {}, "waybill_validate_receipt_form" ),
+    ( r'^validate_dispatch/$', "waybill_validate", {
+        'template': 'validate/validate.html',
+        'formset_model': ets.models.Waybill,
+        'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
+                                   status__gte=ets.models.Waybill.SIGNED,
+                                   warehouse=settings.COMPAS_STATION),
+    }, "waybill_validate_dispatch_form" ),
+    ( r'^validate_receipt_form/$', "waybill_validate", {
+        'template': 'validate/receipt.html',
+        'formset_model': ets.models.ReceiptWaybill,
+        'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
+                                   waybill__status__gte=ets.models.Waybill.DELIVERED,
+                                   waybill__destination=settings.COMPAS_STATION),
+    }, "waybill_validate_receipt_form" ),
+                       
     ( r'^validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
         'queryset': Waybill.objects.all(),
     }, "waybill_validate_form_update" ),
+                       
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
     #===================================================================================================================
     # ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),

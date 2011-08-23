@@ -7,6 +7,7 @@
 
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="toplist">
     <thead>
+    {% block thead %}
         <tr>
         <th>{% trans "Order" %}</th>
         <th>{% trans "Waybill Number" %}</th>
@@ -18,41 +19,46 @@
         <th>{% trans "Validated" %}</th>
         <th></th>
         </tr>
-        </thead>
+    {% endblock %}
+    </thead>
     {% for form in formset.forms %}
     <tr>
-             <td>{{ form.instance.order_code }}</td>
-             <td>{{ form.slug }}{{ form.instance.pk }}</td>
-             <td>{{ form.instance.warehouse }}</td>
-             <td>{{ form.instance.destination.organization }}</td>
-             <td>{{ form.instance.destination.location }}</td>
-             <td>
-              {% if form.instance.transport_dispach_signed_date %}
-                {{ form.instance.transport_dispach_signed_date }}
-              {% else %}
-                {% trans "Pending" %}
-              {% endif %}
-             </td>
-             <td>
-              {% if form.instance.receipt.signed_date %}
-                {{ form.instance.receipt.signed_date }}
-              {% else %}
-                {% trans "Pending" %}
-              {% endif %}
-             </td>
-             <td>{{ form.validated }}
-              {% if form.instance.hasError %}
-                <span onMouseUp="alert('{{ form.instance.errors.errorDisp|escapejs }}')">
-                  <span style='color:red;'>{% trans "Error!" %}</span>
-                </span>
-              {% endif %}
-             </td>
-             <td>
-              <a href="{{ form.intance.get_absolute_url }}">{% trans "View" %}</a>
-              {% if user.is_superuser %}
-                <a href='{% url waybill_validate_form_update waybill_pk=form.instance.pk %}'>{% trans "Edit" %}</a>
-              {% endif %}
-             </td>
+    {% with form.instance as waybill %}
+    {% block waybill-row %}
+       <td>{{ waybill.order_code }}</td>
+       <td>{{ form.slug }}{{ waybill.pk }}</td>
+       <td>{{ waybill.warehouse }}</td>
+       <td>{{ waybill.destination.organization }}</td>
+       <td>{{ waybill.destination.location }}</td>
+       <td>
+        {% if waybill.transport_dispach_signed_date %}
+          {{ waybill.transport_dispach_signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+       </td>
+       <td>
+        {% if waybill.receipt.signed_date %}
+          {{ waybill.receipt.signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+       </td>
+       <td>{{ form.validated }}
+        {% if waybill.hasError %}
+          <span onMouseUp="alert('{{ waybill.errors.errorDisp|escapejs }}')">
+            <span style='color:red;'>{% trans "Error!" %}</span>
+          </span>
+        {% endif %}
+       </td>
+       <td>
+        <a href="{{ waybill.get_absolute_url }}">{% trans "View" %}</a>
+        {% if user.is_superuser %}
+          <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>
+        {% endif %}
+       </td>
+    {% endblock %}
+    {% endwith %}
     </tr>
     {% endfor %}
 </table>
@@ -75,6 +81,7 @@
         </tr>
         </thead>
     {% for waybill in validated_waybills %}
+    {% block validated-item %}
     <tr>
       <td>{{ waybill.order_code }}</td>
       <td>{{ waybill.pk }}</td>
@@ -96,6 +103,7 @@
         {% endif %}
       </td>
     </tr>
+    {% endblock %}
     {% endfor %}
 </table>
 {%endblock%}
