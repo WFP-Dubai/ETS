@@ -203,6 +203,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         'formset': loading_formset,
         'object': order,
         'waybill': waybill,
+        'user': request.user,
     })
 
 
@@ -261,6 +262,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'form': form, 
         'formset': loading_formset,
         'waybill': waybill,
+        'user': request.user,
     })
 
 
