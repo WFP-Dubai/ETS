@@ -719,7 +719,7 @@ class Waybill( ld_models.Model ):
             return default
     
     def is_editable(self, user):
-        return self.status < self.SIGNED and not user.get_profile().reader_user
+        return self.status < self.SIGNED and not user.get_profile().compas_person.warehouse == self.warehouse
     
     def errors(self):
         try:

@@ -20,6 +20,7 @@ from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 
 from uni_form.helpers import FormHelper, Layout, HTML, Row
@@ -106,26 +107,10 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
     form = form_class(request.POST or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    found_wb = queryset.filter(pk__icontains=search_string)
-    my_valid_wb = []
+    queryset = queryset.filter(pk__icontains=search_string)
     
-    profile = request.user.get_profile()
-    
-    #TODO: Insert all these condition in query set
-    for waybill in found_wb:
-        if profile.is_compas_user or profile.reader_user or (
-            profile.dispatch_warehouse and waybill.warehouse == profile.dispatch_warehouse
-        ) or ( 
-            profile.reception_warehouse 
-            and waybill.destination.organization == profile.reception_warehouse.organization 
-            and waybill.destination.location == profile.reception_warehouse.location ):
-#        ) or ( profile.is_all_receiver and waybill.consegnee_code == consegnee_code ):
-            my_valid_wb.append( waybill.pk )
-
     return direct_to_template( request, template, {
-        'object_list': found_wb, 
-        'my_wb': my_valid_wb, 
-        'is_user': profile.super_user or profile.reader_user or profile.is_compas_user
+        'object_list': queryset, 
     })
 
 
