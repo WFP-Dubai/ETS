@@ -3,16 +3,14 @@
 {% block title %}{% trans "Stock List" %}{% endblock %}
 {% block content %}
 <table id='toplist'>
-  <thead>
-    <tr>
-      <th>{% trans "Warehouse" %}</th>
-      <th>{% trans "Commodity" %}</th>
-      <th>{% trans "SI" %}</th>
-      <th>{% trans "Items" %}</th>
-      <th>{% trans "MT Net" %}</th>
-      <th>{% trans "Quality" %}</th>
-    </tr>
-  </thead>
+  <tr>
+    <th>{% trans "Warehouse" %}</th>
+    <th>{% trans "Commodity" %}</th>
+    <th>{% trans "SI" %}</th>
+    <th>{% trans "Items" %}</th>
+    <th>{% trans "MT Net" %}</th>
+    <th>{% trans "Quality" %}</th>
+  </tr>
   {% for item in stocklist%}
   <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
     <td>{% ifchanged %}{{ item.warehouse }}{% endifchanged %}</td>
