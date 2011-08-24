@@ -83,9 +83,7 @@
 {% endif %}
 
 <br>
-{% if warehouse == object.warehouse %}
-<a href='{% url waybill_create order_pk=object.pk %}'>{% trans "Create New Waybill" %}</a><br>
-{% endif %}
+{% waybill_creation object user %} New Waybill<br>
 <br>
 
 {% endblock %}

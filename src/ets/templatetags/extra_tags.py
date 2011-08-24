@@ -150,3 +150,16 @@ def waybill_reception(waybill, user):
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
             'success': success,
     }
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_creation(order, user):
+    text = "Create"
+    if user.get_profile().compas_person.warehouse == order.warehouse:
+        success = True
+    else:
+        success = False
+    return { 
+            'text': text,
+            'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
+            'success': success,
+    }
