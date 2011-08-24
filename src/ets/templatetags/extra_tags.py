@@ -134,7 +134,7 @@ def waybill_edit(waybill, user):
         success = False
     return { 
             'text': text,
-            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk}),
+            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order_code }),
             'success': success,
     }
 
@@ -147,6 +147,6 @@ def waybill_reception(waybill, user):
         success = False
     return { 
             'text': text,
-            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order_code }),
+            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
             'success': success,
     }

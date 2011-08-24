@@ -55,14 +55,14 @@
       <tr>
         <td colspan="3" rowspan="2" class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
         <td class='bordered' align="center"><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
-        <td >{% waybill_edit waybill user %}</td>
+        <td class='bordered' align="center">{% waybill_edit waybill user %}</td>
       </tr>
       <tr>
         {% if warehouse == object.warehouse %}
         <td class='bordered' align="center"><a href='{% url waybill_delete waybill_pk=waybill.pk %}'>
               {% trans "Delete Waybill" %}</a></td>
         {% endif %}
-        <td >{% waybill_reception waybill user %}</td>
+        <td class='bordered' align="center">{% waybill_reception waybill user %}</td>
       </tr>
       <tr class='itemhead'>
         <td></td>
