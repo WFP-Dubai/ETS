@@ -124,6 +124,7 @@ def waybill_search( request, form_class=WaybillSearchForm,
     
     return direct_to_template( request, template, {
         'object_list': queryset, 
+        'user': request.user,
     })
 
 

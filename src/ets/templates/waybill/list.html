@@ -14,7 +14,8 @@
       <th>{% trans "Received" %}</th>
       <th>{% trans "Validated" %}</th>
       <th>{% trans "In Compas" %}</th>
-      <th>{% trans "Action" %}</th>
+      <th>{% trans "View" %}</th>
+      <th>{% trans "Edit" %}</th>
       <th>{% trans "Delete" %}</th>
       <th>{% trans "Receive" %}</th>
     </tr>
@@ -50,13 +51,10 @@
           {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
-          {% if not user.is_superuser %}
-            <a href='{{ waybill.get_absolute_url }}'>
-             {% trans "View WB" %}
-            </a>
-          {% else %}
-            <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>
-          {% endif %}
+          <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>
+        </td>
+        <td>
+          {% waybill_edit waybill user %}
         </td>
         <td>
           <a href='{% url waybill_delete waybill_pk=waybill.pk %}'>{% trans "Delete" %}</a>   

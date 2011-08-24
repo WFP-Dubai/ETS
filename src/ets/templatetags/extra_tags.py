@@ -128,7 +128,7 @@ class PrintTagNode( template.Node ):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_edit(waybill, user):
     text = "Edit"
-    if user.get_profile().compas_person.warehouse == waybill.destination:
+    if user.get_profile().compas_person.warehouse == waybill.warehouse:
         success = True
     else:
         success = False
@@ -141,7 +141,7 @@ def waybill_edit(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user):
     text = "Recept"
-    if user.get_profile().compas_person.warehouse == waybill.warehouse:
+    if user.get_profile().compas_person.warehouse == waybill.destination:
         success = True
     else:
         success = False
