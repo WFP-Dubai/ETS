@@ -464,8 +464,7 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 @login_required
 @officer_required
-def waybill_validate(request, queryset, template, 
-            formset_model=ets.models.Waybill):
+def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
