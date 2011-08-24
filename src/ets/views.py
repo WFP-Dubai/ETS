@@ -20,6 +20,8 @@ from django.db import transaction
 from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from django.contrib.auth.decorators import user_passes_test
 
 
 from uni_form.helpers import FormHelper, Layout, HTML, Row
@@ -37,6 +39,18 @@ LOADING_LINES = 5
 def prep_req( request ):
 
     return {'user': request.user}
+
+def superuser_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: u.is_superuser, **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+
+def officer_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 
 @login_required
@@ -106,26 +120,10 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
     form = form_class(request.POST or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    found_wb = queryset.filter(pk__icontains=search_string)
-    my_valid_wb = []
+    queryset = queryset.filter(pk__icontains=search_string)
     
-    profile = request.user.get_profile()
-    
-    #TODO: Insert all these condition in query set
-    for waybill in found_wb:
-        if profile.is_compas_user or profile.reader_user or (
-            profile.dispatch_warehouse and waybill.warehouse == profile.dispatch_warehouse
-        ) or ( 
-            profile.reception_warehouse 
-            and waybill.destination.organization == profile.reception_warehouse.organization 
-            and waybill.destination.location == profile.reception_warehouse.location ):
-#        ) or ( profile.is_all_receiver and waybill.consegnee_code == consegnee_code ):
-            my_valid_wb.append( waybill.pk )
-
     return direct_to_template( request, template, {
-        'object_list': found_wb, 
-        'my_wb': my_valid_wb, 
-        'is_user': profile.super_user or profile.reader_user or profile.is_compas_user
+        'object_list': queryset, 
     })
 
 
@@ -467,84 +465,21 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-def waybill_validate_dispatch_form( request, template='validate/validateForm.html' ):
-    ValidateFormset = modelformset_factory( Waybill, fields = ( 'id', 'waybillValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter( invalidated = False ).filter( waybillValidated = True ).filter( waybillSentToCompas = False )
-    issue = ''
-    errorMessage = _('Problems with Stock, Not enough in Dispatch Warehouse')
-    if request.method == 'POST':
-        formset = ValidateFormset( request.POST, WaybillValidationFormset )
-        if  formset.is_valid() :
-            instances = formset.save( commit = False )
-            for waybill in instances:
-                try:
-                    if waybill.check_lines():
-                        waybill.auditComment = _('Validated Dispatch')
-                        try:
-                            errorlog = CompasLogger.objects.get( wb = waybill )
-                            errorlog.user = ''
-                            errorlog.errorDisp = ''
-                            errorlog.timestamp = datetime.datetime.now()
-                            errorlog.save()
-                        except:
-                            pass
-                    else:
-                        waybill.auditComment = _('Tried to Validate Dispatch')
-                        issue = _('Problems with Stock on WB:  ' )+ str( waybill )
-                        waybill.waybillValidated = False
-                        messages.add_message( request, messages.ERROR, issue )
-                        create_or_update(waybill, request.user, errorMessage)
-                except: #Indicate here the error
-                        waybill.auditComment = _('Tried to Validate Dispatch')
-                        issue = _('Problems with Stock on WB:  ') + str( waybill )
-                        waybill.waybillValidated = False
-                        messages.add_message( request, messages.ERROR, issue )
-                        create_or_update(waybill, request.user, errorMessage)
-
-            formset.save()
-    waybills = Waybill.objects.filter( waybillValidated = False, dispatcherSigned = True )
-    formset = ValidateFormset( queryset = waybills )
+@officer_required
+def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
-    return direct_to_template( request, template, {
+    formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
+                    (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
+                                  
+    if formset.is_valid():
+        formset.save(commit=True)
+        
+        return redirect(request.build_absolute_uri())
+    
+    return direct_to_template(request, template, {
         'formset': formset, 
-        'validatedWB': validatedWB
+        'validated_waybills': queryset.filter(validated=True),
     })
-
-@login_required
-def waybill_validate_receipt_form( request, template='validate/validateReceiptForm.html' ):
-    ValidateFormset = modelformset_factory( Waybill, fields = ( 'waybillReceiptValidated', ), extra = 0 )
-    validatedWB = Waybill.objects.filter(waybillReceiptValidated=True, 
-                                        waybillRecSentToCompas=False, waybillSentToCompas=True)
-    errorMessage = _('Problems with Waybill, More Offloaded than Loaded, Update Dispatched Units!')
-    if request.method == 'POST':
-        formset = ValidateFormset( request.POST )
-        if  formset.is_valid():
-            instances = formset.save( commit = False )
-            for waybill in  instances:
-                if waybill.check_lines_receipt():
-                    waybill.auditComment = _('Validated Receipt')
-                    
-                    CompasLogger.objects.filter( wb = waybill )\
-                                .update(user = request.user, errorRec = '', timestamp = datetime.datetime.now())
-                    
-                else:
-                    waybill.auditComment = _('Tried to Validate Receipt')
-                    messages.add_message( request, messages.ERROR, 
-                                          _('Problems with Stock on WB: %(waybill)s') % {'waybill': waybill} )
-                    waybill.waybillReceiptValidated = False
-                    create_or_update(waybill, request.user, errorMessage)
-                    
-            formset.save()
-
-    waybills = Waybill.objects.filter( waybillReceiptValidated = False, 
-                                       recipientSigned = True, waybillValidated = True )
-    formset = ValidateFormset( queryset = waybills )
-
-    return direct_to_template( request, template, {
-        'formset': formset, 
-        'validatedWB': validatedWB
-    })
-
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required

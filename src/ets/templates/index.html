@@ -18,7 +18,8 @@
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
   
   {% if myprofile.officer %}
-  <li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
+  <li><a href='{% url waybill_validate_dispatch_form %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
+  <li><a href='{% url waybill_validate_receipt_form %}'>{% trans "Validate Received Waybill" %}</a></li>
   {% endif %}
 
   {% if user.is_superuser %}

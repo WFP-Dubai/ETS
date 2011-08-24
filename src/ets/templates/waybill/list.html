@@ -21,8 +21,6 @@
   </thead>
   
   {% for waybill in object_list %}
-    {% if waybill.pk in my_wb %}
-  
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
         <td>{{waybill.order_code}}</td>
         <td>{{waybill.pk}}</td>
@@ -52,8 +50,8 @@
           {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
-          {% if not myprofile.super_user %}
-            <a href='{% if myprofile.is_dispatcher %}{{ waybill.get_absolute_url }}{% else %}{% url waybill_view_reception waybill_pk=waybill.pk %}{% endif %}'>
+          {% if not user.is_superuser %}
+            <a href='{{ waybill.get_absolute_url }}'>
              {% trans "View WB" %}
             </a>
           {% else %}
@@ -67,7 +65,6 @@
           {% waybill_reception waybill user %}   
         </td>
       </tr>
-    {% endif %}
   {% endfor %}
 </table>
 

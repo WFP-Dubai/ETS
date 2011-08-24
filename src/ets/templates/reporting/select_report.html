@@ -56,7 +56,7 @@
   <tr class='reports-title'>
     <td>{% trans "Waybill reports" %}</td>
   </tr>
-  {% if user.get_profile.is_dispatcher %}
+  {% if warehouse %}
   <tr>
     <td>{% trans "Warehouse Dispatch Waybill Report: All items for" %} {{ warehouse }} </td>
     <td><a href='{% url api_waybills warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
