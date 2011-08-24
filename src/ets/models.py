@@ -719,7 +719,7 @@ class Waybill( ld_models.Model ):
             return default
     
     def is_editable(self, user):
-        return self.status < self.SIGNED and not user.get_profile().reader_user
+        return self.status < self.SIGNED and not user.get_profile().compas_person.warehouse == self.warehouse
     
     def errors(self):
         try:
@@ -941,10 +941,8 @@ class LoadingDetail(models.Model):
 #        return True
 #=======================================================================================================================
     
-    #===================================================================================================================
-    # def get_stock_item( self ):
-    #    return EpicStock.objects.get( pk = self.order_item.stock_item.pk )
-    #===================================================================================================================
+    def get_stock_item( self ):
+        return StockItem.objects.get(pk=self.origin_id)
 
     def calculate_total_net( self ):
         return ( self.number_of_units * self.unit_weight_net ) / 1000

@@ -262,36 +262,22 @@ class WaybillTestCase(TestCase):
         """ets.views.dispatch"""       
         response = self.client.get(reverse('dispatch'))
         self.assertEqual(response.status_code, 302)  
-
-    #===================================================================================================================
-    # def test_singleWBDispatchToCompas(self):
-    #    """ets.views.singleWBDispatchToCompas"""
-    #    response = self.client.get(reverse('singleWBDispatchToCompas', args=(self.waybill.pk,)))
-    #    self.assertEqual(response.status_code, 302) 
-    #    
-    # def test_singleWBReceiptToCompas(self):
-    #    """ets.views.singleWBReceiptToCompas"""
-    #    response = self.client.get(reverse('singleWBReceiptToCompas', args=(self.waybill.pk,)))
-    #    self.assertEqual(response.status_code, 200) 
-    #===================================================================================================================
         
     def test_receiptToCompas(self):
         """ets.views.receiptToCompas"""
         response = self.client.get(reverse('receiptToCompas'))
         self.assertEqual(response.status_code, 200)
         
-    def test_invalidate_waybill(self):
-        """ets.views.invalidate_waybill"""
-        response = self.client.get(reverse('invalidate_waybill', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
-        
     def test_waybill_view_reception(self):
         """ets.views.waybill_view_reception"""
         response = self.client.get(reverse('waybill_view_reception', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200) 
-        
-    def test_waybill_validate_receipt_form(self):
-        """ets.views.waybill_validate_receipt_form"""
+    
+    def waybill_validate(self):
+        """ets.views.waybill_validate"""
+        response = self.client.get(reverse("waybill_validate_dispatch_form"))
+        self.assertEqual(response.status_code, 200)
+    
         response = self.client.get(reverse('waybill_validate_receipt_form'))
         self.assertEqual(response.status_code, 200)     
         
@@ -319,82 +305,13 @@ class WaybillTestCase(TestCase):
         response = self.client.get(reverse('viewLogView'))
         self.assertEqual(response.status_code, 200)  
         
-    def test_profile(self):
-        """ets.views.profile"""
-        response = self.client.get(reverse('profile'))
-        self.assertEqual(response.status_code, 200) 
-                
-    def test_ltis_report(self):
-        """ets.views.ltis_report"""
-        response = self.client.get(reverse('ltis_report'))
-        self.assertEqual(response.status_code, 200)   
-        
-                               
-    def test_dispatch_report_wh(self):
-        """ets.views.dispatch_report_wh"""
-        response = self.client.get(reverse('dispatch_report_wh', args=(self.lti.origin_wh_code,)))
-        self.assertEqual(response.status_code, 200)   
-        
-    def test_receipt_report_wh(self):
-        """ets.views.receipt_report_wh"""
-        response = self.client.get(reverse('receipt_report_wh', args=(self.lti.destination_location_code, self.lti.consegnee_code,)))
-        self.assertEqual(response.status_code, 200) 
-        
-    def test_receipt_report_cons(self):
-        """ets.views.receipt_report_cons"""
-        response = self.client.get(reverse('receipt_report_cons', args=(self.lti.consegnee_code,)))
-        self.assertEqual(response.status_code, 200) 
-        
-        
     #===================================================================================================================
     # def test_barcode_qr(self):
     #    """ets.views.barcode_qr"""
     #    response = self.client.get(reverse('barcode_qr', args=(self.waybill.pk,) ))
     #    self.assertEqual(response.status_code, 200) 
     #===================================================================================================================
-        
-    def test_post_synchronize_waybill(self):
-        """ets.views.post_synchronize_waybill"""
-        response = self.client.get(reverse('post_synchronize_waybill'))
-        self.assertEqual(response.status_code, 200) 
-        
-    def test_get_synchronize_stock(self):
-        """ets.views.get_synchronize_stock"""
-        response = self.client.get(reverse('get_synchronize_stock', args=(self.stock.wh_code,)))
-        self.assertEqual(response.status_code, 200)  
-        
-    def test_get_synchronize_lti(self):
-        """ets.views.get_synchronize_lti"""
-        response = self.client.get(reverse('get_synchronize_lti', args=(self.lti.origin_wh_code,)))
-        self.assertEqual(response.status_code, 200) 
-         
-
-        
-    def test_get_synchronize_waybill(self):
-        """ets.views.get_synchronize_waybill"""
-        response = self.client.get(reverse('get_synchronize_waybill', args=(self.waybill.destinationWarehouse.pk,)))
-        self.assertEqual(response.status_code, 200)
-        
-    def test_get_synchronize_waybill2(self):
-        """ets.views.get_synchronize_waybill2"""
-        response = self.client.get(reverse('get_synchronize_waybill2'))
-        self.assertEqual(response.status_code, 200)  
-        
-    def test_get_all_data(self):
-        """ets.views.get_all_data"""
-        response = self.client.get(reverse('get_all_data'))
-        self.assertEqual(response.status_code, 200)         
-        
-    def test_get_all_data_download(self):
-        """ets.views.get_all_data_download"""
-        response = self.client.get(reverse('get_all_data_download'))
-        self.assertEqual(response.status_code, 200)  
                
-    def waybill_validate_dispatch_form(self):
-        """ets.views.waybill_validate_dispatch_form"""
-        response = self.client.get(reverse("waybill_validate_dispatch_form"))
-        self.assertEqual(response.status_code, 200)     
-    
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
