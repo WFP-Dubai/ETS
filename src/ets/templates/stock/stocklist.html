@@ -17,7 +17,7 @@
     <td>{% ifchanged %}{{ item.commodity_name }}{% endifchanged %}</td>
     <td>{% ifchanged %}{{ item.si_code }}{% endifchanged %}</td>
     <td>{{ item.number_of_units }}</td>
-    <td>{% if item.package_name == 'BULK' %}{{ item.unit_weight_net }}{% endif %}</td>
+    <td>{% if item.number_of_units %}{{ item.unit_weight_net }}{% endif %}</td>
     <th>{% if item.quality_code != 'G' %}{{ item.quality_description }}{% endif %}</th>
   </tr>
   {% endfor%}

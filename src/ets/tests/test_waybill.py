@@ -368,16 +368,12 @@ class WaybillTestCase(TestCase):
         response = self.client.get(reverse('get_synchronize_lti', args=(self.lti.origin_wh_code,)))
         self.assertEqual(response.status_code, 200) 
          
-    def test_get_wb_stock(self):
-        """ets.views.get_wb_stock"""
-        response = self.client.get(reverse('get_wb_stock'), data={'warehouse': self.dispatch_point.pk})
-        self.assertEqual(response.status_code, 200)  
+
         
     def test_get_synchronize_waybill(self):
         """ets.views.get_synchronize_waybill"""
         response = self.client.get(reverse('get_synchronize_waybill', args=(self.waybill.destinationWarehouse.pk,)))
         self.assertEqual(response.status_code, 200)
-        
         
     def test_get_synchronize_waybill2(self):
         """ets.views.get_synchronize_waybill2"""
