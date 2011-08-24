@@ -311,12 +311,7 @@ class WaybillTestCase(TestCase):
     #    response = self.client.get(reverse('barcode_qr', args=(self.waybill.pk,) ))
     #    self.assertEqual(response.status_code, 200) 
     #===================================================================================================================
-                 
-    def test_get_wb_stock(self):
-        """ets.views.get_wb_stock"""
-        response = self.client.get(reverse('get_wb_stock'), data={'warehouse': self.dispatch_point.pk})
-        self.assertEqual(response.status_code, 200)  
-        
+               
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
