@@ -1,5 +1,5 @@
 {% extends "base_template.html"%}
-{% load i18n %}
+{% load i18n extra_tags %}
 {% block content %}
 <h3>{% block page_title %}{% trans "Validate Dispatch" %}{% endblock %}</h3>
 <form method="post" action="">{% csrf_token %}
@@ -54,7 +54,7 @@
        <td>
         <a href="{{ waybill.get_absolute_url }}">{% trans "View" %}</a>
         {% if user.is_superuser %}
-          <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>
+          {% waybill_edit waybill user %}
         {% endif %}
        </td>
     {% endblock %}
