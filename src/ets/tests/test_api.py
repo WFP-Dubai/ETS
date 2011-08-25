@@ -15,8 +15,6 @@ from django.core.management import call_command
 import ets.models
 #from ..models import Waybill, LtiOriginal, EpicStock, Warehouse,
 from ets.utils import update_compas
-from ets.api.client import *
-import ets.api.client
 
 def get_fixture_text(file_name):
     return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
@@ -66,27 +64,6 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     #    self.assertDictEqual(data, self.waybill_dict)
     #===========================================================================
     
-    def test_get_receiving(self):
-        #Change status of first one
-        self.get_waybill().update_status(status=ets.models.Waybill.SENT)
-        
-        response = self.client.get(reverse("api_receiving_waybill", 
-                                           kwargs={"destination": self.get_waybill().destination.pk}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-        
-        #Check iterator and existence of waybill in result
-        self.assertTrue(self.get_waybill() in (obj.object for obj in serializers.deserialize('json', response.content)))
-    
-    def test_get_delivered(self):
-        #Change status of first one
-        self.get_waybill().update_status(status=ets.models.Waybill.DELIVERED)
-        
-        response = self.client.get(reverse("api_delivered_waybill", kwargs={"slug": self.get_waybill().pk}))
-        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-        
-        waybill = serializers.deserialize('json', response.content).next().object
-        self.assertEqual(waybill, self.get_waybill())
     
         
     def test_get_waybills(self):
