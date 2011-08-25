@@ -16,21 +16,28 @@ class CommandTestCase(TestCase):
         self.assertEqual(ets.models.Location.objects.count(), 0)
         self.assertEqual(ets.models.Warehouse.objects.count(), 0)
         self.assertEqual(ets.models.Organization.objects.count(), 0)
+        self.assertEqual(ets.models.Compas.objects.count(), 0)
         
         call_command('sync_compas', nodelete=True)
         
         """Test place's update method"""
         self.assertEqual(ets.models.Location.objects.count(), 2)
         self.assertEqual(ets.models.Warehouse.objects.count(), 3)
-        self.assertEqual(ets.models.Consignee.objects.count(), 1)
+        self.assertEqual(ets.models.Organization.objects.count(), 1)
+        self.assertEqual(ets.models.Compas.objects.count(), 2)
+
+        wh = ets.models.Warehouse.objects.get(pk='ISBX002')
+        self.assertTupleEqual((wh.organization, wh.location, wh.compas) , 
+                              (ets.models.Organization.objects.get(pk='DOEAF'), 
+                               ets.models.Location.objects.get(pk='ISBX'),
+                               ets.models.Compas.objects.get(pk='HQX0001'),))
         
-        warehouse = ets.models.Warehouse.objects.get(pk='ISBX002')
-        self.assertTupleEqual((warehouse.organization, warehouse.location) , 
-                              (ets.models.Consignee.objects.get(pk='DOEAF'), 
-                               ets.models.Location.objects.get(pk='ISBX')))
-        
-        #test compas persons. It's silly, because test case've already created such persons
-        self.assertEqual(ets.models.CompasPerson.objects.count(), 2)
+        #Persons
+        person = ets.models.Person.objects.get(pk="ISBX0020000586")
+        self.assertTupleEqual((person.organization, person.location, person.compas),
+                              (ets.models.Organization.objects.get(pk='DOEAF'), 
+                               ets.models.Location.objects.get(pk='ISBX'),
+                               ets.models.Compas.objects.get(pk='HQX0001'),))
         
         #test loss and damage types. The same story. It's stupid :)
         self.assertEqual(ets.models.LossDamageType.objects.count(), 3)

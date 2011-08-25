@@ -1,16 +1,91 @@
-from django.contrib import admin
 import datetime
+from functools import partial
+
+from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
+from django.utils.datastructures import SortedDict
+from django.http import HttpResponseRedirect
+from django.forms import MediaDefiningClass
 
 import logicaldelete.admin
 
 import ets.models
 
 
-class LoadingDetailsInline(admin.StackedInline):
+class ButtonableModelAdmin(admin.ModelAdmin):
+
+    buttons = ()
+
+    def change_view(self, request, object_id, extra_context=None):
+        obj = self.get_object(request, admin.util.unquote(object_id))
+        extra = {'buttons': self.get_buttons(request, obj).values()}
+        extra.update(extra_context or {})
+
+        return super(ButtonableModelAdmin, self).change_view(request, object_id, extra_context=extra)
+
+    def button_view_dispatcher(self, request, object_id, command):
+        obj = self.get_object(request, admin.util.unquote(object_id))
+        response = self.get_buttons(request, obj)[command][0](request, obj)
+
+        return response or HttpResponseRedirect(request.META['HTTP_REFERER'])
+
+    def get_buttons(self, request, obj):
+        """
+        Return a dictionary mapping the names of all buttons for this
+        ModelAdmin to a tuple of (callable, name, description) for each button.
+        Each button may assign 'condition', which chould be callable with following attrs: self, request, obj
+        """
+
+        buttons = SortedDict()
+        for name in self.buttons:
+            handler = getattr(self, name)
+            if getattr(handler, 'condition', lambda self, request, obj: True)(self, request, obj):
+                buttons[name] = (handler, name,
+                                 getattr(handler, 'short_description', name.replace('_', ' ')))
+
+        return buttons
+
+    def get_urls(self):
+
+        from django.conf.urls.defaults import patterns, url
+        from django.utils.functional import update_wrapper
+
+        def wrap(view):
+            def wrapper(*args, **kwargs):
+                return self.admin_site.admin_view(view)(*args, **kwargs)
+            return update_wrapper(wrapper, view)
+
+        return patterns('',
+            *(url(r'^(\d+)/(%s)/$' % command, wrap(self.button_view_dispatcher)) for command in self.buttons)
+        ) + super(ButtonableModelAdmin, self).get_urls()
+
+
+class ModelAdminWithForeignKeyLinksMetaclass(MediaDefiningClass):
+
+    def __new__(cls, name, bases, attrs):
+        new_class = super(ModelAdminWithForeignKeyLinksMetaclass, cls).__new__(cls, name, bases, attrs)
+
+        def foreign_key_link(instance, field):
+            target = getattr(instance, field)
+            return u'<a href="../../%s/%s/%d">%s</a>' % (
+                target._meta.app_label, target._meta.module_name, target.id, unicode(target))
+
+        for col in new_class.list_display:
+            if col[:8] == 'link_to_':
+                field_name = col[8:]
+                method = partial(foreign_key_link, field=field_name)
+                method.__name__ = col[8:]
+                method.allow_tags = True
+                method.admin_order_field = field_name
+                setattr(new_class, col, method)
+
+        return new_class
+
+
+class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
     
@@ -24,7 +99,7 @@ class LoadingDetailsInline(admin.StackedInline):
     )
     
 class ReceiptInline(admin.StackedInline):
-    model= ets.models.ReceiptWaybill
+    model = ets.models.ReceiptWaybill
     extra = 0
     
     fieldsets = (
@@ -36,10 +111,10 @@ class ReceiptInline(admin.StackedInline):
     )
 
 class WaybillAdmin(logicaldelete.admin.ModelAdmin):
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     fieldsets = (
-        (_('Order'), {'fields': ('order_code', 'project_number', 'transport_name', 'warehouse', 'destination')}),
-        (_("Status"), {'fields': ('status', 'validated', 'sent_compas', 'processed_for_payment',)}),
+        (_('General'), {'fields': ('order', 'destination', 'status', 'processed_for_payment')}),
         (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
         (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
         (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
@@ -49,10 +124,11 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                        'container_one_remarks_dispatch',)}),
         (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
                                        'container_two_remarks_dispatch',)}),
+        (_("COMPAS"), {'fields': ('validated', 'sent_compas',)}),
     )
     
     add_fieldsets = (
-        (_('Order'), {'fields': ('order_code', 'project_number', 'transport_name', 'warehouse', 'destination')}),
+        (_('Order'), {'fields': ('order', 'destination')}),
         (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
         (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
         (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
@@ -64,10 +140,12 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                        'container_two_remarks_dispatch',)}),
     )
     
-    list_display = ('pk', 'status', 'order_code', 'date_created','dispatch_date', 'warehouse', 'destination', 'active')
+    list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date', 
+                    'warehouse', 'destination', 'active')
     readonly_fields = ('date_created',)
+    date_hierarchy = 'date_created'
     list_filter = ('status', 'date_created',)
-    search_fields = ('pk', 'order_code')
+    search_fields = ('pk', 'order__pk')
     inlines = (LoadingDetailsInline, ReceiptInline)
         
     def get_fieldsets(self, request, obj=None):
@@ -115,17 +193,15 @@ class StockInline(admin.TabularInline):
     extra = 0
 
 class PersonInline(admin.TabularInline):
-    model = ets.models.CompasPerson
+    model = ets.models.Person
     extra = 0
 
 class WarehouseAdmin(admin.ModelAdmin):
-    #list_display = ('pk', 'title', 'place', 'start_date',)
-    list_display = ('pk', 'name', 'location', 'start_date',)
+    list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date',)
     list_filter = ('location', 'start_date')
-    #list_filter = ('place', 'start_date')
     date_hierarchy = 'start_date'
     search_fields = ('pk', 'title', 'place__name',)
-    inlines = (PersonInline, StockInline, OrderInline)
+    inlines = (StockInline, OrderInline)
     
 admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
@@ -134,36 +210,33 @@ class WarehouseInline(admin.TabularInline):
     model = ets.models.Warehouse
     extra = 0
 
-class ConsigneeAdmin(admin.ModelAdmin):
+class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
     search_fields = list_display
-    inlines = (WarehouseInline, OrderInline)
+    inlines = (PersonInline, WarehouseInline, OrderInline)
 
-admin.site.register( ets.models.Consignee, ConsigneeAdmin )
+admin.site.register( ets.models.Organization, OrganizationAdmin )
 
 class LocationAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'country', 'compas')
+    list_display = ('pk', 'name', 'country',)
     search_fields = list_display
     inlines = (WarehouseInline, OrderInline)
     list_filter = ('country',)
 
 admin.site.register( ets.models.Location, LocationAdmin )
 
-class UserProfileInline( admin.StackedInline ):
-    model = ets.models.UserProfile
-    verbose_name_plural = 'User Profile'
-    extra = 0
 
+class CompasAdmin(admin.ModelAdmin):
+    list_display = ('pk',)
+    search_fields = list_display
+    inlines = (WarehouseInline, PersonInline)
+    list_filter = ('country',)
 
-class UserAdmin( UserAdmin ):
-    inlines = (UserProfileInline, )
-
-admin.site.unregister(User)
-admin.site.register(User, UserAdmin)
+admin.site.register( ets.models.Location, LocationAdmin )
 
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
-    list_display = ( 'code', 'description')
+    list_display = ('code', 'description')
     list_filter = list_display
 
 admin.site.register( ets.models.PackagingDescriptionShort, PackagingDescriptonShortAdmin )

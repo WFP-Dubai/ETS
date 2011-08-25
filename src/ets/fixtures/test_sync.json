@@ -42,7 +42,6 @@
    "containerTwoSealNumber": "",
    "auditComment": "Print Dispatch Original",
    "dispatcherSigned": true,
-   "waybillProcessedForPayment": false,
    "recipientSignedTimestamp": null,
    "dispatcherTitle": "LOGISTICS OFFICER",
    "containerOneSealNumber": "",

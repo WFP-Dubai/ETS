@@ -111,7 +111,7 @@ class Place( models.Model ):
 class Compas(models.Model):
     """ Compas station """
     
-    code = models.CharField(_("Station code"), max_lenth=7, primary_key=True)
+    code = models.CharField(_("Station code"), max_length=7, primary_key=True)
     
 
 class Location(models.Model):
@@ -133,7 +133,7 @@ class Organization(models.Model):
     """ Organization model"""
     
     code = models.CharField(_("code"), max_length=20, primary_key=True)
-    name = models.CharField(_("Name"), max_length = 100, blank=True)
+    name = models.CharField(_("Name"), max_length=100, blank=True)
     
     class Meta:
         ordering = ('code',)
@@ -688,7 +688,6 @@ class Waybill( ld_models.Model ):
         (SENT, _("Sent")),
         (INFORMED, _("Informed")),
         (DELIVERED, _("Delivered")),
-        (COMPLETE, _("Complete")),
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
@@ -697,13 +696,6 @@ class Waybill( ld_models.Model ):
                          sep='', primary_key=True)
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
-    #===================================================================================================================
-    # #Data from order
-    # order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
-    # project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
-    # transport_name = models.CharField(_("Transport Name"), max_length = 30) #transport_name
-    # warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
-    #===================================================================================================================
     
     destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     
@@ -742,7 +734,6 @@ class Waybill( ld_models.Model ):
     #Extra Fields
     validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
     sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
-    processed_for_payment = models.BooleanField(_("Waybill Processed For Payment"), default=False) #waybillProcessedForPayment
     
     audit_log = AuditLog()
 
@@ -928,20 +919,6 @@ class LoadingDetail(models.Model):
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-#=======================================================================================================================
-#    origin_id = models.CharField(_("Origin stock identifier"), max_length=23)
-#    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
-#    
-#    comm_category_code = models.CharField(_("Commodity Category Code"), max_length=9)
-#    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
-#    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
-#    
-#    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, )
-#    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
-# 
-#    package = models.CharField(_("Package"), max_length=10)
-#=======================================================================================================================
-
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
 
     #Number of delivered units
