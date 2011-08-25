@@ -15,7 +15,7 @@ class CommandTestCase(TestCase):
         self.assertEqual(ets.models.Place.objects.using('compas').count(), 3)
         self.assertEqual(ets.models.Location.objects.count(), 0)
         self.assertEqual(ets.models.Warehouse.objects.count(), 0)
-        self.assertEqual(ets.models.Consignee.objects.count(), 0)
+        self.assertEqual(ets.models.Organization.objects.count(), 0)
         
         call_command('sync_compas', nodelete=True)
         

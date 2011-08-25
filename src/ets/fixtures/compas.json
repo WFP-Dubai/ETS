@@ -39,7 +39,7 @@
     "pk": "ISBX0020000586", 
     "model": "ets.compasperson", 
     "fields": {
-      "warehouse": "ISBX002", 
+      "compas": "ISBX002", 
       "first_name": "RIAZ", 
       "code": "0000586", 
       "title": "LOGISTICS OFFICER", 
