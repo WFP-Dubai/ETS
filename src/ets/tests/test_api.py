@@ -15,8 +15,6 @@ from django.core.management import call_command
 import ets.models
 #from ..models import Waybill, LtiOriginal, EpicStock, Warehouse,
 from ets.utils import update_compas
-from ets.api.client import *
-import ets.api.client
 
 def get_fixture_text(file_name):
     return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()

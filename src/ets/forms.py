@@ -28,7 +28,6 @@ class DispatchWaybillForm( forms.ModelForm ):
             'status',
             'validated',
             'sent_compas',
-            'processed_for_payment',
         )
     
     helper = FormHelper()

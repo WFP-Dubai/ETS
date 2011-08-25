@@ -242,7 +242,6 @@ COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
-AUTH_PROFILE_MODULE = 'ets.UserProfile'
 
 IN_PRODUCTION = False
 

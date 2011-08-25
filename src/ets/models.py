@@ -93,7 +93,7 @@ class Place( models.Model ):
                             if place.organization_id else None
             
             #Compas station
-            compas = Compas.objects.get_or_create(compas=place.reporting_code)[0]
+            compas = Compas.objects.get_or_create(code=place.reporting_code)[0]
             
             #Update warehouse
             defaults = {
@@ -213,7 +213,7 @@ class CompasPerson( models.Model ):
             try:
                 person = Person.objects.get(pk=person.person_pk)
             except Person.DoesNotExist:
-                user = User.objects.create(username=person.person_pk, pasword=UNUSABLE_PASSWORD,
+                user = User.objects.create(username=person.person_pk, password=UNUSABLE_PASSWORD,
                                            email=person.email,
                                            first_name = person.first_name, last_name = person.last_name, 
                                            is_staff=False, is_active=False, is_superuser=False)

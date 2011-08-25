@@ -16,14 +16,6 @@
     }
   },
   {
-    "pk": 1, 
-    "model": "ets.userprofile", 
-    "fields": {
-      "officer": true, 
-      "compas_person": "ISBX0020000586" 
-    }
-  }, 
-  {
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
@@ -63,7 +55,6 @@
       
       "validated": false,
       "sent_compas": false,
-      "processed_for_payment": false
     }
   }, 
   {
@@ -138,7 +129,6 @@
       
       "validated": false,
       "sent_compas": false,
-      "processed_for_payment": false
     }
   }, 
   {
@@ -171,7 +161,6 @@
     "model": "ets.waybill",
     "fields": {
       "dispatcher_person": "ISBX0020000613",
-      "processed_for_payment": false,
       "dispatch_date": "2011-06-12",
       "transport_dispach_signed_date": "2011-06-12 05:36:54",
       "validated": false,

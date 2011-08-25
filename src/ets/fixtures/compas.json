@@ -39,7 +39,7 @@
     "pk": "ISBX0020000586", 
     "model": "ets.compasperson", 
     "fields": {
-      "compas": "HQX0001",
+      "org_unit_code": "HQX0001",
       "location_code": "ISBX",
       "organization_id": "DOEAF", 
       "first_name": "RIAZ", 
@@ -53,7 +53,7 @@
     "pk": "ISBX0020000613", 
     "model": "ets.compasperson", 
     "fields": {
-      "compas": "HQX0001", 
+      "org_unit_code": "HQX0001", 
       "first_name": "DIDIER", 
       "code": "0000613", 
       "title": "REGIONAL LOGISTICS COORDINATOR", 

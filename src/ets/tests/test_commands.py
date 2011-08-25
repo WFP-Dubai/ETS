@@ -34,10 +34,11 @@ class CommandTestCase(TestCase):
         
         #Persons
         person = ets.models.Person.objects.get(pk="ISBX0020000586")
-        self.assertTupleEqual((person.organization, person.location, person.compas),
+        self.assertTupleEqual((person.organization, person.location, person.compas, person.user.username),
                               (ets.models.Organization.objects.get(pk='DOEAF'), 
                                ets.models.Location.objects.get(pk='ISBX'),
-                               ets.models.Compas.objects.get(pk='HQX0001'),))
+                               ets.models.Compas.objects.get(pk='HQX0001'),
+                               'ISBX0020000586'))
         
         #test loss and damage types. The same story. It's stupid :)
         self.assertEqual(ets.models.LossDamageType.objects.count(), 3)
@@ -63,12 +64,12 @@ class CommandTestCase(TestCase):
         
         """Update orders"""
         order = ets.models.Order.objects.all()[0]
-        self.assertEqual(order.warehouse, warehouse)
+        self.assertEqual(order.warehouse, wh)
         self.assertEqual(order.location, ets.models.Location.objects.get(pk='ISBX'))
-        self.assertEqual(order.consignee, ets.models.Consignee.objects.get(pk='DOEAF'))
+        self.assertEqual(order.consignee, ets.models.Organization.objects.get(pk='DOEAF'))
         
         #Test updated consignee's name
-        self.assertEqual(ets.models.Consignee.objects.get(pk='DOEAF').name, 'First consignee in our system')
+        self.assertEqual(ets.models.Organization.objects.get(pk='DOEAF').name, 'First consignee in our system')
         
         #Test order items
         self.assertEqual(order.items.count(), 1)

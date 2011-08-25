@@ -114,7 +114,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     fieldsets = (
-        (_('General'), {'fields': ('order', 'destination', 'status', 'processed_for_payment')}),
+        (_('General'), {'fields': ('order', 'destination', 'status',)}),
         (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
         (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
         (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
