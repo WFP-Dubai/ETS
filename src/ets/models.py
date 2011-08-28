@@ -112,6 +112,7 @@ class Compas(models.Model):
     """ Compas station """
     
     code = models.CharField(_("Station code"), max_length=7, primary_key=True)
+    officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
     
 
 class Location(models.Model):
