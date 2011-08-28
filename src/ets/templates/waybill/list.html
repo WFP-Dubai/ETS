@@ -1,5 +1,5 @@
 {% extends "base_template.html" %}
-{% load i18n %}
+{% load i18n extra_tags %}
 
 {% block content %}
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
@@ -14,14 +14,14 @@
       <th>{% trans "Received" %}</th>
       <th>{% trans "Validated" %}</th>
       <th>{% trans "In Compas" %}</th>
-      <th>{% trans "Action" %}</th>
+      <th>{% trans "View" %}</th>
+      <th>{% trans "Edit" %}</th>
       <th>{% trans "Delete" %}</th>
+      <th>{% trans "Receive" %}</th>
     </tr>
   </thead>
   
   {% for waybill in object_list %}
-    {% if waybill.pk in my_wb %}
-  
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
         <td>{{waybill.order_code}}</td>
         <td>{{waybill.pk}}</td>
@@ -51,19 +51,18 @@
           {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
-          {% if not myprofile.super_user %}
-            <a href='{% if myprofile.is_dispatcher %}{{ waybill.get_absolute_url }}{% else %}{% url waybill_view_reception waybill_pk=waybill.pk %}{% endif %}'>
-             {% trans "View WB" %}
-            </a>
-          {% else %}
-            <a href='{% url waybill_validate_form_update waybill_pk=waybill.pk %}'>{% trans "Edit" %}</a>
-          {% endif %}
+          <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>
+        </td>
+        <td>
+          {% waybill_edit waybill user %}
         </td>
         <td>
           <a href='{% url waybill_delete waybill_pk=waybill.pk %}'>{% trans "Delete" %}</a>   
         </td>
+        <td>
+          {% waybill_reception waybill user %}   
+        </td>
       </tr>
-    {% endif %}
   {% endfor %}
 </table>
 

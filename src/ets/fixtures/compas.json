@@ -4,7 +4,7 @@
     "model": "ets.place", 
     "fields": {
       "name": "PAKISTAN COUNTRY OFFICE",
-      "reporting_code": "HQX0001",
+      "reporting_code": "dev_compas",
       "organization_id": "DOEAF",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -16,7 +16,7 @@
     "model": "ets.place", 
     "fields": {
       "name": "ISLAMABAD CITY OFFICE",
-      "reporting_code": "HQX0001",
+      "reporting_code": "dev_compas",
       "organization_id": "DOEAF",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -28,7 +28,7 @@
     "model": "ets.place", 
     "fields": {
       "name": "EDO OFFICE MEHTI", 
-      "reporting_code": "KARX001", 
+      "reporting_code": "dev_compas", 
       "organization_id": "", 
       "geo_point_code": "OE7X", 
       "country_code": "586", 
@@ -39,42 +39,28 @@
     "pk": "ISBX0020000586", 
     "model": "ets.compasperson", 
     "fields": {
-      "warehouse": "ISBX002", 
+      "org_unit_code": "dev_compas",
+      "location_code": "ISBX",
+      "organization_id": "DOEAF", 
       "first_name": "RIAZ", 
       "code": "0000586", 
       "title": "LOGISTICS OFFICER", 
-      "document_number": "", 
-      "official_tel_number": "92 51-272589", 
-      "mobile_phone_number": "92 320-268658", 
-      "fax_number": "9251-827149", 
-      "organization_id": "DOEAF", 
       "last_name": "LODHI", 
-      "e_mail_address": "RIAZ.LODHI@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "location_code": "ISBX", 
-      "expiry_date": null
+      "email": "RIAZ.LODHI@WFP.ORG"
     }
   }, 
   {
     "pk": "ISBX0020000613", 
     "model": "ets.compasperson", 
     "fields": {
-      "warehouse": "ISBX003", 
+      "org_unit_code": "dev_compas", 
       "first_name": "DIDIER", 
       "code": "0000613", 
       "title": "REGIONAL LOGISTICS COORDINATOR", 
-      "document_number": "", 
-      "official_tel_number": "92-51-272589", 
-      "mobile_phone_number": "92 320-266722", 
-      "fax_number": "92-51-827149", 
       "organization_id": "DOEAF", 
       "location_code": "ISBX", 
       "last_name": "FRISCH", 
-      "e_mail_address": "DIDIER.FRISCH@WFP.ORG", 
-      "effective_date": null, 
-      "type_of_document": "", 
-      "expiry_date": null
+      "email": "DIDIER.FRISCH@WFP.ORG" 
     }
   },
   {
@@ -83,7 +69,7 @@
     "fields": {
       "cause": "VARIANCE IN WEIGHT", 
       "type": "L", 
-      "comm_category_code": "MIX"
+      "category": "MIX"
     }
   }, 
   {
@@ -92,7 +78,7 @@
     "fields": {
       "cause": "PROCESSING/TRANSFORMATION OF COMMODITY", 
       "type": "L", 
-      "comm_category_code": "SED"
+      "category": "SED"
     }
   }, 
   {
@@ -101,7 +87,7 @@
     "fields": {
       "cause": "WET BY GASOIL", 
       "type": "D", 
-      "comm_category_code": "MIX"
+      "category": "MIX"
     }
   },
   {

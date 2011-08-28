@@ -9,16 +9,18 @@
 <ul>
 
   {% if myprofile.compas_person %}
-  <li><a href='{% url orders warehouse_pk=myprofile.compas_person.warehouse.pk %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
+  <li><a href='{% url orders warehouse_pk=COMPAS_STATION %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
   {% endif %}
   
   {% if user.is_superuser %}
   <li><a href='{% url orders %}'>{% trans "All Orders" %}</a></li>
   {% endif %}
+  <li><a href='{% url view_stock warehouse_pk=COMPAS_STATION %}'>{% trans "View Stock" %}</a></li>
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
   
   {% if myprofile.officer %}
-  <li><a href='{% url waybill_validate_action %}'>{% trans "Validate Waybill" %}</a></li>
+  <li><a href='{% url waybill_validate_dispatch_form %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
+  <li><a href='{% url waybill_validate_receipt_form %}'>{% trans "Validate Received Waybill" %}</a></li>
   {% endif %}
 
   {% if user.is_superuser %}

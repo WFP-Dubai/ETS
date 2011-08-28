@@ -6,7 +6,7 @@ from functools import wraps
 from datetime import datetime
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
@@ -29,7 +29,6 @@ DEFAULT_TIMEOUT = 10
 API_DOMAIN = "http://localhost:8000"
 BULK_NAME = "BULK"
 
-COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 
 # like a normal ForeignKey.
@@ -49,6 +48,7 @@ def capitalize_slug(func):
 
 TOTAL_WEIGHT_METRIC = 1000
 
+
 #=======================================================================================================================
 # Models based on compas Views & Tables
 #=======================================================================================================================
@@ -64,7 +64,7 @@ class Place( models.Model ):
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
     geo_name = models.CharField(_("Geo name"), max_length = 100 )
     country_code = models.CharField( _("Country code"), max_length = 3 )
-    reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
+    reporting_code = models.CharField(_("COMPAS station code"), max_length = 7 )
     organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
 
     class Meta:
@@ -77,26 +77,27 @@ class Place( models.Model ):
         return self.name
 
     @classmethod
-    def update(cls):
+    def update(cls, compas):
         """Executes Imports of Place"""
-        for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
+        for place in cls.objects.using(compas).filter(country_code__in = settings.COUNTRIES,
+                                                      reporting_code=compas):
             
             #Create location
             location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
                 'name': place.geo_name,
                 'country': place.country_code,
-                'compas': place.reporting_code,
             })[0]
             
             #Create consignee organization
-            organization = Consignee.objects.get_or_create(code=place.organization_id)[0]\
+            organization = Organization.objects.get_or_create(code=place.organization_id)[0]\
                             if place.organization_id else None
             
             #Update warehouse
             defaults = {
+                'name': place.name,
                 'location': location,
                 'organization': organization,
-                'name': place.name,
+                'compas': Compas.objects.get(pk=place.reporting_code),
             }
             
             rows = Warehouse.objects.filter(code=place.org_code).update(**defaults)
@@ -104,13 +105,34 @@ class Place( models.Model ):
                 Warehouse.objects.create(code=place.org_code, **defaults)
             
 
+class Compas(models.Model):
+    """ Compas station """
+    
+    code = models.CharField(_("Station code"), max_length=7, primary_key=True)
+    officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
+    
+    #Database settings
+    db_engine = models.CharField(_("Database engine"), max_length=100)
+    db_name = models.CharField(_("Database name"), max_length=100)
+    db_user = models.CharField(_("Database user"), max_length=100, blank=True)
+    db_password = models.CharField(_("Database password"), max_length=100, blank=True)
+    db_host = models.CharField(_("Database host"), max_length=100, default='localhost')
+    db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('Compas station')
+        verbose_name_plural = _("compases")
+        
+    def __unicode__(self):
+        return self.pk
+    
 class Location(models.Model):
     """Location model. City or region"""
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
     country = models.CharField( _("Country"), max_length=3, choices=COUNTRY_CHOICES)
-    compas = models.CharField(_("COMPAS station"), max_length=7)
     
     class Meta:
         ordering = ('code',)
@@ -120,27 +142,28 @@ class Location(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.country, self.name)
     
-class Consignee(models.Model):
-    """Consignee organization"""
+class Organization(models.Model):
+    """ Organization model"""
     
-    code = models.CharField(_("Organization identifier"), max_length=20, primary_key=True)
-    name = models.CharField(_("Name"), max_length = 100, blank=True)
+    code = models.CharField(_("code"), max_length=20, primary_key=True)
+    name = models.CharField(_("Name"), max_length=100, blank=True)
     
     class Meta:
         ordering = ('code',)
-        verbose_name = _('consignee')
-        verbose_name_plural = _("consignees")
+        verbose_name = _('oranization')
+        verbose_name_plural = _("organizations")
     
     def __unicode__(self):
-        return self.name or self.pk
+        return self.name or self.code
 
-class Warehouse( models.Model ):
+class Warehouse(models.Model):
     """ Warehouse. dispatch or recipient."""
     code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
     name = models.CharField(_("name"),  max_length = 50, blank = True ) #origin_wh_name
     location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
-    organization = models.ForeignKey(Consignee, verbose_name=_("Organization"), related_name="warehouses", 
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
     start_date = models.DateField(_("start date"), null=True, blank=True)
     
     
@@ -177,37 +200,114 @@ class CompasPerson( models.Model ):
     last_name = models.CharField(_("last name"), max_length=30)
     first_name = models.CharField(_("first name"), max_length=25)
     code = models.CharField(_("code"), max_length=7)
-    type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
-    document_number = models.CharField(_("document number"), max_length=25, blank=True)
-    e_mail_address = models.CharField(_("e_mail address"), max_length=100, blank=True)
-    mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
-    official_tel_number = models.CharField(_("official telephone number"), max_length=20, blank=True)
-    fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
-    effective_date = models.DateField(_("effective date"), null=True, blank=True)
-    expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
+    #type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
+    #document_number = models.CharField(_("document number"), max_length=25, blank=True)
+    email = models.CharField(_("e_mail address"), max_length=100, blank=True, db_column='e_mail_address')
+    #mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
+    #official_tel_number = models.CharField(_("official telephone number"), max_length=20, blank=True)
+    #fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
+    #effective_date = models.DateField(_("effective date"), null=True, blank=True)
+    #expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
     
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("warehouse"), db_column='org_unit_code')
-
-    #Dummy fields
-    organization_id = models.CharField(_("organization identifier"), max_length=12, editable=False)
-    location_code = models.CharField(_("location"), max_length=10, editable=False)
+    org_unit_code = models.CharField(_("compas station"), max_length=10)
+    organization_id = models.CharField(_("organization identifier"), max_length=12)
+    location_code = models.CharField(_("location"), max_length=12)
 
     class Meta:
         db_table = u'epic_persons'
-        ordering = ('code',)
-        verbose_name = _('COMPAS User')
-        verbose_name_plural = _("COMPAS users")
     
     def  __unicode__( self ):
         return "%s, %s" % (self.last_name, self.first_name)
     
     @classmethod
-    def update(cls):
-        warehouses = Warehouse.objects.values_list('pk', flat=True)
-        for my_person in cls.objects.using('compas')\
-                .filter(warehouse__in=tuple(warehouses)):
-            my_person.save(using='default')
+    def update(cls, compas):
+        for person in cls.objects.using(compas).filter(org_unit_code=compas):
+            
+            try:
+                person = Person.objects.get(pk=person.person_pk)
+            except Person.DoesNotExist:
+                user = User.objects.create(username=person.person_pk, password=UNUSABLE_PASSWORD,
+                                           email=person.email,
+                                           first_name = person.first_name, last_name = person.last_name, 
+                                           is_staff=False, is_active=False, is_superuser=False)
+                person = Person.objects.create(user=user, person_pk=person.person_pk, title=person.title,
+                                               code=person.code, compas_id=person.org_unit_code, 
+                                               organization_id=person.organization_id, 
+                                               location_id=person.location_code)
+        
 
+class Person(models.Model):
+    """Person model"""
+    
+    user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
+    
+    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
+    title = models.CharField(_("title"), max_length=50, blank=True)
+    code = models.CharField(_("code"), max_length=7)
+    
+    compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
+    organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
+    location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
+    
+    #===================================================================================================================
+    # officer = models.BooleanField(_('Officer who can validate waybills'), default=False) #isCompasUser
+    #===================================================================================================================
+    #===================================================================================================================
+    # is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
+    # super_user = models.BooleanField(_("Super User"), 
+    #        help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
+    # reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
+    #===================================================================================================================
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('person')
+        verbose_name_plural = _("persons")
+    
+    def __unicode__(self):
+        return "%s %s" % (self.code, self.title)
+
+
+class CommodityCategory(models.Model):
+    """Commodity category"""
+    code = models.CharField(_("Commodity Category Code"), max_length=9, primary_key=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('commodity category')
+        verbose_name_plural = _("commodity categories")
+        
+    def __unicode__(self):
+        return self.code
+    
+class Commodity(models.Model):
+    """Commodity model"""
+    
+    code = models.CharField(_("Commodity Code"), max_length=18, primary_key=True)
+    name = models.CharField(_("Commodity Name"), max_length=100)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity Category"), related_name="commodities")
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('Commodity')
+        verbose_name_plural = _("Commodities")
+    
+    def __unicode__(self):
+        return self.name
+
+class Package(models.Model):
+    """Packaging model"""
+    
+    code = models.CharField(_("code"), max_length=17, primary_key=True)
+    name = models.CharField(_("name"), max_length=50)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('package')
+        verbose_name_plural = _("packages")
+    
+    def __unicode__(self):
+        return self.name
 
 class EpicStock( models.Model ):
     """COMPAS stock. We retrieve it from Oracle database view."""
@@ -247,12 +347,24 @@ class EpicStock( models.Model ):
         return self.packagename == BULK_NAME and self.quantity_net
     
     @classmethod 
-    def update(cls):
+    def update(cls, using):
         """Executes Imports of Stock"""
         
         now = datetime.now()
         
-        for stock in cls.objects.using( 'compas' ):
+        for stock in cls.objects.using(using):
+            
+            #Create commodity's category
+            category = CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
+            
+            #Create commodity
+            commodity = Commodity.objects.get_or_create(pk=stock.commodity_code, defaults={
+                'name': stock.cmmname,
+                'category': category, 
+            })[0]
+            
+            #Create package
+            package = Package.objects.get_or_create(pk=stock.package_code, defaults={'name': stock.packagename})[0]
             
             #Check package type. If 'BULK' then modify number and weight
             number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
@@ -262,12 +374,9 @@ class EpicStock( models.Model ):
                 'warehouse': Warehouse.objects.get(pk=stock.wh_code),
                 'project_number': stock.project_wbs_element,
                 'si_code': stock.si_code,
-                'commodity_code': stock.commodity_code,
-                'comm_category_code': stock.comm_category_code,
-                'commodity_name': stock.cmmname,
+                'commodity': commodity,
+                'package': package,
                 'number_of_units': number_of_units,
-                'package_code': stock.package_code,
-                'package_name': stock.packagename,
                 'quality_code': stock.qualitycode,
                 'quality_description': stock.qualitydescr,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
@@ -297,12 +406,8 @@ class StockItem( models.Model ):
     project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
     si_code = models.CharField(_("shipping instruction code"), max_length=8)
     
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
-    commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank=True) #cmmname
-    
-    package_code = models.CharField(_("Package code"), max_length=17)
-    package_name = models.CharField(_("Package name"), max_length=50, blank=True)
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
+    package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
     quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
     quality_description = models.CharField(_("Quality description "), max_length=11, blank=True) #qualitydescr
@@ -316,22 +421,16 @@ class StockItem( models.Model ):
     objects = StockManager()
 
     class Meta:
-        ordering = ('si_code', 'commodity_name')
+        ordering = ('si_code', 'commodity__name')
         order_with_respect_to = 'warehouse'
         verbose_name = _("stock item")
         verbose_name_plural = _("stocks")
 
     def  __unicode__( self ):
-        return "%s-%s-%s" % (self.warehouse.name, self.commodity_code, self.number_of_units)
+        return "%s-%s-%s" % (self.warehouse.name, self.commodity.pk, self.number_of_units)
         
     def coi_code(self):
         return self.origin_id[7:]
-    
-    def packaging_description( self ):
-        try:
-            return PackagingDescriptionShort.objects.get( pk = self.package_code ).description
-        except PackagingDescriptionShort.DoesNotExist:
-            return self.package_name
     
     #===================================================================================================================
     # def number_of_units_ordered(self, order):
@@ -344,20 +443,7 @@ class StockItem( models.Model ):
     #                                    ).order_by('-warehouse__orders__items__number_of_units')
     #===================================================================================================================
 
-class PackagingDescriptionShort( models.Model ):
-    code = models.CharField(_("Package Code"), primary_key=True, max_length=5)
-    description = models.CharField(_("Package Short Name"), max_length=10)
-    
-    class Meta:
-        ordering = ('code',)
-        verbose_name = _("Packaging")
-        verbose_name_plural = _("package descriptions")
-    
-    def  __unicode__( self ):
-        return "%s - %s" % (self.code, self.description)
-
-
-class LossDamageType( models.Model ):
+class LossDamageType(models.Model):
     
     LOSS = 'L'
     DAMAGE = 'D'
@@ -368,15 +454,17 @@ class LossDamageType( models.Model ):
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
-                            instance.type, instance.comm_category_code
+                            instance.type, instance.category_id
                          ), unique=True, primary_key=True)
     type = models.CharField(_("Type"), max_length=1, choices=TYPE_CHOICE)
-    comm_category_code = models.CharField(_("Commodity category code"), max_length=9)
-    cause = models.CharField(_("Cause"), max_length = 100)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), 
+                                 related_name="loss_damages", db_column='comm_category_code')
+    cause = models.CharField(_("Cause"), max_length=100)
 
     class Meta:
         db_table = u'epic_lossdamagereason'
         verbose_name = _('Loss/Damages Reason')
+        verbose_name_plural = _("Losses/Damages")
     
     def  __unicode__( self ):
         cause = self.cause
@@ -386,13 +474,38 @@ class LossDamageType( models.Model ):
         return cause
     
     @classmethod
-    def update(cls):
-        for myrecord in cls.objects.using('compas').all():
+    def update(cls, using):
+        for myrecord in cls.objects.using(using).all():
             if not cls.objects.filter(type=myrecord.type, 
-                                  comm_category_code=myrecord.comm_category_code, 
+                                  category__pk=myrecord.category_id, 
                                   cause=myrecord.cause).count():
                 myrecord.save(using='default')
 
+#=======================================================================================================================
+# 
+# class ReasonBase(models.Model):
+#    """Loss reason"""
+#    
+#    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), related_name="%(class)s")
+#    cause = models.CharField(_("Cause"), max_length=100)
+# 
+#    class Meta:
+#        abstract = True
+# 
+# class LossReason(ReasonBase):
+#    """Loss reason"""
+#    
+#    class Meta:
+#        verbose_name = _("loss reason")
+#        verbose_name_plural = _("loss reasons")
+#    
+# class DamageReason(ReasonBase):
+#    """Damage reason"""
+#    
+#    class Meta:
+#        verbose_name = _("damage reason")
+#        verbose_name_plural = _("damage reasons")
+#=======================================================================================================================
 
 class LtiOriginal( models.Model ):
     """LTIs for office"""
@@ -441,11 +554,11 @@ class LtiOriginal( models.Model ):
         #managed = False
     
     @classmethod
-    def update(cls):
+    def update(cls, using):
         """Imports all LTIs from COMPAS"""
         now = datetime.now()
 
-        original = cls.objects.using('compas').filter(requested_dispatch_date__gt = settings.MAX_DATE)
+        original = cls.objects.using(using).filter(requested_dispatch_date__gt = settings.MAX_DATE)
         if not settings.DISABLE_EXPIERED_LTI:
             original = original.filter( expiry_date__gt = now )
         
@@ -453,7 +566,7 @@ class LtiOriginal( models.Model ):
             
             #Update Consignee
             # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
-            consignee = Consignee.objects.get(pk=lti.consegnee_code)
+            consignee = Organization.objects.get(pk=lti.consegnee_code)
             
             if not consignee.name:
                 consignee.name = lti.consegnee_name
@@ -481,8 +594,7 @@ class LtiOriginal( models.Model ):
             defaults = {
                 'order': order,
                 'si_code': lti.si_code,
-                'commodity_code': lti.commodity_code,
-                'commodity_name': lti.cmmname,
+                'commodity': Commodity.objects.get(pk=lti.commodity_code),
                 'number_of_units': lti.number_of_units,
             }
             
@@ -509,7 +621,7 @@ class Order(models.Model):
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("dispatch warehouse"), related_name="orders")
-    consignee = models.ForeignKey(Consignee, verbose_name=_("consignee"), related_name="orders")
+    consignee = models.ForeignKey(Organization, verbose_name=_("consignee"), related_name="orders")
     location = models.ForeignKey(Location, verbose_name=_("consignee's location"), related_name="orders")
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
@@ -546,8 +658,7 @@ class OrderItem(models.Model):
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
     
-    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
     
@@ -559,9 +670,9 @@ class OrderItem(models.Model):
     
     def  __unicode__( self ):
         if self.removed:
-            return u"Void %s -  %.0f " % ( self.commodity_name, self.items_left() )
+            return u"Void %s -  %.0f " % ( self.commodity.name, self.items_left() )
         else:
-            return u"%s -  %.0f " % ( self.commodity_name, self.items_left() )
+            return u"%s -  %.0f " % ( self.commodity.name, self.items_left() )
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
@@ -642,19 +753,14 @@ class Waybill( ld_models.Model ):
         (SENT, _("Sent")),
         (INFORMED, _("Informed")),
         (DELIVERED, _("Delivered")),
-        (COMPLETE, _("Complete")),
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            COMPAS_STATION, instance.date_created.strftime('%y'), LETTER_CODE
+                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     
-    #Data from order
-    order_code = models.CharField( _("order code"), max_length = 20, db_index=True)
-    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
-    transport_name = models.CharField(_("Transport Name"), max_length = 30) #transport_name
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Dispatch Warehouse"), related_name="dispatch_waybills")
+    order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
     destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
     
@@ -693,7 +799,6 @@ class Waybill( ld_models.Model ):
     #Extra Fields
     validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
     sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
-    processed_for_payment = models.BooleanField(_("Waybill Processed For Payment"), default=False) #waybillProcessedForPayment
     
     audit_log = AuditLog()
 
@@ -701,7 +806,7 @@ class Waybill( ld_models.Model ):
     
     class Meta:
         ordering = ('slug',)
-        #order_with_respect_to = 'order'
+        order_with_respect_to = 'order'
         verbose_name = _("waybill")
         verbose_name_plural = _("waybills")
     
@@ -712,20 +817,16 @@ class Waybill( ld_models.Model ):
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
     
-    def get_order(self, default=None):
-        try:
-            return Order.objects.get(pk=self.order_code)
-        except Order.DoesNotExist:
-            return default
-    
     def is_editable(self, user):
-        return self.status < self.SIGNED and not user.get_profile().reader_user
+        return self.status < self.SIGNED and not user.get_profile().compas_person.warehouse == self.warehouse
     
-    def errors(self):
-        try:
-            return CompasLogger.objects.get( wb = self )
-        except CompasLogger.DoesNotExist:
-            return ''
+    #===================================================================================================================
+    # def errors(self):
+    #    try:
+    #        return CompasLogger.objects.get( wb = self )
+    #    except CompasLogger.DoesNotExist:
+    #        return ''
+    #===================================================================================================================
     
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
@@ -842,6 +943,8 @@ class ReceiptWaybill(models.Model):
         verbose_name = _("reception")
         verbose_name_plural = _("reception")
     
+    def __unicode__(self):
+        return "Reception of waybill: %s" % self.waybill
     
     def sign(self, commit=True):
         """
@@ -879,20 +982,10 @@ class LoadingDetail(models.Model):
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
     #Stock data
-    origin_id = models.CharField(_("Origin stock identifier"), max_length=23)
-    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
+    stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length=9)
-    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
-    
-    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, )
-    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
-
-    package = models.CharField(_("Package"), max_length=10)
-
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
-        
+
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 
                                             max_digits=10, decimal_places=3) #numberUnitsGood
@@ -922,7 +1015,7 @@ class LoadingDetail(models.Model):
         order_with_respect_to = 'waybill'
         verbose_name = _("loading detail")
         verbose_name_plural = _("waybill items")
-        unique_together = ('waybill', 'origin_id')
+        unique_together = ('waybill', 'stock_item')
 
 
 #=======================================================================================================================
@@ -941,11 +1034,6 @@ class LoadingDetail(models.Model):
 #        return True
 #=======================================================================================================================
     
-    #===================================================================================================================
-    # def get_stock_item( self ):
-    #    return EpicStock.objects.get( pk = self.order_item.stock_item.pk )
-    #===================================================================================================================
-
     def calculate_total_net( self ):
         return ( self.number_of_units * self.unit_weight_net ) / 1000
 
@@ -976,11 +1064,8 @@ class LoadingDetail(models.Model):
     def calculate_total_received_net( self ):
         return self.calculate_net_received_good() + self.calculate_net_received_damaged()
     
-    def get_coi_code(self):
-        return self.origin_id[7:]
-    
     def  __unicode__( self ):
-        return "%s - %s - %s" % (self.waybill, self.si_code, self.number_of_units)
+        return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
     
     def clean(self):
         #Clean units_lost_reason
@@ -1008,38 +1093,6 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.comm_category_code != self.comm_category_code:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
-
-class UserProfile( models.Model ):
-    user = models.ForeignKey(User, unique = True, primary_key = True)#OneToOneField(User, primary_key = True)
-    
-    compas_person = models.ForeignKey(CompasPerson, verbose_name = _('Use this Compas Person'),
-                                      related_name="profiles",
-                                      help_text = _('Select the corresponding user from Compas'), 
-                                      blank=True, null=True)
-    
-    officer = models.BooleanField(_('Officer who can validate waybills'), default=False) #isCompasUser
-    #===================================================================================================================
-    # is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
-    # super_user = models.BooleanField(_("Super User"), 
-    #        help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
-    # reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
-    #===================================================================================================================
-
-    audit_log = AuditLog()
-    
-    def __unicode__( self ):
-        if self.user.first_name and self.user.last_name:
-            return "%s %s's profile (%s)" % ( self.user.first_name, self.user.last_name, self.user.username )
-        else:
-            return "%s's profile" % self.user.username
-
-
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
-post_save.connect(create_user_profile, sender=User)
-
 
 class CompasLogger( models.Model ):
     timestamp = models.DateTimeField(_("Time stamp"), null = True, blank = True )
@@ -1140,9 +1193,3 @@ class DispatchDetail( models.Model ):
     
     class Meta:
         db_table = u'dispatch_details'
-
-
-
-def sync_data(waybills):
-    load_details = LoadingDetail.objects.filter(waybill__in=waybills)
-    return chain(waybills, load_details)

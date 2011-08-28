@@ -16,21 +16,10 @@
     }
   },
   {
-    "pk": 1, 
-    "model": "ets.userprofile", 
-    "fields": {
-      "officer": true, 
-      "compas_person": "ISBX0020000586" 
-    }
-  }, 
-  {
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
-      "order_code": "OURLITORDER",
-      "project_number": "1",
-      "transport_name": "MUSLIM TRANSPORT",
-      "warehouse": "ISBX002",
+      "order": "OURLITORDER",
       
       "status": 1,
       
@@ -63,7 +52,8 @@
       
       "validated": false,
       "sent_compas": false,
-      "processed_for_payment": false
+      
+      "_order": 0
     }
   }, 
   {
@@ -72,17 +62,9 @@
     "fields": {
       "waybill": "ISBX00211A",
       
-      "origin_id": "testme0123",
-      "package": "CARTON, FIBREBOARD, 100 X 100 GRM BAG",
-      
-      "si_code": "123",
-      "comm_category_code": "MIX",
-      "commodity_code": "BEER",
-      "commodity_name": "COOL UKRAINIAN BEER",
+      "stock_item": "testme0123",
       
       "number_of_units": 35,
-      "unit_weight_net": "50.000",
-      "unit_weight_gross": "50.330",
       
       "number_units_good": "0",
       "number_units_lost": "0",
@@ -102,11 +84,7 @@
     "pk": "ISBX00311A", 
     "model": "ets.waybill", 
     "fields": {
-      "order_code": "THEIRORDER",
-      "project_number": "2",
-      "transport_name": "MUSLIM TRANSPORT",
-      "warehouse": "ISBX003",
-      
+      "order": "THEIRORDER",
       "status": 4,
       
       "date_created": "2011-06-12 05:36:54",
@@ -138,7 +116,8 @@
       
       "validated": false,
       "sent_compas": false,
-      "processed_for_payment": false
+      
+      "_order": 0
     }
   }, 
   {
@@ -146,15 +125,8 @@
     "model": "ets.loadingdetail", 
     "fields": {
       "waybill": "ISBX00311A",
-      "origin_id": "anotherstock1234",
-      "package": "CARTON, FIBREBOARD, 100 X 100 GRM BAG",
-      "si_code": "1234",
-      "comm_category_code": "MIX",
-      "commodity_code": "BEER",
-      "commodity_name": "COOL UKRAINIAN BEER",
+      "stock_item": "anotherstock1234",
       "number_of_units": 35,
-      "unit_weight_net": "50.000",
-      "unit_weight_gross": "50.330",
       "number_units_good": "0",
       "number_units_lost": "0",
       "number_units_damaged": "0",
@@ -170,24 +142,21 @@
     "pk": "ISBX00312A",
     "model": "ets.waybill",
     "fields": {
+      "order": "THEIRORDER",
+    
       "dispatcher_person": "ISBX0020000613",
-      "processed_for_payment": false,
       "dispatch_date": "2011-06-12",
       "transport_dispach_signed_date": "2011-06-12 05:36:54",
       "validated": false,
       "transport_driver_licence": "EG234454",
-      "transport_name": "MUSLIM TRANSPORT",
       "container_two_number": "",
       "destination": "ISBX002",
       "container_two_seal_number": "",
-      "warehouse": "ISBX003",
       "transport_trailer_registration": "",
       "status": 5,
       "date_removed": null,
       "loading_date": "2011-06-12",
       "transport_driver_name": "Ahmed",
-      "order_code": "THEIRORDER",
-      "project_number": "2",
       "sent_compas": false,
       "dispatch_remarks": "That was long night",
       "container_one_seal_number": "",
@@ -199,7 +168,9 @@
       "container_one_remarks_dispatch": "",
       "transport_type": "02",
       "container_one_number": "",
-      "date_created": "2011-06-12 05:36:54"
+      "date_created": "2011-06-12 05:36:54",
+      
+      "_order": 0
     }
   },
   {
@@ -226,22 +197,15 @@
     "model": "ets.loadingdetail",
     "fields": {
       "_order": 0,
-      "si_code": "1234",
       "number_units_good": "23",
-      "unit_weight_gross": "50.33",
-      "unit_weight_net": "50",
-      "comm_category_code": "MIX",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "origin_id": "anotherstock1234",
-      "package": "CARTON, FIBREBOARD, 100 X 100 GRM BAG",
+      "stock_item": "anotherstock1234",
       "number_units_damaged": "2",
       "number_units_lost": "10",
       "sent_compas": false,
-      "commodity_code": "BEER",
       "units_damaged_reason": "dmix",
       "overloaded_units": false,
-      "commodity_name": "COOL UKRAINIAN BEER",
       "units_lost_reason": "lmix",
       "number_of_units": "35"
     }
