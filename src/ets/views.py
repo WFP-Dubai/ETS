@@ -110,7 +110,7 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
         "waybill": waybill.pk
     })
     
-    return redirect( "order_detail", waybill.order_code)
+    return redirect( "order_detail", waybill.order.pk)
 
 
 @login_required
