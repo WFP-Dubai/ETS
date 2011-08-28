@@ -47,6 +47,9 @@ class CommandTestCase(TestCase):
         self.assertEqual(ets.models.StockItem.objects.count(), 2)
         stock_item = ets.models.StockItem.objects.get(pk='testme0124')
         
+        #Commodity name and category
+        self.assertTupleEqual((stock_item.commodity.name, stock_item.commodity.category.pk), (u'WHEET', u'SED'))
+        
         #After import we've got net --> number_of_units and quantity_net == 1
         self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         

@@ -9,11 +9,12 @@ def update_compas():
     #Update persons
     ets_models.CompasPerson.update()
     
-    #Update loss/damage types
-    ets_models.LossDamageType.update()
-    
     #Update stocks
     ets_models.EpicStock.update()
     
+    #Update loss/damage types
+    ets_models.LossDamageType.update()
+    
     #Update orders
     ets_models.LtiOriginal.update()
+    
