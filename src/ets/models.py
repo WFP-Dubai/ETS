@@ -631,14 +631,14 @@ class Order(models.Model):
         return ('order_detail', (), {'object_id': self.pk})
     
     def get_waybills(self):
-        return Waybill.objects.filter(order_code=self.pk)
+        return Waybill.objects.filter(order=self)
     
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         return StockItem.objects.filter(warehouse__orders=self,
                                         project_number=F('project_number'),
                                         si_code = F('warehouse__orders__items__si_code'), 
-                                        commodity_code = F('warehouse__orders__items__commodity_code'),
+                                        commodity = F('warehouse__orders__items__commodity'),
                                         ).order_by('-warehouse__orders__items__number_of_units')
     
     
@@ -662,16 +662,16 @@ class OrderItem(models.Model):
     
     def  __unicode__( self ):
         if self.removed:
-            return u"Void %s -  %.0f " % ( self.commodity.name, self.items_left() )
+            return u"Void %s -  %.0f " % ( self.commodity, self.items_left() )
         else:
-            return u"%s -  %.0f " % ( self.commodity.name, self.items_left() )
+            return u"%s -  %.0f " % ( self.commodity, self.items_left() )
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
         return StockItem.objects.filter(warehouse__orders__items=self,
                                         project_number=self.order.project_number,
                                         si_code = self.si_code, 
-                                        commodity_code = self.commodity_code,
+                                        commodity = self.commodity,
                                         ).order_by('-number_of_units')
     
     @staticmethod
@@ -681,15 +681,15 @@ class OrderItem(models.Model):
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
-                                            waybill__project_number=self.order.project_number,
+                                            waybill__order__project_number=self.order.project_number,
                                             waybill__date_removed__isnull=True,
-                                            si_code = self.si_code, 
-                                            commodity_code = self.commodity_code
+                                            stock_item__si_code = self.si_code, 
+                                            stock_item__commodity = self.commodity,
                                             ).order_by('-waybill__dispatch_date')
     
     def get_order_dispatches(self):
         """Returns dispatches of current order"""
-        return self.get_similar_dispatches().filter(waybill__order_code=self.order.pk)
+        return self.get_similar_dispatches().filter(waybill__order=self.order)
     
     
     def get_available_stocks(self):
@@ -810,7 +810,8 @@ class Waybill( ld_models.Model ):
         return ('waybill_view', (), {'waybill_pk': self.pk})
     
     def is_editable(self, user):
-        return self.status < self.SIGNED and not user.get_profile().compas_person.warehouse == self.warehouse
+        return self.status < self.SIGNED and \
+            not user.get_profile().get_warehouses().filter(pk=self.order.warehouse.pk).count()
     
     #===================================================================================================================
     # def errors(self):

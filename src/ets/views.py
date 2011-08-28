@@ -138,7 +138,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
                              template='waybill/create.html' ):
     """Creates a Waybill"""
     
-    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order_code=order_pk) if waybill_pk else None
+    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk) if waybill_pk else None
     
     order = get_object_or_404(order_queryset, pk=order_pk)
     
@@ -183,7 +183,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save(False)
-        waybill.order_code = order.pk
+        waybill.order = order
         waybill.project_number = order.project_number
         waybill.transport_name = order.transport_name
         waybill.dispatcher_person = request.user.get_profile().compas_person

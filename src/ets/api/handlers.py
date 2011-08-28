@@ -43,7 +43,7 @@ class ReadCSVWaybillHandler(BaseHandler):
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
         filter_arg = {}
         if warehouse: 
-            filter_arg['warehouse__pk'] = warehouse
+            filter_arg['order__warehouse__pk'] = warehouse
         if destination:
             filter_arg['destination__pk'] = destination
         if slug:
@@ -64,7 +64,7 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
         """Return loadin details for waybills in CSV"""
         filter_arg = {}
         if warehouse: 
-            filter_arg['waybill__warehouse__pk'] = warehouse
+            filter_arg['waybill__order__warehouse__pk'] = warehouse
         if destination:
             filter_arg['waybill__destination__pk'] = destination
         if waybill:
@@ -148,7 +148,7 @@ class ReadCSVStockItemsHandler(BaseHandler):
         titles.update(get_titles(ets.models.Warehouse))   
         result = [titles]
         for item in stock_items:
-            stock_items_data = ets.models.Warehouse.objects.filter(code=item['warehouse_id']).values()[0]
+            stock_items_data = ets.models.Warehouse.objects.filter(pk=item['warehouse_id']).values()[0]
             stock_items_data.update(item)
             result.append(stock_items_data)  
         return result
