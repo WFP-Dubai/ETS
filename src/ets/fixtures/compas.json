@@ -69,7 +69,7 @@
     "fields": {
       "cause": "VARIANCE IN WEIGHT", 
       "type": "L", 
-      "comm_category_code": "MIX"
+      "category": "MIX"
     }
   }, 
   {
@@ -78,7 +78,7 @@
     "fields": {
       "cause": "PROCESSING/TRANSFORMATION OF COMMODITY", 
       "type": "L", 
-      "comm_category_code": "SED"
+      "category": "SED"
     }
   }, 
   {
@@ -87,7 +87,7 @@
     "fields": {
       "cause": "WET BY GASOIL", 
       "type": "D", 
-      "comm_category_code": "MIX"
+      "category": "MIX"
     }
   },
   {

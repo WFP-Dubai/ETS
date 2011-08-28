@@ -235,14 +235,43 @@ class CompasAdmin(admin.ModelAdmin):
 admin.site.register( ets.models.Location, LocationAdmin )
 
 
-class PackagingDescriptonShortAdmin( admin.ModelAdmin ):
-    list_display = ('code', 'description')
+class PackageAdmin( admin.ModelAdmin ):
+    list_display = ('pk', 'name',)
     list_filter = list_display
 
-admin.site.register( ets.models.PackagingDescriptionShort, PackagingDescriptonShortAdmin )
+admin.site.register( ets.models.Package, PackageAdmin )
 
 class LossDamageTypeAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'type', 'comm_category_code', 'cause')
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+    
+    list_display = ('pk', 'type', 'link_to_category', 'cause')
     list_filter = ('type',)
 
 admin.site.register( ets.models.LossDamageType, LossDamageTypeAdmin )
+
+
+class CommodityAdmin(admin.ModelAdmin):
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+    
+    list_display = ('pk', 'name', 'link_to_category',)
+    search_fields = ('name', 'category__pk')
+    inlines = (StockInline,)
+
+admin.site.register( ets.models.Commodity, CommodityAdmin )
+
+
+class CommodityInline(admin.TabularInline):
+    model = ets.models.Commodity
+    extra = 0
+    
+class LossDamageTypeInline(admin.TabularInline):
+    model = ets.models.LossDamageType
+    extra = 0
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('pk',)
+    search_fields = list_display
+    inlines = (LossDamageTypeAdmin, CommodityInline)
+
+admin.site.register( ets.models.Commodity, CommodityAdmin )

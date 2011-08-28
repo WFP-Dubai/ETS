@@ -256,6 +256,47 @@ class Person(models.Model):
         return "%s %s" % (self.code, self.title)
 
 
+class CommodityCategory(models.Model):
+    """Commodity category"""
+    code = models.CharField(_("Commodity Category Code"), max_length=9, primary_key=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('commodity category')
+        verbose_name_plural = _("commodity categories")
+        
+    def __unicode__(self):
+        return self.code
+    
+class Commodity(models.Model):
+    """Commodity model"""
+    
+    code = models.CharField(_("Commodity Code"), max_length=18, primary_key=True)
+    name = models.CharField(_("Commodity Name"), max_length=100)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity Category"), related_name="commodities")
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('Commodity')
+        verbose_name_plural = _("Commodities")
+    
+    def __unicode__(self):
+        return self.name
+
+class Package(models.Model):
+    """Packaging model"""
+    
+    code = models.CharField(_("code"), max_length=17, primary_key=True)
+    name = models.CharField(_("name"), max_length=50)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('package')
+        verbose_name_plural = _("packages")
+    
+    def __unicode__(self):
+        return self.name
+
 class EpicStock( models.Model ):
     """COMPAS stock. We retrieve it from Oracle database view."""
     wh_pk = models.CharField(_("warehouse primary key"), max_length = 90, blank = True, primary_key = True)
@@ -301,6 +342,18 @@ class EpicStock( models.Model ):
         
         for stock in cls.objects.using( 'compas' ):
             
+            #Create commodity's category
+            category = CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
+            
+            #Create commodity
+            commodity = Commodity.objects.get_or_create(pk=stock.commodity_code, defaults={
+                'name': stock.cmmname,
+                'category': category, 
+            })[0]
+            
+            #Create package
+            package = Package.objects.get_or_create(pk=stock.package_code, defaults={'name': stock.packagename})[0]
+            
             #Check package type. If 'BULK' then modify number and weight
             number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
                                             else (stock.number_of_units, stock.quantity_net)
@@ -309,12 +362,9 @@ class EpicStock( models.Model ):
                 'warehouse': Warehouse.objects.get(pk=stock.wh_code),
                 'project_number': stock.project_wbs_element,
                 'si_code': stock.si_code,
-                'commodity_code': stock.commodity_code,
-                'comm_category_code': stock.comm_category_code,
-                'commodity_name': stock.cmmname,
+                'commodity': commodity,
+                'package': package,
                 'number_of_units': number_of_units,
-                'package_code': stock.package_code,
-                'package_name': stock.packagename,
                 'quality_code': stock.qualitycode,
                 'quality_description': stock.qualitydescr,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
@@ -344,12 +394,8 @@ class StockItem( models.Model ):
     project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
     si_code = models.CharField(_("shipping instruction code"), max_length=8)
     
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9)
-    commodity_code = models.CharField(_("Commodity Code "), max_length = 18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length = 100, blank=True) #cmmname
-    
-    package_code = models.CharField(_("Package code"), max_length=17)
-    package_name = models.CharField(_("Package name"), max_length=50, blank=True)
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
+    package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
     quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
     quality_description = models.CharField(_("Quality description "), max_length=11, blank=True) #qualitydescr
@@ -363,22 +409,16 @@ class StockItem( models.Model ):
     objects = StockManager()
 
     class Meta:
-        ordering = ('si_code', 'commodity_name')
+        ordering = ('si_code', 'commodity__name')
         order_with_respect_to = 'warehouse'
         verbose_name = _("stock item")
         verbose_name_plural = _("stocks")
 
     def  __unicode__( self ):
-        return "%s-%s-%s" % (self.warehouse.name, self.commodity_code, self.number_of_units)
+        return "%s-%s-%s" % (self.warehouse.name, self.commodity.pk, self.number_of_units)
         
     def coi_code(self):
         return self.origin_id[7:]
-    
-    def packaging_description( self ):
-        try:
-            return PackagingDescriptionShort.objects.get( pk = self.package_code ).description
-        except PackagingDescriptionShort.DoesNotExist:
-            return self.package_name
     
     #===================================================================================================================
     # def number_of_units_ordered(self, order):
@@ -391,20 +431,7 @@ class StockItem( models.Model ):
     #                                    ).order_by('-warehouse__orders__items__number_of_units')
     #===================================================================================================================
 
-class PackagingDescriptionShort( models.Model ):
-    code = models.CharField(_("Package Code"), primary_key=True, max_length=5)
-    description = models.CharField(_("Package Short Name"), max_length=10)
-    
-    class Meta:
-        ordering = ('code',)
-        verbose_name = _("Packaging")
-        verbose_name_plural = _("package descriptions")
-    
-    def  __unicode__( self ):
-        return "%s - %s" % (self.code, self.description)
-
-
-class LossDamageType( models.Model ):
+class LossDamageType(models.Model):
     
     LOSS = 'L'
     DAMAGE = 'D'
@@ -415,15 +442,17 @@ class LossDamageType( models.Model ):
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
-                            instance.type, instance.comm_category_code
+                            instance.type, instance.category_id
                          ), unique=True, primary_key=True)
     type = models.CharField(_("Type"), max_length=1, choices=TYPE_CHOICE)
-    comm_category_code = models.CharField(_("Commodity category code"), max_length=9)
-    cause = models.CharField(_("Cause"), max_length = 100)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), 
+                                 related_name="loss_damages", db_column='comm_category_code')
+    cause = models.CharField(_("Cause"), max_length=100)
 
     class Meta:
         db_table = u'epic_lossdamagereason'
         verbose_name = _('Loss/Damages Reason')
+        verbose_name_plural = _("Losses/Damages")
     
     def  __unicode__( self ):
         cause = self.cause
@@ -436,10 +465,35 @@ class LossDamageType( models.Model ):
     def update(cls):
         for myrecord in cls.objects.using('compas').all():
             if not cls.objects.filter(type=myrecord.type, 
-                                  comm_category_code=myrecord.comm_category_code, 
+                                  category__pk=myrecord.category_id, 
                                   cause=myrecord.cause).count():
                 myrecord.save(using='default')
 
+#=======================================================================================================================
+# 
+# class ReasonBase(models.Model):
+#    """Loss reason"""
+#    
+#    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), related_name="%(class)s")
+#    cause = models.CharField(_("Cause"), max_length=100)
+# 
+#    class Meta:
+#        abstract = True
+# 
+# class LossReason(ReasonBase):
+#    """Loss reason"""
+#    
+#    class Meta:
+#        verbose_name = _("loss reason")
+#        verbose_name_plural = _("loss reasons")
+#    
+# class DamageReason(ReasonBase):
+#    """Damage reason"""
+#    
+#    class Meta:
+#        verbose_name = _("damage reason")
+#        verbose_name_plural = _("damage reasons")
+#=======================================================================================================================
 
 class LtiOriginal( models.Model ):
     """LTIs for office"""
@@ -528,8 +582,7 @@ class LtiOriginal( models.Model ):
             defaults = {
                 'order': order,
                 'si_code': lti.si_code,
-                'commodity_code': lti.commodity_code,
-                'commodity_name': lti.cmmname,
+                'commodity': Commodity.objects.get(pk=lti.commodity_code),
                 'number_of_units': lti.number_of_units,
             }
             
@@ -593,8 +646,7 @@ class OrderItem(models.Model):
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
     
-    commodity_code = models.CharField(_("Commodity Code "), max_length=18)
-    commodity_name = models.CharField(_("Commodity Name"), max_length=100, blank=True) #cmmname
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
     
@@ -606,9 +658,9 @@ class OrderItem(models.Model):
     
     def  __unicode__( self ):
         if self.removed:
-            return u"Void %s -  %.0f " % ( self.commodity_name, self.items_left() )
+            return u"Void %s -  %.0f " % ( self.commodity.name, self.items_left() )
         else:
-            return u"%s -  %.0f " % ( self.commodity_name, self.items_left() )
+            return u"%s -  %.0f " % ( self.commodity.name, self.items_left() )
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""

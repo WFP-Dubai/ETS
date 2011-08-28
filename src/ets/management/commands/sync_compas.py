@@ -7,7 +7,7 @@ from ets.utils import update_compas
 
 class Command(BaseCommand):
 
-    help = 'Synchronizes data with compas database'
+    help = 'Import data from COMPAS stations'
 
     def handle(self, *args, **options):
         update_compas()
