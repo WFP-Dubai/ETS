@@ -1,294 +1,187 @@
 import datetime
 
-from django.forms import ModelForm
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
+from django.forms.formsets import formset_factory, BaseFormSet
 from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext, ugettext_lazy as _
+
+from uni_form.helpers import FormHelper, Layout, Fieldset, Row, HTML
+
 from ets import models as ets_models
 
 UNDEFINED_MESSAGE = "N/A"
 
-class WarehouseForm( forms.Form ):
-    warehouse = forms.ModelChoiceField( queryset = ets_models.DispatchPoint.objects.filter( ACTIVE_START_DATE__lt = datetime.date.today() ) )
+class WaybillSearchForm( forms.Form ):
+    q = forms.CharField(required=False, label=_('Waybill code'))
 
-class WaybillForm( ModelForm ):
+
+class DispatchWaybillForm( forms.ModelForm ):
     
-    #===================================================================================================================
-    # dateOfLoading = forms.DateField(_("Date of loading"))
-    # dateOfDispatch = forms.DateField(_("Date of Dispatch"))
-    # transportType = forms.CharField(_("Transport Type"), widget = forms.Select( choices = Waybill.transport_type ) )
-    # transactionType = forms.CharField(_("Transaction Type"), widget = forms.Select( choices = Waybill.transaction_type_choice ) )
-    # dispatchRemarks = forms.CharField(_("Dispatch Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # ltiNumber = forms.CharField(_("LTI Number"), widget = forms.HiddenInput() )
-    # transportContractor = forms.CharField(_("Transport Contractor"), widget = forms.HiddenInput() )
-    # transportSubContractor = forms.CharField(_("Transport SubContractor"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportDriverName = forms.CharField(_("Transport DriverName"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportDriverLicenceID = forms.CharField(_("Transport DriverLicenceID"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportVehicleRegistration = forms.CharField(_("Transport Vehicle Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # dispatcherName = forms.CharField(_("Dispatcher Name"), widget = forms.HiddenInput(), required = False )
-    # dispatcherTitle = forms.CharField(_("Dispatcher Title"), widget = forms.HiddenInput(), required = False )
-    # transportTrailerRegistration = forms.CharField(_("Transport Trailer Registration "), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
-    # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
-    # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    # destinationWarehouse = ModelChoiceField(_("Destination Warehouse "), queryset = Place.objects.all() )
-    # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
-    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
-
     class Meta:
         model = ets_models.Waybill
-        fields = (
-            'ltiNumber',
-            'waybillNumber',
-            'dateOfLoading',
-            'dateOfDispatch',
-            'transactionType',
-            'transportType',
-            'dispatchRemarks',
-            'dispatcherName',
-            'dispatcherTitle',
-            'destinationWarehouse',
-            'transportContractor',
-            'transportSubContractor',
-            'transportDriverName',
-            'transportDriverLicenceID',
-            'transportVehicleRegistration',
-            'transportTrailerRegistration',
-            'transportDispachSigned',
-            'containerOneNumber',
-            'containerTwoNumber',
-            'containerOneSealNumber',
-            'containerTwoSealNumber',
-            'containerOneRemarksDispatch',
-            'containerTwoRemarksDispatch',
-            'recipientLocation',
-            'recipientConsingee',
-            'auditComment',
+        exclude = (
+            'order_code',
+            'project_number',
+            'transport_name',
+            'warehouse',
+            'status',
+            'validated',
+            'sent_compas',
         )
-        widgets = {
-            'dispatchRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'ltiNumber': forms.HiddenInput,
-            'transportContractor': forms.HiddenInput,
-            'transportSubContractor': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverName': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverLicenceID': forms.TextInput( attrs = {'size':'40'} ),
-            'transportVehicleRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'dispatcherName': forms.HiddenInput,
-            'dispatcherTitle': forms.HiddenInput,
-            'transportTrailerRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'recipientLocation': forms.HiddenInput,
-            'recipientConsingee': forms.HiddenInput,
-            'waybillNumber': forms.HiddenInput,
-            'invalidated': forms.HiddenInput,
-            'auditComment': forms.HiddenInput,
-        }
     
-#=======================================================================================================================
-#    def clean( self ):
-#        cleaned = super(WaybillForm, self).clean()
-#        dateOfDispatch = cleaned.get( 'dateOfDispatch' )
-#        dateOfLoading = cleaned.get( 'dateOfLoading' )
-#        
-#        if dateOfDispatch and dateOfLoading:
-#            if dateOfLoading > dateOfDispatch:
-#                message = _("Cargo Dispatched before being Loaded")
-#                #=======================================================================================================
-#                # self._errors['dateOfDispatch'] = self._errors.get( 'dateOfDispatch', [] )
-#                # self._errors['dateOfDispatch'].append( myerror )
-#                #=======================================================================================================
-#                raise forms.ValidationError( message )
-# 
-#        return cleaned
-#=======================================================================================================================
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(
+        Fieldset(ugettext('Date'), Row('loading_date', 'dispatch_date')),
+        Fieldset(ugettext('General'),
+                'destination',
+                Row('transaction_type', 'transport_type'),
+                'dispatch_remarks',
+                 ),
+        Fieldset(ugettext('Transport'),
+                 'transport_sub_contractor',
+                 Row('transport_driver_name', 'transport_driver_licence'),
+                 Row('transport_vehicle_registration', 'transport_trailer_registration'),
+                 ),
+        Fieldset(ugettext('Container'),
+                 Row('container_one_number', 'container_one_seal_number', 'container_one_remarks_dispatch'),
+                 Row('container_two_number', 'container_two_seal_number', 'container_two_remarks_dispatch'),
+                 )
+    ))
+                      
+    #helper.add_input(Submit('add', _('Create waybill')))
+    helper.form_tag = False
 
-class WaybillRecieptForm( ModelForm ):
-    #===================================================================================================================
-    # recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"))
-    # recipientStartDischargeDate = forms.DateField(_("Recipient Start Discharge Date"))
-    # recipientEndDischargeDate = forms.DateField(_("Recipient End Discharge Date"))
-    # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput() )
-    # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput() )
-    # recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput() )
-    # invalidated = forms.CharField(_("Invalidated "), widget = forms.HiddenInput(), required = False )
-    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.HiddenInput(), required = False )
-    #===================================================================================================================
+
+class LoadingDetailDispatchForm( forms.ModelForm ):
+    stock_item = forms.ModelChoiceField(queryset=ets_models.StockItem.objects.all(), 
+                                        label=_('Commodity'), required=True)
+    overload = forms.BooleanField( required = False )
+
+    class Meta:
+        model = ets_models.LoadingDetail
+        fields = ( 'number_of_units', 'overloaded_units', 'over_offload_units' )
     
-    def __init__(self, **kwargs):
-        super(WaybillRecieptForm, self).__init__(**kwargs)
-        self.fields['recipientArrivalDate'].required = True
-        self.fields['recipientStartDischargeDate'].required = True
-        self.fields['recipientEndDischargeDate'].required = True
+    def save(self, commit=True):
+        obj = super(LoadingDetailDispatchForm, self).save(commit=False)
+        stock_item = self.cleaned_data['stock_item']
+    
+        obj.origin_id = stock_item.pk
+        obj.si_code = stock_item.si_code
         
-    class Meta:
-        model = ets_models.Waybill
-        fields = (
-            'waybillNumber',
-            'recipientLocation',
-            'recipientConsingee',
-            'recipientArrivalDate',
-            'recipientStartDischargeDate',
-            'recipientEndDischargeDate',
-            'recipientDistance',
-            'recipientRemarks',
-            'recipientSigned',
-            'recipientSignedTimestamp',
-            'transportDeliverySigned',
-            'containerOneRemarksReciept',
-            'containerTwoRemarksReciept',
-            'invalidated',
-            'auditComment',
-        )
-        widgets = {
-            'waybillNumber': forms.HiddenInput,
-            'recipientLocation': forms.HiddenInput,
-            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'recipientConsingee': forms.HiddenInput,
-            'invalidated': forms.HiddenInput,
-            'auditComment': forms.HiddenInput,
-        }
-
-#=======================================================================================================================
-#    def clean( self ):
-#        cleaned = self.cleaned_data
-#        print self.instance.dateOfDispatch
-#        dispatch_date = self.instance.dateOfDispatch
-#        arrival_date = cleaned.get( 'recipientArrivalDate' )
-#        discharge_start = cleaned.get( 'recipientStartDischargeDate' )
-#        discharge_end = cleaned.get( 'recipientEndDischargeDate' )
-#        faults = False
-#        if arrival_date < dispatch_date:
-#            myerror = ''
-#            myerror = _("Cargo arrived before being dispatched")
-#            self._errors['recipientArrivalDate'] = self._errors.get( 'recipientArrivalDate', [] )
-#            self._errors['recipientArrivalDate'].append( myerror )
-#            faults = True
-# 
-#        if discharge_start < arrival_date:
-#            myerror = ''
-#            myerror = _("Cargo Discharge started before Arrival?")
-#            self._errors['recipientStartDischargeDate'] = self._errors.get( 'recipientStartDischargeDate', [] )
-#            self._errors['recipientStartDischargeDate'].append( myerror )
-#            faults = True
-# 
-#        if discharge_end < discharge_start:
-#            myerror = ''
-#            myerror = _("Cargo finished Discharge before Starting?")
-#            self._errors['recipientEndDischargeDate'] = self._errors.get( 'recipientEndDischargeDate', [] )
-#            self._errors['recipientEndDischargeDate'].append( myerror )
-#            faults = True
-# 
-#        if faults:
-#            raise forms.ValidationError( myerror )
-# 
-#        return cleaned
-#=======================================================================================================================
-
-class BaseLoadingDetailFormFormSet( BaseInlineFormSet ):
+        obj.comm_category_code = stock_item.comm_category_code
+        obj.commodity_code = stock_item.commodity_code
+        obj.commodity_name = stock_item.commodity_name
+        
+        obj.unit_weight_net = stock_item.unit_weight_net
+        obj.unit_weight_gross = stock_item.unit_weight_gross
+        
+        obj.package = stock_item.packaging_description()
     
-    def append_non_form_error( self, message ):
-        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
-        errors.append( message )
-        raise forms.ValidationError( errors )
+        if commit:
+            obj.save()
+        
+        return obj
+
+
+class BaseLoadingDetailFormFormSet(BaseModelFormSet):
     
-    def clean( self ):
+#    def append_non_form_error( self, message ):
+#        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
+#        errors.append( message )
+#        raise forms.ValidationError( errors )
+    
+    def clean(self):
+        super(BaseLoadingDetailFormFormSet, self).clean()
         count = 0
         for form in self.forms:
-            if form.is_bound:
-                #TODO: remove try..except or specify error types
-                try:
-                    if form.cleaned_data.get( 'numberUnitsLoaded' ):
-                        count += 1
-                except:
-                    pass
+            if not hasattr(form, 'cleaned_data'):
+                continue
+
+            if form.is_bound and getattr(form, 'cleaned_data', {}).get('number_of_units'):
+                count += 1
         
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
-
-
-class WaybillFullForm( ModelForm ):
-
-
-    #===================================================================================================================
-    # dateOfDispatch = forms.DateField(_("date Of Dispatch"), required = False )
-    # dateOfLoading = forms.DateField(_("date Of Loading"), required = False )
-    # dispatchRemarks = forms.CharField(_("dispatch Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # dispatcherName = forms.CharField(_("dispatcher Name"), widget = forms.HiddenInput(), required = False )
-    # dispatcherTitle = forms.CharField(_("dispatcher Title"), widget = forms.HiddenInput(), required = False )
-    # invalidated = forms.CharField(_("Invalidated"), widget = forms.HiddenInput(), required = False )
-    # ltiNumber = forms.CharField(_("LTI Number"), widget = forms.HiddenInput(), required = False )
-    # recipientArrivalDate = forms.DateField(_("Recipient Arrival Date"), required = False )
-    # recipientConsingee = forms.CharField(_("Recipient Consingee"), widget = forms.HiddenInput(), required = False )
-    # recipientEndDischargeDate = forms.DateField(_("Recipient End DischargeDate"), required = False )
-    # recipientLocation = forms.CharField(_("Recipient Location"), widget = forms.HiddenInput(), required = False )
-    # recipientName = forms.CharField(_("Recipient Name"), widget = forms.HiddenInput(), required = False )
-    # recipientRemarks = forms.CharField(_("Recipient Remarks"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # recipientSignedTimestamp = forms.DateTimeField(_("Recipient Signed Timestamp"), widget = forms.HiddenInput(), required = False )
-    # recipientStartDischargeDate = forms.DateField(_("Recipient Start DischargeDate"), required = False )
-    # recipientTitle = forms.CharField(_("Recipient Title"), widget = forms.HiddenInput(), required = False )
-    # transactionType = forms.CharField(_("Transaction Type"), widget = forms.Select( choices = Waybill.TRANSACTION_TYPES ) )
-    # transportContractor = forms.CharField(_("Transport Contractor"), widget = forms.HiddenInput(), required = False )
-    # transportDeliverySigned = forms.CharField(_("Transport Delivery Signed"), widget = forms.HiddenInput(), required = False )
-    # transportDeliverySignedTimestamp = forms.DateTimeField(_("Transport Delivery SignedTimestamp"), widget = forms.HiddenInput(), required = False )
-    # transportDispachSigned = forms.CharField(_("Transport DispachSigned"), widget = forms.HiddenInput(), required = False )
-    # transportDispachSignedTimestamp = forms.DateTimeField( _(""),widget = forms.HiddenInput(), required = False )
-    # transportDriverLicenceID = forms.CharField(_("Transport Driver LicenceID"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportDriverName = forms.CharField(_("Transport DriverName"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportSubContractor = forms.CharField(_("Transport SubContractor"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportTrailerRegistration = forms.CharField(_("Transport Trailer Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # transportType = forms.CharField(_("Transport Type"), widget = forms.Select( choices = Waybill.TRANSPORT_TYPES ) )
-    # transportVehicleRegistration = forms.CharField(_("Transport Vehicle Registration"), widget = forms.TextInput( attrs = {'size':'40'} ), required = False )
-    # waybillNumber = forms.CharField(_("Waybill Number"), widget = forms.HiddenInput(), required = False )
-    # auditComment = forms.CharField(_("Audit Comment"), widget = forms.Textarea, required = True )
-    #===================================================================================================================
     
-    def __init__(self, **kwargs):
-        super(WaybillFullForm,self).__init__(**kwargs)
-        self.fields['auditComment'].required = True
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units', 
+                                 'over_offload_units', 'overload',)))
+    helper.formset_tag = False
+
+
+class WaybillRecieptForm( forms.ModelForm ):
     
     class Meta:
-        model = ets_models.Waybill
+        model = ets_models.ReceiptWaybill
+        exclude = (
+            'waybill',
+            'slug',
+            'validated',
+            'sent_compas',
+            'person',
+            'signed_date',
+        )
+    
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(
+        Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
+        Fieldset(ugettext('Containers'), Row('container_one_remarks_reciept', 'container_two_remarks_reciept')),
+        Fieldset('', Row('distance', 'remarks')),
+    ))
+    
+    helper.form_tag = False
+
+
+class LoadingDetailRecieptForm( forms.ModelForm ):
+    
+    def __init__(self, *args, **kwargs):
+        super(LoadingDetailRecieptForm, self).__init__(*args, **kwargs)
+        
+        for field_name in ('units_lost_reason', 'units_damaged_reason'):
+            self.fields[field_name].queryset = self.fields[field_name].queryset.filter(comm_category_code=self.instance.comm_category_code)
+        
+    
+    class Meta:
+        model = ets_models.LoadingDetail
+        fields = (
+            'stock_item',
+            'number_units_good', 
+            'number_units_lost', 'units_lost_reason',
+            'number_units_damaged', 'units_damaged_reason',
+        )
         widgets = {
-            'dispatchRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'ltiNumber': forms.HiddenInput,
-            'transportContractor': forms.HiddenInput,
-            'transportSubContractor': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverName': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDriverLicenceID': forms.TextInput( attrs = {'size':'40'} ),
-            'transportVehicleRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'dispatcherName': forms.HiddenInput,
-            'dispatcherTitle': forms.HiddenInput,
-            'transportTrailerRegistration': forms.TextInput( attrs = {'size':'40'} ),
-            'transportDeliverySigned': forms.HiddenInput,
-            'transportDeliverySignedTimestamp': forms.HiddenInput,
-            'transportDispachSigned': forms.HiddenInput,
-            'transportDispachSignedTimestamp': forms.HiddenInput,
-            'recipientName': forms.HiddenInput,
-            'recipientTitle': forms.HiddenInput,
-            'recipientLocation': forms.HiddenInput,
-            'recipientConsingee': forms.HiddenInput,
-            'recipientRemarks': forms.TextInput( attrs = {'size':'40'} ),
-            'recipientSignedTimestamp': forms.HiddenInput,
-            'waybillNumber': forms.HiddenInput,
-            'invalidated': forms.HiddenInput,
-            'auditComment': forms.Textarea,
+            'number_units_good': forms.TextInput(attrs={'size': 5}),
+            'number_units_lost': forms.TextInput(attrs={'size': 5}),
+            'number_units_damaged': forms.TextInput(attrs={'size': 5}),
         }
+
+
+class BaseRecieptFormFormSet(BaseInlineFormSet):
     
-    def thisDispName( self ):
-        try:
-            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.dispatcherName )
-        except ets_models.EpicPerson.DoesNotExist:
-            name = UNDEFINED_MESSAGE
-        return name
+    helper = FormHelper()
     
-    def thisRecName( self ):
-        try:
-            name = ets_models.EpicPerson.objects.get( person_pk = self.instance.recipientName )
-        except ets_models.EpicPerson.DoesNotExist:
-            name = UNDEFINED_MESSAGE
-        return name
+    # create the layout object
+    helper.add_layout(Layout(
+        #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
+        Row(
+        'origin_id', 'commodity_name', 'number_units_good', 
+        'number_units_lost', 'units_lost_reason',
+        'number_units_damaged', 'units_damaged_reason',
+    )))
+    helper.formset_tag = False
+
+
+class WaybillFullForm(forms.ModelForm):
+    class Meta:
+        model = ets_models.Waybill
+    
 
 class WaybillValidationFormset( BaseModelFormSet ):
     def clean( self ):
@@ -309,18 +202,3 @@ class WaybillValidationFormset( BaseModelFormSet ):
 class MyModelChoiceField( forms.ModelChoiceField ):
     def label_from_instance( self, obj ):
         return "%s - %s" % ( obj.si_code , obj.cmmname )
-
-class LoadingDetailDispatchForm( ModelForm ):
-    class Meta:
-        model = ets_models.LoadingDetail
-        fields = ( 'order_item', 'numberUnitsLoaded' )
-
-
-class LoadingDetailRecieptForm( ModelForm ):
-    class Meta:
-        model = ets_models.LoadingDetail
-        fields = ( 
-            'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 
-            'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 
-            'unitsDamagedReason', 
-        )

@@ -152,6 +152,8 @@ LANGUAGES = (
     ('en', ugettext('English')),
 )
 
+AUTH_PROFILE_MODULE = 'ets.Person'
+
 USE_I18N = True
 USE_L10N = True
 
@@ -226,6 +228,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'piston',
     'autoslug',
+    'uni_form',
+    'logicaldelete',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
@@ -240,7 +244,6 @@ COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
-AUTH_PROFILE_MODULE = 'ets.UserProfile'
 
 IN_PRODUCTION = False
 

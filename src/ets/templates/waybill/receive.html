@@ -1,0 +1,34 @@
+{% extends "base_template.html"%}
+{% load extra_tags i18n uni_form_tags %}
+
+{% block title %}{% trans "Receiving waybill" %}: {{ waybill }}{% endblock %}
+
+{% block content %}
+
+<table cellpadding="0" cellspacing="0" border="0"><tbody>
+<tr><td>{% trans "Waybill Number:" %}</td><td> {{ waybill.pk }}</td></tr>
+<tr><td>{% trans "Dispatch Location" %}</td><td>{{ waybill.warehouse.location }}</td></tr>
+<tr><td>{% trans "Recipient Location:" %}</td><td> {{ waybill.destination.location }}</td></tr>
+<tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.destination.organization }}</td></tr>
+</tbody></table>
+
+<form method="POST" action="" class="uniForm">{% csrf_token %}
+  <fieldset>
+    {% uni_form formset formset.helper %}
+  </fieldset>
+    {% uni_form form form.helper %}
+    <div class="buttonHolder">
+      <input type="submit" name="save" value="{% trans 'Save &amp; Print' %}"/>
+    </div>
+</form>
+
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8" type="text/javascript">
+$(document).ready(function() {
+   $('#{{ form.arrival_date.auto_id }}, ##{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });
+});
+</script>
+{% endblock %}

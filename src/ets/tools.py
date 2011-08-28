@@ -21,9 +21,11 @@ def removeNonAsciiChars( s ):
 #    pass
 #=======================================================================================================================
 
-def track_compas_update(file_name = 'tagfile.tag'):
-    with open( file_name, "w" ) as f:
-        f.write( str( datetime.datetime.now() ) )
+#=======================================================================================================================
+# def track_compas_update(file_name = 'tagfile.tag'):
+#    with open( file_name, "w" ) as f:
+#        f.write( str( datetime.datetime.now() ) )
+#=======================================================================================================================
 
 #=======================================================================================================================
 # def readTag():
@@ -230,24 +232,26 @@ def un64unZip( data ):
 #    return deserialized_content
 #=======================================================================================================================
 
-def restant_si( lti_code ):
-    """
-    TODO: write method definition
-    """
-    listExl = ets_models.RemovedLtis.objects.all()
-    detailed_lti = ets_models.LtiOriginal.objects.filter( code = lti_code ).exclude( pk__in = listExl )
-    listOfWaybills = ets_models.Waybill.objects.filter( invalidated = False, ltiNumber = lti_code, waybillSentToCompas = False )
-
-    listOfSI = [ets_models.SIWithRestant( lti.si_code, lti.is_bulk and lti.quantity_net or lti.number_of_units, lti.cmmname ) 
-                for lti in detailed_lti if not ets_models.RemovedLtis.objects.filter( lti = lti.lti_pk )]
-
-    for wb in listOfWaybills:
-        for loading in wb.loading_details.select_related():
-            for si in listOfSI:
-                if si.SINumber == loading.order_item.lti_line.si_code:
-                    si.reduce_current( loading.numberUnitsLoaded )
-
-    return listOfSI
+#=======================================================================================================================
+# def restant_si( lti_code ):
+#    """
+#    TODO: write method definition
+#    """
+#    listExl = ets_models.RemovedLtis.objects.all()
+#    detailed_lti = ets_models.LtiOriginal.objects.filter( code = lti_code ).exclude( pk__in = listExl )
+#    listOfWaybills = ets_models.Waybill.objects.filter( invalidated = False, ltiNumber = lti_code, waybillSentToCompas = False )
+# 
+#    listOfSI = [ets_models.SIWithRestant( lti.si_code, lti.is_bulk and lti.quantity_net or lti.number_of_units, lti.cmmname ) 
+#                for lti in detailed_lti]
+# 
+#    for wb in listOfWaybills:
+#        for loading in wb.loading_details.select_related():
+#            for si in listOfSI:
+#                if si.SINumber == loading.order_item.lti_line.si_code:
+#                    si.reduce_current( loading.numberUnitsLoaded )
+# 
+#    return listOfSI
+#=======================================================================================================================
 
 
 #=======================================================================================================================
@@ -451,31 +455,33 @@ def restant_si( lti_code ):
 #=======================================================================================================================
 
 
-def import_setup():
-    ## read all ltis from compas & extract Dispatch points & reception points
-    #select distinct origin_loc_name,origin_location_code,origin_wh_name,origin_wh_code from epic_lti
-    #select distinct destination_location_code,consegnee_name,destination_loc_name,consingee_code from epic_lti
-    disp = ets_models.LtiOriginal.objects.using( 'compas' )\
-                .values( 'origin_loc_name', 'origin_location_code', 'origin_wh_name', 'origin_wh_code' )\
-                .filter( lti_id__startswith = settings.COMPAS_STATION )\
-                .distinct()
-    rec = ets_models.LtiOriginal.objects.using( 'compas' )\
-                .values( 'destination_location_code', 'consegnee_name', 'destination_loc_name', 'consegnee_code' )\
-                .filter( lti_id__startswith = settings.COMPAS_STATION )\
-                .distinct()
-    ## maybe add a time limit?
-    for d in rec:
-        ets_models.ReceptionPoint.objects.get_or_create( LOC_NAME = d['destination_loc_name'], 
-                                              LOCATION_CODE = d['destination_location_code'], 
-                                              consegnee_name = d['consegnee_name'], 
-                                              consegnee_code = d['consegnee_code'], 
-                                              defaults = {'ACTIVE_START_DATE': datetime.date( 9999, 12, 31 )} )
-    for d in disp:
-        ets_models.DispatchPoint.objects.get_or_create( origin_loc_name = d['origin_loc_name'], 
-                                             origin_location_code = d['origin_location_code'], 
-                                             origin_wh_name = d['origin_wh_name'], 
-                                             origin_wh_code = d['origin_wh_code'], 
-                                             defaults = {'ACTIVE_START_DATE': datetime.date( 9999, 12, 31 )} )
+#=======================================================================================================================
+# def import_setup():
+#    ## read all ltis from compas & extract Dispatch points & reception points
+#    #select distinct origin_loc_name,origin_location_code,origin_wh_name,origin_wh_code from epic_lti
+#    #select distinct destination_location_code,consegnee_name,destination_loc_name,consingee_code from epic_lti
+#    disp = ets_models.LtiOriginal.objects.using( 'compas' )\
+#                .values( 'origin_loc_name', 'origin_location_code', 'origin_wh_name', 'origin_wh_code' )\
+#                .filter( lti_id__startswith = settings.COMPAS_STATION )\
+#                .distinct()
+#    rec = ets_models.LtiOriginal.objects.using( 'compas' )\
+#                .values( 'destination_location_code', 'consegnee_name', 'destination_loc_name', 'consegnee_code' )\
+#                .filter( lti_id__startswith = settings.COMPAS_STATION )\
+#                .distinct()
+#    ## maybe add a time limit?
+#    for d in rec:
+#        ets_models.ReceptionPoint.objects.get_or_create( LOC_NAME = d['destination_loc_name'], 
+#                                              LOCATION_CODE = d['destination_location_code'], 
+#                                              consegnee_name = d['consegnee_name'], 
+#                                              consegnee_code = d['consegnee_code'], 
+#                                              defaults = {'ACTIVE_START_DATE': datetime.date( 9999, 12, 31 )} )
+#    for d in disp:
+#        ets_models.DispatchPoint.objects.get_or_create( origin_loc_name = d['origin_loc_name'], 
+#                                             origin_location_code = d['origin_location_code'], 
+#                                             origin_wh_name = d['origin_wh_name'], 
+#                                             origin_wh_code = d['origin_wh_code'], 
+#                                             defaults = {'ACTIVE_START_DATE': datetime.date( 9999, 12, 31 )} )
+#=======================================================================================================================
 
 #=======================================================================================================================
 # def import_reason():
@@ -516,77 +522,81 @@ def import_setup():
 #=======================================================================================================================
 
 
-def import_lti():
-    listRecepients = ets_models.ReceptionPoint.objects.values( 'consegnee_code', 'LOCATION_CODE', 'ACTIVE_START_DATE' )\
-                                           .filter( ACTIVE_START_DATE__lt = datetime.date.today() )\
-                                           .distinct()
-    listDispatchers = ets_models.DispatchPoint.objects.values( 'origin_wh_code', 'ACTIVE_START_DATE' )\
-                                           .filter( ACTIVE_START_DATE__lt = datetime.date.today() )\
-                                           .distinct()
-    
-    ## TODO: Fix so ltis imported are not expired
-    original = ets_models.LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = settings.MAX_DATE )
-    if not settings.DISABLE_EXPIERED_LTI:
-        original = original.filter( expiry_date__gt = datetime.date.today() )
-    
-    # log each item
-    for myrecord in original:
-        for rec in listRecepients:
-            if (myrecord.consegnee_code in rec['consegnee_code'] 
-                and myrecord.destination_location_code in rec['LOCATION_CODE'] 
-                and myrecord.lti_date >= rec['ACTIVE_START_DATE']
-            ):
-                for disp in listDispatchers:
-                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >= disp['ACTIVE_START_DATE']:
-                        myrecord.save( using = 'default' ) ## here we import the record...
-                        try:
-                            myr = ets_models.RemovedLtis.objects.get( lti = myrecord )
-                            myr.delete()
-                        except:
-                            pass
-                        try:
-                            mysist = myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal#Use get or create!!
-                            if mysist.number_units_start != myrecord.number_of_units:
-                                try:
-                                    change = myrecord.number_of_units - mysist.number_units_start
-                                    mysist.number_units_left = mysist.number_units_left + change
-                                    mysist.save( using = 'default' )
-                                except:
-                                    pass
-                        except:
-                            mysist = ets_models.SiTracker()
-                            mysist.LTI = myrecord
-                            mysist.number_units_left = myrecord.number_of_units
-                            mysist.number_units_start = myrecord.number_of_units
-                            mysist.save( using = 'default' )
-                        break
-                break
-            else:
-                #TODO: not here (remove if it should no be here)
-                try:
-                    ets_models.LtiOriginal.objects.get( id = myrecord.id )
-                except:
-                    pass
+#=======================================================================================================================
+# def import_lti():
+#    listRecepients = ets_models.ReceptionPoint.objects.values( 'consegnee_code', 'LOCATION_CODE', 'ACTIVE_START_DATE' )\
+#                                           .filter( ACTIVE_START_DATE__lt = datetime.date.today() )\
+#                                           .distinct()
+#    listDispatchers = ets_models.DispatchPoint.objects.values( 'origin_wh_code', 'ACTIVE_START_DATE' )\
+#                                           .filter( ACTIVE_START_DATE__lt = datetime.date.today() )\
+#                                           .distinct()
+#    
+#    ## TODO: Fix so ltis imported are not expired
+#    original = ets_models.LtiOriginal.objects.using( 'compas' ).filter( requested_dispatch_date__gt = settings.MAX_DATE )
+#    if not settings.DISABLE_EXPIERED_LTI:
+#        original = original.filter( expiry_date__gt = datetime.date.today() )
+#    
+#    # log each item
+#    for myrecord in original:
+#        for rec in listRecepients:
+#            if (myrecord.consegnee_code in rec['consegnee_code'] 
+#                and myrecord.destination_location_code in rec['LOCATION_CODE'] 
+#                and myrecord.lti_date >= rec['ACTIVE_START_DATE']
+#            ):
+#                for disp in listDispatchers:
+#                    if myrecord.origin_wh_code in disp['origin_wh_code'] and myrecord.lti_date >= disp['ACTIVE_START_DATE']:
+#                        myrecord.save( using = 'default' ) ## here we import the record...
+#                        try:
+#                            myr = ets_models.RemovedLtis.objects.get( lti = myrecord )
+#                            myr.delete()
+#                        except:
+#                            pass
+#                        try:
+#                            mysist = myrecord.sitracker #try to get it, if it exist check LTI NOU and update if not equal#Use get or create!!
+#                            if mysist.number_units_start != myrecord.number_of_units:
+#                                try:
+#                                    change = myrecord.number_of_units - mysist.number_units_start
+#                                    mysist.number_units_left = mysist.number_units_left + change
+#                                    mysist.save( using = 'default' )
+#                                except:
+#                                    pass
+#                        except:
+#                            mysist = ets_models.SiTracker()
+#                            mysist.LTI = myrecord
+#                            mysist.number_units_left = myrecord.number_of_units
+#                            mysist.number_units_start = myrecord.number_of_units
+#                            mysist.save( using = 'default' )
+#                        break
+#                break
+#            else:
+#                #TODO: not here (remove if it should no be here)
+#                try:
+#                    ets_models.LtiOriginal.objects.get( id = myrecord.id )
+#                except:
+#                    pass
+# 
+#    #cleanup ltis loop and see if changes to lti ie deleted rows
+#    current = ets_models.LtiOriginal.objects.all()
+#    for c in current:
+#        if c not in original:
+#            c.remove_lti()
+#        if settings.IN_PRODUCTION:
+#            if c.expiry_date < datetime.date.today():
+#                c.remove_lti()
+#=======================================================================================================================
 
-    #cleanup ltis loop and see if changes to lti ie deleted rows
-    current = ets_models.LtiOriginal.objects.all()
-    for c in current:
-        if c not in original:
-            c.remove_lti()
-        if settings.IN_PRODUCTION:
-            if c.expiry_date < datetime.date.today():
-                c.remove_lti()
 
-
-def serialized_all_items():
-    wh_disp_list = ets_models.DispatchPoint.objects.all()
-    wh_rec_list = ets_models.ReceptionPoint.objects.all()
-    users_list = User.objects.all()
-    profiles_list = ets_models.UserProfile.objects.all()
-    persons_list = ets_models.EpicPerson.objects.all()
-    place_list = ets_models.Place.objects.all()
-    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( place_list ) + list( persons_list ) )
-    return data
+#=======================================================================================================================
+# def serialized_all_items():
+#    wh_disp_list = ets_models.DispatchPoint.objects.all()
+#    wh_rec_list = ets_models.ReceptionPoint.objects.all()
+#    users_list = User.objects.all()
+#    profiles_list = ets_models.UserProfile.objects.all()
+#    persons_list = ets_models.EpicPerson.objects.all()
+#    place_list = ets_models.Place.objects.all()
+#    data = serializers.serialize( 'json', list( wh_disp_list ) + list( wh_rec_list ) + list( users_list ) + list( profiles_list ) + list( place_list ) + list( persons_list ) )
+#    return data
+#=======================================================================================================================
 
 
 #=======================================================================================================================
@@ -638,14 +648,16 @@ def serialized_all_items():
 #                        myline.save()
 #=======================================================================================================================
 
-def sync_lti_stock():
-    #all_stock = ets_models.EpicStock.objects.all()
-    all_ltis = ets_models.LtiOriginal.objects.all()
-    for lti_item in all_ltis:
-        for item in lti_item.stock_items():
-            ets_models.LtiWithStock.objects.get_or_create( lti_line = lti_item, 
-                                                           stock_item = item , 
-                                                           lti_code = lti_item.code )
+#=======================================================================================================================
+# def sync_lti_stock():
+#    #all_stock = ets_models.EpicStock.objects.all()
+#    all_ltis = ets_models.LtiOriginal.objects.all()
+#    for lti_item in all_ltis:
+#        for item in lti_item.stock_items():
+#            ets_models.LtiWithStock.objects.get_or_create( lti_line = lti_item, 
+#                                                           stock_item = item , 
+#                                                           lti_code = lti_item.code )
+#=======================================================================================================================
 
 #=======================================================================================================================
 # def coi_for_lti_item( lti_line ):

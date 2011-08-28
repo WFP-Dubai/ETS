@@ -1,24 +1,99 @@
 {% extends "base_template.html"%}
 {% load i18n %}
+
 {%block title %}{% trans "Select Action" %}{%endblock%}
+
 {%block content %}
 <table>
-<tr>
-<td>{%if user.get_profile.isDispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.get_profile.warehouses.origin_wh_name}} </td>
-<td><a href='{% url dispatch_report_wh user.get_profile.warehouses.origin_wh_code %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr>
-<td>{%if user.get_profile.isReciever%}{% trans "Warehouse Reciept Report" %}{{user.get_profile.receptionPoints.LOC_NAME}} </td>
-<td><a href='{% url receipt_report_wh user.get_profile.receptionPoints.LOCATION_CODE  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr>
-<td>{%if user.get_profile.superUser%}{% trans "Full LTI Report" %} </td>
-<td><a href='{% url ltis_report %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr><td>{% trans "Recipient Report: All items for" %} {{user.get_profile.receptionPoints.consegnee_name}} </td>
-<td><a href='{% url receipt_report_cons  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a></td>
-</tr>
+  <tr class='reports-title'>
+    <td>{% trans "Orders reports" %}</td>
+  </tr>
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Dispatch Report for " %} {{ warehouse }} </td>
+    <td><a href='{% url api_order_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Reciept Report " %}{{ warehouse }}</td>
+    <td><a href='{% url api_order_items destination=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if user.is_superuser %}
+  <tr>
+    <td>{% trans "Full Orders Report" %} </td>
+    <td><a href='{% url api_order_items %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  <tr>
+    <td>{% trans "Recipient Report: All items for" %} {{ warehouse.organization }}</td>
+    <td><a href='{% url api_order_items consignee=warehouse.organization.pk %}'>
+      {% trans "download" %}</a>
+    </td>
+  </tr> 
+  <tr class='reports-title'>
+    <td>{% trans "Stock reports" %}</td>
+  </tr>
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Dispatch Stock Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_stock_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Reciept Stock Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_stock_items warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if user.is_superuser %}
+  <tr>
+    <td>{% trans "Stock Report: All items for all warehouses" %} </td>
+    <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  <tr class='reports-title'>
+    <td>{% trans "Waybill reports" %}</td>
+  </tr>
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Dispatch Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_waybills warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Reciept Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_waybills destination=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if user.is_superuser %}
+  <tr>
+    <td>{% trans "Waybill Report: All items for all warehouses" %} </td>
+    <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  <tr class='reports-title'>
+    <td>{% trans "Detail Waybill reports" %}</td>
+  </tr>
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Dispatch Detail Waybill Report: All items for" %} {{ warehouse }}</td>
+    <td><a href='{% url api_loading_details warehouse=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if warehouse %}
+  <tr>
+    <td>{% trans "Warehouse Reciept Detail Waybill Report: All items for" %} {{ warehouse }} </td>
+    <td><a href='{% url api_loading_details destination=warehouse.pk %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
+  {% if user.is_superuser %}
+  <tr>
+    <td>{% trans "Detail Waybill Report: All items for all warehouses" %} </td>
+    <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
+  </tr>
+  {% endif %}
 </table>
-
-
-{%endblock%}
+{% endblock %}

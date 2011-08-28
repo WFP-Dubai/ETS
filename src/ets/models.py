@@ -1,32 +1,36 @@
 
-import zlib, base64, string, urllib2
+import zlib, base64, string
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import date, datetime
+from datetime import datetime
 
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
-from django.core.urlresolvers import reverse
 from django.utils import simplejson
 from django.utils.translation import ugettext, ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
-from django.db import transaction
+from django.db.models import Q, F
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
-from piston.emitters import Emitter
 from autoslug.settings import slugify
+import logicaldelete.models as ld_models 
 
-name = "1234"
+
+from .country import COUNTRY_CHOICES
+
+#name = "1234"
 DEFAULT_TIMEOUT = 10
+API_DOMAIN = "http://localhost:8000"
+BULK_NAME = "BULK"
+
 COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
-API_DOMAIN = "http://localhost:8000"
 
 # like a normal ForeignKey.
 try:
@@ -43,20 +47,17 @@ def capitalize_slug(func):
     
     return wrapper
 
+TOTAL_WEIGHT_METRIC = 1000
+
+
+#=======================================================================================================================
+# Models based on compas Views & Tables
+#=======================================================================================================================
+
 class Place( models.Model ):
     """
     Location model.
-    
-    >>> place, c = Place.objects.get_or_create(org_code="test", name="The best place in the world", 
-    ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-    ...                      reporting_code="SOME_CODE", )
-    >>> place
-    <Place: The best place in the world>
-    >>> #Validation
-    >>> Place().full_clean()
-    Traceback (most recent call last):
-    ...
-    ValidationError: {'name': [u'This field cannot be blank.'], 'org_code': [u'This field cannot be blank.'], 'reporting_code': [u'This field cannot be blank.'], 'geo_point_code': [u'This field cannot be blank.'], 'country_code': [u'This field cannot be blank.'], 'geo_name': [u'This field cannot be blank.']}
+    Model based on compas Views & Tables
     """
 
     org_code = models.CharField(_("Org code"), max_length = 7, primary_key = True )
@@ -64,7 +65,7 @@ class Place( models.Model ):
     geo_point_code = models.CharField(_("Geo point code"), max_length = 4 )
     geo_name = models.CharField(_("Geo name"), max_length = 100 )
     country_code = models.CharField( _("Country code"), max_length = 3 )
-    reporting_code = models.CharField(_("Reporting code"), max_length = 7 )
+    reporting_code = models.CharField(_("COMPAS station code"), max_length = 7 )
     organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
 
     class Meta:
@@ -78,27 +79,632 @@ class Place( models.Model ):
 
     @classmethod
     def update(cls):
-        """
-        Executes Imports of Place
+        """Executes Imports of Place"""
+        for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
+            
+            #Create location
+            location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
+                'name': place.geo_name,
+                'country': place.country_code,
+            })[0]
+            
+            #Create consignee organization
+            organization = Organization.objects.get_or_create(code=place.organization_id)[0]\
+                            if place.organization_id else None
+            
+            #Compas station
+            compas = Compas.objects.get_or_create(code=place.reporting_code)[0]
+            
+            #Update warehouse
+            defaults = {
+                'name': place.name,
+                'location': location,
+                'organization': organization,
+                'compas': compas,
+            }
+            
+            rows = Warehouse.objects.filter(code=place.org_code).update(**defaults)
+            if not rows:
+                Warehouse.objects.create(code=place.org_code, **defaults)
+            
+
+class Compas(models.Model):
+    """ Compas station """
+    
+    code = models.CharField(_("Station code"), max_length=7, primary_key=True)
+    officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
+    
+
+class Location(models.Model):
+    """Location model. City or region"""
+    
+    code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
+    name = models.CharField(_("Name"), max_length=100)
+    country = models.CharField( _("Country"), max_length=3, choices=COUNTRY_CHOICES)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('location')
+        verbose_name_plural = _("locations")
+    
+    def __unicode__(self):
+        return "%s %s" % (self.country, self.name)
+    
+class Organization(models.Model):
+    """ Organization model"""
+    
+    code = models.CharField(_("code"), max_length=20, primary_key=True)
+    name = models.CharField(_("Name"), max_length=100, blank=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('oranization')
+        verbose_name_plural = _("organizations")
+    
+    def __unicode__(self):
+        return self.name or self.code
+
+class Warehouse(models.Model):
+    """ Warehouse. dispatch or recipient."""
+    code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
+    name = models.CharField(_("name"),  max_length = 50, blank = True ) #origin_wh_name
+    location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
+    organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
+                                     blank=True, null=True)
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
+    start_date = models.DateField(_("start date"), null=True, blank=True)
+    
+    
+    class Meta:
+        ordering = ('name',)
+        order_with_respect_to = 'location'
+        verbose_name = _('warehouse')
+        verbose_name_plural = _("warehouses")
         
-        >>> place, created = Place.objects.using('compas').get_or_create(org_code="completely_unique_code", 
-        ...                      name="The best place in the world", 
-        ...                      geo_point_code = 'TEST', geo_name="Dubai", country_code="586", 
-        ...                      reporting_code="SOME_CODE", )
-        >>> Place.update()
-        >>> Place.objects.using('default').get(pk="completely_unique_code")
-        <Place: The best place in the world>
-        >>> #Try Repeating
-        >>> Place.update()
-        """
-        for the_geo in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
-            the_geo.save( using = 'default' )
+    def  __unicode__( self ):
+        return "%s - %s - %s" % (self.code, self.location.name, self.name)
+
+    @classmethod
+    def get_warehouses(cls, location, organization=None):
+        queryset = cls.objects.filter(location=location)
+        objects = queryset.filter(organization=organization)
+        if not objects.exists():
+            objects = queryset.filter(organization__isnull=True)
+        
+        return objects
+    
+    #===================================================================================================================
+    # def serialize(self):
+    #    #wh = DispatchPoint.objects.get( id = warehouse )
+    #    return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
+    #                                        + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
+    #===================================================================================================================
+
+    
+class CompasPerson( models.Model ):
+    """Compas CompasPerson. We import them directly from compas Oracle using database view"""
+    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
+    title = models.CharField(_("title"), max_length=50, blank=True)
+    last_name = models.CharField(_("last name"), max_length=30)
+    first_name = models.CharField(_("first name"), max_length=25)
+    code = models.CharField(_("code"), max_length=7)
+    #type_of_document = models.CharField(_("type of document"), max_length=2, blank=True)
+    #document_number = models.CharField(_("document number"), max_length=25, blank=True)
+    email = models.CharField(_("e_mail address"), max_length=100, blank=True, db_column='e_mail_address')
+    #mobile_phone_number = models.CharField(_("cell phone number"), max_length=20, blank=True)
+    #official_tel_number = models.CharField(_("official telephone number"), max_length=20, blank=True)
+    #fax_number = models.CharField(_("fax_number"), max_length=20, blank=True)
+    #effective_date = models.DateField(_("effective date"), null=True, blank=True)
+    #expiry_date = models.DateField(_("expiry date "), null=True, blank=True)
+    
+    org_unit_code = models.CharField(_("compas station"), max_length=10)
+    organization_id = models.CharField(_("organization identifier"), max_length=12)
+    location_code = models.CharField(_("location"), max_length=12)
+
+    class Meta:
+        db_table = u'epic_persons'
+    
+    def  __unicode__( self ):
+        return "%s, %s" % (self.last_name, self.first_name)
+    
+    @classmethod
+    def update(cls):
+        for person in cls.objects.using('compas').all():
+            
+            try:
+                person = Person.objects.get(pk=person.person_pk)
+            except Person.DoesNotExist:
+                user = User.objects.create(username=person.person_pk, password=UNUSABLE_PASSWORD,
+                                           email=person.email,
+                                           first_name = person.first_name, last_name = person.last_name, 
+                                           is_staff=False, is_active=False, is_superuser=False)
+                person = Person.objects.create(user=user, person_pk=person.person_pk, title=person.title,
+                                               code=person.code, compas_id=person.org_unit_code, 
+                                               organization_id=person.organization_id, 
+                                               location_id=person.location_code)
+        
+
+class Person(models.Model):
+    """Person model"""
+    
+    user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
+    
+    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
+    title = models.CharField(_("title"), max_length=50, blank=True)
+    code = models.CharField(_("code"), max_length=7)
+    
+    compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
+    organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
+    location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
+    
+    #===================================================================================================================
+    # officer = models.BooleanField(_('Officer who can validate waybills'), default=False) #isCompasUser
+    #===================================================================================================================
+    #===================================================================================================================
+    # is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
+    # super_user = models.BooleanField(_("Super User"), 
+    #        help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
+    # reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
+    #===================================================================================================================
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('person')
+        verbose_name_plural = _("persons")
+    
+    def __unicode__(self):
+        return "%s %s" % (self.code, self.title)
+
+    def get_warehouses(self):
+        return Warehouse.objects.filter(Q(compas=self.compas) | Q (organization=self.organization) \
+                                        |Q(location=self.location))
+        
+
+class CommodityCategory(models.Model):
+    """Commodity category"""
+    code = models.CharField(_("Commodity Category Code"), max_length=9, primary_key=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('commodity category')
+        verbose_name_plural = _("commodity categories")
+        
+    def __unicode__(self):
+        return self.code
+    
+class Commodity(models.Model):
+    """Commodity model"""
+    
+    code = models.CharField(_("Commodity Code"), max_length=18, primary_key=True)
+    name = models.CharField(_("Commodity Name"), max_length=100)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity Category"), related_name="commodities")
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('Commodity')
+        verbose_name_plural = _("Commodities")
+    
+    def __unicode__(self):
+        return self.name
+
+class Package(models.Model):
+    """Packaging model"""
+    
+    code = models.CharField(_("code"), max_length=17, primary_key=True)
+    name = models.CharField(_("name"), max_length=50)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('package')
+        verbose_name_plural = _("packages")
+    
+    def __unicode__(self):
+        return self.name
+
+class EpicStock( models.Model ):
+    """COMPAS stock. We retrieve it from Oracle database view."""
+    wh_pk = models.CharField(_("warehouse primary key"), max_length = 90, blank = True, primary_key = True)
+    wh_regional = models.CharField(_("warehouse regional"), max_length = 4, blank = True )
+    wh_country = models.CharField(_("warehouse country"), max_length = 15 )
+    wh_location = models.CharField(_("warehouse location"), max_length = 30 )
+    wh_code = models.CharField(_("warehouse code"), max_length = 13 )
+    wh_name = models.CharField(_("warehouse name"), max_length = 50, blank = True )
+    
+    project_wbs_element = models.CharField(_("Project wbs element"), max_length = 24, blank = True )
+    si_record_id = models.CharField(_("SI record id "), max_length = 25 )
+    si_code = models.CharField(_("SI code"), max_length = 8 )
+    origin_id = models.CharField(_("Origin id"), max_length = 23 )
+    
+    comm_category_code = models.CharField(_("commodity category code"), max_length = 9 )
+    commodity_code = models.CharField(_("commodity code "), max_length = 18 )
+    cmmname = models.CharField(_("commodity name"), max_length = 100, blank = True )
+    
+    package_code = models.CharField(_("Package code"), max_length = 17 )
+    packagename = models.CharField(_("Package name"), max_length = 50, blank = True )
+    
+    qualitycode = models.CharField(_("Quality code"), max_length = 1 )
+    qualitydescr = models.CharField(_("Quality descr "), max_length = 11, blank = True )
+    quantity_net = models.DecimalField(_("Quantity net"), null = True, max_digits = 12, decimal_places = 3, blank = True )
+    quantity_gross = models.DecimalField(_("Quantity gross"), null = True, max_digits = 12, decimal_places = 3, blank = True )
+    number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
+    
+    allocation_code = models.CharField(_("Allocation code"), max_length = 10 )
+    reference_number = models.CharField( _("Reference number"),max_length = 50 )
+    
+    class Meta:
+        db_table = u'epic_stock'
+        #managed = False
+    
+    def is_bulk(self):
+        return self.packagename == BULK_NAME and self.quantity_net
+    
+    @classmethod 
+    def update(cls):
+        """Executes Imports of Stock"""
+        
+        now = datetime.now()
+        
+        for stock in cls.objects.using( 'compas' ):
+            
+            #Create commodity's category
+            category = CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
+            
+            #Create commodity
+            commodity = Commodity.objects.get_or_create(pk=stock.commodity_code, defaults={
+                'name': stock.cmmname,
+                'category': category, 
+            })[0]
+            
+            #Create package
+            package = Package.objects.get_or_create(pk=stock.package_code, defaults={'name': stock.packagename})[0]
+            
+            #Check package type. If 'BULK' then modify number and weight
+            number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
+                                            else (stock.number_of_units, stock.quantity_net)
+            
+            defaults = {
+                'warehouse': Warehouse.objects.get(pk=stock.wh_code),
+                'project_number': stock.project_wbs_element,
+                'si_code': stock.si_code,
+                'commodity': commodity,
+                'package': package,
+                'number_of_units': number_of_units,
+                'quality_code': stock.qualitycode,
+                'quality_description': stock.qualitydescr,
+                'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
+                'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
+                'updated': now
+            }
+            
+            rows = StockItem.objects.filter(origin_id=stock.origin_id).update(**defaults)
+            if not rows:
+                StockItem.objects.create(origin_id=stock.origin_id, **defaults)
+        
+        #Flush empty stocks
+        StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
+        
+            
+class StockManager( models.Manager ):
+    
+    def get_existing_units( self ):
+        return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
+
+class StockItem( models.Model ):
+    """Accessible stocks"""
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
+    
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
+    
+    project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
+    si_code = models.CharField(_("shipping instruction code"), max_length=8)
+    
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
+    package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
+    
+    quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
+    quality_description = models.CharField(_("Quality description "), max_length=11, blank=True) #qualitydescr
+    
+    number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    
+    updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+    
+    objects = StockManager()
+
+    class Meta:
+        ordering = ('si_code', 'commodity__name')
+        order_with_respect_to = 'warehouse'
+        verbose_name = _("stock item")
+        verbose_name_plural = _("stocks")
+
+    def  __unicode__( self ):
+        return "%s-%s-%s" % (self.warehouse.name, self.commodity.pk, self.number_of_units)
+        
+    def coi_code(self):
+        return self.origin_id[7:]
+    
+    #===================================================================================================================
+    # def number_of_units_ordered(self, order):
+    #    """Calculates maximum possible loading ordered amount"""
+    #    order.get_stock_items().filter()
+    #    return StockItem.objects.filter(warehouse__orders=self,
+    #                                    project_number=F('project_number'),
+    #                                    si_code = F('warehouse__orders__items__si_code'), 
+    #                                    commodity_code = F('warehouse__orders__items__commodity_code'),
+    #                                    ).order_by('-warehouse__orders__items__number_of_units')
+    #===================================================================================================================
+
+class LossDamageType(models.Model):
+    
+    LOSS = 'L'
+    DAMAGE = 'D'
+    
+    TYPE_CHOICE = (
+        (LOSS, _("Loss")),
+        (DAMAGE, _("Damage")),
+    )
+    
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
+                            instance.type, instance.category_id
+                         ), unique=True, primary_key=True)
+    type = models.CharField(_("Type"), max_length=1, choices=TYPE_CHOICE)
+    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), 
+                                 related_name="loss_damages", db_column='comm_category_code')
+    cause = models.CharField(_("Cause"), max_length=100)
+
+    class Meta:
+        db_table = u'epic_lossdamagereason'
+        verbose_name = _('Loss/Damages Reason')
+        verbose_name_plural = _("Losses/Damages")
+    
+    def  __unicode__( self ):
+        cause = self.cause
+        length_c = len( cause ) - 10
+        if length_c > 20:
+            cause = "%s...%s" % (cause[0:20], cause[length_c:])
+        return cause
+    
+    @classmethod
+    def update(cls):
+        for myrecord in cls.objects.using('compas').all():
+            if not cls.objects.filter(type=myrecord.type, 
+                                  category__pk=myrecord.category_id, 
+                                  cause=myrecord.cause).count():
+                myrecord.save(using='default')
+
+#=======================================================================================================================
+# 
+# class ReasonBase(models.Model):
+#    """Loss reason"""
+#    
+#    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), related_name="%(class)s")
+#    cause = models.CharField(_("Cause"), max_length=100)
+# 
+#    class Meta:
+#        abstract = True
+# 
+# class LossReason(ReasonBase):
+#    """Loss reason"""
+#    
+#    class Meta:
+#        verbose_name = _("loss reason")
+#        verbose_name_plural = _("loss reasons")
+#    
+# class DamageReason(ReasonBase):
+#    """Damage reason"""
+#    
+#    class Meta:
+#        verbose_name = _("damage reason")
+#        verbose_name_plural = _("damage reasons")
+#=======================================================================================================================
+
+class LtiOriginal( models.Model ):
+    """LTIs for office"""
+    
+    lti_pk = models.CharField( _("LTI primary key"),max_length = 50, primary_key = True, db_column = 'LTI_PK' )
+    lti_id = models.CharField(_("LTI ID"), max_length = 40, db_column = 'LTI_ID' )
+    code = models.CharField( _("Code"),max_length = 40, db_column = 'CODE' )
+    lti_date = models.DateField( _("LTI Date"),db_column = 'LTI_DATE' )
+    expiry_date = models.DateField(_("Expiry Date"), blank = True, null = True, db_column = 'EXPIRY_DATE' )
+    transport_code = models.CharField(_("Transport Code"), max_length = 4, db_column = 'TRANSPORT_CODE' )
+    transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, db_column = 'TRANSPORT_OUC' )
+    transport_name = models.CharField(_("Transport Name"), max_length = 30, db_column = 'TRANSPORT_NAME' )
+    origin_type = models.CharField(_("Origin Type"), max_length = 1, db_column = 'ORIGIN_TYPE' )
+    origintype_desc = models.CharField(_("Origin Type Desc"), max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
+    
+    #Warehouse
+    origin_location_code = models.CharField( _("Origin location code"),max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
+    origin_loc_name = models.CharField(_("Origin location name"), max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
+    origin_wh_code = models.CharField( _("Origin warehouse code"),max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
+    origin_wh_name = models.CharField( _("Origin warehouse name"),max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
+    
+    #Location
+    destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
+    destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
+    
+    #Organization
+    consegnee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
+    consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
+    
+    requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
+    project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
+    si_record_id = models.CharField( _("SI Record ID "),max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
+    si_code = models.CharField( _("SI Code"),max_length = 8, db_column = 'SI_CODE' )
+    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
+    commodity_code = models.CharField(_("Commodity Code "), max_length = 18, db_column = 'COMMODITY_CODE' )
+    cmmname = models.CharField(_("Commodity Name"), max_length = 100, blank = True, db_column = 'CMMNAME' )
+    
+    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 3, db_column = 'NUMBER_OF_UNITS' )
+    quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
+    quantity_gross = models.DecimalField( _("Quantity Gross"),max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
+    unit_weight_net = models.DecimalField( _("Unit Weight Net"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
+    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
+
+    class Meta:
+        db_table = u'epic_lti'
+        #managed = False
+    
+    @classmethod
+    def update(cls):
+        """Imports all LTIs from COMPAS"""
+        now = datetime.now()
+
+        original = cls.objects.using('compas').filter(requested_dispatch_date__gt = settings.MAX_DATE)
+        if not settings.DISABLE_EXPIERED_LTI:
+            original = original.filter( expiry_date__gt = now )
+        
+        for lti in original:
+            
+            #Update Consignee
+            # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
+            consignee = Organization.objects.get(pk=lti.consegnee_code)
+            
+            if not consignee.name:
+                consignee.name = lti.consegnee_name
+                consignee.save()
+            
+            #Create Order
+            defaults = {
+                'created': lti.lti_date,
+                'expiry': lti.expiry_date,
+                'dispatch_date': lti.requested_dispatch_date,
+                'transport_code': lti.transport_code,
+                'transport_ouc': lti.transport_ouc,
+                'transport_name': lti.transport_name,
+                'origin_type': lti.origin_type,
+                'project_number': lti.project_wbs_element,
+                'warehouse': Warehouse.objects.get(code=lti.origin_wh_code),
+                'consignee': consignee,
+                'location': Location.objects.get(pk=lti.destination_location_code),
+                'updated': now,
+            }
+            
+            order = Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
+            
+            #Create order item
+            defaults = {
+                'order': order,
+                'si_code': lti.si_code,
+                'commodity': Commodity.objects.get(pk=lti.commodity_code),
+                'number_of_units': lti.number_of_units,
+            }
+            
+            rows = OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
+            if not rows:
+                OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
+            
+
+class Order(models.Model):
+    """Delivery order"""
+    
+    code = models.CharField(_("Code"), max_length=40, primary_key=True)
+    
+    created = models.DateField(_("Created date")) #lti_date
+    expiry = models.DateField(_("expire date"), blank=True, null=True) #expiry_date
+    dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True)
+    
+    transport_code = models.CharField(_("Transport Code"), max_length = 4, editable=False)
+    transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, editable=False)
+    transport_name = models.CharField(_("Transport Name"), max_length = 30)
+    
+    origin_type = models.CharField(_("Origin Type"), max_length = 1, editable=False)
+    
+    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
+    
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("dispatch warehouse"), related_name="orders")
+    consignee = models.ForeignKey(Organization, verbose_name=_("consignee"), related_name="orders")
+    location = models.ForeignKey(Location, verbose_name=_("consignee's location"), related_name="orders")
+    
+    updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+    
+    class Meta:
+        verbose_name = _("order")
+        verbose_name_plural = _("orders")
+        ordering = ('code',)
+    
+    def  __unicode__(self):
+        return self.code
+    
+    @models.permalink
+    def get_absolute_url(self):
+        return ('order_detail', (), {'object_id': self.pk})
+    
+    def get_waybills(self):
+        return Waybill.objects.filter(order=self)
+    
+    def get_stock_items(self):
+        """Retrieves stock items for current order through warehouse"""
+        return StockItem.objects.filter(warehouse__orders=self,
+                                        project_number=F('project_number'),
+                                        si_code = F('warehouse__orders__items__si_code'), 
+                                        commodity = F('warehouse__orders__items__commodity'),
+                                        ).order_by('-warehouse__orders__items__number_of_units')
     
     
-class Waybill( models.Model ):
+class OrderItem(models.Model):
+    """Order item with commodity and counters"""
+    
+    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, editable=False, primary_key=True)
+    order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
+    
+    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
+    
+    commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
+    
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+    
+    class Meta:
+        ordering = ('si_code',)
+        order_with_respect_to = 'order'
+        verbose_name = _("order item")
+        verbose_name_plural = _("order items")
+    
+    def  __unicode__( self ):
+        if self.removed:
+            return u"Void %s -  %.0f " % ( self.commodity, self.items_left() )
+        else:
+            return u"%s -  %.0f " % ( self.commodity, self.items_left() )
+
+    def get_stock_items(self):
+        """Retrieves stock items for current order item through warehouse"""
+        return StockItem.objects.filter(warehouse__orders__items=self,
+                                        project_number=self.order.project_number,
+                                        si_code = self.si_code, 
+                                        commodity = self.commodity,
+                                        ).order_by('-number_of_units')
+    
+    @staticmethod
+    def sum_number( queryset ):
+        return queryset.aggregate(units_count=Sum('number_of_units'))['units_count'] or 0
+    
+    def get_similar_dispatches(self):
+        """Returns all loading details with such item within any orders"""
+        return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
+                                            waybill__order__project_number=self.order.project_number,
+                                            waybill__date_removed__isnull=True,
+                                            stock_item__si_code = self.si_code, 
+                                            stock_item__commodity = self.commodity,
+                                            ).order_by('-waybill__dispatch_date')
+    
+    def get_order_dispatches(self):
+        """Returns dispatches of current order"""
+        return self.get_similar_dispatches().filter(waybill__order=self.order)
+    
+    
+    def get_available_stocks(self):
+        """Calculates available stocks"""
+        return self.sum_number(self.get_stock_items()) - self.sum_number(self.get_similar_dispatches())
+        
+        
+    def items_left( self ):
+        """Calculates number of such items supposed to be delivered in this order"""
+        return self.number_of_units - self.sum_number(self.get_order_dispatches())
+
+
+class Waybill( ld_models.Model ):
     """
-    Main model in the system. Tracks waybills.
-    
+    Base waybill abstract class
     """
     
     TRANSACTION_TYPES = ( 
@@ -139,115 +745,87 @@ class Waybill( models.Model ):
         (SENT, _("Sent")),
         (INFORMED, _("Informed")),
         (DELIVERED, _("Delivered")),
-        (COMPLETE, _("Complete")),
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            COMPAS_STATION, instance.created.strftime('%y'), LETTER_CODE
+                            COMPAS_STATION, instance.date_created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     
+    order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
+    
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
+    
     status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
-    ltiNumber = models.CharField( _("LTI number"), max_length = 20)
-    waybillNumber = models.CharField(_("Waybill number"), max_length = 20 )
-    created = models.DateTimeField(_("created date/time"), default=datetime.now)
+    #Dates
+    loading_date = models.DateField(_("Date of loading"), default=datetime.now) #dateOfLoading
+    dispatch_date = models.DateField( _("Date of dispatch"), default=datetime.now) #dateOfDispatch
     
-    dateOfLoading = models.DateField(_("Date of loading"), null = True, blank = True )
-    dateOfDispatch = models.DateField( _("Date of dispatch"), null = True, blank = True )
-    transactionType = models.CharField( _("Transaction Type"),max_length = 10, choices = TRANSACTION_TYPES )
-    transportType = models.CharField(_("Transport Type"), max_length = 10, choices = TRANSPORT_TYPES )
+    transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
+                                         choices=TRANSACTION_TYPES, default=u'WIT') #transactionType
+    transport_type = models.CharField(_("Transport Type"), max_length=10, 
+                                      choices=TRANSPORT_TYPES, default=u'02') #transportType
     
     #Dispatcher
-    dispatchRemarks = models.CharField(_("Dispatch Remarks"), max_length = 200, blank=True)
-    dispatcherName = models.TextField( _("Diapatcher Name"), blank=True, null=True )
-    dispatcherTitle = models.TextField(_("Dispatcher Title"), blank = True )
-    dispatcherSigned = models.BooleanField(_("Dispatcher Signed"), blank = True )
-    dispatch_warehouse = models.ForeignKey( Place, verbose_name=_("Original Warehouse"), 
-                                            default=COMPAS_STATION, related_name="dispatch_waybills")
+    dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=400, blank=True)
+    dispatcher_person = models.ForeignKey(CompasPerson, verbose_name=_("Dispatch person"), 
+                                          related_name="dispatch_waybills") #dispatcherName
     
     #Transporter
-    transportContractor = models.TextField(_("Transport Contarctor"), blank = True )
-    transportSubContractor = models.TextField(_("Transport Sub contarctor"), blank = True )
-    transportDriverName = models.TextField(_("Transport Driver Name"), blank = True )
-    transportDriverLicenceID = models.TextField(_("Transport Driver LicenceID "), blank = True )
-    transportVehicleRegistration = models.TextField(_("Transport Vehicle Registration "), blank = True )
-    transportTrailerRegistration = models.TextField( _("Transport Trailer Registration"), blank=True )
-    transportDispachSigned = models.BooleanField( _("Transport Dispach Signed"),blank = True )
-    transportDispachSignedTimestamp = models.DateTimeField( _("Transport Dispach Signed Timestamp"),null = True, blank = True )
-    transportDeliverySigned = models.BooleanField( _("Transport Delivery Signed"),blank = True )
-    transportDeliverySignedTimestamp = models.DateTimeField( _("Transport Delivery Signed Timestamp"),null = True, blank = True )
+    transport_sub_contractor = models.CharField(_("Transport Sub contractor"), max_length=40, blank=True) #transportSubContractor
+    transport_driver_name = models.CharField(_("Transport Driver Name"), max_length=40) #transportDriverName
+    transport_driver_licence = models.CharField(_("Transport Driver LicenceID "), max_length=40) #transportDriverLicenceID
+    transport_vehicle_registration = models.CharField(_("Transport Vehicle Registration "), max_length=40) #transportVehicleRegistration
+    transport_trailer_registration = models.CharField( _("Transport Trailer Registration"), max_length=40, blank=True) #transportTrailerRegistration
+    transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
 
     #Container        
-    containerOneNumber = models.CharField(_("Container One Number"), max_length = 40, blank = True )
-    containerTwoNumber = models.CharField( _("Container Two Number"), max_length = 40, blank = True )
-    containerOneSealNumber = models.CharField(_("Container One Seal Number"), max_length = 40, blank = True )
-    containerTwoSealNumber = models.CharField(_("Container Two Seal Number"), max_length = 40, blank = True )
-    containerOneRemarksDispatch = models.CharField( _("Container One Remarks Dispatch"), max_length = 40, blank = True )
-    containerTwoRemarksDispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length = 40, blank = True )
-    containerOneRemarksReciept = models.CharField( _("Container One Remarks Reciept"), max_length = 40, blank = True )
-    containerTwoRemarksReciept = models.CharField(_("Container Two Remarks Reciept"), max_length = 40, blank = True )
-
-    #Receiver
-    recipientLocation = models.CharField(_("Recipient Location"), max_length = 100, blank = True )
-    recipientConsingee = models.CharField( _("Recipient Consingee"), max_length = 100, blank = True )
-    recipientName = models.CharField( _("Recipient Name"), max_length = 100, blank = True )
-    recipientTitle = models.CharField(_("Recipient Title "), max_length = 100, blank = True )
-    recipientArrivalDate = models.DateField( _("Recipient Arrival Date"), null = True, blank = True )
-    recipientStartDischargeDate = models.DateField( _("Recipient Start Discharge Date"), null = True, blank = True )
-    recipientEndDischargeDate = models.DateField( _("Recipient End Discharge Date"), null = True, blank = True )
-    recipientDistance = models.IntegerField(_("Recipient Distance"), blank = True, null = True )
-    recipientRemarks = models.TextField( _("Recipient Remarks"),blank = True )
-    recipientSigned = models.BooleanField( _("Recipient Signed"),blank = True )
-    recipientSignedTimestamp = models.DateTimeField( _("Recipient Signed Timestamp"),null = True, blank = True )
-    destinationWarehouse = models.ForeignKey( Place, verbose_name=_("Destination Warehouse"), 
-                                              related_name="recipient_waybills" )
+    container_one_number = models.CharField(_("Container One Number"), max_length=40, blank=True) #containerOneNumber
+    container_two_number = models.CharField( _("Container Two Number"), max_length=40, blank=True) #containerTwoNumber
+    container_one_seal_number = models.CharField(_("Container One Seal Number"), max_length=40, blank=True) #containerOneSealNumber
+    container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
+    container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
+    container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
 
     #Extra Fields
-    waybillValidated = models.BooleanField( _("Waybill Validated"))
-    waybillReceiptValidated = models.BooleanField( _("Waybill Receipt Validated"))
-    waybillSentToCompas = models.BooleanField(_("Waybill Sent To Compas"))
-    waybillRecSentToCompas = models.BooleanField(_("Waybill Reciept Sent to Compas"))
-    waybillProcessedForPayment = models.BooleanField(_("Waybill Processed For Payment"))
-    invalidated = models.BooleanField(_("Invalidated"))
-    auditComment = models.TextField( _("Audit Comment"), null = True, blank = True )
+    validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
+    sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
     
     audit_log = AuditLog()
 
+    objects = ld_models.managers.LogicalDeletedManager()
+    
+    class Meta:
+        ordering = ('slug',)
+        order_with_respect_to = 'order'
+        verbose_name = _("waybill")
+        verbose_name_plural = _("waybills")
+    
     def  __unicode__( self ):
-        return self.waybillNumber
+        return self.slug
     
     @models.permalink
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
-
-    def mydesc( self ):
-        return self.waybillNumber
-
-    def errors( self ):
-        try:
-            return CompasLogger.objects.get( wb = self )
-        except:
-            return ''
+    
+    def is_editable(self, user):
+        return self.status < self.SIGNED and \
+            not user.get_profile().get_warehouses().filter(pk=self.order.warehouse.pk).count()
+    
+    #===================================================================================================================
+    # def errors(self):
+    #    try:
+    #        return CompasLogger.objects.get( wb = self )
+    #    except CompasLogger.DoesNotExist:
+    #        return ''
+    #===================================================================================================================
     
     def clean(self):
-        """Validates Waybil instance. Checks different dates"""
-        if self.dateOfDispatch and self.dateOfLoading \
-        and self.dateOfLoading > self.dateOfDispatch:
+        """Validates Waybill instance. Checks different dates"""
+        if self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
-    
-        if self.recipientArrivalDate and self.dateOfDispatch \
-         and self.recipientArrivalDate < self.dateOfDispatch:
-            raise ValidationError(_("Cargo arrived before being dispatched"))
-
-        if self.recipientStartDischargeDate and self.recipientArrivalDate \
-        and self.recipientStartDischargeDate < self.recipientArrivalDate:
-            raise ValidationError(_("Cargo Discharge started before Arrival?"))
-
-        if self.recipientStartDischargeDate and self.recipientEndDischargeDate \
-        and self.recipientEndDischargeDate < self.recipientStartDischargeDate:
-            raise ValidationError(_("Cargo finished Discharge before Starting?"))
-
+            
     
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
@@ -263,62 +841,6 @@ class Waybill( models.Model ):
                 return False
         return True
 
-    #===================================================================================================================
-    # def dispatch_person( self ):
-    #    return EpicPerson.objects.get( person_pk = self.dispatcherName )
-    #===================================================================================================================
-
-    #===================================================================================================================
-    # def receipt_person( self ):
-    #    return EpicPerson.objects.get( person_pk = self.recipientName )
-    #===================================================================================================================
-
-    @property
-    def is_bulk( self ):
-        return LtiOriginal.objects.filter( code = self.ltiNumber )[0].is_bulk
-
-    @property
-    def consegnee_name( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_name
-        except:
-            pass
-
-    @property
-    def origin_wh_code( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_code
-        except:
-            return None
-
-    @property
-    def origin_loc_name( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_loc_name
-        except:
-            return None
-
-    @property
-    def destination_loc_name( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_loc_name
-        except:
-            return None
-
-    @property
-    def consegnee_code( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].consegnee_code
-        except:
-            return None
-
-    @property
-    def origin_wh_name( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].origin_wh_name
-        except:
-            return None
-
     @property
     def hasError( self ):
         myerror = self.errors()
@@ -328,59 +850,27 @@ class Waybill( models.Model ):
         except:
             return None
 
-    @property
-    def destination_location_code( self ):
-        try:
-            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].destination_location_code
-        except:
-            return None
-
-
-#    def lti_date( self ):
-#        try:
-#            return LtiOriginal.objects.filter( code = self.ltiNumber )[0].lti_date
-#        except:
-#            return None
-#    lti_date = property( lti_date )
-    
-    def invalidate_waybill_action( self ):
-        for lineitem in self.loading_details.select_related():
-            lineitem.order_item.lti_line.restore_si( lineitem.numberUnitsLoaded )
-            lineitem.numberUnitsLoaded = 0
-            lineitem.save()
-        self.invalidated = True
-        self.save()
-    
     def dispatch_sign(self, commit=True):
         """
-        Signs the waybill as ready to be sent and sets special status SIGNED. 
+        Signs the waybill as ready to be sent by setting special status SIGNED. 
         After this system sends it to central server.
         """
-        self.transportDispachSigned = True
-        self.transportDispachSignedTimestamp = datetime.now()
-        self.dispatcherSigned = True
-        self.auditComment = ugettext('Print Dispatch Original')
+        self.transport_dispach_signed_date = datetime.now()
         
         self.update_status(self.SIGNED)
         
         if commit:
             self.save()
     
-    def receipt_sign(self, commit=True):
-        """
-        Signs the waybill as delivered and sets special status DELIVERED. 
-        After this system sends it to central server.
-        """
-        self.recipientSigned = True
-        self.transportDeliverySignedTimestamp = datetime.now()
-        self.recipientSignedTimestamp = datetime.now()
-        self.transportDeliverySigned = True
-        self.auditComment = ugettext('Print Dispatch Receipt')
+    def get_receipt(self):
+        """Returns receipt instance if exists or None otherwise"""
+        try:
+            receipt = self.receipt
+        except ReceiptWaybill.DoesNotExist:
+            receipt = None
         
-        self.update_status(self.DELIVERED)
-        
-        if commit:
-            self.save()
+        return receipt
+    
     
     def serialize(self):
         """
@@ -388,51 +878,23 @@ class Waybill( models.Model ):
     
         @param self: the Waybill instance
         @return the serialized json data.
-    
-        Usage:
-        
-        waybill = Waybill.objects.get( pk = 1 )
-        waybill.serialize()
-        [{"pk": 1, "model": "offliner.waybill", "fields": {"waybillNumber": "X0167", "transportVehicleRegistration": "vrn", "transportContractor": "RAIS MIDDLE EAST LTD.", "dispatchRemarks": "dr", "dateOfDispatch": "2011-01-18", "recipientArrivalDate": null, "recipientConsingee": "WORLD FOOD PROGRAMME", "transportSubContractor": "ts", "transportDeliverySignedTimestamp": null, "recipientDistance": null, "recipientName": "", "auditComment": "", "dispatcherSigned": false, "waybillProcessedForPayment": false, "recipientSignedTimestamp": null, "dispatcherTitle": "LOGISTICS OFFICER", "containerTwoSealNumber": "2s", "transportDeliverySigned": false, "containerTwoRemarksReciept": "", "ltiNumber": "JERX0011000Z7901P", "containerOneRemarksReciept": "", "transportDispachSignedTimestamp": null, "transactionType": "DEL", "invalidated": false, "containerTwoRemarksDispatch": "2r", "recipientSigned": false, "transportDispachSigned": false, "dateOfLoading": "2011-01-18", "recipientEndDischargeDate": null, "recipientRemarks": "", "waybillSentToCompas": false, "recipientStartDischargeDate": null, "containerOneRemarksDispatch": "1r", "containerOneSealNumber": "1s", "waybillValidated": false, "transportType": "02", "destinationWarehouse": "QD9X001", "recipientLocation": "QALANDIA", "waybillRecSentToCompas": false, "transportDriverName": "dn", "dispatcherName": "JERX0010002630", "transportDriverLicenceID": "dln", "containerOneNumber": "1n", "recipientTitle": "", "containerTwoNumber": "2n", "waybillReceiptValidated": false, "transportTrailerRegistration": "trn"}}, {"pk": "JERX001000000000000011031HQX0001000000000000990922", "model": "offliner.LtiOriginal", "fields": {"origin_location_code": "ASHX", "si_record_id": "HQX0001000000000000990922", "origin_loc_name": "ASHDOD", "code": "JERX0011000Z7901P", "destination_location_code": "QD9X", "quantity_net": "150.000", "consegnee_code": "WFP", "quantity_gross": "150.300", "commodity_code": "CERWHF", "destination_loc_name": "QALANDIA", "requested_dispatch_date": "2010-06-29", "transport_name": "RAIS MIDDLE EAST LTD.", "unit_weight_net": "50.000", "transport_ouc": "JERX001", "origin_wh_code": "ASHX004", "lti_id": "JERX001000000000000011031", "number_of_units": "3000", "unit_weight_gross": "50.100", "comm_category_code": "CER", "origin_wh_name": "ASHDOD_OVERSEAS_BONDED", "expiry_date": "2010-07-04", "project_wbs_element": "103871.1", "cmmname": "WHEAT FLOUR", "lti_date": "2010-06-29", "consegnee_name": "WORLD FOOD PROGRAMME", "origintype_desc": "Warehouse", "transport_code": "R001", "origin_type": "2", "si_code": "00004178"}}, {"pk": "JERX001000000000000011031HQX0001000000000000991507", "model": "offliner.LtiOriginal", "fields": {"origin_location_code": "ASHX", "si_record_id": "HQX0001000000000000991507", "origin_loc_name": "ASHDOD", "code": "JERX0011000Z7901P", "destination_location_code": "QD9X", "quantity_net": "200.000", "consegnee_code": "WFP", "quantity_gross": "200.400", "commodity_code": "PULCKP", "destination_loc_name": "QALANDIA", "requested_dispatch_date": "2010-06-29", "transport_name": "RAIS MIDDLE EAST LTD.", "unit_weight_net": "50.000", "transport_ouc": "JERX001", "origin_wh_code": "ASHX004", "lti_id": "JERX001000000000000011031", "number_of_units": "4000", "unit_weight_gross": "50.100", "comm_category_code": "PUL", "origin_wh_name": "ASHDOD_OVERSEAS_BONDED", "expiry_date": "2010-07-04", "project_wbs_element": "103871.1", "cmmname": "CHICKPEAS", "lti_date": "2010-06-29", "consegnee_name": "WORLD FOOD PROGRAMME", "origintype_desc": "Warehouse", "transport_code": "R001", "origin_type": "2", "si_code": "00005581"}}, {"pk": "JERX001000000000000011031HQX0001000000000000890038", "model": "offliner.LtiOriginal", "fields": {"origin_location_code": "ASHX", "si_record_id": "HQX0001000000000000890038", "origin_loc_name": "ASHDOD", "code": "JERX0011000Z7901P", "destination_location_code": "QD9X", "quantity_net": "357.000", "consegnee_code": "WFP", "quantity_gross": "384.000", "commodity_code": "OILVEG", "destination_loc_name": "QALANDIA", "requested_dispatch_date": "2010-06-29", "transport_name": "RAIS MIDDLE EAST LTD.", "unit_weight_net": "11.900", "transport_ouc": "JERX001", "origin_wh_code": "ASHX004", "lti_id": "JERX001000000000000011031", "number_of_units": "30000", "unit_weight_gross": "12.800", "comm_category_code": "OIL", "origin_wh_name": "ASHDOD_OVERSEAS_BONDED", "expiry_date": "2010-07-04", "project_wbs_element": "10387.1.01.01", "cmmname": "VEGETABLE OIL", "lti_date": "2010-06-29", "consegnee_name": "WORLD FOOD PROGRAMME", "origintype_desc": "Warehouse", "transport_code": "R001", "origin_type": "2", "si_code": "82492906"}}, {"pk": "ASHX004JERX0010000417801CERCERWHFBY17275", "model": "offliner.epicstock", "fields": {"si_record_id": "HQX0001000000000000990922", "quantity_gross": "10020.390", "qualitydescr": "Good", "si_code": "00004178", "quantity_net": "10000.000", "origin_id": "JERX0010000417801", "wh_code": "ASHX004", "packagename": "BAG, POLYPROPYLENE, 50 KG", "comm_category_code": "CER", "wh_country": "ISRAEL", "wh_location": "ASHDOD", "reference_number": "0080003270", "wh_regional": "OMC", "qualitycode": "G", "wh_name": "ASHDOD_OVERSEAS_BONDED", "commodity_code": "CERWHF", "package_code": "BY17", "allocation_code": "275", "number_of_units": 200, "project_wbs_element": "103871.1", "cmmname": "WHEAT FLOUR"}}, {"pk": "ASHX004JERX0010000558101PULPULCKPBY17275", "model": "offliner.epicstock", "fields": {"si_record_id": "HQX0001000000000000991507", "quantity_gross": "510.054", "qualitydescr": "Good", "si_code": "00005581", "quantity_net": "500.000", "origin_id": "JERX0010000558101", "wh_code": "ASHX004", "packagename": "BAG, POLYPROPYLENE, 50 KG", "comm_category_code": "PUL", "wh_country": "ISRAEL", "wh_location": "ASHDOD", "reference_number": "0080003713", "wh_regional": "OMC", "qualitycode": "G", "wh_name": "ASHDOD_OVERSEAS_BONDED", "commodity_code": "PULCKP", "package_code": "BY17", "allocation_code": "275", "number_of_units": 100000, "project_wbs_element": "103871.1", "cmmname": "CHICKPEAS"}}]
         """
-    
-        #waybill_to_serialize = Waybill.objects.get( id = wb_id )
-    
-        # Add related LoadingDetais to serialized representation
-        loadingdetails_to_serialize = self.loading_details.all().select_related('order_item')
         
-        # Add related LtiOriginals to serialized representation
-        # Add related EpicStocks to serialized representation
-        pack = [(ld.order_item.stock_item, ld.order_item.lti_line) for ld in loadingdetails_to_serialize]
-        stocks_to_serialize, ltis_to_serialize = zip(*pack)
+        items = chain((self,), self.loading_details.all())
         
-        return serializers.serialize( 'json', [self] + list( loadingdetails_to_serialize ) 
-                                      + list( ltis_to_serialize ) + list( stocks_to_serialize ) )
+        receipt = self.get_receipt()
+        if receipt:
+            items = chain((receipt,), items)
         
-    def new_waybill_no(self):
-        """
-        This method gives a waybill identifier for the waybill instance param, chaining the warehouse identifier char with the sequence of the table.
-        Note: Different offliner app installation must have different warehouse identifier char.
-        # TODO: Make waybill id = code
-        @param self: the Waybill instance
-        @return: a string containing the waybill identifier.
-        """
-        return '%s%04d' % (settings.WAYBILL_LETTER, self.pk)
-    
+        return serializers.serialize( 'json', items)
+        
     def compress(self):
         """
         This method compress the Waybill using zipBase64 algorithm.
     
         @param self: the Waybill instance
         @return: a string containing the compressed representation of the Waybill with related LoadingDetails, LtiOriginals and EpicStocks
-    
-        Usage:
-    
-        waybill = Waybill.objects.get( pk = 1 )
-        waybill.compress()
-        'eJzlWG1P4zgQ/itRPkPlpC1t71sgaeltICUtb3c6RSFxWx+pnXVSuGrFf79x3tOmRQu7sKdDfEAeezzzzPNMxvz5TQ4f5d+k9pEkr5iPA/hbZvN5QCjmrWd380CCQAbjnODAj8D6Tc5WL9erB8zF/juknPTEppi7NAoZj2/wkngBtvGCRLAYE0bFxidOa9vOGIW/vZglbmxtPJUuxrpuGpKhTWeSOdNbYr9PotCNvaWNVy5/FEHIPk8MboytuZ6ZxbqKFOUYKcdKX9g59khIMI01zsmTG+iwH3bRdRBUrRBGROgCC5t8a9mmLg0tS5cmtjWytYsLoxb0dP1QjzuOanYdB+QJ882ULCj2Z2SFo9hdhQ33QuCxS72mkC7dVRKN8OyufQIxrlawnq/lkGCeXgPrczeIMJiy8kw483AUYX/I+MTdZIfzTcVFe6Msb5iROEiCMa3ReDobn00lazgcnxm2iMQDLFzBltkzm2K3Qgv1EC6VWKoeshLbEB4Oi2yDmJRufzfsOwRlRgj90RsgZVKLwqK42UcZh0jMW+5NPNkIxQXOzjZhkrhumMIFocAhIkj3Svg1RnJ5F+/K8ea4KhtSkpvM9YGjBzhuUB9ceEuXL/AeolcEJJdMmYJlxoBgoRs1UiR2k+iaXDfgXk1e4dvFqVNEiSpx3DSAW6CTlwKpCf2haIQmfeXW5XjJ1lFivdIHghs1XEzmFQ3oSjO1S32sVW4FmuwBoKwMF8TNJenTugDz9YyXQEv1pI3kXQcm8TCofawnXgK6DU0FFlrLoBDgtt4qWqP1lDAJ48N4cpcEmG936Bg69MvLkZR9FipJlT8gvbZyfnWHtgyDARqoSXl2vySgYMbJAmq2/TVJl50gq5LjwVlxVJue34mtEXEACMZ9h4hE5IMXl84cmpUF/OiWniLnVwtVbyAVRu3GImglNn1duzQm8cahOOkrShe1wEtWlgiDcnFx6HY4qZ1ZcBZF+al2fmoFWAlrfgq66u35sCGiIqEqhzn+uoZt2HdyPjp+qk/RJdAxOjlWBzUqFm72fm3XlMTOMyaLZZznWaZZ+mFrrwJmBfznZa2GCHWyFp4VcC+lxDaaMNphc0eEkcDVzq6uxlVgCZEpJZQO1A0vGK/BWQ+tTgvHujHsKaTvnFqXupHQBP8TEvBQx7F3nKYRcvY39iCOh8jBAc4/yRB+v6e0khS81Sq/5Pbc0GbS0LSu7RyD5vKU7CmO7hlD0kxi6IYOECQpQdkBawXKIbDr5YmzRqpm4sq3iTJ0lF7/HfIHYvc+Rf75xR8sfxW9Rf7iVGef/CfX5tmXpoj+t/LvvEf+AOcnyv/sfAzFBPf/CfF3u33lzeLvDxBg8AniLy/+YPG3u703iL/d75SntsVvjc0bY/SLiV9RWoNP/fbvV7+itvqH1A94fpj6W0oLid+tFgD1NGbaKeCcBfNLt4G+2hmoA3RSawNZISulE2MCUmC0SofV03ulp/a6zeLHIfGimHmPW9L/rrG+YYaGVxZM0QOUmQOwCiySx9CIMX/fdNM0xQtjrsoMoR26pjknj6xGjsPT/dFd4Lx0p9roSJpY5j0UbnJvGpfGkdRF0pfRq6Nq4n5NY74Ri+OpraX/fID1oPKSLVsbx3PMxcPSocVzEPoixNxWeyg7yuGdx0QDFrK4OKugll8/yna+rpFDj5YMhsIiuCHW3WCnsWaU2VU9DEjvmrQPk1d85qDvX5vpqPXzyJsPpbvk7SpAt27nO6ibfJsbqNt9nbhpvj+TuNmQ9SOJ21PaH0Lcctz+EcRNCfCOMfHl5a9/AexyIYk='
         """
-        #waybill = Waybill.objects.get( id = wb_id )
         return base64.b64encode( zlib.compress( simplejson.dumps( self.serialize(), use_decimal=True ) ) )
     
     def decompress(self, data):
@@ -446,596 +908,184 @@ class Waybill( models.Model ):
         
         self.status = status
         self.save()
+
+
+class ReceiptWaybill(models.Model):
+    """Receipt data"""
+    waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
+    person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
+                                          related_name="recipient_waybills") #recipientName
+    arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
+    start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
+    end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate
+    distance = models.IntegerField(_("Recipient Distance (km)"), blank=True, null=True) #recipientDistance
+    remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
+    signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
     
-    @classmethod
-    def send_new(cls):
-        """Sents new waybills to central server"""
-        url = "%s%s" % (API_DOMAIN, reverse("api_new_waybill"))
-        
-        waybills = cls.objects.filter(status=cls.SIGNED, dispatch_warehouse__pk=COMPAS_STATION)
-        
-        data = serializers.serialize( 'json', sync_data(waybills), indent=True)
-        if data:
-            try:
-                response = urllib2.urlopen(urllib2.Request(url, data, {
-                    'Content-Type': 'application/json'
-                }), timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.read() == 'Created':
-                    waybills.update(status=cls.SENT)
-
+    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
     
-    @classmethod
-    def get_informed(cls):
-        """Dispatcher reads the server for new informed waybills"""
-        for waybill in cls.objects.filter(status=cls.SENT, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill", kwargs={"slug": waybill.slug}))
-            try:
-                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.code == 200:
-                    waybill.update_status(cls.INFORMED)
-    
-    
-    @classmethod
-    def get_delivered(cls):
-        """Dispatcher reads the server for delivered waybills"""
-        for waybill in cls.objects.filter(status=cls.INFORMED, dispatch_warehouse__pk=COMPAS_STATION):
-            url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill", kwargs={"slug": waybill.slug}))
-            try:
-                response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-            except (urllib2.HTTPError, urllib2.URLError) as err:
-                print err
-            else:
-                if response.code == 200:
-                    for obj in serializers.deserialize('json', response.read()):
-                        obj.save()
-                
-    
-    @classmethod
-    def get_receiving(cls):
-        """
-        Receiver reads the server for new waybills, that we are expecting to receive 
-        and update status of such waybills to 'informed'.
-        """ 
-        url = "%s%s" % (API_DOMAIN, reverse("api_receiving_waybill", kwargs={'destination': COMPAS_STATION}))
-        try:
-            response = urllib2.urlopen(url, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                for obj in serializers.deserialize('json', response.read()):
-                    obj.save()
-                
-    @classmethod
-    def send_informed(cls):
-        """Receiver updates status of receiving waybill to 'informed'"""
-        waybills = cls.objects.filter(status=cls.SENT, destinationWarehouse__pk=COMPAS_STATION)
-        url = "%s%s" % (API_DOMAIN, reverse("api_informed_waybill"))
-        
-        request = urllib2.Request(url, simplejson.dumps(tuple(waybills.values_list('pk', flat=True))), {
-            'Content-Type': 'application/json'
-        })
-        request.get_method = lambda: 'PUT'
-        
-        try:
-            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                waybills.update(status=cls.INFORMED)
-    
-    @classmethod
-    def send_delivered(cls):
-        """Receiver sends 'delivered' waybills to the central server"""
-        waybills = cls.objects.filter(status=cls.DELIVERED, destinationWarehouse__pk=COMPAS_STATION)
-        url = "%s%s" % (API_DOMAIN, reverse("api_delivered_waybill"))
-        data = serializers.serialize( 'json', waybills, indent=True)
-        
-        request = urllib2.Request(url, data, {
-            'Content-Type': 'application/json'
-        })
-        request.get_method = lambda: 'PUT'
-        
-        try:
-            response = urllib2.urlopen(request, timeout=DEFAULT_TIMEOUT)
-        except (urllib2.HTTPError, urllib2.URLError) as err:
-            print err
-        else:
-            if response.code == 200:
-                waybills.update(status=cls.COMPLETE)
-    
-#### Compas Tables Imported
-
-
-"""
-Models based on compas Views & Tables
-"""
-"""
-LTIs for office 
-"""
-class LtiOriginal( models.Model ):
-    lti_pk = models.CharField( _("LTI primary key"),max_length = 50, primary_key = True, db_column = 'LTI_PK' )
-    lti_id = models.CharField(_("LTI ID"), max_length = 40, db_column = 'LTI_ID' )
-    code = models.CharField( _("Code"),max_length = 40, db_column = 'CODE' )
-    lti_date = models.DateField( _("LTI Date"),db_column = 'LTI_DATE' )
-    expiry_date = models.DateField(_("Expiry Date"), blank = True, null = True, db_column = 'EXPIRY_DATE' )
-    transport_code = models.CharField(_("Transport Code"), max_length = 4, db_column = 'TRANSPORT_CODE' )
-    transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, db_column = 'TRANSPORT_OUC' )
-    transport_name = models.CharField(_("Transport Name"), max_length = 30, db_column = 'TRANSPORT_NAME' )
-    origin_type = models.CharField(_("Origin Type"), max_length = 1, db_column = 'ORIGIN_TYPE' )
-    origintype_desc = models.CharField(_("Origin Type Desc"), max_length = 12, blank = True, db_column = 'ORIGINTYPE_DESC' )
-    origin_location_code = models.CharField( _("Origin location code"),max_length = 10, db_column = 'ORIGIN_LOCATION_CODE' )
-    origin_loc_name = models.CharField(_("Origin location name"), max_length = 30, db_column = 'ORIGIN_LOC_NAME' )
-    origin_wh_code = models.CharField( _("Origin warehouse code"),max_length = 13, blank = True, db_column = 'ORIGIN_WH_CODE' )
-    origin_wh_name = models.CharField( _("Origin warehouse name"),max_length = 50, blank = True, db_column = 'ORIGIN_WH_NAME' )
-    destination_location_code = models.CharField( _("Destination Location Code"),max_length = 10, db_column = 'DESTINATION_LOCATION_CODE' )
-    destination_loc_name = models.CharField(_("Destination Loc Name"), max_length = 30, db_column = 'DESTINATION_LOC_NAME' )
-    consegnee_code = models.CharField(_("Consegnee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
-    consegnee_name = models.CharField(_("Consegnee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
-    requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
-    project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
-    si_record_id = models.CharField( _("SI Record ID "),max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
-    si_code = models.CharField( _("SI Code"),max_length = 8, db_column = 'SI_CODE' )
-    comm_category_code = models.CharField(_("Commodity Category Code"), max_length = 9, db_column = 'COMM_CATEGORY_CODE' )
-    commodity_code = models.CharField(_("Commodity Code "), max_length = 18, db_column = 'COMMODITY_CODE' )
-    cmmname = models.CharField(_("Commodity Name"), max_length = 100, blank = True, db_column = 'CMMNAME' )
-    quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
-    quantity_gross = models.DecimalField( _("Quantity Gross"),max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
-    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 0, db_column = 'NUMBER_OF_UNITS' )
-    unit_weight_net = models.DecimalField( _("Unit Weight Net"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )
-    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_GROSS' )
-
-    #objects = models.Manager()
-
-    class Meta:
-        db_table = u'epic_lti'
-
-    def  __unicode__( self ):
-        if self.valid():
-            return u"%s -  %.0f " % ( self.cmmname, self.items_left )
-        else:
-            return u"Void %s -  %.0f " % ( self.cmmname, self.items_left )
-
-    def mydesc( self ):
-        return self.code
-
-    def commodity( self ):
-        return self.cmmname
-
-    def valid( self ):
-        return RemovedLtis.objects.filter( lti = self.lti_pk ).count() == 0 
-
-    @property
-    def items_left( self ):
-        order_item = LtiWithStock.objects.filter( lti_line = self )
-        used = 0
-        for lines in order_item:
-            wblines = LoadingDetail.objects.filter( order_item = lines )
-            for line in wblines:
-                if line.invalid == False and line.wbNumber.dispatcherSigned == True:
-                    used += line.numberUnitsLoaded
-        
-        if self.is_bulk:
-            return self.quantity_net - used
-        else:
-            return self.number_of_units - used
-
-    def stock_items( self ):
-        return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                         si_code = self.si_code, 
-                                         commodity_code = self.commodity_code 
-                                         ).order_by( '-number_of_units' )
-
-    def reduce_si( self, units ):
-        self.sitracker.update_units( units )
-        return self.items_left
-
-    def restore_si( self, units ):
-        self.sitracker.update_units_restore( units )
-        return self.items_left
-
-    def packaging( self ):
-        pack = 'Unknown'
-        try:
-            mypkg = self.stock_items()
-            pack = str( mypkg[0].packagename )
-        except:
-            pass
-        return pack
-
-    @property
-    def is_bulk( self ):
-        return self.packaging() == 'BULK'
-
-    def coi_code( self ):
-        stock_items_qs = self.stock_items()
-        if stock_items_qs.count() > 0:
-            return str( stock_items_qs[0].coi_code() )
-        else:
-            stock_items_qs = EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-                                                       si_code = self.si_code, 
-                                                       comm_category_code = self.comm_category_code 
-                                                       ).order_by( '-number_of_units' )
-            if stock_items_qs.count() > 0:
-                return str( stock_items_qs[0].coi_code() )
-            else:
-                stock_items_qs = EpicStock.objects.filter( si_code = self.si_code, 
-                                                           comm_category_code = self.comm_category_code 
-                                                           ).order_by( '-number_of_units' )
-                if stock_items_qs.count() > 0:
-                    return str( stock_items_qs[0].coi_code() )
-                else:
-                    return 'No Stock '
-
-    #===================================================================================================================
-    # def related_stock( self ):
-    #    return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-    #                                     si_code = self.si_code, 
-    #                                     commodity_code = self.commodity_code 
-    #                                     ).order_by( '-number_of_units' )
-    #===================================================================================================================
-
-    def remove_lti( self ):
-        all_removed = RemovedLtis.objects.all()
-        this_lti = RemovedLtis()
-        this_lti.lti = self
-        if this_lti not in all_removed:
-            this_lti.save()
-
-    #===================================================================================================================
-    # def get_stocks( self ):
-    #    return EpicStock.objects.filter( wh_code = self.origin_wh_code, 
-    #                                     si_code = self.si_code, 
-    #                                     commodity_code = self.commodity_code )
-    #===================================================================================================================
-
-    @property
-    def total_stock( self ):
-        return self.stock_items().aggregate(units_count=Sum('number_of_units'))['units_count']
-    
-    
-
-#=======================================================================================================================
-# class RemovedLtisManager( models.Manager ):
-#        def list( self ):
-#            listExl = []
-#            listOfExcluded = RemovedLtis.objects.all()
-#            for exl in listOfExcluded:
-#                listExl += [exl.lti.lti_pk]
-#            return listExl
-#=======================================================================================================================
-
-class RemovedLtis( models.Model ):
-    lti = models.ForeignKey( LtiOriginal, primary_key = True )
-    #objects = RemovedLtisManager()
+    validated = models.BooleanField( _("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
+    sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
     
     class Meta:
-        db_table = u'waybill_removed_ltis'
+        ordering = ('slug',)
+        order_with_respect_to = 'waybill'
+        verbose_name = _("reception")
+        verbose_name_plural = _("reception")
     
-    def  __unicode__( self ):
-        return self.lti.lti_id
-
-class EpicPerson( models.Model ):
-    person_pk = models.CharField(_("person pk"), max_length = 20, blank = True, primary_key = True )
-    org_unit_code = models.CharField(_("org unit code"), max_length = 13 )
-    code = models.CharField(_("code"), max_length = 7 )
-    type_of_document = models.CharField(_("type of document"), max_length = 2, blank = True )
-    organization_id = models.CharField(_("organization id"), max_length = 12 )
-    last_name = models.CharField(_("last name"), max_length = 30 )
-    first_name = models.CharField(_("first name"), max_length = 25 )
-    title = models.CharField(_("title"), max_length = 50, blank = True )
-    document_number = models.CharField(_("document number"), max_length = 25, blank = True )
-    e_mail_address = models.CharField(_("e_mail address"), max_length = 100, blank = True )
-    mobile_phone_number = models.CharField(_("mobile phone number"), max_length = 20, blank = True )
-    official_tel_number = models.CharField(_("official tel number"), max_length = 20, blank = True )
-    fax_number = models.CharField(_("fax_number"), max_length = 20, blank = True )
-    effective_date = models.DateField(_("effective date"), null = True, blank = True )
-    expiry_date = models.DateField(_("expiry date "), null = True, blank = True )
-    location_code = models.CharField(_("location code"), max_length = 10 )
-
-    class Meta:
-        db_table = u'epic_persons'
-        verbose_name = 'COMPAS User'
-
-    def  __unicode__( self ):
-        return "%s, %s" % (self.last_name, self.first_name)
+    def __unicode__(self):
+        return "Reception of waybill: %s" % self.waybill
     
-    @classmethod
-    def update(cls):
+    def sign(self, commit=True):
         """
-        Executes Imports of LTIs Persons
+        Signs the waybill as delivered by setting special status DELIVERED. 
+        After this system sends it to central server.
         """
-    
-        for my_person in cls.objects.using( 'compas' ).filter( org_unit_code = COMPAS_STATION ):
-            my_person.save( using = 'default' )
-
-class StockManager( models.Manager ):
-    
-    def get_query_set( self ):
-        return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
-
-class EpicStock( models.Model ):
-    wh_pk = models.CharField(_("warehouse pk"), max_length = 90, blank = True, primary_key = True )
-    wh_regional = models.CharField(_("warehouse regional"), max_length = 4, blank = True )
-    wh_country = models.CharField(_("warehouse country"), max_length = 15 )
-    wh_location = models.CharField(_("warehouse location"), max_length = 30 )
-    wh_code = models.CharField(_("warehouse code"), max_length = 13 )
-    wh_name = models.CharField(_("warehouse name"), max_length = 50, blank = True )
-    project_wbs_element = models.CharField(_("Project wbs element"), max_length = 24, blank = True )
-    si_record_id = models.CharField(_("SI record id "), max_length = 25 )
-    si_code = models.CharField(_("SI code"), max_length = 8 )
-    origin_id = models.CharField(_("Origin id"), max_length = 23 )
-    comm_category_code = models.CharField(_("commodity category code"), max_length = 9 )
-    commodity_code = models.CharField(_("commodity code "), max_length = 18 )
-    cmmname = models.CharField(_("commodity name"), max_length = 100, blank = True )
-    package_code = models.CharField(_("Package code"), max_length = 17 )
-    packagename = models.CharField(_("Package name"), max_length = 50, blank = True )
-    qualitycode = models.CharField(_("Quality code"), max_length = 1 )
-    qualitydescr = models.CharField(_("Quality descr "), max_length = 11, blank = True )
-    quantity_net = models.DecimalField(_("Quantity net"), null = True, max_digits = 12, decimal_places = 3, blank = True )
-    quantity_gross = models.DecimalField(_("Quantity gross"), null = True, max_digits = 12, decimal_places = 3, blank = True )
-    number_of_units = models.IntegerField(_("Number of units"))
-    allocation_code = models.CharField(_("Allocation code"), max_length = 10 )
-    reference_number = models.CharField( _("Reference number"),max_length = 50 )
-    
-    objects = models.Manager()
-    in_stock_objects = StockManager()
-
-    class Meta:
-        db_table = u'epic_stock'
-
-    def  __unicode__( self ):
-        return "%s\t%s\t%s\t%s" % (self.wh_name, self.cmmname, self.number_of_units, self.coi_code())
-
-    def packaging_description_short( self ):
-        try:
-            return PackagingDescriptionShort.objects.get( pk = self.package_code ).packageShortName
-        except:
-            return self.packagename
+        self.signed_date = datetime.now()
         
-    def coi_code( self ):
-        return self.origin_id[7:]
-    
-    @classmethod    
-    def update(cls):
-        """
-        Executes Imports of Stock
-        """
-        originalStock = cls.objects.using( 'compas' )
-        for myrecord in originalStock:
-            myrecord.save( using = 'default' )
+        self.waybill.update_status(self.waybill.DELIVERED)
         
-        for item in cls.objects.all():
-            if item not in originalStock:
-                item.number_of_units = 0
-                item.save()
-
-class EpicLossDamages( models.Model ):
-    type = models.CharField(_("Type"), max_length = 1 )
-    comm_category_code = models.CharField(_("Comm category code"), max_length = 9 )
-    cause = models.CharField(_("Cause"), max_length = 100 )
-
-    class Meta:
-        db_table = u'epic_lossdamagereason'
-        verbose_name = 'Loss/Damages Reason'
+        if commit:
+            self.save()
     
-    def  __unicode__( self ):
-        cause = self.cause
-        length_c = len( cause ) - 10
-        if length_c > 20:
-            cause = "%s...%s" % (cause[0:20], cause[length_c:])
-        return cause
+    def clean(self):
+        """Validates Waybill instance. Checks different dates"""
     
-    @classmethod
-    def update(cls):
-        reasons = cls.objects.using( 'compas' ).all()
-        for myrecord in reasons:
-            myrecord.save( using = 'default' )
+        #===============================================================================================================
+        # if self.arrival_date \
+        # and self.arrival_date < self.waybill.dispatch_date:
+        #    raise ValidationError(_("Cargo arrived before being dispatched"))
+        #===============================================================================================================
 
+        if self.start_discharge_date and self.arrival_date \
+        and self.start_discharge_date < self.arrival_date:
+            raise ValidationError(_("Cargo Discharge started before Arrival?"))
 
-class LtiWithStock( models.Model ):
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
-                            instance.lti_line.pk, instance.stock_item.pk
-                         ), sep='', unique=True, primary_key=True)
+        if self.start_discharge_date and self.end_discharge_date \
+        and self.end_discharge_date < self.start_discharge_date:
+            raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
     
-    lti_line = models.ForeignKey( LtiOriginal, verbose_name = _("LTI Line"), related_name="ltistockrel" )
-    stock_item = models.ForeignKey( EpicStock, verbose_name = _("Stock Item"), related_name="ltistockrel")
-    lti_code = models.CharField(_("LTI Code"), max_length = 20, db_index = True )
+class LoadingDetail(models.Model):
+    """Loading details related to dispatch waybill"""
+    waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
-    def  __unicode__( self ):
-        item_name = u"%s - %s (%s)" % (self.coi_code(), self.stock_item.cmmname, self.lti_line.items_left)
-        return self.lti_line.valid() and item_name or 'Void %s' % item_name
-
-    def coi_code( self ):
-        return self.stock_item.coi_code()
-
-
-class LoadingDetail( models.Model ):
-    wbNumber = models.ForeignKey( Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
-    slug = AutoSlugField(populate_from='wbNumber', unique=True, sep='', primary_key=True)
+    #Stock data
+    stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-    order_item = models.ForeignKey( LtiWithStock, verbose_name =_("Order item"), related_name="loading_details" )
-    numberUnitsLoaded = models.DecimalField(_("number Units Loaded"), default = 0, blank = False, 
-                                            null = False, max_digits = 10, decimal_places = 3 )
-    numberUnitsGood = models.DecimalField(_("number Units Good"), default = 0, blank = True, 
-                                          null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsLost = models.DecimalField(_("number Units Lost"), default = 0, blank = True, 
-                                          null = True, max_digits = 10, decimal_places = 3 )
-    numberUnitsDamaged = models.DecimalField(_("number Units Damaged"), default = 0, blank = True, 
-                                             null = True, max_digits = 10, decimal_places = 3 )
-    unitsLostReason = models.ForeignKey( EpicLossDamages, verbose_name = _("units Lost Reason"), 
-                                         related_name = 'LD_LostReason', blank = True, null = True )
-    unitsDamagedReason = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Reason"), 
-                                            related_name = 'LD_DamagedReason', blank = True, null = True )
-    unitsDamagedType = models.ForeignKey( EpicLossDamages,verbose_name = _("units Damaged Type"),
-                                          related_name = 'LD_DamagedType', blank = True, null = True )
-    unitsLostType = models.ForeignKey( EpicLossDamages,verbose_name = _("units LostType "), 
-                                       related_name = 'LD_LossType', blank = True, null = True )
-    overloadedUnits = models.BooleanField(_("overloaded Units"))
-    loadingDetailSentToCompas = models.BooleanField(_("loading Detail Sent to Compas "))
-    overOffloadUnits = models.BooleanField(_("over offloaded Units"))
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+
+    #Number of delivered units
+    number_units_good = models.DecimalField(_("number Units Good"), default=0, 
+                                            max_digits=10, decimal_places=3) #numberUnitsGood
+    number_units_lost = models.DecimalField(_("number Units Lost"), default=0, 
+                                            max_digits=10, decimal_places=3 ) #numberUnitsLost
+    number_units_damaged = models.DecimalField(_("number Units Damaged"), default=0, 
+                                               max_digits=10, decimal_places=3 ) #numberUnitsDamaged
+    
+    #Reasons
+    units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("Lost Reason"), 
+                                           related_name='lost_reason', #LD_LostReason 
+                                           blank=True, null=True,
+                                           limit_choices_to={'type': LossDamageType.LOSS}) #unitsLostReason
+    units_damaged_reason = models.ForeignKey( LossDamageType, verbose_name=_("Damaged Reason"), 
+                                            related_name='damage_reason', #LD_DamagedReason 
+                                            blank=True, null=True,
+                                            limit_choices_to={'type': LossDamageType.DAMAGE}) #unitsDamagedReason
+    
+    overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
+    sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
+    over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
     audit_log = AuditLog()
 
-    def check_stock( self ):
-        stock = self.order_item.stock_item
-        if self.order_item.lti_line.is_bulk:
-            if self.numberUnitsLoaded <= stock.quantity_net:
-                return True
-        else:
-            if self.numberUnitsLoaded <= stock.number_of_units :
-                return True
-        
-        return False
+    class Meta:
+        ordering = ('slug',)
+        order_with_respect_to = 'waybill'
+        verbose_name = _("loading detail")
+        verbose_name_plural = _("waybill items")
+        unique_together = ('waybill', 'stock_item')
 
-    def check_receipt_item( self ):
-        return True
+
+#=======================================================================================================================
+#    def check_stock( self ):
+#        stock = self.order_item.stock_item
+#        if self.order_item.lti_line.is_bulk:
+#            if self.numberUnitsLoaded <= stock.quantity_net:
+#                return True
+#        else:
+#            if self.numberUnitsLoaded <= stock.number_of_units :
+#                return True
+#        
+#        return False
+# 
+#    def check_receipt_item( self ):
+#        return True
+#=======================================================================================================================
     
-    def get_stock_item( self ):
-        return EpicStock.objects.get( pk = self.order_item.stock_item.pk )
-
     def calculate_total_net( self ):
-        return ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_net ) / 1000
+        return ( self.number_of_units * self.unit_weight_net ) / 1000
 
     def calculate_total_gross( self ):
-        return ( self.numberUnitsLoaded * self.order_item.lti_line.unit_weight_gross ) / 1000
+        return ( self.number_of_units * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_good( self ):
-        return ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_net ) / 1000
+        return ( self.number_units_good * self.unit_weight_net ) / 1000
 
-    #===============================================================================================================
-    # def calculate_gross_received_good( self ):
-    #    return ( self.numberUnitsGood * self.order_item.lti_line.unit_weight_gross ) / 1000
-    #===============================================================================================================
+    def calculate_gross_received_good( self ):
+        return ( self.number_units_good * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_damaged( self ):
-        return ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_net ) / 1000
+        return ( self.number_units_damaged * self.unit_weight_net ) / 1000
 
-    #===============================================================================================================
-    # def calculate_gross_received_damaged( self ):
-    #    return ( self.numberUnitsDamaged * self.order_item.lti_line.unit_weight_gross ) / 1000
-    #===============================================================================================================
+    def calculate_gross_received_damaged( self ):
+        return ( self.number_units_damaged * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_lost( self ):
-        return ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_net ) / 1000
+        return ( self.number_units_lost * self.unit_weight_net ) / 1000
 
-    #===============================================================================================================
-    # def calculate_gross_received_lost( self ):
-    #    return ( self.numberUnitsLost * self.order_item.lti_line.unit_weight_gross ) / 1000
-    #===============================================================================================================
-
+    def calculate_gross_received_lost( self ):
+        return ( self.number_units_lost * self.unit_weight_gross ) / 1000
+    
     def calculate_total_received_units( self ):
-        return self.numberUnitsGood + self.numberUnitsDamaged
+        return self.number_units_good + self.number_units_damaged
 
     def calculate_total_received_net( self ):
         return self.calculate_net_received_good() + self.calculate_net_received_damaged()
-
-    @property
-    def invalid( self ):
-        return self.wbNumber.invalidated
-
-    def  __unicode__( self ):
-        return "%s - %s - %s" % (self.wbNumber.mydesc(), self.order_item.stock_item, self.order_item.lti_code) #.mydesc() + ' - ' + self.order_item.stock_item.lti_pk
-
-class DispatchPoint( models.Model ):
-    origin_loc_name = models.CharField(_("Origin loc name"),  max_length = 40, blank = True )
-    origin_location_code = models.CharField(_("Origin location code"),  max_length = 40, blank = True )
-    origin_wh_code = models.CharField(_("Origin warehouse code"), max_length = 40, blank = True )
-    origin_wh_name = models.CharField(_("Origin warehouse name"),  max_length = 80, blank = True )
-    ACTIVE_START_DATE = models.DateField(_("ACTIVE START DATE"), null = True, blank = True )
-
-    class Meta:
-        verbose_name = _('Dispatch Warehouse')
-        
-    def  __unicode__( self ):
-        return "%s - %s - %s" % (self.origin_wh_code, self.origin_loc_name, self.origin_wh_name)
-    
-    def serialize(self):
-        #wh = DispatchPoint.objects.get( id = warehouse )
-        return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
-                                            + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
-
-class ReceptionPoint( models.Model ):
-    LOC_NAME = models.CharField(_('Location Name'), max_length = 40, blank = True )
-    LOCATION_CODE = models.CharField(_('Location Code'), max_length = 40, blank = True )
-    consegnee_code = models.CharField(_("consegnee code"), 'Consengee Code', max_length = 40, blank = True )
-    consegnee_name = models.CharField(_("Consegnee name"), 'Consengee Name', max_length = 80, blank = True )
-    #DESC_NAME = models.CharField(max_length = 80, blank = True)
-    ACTIVE_START_DATE = models.DateField( null = True, blank = True )
     
     def  __unicode__( self ):
-        return "%s - %s" % (self.LOC_NAME, self.consegnee_name)
-        
-    class Meta:
-        ordering = ('LOC_NAME', 'consegnee_name')
-        verbose_name = _('Reception Warehouse')
-
-class UserProfile( models.Model ):
-    user = models.ForeignKey( User, unique = True, primary_key = True )#OneToOneField(User, primary_key = True)
-    warehouses = models.ForeignKey( DispatchPoint, verbose_name=_("Dispatch Warehouse"), blank = True, null = True)
-    receptionPoints = models.ForeignKey( ReceptionPoint, verbose_name=_("Reception Points"), blank = True, null = True )
-    isCompasUser = models.BooleanField(_('Is Compas User'))
-    isDispatcher = models.BooleanField(_("Is Dispatcher"))
-    isReciever = models.BooleanField(_("Is Reciever"))
-    isAllReceiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') )
-    compasUser = models.ForeignKey( EpicPerson, verbose_name = _('Use this Compas User'), 
-                                    related_name="profiles",
-                                    help_text = _('Select the corrisponding user from Compas'), 
-                                    blank = True, null = True)
-    superUser = models.BooleanField(_("Super User"), help_text = _('This user has Full Privileges to edit Waybills even after Signatures'))
-    readerUser = models.BooleanField(_( 'Readonly User' ))
-
-    audit_log = AuditLog()
+        return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
     
-    def __unicode__( self ):
-        if self.user.first_name and self.user.last_name:
-            return "%s %s's profile (%s)" % ( self.user.first_name, self.user.last_name, self.user.username )
-        else:
-            return "%s's profile" % self.user.username
-
-
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        UserProfile.objects.create(user=instance)
-
-post_save.connect(create_user_profile, sender=User)
-
-#=======================================================================================================================
-# User.profile = property( lambda u: UserProfile.objects.get_or_create( user = u )[0] )
-#=======================================================================================================================
-
-
-class SiTracker( models.Model ):
-    LTI = models.OneToOneField(LtiOriginal, verbose_name=_("LTI"), primary_key = True, related_name="sitracker" )
-    number_units_left = models.DecimalField(_("Number units left"), decimal_places = 3, max_digits = 10 )
-    number_units_start = models.DecimalField(_("Number units start"), decimal_places = 3, max_digits = 10 )
-
-    def update_units( self, ammount ):
-        self.number_units_left -= ammount
-        self.save()
+    def clean(self):
+        #Clean units_lost_reason
+        if self.number_units_lost:
+            if not self.units_lost_reason:
+                raise ValidationError(_("You must provide a loss reason"))
         
-    def update_units_restore( self, ammount ):
-        self.number_units_left += ammount
-        self.save()
+        #Clean units_damaged_reason
+        if self.number_units_damaged:
+            if not self.units_damaged_reason:
+                raise ValidationError(_("You must provide a damaged reason"))
         
-    def  __unicode__( self ):
-        return self.number_units_left
-
-class PackagingDescriptionShort( models.Model ):
-    packageCode = models.CharField(_("Package Code"), primary_key = True, max_length = 5 )
-    packageShortName = models.CharField(_("Package Short Name"), max_length = 10 )
-    
-    def  __unicode__( self ):
-        return "%s - %s" % (self.packageCode, self.packageShortName)
-
+        #clean number of items
+        if self.number_of_units \
+        and (self.number_units_good or self.number_units_damaged or self.number_units_lost) \
+        and (self.number_of_units != self.number_units_good + self.number_units_damaged + self.number_units_lost):
+            raise ValidationError(_("%(loaded).3f Units loaded but %(offload).3f units accounted for") % {
+                    "loaded" : self.number_of_units, 
+                    "offload" : self.number_units_good + self.number_units_damaged + self.number_units_lost 
+            })
+            
+        #clean reasons
+        if self.units_damaged_reason and self.units_damaged_reason.comm_category_code != self.comm_category_code:
+            raise ValidationError(_("You have chosen wrong damaged reason for current commodity category"))
+        if self.units_lost_reason and self.units_lost_reason.comm_category_code != self.comm_category_code:
+            raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
+        
 
 class CompasLogger( models.Model ):
     timestamp = models.DateTimeField(_("Time stamp"), null = True, blank = True )
@@ -1051,29 +1101,6 @@ class CompasLogger( models.Model ):
     
     class Meta:
         db_table = u'loggercompas'
-
-class SIWithRestant:
-    SINumber = ''
-    StartAmount = 0.0
-    CurrentAmount = 0.0
-    CommodityName = ''
-    InStock = 0
-    COI_Code = ''
-
-    def __init__( self, SINumber, StartAmount, CommodityName ):
-        self.SINumber = SINumber
-        self.StartAmount = StartAmount
-        self.CurrentAmount = StartAmount
-        self.CommodityName = CommodityName
-
-    def reduce_current( self, reduce ):
-        self.CurrentAmount = self.CurrentAmount - reduce
-        
-    def get_current_amount( self ):
-        return self.CurrentAmount
-    
-    def get_start_amount( self ):
-        return self.StartAmount
 
 
 # TODO: Importing of old waybills....
@@ -1159,14 +1186,3 @@ class DispatchDetail( models.Model ):
     
     class Meta:
         db_table = u'dispatch_details'
-
-
-
-def sync_data(waybills):
-    load_details = LoadingDetail.objects.filter(wbNumber__in=waybills)
-    lti_stocks = LtiWithStock.objects.filter(loading_details__in=load_details)
-    stocks = EpicStock.objects.filter(ltistockrel__in=lti_stocks)
-    ltis = LtiOriginal.objects.filter(ltistockrel__in=lti_stocks)
-    places = Place.objects.filter(models.Q(dispatch_waybills__in=waybills) | models.Q(recipient_waybills__in=waybills))
-    
-    return chain(places, waybills, load_details, lti_stocks, stocks, ltis)
