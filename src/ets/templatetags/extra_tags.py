@@ -154,7 +154,7 @@ def waybill_reception(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_creation(order, user):
     text = "Create"
-    if user.get_profile().compas_person.warehouse == order.warehouse:
+    if user.get_profile().get_warehouses() == order.warehouse:
         success = True
     else:
         success = False

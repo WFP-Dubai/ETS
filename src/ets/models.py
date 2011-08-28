@@ -255,6 +255,10 @@ class Person(models.Model):
     def __unicode__(self):
         return "%s %s" % (self.code, self.title)
 
+    def get_warehouses(self):
+        return Warehouse.objects.filter(Q(compas=self.compas) | Q (organization=self.organization) \
+                                        |Q(location=self.location))
+        
 
 class EpicStock( models.Model ):
     """COMPAS stock. We retrieve it from Oracle database view."""

@@ -186,7 +186,6 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         waybill.order_code = order.pk
         waybill.project_number = order.project_number
         waybill.transport_name = order.transport_name
-        waybill.warehouse = order.warehouse
         waybill.dispatcher_person = request.user.get_profile().compas_person
         waybill.save()
         

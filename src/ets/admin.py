@@ -90,8 +90,7 @@ class LoadingDetailsInline(admin.TabularInline):
     extra = 0
     
     fieldsets = (
-        (_("Stock"), {'fields': ('origin_id', 'si_code', 'comm_category_code', 'commodity_code', 'commodity_name', 
-                                 'package', 'unit_weight_net', 'unit_weight_gross',)}),
+        (_("Stock"), {'fields': ('stock_item',)}),
         (_('Loading details'), {'fields': ('number_of_units', 'overloaded_units')}),
         (_('Receipt details'), {'fields': ('number_units_good', 'number_units_lost', 'number_units_damaged', 
                                            'units_lost_reason', 'units_damaged_reason')}),
@@ -141,7 +140,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     )
     
     list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date', 
-                    'warehouse', 'destination', 'active')
+                    'destination', 'active')
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
     list_filter = ('status', 'date_created',)
@@ -230,9 +229,8 @@ class CompasAdmin(admin.ModelAdmin):
     list_display = ('pk',)
     search_fields = list_display
     inlines = (WarehouseInline, PersonInline)
-    list_filter = ('country',)
 
-admin.site.register( ets.models.Location, LocationAdmin )
+admin.site.register( ets.models.Compas, CompasAdmin )
 
 
 class PackagingDescriptonShortAdmin( admin.ModelAdmin ):

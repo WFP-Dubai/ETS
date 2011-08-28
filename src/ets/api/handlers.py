@@ -19,7 +19,7 @@ from piston.handler import BaseHandler
 from piston.utils import rc
 from piston.emitters import Emitter, DjangoEmitter
 
-from ..models import Waybill, Warehouse, sync_data
+from ..models import Waybill, Warehouse
 import ets.models
 
 

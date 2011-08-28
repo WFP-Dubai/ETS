@@ -45,8 +45,7 @@ urlpatterns = patterns("ets.views",
     ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create_or_update", {}, "waybill_create" ),
     ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_create_or_update", {
         'template': 'waybill/edit.html',
-        'waybill_queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED,
-                                                      warehouse__pk=COMPAS_STATION)
+        'waybill_queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED)
     }, "waybill_edit" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
@@ -56,7 +55,7 @@ urlpatterns = patterns("ets.views",
     
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
-        'queryset': Waybill.objects.filter(status=Waybill.NEW, warehouse__pk=COMPAS_STATION),
+        'queryset': Waybill.objects.filter(status=Waybill.NEW),
     }, "waybill_finalize_dispatch" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
@@ -81,8 +80,7 @@ urlpatterns = patterns("ets.views",
         'template': 'validate/dispatch.html',
         'formset_model': ets.models.Waybill,
         'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
-                                   status__gte=ets.models.Waybill.SIGNED,
-                                   warehouse=settings.COMPAS_STATION),
+                                   status__gte=ets.models.Waybill.SIGNED),
     }, "waybill_validate_dispatch_form" ),
     ( r'^validate_receipt_form/$', "waybill_validate", {
         'template': 'validate/receipt.html',
