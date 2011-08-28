@@ -29,7 +29,6 @@ DEFAULT_TIMEOUT = 10
 API_DOMAIN = "http://localhost:8000"
 BULK_NAME = "BULK"
 
-COMPAS_STATION = getattr(settings, 'COMPAS_STATION', None)
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 
 # like a normal ForeignKey.
@@ -78,9 +77,10 @@ class Place( models.Model ):
         return self.name
 
     @classmethod
-    def update(cls):
+    def update(cls, compas):
         """Executes Imports of Place"""
-        for place in cls.objects.using( 'compas' ).filter( country_code__in = settings.COUNTRIES ):
+        for place in cls.objects.using(compas).filter(country_code__in = settings.COUNTRIES,
+                                                      reporting_code=compas):
             
             #Create location
             location = Location.objects.get_or_create(code=place.geo_point_code, defaults={
@@ -92,15 +92,12 @@ class Place( models.Model ):
             organization = Organization.objects.get_or_create(code=place.organization_id)[0]\
                             if place.organization_id else None
             
-            #Compas station
-            compas = Compas.objects.get_or_create(code=place.reporting_code)[0]
-            
             #Update warehouse
             defaults = {
                 'name': place.name,
                 'location': location,
                 'organization': organization,
-                'compas': compas,
+                'compas': Compas.objects.get(pk=place.reporting_code),
             }
             
             rows = Warehouse.objects.filter(code=place.org_code).update(**defaults)
@@ -114,7 +111,22 @@ class Compas(models.Model):
     code = models.CharField(_("Station code"), max_length=7, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
     
-
+    #Database settings
+    db_engine = models.CharField(_("Database engine"), max_length=100)
+    db_name = models.CharField(_("Database name"), max_length=100)
+    db_user = models.CharField(_("Database user"), max_length=100, blank=True)
+    db_password = models.CharField(_("Database password"), max_length=100, blank=True)
+    db_host = models.CharField(_("Database host"), max_length=100, default='localhost')
+    db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
+    
+    class Meta:
+        ordering = ('code',)
+        verbose_name = _('Compas station')
+        verbose_name_plural = _("compases")
+        
+    def __unicode__(self):
+        return self.pk
+    
 class Location(models.Model):
     """Location model. City or region"""
     
@@ -208,8 +220,8 @@ class CompasPerson( models.Model ):
         return "%s, %s" % (self.last_name, self.first_name)
     
     @classmethod
-    def update(cls):
-        for person in cls.objects.using('compas').all():
+    def update(cls, compas):
+        for person in cls.objects.using(compas).filter(org_unit_code=compas):
             
             try:
                 person = Person.objects.get(pk=person.person_pk)
@@ -335,12 +347,12 @@ class EpicStock( models.Model ):
         return self.packagename == BULK_NAME and self.quantity_net
     
     @classmethod 
-    def update(cls):
+    def update(cls, using):
         """Executes Imports of Stock"""
         
         now = datetime.now()
         
-        for stock in cls.objects.using( 'compas' ):
+        for stock in cls.objects.using(using):
             
             #Create commodity's category
             category = CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
@@ -462,8 +474,8 @@ class LossDamageType(models.Model):
         return cause
     
     @classmethod
-    def update(cls):
-        for myrecord in cls.objects.using('compas').all():
+    def update(cls, using):
+        for myrecord in cls.objects.using(using).all():
             if not cls.objects.filter(type=myrecord.type, 
                                   category__pk=myrecord.category_id, 
                                   cause=myrecord.cause).count():
@@ -542,11 +554,11 @@ class LtiOriginal( models.Model ):
         #managed = False
     
     @classmethod
-    def update(cls):
+    def update(cls, using):
         """Imports all LTIs from COMPAS"""
         now = datetime.now()
 
-        original = cls.objects.using('compas').filter(requested_dispatch_date__gt = settings.MAX_DATE)
+        original = cls.objects.using(using).filter(requested_dispatch_date__gt = settings.MAX_DATE)
         if not settings.DISABLE_EXPIERED_LTI:
             original = original.filter( expiry_date__gt = now )
         
@@ -744,7 +756,7 @@ class Waybill( ld_models.Model ):
     )
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            COMPAS_STATION, instance.date_created.strftime('%y'), LETTER_CODE
+                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     

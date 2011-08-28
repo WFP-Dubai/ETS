@@ -8,36 +8,43 @@ import ets.models
 class CommandTestCase(TestCase):
     
     multi_db = True
-    fixtures = ('compas.json',)
+    compas = 'dev_compas'
     
+    def setUp(self):
+        "Hook method for setting up the test fixture before exercising it."
+        
+        call_command('loaddata', 'db_compas.json', verbosity=0, commit=False, database='default')
+        call_command('syncdb', migrate_all=True, verbosity=0, database=self.compas, interactive=False)
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
+        
     def test_sync_compas(self):
         
-        self.assertEqual(ets.models.Place.objects.using('compas').count(), 3)
+        self.assertEqual(ets.models.Compas.objects.count(), 1)
+        self.assertEqual(ets.models.Place.objects.using(self.compas).count(), 3)
         self.assertEqual(ets.models.Location.objects.count(), 0)
         self.assertEqual(ets.models.Warehouse.objects.count(), 0)
         self.assertEqual(ets.models.Organization.objects.count(), 0)
-        self.assertEqual(ets.models.Compas.objects.count(), 0)
         
-        call_command('sync_compas', nodelete=True)
+        call_command('sync_compas')
         
         """Test place's update method"""
         self.assertEqual(ets.models.Location.objects.count(), 2)
         self.assertEqual(ets.models.Warehouse.objects.count(), 3)
         self.assertEqual(ets.models.Organization.objects.count(), 1)
-        self.assertEqual(ets.models.Compas.objects.count(), 2)
+        self.assertEqual(ets.models.Compas.objects.count(), 1)
 
         wh = ets.models.Warehouse.objects.get(pk='ISBX002')
         self.assertTupleEqual((wh.organization, wh.location, wh.compas) , 
                               (ets.models.Organization.objects.get(pk='DOEAF'), 
                                ets.models.Location.objects.get(pk='ISBX'),
-                               ets.models.Compas.objects.get(pk='HQX0001'),))
+                               ets.models.Compas.objects.get(pk=self.compas),))
         
         #Persons
         person = ets.models.Person.objects.get(pk="ISBX0020000586")
         self.assertTupleEqual((person.organization, person.location, person.compas, person.user.username),
                               (ets.models.Organization.objects.get(pk='DOEAF'), 
                                ets.models.Location.objects.get(pk='ISBX'),
-                               ets.models.Compas.objects.get(pk='HQX0001'),
+                               ets.models.Compas.objects.get(pk=self.compas),
                                'ISBX0020000586'))
         
         #test loss and damage types. The same story. It's stupid :)
@@ -54,14 +61,14 @@ class CommandTestCase(TestCase):
         self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         
         #Update changed stock
-        ets.models.EpicStock.objects.using('compas').filter(origin_id='testme0124').update(quantity_net=700)
-        ets.models.EpicStock.update()
+        ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
+        ets.models.EpicStock.update(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 700)
         
         #Deleted stock
-        ets.models.EpicStock.objects.using('compas').filter(origin_id='testme0124').delete()
-        ets.models.EpicStock.update()
+        ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').delete()
+        ets.models.EpicStock.update(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)
         

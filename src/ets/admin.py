@@ -227,10 +227,9 @@ admin.site.register( ets.models.Location, LocationAdmin )
 
 
 class CompasAdmin(admin.ModelAdmin):
-    list_display = ('pk',)
+    list_display = ('pk')
     search_fields = list_display
     inlines = (WarehouseInline, PersonInline)
-    list_filter = ('country',)
 
 admin.site.register( ets.models.Location, LocationAdmin )
 
