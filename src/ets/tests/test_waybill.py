@@ -90,11 +90,6 @@ class WaybillTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
 
-        #Provide dispatch warehouse
-        response = self.client.get(reverse('orders', kwargs={'warehouse_pk': settings.COMPAS_STATION}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 1)
-    
     def test_order_detail(self):
         """Order's detail page"""
         response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))

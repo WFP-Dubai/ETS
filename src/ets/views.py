@@ -54,7 +54,7 @@ def officer_required(function=None, **kwargs):
 
 
 @login_required
-def order_list(request, warehouse_pk=None, template='order/list.html', 
+def order_list(request, template='order/list.html', 
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
@@ -65,9 +65,6 @@ def order_list(request, warehouse_pk=None, template='order/list.html',
     Shows the orders that are in a specific warehouse
     """
     
-    if warehouse_pk:
-        queryset = queryset.filter(warehouse__pk=warehouse_pk)
-        
     #TODO: Exclude delivered orders
     #===================================================================================================================
     # still_ltis = []
@@ -77,12 +74,7 @@ def order_list(request, warehouse_pk=None, template='order/list.html',
     #            still_ltis.append( lti )
     #===================================================================================================================
     
-    extra = {
-        'warehouse_pk': warehouse_pk,
-    }
-    apply_extra_context(extra_context or {}, extra)
-    
-    return object_list(request, queryset=queryset, template_name=template, extra_context=extra)
+    return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
 
 @login_required
 def waybill_view(request, waybill_pk, queryset, template):

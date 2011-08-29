@@ -226,7 +226,7 @@ admin.site.register( ets.models.Location, LocationAdmin )
 
 
 class CompasAdmin(admin.ModelAdmin):
-    list_display = ('pk')
+    list_display = ('pk',)
     search_fields = list_display
     inlines = (WarehouseInline, PersonInline)
 
@@ -234,8 +234,8 @@ admin.site.register( ets.models.Compas, CompasAdmin )
 
 
 class PackageAdmin( admin.ModelAdmin ):
-    list_display = ('pk', 'name',)
-    list_filter = ('code', 'name',)
+    list_display = ('code', 'name',)
+    list_filter = list_display
 
 admin.site.register( ets.models.Package, PackageAdmin )
 

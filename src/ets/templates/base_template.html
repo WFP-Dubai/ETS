@@ -2,7 +2,7 @@
 {% load i18n %}   
 <html lang="en">
 <head>
-  <title>{% trans "ETS" %} {% block title %}{{ section.title }}{% endblock %} - {{COMPAS_STATION}}</title>
+  <title>{% trans "ETS" %} {% block title %}{{ section.title }}{% endblock %}</title>
   
   {% block style %}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_page.css" media="screen"/>
@@ -22,7 +22,7 @@
 </head>
 <body OnKeyPress="return disableEnterKey(event)">
   <div class="header">
-    <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill - {{COMPAS_STATION}} {% endblocktrans %}</span>
+    <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill{% endblocktrans %}</span>
   </div>
   
   <div class="menu">

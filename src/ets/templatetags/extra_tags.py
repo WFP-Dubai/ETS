@@ -61,22 +61,6 @@ def truncatesmart( value, limit = 80 ):
     # Join the words and return
     return ' '.join( words ) + '...'
 
-@register.tag( name = "print_tag" )
-def do_print_tag( parser, token ):
-    return PrintTagNode()
-
-class PrintTagNode( template.Node ):
-    def render( self, context ):
-        #TODO: remove such try...except and prints
-        try:
-            logfile = 'tagfile.tag'
-            FILE = open( logfile )
-            the_date = FILE.read()
-            return '<br/><small>Latest COMPAS import from <b>' + settings.COMPAS_STATION + '</b>: ' + the_date[0:19] + '</small>'
-        except Exception as e:
-            print e
-            return ''
-
 #=======================================================================================================================
 # @register.tag
 # def waybill_edit( parser, token ):

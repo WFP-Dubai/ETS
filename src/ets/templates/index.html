@@ -8,14 +8,9 @@
 {% trans "Select an action" %}:
 <ul>
 
-  {% if myprofile.compas_person %}
-  <li><a href='{% url orders warehouse_pk=COMPAS_STATION %}'>{% trans "Create & Dispatch Waybill" %}</a></li>
-  {% endif %}
-  
-  {% if user.is_superuser %}
-  <li><a href='{% url orders %}'>{% trans "All Orders" %}</a></li>
-  {% endif %}
-  <li><a href='{% url view_stock warehouse_pk=COMPAS_STATION %}'>{% trans "View Stock" %}</a></li>
+  <li><a href='{% url orders %}'>{% trans "List Of Orders" %}</a></li>
+
+  <li><a href='{% url view_stock %}'>{% trans "View Stock" %}</a></li>
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
   
   {% if myprofile.officer %}
@@ -49,5 +44,4 @@
 
 </ul>
 
-{% print_tag %}
 {% endblock %}
