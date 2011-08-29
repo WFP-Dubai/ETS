@@ -88,7 +88,6 @@ def waybill_view(request, waybill_pk, queryset, template):
         'extra_lines': my_empty,
         'items': waybill.loading_details.select_related(),
         'items_count': waybill.loading_details.count(),
-        'editable': waybill.is_editable(request.user),
     })
 
 @login_required
@@ -180,7 +179,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         waybill.order = order
         waybill.project_number = order.project_number
         waybill.transport_name = order.transport_name
-        waybill.dispatcher_person = request.user.get_profile().compas_person
+        waybill.dispatcher_person = request.user.person
         waybill.save()
         
         for details in loading_formset.save(False):
@@ -243,7 +242,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     if form.is_valid() and loading_formset.is_valid():
         receipt = form.save(False)
         receipt.waybill = waybill
-        receipt.person = request.user.get_profile().compas_person
+        receipt.person = request.user.person
         receipt.save()
         
         loading_formset.save(True)
