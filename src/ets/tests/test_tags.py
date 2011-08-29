@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 import ets.models
 from ets.utils import update_compas
-from ets.templatetags.extra_tags import waybill_edit, waybill_reception, waybill_creation
+from ets.templatetags.extra_tags import waybill_edit, waybill_reception, waybill_creation, waybill_delete
 
 class TagsTestCase(TestCase):
     
@@ -38,4 +38,9 @@ class TagsTestCase(TestCase):
     def test_waybill_creation(self):
         """Checks methods compress of waybill instance"""
         data = waybill_creation(self.order, self.user)
+        self.assertTrue(data['success'])
+        
+    def test_waybill_delete(self):
+        """Checks methods compress of waybill instance"""
+        data = waybill_delete(self.waybill, self.user)
         self.assertTrue(data['success'])

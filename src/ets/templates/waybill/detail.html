@@ -26,11 +26,7 @@
       name="Print Original" id='Print1' value='Print Original' />
   </form>
 
-  <form action="{% url waybill_delete waybill_pk=object.pk redirect_to='index' %}" 
-    class="the_forms" name="deletewaybill" id="deletewaybill" method="get"
-  >
-    <input type="submit" name="Delete Waybill" id='Delete' value='Delete Waybill' />
-  </form>
+  {% waybill_edit object user %}
 
 
 {% if 'create' in request.META.HTTP_REFERER %}

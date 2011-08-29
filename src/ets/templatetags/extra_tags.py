@@ -111,7 +111,7 @@ def truncatesmart( value, limit = 80 ):
 
 
 @register.inclusion_tag('tags/give_link.html')
-def waybill_edit(waybill, user):
+def waybill_edit(waybill, user, text=""):
     text = "Edit"
     warehouses = Warehouse.filter_by_user(user)
     if warehouses.filter(pk=waybill.order.warehouse.pk).count():
@@ -151,3 +151,18 @@ def waybill_creation(order, user):
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
             'success': success,
     }
+    
+@register.inclusion_tag('tags/give_link.html')
+def waybill_delete(waybill, user, text=""):
+    text = "Delete"
+    warehouses = Warehouse.filter_by_user(user)
+    if warehouses.filter(pk=waybill.order.warehouse.pk).count():
+        success = True
+    else:
+        success = False
+    return { 
+            'text': text,
+            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
+            'success': success,
+    }
+    
