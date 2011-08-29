@@ -23,11 +23,11 @@
   
   {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-        <td>{{waybill.order_code}}</td>
-        <td>{{waybill.pk}}</td>
-        <td>{{waybill.warehouse.location}}</td>
-        <td>{{ waybill.warehouse.organization }}</td>
-        <td>{{waybill.destination.location}}</td>
+        <td>{{ waybill.order.pk }}</td>
+        <td>{{ waybill.pk }}</td>
+        <td>{{ waybill.order.warehouse.location }}</td>
+        <td>{{ waybill.order.warehouse.organization }}</td>
+        <td>{{ waybill.destination.location }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date }}

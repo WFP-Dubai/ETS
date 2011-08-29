@@ -128,20 +128,20 @@ class PrintTagNode( template.Node ):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_edit(waybill, user):
     text = "Edit"
-    if user.get_profile().compas_person.warehouse == waybill.warehouse:
+    if user.get_profile().get_warehouses().filter(pk=waybill.order.warehouse.pk).count():
         success = True
     else:
         success = False
     return { 
             'text': text,
-            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order_code }),
+            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
             'success': success,
     }
 
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user):
     text = "Recept"
-    if user.get_profile().compas_person.warehouse == waybill.destination:
+    if user.get_profile().get_warehouses().filter(pk=waybill.destination.pk).count():
         success = True
     else:
         success = False
@@ -154,7 +154,7 @@ def waybill_reception(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_creation(order, user):
     text = "Create"
-    if user.get_profile().compas_person.warehouse == order.warehouse:
+    if user.get_profile().get_warehouses().filter(pk=order.warehouse.pk).count():
         success = True
     else:
         success = False
