@@ -220,8 +220,14 @@ class DatabasesFormDatabase(object):
         self.default_db = default
     
     def get_compases(self):
-        from django.db.models.loading import get_model
-        return get_model(app_label='ets', model_name='Compas').objects.using(self.default)
+        try:
+            #Check applications aren't initialized yet
+            from django.db.models.loading import get_model
+            Compas = get_model(app_label='ets', model_name='Compas')
+        except ImportError:
+            return ()
+        else:
+            return Compas.objects.using(self.default)
     
     def __getitem__(self, alias):
         if alias != self.default:
@@ -244,7 +250,10 @@ class DatabasesFormDatabase(object):
             return self.default_db
     
     def items(self):
-        return ( (self.default, self.default_db), )
+        return ( (self.default, self.default_db), ) \
+            + tuple((compas.pk, self[compas.pk]) for compas in self.get_compases())
+        
+            
     
     def __iter__(self):
         yield self.default

@@ -40,17 +40,13 @@ def prep_req( request ):
 
     return {'user': request.user}
 
-def superuser_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: u.is_superuser, **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
-
-def officer_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
+#=======================================================================================================================
+# def officer_required(function=None, **kwargs):
+#    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
+#    if function:
+#        return actual_decorator(function)
+#    return actual_decorator
+#=======================================================================================================================
 
 
 @login_required
@@ -116,7 +112,7 @@ def waybill_search( request, form_class=WaybillSearchForm,
                     queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
 
-    form = form_class(request.POST or None)
+    form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
     queryset = queryset.filter(pk__icontains=search_string)
     
@@ -463,7 +459,6 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-@officer_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
