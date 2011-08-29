@@ -54,7 +54,7 @@ def officer_required(function=None, **kwargs):
 
 
 @login_required
-def order_list(request, template='order/list.html', 
+def order_list(request, warehouse="", template='order/list.html', 
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
@@ -64,6 +64,12 @@ def order_list(request, template='order/list.html',
     URL: /orders/{{ warehouse }}/
     Shows the orders that are in a specific warehouse
     """
+    if warehouse:
+        warehouse = get_object_or_404(queryset, pk = warehouse)
+        queryset.filter(warehouse=warehouse)
+    
+    warehouses = ets.models.Warehouse.filter_by_user(request.user)
+    queryset = queryset.filter(warehouse__in=warehouses)
     
     #TODO: Exclude delivered orders
     #===================================================================================================================
