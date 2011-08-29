@@ -1,17 +1,38 @@
 from datetime import datetime
 
 from django.db import connections
+from django.db.utils import DatabaseError
 
 import models as ets_models
 
 
 def update_compas(using):
     
+    #send_dispatched(using)
+    #send_received(using)
+    
+    #Update places
+    ets_models.Place.update(using)
+    
+    #Update persons
+    ets_models.CompasPerson.update(using)
+    
+    #Update stocks
+    ets_models.EpicStock.update(using)
+    
+    #Update loss/damage types
+    ets_models.LossDamageType.update(using)
+    
+    #Update orders
+    ets_models.LtiOriginal.update(using)
+
+
+def send_dispatched(using):
+    connection = connections[using]
+    cursor = connection.cursor()
     for waybill in ets_models.Waybill.objects.filter(transport_dispach_signed_date__lte=datetime.now(), 
                                                      validated=True, sent_compas=False):
         try:
-            connection = connections[using]
-            cursor = connection.cursor()
             #===========================================================================================================
             # self.ErrorMessages = u''
             # self.ErrorCodes = u''
@@ -25,7 +46,7 @@ def update_compas(using):
 
             ## check if containers = 2 & lines = 2
             twoCont = loading_details.count() == 2 and waybill.container_two_number
-            #db.begin()
+            #connecion.begin()
             codeLetter = u'A'
 
             for index, loading in enumerate( loading_details ):
@@ -108,7 +129,7 @@ def update_compas(using):
             cursor.close()
             db.close()
             return all_ok
-        except cx_Oracle.DatabaseError, e:
+        except DatabaseError, e:
             errorObj, = e.args
             if errorObj.code == 12514:
                 print 'Issue with Connection' + str( errorObj.code )
@@ -116,35 +137,18 @@ def update_compas(using):
                 return False
             else:
                 print 'Issue with data1'
-                the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
-                self.ErrorMessages = _("Problem with data of Waybill  %(waybill)s: %(errorcode)s \n") % {"waybill": the_waybill,"errorcode": errorObj.code }
+                self.ErrorMessages = _("Problem with data of Waybill  %(waybill)s: %(errorcode)s \n") % {"waybill": waybill,"errorcode": errorObj.code }
                 return False
         except Exception as e:
             print 'Issue with data2'
             print self.ErrorMessages
             
-            the_waybill = ets_models.Waybill.objects.get( id = waybill_pk )
-            
-            self.ErrorMessages = _("Problem with data of Waybill %(waybill)s \n %(errormsg)s") % { "waybill": the_waybill, "errormsg":self.ErrorMessages }
+            self.ErrorMessages = _("Problem with data of Waybill %(waybill)s \n %(errormsg)s") % { "waybill": waybill, "errormsg": self.ErrorMessages }
             
             return False
-    
+
+
+def send_received(using):
     for reception in ets_models.ReceiptWaybill.objects.filter(signed_date__lte=datetime.now(), 
                                                             validated=True, sent_compas=False):
             pass
-    
-    #Update places
-    ets_models.Place.update(using)
-    
-    #Update persons
-    ets_models.CompasPerson.update(using)
-    
-    #Update stocks
-    ets_models.EpicStock.update(using)
-    
-    #Update loss/damage types
-    ets_models.LossDamageType.update(using)
-    
-    #Update orders
-    ets_models.LtiOriginal.update(using)
-    
