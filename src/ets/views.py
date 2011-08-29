@@ -26,7 +26,7 @@ from django.contrib.auth.decorators import user_passes_test
 
 from uni_form.helpers import FormHelper, Layout, HTML, Row
 
-from ets.compas import compas_write
+#from ets.compas import compas_write
 from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
 from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
