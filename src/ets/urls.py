@@ -13,12 +13,6 @@ from ets.forms import WaybillSearchForm
 from ets.models import Waybill
 import ets.models
 
-COMPAS_STATION = getattr(settings, "COMPAS_STATION", '')
-
-#databrowse.site.register( Waybill )
-#databrowse.site.register( EpicStock )
-#databrowse.site.register( LtiOriginal )
-
 info_dict_waybill = {
     'queryset': Waybill.objects.all()
 }
@@ -63,17 +57,16 @@ urlpatterns = patterns("ets.views",
     
     #Reception pages
     ( r'^receive/$', "waybill_search", {
-        "queryset": Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
+        "queryset": Waybill.objects.filter(status=Waybill.INFORMED)#, destination__pk=COMPAS_STATION),
     }, "waybill_reception_list" ),
     
     ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
-       'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED), 
-                                          destination__pk=COMPAS_STATION),
+       'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED))#,destination__pk=COMPAS_STATION),
     }, "waybill_reception"),
                        
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
-        'queryset': Waybill.objects.filter(status=Waybill.INFORMED, destination__pk=COMPAS_STATION),
+        'queryset': Waybill.objects.filter(status=Waybill.INFORMED)#, destination__pk=COMPAS_STATION),
     }, "waybill_finalize_receipt" ),
     
     ( r'^validate_dispatch/$', "waybill_validate", {
@@ -86,8 +79,7 @@ urlpatterns = patterns("ets.views",
         'template': 'validate/receipt.html',
         'formset_model': ets.models.ReceiptWaybill,
         'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
-                                   waybill__status__gte=ets.models.Waybill.DELIVERED,
-                                   waybill__destination=settings.COMPAS_STATION),
+                                   waybill__status__gte=ets.models.Waybill.DELIVERED)#,waybill__destination=settings.COMPAS_STATION),
     }, "waybill_validate_receipt_form" ),
                        
     ( r'^validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
