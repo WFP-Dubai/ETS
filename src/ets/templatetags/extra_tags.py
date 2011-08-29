@@ -4,6 +4,7 @@ from django import template
 from django.core.urlresolvers import reverse
 
 from ets import settings
+from ets.models import Warehouse
 
 register = template.Library()
 # Sample
@@ -112,7 +113,8 @@ def truncatesmart( value, limit = 80 ):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_edit(waybill, user):
     text = "Edit"
-    if user.get_profile().get_warehouses().filter(pk=waybill.order.warehouse.pk).count():
+    warehouses = Warehouse.filter_by_user(user)
+    if warehouses.filter(pk=waybill.order.warehouse.pk).count():
         success = True
     else:
         success = False
@@ -125,7 +127,8 @@ def waybill_edit(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user):
     text = "Recept"
-    if user.get_profile().get_warehouses().filter(pk=waybill.destination.pk).count():
+    warehouses = Warehouse.filter_by_user(user)
+    if warehouses.filter(pk=waybill.destination.pk).count():
         success = True
     else:
         success = False
@@ -138,7 +141,8 @@ def waybill_reception(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_creation(order, user):
     text = "Create"
-    if user.get_profile().get_warehouses().filter(pk=order.warehouse.pk).count():
+    warehouses = Warehouse.filter_by_user(user)
+    if warehouses.filter(pk=order.warehouse.pk).count():
         success = True
     else:
         success = False

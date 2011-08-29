@@ -68,8 +68,6 @@ LANGUAGES = (
     ('en', ugettext('English')),
 )
 
-AUTH_PROFILE_MODULE = 'ets.Person'
-
 USE_I18N = True
 USE_L10N = True
 

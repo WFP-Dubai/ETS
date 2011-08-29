@@ -185,6 +185,12 @@ class Warehouse(models.Model):
         
         return objects
     
+    @classmethod
+    def filter_by_user(cls, user):
+        return cls.objects.filter(location__persons__user=user, organization__persons__user=user,\
+                                  compas__persons__user=user)
+
+    
     #===================================================================================================================
     # def serialize(self):
     #    #wh = DispatchPoint.objects.get( id = warehouse )
@@ -642,9 +648,6 @@ class Order(models.Model):
     def get_absolute_url(self):
         return ('order_detail', (), {'object_id': self.pk})
     
-    def get_waybills(self):
-        return Waybill.objects.filter(order=self)
-    
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         return StockItem.objects.filter(warehouse__orders=self,
@@ -820,11 +823,7 @@ class Waybill( ld_models.Model ):
     @models.permalink
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
-    
-    def is_editable(self, user):
-        return self.status < self.SIGNED and \
-            not user.get_profile().get_warehouses().filter(pk=self.order.warehouse.pk).count()
-    
+
     #===================================================================================================================
     # def errors(self):
     #    try:

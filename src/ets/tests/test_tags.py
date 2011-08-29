@@ -10,12 +10,15 @@ from ets.templatetags.extra_tags import waybill_edit, waybill_reception, waybill
 class TagsTestCase(TestCase):
     
     multi_db = True
+    compas = 'dev_compas'
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         
-        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
-        update_compas()
+        call_command('loaddata', 'db_compas.json', verbosity=0, commit=False, database='default')
+        call_command('syncdb', migrate_all=True, verbosity=0, database=self.compas, interactive=False)
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
+        update_compas(self.compas)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
         
         self.user = User.objects.get(username="admin")
