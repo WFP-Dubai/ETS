@@ -20,7 +20,7 @@
   <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
   
   <li>
-    <form method='POST' action='{% url waybill_search %}'>
+    <form method='GET' action='{% url waybill_search %}'>
       {{ form.as_p }}
       <input type="submit" value="{% trans 'Search Waybill' %}">
     </form>

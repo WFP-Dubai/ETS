@@ -106,7 +106,7 @@ def waybill_search( request, form_class=WaybillSearchForm,
                     queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
 
-    form = form_class(request.POST or None)
+    form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
     queryset = queryset.filter(pk__icontains=search_string)
     
