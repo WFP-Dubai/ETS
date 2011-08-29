@@ -70,8 +70,8 @@ class ModelAdminWithForeignKeyLinksMetaclass(MediaDefiningClass):
 
         def foreign_key_link(instance, field):
             target = getattr(instance, field)
-            return u'<a href="../../%s/%s/%d">%s</a>' % (
-                target._meta.app_label, target._meta.module_name, target.id, unicode(target))
+            return u'<a href="../../%s/%s/%s">%s</a>' % (
+                target._meta.app_label, target._meta.module_name, target.pk, unicode(target))
 
         for col in new_class.list_display:
             if col[:8] == 'link_to_':
@@ -139,7 +139,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                        'container_two_remarks_dispatch',)}),
     )
     
-    list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date', 
+    list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date',
                     'destination', 'active')
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
@@ -150,7 +150,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     def get_fieldsets(self, request, obj=None):
         if not obj:
             return self.add_fieldsets
-        return super(UserAdmin, self).get_fieldsets(request, obj)
+        return super(WaybillAdmin, self).get_fieldsets(request, obj)
     
     def get_formsets(self, request, obj=None):
         for inline in self.inline_instances:
@@ -235,7 +235,7 @@ admin.site.register( ets.models.Compas, CompasAdmin )
 
 class PackageAdmin( admin.ModelAdmin ):
     list_display = ('code', 'name',)
-    list_filter = list_display
+    search_fields = list_display
 
 admin.site.register( ets.models.Package, PackageAdmin )
 

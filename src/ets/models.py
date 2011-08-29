@@ -241,7 +241,7 @@ class Person(models.Model):
     
     user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
     
-    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True)
+    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True, editable=False)
     title = models.CharField(_("title"), max_length=50, blank=True)
     code = models.CharField(_("code"), max_length=7)
     
@@ -282,7 +282,7 @@ class CommodityCategory(models.Model):
         verbose_name_plural = _("commodity categories")
         
     def __unicode__(self):
-        return self.code
+        return self.pk
     
 class Commodity(models.Model):
     """Commodity model"""
@@ -403,7 +403,7 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True, editable=False)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
@@ -610,7 +610,7 @@ class LtiOriginal( models.Model ):
 class Order(models.Model):
     """Delivery order"""
     
-    code = models.CharField(_("Code"), max_length=40, primary_key=True)
+    code = models.CharField(_("Code"), max_length=40, primary_key=True, editable=False)
     
     created = models.DateField(_("Created date")) #lti_date
     expiry = models.DateField(_("expire date"), blank=True, null=True) #expiry_date
@@ -673,10 +673,7 @@ class OrderItem(models.Model):
         verbose_name_plural = _("order items")
     
     def  __unicode__( self ):
-        if self.removed:
-            return u"Void %s -  %.0f " % ( self.commodity, self.items_left() )
-        else:
-            return u"%s -  %.0f " % ( self.commodity, self.items_left() )
+        return u"%s -  %.0f " % ( self.commodity, self.items_left() )
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
@@ -781,7 +778,7 @@ class Waybill( ld_models.Model ):
     
     #Dispatcher
     dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=400, blank=True)
-    dispatcher_person = models.ForeignKey(CompasPerson, verbose_name=_("Dispatch person"), 
+    dispatcher_person = models.ForeignKey(Person, verbose_name=_("Dispatch person"), 
                                           related_name="dispatch_waybills") #dispatcherName
     
     #Transporter
@@ -927,8 +924,7 @@ class ReceiptWaybill(models.Model):
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
     
-    person =  models.ForeignKey(CompasPerson, verbose_name=_("Recipient person"), 
-                                          related_name="recipient_waybills") #recipientName
+    person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills") #recipientName
     arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
     start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
     end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate

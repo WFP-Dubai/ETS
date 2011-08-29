@@ -40,17 +40,13 @@ def prep_req( request ):
 
     return {'user': request.user}
 
-def superuser_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: u.is_superuser, **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
-
-def officer_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
+#=======================================================================================================================
+# def officer_required(function=None, **kwargs):
+#    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
+#    if function:
+#        return actual_decorator(function)
+#    return actual_decorator
+#=======================================================================================================================
 
 
 @login_required
@@ -457,7 +453,6 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 
 
 @login_required
-@officer_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\

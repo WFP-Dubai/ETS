@@ -6,7 +6,7 @@
       "officers": [1],
       
       "db_engine": "django.db.backends.sqlite3",
-      "db_name": "db"
+      "db_name": "compas"
     }
   }
 ]
