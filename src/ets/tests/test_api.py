@@ -81,7 +81,7 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         item = dict_reader.next()
         self.assertEqual(item['slug'], self.get_waybill().slug)
         # Waybills with destination and warehouse
-        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": self.get_waybill().warehouse.code, 
+        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
                                                                    "destination": self.get_waybill().destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
@@ -101,9 +101,9 @@ class ApiServerTestCase(TestDevelopmentMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['order code'], self.get_waybill().order_code)
+        self.assertEqual(item['Order'], self.get_waybill().order.pk)
         # Loading details for some destination and some warehouse
-        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().warehouse.code, 
+        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
                                                                     "destination": self.get_waybill().destination.code}))
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)

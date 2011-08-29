@@ -30,7 +30,7 @@ class TagsTestCase(TestCase):
     def test_waybill_reception(self):
         """Checks methods compress of waybill instance"""
         data = waybill_reception(self.waybill, self.user)
-        self.assertTrue(not data['success'])
+        self.assertTrue(data['success'])
         
     def test_waybill_creation(self):
         """Checks methods compress of waybill instance"""

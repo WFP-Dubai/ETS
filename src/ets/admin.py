@@ -90,8 +90,7 @@ class LoadingDetailsInline(admin.TabularInline):
     extra = 0
     
     fieldsets = (
-        (_("Stock"), {'fields': ('origin_id', 'si_code', 'comm_category_code', 'commodity_code', 'commodity_name', 
-                                 'package', 'unit_weight_net', 'unit_weight_gross',)}),
+        (_("Stock"), {'fields': ('stock_item',)}),
         (_('Loading details'), {'fields': ('number_of_units', 'overloaded_units')}),
         (_('Receipt details'), {'fields': ('number_units_good', 'number_units_lost', 'number_units_damaged', 
                                            'units_lost_reason', 'units_damaged_reason')}),
@@ -141,7 +140,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     )
     
     list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date', 
-                    'warehouse', 'destination', 'active')
+                    'destination', 'active')
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
     list_filter = ('status', 'date_created',)
@@ -180,11 +179,11 @@ class OrderInline(admin.TabularInline):
     
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'comm_category_code', 'commodity_name', 
-                    'package_name', 'number_of_units', 'unit_weight_net')
+    list_display = ('pk', 'warehouse', 'project_number', 'si_code', 'commodity', 
+                    'package', 'number_of_units', 'unit_weight_net')
     readonly_fields = ('updated',)
     list_filter = ('warehouse',)
-    search_fields = ('pk', 'warehouse__title', 'project_number', 'si_code', 'commodity_code', 'package_code',)
+    search_fields = ('pk', 'warehouse__title', 'project_number', 'si_code', 'commodity', 'package',)
 
 admin.site.register( ets.models.StockItem, StockAdmin )
 
@@ -231,12 +230,12 @@ class CompasAdmin(admin.ModelAdmin):
     search_fields = list_display
     inlines = (WarehouseInline, PersonInline)
 
-admin.site.register( ets.models.Location, LocationAdmin )
+admin.site.register( ets.models.Compas, CompasAdmin )
 
 
 class PackageAdmin( admin.ModelAdmin ):
     list_display = ('pk', 'name',)
-    list_filter = list_display
+    list_filter = ('code', 'name',)
 
 admin.site.register( ets.models.Package, PackageAdmin )
 
@@ -268,9 +267,9 @@ class LossDamageTypeInline(admin.TabularInline):
     extra = 0
 
 
-class CategoryAdmin(admin.ModelAdmin):
+class CommodityCategoryAdmin(admin.ModelAdmin):
     list_display = ('pk',)
     search_fields = list_display
-    inlines = (LossDamageTypeAdmin, CommodityInline)
+    inlines = (LossDamageTypeInline, CommodityInline)
 
-admin.site.register( ets.models.Commodity, CommodityAdmin )
+admin.site.register( ets.models.CommodityCategory, CommodityCategoryAdmin )

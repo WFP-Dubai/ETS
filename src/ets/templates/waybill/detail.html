@@ -11,7 +11,7 @@
 {% block content %}
 
 <div class="hidden_print">
-  <form class="the_forms" method="get" action="{% url waybill_edit order_pk=object.order_code waybill_pk=object.pk %}">
+  <form class="the_forms" method="get" action="{% url waybill_edit order_pk=object.order.pk waybill_pk=object.pk %}">
     <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" 
       name="Print Copy" id='PrintCopy'
     >{% trans "Print Copy" %}</button>
@@ -39,7 +39,7 @@
 
 
 {% if 'create' in request.META.HTTP_REFERER %}
-  <a href="{% url order_detail object_id=object.order_code %}">{% trans "Back to Dispatch" %}</a>
+  <a href="{% url order_detail object_id=object.order.pk %}">{% trans "Back to Dispatch" %}</a>
 {% else %}
 {% if request.META.HTTP_REFERER %}<a href='{{ request.META.HTTP_REFERER }}'>{% trans "Back" %}</a>{% endif %}
 {% endif %}

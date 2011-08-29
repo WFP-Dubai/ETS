@@ -113,7 +113,7 @@ DEBUG_TOOLBAR_PANELS = (
     'debug_toolbar.panels.signals.SignalDebugPanel',
     'debug_toolbar.panels.logger.LoggingPanel',
  )
-AUTH_PROFILE_MODULE = 'ets.UserProfile'
+AUTH_PROFILE_MODULE = 'ets.Person'
 
 TEMPLATE_CONTEXT_PROCESSORS = ( 
 "django.contrib.auth.context_processors.auth",
