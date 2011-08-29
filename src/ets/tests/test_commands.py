@@ -7,16 +7,15 @@ import ets.models
 
 class CommandTestCase(TestCase):
     
-    multi_db = True
+    #multi_db = True
     compas = 'dev_compas'
+    fixtures = ('db_compas.json',)
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         
-        call_command('loaddata', 'db_compas.json', verbosity=0, commit=False, database='default')
-        call_command('syncdb', migrate_all=True, verbosity=0, database=self.compas, interactive=False)
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
-        
+    
     def test_sync_compas(self):
         
         self.assertEqual(ets.models.Compas.objects.count(), 1)
