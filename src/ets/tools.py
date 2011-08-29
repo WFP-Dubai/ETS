@@ -13,8 +13,10 @@ from django.core import serializers
 from ets import models as ets_models
 
 
-def removeNonAsciiChars( s ):
-    return s if s == '' else ''.join( [i for i in s if s in string.printable] )
+#=======================================================================================================================
+# def removeNonAsciiChars( s ):
+#    return s if s == '' else ''.join( [i for i in s if s in string.printable] )
+#=======================================================================================================================
 
 def viewLog(logfile = 'logg.txt'):
     try:
