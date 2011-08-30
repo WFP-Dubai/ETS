@@ -7,8 +7,8 @@
                 <tr><th colspan="5" bgcolor='black' color='white'>{% trans "Transaction Details" %}</th></tr>
             </thead>
             <tr>
-                <td><sup style="font-size:x-small;">{% trans "Origin(location)" %}:</sup><br>{{ object.warehouse.location }}</td>
-                <td><sup style="font-size:x-small;" >{% trans "Origin(warehouse)" %}:</sup><br>{{ object.warehouse.name }}</td>
+                <td><sup style="font-size:x-small;">{% trans "Origin(location)" %}:</sup><br>{{ object.order.warehouse.location }}</td>
+                <td><sup style="font-size:x-small;" >{% trans "Origin(warehouse)" %}:</sup><br>{{ object.order.warehouse.name }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Destination(location)" %}</sup><br>{{ object.destination.location.name }}</td>
                 <td  rowspan=5>
                 {% include 'waybill/print/barcode.html'%}
