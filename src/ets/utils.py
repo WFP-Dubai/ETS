@@ -49,18 +49,9 @@ def send_dispatched(using):
                     if index == 1:
                         CONTAINER_NUMBER = waybill.container_two_number
             
-                import cx_Oracle
-                cursor = connections[tr.using].cursor()
-                Response_Message = cursor.var( cx_Oracle.STRING )
-                Response_Message.setvalue( 0, u' ' * 80 )
-                
-                Response_Code = cursor.var( cx_Oracle.STRING )
-                Response_Code.setvalue( 0, u'x' * 2 )
-                
                 is_bulk = loading.stock_item.is_bulk
                 
-                cursor.callproc( u'write_waybill.dispatch', ( 
-                    Response_Message, Response_Code,
+                call_db_procedure('write_waybill.dispatch', (
                     CURR_CODE, 
                     waybill.dispatch_date.strftime( "%Y%m%d" ), 
                     waybill.order.origin_type, 
@@ -99,7 +90,7 @@ def send_dispatched(using):
                     u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
                     
                     '', '', '' 
-                ))
+                ), tr.using)
             
             waybill.sent_compas = True
             waybill.save()
@@ -123,16 +114,7 @@ def send_received(using):
                     CURR_CODE = u"%s%s%s" % (datetime.datetime.now().strftime( '%y' ), code_letter, waybill.pk)
                     code_letter = u'B'
                 
-                
-                import cx_Oracle
-                cursor = connections[tr.using].cursor()
-                Response_Message = cursor.var( cx_Oracle.STRING )
-                Response_Message.setvalue( 0, u' ' * 200 )
-                Response_Code = cursor.var( cx_Oracle.STRING )
-                Response_Code.setvalue( 0, u' ' * 2 )
-                
-                cursor.callproc( u'write_waybill.receipt', ( 
-                    Response_Message, Response_Code, 
+                call_db_procedure('write_waybill.receipt', (
                     CURR_CODE, 
                     reception.person.compas.pk, 
                     reception.person.code, 
@@ -147,8 +129,19 @@ def send_received(using):
                     loading.stock_item.commodity.pk, 
                     loading.stock_item.package.pk, 
                     loading.stock_item.allocation_code, 
-                    loading.stock_item.quality_code 
-                ))
+                    loading.stock_item.quality_code
+                ), tr.using)
+                
         waybill.sent_compas = True
         waybill.save()
         
+
+def call_db_procedure(name, parameters, using):
+    import cx_Oracle
+    cursor = connections[using].cursor()
+    Response_Message = cursor.var( cx_Oracle.STRING )
+    Response_Message.setvalue( 0, u' ' * 200 )
+    Response_Code = cursor.var( cx_Oracle.STRING )
+    Response_Code.setvalue( 0, u' ' * 2 )
+    
+    cursor.callproc( name, (Response_Message, Response_Code,)+parameters)
