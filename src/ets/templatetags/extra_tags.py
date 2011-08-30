@@ -123,7 +123,7 @@ def waybill_edit(waybill, user, text=""):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user):
     text = "Recept"
-    success = Warehouse.filter_by_user(user).warehouses.filter(pk=waybill.destination.pk).count()
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count()
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),

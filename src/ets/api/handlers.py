@@ -113,6 +113,7 @@ class ReadCSVOrderItemsHandler(BaseHandler):
     def read(self, request, order="", warehouse="", destination="", consignee=""):
         """Return order items in CSV"""
         filter_arg = {}
+        #queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
         if destination:

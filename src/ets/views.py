@@ -1,4 +1,3 @@
-
 import datetime
 
 from django import forms
@@ -61,8 +60,7 @@ def order_list(request, warehouse="", template='order/list.html',
     Shows the orders that are in a specific warehouse
     """
         
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(warehouse__in=warehouses)
+    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     
     #TODO: Exclude delivered orders
     #===================================================================================================================
@@ -78,6 +76,7 @@ def order_list(request, warehouse="", template='order/list.html',
 @login_required
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
     
     return direct_to_template( request, template, {
@@ -94,6 +93,7 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.dispatch_sign(True)
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
@@ -107,10 +107,13 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
 def waybill_search( request, form_class=WaybillSearchForm, 
                     queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
-
+    
     form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    queryset = queryset.filter(pk__icontains=search_string)
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user),\
+                               pk__icontains=search_string)
+    
+
     
     return direct_to_template( request, template, {
         'object_list': queryset, 
@@ -130,9 +133,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
     
     waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk) if waybill_pk else None
     
-    order = get_object_or_404(order_queryset, pk=order_pk)
-#    if not ets.models.Warehouse.filter_by_user(request.user).filter(pk=order.warehouse.pk).count():
-#        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    order = get_object_or_404(order_queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user)), pk=order_pk) 
     
     class FormsetForm( formset_form ):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))
@@ -207,6 +208,7 @@ def waybill_finalize_receipt( request, waybill_pk, queryset):
     Called when user pushes Print Original on Receipt
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.receipt_sign()
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
@@ -222,7 +224,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
                       template='waybill/receive.html'):
     
     waybill = get_object_or_404(queryset, pk=waybill_pk)
-    
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     today = datetime.date.today()
     
     
@@ -371,6 +373,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 @login_required
 def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.delete()
     messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
     if redirect_to:
@@ -388,7 +391,7 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
     waybill/waybill_detail.html
     """
     current_wb = get_object_or_404(queryset, pk = waybill_pk)
-    
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     lti_code = current_wb.ltiNumber
     current_lti = LtiOriginal.objects.filter( code = lti_code )
     current_audit = current_wb.audit_log.all()
@@ -459,6 +462,7 @@ def waybill_validate_form_update(request, waybill_pk, queryset,
 @login_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
+    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
                                   
