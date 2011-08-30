@@ -119,11 +119,11 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'ets.urls'
 
 INSTALLED_APPS = (
-
-    #own
+    
+    'south',
+    
     'ets',
     
-    # builtin
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -135,9 +135,7 @@ INSTALLED_APPS = (
     'django.contrib.markup',
     'django.contrib.humanize',
     
-    #external
     'django_extensions',
-    'south',
     'rosetta',
     'debug_toolbar',
     'piston',
@@ -250,10 +248,12 @@ class DatabasesFormDatabase(object):
             return self.default_db
     
     def items(self):
-        return ( (self.default, self.default_db), ) \
-            + tuple((compas.pk, self[compas.pk]) for compas in self.get_compases())
+        return ( (self.default, self.default_db), )
         
-            
+        #===============================================================================================================
+        # for alias in self:
+        #    yield alias, self[alias]
+        #===============================================================================================================
     
     def __iter__(self):
         yield self.default
@@ -267,6 +267,9 @@ DATABASES = DatabasesFormDatabase({
     'PASSWORD': '',
     'HOST': 'localhost',
 })
+
+#Prevent migrations during testing
+SOUTH_TESTS_MIGRATE = False
 
 # Local settings for development / production
 try:

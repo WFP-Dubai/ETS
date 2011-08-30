@@ -1,51 +1,24 @@
 ### -*- coding: utf-8 -*- ####################################################
 
 import datetime
-from functools import wraps
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.http import HttpResponseNotAllowed
 from django.utils.datastructures import MultiValueDictKeyError 
 from django.contrib.auth.forms import AuthenticationForm
-from django.core.management import call_command
 
 import ets.models
-from ets.utils import update_compas
-
-def change_settings(func, **kwargs):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        old_settings = {}
-        for name, value in kwargs:
-            old_settings[name] = getattr(settings, name)
-            setattr(settings, value)
-            
-        result = func(*args, **kwargs)
-        
-        for name, value in kwargs:
-            setattr(settings, old_settings[name])
-        
-        return result
-    
-    return wrapper
+from .utils import TestCaseMixin
 
 
-class WaybillTestCase(TestCase):
-    
-    multi_db = True
-    compas = 'dev_compas'
+class WaybillTestCase(TestCaseMixin, TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         
-        call_command('loaddata', 'db_compas.json', verbosity=0, commit=False, database='default')
-        call_command('syncdb', migrate_all=True, verbosity=0, database=self.compas, interactive=False)
-        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
-        update_compas(self.compas)
-        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+        super(WaybillTestCase, self).setUp()
         
         self.client.login(username='admin', password='admin')
         self.user = User.objects.get(username="admin")

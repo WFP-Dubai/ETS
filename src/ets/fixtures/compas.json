@@ -145,7 +145,7 @@
     }
   },
   {
-    "pk": "KARX025KARX0010000944801MIXMIXHEBCG15587", 
+    "pk": "KARX025KARX0011234EBCG15587", 
     "model": "ets.epicstock", 
     "fields": {
       "origin_id": "anotherstock1234",
@@ -155,7 +155,7 @@
       "quantity_gross": "0.015", 
       "qualitydescr": "Good", 
       "quantity_net": "1000", 
-      "wh_code": "ISBX002", 
+      "wh_code": "ISBX003", 
       "package_code": "BG16",
       "packagename": "BULK", 
       "comm_category_code": "SED", 
