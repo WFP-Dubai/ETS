@@ -4,6 +4,7 @@ import os
 from functools import wraps
 
 from django.conf import settings
+from django.core.management import call_command
 
 from windmill.authoring import djangotest
 
@@ -25,6 +26,18 @@ def change_settings(func, **kwargs):
     
     return wrapper
 
+class TestCaseMixin(object):
+    
+    #multi_db = True
+    compas = 'dev_compas'
+    fixtures = ('db_compas.json',)
+    
+    def setUp(self):
+        "Hook method for setting up the test fixture before exercising it."
+        
+        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
+        call_command('sync_compas')
+        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
 
 class WindmillMixin(object):
     def setUp(self):

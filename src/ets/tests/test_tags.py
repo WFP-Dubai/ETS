@@ -1,26 +1,19 @@
 ### -*- coding: utf-8 -*- ####################################################
 from django.test import TestCase
-from django.core.management import call_command
 from django.contrib.auth.models import User
 
 import ets.models
-from ets.utils import update_compas
 from ets.templatetags.extra_tags import waybill_edit, waybill_reception, waybill_creation, waybill_delete
 
-class TagsTestCase(TestCase):
-    
-    multi_db = True
-    compas = 'dev_compas'
+from .utils import TestCaseMixin
+
+class TagsTestCase(TestCaseMixin, TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         
-        call_command('loaddata', 'db_compas.json', verbosity=0, commit=False, database='default')
-        call_command('syncdb', migrate_all=True, verbosity=0, database=self.compas, interactive=False)
-        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
-        update_compas(self.compas)
-        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
-        
+        super(TagsTestCase, self).setUp()
+            
         self.user = User.objects.get(username="admin")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')

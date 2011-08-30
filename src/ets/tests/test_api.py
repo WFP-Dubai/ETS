@@ -1,33 +1,22 @@
 ### -*- coding: utf-8 -*- ####################################################
-import os
-import urllib2
 import csv
 import StringIO
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User
-from django.core import serializers
-from django.utils import simplejson
-from django.core.management import call_command
 
 #from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
 #from ..models import Waybill, LtiOriginal, EpicStock, Warehouse,
-from ets.utils import update_compas
+from .utils import TestCaseMixin
 
-def get_fixture_text(file_name):
-    return open(os.path.join(os.path.dirname(__file__), '../fixtures', file_name)).read()
 
-class TestDevelopmentMixin(object):
-
-    multi_db = True
+class ApiServerTestCase(TestCaseMixin, TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."        
-        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
-        update_compas()
-        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+        super(ApiServerTestCase, self).setUp()
 
         self.client.login(username="admin", password="admin")
         self.user = User.objects.get(username="admin")
@@ -38,9 +27,6 @@ class TestDevelopmentMixin(object):
     
     def get_waybill(self):
         return ets.models.Waybill.objects.get(pk="ISBX00211A")
-    
-
-class ApiServerTestCase(TestDevelopmentMixin, TestCase):
     
     #===========================================================================
     # def test_read_waybills(self):

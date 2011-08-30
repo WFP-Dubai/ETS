@@ -391,7 +391,11 @@ class EpicStock( models.Model ):
                 'quality_description': stock.qualitydescr,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
-                'updated': now
+                
+                'allocation_code': stock.allocation_code,
+                'is_bulk': stock.is_bulk(),
+                
+                'updated': now,
             }
             
             rows = StockItem.objects.filter(origin_id=stock.origin_id).update(**defaults)
@@ -426,7 +430,11 @@ class StockItem( models.Model ):
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
     unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
     
+    is_bulk = models.BooleanField(_("Bulk"), default=False)
+    
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+    
+    allocation_code = models.CharField(_("Allocation code"), max_length = 10, editable=False)
     
     objects = StockManager()
 

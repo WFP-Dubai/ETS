@@ -5,7 +5,7 @@ from django.conf import settings #@Reimport
 from django.utils.translation import ugettext_lazy as _
 
 from ets import models as ets_models
-from ets.tools import removeNonAsciiChars
+#from ets.tools import removeNonAsciiChars
 
 class compas_write:
     
@@ -274,10 +274,3 @@ class compas_write:
             self.ErrorMessages = _('Problem with data of Waybill %(waybill)s \n') % { "waybill": the_waybill }
 
             return False
-
-
-#=======================================================================================================================
-# def printlist( list ):
-#    for item in list:
-#        print item
-#=======================================================================================================================

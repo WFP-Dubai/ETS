@@ -3,19 +3,15 @@ from django.test import TestCase
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 
-from ets.utils import update_compas
 import ets.models
+from .utils import TestCaseMixin
 
-class WarehouseTestCase(TestCase):
-    
-    multi_db = True
+class WarehouseTestCase(TestCaseMixin, TestCase):
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
         
-        call_command('loaddata', 'compas.json', verbosity=0, commit=False, database='compas')
-        update_compas()
-        call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
+        super(WarehouseTestCase, self).setUp()
         
         self.client.login(username='admin', password='admin')
         self.user = ets.models.User.objects.get(username="admin")
