@@ -50,7 +50,7 @@ def prep_req( request ):
 
 
 @login_required
-def order_list(request, template='order/list.html', 
+def order_list(request, warehouse="", template='order/list.html', 
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
@@ -60,6 +60,12 @@ def order_list(request, template='order/list.html',
     URL: /orders/{{ warehouse }}/
     Shows the orders that are in a specific warehouse
     """
+    if warehouse:
+        warehouse = get_object_or_404(queryset, pk = warehouse)
+        queryset.filter(warehouse=warehouse)
+    
+    warehouses = ets.models.Warehouse.filter_by_user(request.user)
+    queryset = queryset.filter(warehouse__in=warehouses)
     
     #TODO: Exclude delivered orders
     #===================================================================================================================
@@ -82,7 +88,6 @@ def waybill_view(request, waybill_pk, queryset, template):
         'extra_lines': my_empty,
         'items': waybill.loading_details.select_related(),
         'items_count': waybill.loading_details.count(),
-        'editable': waybill.is_editable(request.user),
     })
 
 @login_required
@@ -174,7 +179,7 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         waybill.order = order
         waybill.project_number = order.project_number
         waybill.transport_name = order.transport_name
-        waybill.dispatcher_person = request.user.get_profile().compas_person
+        waybill.dispatcher_person = request.user.person
         waybill.save()
         
         for details in loading_formset.save(False):
@@ -237,7 +242,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     if form.is_valid() and loading_formset.is_valid():
         receipt = form.save(False)
         receipt.waybill = waybill
-        receipt.person = request.user.get_profile().compas_person
+        receipt.person = request.user.person
         receipt.save()
         
         loading_formset.save(True)
