@@ -60,10 +60,7 @@ def order_list(request, warehouse="", template='order/list.html',
     URL: /orders/{{ warehouse }}/
     Shows the orders that are in a specific warehouse
     """
-    if warehouse:
-        warehouse = get_object_or_404(queryset, pk = warehouse)
-        queryset.filter(warehouse=warehouse)
-    
+        
     warehouses = ets.models.Warehouse.filter_by_user(request.user)
     queryset = queryset.filter(warehouse__in=warehouses)
     
@@ -134,6 +131,8 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
     waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk) if waybill_pk else None
     
     order = get_object_or_404(order_queryset, pk=order_pk)
+#    if not ets.models.Warehouse.filter_by_user(request.user).filter(pk=order.warehouse.pk).count():
+#        return HttpResponseRedirect(request.META['HTTP_REFERER'])
     
     class FormsetForm( formset_form ):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))

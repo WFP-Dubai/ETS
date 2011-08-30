@@ -113,11 +113,7 @@ def truncatesmart( value, limit = 80 ):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_edit(waybill, user, text=""):
     text = "Edit"
-    warehouses = Warehouse.filter_by_user(user)
-    if warehouses.filter(pk=waybill.order.warehouse.pk).count():
-        success = True
-    else:
-        success = False
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count()
     return { 
             'text': text,
             'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
@@ -127,11 +123,7 @@ def waybill_edit(waybill, user, text=""):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user):
     text = "Recept"
-    warehouses = Warehouse.filter_by_user(user)
-    if warehouses.filter(pk=waybill.destination.pk).count():
-        success = True
-    else:
-        success = False
+    success = Warehouse.filter_by_user(user).warehouses.filter(pk=waybill.destination.pk).count()
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
@@ -141,11 +133,7 @@ def waybill_reception(waybill, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_creation(order, user):
     text = "Create"
-    warehouses = Warehouse.filter_by_user(user)
-    if warehouses.filter(pk=order.warehouse.pk).count():
-        success = True
-    else:
-        success = False
+    success = Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count()
     return { 
             'text': text,
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
@@ -155,11 +143,7 @@ def waybill_creation(order, user):
 @register.inclusion_tag('tags/give_link.html')
 def waybill_delete(waybill, user, text=""):
     text = "Delete"
-    warehouses = Warehouse.filter_by_user(user)
-    if warehouses.filter(pk=waybill.order.warehouse.pk).count():
-        success = True
-    else:
-        success = False
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count()
     return { 
             'text': text,
             'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
