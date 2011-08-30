@@ -145,7 +145,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         super(LoadingDetailRecieptForm, self).__init__(*args, **kwargs)
         
         for field_name in ('units_lost_reason', 'units_damaged_reason'):
-            self.fields[field_name].queryset = self.fields[field_name].queryset.filter(comm_category_code=self.instance.comm_category_code)
+            self.fields[field_name].queryset = self.fields[field_name].queryset.filter(category=self.instance.stock_item.commodity.category)
         
     
     class Meta:

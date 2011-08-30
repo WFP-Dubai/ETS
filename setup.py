@@ -22,7 +22,7 @@ install_requires = [
         'django-debug-toolbar',
         #'hashlib',
         'django-audit-log',
-        #'cx_Oracle',
+        'cx_Oracle',
         'simplejson >= 2.1.0',
         'django-piston',
         'docutils',

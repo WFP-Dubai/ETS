@@ -841,7 +841,10 @@ class Waybill( ld_models.Model ):
         """Validates Waybill instance. Checks different dates"""
         if self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
-            
+        
+        #If second container exists, first must exist also
+        if self.container_two_number and not self.container_one_number:
+            raise ValidationError(_("Type container 1 number"))
     
     def check_lines( self ):
         lines = LoadingDetail.objects.filter( wbNumber = self )
@@ -1013,7 +1016,6 @@ class LoadingDetail(models.Model):
                                             limit_choices_to={'type': LossDamageType.DAMAGE}) #unitsDamagedReason
     
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
-    sent_compas = models.BooleanField(_("loading Detail Sent to Compas "), default=False) #loadingDetailSentToCompas
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
     audit_log = AuditLog()

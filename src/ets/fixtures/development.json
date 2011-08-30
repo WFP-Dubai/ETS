@@ -74,7 +74,6 @@
       "units_damaged_reason": null,
       
       "overloaded_units": false,
-      "sent_compas": false,
       "over_offload_units": false,
       
       "_order": 0
@@ -133,7 +132,6 @@
       "units_lost_reason": null,
       "units_damaged_reason": null,
       "overloaded_units": false,
-      "sent_compas": false,
       "over_offload_units": false,
       "_order": 0
     }
@@ -203,7 +201,6 @@
       "stock_item": "anotherstock1234",
       "number_units_damaged": "2",
       "number_units_lost": "10",
-      "sent_compas": false,
       "units_damaged_reason": "dmix",
       "overloaded_units": false,
       "units_lost_reason": "lmix",

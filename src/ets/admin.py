@@ -94,7 +94,7 @@ class LoadingDetailsInline(admin.TabularInline):
         (_('Loading details'), {'fields': ('number_of_units', 'overloaded_units')}),
         (_('Receipt details'), {'fields': ('number_units_good', 'number_units_lost', 'number_units_damaged', 
                                            'units_lost_reason', 'units_damaged_reason')}),
-        (_('Utility information'), {'fields': ('sent_compas', 'over_offload_units')}),
+        (_('Utility information'), {'fields': ('over_offload_units',)}),
     )
     
 class ReceiptInline(admin.StackedInline):
