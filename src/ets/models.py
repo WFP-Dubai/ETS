@@ -387,6 +387,7 @@ class EpicStock( models.Model ):
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
                 'allocation_code': stock.allocation_code,
+                'is_bulk': stock.is_bulk(),
                 
                 'updated': now,
             }
