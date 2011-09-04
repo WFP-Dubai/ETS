@@ -11,7 +11,7 @@
     <th>{% trans "MT Net" %}</th>
     <th>{% trans "Quality" %}</th>
   </tr>
-  {% for item in stocklist%}
+  {% for item in object_list %}
   <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
     <td>{% ifchanged %}{{ item.warehouse }}{% endifchanged %}</td>
     <td>{% ifchanged %}{{ item.commodity_name }}{% endifchanged %}</td>

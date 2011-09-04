@@ -75,8 +75,14 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_stock_view(self):
         """ets.views.stock_view"""
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 3)
+        self.client.login(username='recepient', password='recepient')
+        response = self.client.get(reverse('view_stock'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 3)
     
     def test_waybill_view(self):
         """ets.views.waybill_view test"""
