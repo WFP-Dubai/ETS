@@ -498,7 +498,7 @@ class Waybill( ld_models.Model ):
     dispatch_date = models.DateField( _("Date of dispatch"), default=datetime.now) #dateOfDispatch
     
     transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
-                                         choices=TRANSACTION_TYPES, default=u'WIT') #transactionType
+                                         choices=TRANSACTION_TYPES, default=TRANSACTION_TYPES[0][0]) #transactionType
     transport_type = models.CharField(_("Transport Type"), max_length=10, 
                                       choices=TRANSPORT_TYPES, default=u'02') #transportType
     

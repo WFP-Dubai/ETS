@@ -148,7 +148,6 @@ INSTALLED_APPS = (
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'django.core.context_processors.csrf',
-    'ets.context_processor.common'
 )
 
 TEST_RUNNER = 'ets.tests.coverage_runner.CaverageTestSuiteRunner'
@@ -157,8 +156,6 @@ COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
-
-IN_PRODUCTION = False
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_NAME = 'ets'
