@@ -8,18 +8,6 @@
   <tr class='reports-title'>
     <td>{% trans "Orders reports" %}</td>
   </tr>
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Dispatch Report for " %} {{ warehouse }} </td>
-    <td><a href='{% url api_order_items %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Reciept Report " %}{{ warehouse }}</td>
-    <td><a href='{% url api_order_items %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
   <tr>
     <td>{% trans "Orders Report" %} </td>
     <td><a href='{% url api_orders %}'>{% trans "download" %}</a></td>
@@ -33,18 +21,6 @@
   <tr class='reports-title'>
     <td>{% trans "Stock reports" %}</td>
   </tr>
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Dispatch Stock Report: All items for" %} {{ warehouse }} </td>
-    <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Reciept Stock Report: All items for" %} {{ warehouse }} </td>
-    <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
   <tr>
     <td>{% trans "Stock Report: All items for warehouses" %} </td>
     <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
@@ -52,18 +28,6 @@
   <tr class='reports-title'>
     <td>{% trans "Waybill reports" %}</td>
   </tr>
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Dispatch Waybill Report: All items for" %} {{ warehouse }} </td>
-    <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Reciept Waybill Report: All items for" %} {{ warehouse }} </td>
-    <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
   <tr>
     <td>{% trans "Waybill Report: All items for warehouses" %} </td>
     <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
@@ -71,18 +35,6 @@
   <tr class='reports-title'>
     <td>{% trans "Detail Waybill reports" %}</td>
   </tr>
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Dispatch Detail Waybill Report: All items for" %} {{ warehouse }}</td>
-    <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
-  {% if warehouse %}
-  <tr>
-    <td>{% trans "Warehouse Reciept Detail Waybill Report: All items for" %} {{ warehouse }} </td>
-    <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
-  </tr>
-  {% endif %}
   <tr>
     <td>{% trans "Detail Waybill Report: All items for warehouses" %} </td>
     <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
