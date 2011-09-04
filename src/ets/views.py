@@ -113,8 +113,6 @@ def waybill_search( request, form_class=WaybillSearchForm,
     queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user),\
                                pk__icontains=search_string)
     
-
-    
     return direct_to_template( request, template, {
         'object_list': queryset, 
         'user': request.user,

@@ -89,11 +89,11 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         # response = self.client.post(reverse('waybill_search'), data={'form': form, 'q': 'ISBX00211A'})
         #=======================================================================
         # Search query with existing waybill code  
-        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A'})
+        response = self.client.get(reverse('waybill_search'), data={'q': 'ISBX00211A'})
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['object_list']), (self.waybill,))
         # Search query with not existing waybill code 
-        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A1'})
+        response = self.client.get(reverse('waybill_search'), data={'q': 'ISBX00211A1'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['object_list']), 0)
         
