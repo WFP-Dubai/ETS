@@ -103,9 +103,9 @@ urlpatterns = patterns("ets.views",
     
     #===================================================================================================================
     # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
+    # ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
     #===================================================================================================================
-    ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
-        
+
 )
 
 urlpatterns += patterns('',

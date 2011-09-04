@@ -48,7 +48,8 @@ def waybill_edit(waybill, user, text=_("Edit")):
     return { 
             'text': text,
             'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
-            'success': Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+            'success': waybill.transport_dispach_signed_date is None 
+                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -56,7 +57,8 @@ def waybill_reception(waybill, user, text=_("Recept")):
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
-            'success': Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count(),
+            'success': not (waybill.get_receipt() and waybill.get_receipt().signed_date) 
+                and Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -72,6 +74,7 @@ def waybill_delete(waybill, user, text=_("Delete")):
     return { 
             'text': text,
             'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
-            'success': Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+            'success': waybill.transport_dispach_signed_date is None \
+                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
     }
     

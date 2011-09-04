@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <title>{% trans "ETS" %} {% block title %}{{ section.title }}{% endblock %}</title>
-  
+
   {% block style %}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_page.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_table.css" media="screen"/>
@@ -12,12 +12,8 @@
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}uni_form/default.uni-form.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}uni_form/dark.uni-form.css" media="screen"/>
   {% endblock %}
-  
+
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.4.3.min.js"></script>
-  
-  <style type="text/css">
-    .header{background-color:{% if IN_PRODUCTION %}#12c8ff{%endif%};}
-  </style>
 
 </head>
 <body OnKeyPress="return disableEnterKey(event)">
