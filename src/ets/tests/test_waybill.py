@@ -297,7 +297,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def waybill_validate(self):
         """ets.views.waybill_validate"""
-        self.client.login(username='recepient', password='recepient')
+        self.client.login(username='admin', password='admin')
         response = self.client.get(reverse("waybill_validate_dispatch_form"))
         self.assertEqual(response.status_code, 200)
         
