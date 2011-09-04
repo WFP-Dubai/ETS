@@ -21,10 +21,6 @@ class DispatchWaybillForm( forms.ModelForm ):
     class Meta:
         model = ets_models.Waybill
         exclude = (
-            'order_code',
-            'project_number',
-            'transport_name',
-            'warehouse',
             'status',
             'validated',
             'sent_compas',
@@ -68,12 +64,7 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
         obj = super(LoadingDetailDispatchForm, self).save(commit=False)
         stock_item = self.cleaned_data['stock_item']
     
-        obj.origin_id = stock_item.pk
-        obj.si_code = stock_item.si_code
-        
-        obj.comm_category_code = stock_item.comm_category_code
-        obj.commodity_code = stock_item.commodity_code
-        obj.commodity_name = stock_item.commodity_name
+        obj.stock_item = stock_item
         
         obj.unit_weight_net = stock_item.unit_weight_net
         obj.unit_weight_gross = stock_item.unit_weight_gross
@@ -171,7 +162,7 @@ class BaseRecieptFormFormSet(BaseInlineFormSet):
     helper.add_layout(Layout(
         #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
         Row(
-        'origin_id', 'commodity_name', 'number_units_good', 
+        'stock_item', 'number_units_good', 
         'number_units_lost', 'units_lost_reason',
         'number_units_damaged', 'units_damaged_reason',
     )))

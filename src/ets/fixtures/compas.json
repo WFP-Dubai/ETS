@@ -91,6 +91,15 @@
     }
   },
   {
+    "pk": "DSED", 
+    "model": "ets.lossdamagetype", 
+    "fields": {
+      "cause": "BROKEN", 
+      "type": "D", 
+      "category": "SED"
+    }
+  }, 
+  {
     "pk": "KARX025KARX0010000944801MIXMIXHEBCG15586", 
     "model": "ets.epicstock", 
     "fields": {

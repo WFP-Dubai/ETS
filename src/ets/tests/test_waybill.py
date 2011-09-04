@@ -224,8 +224,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
-            'item-0-origin_id': 'anotherstock1234',
-            'item-0-commodity_name': 'COOL UKRAINIAN BEER',
+            'item-0-stock-item': 'anotherstock1234',
             'item-0-number_units_good': 25,
             'item-0-number_units_lost': 0,
             'item-0-units_lost_reason': '',
@@ -254,9 +253,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
                                     data=data)
         self.assertContains(response, "You must provide a loss reason")
         
-        #Let's provide a reason and damaged units
+        # Let's provide a reason and damaged units
         data.update({
-            'item-0-units_lost_reason': 'lmix',
+            'item-0-units_lost_reason': 'lsed',
             'item-0-number_units_damaged': 5,
         })
         
@@ -266,13 +265,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         #Provide a reason of damage
         data.update({
-            'item-0-units_damaged_reason': 'dmix',
+            'item-0-units_damaged_reason': 'dsed',
         })
         
         response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
                                     data=data)
         
-        #Now everything should be all right
+        # Now everything should be all right
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(self.reception_waybill.get_receipt().remarks, 'test remarks')
     
