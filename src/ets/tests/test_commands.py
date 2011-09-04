@@ -49,7 +49,7 @@ class CommandTestCase(TestCase):
                                'ISBX0020000586'))
         
         #test loss and damage types. The same story. It's stupid :)
-        self.assertEqual(ets.models.LossDamageType.objects.count(), 3)
+        self.assertEqual(ets.models.LossDamageType.objects.count(), 4)
         
         """test stock update"""
         self.assertEqual(ets.models.StockItem.objects.count(), 3)
