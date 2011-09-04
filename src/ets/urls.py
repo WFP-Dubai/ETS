@@ -102,8 +102,8 @@ urlpatterns = patterns("ets.views",
     }, "select_report" ),
     #===================================================================================================================
     # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
+    # ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     #===================================================================================================================
-    ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     
     #===================================================================================================================
     # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
