@@ -26,7 +26,6 @@ urlpatterns = patterns("ets.views",
     }}, "index" ),
     
     #Order list
-    ( r'^orders/(?P<warehouse>[-\w]+)$', "order_list", {}, "orders"),
     ( r'^orders/$', "order_list", {}, "orders"),
     
     #Order detail

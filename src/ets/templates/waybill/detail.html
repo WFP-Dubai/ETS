@@ -11,35 +11,23 @@
 {% block content %}
 
 <div class="hidden_print">
-  <form class="the_forms" method="get" action="{% url waybill_edit order_pk=object.order.pk waybill_pk=object.pk %}">
-    <button onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print(); return false;" 
-      name="Print Copy" id='PrintCopy'
-    >{% trans "Print Copy" %}</button>
-    {% waybill_edit object user %}
-    
-  </form>
-
-  <form action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}" 
-    class="the_forms" name="printoriginal" id="printoriginal" method="get"
-  >
-    <input type="submit" onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" 
-      name="Print Original" id='Print1' value='Print Original' />
-  </form>
-
+  <a onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print();" href="#">Print Copy</a>
   {% waybill_edit object user %}
-
-
-{% if 'create' in request.META.HTTP_REFERER %}
-  <a href="{% url order_detail object_id=object.order.pk %}">{% trans "Back to Dispatch" %}</a>
-{% else %}
-{% if request.META.HTTP_REFERER %}<a href='{{ request.META.HTTP_REFERER }}'>{% trans "Back" %}</a>{% endif %}
-{% endif %}
+  <a onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" 
+      href="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">Print Original</a>
+  <a href="{% url waybill_finalize_receipt waybill_pk=object.pk %}">Sign recieption</a>
+  {% waybill_reception object user %}
+  {% waybill_delete object user %}
+  {% if 'create' in request.META.HTTP_REFERER %}
+    <a href="{% url order_detail object_id=object.order.pk %}">{% trans "Back to Dispatch" %}</a>
+  {% else %}
+    {% if request.META.HTTP_REFERER %}<a href='{{ request.META.HTTP_REFERER }}'>{% trans "Back" %}</a>{% endif %}
+  {% endif %}
 </div>
 
 <table cellpadding="0" cellspacing="0" border="0px" >
   {% include 'waybill/print/wb_header.html'%}
   {% include 'waybill/print/wb_loading.html'%}
-  
   {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
 </table>
 
