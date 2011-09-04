@@ -92,11 +92,7 @@ urlpatterns = patterns("ets.views",
     
     ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
     ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
-    ( r'^view_stock/$', "direct_to_template", {
-        "template": 'stock/stocklist.html',
-        "extra_context": {
-            'stocklist': ets.models.StockItem.objects.all,
-    }}, "view_stock" ),
+    ( r'^view_stock/$', "stock_view", {}, "view_stock" ),
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',
     }, "select_report" ),

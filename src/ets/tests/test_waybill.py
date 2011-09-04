@@ -73,6 +73,11 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
         self.assertEqual(response.status_code, 200)
     
+    def test_stock_view(self):
+        """ets.views.stock_view"""
+        response = self.client.get(reverse('view_stock'))
+        self.assertEqual(response.status_code, 200)
+    
     def test_waybill_view(self):
         """ets.views.waybill_view test"""
         response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))

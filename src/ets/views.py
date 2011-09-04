@@ -70,6 +70,13 @@ def order_list(request, warehouse="", template='order/list.html',
     return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
 
 @login_required
+def stock_view(request, queryset=ets.models.StockItem.objects.all(), template='stock/stocklist.html'):
+    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    return direct_to_template( request, template, {
+        'stocklist': queryset,
+    })
+
+@login_required
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
