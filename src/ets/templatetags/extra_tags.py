@@ -74,6 +74,7 @@ def waybill_delete(waybill, user, text=_("Delete")):
     return { 
             'text': text,
             'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
-            'success': Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+            'success': waybill.transport_dispach_signed_date is None \
+                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
     }
     
