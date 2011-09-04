@@ -1,18 +1,34 @@
 [
   {
-    "pk": 1,
+    "pk": 2,
     "model": "auth.user",
     "fields": {
-        "username": "admin",
-        "first_name": "Admin",
-        "last_name": "Adminskiy",
+        "username": "dispatcher",
+        "first_name": "Test",
+        "last_name": "Dispatcher",
         "is_active": true,
-        "is_superuser": true,
-        "is_staff": true,
+        "is_superuser": false,
+        "is_staff": false,
         "groups": [],
         "user_permissions": [],
-        "password": "sha1$1fcb3$8df119b3ac1f36c936a6ee3d99b50908a516f276",
-        "email": "admin@example.com"
+        "password": "sha1$b3f5d$1f839c200fad577bd125f1ec830993719bf9dfd6",
+        "email": "dispatcher@example.com"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "auth.user",
+    "fields": {
+        "username": "recepient",
+        "first_name": "Test",
+        "last_name": "Recepient",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "groups": [],
+        "user_permissions": [],
+        "password": "sha1$7cf39$b9630a8123646e991cfbd961f27606f4017c18d0",
+        "email": "recepient@example.com"
     }
   },
   {

@@ -1,7 +1,7 @@
 [
   {
     "pk": "ISBX002", 
-    "model": "ets.place", 
+    "model": "compas.place", 
     "fields": {
       "name": "PAKISTAN COUNTRY OFFICE",
       "reporting_code": "dev_compas",
@@ -13,7 +13,7 @@
   },
   {
     "pk": "ISBX003", 
-    "model": "ets.place", 
+    "model": "compas.place", 
     "fields": {
       "name": "ISLAMABAD CITY OFFICE",
       "reporting_code": "dev_compas",
@@ -25,7 +25,7 @@
   }, 
   {
     "pk": "OE7X001", 
-    "model": "ets.place", 
+    "model": "compas.place", 
     "fields": {
       "name": "EDO OFFICE MEHTI", 
       "reporting_code": "dev_compas", 
@@ -37,7 +37,7 @@
   },
   {
     "pk": "ISBX0020000586", 
-    "model": "ets.compasperson", 
+    "model": "compas.compasperson", 
     "fields": {
       "org_unit_code": "dev_compas",
       "location_code": "ISBX",
@@ -51,7 +51,7 @@
   }, 
   {
     "pk": "ISBX0020000613", 
-    "model": "ets.compasperson", 
+    "model": "compas.compasperson", 
     "fields": {
       "org_unit_code": "dev_compas", 
       "first_name": "DIDIER", 
@@ -101,7 +101,7 @@
   }, 
   {
     "pk": "KARX025KARX0010000944801MIXMIXHEBCG15586", 
-    "model": "ets.epicstock", 
+    "model": "compas.epicstock", 
     "fields": {
       "origin_id": "testme0123",
       "project_wbs_element": "1", 
@@ -128,7 +128,7 @@
   },
   {
     "pk": "KARX025KARX0010000944801MIXMIXHEBCG15587", 
-    "model": "ets.epicstock", 
+    "model": "compas.epicstock", 
     "fields": {
       "origin_id": "testme0124",
       "project_wbs_element": "1", 
@@ -155,7 +155,7 @@
   },
   {
     "pk": "KARX025KARX0011234EBCG15587", 
-    "model": "ets.epicstock", 
+    "model": "compas.epicstock", 
     "fields": {
       "origin_id": "anotherstock1234",
       "project_wbs_element": "1", 
@@ -182,7 +182,7 @@
   },
   {
     "pk": "QANX001000000000000005217HQX0001000000000000984141", 
-    "model": "ets.ltioriginal", 
+    "model": "compas.ltioriginal", 
     "fields": {
       "origin_location_code": "ISBX", 
       "origin_wh_code": "ISBX002", 
@@ -217,7 +217,7 @@
   },
   {
     "pk": "QANX001000000000000005217HQX0001000000000000984142", 
-    "model": "ets.ltioriginal", 
+    "model": "compas.ltioriginal", 
     "fields": {
       "origin_location_code": "ISBX", 
       "origin_wh_code": "ISBX003", 

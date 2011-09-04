@@ -30,7 +30,7 @@ from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailForm
 from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
-from ets.tools import un64unZip, viewLog, default_json_dump
+from ets.tools import un64unZip, viewLog
 
 LOADING_LINES = 5
 
@@ -206,7 +206,7 @@ def waybill_finalize_receipt( request, waybill_pk, queryset):
     Called when user pushes Print Original on Receipt
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    queryset = queryset.filter(destination__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.receipt_sign()
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
@@ -256,118 +256,6 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     })
 
 
-#=======================================================================================================================
-# 
-# def create_or_update(waybill, user, error_message):
-#    compas_logger, created = CompasLogger.objects.get_or_create(wb = waybill, defaults={
-#        "user": user, 
-#        "errorDisp": error_message, 
-#        "timestamp": datetime.datetime.now()
-#    })
-#    
-#    if not created:
-#        compas_logger.user = user
-#        compas_logger.errorDisp = error_message
-#        compas_logger.timestamp = datetime.datetime.now()
-#        compas_logger.save()
-#    
-#    return compas_logger
-# 
-# @login_required
-# def singleWBDispatchToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all() ):
-#    """
-#    View: singleWBDispatchToCompas
-#    URL: 
-#    
-#    Sends a single Dipatch into compas
-#    """
-#    waybill = get_object_or_404(queryset, pk = waybill_pk )
-#    the_compas = compas_write()
-#    error_message, error_codes = '', ''
-#    if the_compas.write_dispatch_waybill_compas( waybill_pk ):
-#        CompasLogger.objects.filter( wb = waybill ).delete()
-#        
-#        waybill.waybillSentToCompas = True
-#        waybill.save()
-#        
-#        messages.add_message( request, messages.INFO, 
-#                _('Waybill %(waybill)s Sucsessfully pushed to COMPAS') % {'waybill': waybill.waybillNumber} )
-#    else:
-#        create_or_update(waybill, request.user, the_compas.ErrorMessages)
-# 
-#        waybill.waybillValidated = False
-#        waybill.save()
-#        messages.add_message( request, messages.ERROR, 
-#                              _('Problem sending to compas: %(message)s') % { 'message': the_compas.ErrorMessages} )
-#        
-#        error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
-#        error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
-#        
-#    # Update stock after submit off waybill
-#    EpicStock.update()
-#    
-#    return redirect("waybill_validate_dispatch_form")
-# 
-# 
-# @login_required
-# def singleWBReceiptToCompas( request, waybill_pk, queryset=ets.models.Waybill.objects.all(), template='compas/status_waybill_compas_rec.html' ):
-#    """
-#    View: singleWBReceiptToCompas
-#    URL: ...
-#    Template: //waybill/templates/compas/status_waybill_compas_rec.html
-#    Sends a single Receipt into compas
-#    """
-#    #profile = getMyProfile(request)
-#    waybill = get_object_or_404(queryset, pk = waybill_pk )
-#    the_compas = compas_write()
-#    error_message, error_codes = '', ''
-#    if  the_compas.write_receipt_waybill_compas( waybill.pk ):
-#        CompasLogger.objects.filter( wb = waybill ).delete()
-# 
-#        waybill.waybillRecSentToCompas = True
-#        waybill.save()
-#    else:
-#        create_or_update(waybill, request.user, the_compas.ErrorMessages)
-#        
-#        waybill.waybillReceiptValidated = False
-#        waybill.save()
-#        
-#        error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
-#        error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
-#    
-#    # add field to say compas error/add logging Change to use messages....
-#    return direct_to_template( request,template, {
-#        'waybill': waybill,
-#        'error_message': error_message,
-#        'error_codes': error_codes,
-#    })
-# 
-# 
-# @login_required
-# def receiptToCompas( request, template='compas/list_waybills_compas_received.html' ):
-# 
-#    list_waybills = Waybill.objects.filter(waybillReceiptValidated = True, 
-#                                           waybillRecSentToCompas = False, 
-#                                           waybillSentToCompas = True )
-#    the_compas = compas_write()
-#    error_message, error_codes = '', ''
-#    
-#    for waybill in list_waybills:
-#        # call compas and read return
-#        if the_compas.write_receipt_waybill_compas( waybill.pk ):
-#            waybill.waybillRecSentToCompas = True
-#            waybill.save()
-#        else:
-#            error_message += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorMessages)
-#            error_codes += "%s-%s" % (waybill.waybillNumber, the_compas.ErrorCodes)
-#    
-#    return direct_to_template( request,template, {
-#        'waybill_list': list_waybills, 
-#        'error_message': error_message, 
-#        'error_codes': error_codes,
-#    })
-#=======================================================================================================================
-
 @login_required
 def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -381,86 +269,9 @@ def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Wayb
         
 
 @login_required
-def waybill_validate_form_update(request, waybill_pk, queryset, 
-                                 template='waybill/waybill_detail.html'):
-    """
-    Admin Edit waybill
-    waybill/validate/(.*)
-    waybill/waybill_detail.html
-    """
-    current_wb = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    lti_code = current_wb.ltiNumber
-    current_lti = LtiOriginal.objects.filter( code = lti_code )
-    current_audit = current_wb.audit_log.all()
-    current_wb.auditComment = ''
-    current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    myerror = current_wb.errors()
-
-    if myerror:
-        current_wb.dispError, current_wb.recError = myerror.errorDisp, myerror.errorRec
-        
-    class LRModelChoiceField( forms.ModelChoiceField ):
-        def label_from_instance( self, obj ):
-            cause = obj.cause
-            length_c = len( cause ) - 10
-            if length_c > 20:
-                cause = "%s...%s" % (cause[0:20], cause[length_c:])
-            return cause
-    
-    comm_cats = [item.comm_category_code for item in current_lti if item]
-    
-    class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
-        numberUnitsLoaded = forms.CharField(_("number of units loaded"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-
-        unitsLostReason = LRModelChoiceField(label = _("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(label = _("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
-
-        class Meta:
-            model = LoadingDetail
-            fields = ( 
-                'wbNumber', 'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 
-                'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 
-                'unitsDamagedReason', 'unitsDamagedType', 'unitsLostType', 
-                'overloadedUnits', 'overOffloadUnits' 
-            )
-
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
-                                       fk_name = "wbNumber", extra = 0 )
-    
-    qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, 
-                               organization_id = current_lti[0].consegnee_code )
-    if len( qs ) == 0:
-        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
-
-    if request.method == 'POST':
-        form = WaybillFullForm( request.POST or None, instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = qs
-        formset = LDFormSet( request.POST, instance = current_wb )
-        if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
-            return redirect( "waybill_search" )
-    else:
-        form = WaybillFullForm( instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = qs
-
-        formset = LDFormSet( instance = current_wb )
-    
-    return direct_to_template( request,template, {
-        'form': form, 'lti_list': current_lti, 
-        'formset': formset, 'audit': current_audit
-    })
-
-
-@login_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    queryset = queryset.filter(order__warehouse__compas__officers=request.user)
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
                                   
@@ -473,6 +284,16 @@ def waybill_validate(request, queryset, template, formset_model=ets.models.Waybi
         'formset': formset, 
         'validated_waybills': queryset.filter(validated=True),
     })
+
+@login_required
+def dispatch_validate(request, queryset, **kwargs):
+    return waybill_validate(request, queryset=queryset.filter(order__warehouse__compas__officers=request.user), **kwargs)
+
+@login_required
+def receipt_validate(request, queryset, **kwargs):
+    return waybill_validate(request, queryset=queryset.filter(destination__compas__officers=request.user), **kwargs)
+
+
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required

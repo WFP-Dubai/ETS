@@ -8,18 +8,6 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding model 'Place'
-        db.create_table(u'epic_geo', (
-            ('org_code', self.gf('django.db.models.fields.CharField')(max_length=7, primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('geo_point_code', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('geo_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
-            ('country_code', self.gf('django.db.models.fields.CharField')(max_length=3)),
-            ('reporting_code', self.gf('django.db.models.fields.CharField')(max_length=7)),
-            ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-        ))
-        db.send_create_signal('ets', ['Place'])
-
         # Adding model 'Compas'
         db.create_table('ets_compas', (
             ('code', self.gf('django.db.models.fields.CharField')(max_length=7, primary_key=True)),
@@ -67,20 +55,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('ets', ['Warehouse'])
 
-        # Adding model 'CompasPerson'
-        db.create_table(u'epic_persons', (
-            ('person_pk', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('last_name', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('first_name', self.gf('django.db.models.fields.CharField')(max_length=25)),
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=7)),
-            ('email', self.gf('django.db.models.fields.CharField')(max_length=100, db_column='e_mail_address', blank=True)),
-            ('org_unit_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=12)),
-            ('location_code', self.gf('django.db.models.fields.CharField')(max_length=12)),
-        ))
-        db.send_create_signal('ets', ['CompasPerson'])
-
         # Adding model 'Person'
         db.create_table('ets_person', (
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='person', unique=True, to=orm['auth.User'])),
@@ -114,33 +88,6 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('ets', ['Package'])
 
-        # Adding model 'EpicStock'
-        db.create_table(u'epic_stock', (
-            ('wh_pk', self.gf('django.db.models.fields.CharField')(max_length=90, primary_key=True)),
-            ('wh_regional', self.gf('django.db.models.fields.CharField')(max_length=4, blank=True)),
-            ('wh_country', self.gf('django.db.models.fields.CharField')(max_length=15)),
-            ('wh_location', self.gf('django.db.models.fields.CharField')(max_length=30)),
-            ('wh_code', self.gf('django.db.models.fields.CharField')(max_length=13)),
-            ('wh_name', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('project_wbs_element', self.gf('django.db.models.fields.CharField')(max_length=24, blank=True)),
-            ('si_record_id', self.gf('django.db.models.fields.CharField')(max_length=25)),
-            ('si_code', self.gf('django.db.models.fields.CharField')(max_length=8)),
-            ('origin_id', self.gf('django.db.models.fields.CharField')(max_length=23)),
-            ('comm_category_code', self.gf('django.db.models.fields.CharField')(max_length=9)),
-            ('commodity_code', self.gf('django.db.models.fields.CharField')(max_length=18)),
-            ('cmmname', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
-            ('package_code', self.gf('django.db.models.fields.CharField')(max_length=17)),
-            ('packagename', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('qualitycode', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('qualitydescr', self.gf('django.db.models.fields.CharField')(max_length=11, blank=True)),
-            ('quantity_net', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3, blank=True)),
-            ('quantity_gross', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3, blank=True)),
-            ('number_of_units', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=3)),
-            ('allocation_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('reference_number', self.gf('django.db.models.fields.CharField')(max_length=50)),
-        ))
-        db.send_create_signal('ets', ['EpicStock'])
-
         # Adding model 'StockItem'
         db.create_table('ets_stockitem', (
             ('origin_id', self.gf('django.db.models.fields.CharField')(max_length=23, primary_key=True)),
@@ -154,7 +101,9 @@ class Migration(SchemaMigration):
             ('number_of_units', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=3)),
             ('unit_weight_net', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=3)),
             ('unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=3)),
+            ('is_bulk', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('allocation_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('ets', ['StockItem'])
@@ -167,41 +116,6 @@ class Migration(SchemaMigration):
             ('cause', self.gf('django.db.models.fields.CharField')(max_length=100)),
         ))
         db.send_create_signal('ets', ['LossDamageType'])
-
-        # Adding model 'LtiOriginal'
-        db.create_table(u'epic_lti', (
-            ('lti_pk', self.gf('django.db.models.fields.CharField')(max_length=50, primary_key=True, db_column='LTI_PK')),
-            ('lti_id', self.gf('django.db.models.fields.CharField')(max_length=40, db_column='LTI_ID')),
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=40, db_column='CODE')),
-            ('lti_date', self.gf('django.db.models.fields.DateField')(db_column='LTI_DATE')),
-            ('expiry_date', self.gf('django.db.models.fields.DateField')(null=True, db_column='EXPIRY_DATE', blank=True)),
-            ('transport_code', self.gf('django.db.models.fields.CharField')(max_length=4, db_column='TRANSPORT_CODE')),
-            ('transport_ouc', self.gf('django.db.models.fields.CharField')(max_length=13, db_column='TRANSPORT_OUC')),
-            ('transport_name', self.gf('django.db.models.fields.CharField')(max_length=30, db_column='TRANSPORT_NAME')),
-            ('origin_type', self.gf('django.db.models.fields.CharField')(max_length=1, db_column='ORIGIN_TYPE')),
-            ('origintype_desc', self.gf('django.db.models.fields.CharField')(max_length=12, db_column='ORIGINTYPE_DESC', blank=True)),
-            ('origin_location_code', self.gf('django.db.models.fields.CharField')(max_length=10, db_column='ORIGIN_LOCATION_CODE')),
-            ('origin_loc_name', self.gf('django.db.models.fields.CharField')(max_length=30, db_column='ORIGIN_LOC_NAME')),
-            ('origin_wh_code', self.gf('django.db.models.fields.CharField')(max_length=13, db_column='ORIGIN_WH_CODE', blank=True)),
-            ('origin_wh_name', self.gf('django.db.models.fields.CharField')(max_length=50, db_column='ORIGIN_WH_NAME', blank=True)),
-            ('destination_location_code', self.gf('django.db.models.fields.CharField')(max_length=10, db_column='DESTINATION_LOCATION_CODE')),
-            ('destination_loc_name', self.gf('django.db.models.fields.CharField')(max_length=30, db_column='DESTINATION_LOC_NAME')),
-            ('consegnee_code', self.gf('django.db.models.fields.CharField')(max_length=12, db_column='CONSEGNEE_CODE')),
-            ('consegnee_name', self.gf('django.db.models.fields.CharField')(max_length=80, db_column='CONSEGNEE_NAME')),
-            ('requested_dispatch_date', self.gf('django.db.models.fields.DateField')(null=True, db_column='REQUESTED_DISPATCH_DATE', blank=True)),
-            ('project_wbs_element', self.gf('django.db.models.fields.CharField')(max_length=24, db_column='PROJECT_WBS_ELEMENT', blank=True)),
-            ('si_record_id', self.gf('django.db.models.fields.CharField')(max_length=25, db_column='SI_RECORD_ID', blank=True)),
-            ('si_code', self.gf('django.db.models.fields.CharField')(max_length=8, db_column='SI_CODE')),
-            ('comm_category_code', self.gf('django.db.models.fields.CharField')(max_length=9, db_column='COMM_CATEGORY_CODE')),
-            ('commodity_code', self.gf('django.db.models.fields.CharField')(max_length=18, db_column='COMMODITY_CODE')),
-            ('cmmname', self.gf('django.db.models.fields.CharField')(max_length=100, db_column='CMMNAME', blank=True)),
-            ('number_of_units', self.gf('django.db.models.fields.DecimalField')(db_column='NUMBER_OF_UNITS', decimal_places=3, max_digits=7)),
-            ('quantity_net', self.gf('django.db.models.fields.DecimalField')(db_column='QUANTITY_NET', decimal_places=3, max_digits=11)),
-            ('quantity_gross', self.gf('django.db.models.fields.DecimalField')(db_column='QUANTITY_GROSS', decimal_places=3, max_digits=11)),
-            ('unit_weight_net', self.gf('django.db.models.fields.DecimalField')(blank=True, null=True, db_column='UNIT_WEIGHT_NET', decimal_places=3, max_digits=8)),
-            ('unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(blank=True, null=True, db_column='UNIT_WEIGHT_GROSS', decimal_places=3, max_digits=8)),
-        ))
-        db.send_create_signal('ets', ['LtiOriginal'])
 
         # Adding model 'Order'
         db.create_table('ets_order', (
@@ -333,7 +247,6 @@ class Migration(SchemaMigration):
             ('units_lost_reason', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='_auditlog_lost_reason', null=True, to=orm['ets.LossDamageType'])),
             ('units_damaged_reason', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='_auditlog_damage_reason', null=True, to=orm['ets.LossDamageType'])),
             ('overloaded_units', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('sent_compas', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('over_offload_units', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('_order', self.gf('django.db.models.fields.proxy.OrderWrt')()),
             ('action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -355,7 +268,6 @@ class Migration(SchemaMigration):
             ('units_lost_reason', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='lost_reason', null=True, to=orm['ets.LossDamageType'])),
             ('units_damaged_reason', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='damage_reason', null=True, to=orm['ets.LossDamageType'])),
             ('overloaded_units', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('sent_compas', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('over_offload_units', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
@@ -364,108 +276,11 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'LoadingDetail', fields ['waybill', 'stock_item']
         db.create_unique('ets_loadingdetail', ['waybill_id', 'stock_item_id'])
 
-        # Adding model 'CompasLogger'
-        db.create_table(u'loggercompas', (
-            ('timestamp', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
-            ('user', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['auth.User'])),
-            ('action', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('errorRec', self.gf('django.db.models.fields.CharField')(max_length=2000, blank=True)),
-            ('errorDisp', self.gf('django.db.models.fields.CharField')(max_length=2000, blank=True)),
-            ('wb', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.Waybill'], primary_key=True)),
-            ('lti', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('data_in', self.gf('django.db.models.fields.CharField')(max_length=5000, blank=True)),
-            ('data_out', self.gf('django.db.models.fields.CharField')(max_length=5000, blank=True)),
-        ))
-        db.send_create_signal('ets', ['CompasLogger'])
-
-        # Adding model 'DispatchMaster'
-        db.create_table(u'dispatch_masters', (
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=25, primary_key=True)),
-            ('document_code', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('dispatch_date', self.gf('django.db.models.fields.DateField')()),
-            ('origin_type', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('origin_location_code', self.gf('django.db.models.fields.CharField')(max_length=13)),
-            ('intvyg_code', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('intdlv_code', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('origin_code', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('origin_descr', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('destination_location_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('destination_code', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('pro_activity_code', self.gf('django.db.models.fields.CharField')(max_length=6, blank=True)),
-            ('activity_ouc', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('lndarrm_code', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('lti_id', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('loan_id', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('loading_date', self.gf('django.db.models.fields.DateField')()),
-            ('organization_id', self.gf('django.db.models.fields.CharField')(max_length=12)),
-            ('tran_type_code', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('tran_type_descr', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('modetrans_code', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('comments', self.gf('django.db.models.fields.CharField')(max_length=250, blank=True)),
-            ('person_code', self.gf('django.db.models.fields.CharField')(max_length=7)),
-            ('person_ouc', self.gf('django.db.models.fields.CharField')(max_length=13)),
-            ('certifing_title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('trans_contractor_code', self.gf('django.db.models.fields.CharField')(max_length=4)),
-            ('supplier1_ouc', self.gf('django.db.models.fields.CharField')(max_length=13)),
-            ('trans_subcontractor_code', self.gf('django.db.models.fields.CharField')(max_length=4, blank=True)),
-            ('supplier2_ouc', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('nmbplt_id', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('nmbtrl_id', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('driver_name', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('license', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-            ('vehicle_registration', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-            ('trailer_plate', self.gf('django.db.models.fields.CharField')(max_length=20, blank=True)),
-            ('container_number', self.gf('django.db.models.fields.CharField')(max_length=15, blank=True)),
-            ('atl_li_code', self.gf('django.db.models.fields.CharField')(max_length=8, blank=True)),
-            ('notify_indicator', self.gf('django.db.models.fields.CharField')(max_length=1, blank=True)),
-            ('customised', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('org_unit_code', self.gf('django.db.models.fields.CharField')(max_length=13)),
-            ('printed_indicator', self.gf('django.db.models.fields.CharField')(max_length=1, blank=True)),
-            ('notify_org_unit_code', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('offid', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('send_pack', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('recv_pack', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('last_mod_user', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-            ('last_mod_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('ets', ['DispatchMaster'])
-
-        # Adding model 'DispatchDetail'
-        db.create_table(u'dispatch_details', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('code', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['ets.DispatchMaster'])),
-            ('document_code', self.gf('django.db.models.fields.CharField')(max_length=2)),
-            ('si_record_id', self.gf('django.db.models.fields.CharField')(max_length=25, null=True, blank=True)),
-            ('origin_id', self.gf('django.db.models.fields.CharField')(max_length=23, blank=True)),
-            ('comm_category_code', self.gf('django.db.models.fields.CharField')(max_length=9)),
-            ('commodity_code', self.gf('django.db.models.fields.CharField')(max_length=18)),
-            ('package_code', self.gf('django.db.models.fields.CharField')(max_length=17)),
-            ('allocation_destination_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
-            ('quality', self.gf('django.db.models.fields.CharField')(max_length=1)),
-            ('quantity_net', self.gf('django.db.models.fields.DecimalField')(max_digits=11, decimal_places=3)),
-            ('quantity_gross', self.gf('django.db.models.fields.DecimalField')(max_digits=11, decimal_places=3)),
-            ('number_of_units', self.gf('django.db.models.fields.IntegerField')()),
-            ('unit_weight_net', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=3, blank=True)),
-            ('unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=8, decimal_places=3, blank=True)),
-            ('lonmst_id', self.gf('django.db.models.fields.CharField')(max_length=25, blank=True)),
-            ('londtl_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('rpydtl_id', self.gf('django.db.models.fields.IntegerField')(null=True, blank=True)),
-            ('offid', self.gf('django.db.models.fields.CharField')(max_length=13, blank=True)),
-            ('send_pack', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('recv_pack', self.gf('django.db.models.fields.BigIntegerField')(null=True, blank=True)),
-            ('last_mod_user', self.gf('django.db.models.fields.CharField')(max_length=30, blank=True)),
-            ('last_mod_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
-        ))
-        db.send_create_signal('ets', ['DispatchDetail'])
-
 
     def backwards(self, orm):
         
         # Removing unique constraint on 'LoadingDetail', fields ['waybill', 'stock_item']
         db.delete_unique('ets_loadingdetail', ['waybill_id', 'stock_item_id'])
-
-        # Deleting model 'Place'
-        db.delete_table(u'epic_geo')
 
         # Deleting model 'Compas'
         db.delete_table('ets_compas')
@@ -482,9 +297,6 @@ class Migration(SchemaMigration):
         # Deleting model 'Warehouse'
         db.delete_table('ets_warehouse')
 
-        # Deleting model 'CompasPerson'
-        db.delete_table(u'epic_persons')
-
         # Deleting model 'Person'
         db.delete_table('ets_person')
 
@@ -497,17 +309,11 @@ class Migration(SchemaMigration):
         # Deleting model 'Package'
         db.delete_table('ets_package')
 
-        # Deleting model 'EpicStock'
-        db.delete_table(u'epic_stock')
-
         # Deleting model 'StockItem'
         db.delete_table('ets_stockitem')
 
         # Deleting model 'LossDamageType'
         db.delete_table(u'epic_lossdamagereason')
-
-        # Deleting model 'LtiOriginal'
-        db.delete_table(u'epic_lti')
 
         # Deleting model 'Order'
         db.delete_table('ets_order')
@@ -529,15 +335,6 @@ class Migration(SchemaMigration):
 
         # Deleting model 'LoadingDetail'
         db.delete_table('ets_loadingdetail')
-
-        # Deleting model 'CompasLogger'
-        db.delete_table(u'loggercompas')
-
-        # Deleting model 'DispatchMaster'
-        db.delete_table(u'dispatch_masters')
-
-        # Deleting model 'DispatchDetail'
-        db.delete_table(u'dispatch_details')
 
 
     models = {
@@ -598,131 +395,6 @@ class Migration(SchemaMigration):
             'db_user': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'officers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'compases'", 'symmetrical': 'False', 'to': "orm['auth.User']"})
         },
-        'ets.compaslogger': {
-            'Meta': {'object_name': 'CompasLogger', 'db_table': "u'loggercompas'"},
-            'action': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'data_in': ('django.db.models.fields.CharField', [], {'max_length': '5000', 'blank': 'True'}),
-            'data_out': ('django.db.models.fields.CharField', [], {'max_length': '5000', 'blank': 'True'}),
-            'errorDisp': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'blank': 'True'}),
-            'errorRec': ('django.db.models.fields.CharField', [], {'max_length': '2000', 'blank': 'True'}),
-            'lti': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'timestamp': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
-            'user': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['auth.User']"}),
-            'wb': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.Waybill']", 'primary_key': 'True'})
-        },
-        'ets.compasperson': {
-            'Meta': {'object_name': 'CompasPerson', 'db_table': "u'epic_persons'"},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '7'}),
-            'email': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_column': "'e_mail_address'", 'blank': 'True'}),
-            'first_name': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
-            'last_name': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'location_code': ('django.db.models.fields.CharField', [], {'max_length': '12'}),
-            'org_unit_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'organization_id': ('django.db.models.fields.CharField', [], {'max_length': '12'}),
-            'person_pk': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
-            'title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'})
-        },
-        'ets.dispatchdetail': {
-            'Meta': {'object_name': 'DispatchDetail', 'db_table': "u'dispatch_details'"},
-            'allocation_destination_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'code': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['ets.DispatchMaster']"}),
-            'comm_category_code': ('django.db.models.fields.CharField', [], {'max_length': '9'}),
-            'commodity_code': ('django.db.models.fields.CharField', [], {'max_length': '18'}),
-            'document_code': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'last_mod_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'last_mod_user': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'londtl_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'lonmst_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'number_of_units': ('django.db.models.fields.IntegerField', [], {}),
-            'offid': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'origin_id': ('django.db.models.fields.CharField', [], {'max_length': '23', 'blank': 'True'}),
-            'package_code': ('django.db.models.fields.CharField', [], {'max_length': '17'}),
-            'quality': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'quantity_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '11', 'decimal_places': '3'}),
-            'quantity_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '11', 'decimal_places': '3'}),
-            'recv_pack': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'rpydtl_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'send_pack': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'null': 'True', 'blank': 'True'}),
-            'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '8', 'decimal_places': '3', 'blank': 'True'}),
-            'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '8', 'decimal_places': '3', 'blank': 'True'})
-        },
-        'ets.dispatchmaster': {
-            'Meta': {'object_name': 'DispatchMaster', 'db_table': "u'dispatch_masters'"},
-            'activity_ouc': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'atl_li_code': ('django.db.models.fields.CharField', [], {'max_length': '8', 'blank': 'True'}),
-            'certifing_title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '25', 'primary_key': 'True'}),
-            'comments': ('django.db.models.fields.CharField', [], {'max_length': '250', 'blank': 'True'}),
-            'container_number': ('django.db.models.fields.CharField', [], {'max_length': '15', 'blank': 'True'}),
-            'customised': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'destination_code': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'destination_location_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'dispatch_date': ('django.db.models.fields.DateField', [], {}),
-            'document_code': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'driver_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'intdlv_code': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'intvyg_code': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'last_mod_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'last_mod_user': ('django.db.models.fields.CharField', [], {'max_length': '30', 'blank': 'True'}),
-            'license': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
-            'lndarrm_code': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'loading_date': ('django.db.models.fields.DateField', [], {}),
-            'loan_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'lti_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'modetrans_code': ('django.db.models.fields.CharField', [], {'max_length': '2'}),
-            'nmbplt_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'nmbtrl_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'blank': 'True'}),
-            'notify_indicator': ('django.db.models.fields.CharField', [], {'max_length': '1', 'blank': 'True'}),
-            'notify_org_unit_code': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'offid': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'org_unit_code': ('django.db.models.fields.CharField', [], {'max_length': '13'}),
-            'organization_id': ('django.db.models.fields.CharField', [], {'max_length': '12'}),
-            'origin_code': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'origin_descr': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'origin_location_code': ('django.db.models.fields.CharField', [], {'max_length': '13'}),
-            'origin_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'person_code': ('django.db.models.fields.CharField', [], {'max_length': '7'}),
-            'person_ouc': ('django.db.models.fields.CharField', [], {'max_length': '13'}),
-            'printed_indicator': ('django.db.models.fields.CharField', [], {'max_length': '1', 'blank': 'True'}),
-            'pro_activity_code': ('django.db.models.fields.CharField', [], {'max_length': '6', 'blank': 'True'}),
-            'recv_pack': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'send_pack': ('django.db.models.fields.BigIntegerField', [], {'null': 'True', 'blank': 'True'}),
-            'supplier1_ouc': ('django.db.models.fields.CharField', [], {'max_length': '13'}),
-            'supplier2_ouc': ('django.db.models.fields.CharField', [], {'max_length': '13', 'blank': 'True'}),
-            'trailer_plate': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
-            'tran_type_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'tran_type_descr': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'trans_contractor_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'trans_subcontractor_code': ('django.db.models.fields.CharField', [], {'max_length': '4', 'blank': 'True'}),
-            'vehicle_registration': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'})
-        },
-        'ets.epicstock': {
-            'Meta': {'object_name': 'EpicStock', 'db_table': "u'epic_stock'"},
-            'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'cmmname': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
-            'comm_category_code': ('django.db.models.fields.CharField', [], {'max_length': '9'}),
-            'commodity_code': ('django.db.models.fields.CharField', [], {'max_length': '18'}),
-            'number_of_units': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
-            'origin_id': ('django.db.models.fields.CharField', [], {'max_length': '23'}),
-            'package_code': ('django.db.models.fields.CharField', [], {'max_length': '17'}),
-            'packagename': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'project_wbs_element': ('django.db.models.fields.CharField', [], {'max_length': '24', 'blank': 'True'}),
-            'qualitycode': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
-            'qualitydescr': ('django.db.models.fields.CharField', [], {'max_length': '11', 'blank': 'True'}),
-            'quantity_gross': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '3', 'blank': 'True'}),
-            'quantity_net': ('django.db.models.fields.DecimalField', [], {'null': 'True', 'max_digits': '12', 'decimal_places': '3', 'blank': 'True'}),
-            'reference_number': ('django.db.models.fields.CharField', [], {'max_length': '50'}),
-            'si_code': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
-            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
-            'wh_code': ('django.db.models.fields.CharField', [], {'max_length': '13'}),
-            'wh_country': ('django.db.models.fields.CharField', [], {'max_length': '15'}),
-            'wh_location': ('django.db.models.fields.CharField', [], {'max_length': '30'}),
-            'wh_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'wh_pk': ('django.db.models.fields.CharField', [], {'max_length': '90', 'primary_key': 'True'}),
-            'wh_regional': ('django.db.models.fields.CharField', [], {'max_length': '4', 'blank': 'True'})
-        },
         'ets.loadingdetail': {
             'Meta': {'ordering': "('_order',)", 'unique_together': "(('waybill', 'stock_item'),)", 'object_name': 'LoadingDetail'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -732,7 +404,6 @@ class Migration(SchemaMigration):
             'number_units_lost': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '10', 'decimal_places': '3'}),
             'over_offload_units': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'overloaded_units': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'sent_compas': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),
             'stock_item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dispatches'", 'to': "orm['ets.StockItem']"}),
             'units_damaged_reason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'damage_reason'", 'null': 'True', 'to': "orm['ets.LossDamageType']"}),
@@ -752,7 +423,6 @@ class Migration(SchemaMigration):
             'number_units_lost': ('django.db.models.fields.DecimalField', [], {'default': '0', 'max_digits': '10', 'decimal_places': '3'}),
             'over_offload_units': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'overloaded_units': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'sent_compas': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'populate_from': 'None', 'db_index': 'True'}),
             'stock_item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_dispatches'", 'to': "orm['ets.StockItem']"}),
             'units_damaged_reason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_damage_reason'", 'null': 'True', 'to': "orm['ets.LossDamageType']"}),
@@ -771,39 +441,6 @@ class Migration(SchemaMigration):
             'cause': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),
             'type': ('django.db.models.fields.CharField', [], {'max_length': '1'})
-        },
-        'ets.ltioriginal': {
-            'Meta': {'object_name': 'LtiOriginal', 'db_table': "u'epic_lti'"},
-            'cmmname': ('django.db.models.fields.CharField', [], {'max_length': '100', 'db_column': "'CMMNAME'", 'blank': 'True'}),
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '40', 'db_column': "'CODE'"}),
-            'comm_category_code': ('django.db.models.fields.CharField', [], {'max_length': '9', 'db_column': "'COMM_CATEGORY_CODE'"}),
-            'commodity_code': ('django.db.models.fields.CharField', [], {'max_length': '18', 'db_column': "'COMMODITY_CODE'"}),
-            'consegnee_code': ('django.db.models.fields.CharField', [], {'max_length': '12', 'db_column': "'CONSEGNEE_CODE'"}),
-            'consegnee_name': ('django.db.models.fields.CharField', [], {'max_length': '80', 'db_column': "'CONSEGNEE_NAME'"}),
-            'destination_loc_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_column': "'DESTINATION_LOC_NAME'"}),
-            'destination_location_code': ('django.db.models.fields.CharField', [], {'max_length': '10', 'db_column': "'DESTINATION_LOCATION_CODE'"}),
-            'expiry_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'db_column': "'EXPIRY_DATE'", 'blank': 'True'}),
-            'lti_date': ('django.db.models.fields.DateField', [], {'db_column': "'LTI_DATE'"}),
-            'lti_id': ('django.db.models.fields.CharField', [], {'max_length': '40', 'db_column': "'LTI_ID'"}),
-            'lti_pk': ('django.db.models.fields.CharField', [], {'max_length': '50', 'primary_key': 'True', 'db_column': "'LTI_PK'"}),
-            'number_of_units': ('django.db.models.fields.DecimalField', [], {'db_column': "'NUMBER_OF_UNITS'", 'decimal_places': '3', 'max_digits': '7'}),
-            'origin_loc_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_column': "'ORIGIN_LOC_NAME'"}),
-            'origin_location_code': ('django.db.models.fields.CharField', [], {'max_length': '10', 'db_column': "'ORIGIN_LOCATION_CODE'"}),
-            'origin_type': ('django.db.models.fields.CharField', [], {'max_length': '1', 'db_column': "'ORIGIN_TYPE'"}),
-            'origin_wh_code': ('django.db.models.fields.CharField', [], {'max_length': '13', 'db_column': "'ORIGIN_WH_CODE'", 'blank': 'True'}),
-            'origin_wh_name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'db_column': "'ORIGIN_WH_NAME'", 'blank': 'True'}),
-            'origintype_desc': ('django.db.models.fields.CharField', [], {'max_length': '12', 'db_column': "'ORIGINTYPE_DESC'", 'blank': 'True'}),
-            'project_wbs_element': ('django.db.models.fields.CharField', [], {'max_length': '24', 'db_column': "'PROJECT_WBS_ELEMENT'", 'blank': 'True'}),
-            'quantity_gross': ('django.db.models.fields.DecimalField', [], {'db_column': "'QUANTITY_GROSS'", 'decimal_places': '3', 'max_digits': '11'}),
-            'quantity_net': ('django.db.models.fields.DecimalField', [], {'db_column': "'QUANTITY_NET'", 'decimal_places': '3', 'max_digits': '11'}),
-            'requested_dispatch_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'db_column': "'REQUESTED_DISPATCH_DATE'", 'blank': 'True'}),
-            'si_code': ('django.db.models.fields.CharField', [], {'max_length': '8', 'db_column': "'SI_CODE'"}),
-            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'db_column': "'SI_RECORD_ID'", 'blank': 'True'}),
-            'transport_code': ('django.db.models.fields.CharField', [], {'max_length': '4', 'db_column': "'TRANSPORT_CODE'"}),
-            'transport_name': ('django.db.models.fields.CharField', [], {'max_length': '30', 'db_column': "'TRANSPORT_NAME'"}),
-            'transport_ouc': ('django.db.models.fields.CharField', [], {'max_length': '13', 'db_column': "'TRANSPORT_OUC'"}),
-            'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'blank': 'True', 'null': 'True', 'db_column': "'UNIT_WEIGHT_GROSS'", 'decimal_places': '3', 'max_digits': '8'}),
-            'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'blank': 'True', 'null': 'True', 'db_column': "'UNIT_WEIGHT_NET'", 'decimal_places': '3', 'max_digits': '8'})
         },
         'ets.order': {
             'Meta': {'ordering': "('code',)", 'object_name': 'Order'},
@@ -850,16 +487,6 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'person'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
-        'ets.place': {
-            'Meta': {'ordering': "('name',)", 'object_name': 'Place', 'db_table': "u'epic_geo'"},
-            'country_code': ('django.db.models.fields.CharField', [], {'max_length': '3'}),
-            'geo_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'geo_point_code': ('django.db.models.fields.CharField', [], {'max_length': '4'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
-            'org_code': ('django.db.models.fields.CharField', [], {'max_length': '7', 'primary_key': 'True'}),
-            'organization_id': ('django.db.models.fields.CharField', [], {'max_length': '20', 'blank': 'True'}),
-            'reporting_code': ('django.db.models.fields.CharField', [], {'max_length': '7'})
-        },
         'ets.receiptwaybill': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'ReceiptWaybill'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
@@ -880,7 +507,9 @@ class Migration(SchemaMigration):
         'ets.stockitem': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Commodity']"}),
+            'is_bulk': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'number_of_units': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
             'origin_id': ('django.db.models.fields.CharField', [], {'max_length': '23', 'primary_key': 'True'}),
             'package': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Package']"}),

@@ -29,7 +29,7 @@
             <tr>
                 <td><sup style="font-size:x-small;">{% trans "Type of Transaction" %}</sup><br>{{ object.get_transaction_type_display }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Transport Type" %}: </sup><br>{{ object.get_transport_type_display }}</td>
-                <td><sup style="font-size:x-small;">{% trans "LTI no" %}: </sup><br>{{ object.order_code }}</td>
+                <td><sup style="font-size:x-small;">{% trans "LTI no" %}: </sup><br>{{ object.order.pk }}</td>
             </tr>
             
             <tr ><td colspan=3 valign="top" style="font-size:small;"><sup style="font-size:x-small;">{% trans "Dispatch Remarks" %}:</sup>{{ object.dispatch_remarks }}
