@@ -81,17 +81,7 @@ urlpatterns = patterns("ets.views",
                                    waybill__status__gte=ets.models.Waybill.DELIVERED),
     }, "waybill_validate_receipt_form" ),
                        
-    ( r'^validate/(?P<waybill_pk>[-\w]+)/$', "waybill_validate_form_update", {
-        'queryset': Waybill.objects.all(),
-    }, "waybill_validate_form_update" ),
-                       
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
-    #===================================================================================================================
-    # ( r'^waybill/commit_to_compas_receipt/$', "receiptToCompas", {}, "receiptToCompas" ),
-    # ( r'^waybill/commit_to_compas_dispatch_one/(?P<waybill_pk>[-\w]+)/$', "singleWBDispatchToCompas", 
-    #  {}, "singleWBDispatchToCompas" ),
-    # ( r'^waybill/commit_to_compas_receipt_one/(?P<waybill_pk>[-\w]+)/$', "singleWBReceiptToCompas", 
-    #  {}, "singleWBReceiptToCompas" ),
     #===================================================================================================================
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',

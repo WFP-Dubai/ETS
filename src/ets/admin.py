@@ -250,3 +250,12 @@ class CommodityCategoryAdmin(admin.ModelAdmin):
     inlines = (LossDamageTypeInline, CommodityInline)
 
 admin.site.register( ets.models.CommodityCategory, CommodityCategoryAdmin )
+
+
+class PersonAdmin(admin.ModelAdmin):
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+    
+    list_display = ('pk', 'code', 'title', 'link_to_user', 'link_to_compas', 'link_to_organization', 'link_to_location')
+    search_fields = ('pk', 'code', 'title', 'user__username', 'compas__code', 'organization__name', 'location__name')
+
+admin.site.register(ets.models.Person, PersonAdmin)

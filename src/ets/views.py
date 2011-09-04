@@ -208,7 +208,7 @@ def waybill_finalize_receipt( request, waybill_pk, queryset):
     Called when user pushes Print Original on Receipt
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    queryset = queryset.filter(destination__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.receipt_sign()
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
@@ -269,83 +269,6 @@ def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Wayb
     else:
         return redirect(request.META['HTTP_REFERER'])
         
-
-@login_required
-def waybill_validate_form_update(request, waybill_pk, queryset, 
-                                 template='waybill/waybill_detail.html'):
-    """
-    Admin Edit waybill
-    waybill/validate/(.*)
-    waybill/waybill_detail.html
-    """
-    current_wb = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    lti_code = current_wb.ltiNumber
-    current_lti = LtiOriginal.objects.filter( code = lti_code )
-    current_audit = current_wb.audit_log.all()
-    current_wb.auditComment = ''
-    current_items = LtiWithStock.objects.filter( lti_code = lti_code )
-    myerror = current_wb.errors()
-
-    if myerror:
-        current_wb.dispError, current_wb.recError = myerror.errorDisp, myerror.errorRec
-        
-    class LRModelChoiceField( forms.ModelChoiceField ):
-        def label_from_instance( self, obj ):
-            cause = obj.cause
-            length_c = len( cause ) - 10
-            if length_c > 20:
-                cause = "%s...%s" % (cause[0:20], cause[length_c:])
-            return cause
-    
-    comm_cats = [item.comm_category_code for item in current_lti if item]
-    
-    class LoadingDetailDispatchForm( forms.ModelForm ):
-        order_item = forms.ModelChoiceField( queryset = current_items, label = 'Commodity' )
-        numberUnitsLoaded = forms.CharField(_("number of units loaded"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsGood = forms.CharField(_("number of units good"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsLost = forms.CharField(_("number of units lost"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-        numberUnitsDamaged = forms.CharField(_("number of units damaged"), widget = forms.TextInput( attrs = {'size':'5'} ), required = False )
-
-        unitsLostReason = LRModelChoiceField(label = _("units lost reason"), queryset = EpicLossDamages.objects.filter(type = 'L', comm_category_code__in = comm_cats ) , required = False )
-        unitsDamagedReason = LRModelChoiceField(label = _("units damaged reason"), queryset = EpicLossDamages.objects.filter( type = 'D', comm_category_code__in = comm_cats ) , required = False )
-
-        class Meta:
-            model = LoadingDetail
-            fields = ( 
-                'wbNumber', 'order_item', 'numberUnitsLoaded', 'numberUnitsGood', 
-                'numberUnitsLost', 'numberUnitsDamaged', 'unitsLostReason', 
-                'unitsDamagedReason', 'unitsDamagedType', 'unitsLostType', 
-                'overloadedUnits', 'overOffloadUnits' 
-            )
-
-    LDFormSet = inlineformset_factory( Waybill, LoadingDetail, LoadingDetailDispatchForm, 
-                                       fk_name = "wbNumber", extra = 0 )
-    
-    qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name, 
-                               organization_id = current_lti[0].consegnee_code )
-    if len( qs ) == 0:
-        qs = Place.objects.filter( geo_name = current_lti[0].destination_loc_name )
-
-    if request.method == 'POST':
-        form = WaybillFullForm( request.POST or None, instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = qs
-        formset = LDFormSet( request.POST, instance = current_wb )
-        if form.is_valid() and formset.is_valid():
-            form.save()
-            formset.save()
-            return redirect( "waybill_search" )
-    else:
-        form = WaybillFullForm( instance = current_wb )
-        form.fields["destinationWarehouse"].queryset = qs
-
-        formset = LDFormSet( instance = current_wb )
-    
-    return direct_to_template( request,template, {
-        'form': form, 'lti_list': current_lti, 
-        'formset': formset, 'audit': current_audit
-    })
-
 
 @login_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):

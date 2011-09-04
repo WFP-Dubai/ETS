@@ -276,12 +276,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(self.reception_waybill.get_receipt().remarks, 'test remarks')
     
-    def test_waybill_validate_form_update(self):
-        """ets.views.waybill_validate_form_update test"""
-        response = self.client.get(reverse('waybill_validate_form_update', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(self.lti in response.context['lti_list'])
-     
     def test_waybill_delete(self):
         """ets.views.waybill_delete"""  
         col = ets.models.Waybill.objects.all().count()     
