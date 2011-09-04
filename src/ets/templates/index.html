@@ -26,15 +26,6 @@
     </form>
   </li>
 
-  <li>
-    {% trans "Scan Waybill -->" %}
-    <form method='POST' action='{% url deserialize %}'>
-      {% csrf_token %}
-      <input type="text" name="wbdata"/>
-      <input type="submit" value="{% trans 'Receive Scanned Waybill' %}" />
-    </form>
-  </li>
-
 </ul>
 
 {% endblock %}
