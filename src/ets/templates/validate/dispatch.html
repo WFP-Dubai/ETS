@@ -1,0 +1,131 @@
+{% extends "base_template.html"%}
+{% load i18n extra_tags %}
+{% block content %}
+<h3>{% block page_title %}{% trans "Validate Dispatch" %}{% endblock %}</h3>
+<form method="post" action="">{% csrf_token %}
+    {{ formset.management_form }}
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="toplist">
+    <thead>
+    {% block thead %}
+        <tr>
+        <th>{% trans "Order" %}</th>
+        <th>{% trans "Waybill Number" %}</th>
+        <th>{% trans "Origin Warehouse" %}</th>
+        <th>{% trans "Consignee" %}</th>
+        <th>{% trans "Delivery Location" %}</th>
+        <th>{% trans "Dispatched" %}</th>
+        <th>{% trans "Received" %}</th>
+        <th>{% trans "Validated" %}</th>
+        <th></th>
+        </tr>
+    {% endblock %}
+    </thead>
+    {% for form in formset.forms %}
+    <tr>
+    {% with form.instance as waybill %}
+    {% block waybill-row %}
+       <td>{{ waybill.order_code }}</td>
+       <td>{{ form.slug }}{{ waybill.pk }}</td>
+       <td>{{ waybill.warehouse }}</td>
+       <td>{{ waybill.destination.organization }}</td>
+       <td>{{ waybill.destination.location }}</td>
+       <td>
+        {% if waybill.transport_dispach_signed_date %}
+          {{ waybill.transport_dispach_signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+       </td>
+       <td>
+        {% if waybill.receipt.signed_date %}
+          {{ waybill.receipt.signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+       </td>
+       <td>{{ form.validated }}
+        {% if waybill.hasError %}
+          <span onMouseUp="alert('{{ waybill.errors.errorDisp|escapejs }}')">
+            <span style='color:red;'>{% trans "Error!" %}</span>
+          </span>
+        {% endif %}
+       </td>
+       <td>
+        <a href="{{ waybill.get_absolute_url }}">{% trans "View" %}</a>
+          {% waybill_edit waybill user %}
+       </td>
+    {% endblock %}
+    {% endwith %}
+    </tr>
+    {% endfor %}
+</table>
+
+<input type="submit" value="{% trans 'Validate Waybills' %}" />
+</form>
+
+<br>
+<h3>{% trans "Validated, but not sent to COMPAS" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
+    <thead>
+        <tr>
+        <th>{% trans "Order" %}</th>
+        <th>{% trans "Waybill Number" %}</th>
+        <th>{% trans "Origin Warehouse" %}</th>
+        <th>{% trans "Consignee" %}</th>
+        <th>{% trans "Delivery Location" %}</th>
+        <th>{% trans "Dispatched" %}</th>
+        <th>{% trans "Received" %}</th>
+        </tr>
+        </thead>
+    {% for waybill in validated_waybills %}
+    {% block validated-item %}
+    <tr>
+      <td>{{ waybill.order_code }}</td>
+      <td>{{ waybill.pk }}</td>
+      <td>{{ waybill.warehouse }}</td>
+      <td>{{ waybill.destination.organization.name }}</td>
+      <td>{{ waybill.destination.location.name }}</td>
+      <td>
+        {% if waybill.transport_dispach_signed_date %}
+          {{ waybill.transport_dispach_signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+      </td>
+      <td>
+        {% if waybill.receipt.signed_date %}
+          {{ waybill.receipt.signed_date }}
+        {% else %}
+          {% trans "Pending" %}
+        {% endif %}
+      </td>
+    </tr>
+    {% endblock %}
+    {% endfor %}
+</table>
+{%endblock%}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8">
+$(document).ready(function() {
+  $('#toplist').dataTable( {
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": false,
+      "bInfo": false,
+      "bAutoWidth": false 
+  });
+  $('#example2').dataTable( {
+      "bPaginate": false,
+      "bLengthChange": false,
+      "bFilter": false,
+      "bSort": false,
+      "bInfo": false,
+      "bAutoWidth": false 
+  });
+});
+</script>
+{% endblock %}

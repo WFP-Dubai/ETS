@@ -22,11 +22,13 @@ install_requires = [
         'django-debug-toolbar',
         #'hashlib',
         'django-audit-log',
-        #'cx_Oracle',
+        'cx_Oracle',
         'simplejson >= 2.1.0',
         'django-piston',
         'docutils',
         'django-autoslug',
+        'django-uni-form >= 0.7.0', #div-based forms
+        'django-logicaldelete',
 ]
 
 #Extra dependencies for test purposes

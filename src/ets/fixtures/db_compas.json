@@ -1,0 +1,12 @@
+[
+  {
+    "pk": "dev_compas",
+    "model": "ets.compas",
+    "fields": {
+      "officers": [1],
+      
+      "db_engine": "django.db.backends.sqlite3",
+      "db_name": "compas"
+    }
+  }
+]

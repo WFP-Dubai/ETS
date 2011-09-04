@@ -1,6 +1,11 @@
-from django import template
 import time, calendar
+
+from django import template
+from django.core.urlresolvers import reverse
+
 from ets import settings
+from ets.models import Warehouse
+
 register = template.Library()
 # Sample
 @register.tag( name = "current_time" )
@@ -57,18 +62,91 @@ def truncatesmart( value, limit = 80 ):
     # Join the words and return
     return ' '.join( words ) + '...'
 
-@register.tag( name = "print_tag" )
-def do_print_tag( parser, token ):
-    return PrintTagNode()
+#=======================================================================================================================
+# @register.tag
+# def waybill_edit( parser, token ):
+#    try:
+#        tag_name, action, waybill, user = token.split_contents()
+#    except ValueError:
+#        msg = '%r tag requires waybill and user as arguments' % token.contents[0]
+#        raise template.TemplateSyntaxError(msg)   
+#    return WaybillEditNode(action, waybill, user)
+#    
+# 
+# class WaybillEditNode(template.Node):
+#    def __init__(self, action, waybill, user):
+#        self.user = user
+#        self.waybill = waybill
+#        self.action = action
+# 
+#    def render(self, context):
+#        if self.user.get_profile().receipt_warehouse == self.waybill.destination:
+#            return '<a href="{% url waybill_edit self.waybill.pk %}">%s</a>' % self.action
+#        else:
+#            return self.action
+# 
+# 
+# @register.tag
+# def waybill_reception( parser, token ):
+#    try:
+#        tag_name, action, waybill, user = token.split_contents()
+#    except ValueError:
+#        msg = '%r tag requires waybill and user as arguments' % token.contents[0]
+#        raise template.TemplateSyntaxError(msg)   
+#    return WaybillReceptionnNode(action, waybill, user)
+#    
+# 
+# class WaybillReceptionnNode(template.Node):
+#    def __init__(self, action, waybill, user):
+#        self.user = user
+#        self.waybill = waybill
+#        self.action = action
+# 
+#    def render(self, context):
+#        if self.user.get_profile().dispatch_warehouse == self.waybill.warehouse:
+#            return '<a href="{% url waybill_reception waybill_pk=self.waybill.pk, order_pk=self.waybill.order_code %}">%s</a>' % self.action
+#        else:
+#            return self.action  
+#=======================================================================================================================
 
-class PrintTagNode( template.Node ):
-    def render( self, context ):
-        #TODO: remove such try...except and prints
-        try:
-            logfile = 'tagfile.tag'
-            FILE = open( logfile )
-            the_date = FILE.read()
-            return '<br/><small>Latest COMPAS import from <b>' + settings.COMPAS_STATION + '</b>: ' + the_date[0:19] + '</small>'
-        except Exception as e:
-            print e
-            return ''
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_edit(waybill, user, text=""):
+    text = "Edit"
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count()
+    return { 
+            'text': text,
+            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
+            'success': success,
+    }
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_reception(waybill, user):
+    text = "Recept"
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count()
+    return { 
+            'text': text,
+            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
+            'success': success,
+    }
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_creation(order, user):
+    text = "Create"
+    success = Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count()
+    return { 
+            'text': text,
+            'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
+            'success': success,
+    }
+    
+@register.inclusion_tag('tags/give_link.html')
+def waybill_delete(waybill, user, text=""):
+    text = "Delete"
+    success = Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count()
+    return { 
+            'text': text,
+            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
+            'success': success,
+    }
+    
