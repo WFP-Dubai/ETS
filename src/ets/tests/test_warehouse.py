@@ -30,10 +30,17 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         self.assertEqual(warehouses[0].name, "EDO OFFICE MEHTI")
         # Get warehouses with organization and location
         location = ets.models.Location.objects.get(code="ISBX")
-        ogranization = ets.models.Consignee.objects.get(code="DOEAF")
+        ogranization = ets.models.Organization.objects.get(code="DOEAF")
         warehouses = ets.models.Warehouse.get_warehouses(location=location, organization=ogranization)
         self.assertEqual(warehouses.count(),2)
     
-    def test_get_view_stock(self):
+    def test_stock_view(self):
+        """ets.views.stock_view"""
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('view_stock'))
-        self.assertEqual(response.status_code, 200)  
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 3)
+        self.client.login(username='recepient', password='recepient')
+        response = self.client.get(reverse('view_stock'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 3)
