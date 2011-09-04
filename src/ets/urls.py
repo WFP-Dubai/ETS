@@ -78,7 +78,7 @@ urlpatterns = patterns("ets.views",
         'template': 'validate/receipt.html',
         'formset_model': ets.models.ReceiptWaybill,
         'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
-                                   waybill__status__gte=ets.models.Waybill.DELIVERED),
+                                                             signed_date__isnull=False),
     }, "waybill_validate_receipt_form" ),
                        
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),

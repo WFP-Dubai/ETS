@@ -53,7 +53,9 @@
        </td>
        <td>
         <a href="{{ waybill.get_absolute_url }}">{% trans "View" %}</a>
+        {% block action-link %}
           {% waybill_edit waybill user %}
+        {% endblock %}
        </td>
     {% endblock %}
     {% endwith %}
@@ -104,7 +106,7 @@
     {% endblock %}
     {% endfor %}
 </table>
-{%endblock%}
+{% endblock %}
 
 {% block script %}
 {{ block.super }}
