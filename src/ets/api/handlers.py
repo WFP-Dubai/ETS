@@ -26,10 +26,11 @@ import ets.models
 def get_titles(model):
     fields_name = {}
     for field in model._meta.fields:
-        fields_name[field.name] = unicode(field.verbose_name)
         if ForeignKey == type(field):
             key = "%s%s" % (field.name, "_id")
             fields_name[key] = unicode(field.verbose_name)
+        else:
+            fields_name[field.name] = unicode(field.verbose_name)
     return fields_name   
 
 
@@ -41,6 +42,7 @@ class ReadCSVWaybillHandler(BaseHandler):
     def read(self, request, slug="", warehouse="", destination=""):
         """Return waybills in CSV"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
+        waybills = self.model.objects.filter(order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
         filter_arg = {}
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
@@ -48,7 +50,6 @@ class ReadCSVWaybillHandler(BaseHandler):
             filter_arg['destination__pk'] = destination
         if slug:
             filter_arg['slug'] = slug
-        waybills = self.model.objects.values()
         if filter_arg:
             waybills = waybills.filter(**filter_arg)
         titles = get_titles(self.model)
@@ -61,7 +62,8 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     model = ets.models.LoadingDetail
     
     def read(self, request, waybill="", warehouse="", destination=""):
-        """Return loadin details for waybills in CSV"""
+        """Return loading details for waybills in CSV"""
+        load_details = self.model.objects.filter(waybill__order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
         filter_arg = {}
         if warehouse: 
             filter_arg['waybill__order__warehouse__pk'] = warehouse
@@ -69,9 +71,8 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
             filter_arg['waybill__destination__pk'] = destination
         if waybill:
             filter_arg['waybill'] = waybill
-        load_details = self.model.objects.all().values()
         if filter_arg:
-            load_details = load_details.filter(**filter_arg)    
+            load_details = load_details.filter(**filter_arg)            
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Waybill))      
         result = [titles]
@@ -89,6 +90,7 @@ class ReadCSVOrdersHandler(BaseHandler):
     
     def read(self, request, code="", warehouse="", destination="", consignee=""):
         """Return orders in CSV"""
+        orders = self.model.objects.filter(warehouse__in=Warehouse.filter_by_user(request.user)).values()
         filter_arg = {}
         if warehouse: 
             filter_arg['warehouse__pk'] = warehouse
@@ -98,7 +100,6 @@ class ReadCSVOrdersHandler(BaseHandler):
             filter_arg['consignee__pk'] = consignee
         if code:
             filter_arg['code'] = code
-        orders = self.model.objects.values()
         if filter_arg:
             orders = orders.filter(**filter_arg)
         titles = get_titles(self.model)
@@ -112,7 +113,9 @@ class ReadCSVOrderItemsHandler(BaseHandler):
     
     def read(self, request, order="", warehouse="", destination="", consignee=""):
         """Return order items in CSV"""
+        order_items = self.model.objects.filter(order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
         filter_arg = {}
+        #queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
         if destination:
@@ -121,9 +124,8 @@ class ReadCSVOrderItemsHandler(BaseHandler):
             filter_arg['order__consignee__pk'] = consignee
         if order:
             filter_arg['order'] = order
-        order_items = self.model.objects.all().values()
         if filter_arg:
-            order_items = order_items.filter(**filter_arg)    
+            order_items = order_items.filter(**filter_arg)            
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Order))                     
         result = [titles]
@@ -141,9 +143,9 @@ class ReadCSVStockItemsHandler(BaseHandler):
     
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
-        stock_items = self.model.objects.values()
+        stock_items = self.model.objects.filter(warehouse__in=Warehouse.filter_by_user(request.user)).values()
         if warehouse: 
-            stock_items = stock_items.filter(warehouse=warehouse)            
+            stock_items = stock_items.filter(warehouse=warehouse)       
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Warehouse))   
         result = [titles]

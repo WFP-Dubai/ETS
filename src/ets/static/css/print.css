@@ -30,6 +30,7 @@ img{position: relative; text-align: right;}
 
 }
 .hidden_print{
+	font-size: large;
 	display: none;
 	visibility: hidden;
 	height: 0px;
