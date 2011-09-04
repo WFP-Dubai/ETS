@@ -11,7 +11,7 @@ def viewLog(logfile = 'logg.txt'):
         return msg
 
 
-def un64unZip( data ):
+def un64unZip(data):
     """
     Unzip data
     
@@ -25,7 +25,7 @@ def un64unZip( data ):
         return zlib.decompress( base64.b64decode( data ) )
     except (zlib.error, TypeError):
         pass
-            
+
 
 #=======================================================================================================================
 # def default_json_dump(obj):

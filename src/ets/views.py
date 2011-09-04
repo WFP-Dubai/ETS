@@ -70,6 +70,7 @@ def order_list(request, warehouse="", template='order/list.html',
     return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
 
 @login_required
+@person_required
 def stock_view(request, queryset=ets.models.StockItem.objects.all(), template='stock/stocklist.html'):
     queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     return direct_to_template( request, template, {
@@ -308,36 +309,6 @@ def dispatch_validate(request, queryset, **kwargs):
 @login_required
 def receipt_validate(request, queryset, **kwargs):
     return waybill_validate(request, queryset=queryset.filter(waybill__destination__compas__officers=request.user), **kwargs)
-
-
-
-## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
-#=======================================================================================================================
-# @login_required
-# @require_POST
-# def deserialize(request):
-#    #TODO: rewrite in with a form
-#    wb_data = request.POST['wbdata']
-#    wb_serialized = ''
-#    
-#    if wb_data[0] == '[':
-#        
-#        wb_serialized = wb_data
-#    else:   
-#        wb_serialized = un64unZip( wb_data )
-#        if wb_serialized is not None:
-#            wb_serialized = eval(wb_serialized)
-#        else:
-#            messages.error(request, _('Data Incorrect!!!'))
-#            return redirect(reverse('index')) 
-# 
-#    for obj in serializers.deserialize("json", wb_serialized):
-#        
-#        if isinstance(obj.object, ets.models.Waybill):
-#            waybillnumber = obj.object.pk
-#    
-#    return redirect("waybill_reception", waybill_pk=waybillnumber )
-#=======================================================================================================================
 
 def viewLogView( request, template='status.html' ):
     return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
