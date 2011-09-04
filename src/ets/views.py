@@ -30,7 +30,7 @@ from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailForm
 from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
-from ets.tools import un64unZip, viewLog, default_json_dump
+from ets.tools import un64unZip, viewLog
 
 LOADING_LINES = 5
 
