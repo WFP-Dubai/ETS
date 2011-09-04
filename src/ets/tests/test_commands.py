@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.management import call_command
 
 import ets.models
+from ets.utils import import_stock
 
 class CommandTestCase(TestCase):
     
@@ -61,13 +62,13 @@ class CommandTestCase(TestCase):
         
         #Update changed stock
         ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
-        ets.models.EpicStock.update(self.compas)
+        import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 700)
         
         #Deleted stock
         ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').delete()
-        ets.models.EpicStock.update(self.compas)
+        import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)
         
