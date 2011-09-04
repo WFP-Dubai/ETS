@@ -39,25 +39,21 @@ def prep_req( request ):
 
     return {'user': request.user}
 
-#=======================================================================================================================
-# def officer_required(function=None, **kwargs):
-#    actual_decorator = user_passes_test(lambda u: u.get_profile().officer, **kwargs)
-#    if function:
-#        return actual_decorator(function)
-#    return actual_decorator
-#=======================================================================================================================
+def person_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: ets.models.Person.objects.filter(user=u).count(), **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
 
 
 @login_required
+@person_required
 def order_list(request, warehouse="", template='order/list.html', 
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
     URL: /orders/
     Shows all orders
-
-    URL: /orders/{{ warehouse }}/
-    Shows the orders that are in a specific warehouse
     """
         
     queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
@@ -76,7 +72,14 @@ def order_list(request, warehouse="", template='order/list.html',
 @login_required
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    
+    #Limit access
+    warehouses = ets.models.Warehouse.filter_by_user(request.user)
+    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
+                               | Q(destination__in=warehouses) 
+                               | Q(order__warehouse__compas__officers=request.user)
+                               | Q(destination__compas__officers=request.user))
+    
     my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
     
     return direct_to_template( request, template, {
@@ -87,6 +90,7 @@ def waybill_view(request, waybill_pk, queryset, template):
     })
 
 @login_required
+@person_required
 def waybill_finalize_dispatch( request, waybill_pk, queryset):
     """
     called when user pushes Print Original on dispatch
@@ -110,8 +114,14 @@ def waybill_search( request, form_class=WaybillSearchForm,
     
     form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user),\
-                               pk__icontains=search_string)
+    
+    warehouses = ets.models.Warehouse.filter_by_user(request.user)
+    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
+                               | Q(destination__in=warehouses) 
+                               | Q(order__warehouse__compas__officers=request.user)
+                               | Q(destination__compas__officers=request.user))
+    
+    queryset = queryset.filter(pk__icontains=search_string)
     
     return direct_to_template( request, template, {
         'object_list': queryset, 
@@ -271,7 +281,6 @@ def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Wayb
 @login_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
-    queryset = queryset.filter(order__warehouse__compas__officers=request.user)
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
                                   
@@ -291,14 +300,14 @@ def dispatch_validate(request, queryset, **kwargs):
 
 @login_required
 def receipt_validate(request, queryset, **kwargs):
-    return waybill_validate(request, queryset=queryset.filter(destination__compas__officers=request.user), **kwargs)
+    return waybill_validate(request, queryset=queryset.filter(waybill__destination__compas__officers=request.user), **kwargs)
 
 
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required
 @require_POST
-def deserialize( request ):
+def deserialize(request):
     #TODO: rewrite in with a form
     waybillnumber = ''
     wb_data = request.POST['wbdata']
@@ -317,18 +326,13 @@ def deserialize( request ):
  
     for obj in serializers.deserialize( "json", wb_serialized ):
         
-        if type( obj.object ) is Waybill:
+        if type( obj.object ) is ets.models.Waybill:
             waybillnumber = obj.object.pk
     
     return redirect(waybill_reception, waybillnumber )
 
 def viewLogView( request, template='status.html' ):
     return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
-
-def expand_response(response, **headers):
-    for header, value in headers.items():
-        response[header] = value
-    return response
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
@@ -353,50 +357,52 @@ def expand_response(response, **headers):
 #    return HttpResponse( image, mimetype = "Image/png" )
 #=======================================================================================================================
 
-@csrf_exempt
-def post_synchronize_waybill( request ):
-    '''
-    This method is called by the offline application,
-    that posts a serialized waybill.
-    The waybill is deserialized and stored in the online database.
-    '''
-    if request.method == 'POST':
-        serilized_waybill = request.POST['serilized_waybill']
-
-        # change app_label
-        serilized_waybill_str = str( serilized_waybill ).replace( '"offliner.', '"waybill.' )
-
-        wb = None
-
-        # try to deserialize waybill and loadingdetails and store in waybill online db
-        is_an_update = False
-        for obj in serializers.deserialize( "json", serilized_waybill_str ):
-            #from waybill.models import Waybill, LoadingDetail
-            if isinstance( obj.object, Waybill ):
-                if Waybill.objects.filter( waybillNumber = obj.object.waybillNumber ).count() == 0:
-                    # perform an insert
-                    try:
-                        obj.object.id = None
-                        obj.object.save()
-                        wb = obj.object
-                    except:
-                        print 'Exception when inserting Waybill'
-                else:
-                    is_an_update = True
-                    # perform an update
-                    try:
-                        obj.object.id = Waybill.objects.filter( waybillNumber = obj.object.waybillNumber )[0].id
-                        obj.object.save()
-                        wb = obj.object
-                    except:
-                        print 'Exception when updating Waybill'
-
-            elif isinstance( obj.object, LoadingDetail ) and wb is not None and not is_an_update:
-                try:
-                    obj.object.id = None
-                    obj.object.wbNumber = wb
-                    obj.object.save()
-                except:
-                    print 'Exception when saving LoadingDetail'
-    response = HttpResponse( 'SYNCHRONIZATION_DONE' )
-    return response
+#=======================================================================================================================
+# @csrf_exempt
+# def post_synchronize_waybill( request ):
+#    '''
+#    This method is called by the offline application,
+#    that posts a serialized waybill.
+#    The waybill is deserialized and stored in the online database.
+#    '''
+#    if request.method == 'POST':
+#        serilized_waybill = request.POST['serilized_waybill']
+# 
+#        # change app_label
+#        serilized_waybill_str = str( serilized_waybill ).replace( '"offliner.', '"waybill.' )
+# 
+#        wb = None
+# 
+#        # try to deserialize waybill and loadingdetails and store in waybill online db
+#        is_an_update = False
+#        for obj in serializers.deserialize( "json", serilized_waybill_str ):
+#            #from waybill.models import Waybill, LoadingDetail
+#            if isinstance( obj.object, Waybill ):
+#                if Waybill.objects.filter( waybillNumber = obj.object.waybillNumber ).count() == 0:
+#                    # perform an insert
+#                    try:
+#                        obj.object.id = None
+#                        obj.object.save()
+#                        wb = obj.object
+#                    except:
+#                        print 'Exception when inserting Waybill'
+#                else:
+#                    is_an_update = True
+#                    # perform an update
+#                    try:
+#                        obj.object.id = Waybill.objects.filter( waybillNumber = obj.object.waybillNumber )[0].id
+#                        obj.object.save()
+#                        wb = obj.object
+#                    except:
+#                        print 'Exception when updating Waybill'
+# 
+#            elif isinstance( obj.object, LoadingDetail ) and wb is not None and not is_an_update:
+#                try:
+#                    obj.object.id = None
+#                    obj.object.wbNumber = wb
+#                    obj.object.save()
+#                except:
+#                    print 'Exception when saving LoadingDetail'
+#    response = HttpResponse( 'SYNCHRONIZATION_DONE' )
+#    return response
+#=======================================================================================================================

@@ -670,7 +670,7 @@ class ReceiptWaybill(models.Model):
         verbose_name_plural = _("reception")
     
     def __unicode__(self):
-        return "Reception of waybill: %s" % self.waybill
+        return "Reception of waybill: %s" % self.waybill_id
     
     def sign(self, commit=True):
         """

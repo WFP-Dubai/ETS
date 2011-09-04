@@ -74,7 +74,7 @@ urlpatterns = patterns("ets.views",
         'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
                                    status__gte=ets.models.Waybill.SIGNED),
     }, "waybill_validate_dispatch_form" ),
-    ( r'^validate_receipt_form/$', "receipt_validate", {
+    ( r'^validate_receipt/$', "receipt_validate", {
         'template': 'validate/receipt.html',
         'formset_model': ets.models.ReceiptWaybill,
         'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
@@ -102,8 +102,8 @@ urlpatterns = patterns("ets.views",
     }, "select_report" ),
     #===================================================================================================================
     # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
+    # ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     #===================================================================================================================
-    ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
     
     #===================================================================================================================
     # ( r'^waybill/serialize/(?P<waybill_pk>[-\w]+)/$', "serialize" ),
