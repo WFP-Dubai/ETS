@@ -21,11 +21,11 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Full Orders Report" %} </td>
-    <td><a href='{% url api_order_items %}'>{% trans "download" %}</a></td>
+    <td>{% trans "Orders Report" %} </td>
+    <td><a href='{% url api_orders %}'>{% trans "download" %}</a></td>
   </tr>
   <tr>
-    <td>{% trans "Recipient Report: All items for" %} {{ warehouse.organization }}</td>
+    <td>{% trans "Recipient Report: All items for warehouses" %}</td>
     <td><a href='{% url api_order_items %}'>
       {% trans "download" %}</a>
     </td>
@@ -46,7 +46,7 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Stock Report: All items for all warehouses" %} </td>
+    <td>{% trans "Stock Report: All items for warehouses" %} </td>
     <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
   </tr>
   <tr class='reports-title'>
@@ -65,7 +65,7 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Waybill Report: All items for all warehouses" %} </td>
+    <td>{% trans "Waybill Report: All items for warehouses" %} </td>
     <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
   </tr>
   <tr class='reports-title'>
@@ -84,7 +84,7 @@
   </tr>
   {% endif %}
   <tr>
-    <td>{% trans "Detail Waybill Report: All items for all warehouses" %} </td>
+    <td>{% trans "Detail Waybill Report: All items for warehouses" %} </td>
     <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
   </tr>
 </table>

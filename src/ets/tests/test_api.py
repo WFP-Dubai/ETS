@@ -67,11 +67,11 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         item = dict_reader.next()
         self.assertEqual(item['slug'], self.get_waybill().slug)
         # Waybills with destination and warehouse
-#        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
-#                                                                   "destination": self.get_waybill().destination.code}))
-#        self.assertContains(response, 'ISBX002', status_code=200)
-#        self.assertContains(response, 'ISBX003', status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
+        response = self.client.get(reverse("api_waybills", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
+                                                                   "destination": self.get_waybill().destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
         
         
     def test_get_loading_details(self):
@@ -81,19 +81,19 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX00211A1', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Loading details for one waybill
-#        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": self.get_waybill().slug}))
-#        self.assertContains(response, 'ISBX00211A', status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
-#        result = StringIO.StringIO(response.content)
-#        dict_reader = csv.DictReader(result)
-#        item = dict_reader.next()
-#        self.assertEqual(item['Order'], self.get_waybill().order.pk)
+        response = self.client.get(reverse("api_loading_details", kwargs={"waybill": self.get_waybill().slug}))
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['Order'], self.get_waybill().order.pk)
         # Loading details for some destination and some warehouse
-#        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
-#                                                                    "destination": self.get_waybill().destination.code}))
-#        self.assertContains(response, 'ISBX002', status_code=200)
-#        self.assertContains(response, 'ISBX003', status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
+        response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
+                                                                    "destination": self.get_waybill().destination.code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'ISBX003', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
         
     def test_get_orders(self):
 
@@ -111,11 +111,11 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         item = dict_reader.next()
         self.assertEqual(item['Code'], order.code)
         # Orders with destination and warehouse
-#        response = self.client.get(reverse("api_orders", kwargs={"warehouse": order.warehouse.code, 
-#                                                        "destination": order.consignee.warehouses.all()[0].code}))
-#        self.assertContains(response, 'ISBX002', status_code=200)
-#        self.assertContains(response, 'DOEAF', status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
+        response = self.client.get(reverse("api_orders", kwargs={"warehouse": order.warehouse.code, 
+                                                        "destination": order.consignee.warehouses.all()[0].code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'DOEAF', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
         
         
     def test_get_order_items(self):
@@ -134,11 +134,11 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         item = dict_reader.next()
         self.assertEqual(item['Code'], order.code)
         # Order items for some destination and some warehouse
-#        response = self.client.get(reverse("api_order_items", kwargs={"warehouse": order.warehouse.code, 
-#                                                        "destination": order.consignee.warehouses.all()[0].code}))
-#        self.assertContains(response, 'ISBX002', status_code=200)
-#        self.assertContains(response, 'DOEAF', status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
+        response = self.client.get(reverse("api_order_items", kwargs={"warehouse": order.warehouse.code, 
+                                                        "destination": order.consignee.warehouses.all()[0].code}))
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertContains(response, 'DOEAF', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
         
     def test_get_stock_items(self):
         
@@ -148,11 +148,11 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, warehouse.code, status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         # Stock items for one warehouse
-#        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse.code}))
-#        self.assertContains(response, warehouse.code, status_code=200)
-#        self.assertEqual(response["Content-Type"], "application/csv")
-#        result = StringIO.StringIO(response.content)
-#        dict_reader = csv.DictReader(result)
-#        item = dict_reader.next()
-#        self.assertEqual(item['Warehouse'], warehouse.code)
+        response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse.code}))
+        self.assertContains(response, warehouse.code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['Warehouse'], warehouse.code)
         
