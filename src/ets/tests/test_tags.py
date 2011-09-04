@@ -14,7 +14,7 @@ class TagsTestCase(TestCaseMixin, TestCase):
         
         super(TagsTestCase, self).setUp()
             
-        self.user = User.objects.get(username="admin")
+        self.user = User.objects.get(username="dispatcher")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')
     
