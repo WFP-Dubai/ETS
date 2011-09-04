@@ -64,6 +64,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_order_list(self):
         """ets.views.order_list"""
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('orders'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 2)
