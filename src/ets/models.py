@@ -813,9 +813,9 @@ class LoadingDetail(models.Model):
             })
             
         #clean reasons
-        if self.units_damaged_reason and self.units_damaged_reason.comm_category_code != self.comm_category_code:
+        if self.units_damaged_reason and self.units_damaged_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong damaged reason for current commodity category"))
-        if self.units_lost_reason and self.units_lost_reason.comm_category_code != self.comm_category_code:
+        if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
 

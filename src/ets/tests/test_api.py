@@ -18,8 +18,8 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         "Hook method for setting up the test fixture before exercising it."        
         super(ApiServerTestCase, self).setUp()
 
-        self.client.login(username="admin", password="admin")
-        self.user = User.objects.get(username="admin")
+        self.client.login(username="dispatcher", password="dispatcher")
+        self.user = User.objects.get(username="dispatcher")
         #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
         #self.dispatch_point = Warehouse.objects.get(pk=1)

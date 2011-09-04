@@ -66,7 +66,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.order_list"""
         response = self.client.get(reverse('orders'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 1)
+        self.assertEqual(response.context['object_list'].count(), 2)
 
     def test_order_detail(self):
         """Order's detail page"""
@@ -82,6 +82,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_search test"""
         #from ..forms import WaybillSearchForm
         # Empty search query
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.post(reverse('waybill_search'))
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['object_list']), 
@@ -91,11 +92,11 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         # response = self.client.post(reverse('waybill_search'), data={'form': form, 'q': 'ISBX00211A'})
         #=======================================================================
         # Search query with existing waybill code  
-        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A'})
+        response = self.client.get(reverse('waybill_search'), data={'q': 'ISBX00211A'})
         self.assertEqual(response.status_code, 200)
         self.assertTupleEqual(tuple(response.context['object_list']), (self.waybill,))
         # Search query with not existing waybill code 
-        response = self.client.post(reverse('waybill_search'), data={'q': 'ISBX00211A1'})
+        response = self.client.get(reverse('waybill_search'), data={'q': 'ISBX00211A1'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['object_list']), 0)
         
@@ -104,6 +105,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_create test"""
         from ..forms import DispatchWaybillForm
         
+        self.client.login(username='dispatcher', password='dispatcher')        
         response = self.client.get(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}))
         self.assertEqual(response.status_code, 200)
         
@@ -141,6 +143,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_waybill_edit(self):
         """ets.views.waybill_edit"""
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('waybill_edit', kwargs={
             'order_pk': self.order.pk, 
             'waybill_pk': self.waybill.pk,
@@ -226,8 +229,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
-            'item-0-origin_id': 'anotherstock1234',
-            'item-0-commodity_name': 'COOL UKRAINIAN BEER',
+            'item-0-stock-item': 'anotherstock1234',
             'item-0-number_units_good': 25,
             'item-0-number_units_lost': 0,
             'item-0-units_lost_reason': '',
@@ -256,9 +258,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
                                     data=data)
         self.assertContains(response, "You must provide a loss reason")
         
-        #Let's provide a reason and damaged units
+        # Let's provide a reason and damaged units
         data.update({
-            'item-0-units_lost_reason': 'lmix',
+            'item-0-units_lost_reason': 'lsed',
             'item-0-number_units_damaged': 5,
         })
         
@@ -268,18 +270,19 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         #Provide a reason of damage
         data.update({
-            'item-0-units_damaged_reason': 'dmix',
+            'item-0-units_damaged_reason': 'dsed',
         })
         
         response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
                                     data=data)
         
-        #Now everything should be all right
+        # Now everything should be all right
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(self.reception_waybill.get_receipt().remarks, 'test remarks')
     
     def test_waybill_delete(self):
         """ets.views.waybill_delete"""  
+        self.client.login(username='dispatcher', password='dispatcher')
         col = ets.models.Waybill.objects.all().count()     
         response = self.client.get(reverse('waybill_delete', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)  
@@ -287,11 +290,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
        
     def test_waybill_view_reception(self):
         """ets.views.waybill_view_reception"""
+        self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('waybill_view_reception', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200) 
     
     def waybill_validate(self):
         """ets.views.waybill_validate"""
+        self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse("waybill_validate_dispatch_form"))
         self.assertEqual(response.status_code, 200)
         

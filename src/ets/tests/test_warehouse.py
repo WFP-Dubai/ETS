@@ -13,8 +13,8 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         
         super(WarehouseTestCase, self).setUp()
         
-        self.client.login(username='admin', password='admin')
-        self.user = ets.models.User.objects.get(username="admin")
+        self.client.login(username='recepient', password='recepient')
+        self.user = ets.models.User.objects.get(username="recepient")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')
         self.warehouse = ets.models.Warehouse.objects.get(pk="ISBX002")
@@ -35,5 +35,5 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         self.assertEqual(warehouses.count(),2)
     
     def test_get_view_stock(self):
-        response = self.client.get(reverse('view_stock', kwargs={'warehouse_pk': self.warehouse.pk}))
+        response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)  
