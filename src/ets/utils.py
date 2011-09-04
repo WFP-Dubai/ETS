@@ -180,7 +180,7 @@ def send_dispatched(using):
                                                      order__warehouse__compas__pk=using):
         with transaction.commit_on_success(using=using) as tr:
             
-            CURR_CODE = u"%s%s" % (datetime.datetime.now().strftime( '%y' ), waybill.pk)
+            CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), waybill.pk)
             
             CONTAINER_NUMBER = waybill.container_one_number
     
@@ -190,7 +190,7 @@ def send_dispatched(using):
             for index, loading in enumerate( waybill.loading_details.all() ):
                 
                 if special_case:
-                    CURR_CODE = u"%s%s%s" % (datetime.datetime.now().strftime( '%y' ), code_letter, waybill.pk)
+                    CURR_CODE = u"%s%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
                     code_letter = u'B'
                     if index == 1:
                         CONTAINER_NUMBER = waybill.container_two_number
@@ -236,7 +236,7 @@ def send_dispatched(using):
                     u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
                     
                     '', '', '' 
-                ), tr.using)
+                ), using)
             
             waybill.sent_compas = True
             waybill.save()
@@ -248,7 +248,7 @@ def send_received(using):
         waybill = reception.waybill
         with transaction.commit_on_success(using=using) as tr:
             
-            CURR_CODE = u"%s%s" % (datetime.datetime.now().strftime( '%y' ), waybill.pk)
+            CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), waybill.pk)
 
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -257,14 +257,14 @@ def send_received(using):
             for loading in waybill.loading_details.all():
                 
                 if special_case:
-                    CURR_CODE = u"%s%s%s" % (datetime.datetime.now().strftime( '%y' ), code_letter, waybill.pk)
+                    CURR_CODE = u"%s%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
                     code_letter = u'B'
                 
                 call_db_procedure('write_waybill.receipt', (
                     CURR_CODE, 
                     reception.person.compas.pk, 
                     reception.person.code, 
-                    waybill.arrival_date.strftime("%Y%m%d"),
+                    reception.arrival_date.strftime("%Y%m%d"),
                     loading.number_units_good, 
                     loading.units_damaged_reason and loading.units_damaged_reason.cause or '', 
                     loading.number_units_damaged or '', 
@@ -276,7 +276,7 @@ def send_received(using):
                     loading.stock_item.package.pk, 
                     loading.stock_item.allocation_code, 
                     loading.stock_item.quality_code
-                ), tr.using)
+                ), using)
                 
         waybill.sent_compas = True
         waybill.save()
