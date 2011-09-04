@@ -73,7 +73,7 @@ def order_list(request, warehouse="", template='order/list.html',
 def stock_view(request, queryset=ets.models.StockItem.objects.all(), template='stock/stocklist.html'):
     queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     return direct_to_template( request, template, {
-        'stocklist': queryset,
+        'object_list': queryset,
     })
 
 @login_required
