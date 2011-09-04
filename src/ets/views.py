@@ -282,8 +282,10 @@ def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Wayb
     messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
     if redirect_to:
         return redirect(redirect_to)
-    else:
+    elif request.META.has_key('HTTP_REFERER'):
         return redirect(request.META['HTTP_REFERER'])
+    else:
+        return redirect('index')
         
 
 @login_required
