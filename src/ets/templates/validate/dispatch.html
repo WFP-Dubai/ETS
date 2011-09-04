@@ -25,9 +25,9 @@
     <tr>
     {% with form.instance as waybill %}
     {% block waybill-row %}
-       <td>{{ waybill.order_code }}</td>
+       <td>{{ waybill.order.pk }}</td>
        <td>{{ form.slug }}{{ waybill.pk }}</td>
-       <td>{{ waybill.warehouse }}</td>
+       <td>{{ waybill.order.warehouse }}</td>
        <td>{{ waybill.destination.organization }}</td>
        <td>{{ waybill.destination.location }}</td>
        <td>
@@ -81,9 +81,9 @@
     {% for waybill in validated_waybills %}
     {% block validated-item %}
     <tr>
-      <td>{{ waybill.order_code }}</td>
+      <td>{{ waybill.order.pk }}</td>
       <td>{{ waybill.pk }}</td>
-      <td>{{ waybill.warehouse }}</td>
+      <td>{{ waybill.order.warehouse }}</td>
       <td>{{ waybill.destination.organization.name }}</td>
       <td>{{ waybill.destination.location.name }}</td>
       <td>

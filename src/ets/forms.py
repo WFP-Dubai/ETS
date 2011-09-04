@@ -21,7 +21,7 @@ class DispatchWaybillForm( forms.ModelForm ):
     class Meta:
         model = ets_models.Waybill
         exclude = (
-            'order_code',
+            'order',
             'project_number',
             'transport_name',
             'warehouse',

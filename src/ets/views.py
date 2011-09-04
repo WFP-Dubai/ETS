@@ -273,7 +273,7 @@ def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Wayb
 @login_required
 def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
     
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    queryset = queryset.filter(order__warehouse__compas__officers=request.user)
     formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
                     (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
                                   
@@ -286,6 +286,16 @@ def waybill_validate(request, queryset, template, formset_model=ets.models.Waybi
         'formset': formset, 
         'validated_waybills': queryset.filter(validated=True),
     })
+
+@login_required
+def dispatch_validate(request, queryset, **kwargs):
+    return waybill_validate(request, queryset=queryset.filter(order__warehouse__compas__officers=request.user), **kwargs)
+
+@login_required
+def receipt_validate(request, queryset, **kwargs):
+    return waybill_validate(request, queryset=queryset.filter(destination__compas__officers=request.user), **kwargs)
+
+
 
 ## receives a POST with the compressed or uncompressed WB and sends you to the Receive WB
 @login_required

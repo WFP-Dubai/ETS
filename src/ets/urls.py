@@ -68,13 +68,13 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.filter(status=Waybill.INFORMED)
     }, "waybill_finalize_receipt" ),
     
-    ( r'^validate_dispatch/$', "waybill_validate", {
+    ( r'^validate_dispatch/$', "dispatch_validate", {
         'template': 'validate/dispatch.html',
         'formset_model': ets.models.Waybill,
         'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
                                    status__gte=ets.models.Waybill.SIGNED),
     }, "waybill_validate_dispatch_form" ),
-    ( r'^validate_receipt_form/$', "waybill_validate", {
+    ( r'^validate_receipt_form/$', "receipt_validate", {
         'template': 'validate/receipt.html',
         'formset_model': ets.models.ReceiptWaybill,
         'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
