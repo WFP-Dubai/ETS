@@ -22,6 +22,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         self.client.login(username='admin', password='admin')
         self.user = User.objects.get(username="admin")
+        self.dispatcher = User.objects.get(username="dispatcher")
+        self.receipient = User.objects.get(username="recepient")
         self.waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.reception_waybill = ets.models.Waybill.objects.get(pk="ISBX00311A")
         self.delivered_waybill = ets.models.Waybill.objects.get(pk="ISBX00312A")
