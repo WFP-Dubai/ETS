@@ -2,8 +2,8 @@ import datetime
 from functools import partial
 
 from django.contrib import admin
-from django.contrib.auth.models import User
-from django.contrib.auth.admin import UserAdmin
+#from django.contrib.auth.models import User
+#from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
@@ -126,19 +126,6 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
         (_("COMPAS"), {'fields': ('validated', 'sent_compas',)}),
     )
     
-    add_fieldsets = (
-        (_('Order'), {'fields': ('order', 'destination')}),
-        (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
-        (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
-        (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
-                                   'transport_driver_licence', 'transport_vehicle_registration', 
-                                   'transport_trailer_registration', 'transport_dispach_signed_date',)}),
-        (_('Container 1'), {'fields': ('container_one_number', 'container_one_seal_number', 
-                                       'container_one_remarks_dispatch',)}),
-        (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
-                                       'container_two_remarks_dispatch',)}),
-    )
-    
     list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date',
                     'destination', 'active')
     readonly_fields = ('date_created',)
@@ -146,16 +133,6 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     list_filter = ('status', 'date_created',)
     search_fields = ('pk', 'order__pk')
     inlines = (LoadingDetailsInline, ReceiptInline)
-        
-    def get_fieldsets(self, request, obj=None):
-        if not obj:
-            return self.add_fieldsets
-        return super(WaybillAdmin, self).get_fieldsets(request, obj)
-    
-    def get_formsets(self, request, obj=None):
-        for inline in self.inline_instances:
-            if obj or inline.model is not ets.models.ReceiptWaybill:
-                yield inline.get_formset(request, obj)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 

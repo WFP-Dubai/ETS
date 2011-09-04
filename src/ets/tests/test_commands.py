@@ -4,6 +4,7 @@ from django.test import TestCase
 from django.core.management import call_command
 
 import ets.models
+import compas.models as compas_models
 from ets.utils import import_stock
 
 class CommandTestCase(TestCase):
@@ -20,7 +21,7 @@ class CommandTestCase(TestCase):
     def test_sync_compas(self):
         
         self.assertEqual(ets.models.Compas.objects.count(), 1)
-        self.assertEqual(ets.models.Place.objects.using(self.compas).count(), 3)
+        self.assertEqual(compas_models.Place.objects.using(self.compas).count(), 3)
         self.assertEqual(ets.models.Location.objects.count(), 0)
         self.assertEqual(ets.models.Warehouse.objects.count(), 0)
         self.assertEqual(ets.models.Organization.objects.count(), 0)
@@ -61,13 +62,13 @@ class CommandTestCase(TestCase):
         self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         
         #Update changed stock
-        ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
+        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
         import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 700)
         
         #Deleted stock
-        ets.models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').delete()
+        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').delete()
         import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)

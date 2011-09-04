@@ -5,6 +5,7 @@ from django.db.utils import DatabaseError
 from django.conf import settings
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 
+import compas.models as compas_models
 import models as ets_models
 
 TOTAL_WEIGHT_METRIC = 1000
@@ -33,7 +34,7 @@ def update_compas(using):
 
 
 def import_places(compas):
-    for place in ets_models.Place.objects.using(compas).filter(country_code__in = settings.COUNTRIES,
+    for place in compas_models.Place.objects.using(compas).filter(country_code__in = settings.COUNTRIES,
                                                                reporting_code=compas):
             
         #Create location
@@ -60,7 +61,7 @@ def import_places(compas):
 
 
 def import_persons(compas):
-    for person in ets_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas):
+    for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas):
         try:
             person = ets_models.Person.objects.get(pk=person.person_pk)
         except ets_models.Person.DoesNotExist:
@@ -79,7 +80,7 @@ def import_stock(compas):
     
     now = datetime.now()
     
-    for stock in ets_models.EpicStock.objects.using(compas):
+    for stock in compas_models.EpicStock.objects.using(compas):
         
         #Create commodity's category
         category = ets_models.CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
@@ -128,7 +129,7 @@ def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
 
-    original = ets_models.LtiOriginal.objects.using(compas).filter(requested_dispatch_date__gt = settings.MAX_DATE)
+    original = compas_models.LtiOriginal.objects.using(compas).filter(requested_dispatch_date__gt = settings.MAX_DATE)
     if not settings.DISABLE_EXPIERED_LTI:
         original = original.filter( expiry_date__gt = now )
     

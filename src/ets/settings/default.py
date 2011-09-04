@@ -123,6 +123,7 @@ INSTALLED_APPS = (
     'south',
     
     'ets',
+    'compas',
     
     'django.contrib.auth',
     'django.contrib.admin',
