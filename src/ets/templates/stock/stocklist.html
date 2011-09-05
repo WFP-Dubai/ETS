@@ -16,13 +16,12 @@
   </thead>
   <tbody>
     {% for item in object_list %}
-    {# <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" > #}
-    <tr>
+    <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
       <td>{{ item.warehouse }}</td>
       <td>{{ item.commodity }}</td>
       <td>{{ item.si_code }}</td>
       <td>{{ item.number_of_units }}</td>
-      <td>{% if item.number_of_units %}{{ item.unit_weight_net }}{% endif %}</td>
+      <td>{{ item.unit_weight_net }}</td>
       <td>{{ item.quality_description }}</td>
     </tr>
     {% endfor %}
