@@ -16,7 +16,7 @@
             
             </tr>
             <tr>
-                <td><sup style="font-size:x-small;">{% trans "Project no." %}</sup> {{ object.project_number }}</td>
+                <td><sup style="font-size:x-small;">{% trans "Project no." %}</sup> {{ object.order.project_number }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Date of Loading" %}:</sup> {{ object.loading_date }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date }}</td>
             </tr>
@@ -65,12 +65,12 @@
             </tr>
             {% for lineitem in items %}
             <tr style="font-size:small;">
-                <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.get_coi_code }}</td>
-                <td>{{ lineitem.commodity_name }}</td>
-                <td>{{ lineitem.package }}</td>
+                <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
+                <td>{{ lineitem.stock_item.commodity.name }}</td>
+                <td>{{ lineitem.stock_item.package.name }}</td>
                 <td style="text-align:right;">{{ lineitem.number_of_units|floatformat:3 }}</td>
-                <td style="text-align:right;">{{ lineitem.unit_weight_net|floatformat:3 }}</td>
-                <td style="text-align:right;">{{ lineitem.unit_weight_gross|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_net|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_gross|floatformat:3 }}</td>
                 <td style="text-align:right;">{{ lineitem.calculate_total_net|floatformat:3 }}</td>
                 <td style="text-align:right;">{{ lineitem.calculate_total_gross|floatformat:3 }}</td>
             </tr>
@@ -106,7 +106,7 @@
         <tr>
           <td><sup>{% trans "Warehouse or Dispatch Point" %}</sup></td>
           <td colspan="2">
-            <sup style="font-size:x-small;">{% trans "Transport Contractor" %}:</sup>{{ object.transport_name }}
+            <sup style="font-size:x-small;">{% trans "Transport Contractor" %}:</sup>{{ object.order.transport_name }}
           </td>
         </tr>
         <tr>
@@ -128,7 +128,7 @@
             </p>
             {% if object.transport_dispach_signed_date %}
             <p style='font-size:14px'>
-              {{ object.dispatcher_person }}<br>
+              {{ object.dispatcher_person.user.get_full_name }}<br>
               {% trans "Date:" %} {{ object.transport_dispach_signed_date }}
             </p>
             {% endif %}
