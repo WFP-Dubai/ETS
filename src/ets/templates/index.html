@@ -1,0 +1,31 @@
+{% extends "base_template.html"%}
+
+{% load i18n extra_tags %}
+
+{% block title %}{% trans "Select Action" %}{% endblock %}
+
+{% block content %} 
+{% trans "Select an action" %}:
+<ul>
+
+  <li><a href='{% url orders %}'>{% trans "List Of Orders" %}</a></li>
+  <li><a href='{% url view_stock %}'>{% trans "View Stock" %}</a></li>
+  <li><a href='{% url waybill_search %}'>{% trans "List of waybills" %}</a></li>
+  
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
+  
+  <li><a href='{% url waybill_validate_dispatch_form %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
+  <li><a href='{% url waybill_validate_receipt_form %}'>{% trans "Validate Received Waybill" %}</a></li>
+
+  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
+  
+  <li>
+    <form method='GET' action='{% url waybill_search %}'>
+      {{ form.as_p }}
+      <input type="submit" value="{% trans 'Search Waybill' %}">
+    </form>
+  </li>
+
+</ul>
+
+{% endblock %}

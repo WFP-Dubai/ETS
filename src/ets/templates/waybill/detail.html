@@ -1,0 +1,34 @@
+{% load extra_tags %}
+{% load i18n %}
+
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="all"/>
+{% endblock %}
+
+{% block title %}{% blocktrans %}Waybill: {{ object }}{% endblocktrans %}{% endblock %}
+
+{% block content %}
+
+<div class="hidden_print">
+  <a onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print();" href="#">Print Copy</a>
+  {% waybill_edit object user %}
+  <a onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" 
+      href="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">Print Original</a>
+  <a href="{% url waybill_finalize_receipt waybill_pk=object.pk %}">Sign recieption</a>
+  {% waybill_reception object user %}
+  {% waybill_delete object user %}
+  {% if 'create' in request.META.HTTP_REFERER %}
+    <a href="{% url order_detail object_id=object.order.pk %}">{% trans "Back to Dispatch" %}</a>
+  {% else %}
+    {% if request.META.HTTP_REFERER %}<a href='{{ request.META.HTTP_REFERER }}'>{% trans "Back" %}</a>{% endif %}
+  {% endif %}
+</div>
+
+<table cellpadding="0" cellspacing="0" border="0px" >
+  {% include 'waybill/print/wb_header.html'%}
+  {% include 'waybill/print/wb_loading.html'%}
+  {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
+</table>
+
+{% endblock %}

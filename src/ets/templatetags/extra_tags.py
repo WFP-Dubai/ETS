@@ -1,28 +1,13 @@
+
 from django import template
-import time, calendar
-from ets import settings
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext_lazy as _
+
+#from ets import settings
+from ets.models import Warehouse
+
 register = template.Library()
-# Sample
-@register.tag( name = "current_time" )
-def do_current_time( parser, token ):
-    try:
-        # split_contents() knows not to split quoted strings.
-        tag_name, format_string = token.split_contents()
-    except ValueError:
-        raise template.TemplateSyntaxError, "%r tag requires a single argument" % token.contents.split()[0]
-    if not ( format_string[0] == format_string[-1] and format_string[0] in ( '"', "'" ) ):
-        raise template.TemplateSyntaxError, "%r tag's argument should be in quotes" % tag_name
-    return CurrentTimeNode( format_string[1:-1] )
 
-
-
-import datetime
-
-class CurrentTimeNode( template.Node ):
-    def __init__( self, format_string ):
-        self.format_string = format_string
-    def render( self, context ):
-        return datetime.datetime.now().strftime( self.format_string )
 
 @register.filter
 def truncatesmart( value, limit = 80 ):
@@ -57,18 +42,40 @@ def truncatesmart( value, limit = 80 ):
     # Join the words and return
     return ' '.join( words ) + '...'
 
-@register.tag( name = "print_tag" )
-def do_print_tag( parser, token ):
-    return PrintTagNode()
 
-class PrintTagNode( template.Node ):
-    def render( self, context ):
-        #TODO: remove such try...except and prints
-        try:
-            logfile = 'tagfile.tag'
-            FILE = open( logfile )
-            the_date = FILE.read()
-            return '<br/><small>Latest COMPAS import from <b>' + settings.COMPAS_STATION + '</b>: ' + the_date[0:19] + '</small>'
-        except Exception as e:
-            print e
-            return ''
+@register.inclusion_tag('tags/give_link.html')
+def waybill_edit(waybill, user, text=_("Edit")):
+    return { 
+            'text': text,
+            'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
+            'success': waybill.transport_dispach_signed_date is None 
+                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+    }
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_reception(waybill, user, text=_("Recept")):
+    return { 
+            'text': text,
+            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
+            'success': waybill.transport_dispach_signed_date \
+                and not (waybill.get_receipt() and waybill.get_receipt().signed_date) 
+                and Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count(),
+    }
+
+@register.inclusion_tag('tags/give_link.html')
+def waybill_creation(order, user, text=_("Create")):
+    return { 
+            'text': text,
+            'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
+            'success': Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count(),
+    }
+    
+@register.inclusion_tag('tags/give_link.html')
+def waybill_delete(waybill, user, text=_("Delete")):
+    return { 
+            'text': text,
+            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
+            'success': waybill.transport_dispach_signed_date is None \
+                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+    }
+    
