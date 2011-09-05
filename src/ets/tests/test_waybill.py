@@ -225,7 +225,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
             
-            'item-0-stock_item': 'anotherstock1234',
             'item-0-number_units_good': 25,
             'item-0-number_units_lost': 0,
             'item-0-units_lost_reason': '',
