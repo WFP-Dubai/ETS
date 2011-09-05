@@ -13,9 +13,10 @@
 </tbody></table>
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
+  {% include "uni_form/errors_formset.html" %}
   <table>
     {{ formset.management_form }}
-    {% for form in formset %}
+    <thead>
       <tr>
         <th>Stock item</th>
         <th>Number Units Good</th>
@@ -24,16 +25,21 @@
         <th>Number Units Damaged</th>
         <th>Damaged Reason</th>
       </tr>
+    </thead>
+    <tbody>
+    {% for form in formset %}
+      <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
       <tr>
-        <td>{{ form.instance.stock_item }}</td>
-        <td>{{ form.number_units_good }}</td>
-        <td>{{ form.number_units_lost }}</td>
-        <td>{{ form.units_lost_reason }}</td>
-        <td>{{ form.number_units_damaged }}</td>
-        <td>{{ form.units_damaged_reason }}</td>
+        <td>{{ form.instance.stock_item.coi_code }} {{ form.slug }} {{ form.waybill }}</td>
+        <td>{{ form.number_units_good|as_uni_field }}</td>
+        <td>{{ form.number_units_lost|as_uni_field }}</td>
+        <td>{{ form.units_lost_reason|as_uni_field }}</td>
+        <td>{{ form.number_units_damaged|as_uni_field }}</td>
+        <td>{{ form.units_damaged_reason|as_uni_field }}</td>
       </tr>
     {% endfor %}
-  </table>  
+    </tbody>
+  </table>
     {% uni_form form form.helper %}
     <div class="buttonHolder">
       <input type="submit" name="save" value="{% trans 'Save &amp; Print' %}"/>
