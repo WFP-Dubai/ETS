@@ -21,7 +21,8 @@
     </tr>
   </thead>
   
-  {% for waybill in object_list %}
+  <tbody>
+    {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
         <td>{{ waybill.order.pk }}</td>
         <td>{{ waybill.pk }}</td>
@@ -63,7 +64,8 @@
           {% waybill_reception waybill user %}   
         </td>
       </tr>
-  {% endfor %}
+    {% endfor %}
+  </tbody>
 </table>
 
 {% endblock %}
