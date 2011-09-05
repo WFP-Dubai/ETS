@@ -53,7 +53,7 @@ def waybill_edit(waybill, user, text=_("Edit")):
     }
 
 @register.inclusion_tag('tags/give_link.html')
-def waybill_reception(waybill, user, text=_("Recept")):
+def waybill_reception(waybill, user, text=_("Receive")):
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
