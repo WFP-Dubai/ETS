@@ -43,6 +43,12 @@ def person_required(function=None, **kwargs):
         return actual_decorator(function)
     return actual_decorator
 
+def officer_required(function=None, **kwargs):
+    actual_decorator = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count(), **kwargs)
+    if function:
+        return actual_decorator(function)
+    return actual_decorator
+
 
 @login_required
 @person_required
@@ -337,10 +343,12 @@ def waybill_validate(request, queryset, template, formset_model=ets.models.Waybi
     })
 
 @login_required
+@officer_required
 def dispatch_validate(request, queryset, **kwargs):
     return waybill_validate(request, queryset=queryset.filter(order__warehouse__compas__officers=request.user), **kwargs)
 
 @login_required
+@officer_required
 def receipt_validate(request, queryset, **kwargs):
     return waybill_validate(request, queryset=queryset.filter(waybill__destination__compas__officers=request.user), **kwargs)
 
