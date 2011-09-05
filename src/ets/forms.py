@@ -25,6 +25,12 @@ class DispatchWaybillForm( forms.ModelForm ):
             'status',
             'validated',
             'sent_compas',
+            
+            'date_created',
+            'date_modified',
+            'date_removed',
+            'dispatcher_person',
+            'transport_dispach_signed_date',
         )
     
     helper = FormHelper()
@@ -53,30 +59,13 @@ class DispatchWaybillForm( forms.ModelForm ):
 
 
 class LoadingDetailDispatchForm( forms.ModelForm ):
-    stock_item = forms.ModelChoiceField(queryset=ets_models.StockItem.objects.all(), 
-                                        label=_('Commodity'), required=True)
+    
     overload = forms.BooleanField( required = False )
 
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'number_of_units', 'overloaded_units', 'over_offload_units' )
+        fields = ( 'stock_item', 'number_of_units', 'overloaded_units', 'over_offload_units' )
     
-    def save(self, commit=True):
-        obj = super(LoadingDetailDispatchForm, self).save(commit=False)
-        stock_item = self.cleaned_data['stock_item']
-    
-        obj.stock_item = stock_item
-        
-        obj.unit_weight_net = stock_item.unit_weight_net
-        obj.unit_weight_gross = stock_item.unit_weight_gross
-        
-        obj.package = stock_item.packaging_description()
-    
-        if commit:
-            obj.save()
-        
-        return obj
-
 
 class BaseLoadingDetailFormFormSet(BaseModelFormSet):
     

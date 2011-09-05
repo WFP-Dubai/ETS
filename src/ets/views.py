@@ -138,6 +138,7 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
 
 @login_required
+@person_required
 @transaction.commit_on_success
 def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, 
                              formset_form=LoadingDetailDispatchForm,
@@ -149,10 +150,10 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
     
     waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk) if waybill_pk else None
     
-    order = get_object_or_404(order_queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user)), pk=order_pk) 
+    order = get_object_or_404(order_queryset, pk=order_pk, warehouse__in=ets.models.Warehouse.filter_by_user(request.user)) 
     
-    class FormsetForm( formset_form ):
-        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Commodity'))
+    class FormsetForm(formset_form):
+        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
         
         #===============================================================================================================
         # def clean( self ):
