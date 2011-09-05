@@ -255,17 +255,11 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, form_class=DispatchWayb
 
 
 @login_required
-def waybill_finalize_receipt( request, waybill_pk, queryset):
-    """
-    View: waybill_finalize_receipt 
-    URL:/waybill/receipt/
-    Template:None
-    Redirects to Lti Details
-    Called when user pushes Print Original on Receipt
-    """
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(destination__in=ets.models.Warehouse.filter_by_user(request.user))
-    waybill.receipt_sign()
+@person_required
+def waybill_finalize_receipt(request, waybill_pk, queryset):
+    """ Signs reception"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk, destination__in=ets.models.Warehouse.filter_by_user(request.user))
+    waybill.receipt.sign()
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
         'waybill': waybill.pk,

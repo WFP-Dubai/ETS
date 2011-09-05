@@ -318,8 +318,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_waybill_finalize_receipt(self):
         """ets.views.waybill_finalize_receipt"""
         
-        self.waybill.update_status(ets.models.Waybill.INFORMED)
+        self.client.login(username='dispatcher', password='dispatcher')
         
-        response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 302)
+        response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
+        self.assertRedirects(response, reverse("waybill_reception_list"))
             
