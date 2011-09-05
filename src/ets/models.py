@@ -436,9 +436,6 @@ class OrderItem(models.Model):
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
-        #loading_details_num = self.order.waybills.all().filter(loading_details__stock_item__commodity=self.commodity)\
-        #                    .aggregate(total=Sum('loading_details__number_of_units'))
-        #return round(loading_details_num['total']/self.number_of_units*100)
         return round(self.sum_number(self.get_order_dispatches())/self.number_of_units*100)
         
     def items_left( self ):
