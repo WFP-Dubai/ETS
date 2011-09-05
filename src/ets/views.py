@@ -279,8 +279,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
                                 destination__in=ets.models.Warehouse.filter_by_user(request.user))
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
-                                            form=formset_form, formset=formset_class, 
-                                            extra=0, max_num=5,
+                                            form=formset_form, extra=0, max_num=5,
                                             can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
     
