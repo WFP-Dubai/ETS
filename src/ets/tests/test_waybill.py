@@ -206,6 +206,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
     def test_waybill_finalize_dispatch(self):
         """ets.views.waybill_finalize_dispatch"""
+        self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)
         
