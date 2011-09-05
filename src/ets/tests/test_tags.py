@@ -25,8 +25,12 @@ class TagsTestCase(TestCaseMixin, TestCase):
         
     def test_waybill_reception(self):
         """Checks methods compress of waybill instance"""
-        self.user = User.objects.get(username="recepient")
-        data = waybill_reception(self.waybill, self.user)
+        data = waybill_reception(self.waybill, User.objects.get(username="recepient"))
+        #Since this waybill is not signed
+        self.assertFalse(data['success'])
+        
+        #This should be succeeded, because this waybill is signed but not received
+        data = waybill_reception(ets.models.Waybill.objects.get(pk="ISBX00311A"), self.user)
         self.assertTrue(data['success'])
         
     def test_waybill_creation(self):

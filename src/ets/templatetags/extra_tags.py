@@ -57,7 +57,7 @@ def waybill_reception(waybill, user, text=_("Recept")):
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
-            'success': waybill.transport_dispach_signed_date is None \
+            'success': waybill.transport_dispach_signed_date \
                 and not (waybill.get_receipt() and waybill.get_receipt().signed_date) 
                 and Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count(),
     }

@@ -101,7 +101,6 @@ class WaybillRecieptForm( forms.ModelForm ):
         model = ets_models.ReceiptWaybill
         exclude = (
             'waybill',
-            'slug',
             'validated',
             'sent_compas',
             'person',

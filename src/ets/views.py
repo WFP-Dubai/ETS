@@ -268,15 +268,15 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
     return redirect( "waybill_reception_list" )
 
 @login_required
+@person_required
+@transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       formset_class = BaseRecieptFormFormSet,
                       template='waybill/receive.html'):
     
-    waybill = get_object_or_404(queryset, pk=waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    today = datetime.date.today()
-    
+    waybill = get_object_or_404(queryset, pk=waybill_pk,
+                                destination__in=ets.models.Warehouse.filter_by_user(request.user))
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                                             form=formset_form, formset=formset_class, 
@@ -284,6 +284,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
                                             can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
     
+    today = datetime.date.today()
     form = form_class(data=request.POST or None, files=request.FILES or None, initial = {
         'arrival_date': today,
         'start_discharge_date': today,
@@ -304,7 +305,6 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'form': form, 
         'formset': loading_formset,
         'waybill': waybill,
-        'user': request.user,
     })
 
 

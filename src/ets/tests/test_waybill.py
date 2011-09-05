@@ -207,12 +207,15 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_reception test"""
         from ..forms import WaybillRecieptForm
         
+        self.client.login(username='dispatcher', password='dispatcher')
+        
+        path = reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,})
         #check it with dispatching waybill. It must fail
         response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 404)
         
         #Check proper waybill
-        response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}))
+        response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(isinstance(response.context['form'], WaybillRecieptForm))
         
@@ -221,14 +224,17 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
-            'item-0-stock-item': 'anotherstock1234',
+            
+            'item-0-stock_item': 'anotherstock1234',
             'item-0-number_units_good': 25,
             'item-0-number_units_lost': 0,
             'item-0-units_lost_reason': '',
             'item-0-number_units_damaged': 0,
             'item-0-units_damaged_reason': '',
+            
             'item-0-slug': 'ISBX00311A1',
             'item-0-waybill': 'ISBX00311A',
+            
             'arrival_date': '2011-08-24',
             'start_discharge_date': '2011-08-24',
             'end_discharge_date': '2011-08-24',
@@ -237,8 +243,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'distance': 5,
             'remarks': 'test remarks',
         }
-        response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
-                                    data=data)
+        response = self.client.post(path, data=data)
         self.assertContains(response, "35.000 Units loaded but 25.000 units accounted for")
         
         #Let's say we lost 5 units without a reason
@@ -246,8 +251,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-number_units_lost': 5,
         })
         
-        response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
-                                    data=data)
+        response = self.client.post(path, data=data)
         self.assertContains(response, "You must provide a loss reason")
         
         # Let's provide a reason and damaged units
@@ -256,8 +260,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-number_units_damaged': 5,
         })
         
-        response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
-                                    data=data)
+        response = self.client.post(path, data=data)
         self.assertContains(response, "You must provide a damaged reason")
         
         #Provide a reason of damage
@@ -265,9 +268,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-units_damaged_reason': 'dsed',
         })
         
-        response = self.client.post(reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,}), 
-                                    data=data)
-        
+        response = self.client.post(path, data=data)
         # Now everything should be all right
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(self.reception_waybill.get_receipt().remarks, 'test remarks')

@@ -647,7 +647,7 @@ class Waybill( ld_models.Model ):
 class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
-    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True, editable=False)
     
     person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills") #recipientName
     arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
