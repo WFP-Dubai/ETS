@@ -2,15 +2,17 @@
 {% load i18n %}
 {% block title %}{% trans "Stock List" %}{% endblock %}
 {% block content %}
-<table id='toplist'>
-  <tr>
-    <th>{% trans "Warehouse" %}</th>
-    <th>{% trans "Commodity" %}</th>
-    <th>{% trans "SI" %}</th>
-    <th>{% trans "Items" %}</th>
-    <th>{% trans "MT Net" %}</th>
-    <th>{% trans "Quality" %}</th>
-  </tr>
+<table class="display" id='toplist'>
+  <thead>
+    <tr>
+      <th>{% trans "Warehouse" %}</th>
+      <th>{% trans "Commodity" %}</th>
+      <th>{% trans "SI" %}</th>
+      <th>{% trans "Items" %}</th>
+      <th>{% trans "MT Net" %}</th>
+      <th>{% trans "Quality" %}</th>
+    </tr>
+  </thead>
   {% for item in object_list %}
   <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
     <td>{% ifchanged %}{{ item.warehouse }}{% endifchanged %}</td>
@@ -20,11 +22,15 @@
     <td>{% if item.number_of_units %}{{ item.unit_weight_net }}{% endif %}</td>
     <th>{% if item.quality_code != 'G' %}{{ item.quality_description }}{% endif %}</th>
   </tr>
-  {% endfor%}
+  {% endfor %}
 </table>
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
 <script charset="utf-8">
-$(document).ready(function() {
+  $(document).ready(function() {
     $('#toplist').dataTable();
-} );
+  } );
 </script>
-{%endblock%}
+{% endblock script %}

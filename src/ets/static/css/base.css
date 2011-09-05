@@ -121,9 +121,3 @@ table.summary {
 .reports-title td{
   height: 50px;
 }
-
-#toplist {
-  border-color: black; 
-  border-style: none; 
-  border-width: 1px;
-}

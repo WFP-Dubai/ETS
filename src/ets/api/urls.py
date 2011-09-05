@@ -36,10 +36,10 @@ CSV_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-it
 FORMAT_CSV = {'emitter_format': 'csv'}
 
 waybills_resource = login_required(expand_response(Resource(ReadCSVWaybillHandler), CSV_WAYBILLS_HEADERS))
-loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadingDetailHandler), CSV_WAYBILLS_HEADERS))
-orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_WAYBILLS_HEADERS))
-order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_WAYBILLS_HEADERS))
-stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_WAYBILLS_HEADERS))
+loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
+orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
+order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
+stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
 
 #history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
 #history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)

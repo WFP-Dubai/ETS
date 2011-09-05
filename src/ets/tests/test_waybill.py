@@ -279,12 +279,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse('waybill_delete', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)  
         self.assertEqual(ets.models.Waybill.objects.all().count(), col-1)
-       
-    def test_waybill_view_reception(self):
-        """ets.views.waybill_view_reception"""
-        self.client.login(username='recepient', password='recepient')
-        response = self.client.get(reverse('waybill_view_reception', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200) 
     
     def waybill_validate(self):
         """ets.views.waybill_validate"""

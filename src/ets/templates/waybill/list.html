@@ -57,7 +57,7 @@
           {% waybill_edit waybill user %}
         </td>
         <td>
-          <a href='{% url waybill_delete waybill_pk=waybill.pk %}'>{% trans "Delete" %}</a>   
+          {% waybill_delete waybill user %}    
         </td>
         <td>
           {% waybill_reception waybill user %}   
