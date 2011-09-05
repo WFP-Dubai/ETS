@@ -740,7 +740,6 @@ class LoadingDetail(models.Model):
         order_with_respect_to = 'waybill'
         verbose_name = _("loading detail")
         verbose_name_plural = _("waybill items")
-        unique_together = ('waybill', 'stock_item')
 
 
 #=======================================================================================================================

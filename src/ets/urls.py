@@ -35,11 +35,8 @@ urlpatterns = patterns("ets.views",
     }, "order_detail" ),
     
     #Waybill pages
-    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create_or_update", {}, "waybill_create" ),
-    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_create_or_update", {
-        'template': 'waybill/edit.html',
-        'waybill_queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED)
-    }, "waybill_edit" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {}, "waybill_edit" ),
     
     ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     

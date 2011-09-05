@@ -26,7 +26,7 @@ from django.contrib.auth.decorators import user_passes_test
 from uni_form.helpers import FormHelper, Layout, HTML, Row
 
 #from ets.compas import compas_write
-from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormFormSet, DispatchWaybillForm
+from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
@@ -140,15 +140,12 @@ def waybill_search( request, form_class=WaybillSearchForm,
 @login_required
 @person_required
 @transaction.commit_on_success
-def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm, 
-                             formset_form=LoadingDetailDispatchForm,
-                             formset_class=BaseLoadingDetailFormFormSet,
-                             order_queryset=ets.models.Order.objects.all(),
-                             waybill_pk=None, waybill_queryset = ets.models.Waybill.objects.all(), 
-                             template='waybill/create.html' ):
+def waybill_create(request, order_pk, form_class=DispatchWaybillForm, 
+                   formset_form=LoadingDetailDispatchForm,
+                   formset_class=BaseLoadingDetailFormSet,
+                   order_queryset=ets.models.Order.objects.all(),
+                   template='waybill/create.html' ):
     """Creates a Waybill"""
-    
-    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk) if waybill_pk else None
     
     order = get_object_or_404(order_queryset, pk=order_pk, warehouse__in=ets.models.Warehouse.filter_by_user(request.user)) 
     
@@ -177,13 +174,13 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         #===============================================================================================================
     
     loading_formset = modelformset_factory(ets.models.LoadingDetail, 
-                                           form=FormsetForm,
-                                           formset = formset_class, 
-                                           extra=5, max_num=5,
-                                           can_order=False, can_delete=False)\
-                                (request.POST or None, request.FILES or None, prefix='item')
+                       form=FormsetForm,
+                       formset = type('LoadingFormSet', (formset_class, forms.models.BaseModelFormSet), {}), 
+                       extra=5, max_num=5,
+                       can_order=False, can_delete=False)\
+            (request.POST or None, request.FILES or None, prefix='item')
     
-    form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill, initial={
+    form = form_class(data=request.POST or None, files=request.FILES or None, initial={
         'loading_date': order.dispatch_date,
         'dispatch_date': order.dispatch_date,
     })
@@ -194,8 +191,6 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save(False)
         waybill.order = order
-        waybill.project_number = order.project_number
-        waybill.transport_name = order.transport_name
         waybill.dispatcher_person = request.user.person
         waybill.save()
         
@@ -210,9 +205,53 @@ def waybill_create_or_update(request, order_pk, form_class=DispatchWaybillForm,
         'form': form, 
         'formset': loading_formset,
         'object': order,
-        'waybill': waybill,
-        'user': request.user,
     })
+
+
+@login_required
+@person_required
+@transaction.commit_on_success
+def waybill_dispatch_edit(request, order_pk, waybill_pk, form_class=DispatchWaybillForm, 
+                      formset_form=LoadingDetailDispatchForm,
+                      formset_class=BaseLoadingDetailFormSet,
+                      waybill_queryset = ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=True), 
+                      template='waybill/edit.html' ):
+    """Edit not signed dispatching waybill"""
+    
+    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk, 
+                                order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    
+    order = waybill.order
+    
+    class FormsetForm(formset_form):
+        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
+        
+    loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
+                       form=FormsetForm,
+                       formset = type('DispatchLoadingFormSet', (formset_class, forms.models.BaseInlineFormSet), {}), 
+                       extra=5, max_num=5,
+                       can_order=False, can_delete=False)\
+            (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
+    
+    form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)
+    
+    form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
+                                                              .exclude(pk=order.warehouse.pk)
+    
+    if form.is_valid() and loading_formset.is_valid():
+        form.save()
+        loading_formset.save()
+        
+        messages.success(request, _("Waybill has been updated."))
+        return redirect(waybill)
+        
+    return direct_to_template(request, template, {
+        'form': form, 
+        'formset': loading_formset,
+        'object': order,
+        'waybill': waybill,
+    })
+    
 
 
 @login_required

@@ -67,7 +67,7 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
         fields = ( 'stock_item', 'number_of_units', 'overloaded_units', 'over_offload_units' )
     
 
-class BaseLoadingDetailFormFormSet(BaseModelFormSet):
+class BaseLoadingDetailFormSet(object):
     
 #    def append_non_form_error( self, message ):
 #        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
@@ -75,7 +75,7 @@ class BaseLoadingDetailFormFormSet(BaseModelFormSet):
 #        raise forms.ValidationError( errors )
     
     def clean(self):
-        super(BaseLoadingDetailFormFormSet, self).clean()
+        super(BaseLoadingDetailFormSet, self).clean()
         count = 0
         for form in self.forms:
             if not hasattr(form, 'cleaned_data'):

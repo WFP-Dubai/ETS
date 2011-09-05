@@ -145,16 +145,17 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_waybill_edit(self):
         """ets.views.waybill_edit"""
         self.client.login(username='dispatcher', password='dispatcher')
-        response = self.client.get(reverse('waybill_edit', kwargs={
+        
+        edit_url = reverse('waybill_edit', kwargs={
             'order_pk': self.order.pk, 
             'waybill_pk': self.waybill.pk,
-        }))
+        })
+        response = self.client.get(edit_url)
         self.assertContains(response, "Edit waybill: ISBX00211A", status_code=200)
         
         today = datetime.date.today()
         
-        #let's check validation. Provide wrong destination warehouse
-        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data={
+        data={
             'loading_date': today,
             'dispatch_date': today,
             'destination': 'ISBX0034',
@@ -166,42 +167,31 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'transport_driver_licence': 'KE23455',
             'transport_vehicle_registration': 'BG2345',
             
+            'item-0-slug': 'ISBX00211A1',
+            'item-0-waybill': 'ISBX00211A',
             'item-0-stock_item': 'testme0123',
             'item-0-number_of_units': '12',
             
             'item-TOTAL_FORMS': 5,
-            'item-INITIAL_FORMS': 0,
+            'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
-        })
+        }
+        
+        #let's check validation. Provide wrong destination warehouse
+        response = self.client.post(edit_url, data=data)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['form']['destination'].errors.as_text(), '* Select a valid choice. That choice is not one of the available choices.')
         
+        data['destination'] = 'ISBX003'
+        data['item-0-number_of_units'] = '10'    
         #Valid data
-        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data={
-            'loading_date': today,
-            'dispatch_date': today,
-            'destination': 'ISBX003',
-            'transaction_type': u'WIT',
-            'transport_type': u'02',
-            'dispatch_remarks': 'You are funny guys!',
-            'transport_sub_contractor': 'Arpaso',
-            'transport_driver_name': 'Ahmed',
-            'transport_driver_licence': 'KE23455',
-            'transport_vehicle_registration': 'BG2345',
-            
-            'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '10',
-            
-            'item-TOTAL_FORMS': 5,
-            'item-INITIAL_FORMS': 0,
-            'item-MAX_NUM_FORMS': 5,
-        })
+        response = self.client.post(edit_url, data=data)
         self.assertEqual(response.status_code, 302)
         
         #check updated waybill and loading details
-        waybill = ets.models.Waybill.objects.all()[1]
+        waybill = ets.models.Waybill.objects.get(pk=self.waybill.pk)
         self.assertEqual(waybill.loading_date, today)
-        self.assertEqual(waybill.loading_details.all()[0].number_of_units, 10)
+        self.assertEqual(waybill.loading_details.get().number_of_units, 10)
         
         
     def test_waybill_finalize_dispatch(self):
