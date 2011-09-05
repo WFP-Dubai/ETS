@@ -1,8 +1,9 @@
 {% extends "base_template.html" %}
 {% load i18n %}
-{% block title %}{% trans "Stock List" %}{% endblock %}
+
 {% block content %}
-<table class="display" id='toplist'>
+<h3>{% trans "Stock List" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id='stocklist'>
   <thead>
     <tr>
       <th>{% trans "Warehouse" %}</th>
@@ -13,15 +14,17 @@
       <th>{% trans "Quality" %}</th>
     </tr>
   </thead>
-  {% for item in object_list %}
-  <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
-    <td>{% ifchanged %}{{ item.warehouse }}{% endifchanged %}</td>
-    <td>{% ifchanged %}{{ item.commodity_name }}{% endifchanged %}</td>
-    <td>{% ifchanged %}{{ item.si_code }}{% endifchanged %}</td>
-    <td>{{ item.number_of_units }}</td>
-    <td>{% if item.number_of_units %}{{ item.unit_weight_net }}{% endif %}</td>
-    <th>{% if item.quality_code != 'G' %}{{ item.quality_description }}{% endif %}</th>
-  </tr>
+  <tbody>
+    {% for item in object_list %}
+    <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
+      <td>{% ifchanged %}{{ item.warehouse }}{% endifchanged %}</td>
+      <td>{% ifchanged %}{{ item.commodity }}{% endifchanged %}</td>
+      <td>{% ifchanged %}{{ item.si_code }}{% endifchanged %}</td>
+      <td>{{ item.number_of_units }}</td>
+      <td>{% if item.number_of_units %}{{ item.unit_weight_net }}{% endif %}</td>
+      <td>{% if item.quality_code != 'G' %}{{ item.quality_description }}{% endif %}</td>
+    </tr>
+  </tbody>
   {% endfor %}
 </table>
 {% endblock %}
@@ -30,7 +33,7 @@
 {{ block.super }}
 <script charset="utf-8">
   $(document).ready(function() {
-    $('#toplist').dataTable();
+    $('#stocklist').dataTable();
   } );
 </script>
 {% endblock script %}
