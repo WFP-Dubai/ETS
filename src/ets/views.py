@@ -1,36 +1,34 @@
 import datetime
 
 from django import forms
-from django.conf import settings
+#from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core import serializers
-from django.core.urlresolvers import reverse
-from django.forms.formsets import formset_factory
-from django.forms.models import inlineformset_factory, modelformset_factory, model_to_dict
-from django.http import HttpResponse
+#from django.core import serializers
+#from django.core.urlresolvers import reverse
+#from django.forms.formsets import formset_factory
+from django.forms.models import inlineformset_factory, modelformset_factory
+#from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-from django.views.decorators.csrf import csrf_exempt
-from django.utils import simplejson
+#from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_list
-from django.views.generic.create_update import apply_extra_context
+#from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
-from django.views.decorators.http import require_POST
+#from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
 
 
-from uni_form.helpers import FormHelper, Layout, HTML, Row
+#from uni_form.helpers import FormHelper, Layout, HTML, Row
 
 #from ets.compas import compas_write
-from ets.forms import WaybillFullForm, WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
-from ets.forms import WaybillValidationFormset, WaybillSearchForm, LoadingDetailDispatchForm
+from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
+from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
-from ets.tools import un64unZip, viewLog
+from ets.tools import viewLog
 
 LOADING_LINES = 5
 
