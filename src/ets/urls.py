@@ -56,7 +56,7 @@ urlpatterns = patterns("ets.views",
     
     #Reception pages
     ( r'^receive/$', "waybill_search", {
-        "queryset": Waybill.objects.filter(status=Waybill.INFORMED)
+        "queryset": Waybill.objects.filter(status=Waybill.INFORMED, transport_dispach_signed_date__isnull=False)
     }, "waybill_reception_list" ),
     
     ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {

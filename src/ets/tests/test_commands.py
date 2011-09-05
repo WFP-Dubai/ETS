@@ -31,19 +31,19 @@ class CommandTestCase(TestCase):
         """Test place's update method"""
         self.assertEqual(ets.models.Location.objects.count(), 2)
         self.assertEqual(ets.models.Warehouse.objects.count(), 3)
-        self.assertEqual(ets.models.Organization.objects.count(), 1)
+        self.assertEqual(ets.models.Organization.objects.count(), 2)
         self.assertEqual(ets.models.Compas.objects.count(), 1)
 
         wh = ets.models.Warehouse.objects.get(pk='ISBX002')
         self.assertTupleEqual((wh.organization, wh.location, wh.compas) , 
-                              (ets.models.Organization.objects.get(pk='DOEAF'), 
+                              (ets.models.Organization.objects.get(pk='WFP'), 
                                ets.models.Location.objects.get(pk='ISBX'),
                                ets.models.Compas.objects.get(pk=self.compas),))
         
         #Persons
         person = ets.models.Person.objects.get(pk="ISBX0020000586")
         self.assertTupleEqual((person.organization, person.location, person.compas, person.user.username),
-                              (ets.models.Organization.objects.get(pk='DOEAF'), 
+                              (ets.models.Organization.objects.get(pk='WFP'), 
                                ets.models.Location.objects.get(pk='ISBX'),
                                ets.models.Compas.objects.get(pk=self.compas),
                                'ISBX0020000586'))

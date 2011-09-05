@@ -5,7 +5,7 @@
     "fields": {
       "name": "PAKISTAN COUNTRY OFFICE",
       "reporting_code": "dev_compas",
-      "organization_id": "DOEAF",
+      "organization_id": "WFP",
       "geo_point_code": "ISBX",
       "country_code": "586",
       "geo_name": "ISLAMABAD_CAP"
@@ -41,7 +41,7 @@
     "fields": {
       "org_unit_code": "dev_compas",
       "location_code": "ISBX",
-      "organization_id": "DOEAF", 
+      "organization_id": "WFP", 
       "first_name": "RIAZ", 
       "code": "0000586", 
       "title": "LOGISTICS OFFICER", 
