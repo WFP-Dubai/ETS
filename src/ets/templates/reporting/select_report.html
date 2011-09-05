@@ -1,24 +1,43 @@
 {% extends "base_template.html"%}
 {% load i18n %}
+
 {%block title %}{% trans "Select Action" %}{%endblock%}
+
 {%block content %}
 <table>
-<tr>
-<td>{%if user.get_profile.isDispatcher%}{% trans "Warehouse Dispatch Report for" %} {{user.get_profile.warehouses.origin_wh_name}} </td>
-<td><a href='{% url dispatch_report_wh user.get_profile.warehouses.origin_wh_code %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr>
-<td>{%if user.get_profile.isReciever%}{% trans "Warehouse Reciept Report" %}{{user.get_profile.receptionPoints.LOC_NAME}} </td>
-<td><a href='{% url receipt_report_wh user.get_profile.receptionPoints.LOCATION_CODE  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr>
-<td>{%if user.get_profile.superUser%}{% trans "Full LTI Report" %} </td>
-<td><a href='{% url ltis_report %}'>{% trans "download" %}</a>{%endif%}</td>
-</tr>
-<tr><td>{% trans "Recipient Report: All items for" %} {{user.get_profile.receptionPoints.consegnee_name}} </td>
-<td><a href='{% url receipt_report_cons  user.get_profile.receptionPoints.consegnee_code %}'>{% trans "download" %}</a></td>
-</tr>
+  <tr class='reports-title'>
+    <td>{% trans "Orders reports" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Orders Report" %} </td>
+    <td><a href='{% url api_orders %}'>{% trans "download" %}</a></td>
+  </tr>
+  <tr>
+    <td>{% trans "Recipient Report: All items for warehouses" %}</td>
+    <td><a href='{% url api_order_items %}'>
+      {% trans "download" %}</a>
+    </td>
+  </tr> 
+  <tr class='reports-title'>
+    <td>{% trans "Stock reports" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Stock Report: All items for warehouses" %} </td>
+    <td><a href='{% url api_stock_items %}'>{% trans "download" %}</a></td>
+  </tr>
+  <tr class='reports-title'>
+    <td>{% trans "Waybill reports" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Waybill Report: All items for warehouses" %} </td>
+    <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
+  </tr>
+  <tr class='reports-title'>
+    <td>{% trans "Detail Waybill reports" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Detail Waybill Report: All items for warehouses" %} </td>
+    <td><a href='{% url api_loading_details %}'>{% trans "download" %}</a></td>
+  </tr>
 </table>
-
-
-{%endblock%}
+{% endblock %}

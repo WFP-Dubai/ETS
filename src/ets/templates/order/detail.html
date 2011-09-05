@@ -1,0 +1,86 @@
+{% extends "base_template.html"%}
+{% load i18n extra_tags %}
+
+{% block title %}{{ object }}{% endblock %}
+
+{% block content %}
+<table class="summary">
+  <tr>
+    <td>{% trans "Code" %}: {{ object.pk }}</td>
+  	<td>{% trans "Created" %}: {{ object.created }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
+  	<td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.pk }}</td>
+  </tr>	
+  <tr>
+    <td>{% trans "Project Number" %}: {{ object.project_number }}</td>
+    <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
+    <td>{% trans "Location:" %} {{ object.location }}</td>
+  </tr>
+  <tr>
+    <td>{% trans "Contractor:" %} {{ object.transport_name }}</td>
+  </tr>
+</table>
+
+{% trans "Order items:" %}
+<table class='bordered' >
+    <tr class='itemhead'>
+      <th class='bordered'>{% trans "Commodity" %}</th>
+      <th>{% trans "SI" %}</th>
+      <th class='bordered'>{% trans "Number Of Units" %}</th>
+      <th class='bordered'>{% trans "To Be Dispatched" %}</th>
+      <th  class='bordered'>{% trans "Stock In Warehouse" %}</th>
+    </tr>
+    
+    {% for item in object.items.all %}
+      <tr class='bordered'>
+        <td class='bordered'>{{ item.commodity }}&nbsp;</td>
+        <td class='bordered'>&nbsp;{{ item.si_code }}&nbsp;</td>
+        <td class='bordered' align="right">{{ item.number_of_units }}</td>
+        <td class='bordered' align="right">{{ item.items_left }}</td>
+        <td class='bordered' align="right"> {{ item.get_available_stocks }}</td>
+      </tr>
+    {% endfor %}
+</table>
+
+<br>
+{% if object.waybills.count %}
+  {% trans "Current Waybills:" %}<br>
+  <table class='bordered' >
+  {% for waybill in object.waybills.all %}
+      <tr>
+        <td colspan="3" rowspan="2" class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
+        <td class='bordered' align="center"><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
+        <td class='bordered' align="center">{% waybill_edit waybill user %}</td>
+      </tr>
+      <tr>
+        <td class='bordered' align="center">{% waybill_delete waybill user %}</td>
+        <td class='bordered' align="center">{% waybill_reception waybill user %}</td>
+      </tr>
+      <tr class='itemhead'>
+        <td></td>
+        <td class='bordered'>{% trans "Commodity" %}</td>
+        <td class='bordered'>{% trans "SI" %}</td>
+        <td class='bordered'>{% trans "Number of units" %}</td>
+      </tr>
+      {% for loading in waybill.loading_details.all %}
+      <tr class='bordered'>
+        <td class='bordered'>&nbsp;</td>
+        <td class='bordered'>&nbsp;{{ loading.stock_item.commodity }}&nbsp;</td>
+        <td class='bordered' >&nbsp;{{ loading.stock_item.si_code }}&nbsp;</td>
+        <td class='bordered' align="right">{{ loading.number_of_units }}</td>
+      </tr>
+      {% endfor %}
+  {% endfor %}
+  </table>
+{% endif %}
+
+<br>
+{% waybill_creation object user %} New Waybill<br>
+<br>
+
+{% endblock %}

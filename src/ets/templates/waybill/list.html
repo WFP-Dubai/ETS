@@ -1,0 +1,80 @@
+{% extends "base_template.html" %}
+{% load i18n extra_tags %}
+
+{% block content %}
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+  <thead>
+    <tr>
+      <th>{% trans "LTI" %}</th>
+      <th>{% trans "Waybill Number" %}</th>
+      <th>{% trans "Origin" %}</th>
+      <th>{% trans "Consignee" %}</th>
+      <th>{% trans "Delivery Location" %}</th>
+      <th>{% trans "Dispatch" %}</th> 
+      <th>{% trans "Received" %}</th>
+      <th>{% trans "Validated" %}</th>
+      <th>{% trans "In Compas" %}</th>
+      <th>{% trans "View" %}</th>
+      <th>{% trans "Edit" %}</th>
+      <th>{% trans "Delete" %}</th>
+      <th>{% trans "Receive" %}</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    {% for waybill in object_list %}
+      <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
+        <td>{{ waybill.order.pk }}</td>
+        <td>{{ waybill.pk }}</td>
+        <td>{{ waybill.order.warehouse.location }}</td>
+        <td>{{ waybill.order.warehouse.organization }}</td>
+        <td>{{ waybill.destination.location }}</td>
+        <td>
+          {% if waybill.transport_dispach_signed_date %}
+            {{ waybill.transport_dispach_signed_date }}
+          {% else %}
+            {% trans "Pending" %}
+          {% endif %}
+        </td>
+        <td>
+          {% if waybill.receipt.signed_date %}
+            {{ waybill.receipt.signed_date }}
+          {% else %}
+            {% trans "Pending" %}
+          {% endif %}
+        </td>
+        <td>
+          {% if waybill.validated %}{% trans "D" %}{% else %}-{% endif %}/
+          {% if waybill.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}
+        </td>
+        <td>
+          {% if waybill.sent_compas %}D{% else %}-{% endif %}/
+          {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
+        </td>
+        <td>
+          <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>
+        </td>
+        <td>
+          {% waybill_edit waybill user %}
+        </td>
+        <td>
+          {% waybill_delete waybill user %}    
+        </td>
+        <td>
+          {% waybill_reception waybill user %}   
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8">
+  $(document).ready(function() {
+  	$('#example').dataTable();
+  } );
+</script>
+{% endblock script %}

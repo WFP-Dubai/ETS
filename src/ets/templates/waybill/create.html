@@ -1,0 +1,29 @@
+{% extends "order/detail.html" %}
+{% load i18n uni_form_tags %}
+
+{% block title %}{% trans "Waybill Creation" %} {% endblock %}
+
+{% block content %}
+{{ block.super }}
+
+<div class="form">
+
+<form method="POST" action="" class="uniForm">{% csrf_token %}
+    {% uni_form form form.helper %}
+    {% uni_form formset formset.helper %}
+    <div class="buttonHolder">
+      <input type="submit" name="add" value="{% trans 'Save' %}"/>
+    </div>
+</form>
+</div>
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8" type="text/javascript">
+$(document).ready(function() {
+  $('#{{ form.dispatch_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });
+  $('#{{ form.loading_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });                
+});
+</script>
+{% endblock %}

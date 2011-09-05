@@ -1,0 +1,28 @@
+[ 
+  {
+    "pk": 1,
+    "model": "auth.user",
+    "fields": {
+        "username": "admin",
+        "first_name": "Admin",
+        "last_name": "Adminskiy",
+        "is_active": true,
+        "is_superuser": true,
+        "is_staff": true,
+        "groups": [],
+        "user_permissions": [],
+        "password": "sha1$1fcb3$8df119b3ac1f36c936a6ee3d99b50908a516f276",
+        "email": "admin@example.com"
+    }
+  },
+  {
+    "pk": "dev_compas",
+    "model": "ets.compas",
+    "fields": {
+      "officers": [1],
+      
+      "db_engine": "django.db.backends.sqlite3",
+      "db_name": "compas"
+    }
+  }
+]

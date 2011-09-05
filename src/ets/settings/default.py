@@ -22,43 +22,12 @@ ADMINS = (
 
 
 ALL_DB = {
-    'default': {
-        'NAME': 'db',
-        'ENGINE': 'django.db.backends.sqlite3',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-    },
     'dev_compas': {
         'NAME': 'compas',
         'ENGINE': 'django.db.backends.sqlite3',
         'USER': '',
         'PASSWORD': '',
         'HOST': 'localhost',
-    },
-    'default_tc_pak': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wb_pak',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '',
-    }, 
-    'default_tc_pak_rem': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'wb_pak',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '10.11.208.20',
-        'PORT': '',
-    },
-    'default_test_pak': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'waybill_pak',
-        'USER': 'root',
-        'PASSWORD': 'trackme',
-        'HOST': '10.11.208.20',
-        'PORT': '',
     },
     'compas_test_pak': {
         'ENGINE': 'django.db.backends.oracle',
@@ -68,28 +37,12 @@ ALL_DB = {
         'HOST': '10.11.70.50',
         'PORT': '',
     },
-    'default_tc_mb': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'waybill',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
     'compas_test_pal': {
         'ENGINE': 'django.db.backends.oracle',
         'NAME': '10.11.216.4/JERX001',
         'USER': 'TESTJERX001',
         'PASSWORD': 'TESTJERX001',
         'HOST': '10.11.216.4',
-        'PORT': '',
-    },
-    'default_tc_mp': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'waybill',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': 'localhost',
         'PORT': '',
     },
     'compas_test_rome': {
@@ -108,43 +61,6 @@ ALL_DB = {
         'HOST': '10.11.33.199',
         'PORT': '',
     },
-    'default_serafino': {
-        'ENGINE': 'postgresql_psycopg2',
-        'NAME': 'waybill',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres_password',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-    'offline_serafino': {
-        'ENGINE': 'postgresql_psycopg2',
-        'NAME': 'offline',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres_password',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-    'default_training_pal': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'waybilltraining',
-        'USER': 'root',
-        'PASSWORD': 'epic',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-    'default_prod_pal': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'waybill',
-        'USER': 'root',
-        'PASSWORD': 'epic',
-        'HOST': 'localhost',
-        'PORT': '',
-    },
-}
-
-DATABASES = {
-    "default": ALL_DB['default'],
-    "compas": ALL_DB["dev_compas"],
 }
 
 LANGUAGE_CODE = 'en'
@@ -203,11 +119,12 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'ets.urls'
 
 INSTALLED_APPS = (
-
-    #own
-    'ets',
     
-    # builtin
+    'south',
+    
+    'ets',
+    'compas',
+    
     'django.contrib.auth',
     'django.contrib.admin',
     'django.contrib.contenttypes',
@@ -219,19 +136,18 @@ INSTALLED_APPS = (
     'django.contrib.markup',
     'django.contrib.humanize',
     
-    #external
     'django_extensions',
-    'south',
     'rosetta',
     'debug_toolbar',
     'piston',
     'autoslug',
+    'uni_form',
+    'logicaldelete',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'django.core.context_processors.csrf',
-    'ets.context_processor.common'
 )
 
 TEST_RUNNER = 'ets.tests.coverage_runner.CaverageTestSuiteRunner'
@@ -240,9 +156,6 @@ COVERAGE_REPORT_PATH = os.path.join(EGG_ROOT, 'coverage_report')
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
 LOGOUT_URL = '/accounts/logout/'
-AUTH_PROFILE_MODULE = 'ets.UserProfile'
-
-IN_PRODUCTION = False
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_NAME = 'ets'
@@ -294,7 +207,67 @@ LOGGING = {
     }
 }
 
-COMPAS_STATION = u'JERX001'
+class DatabasesFormDatabase(object):
+    
+    default = 'default'
+    
+    def __init__(self, default):
+        super(DatabasesFormDatabase, self).__init__()
+        self.default_db = default
+    
+    def get_compases(self):
+        try:
+            #Check applications aren't initialized yet
+            from django.db.models.loading import get_model
+            Compas = get_model(app_label='ets', model_name='Compas')
+        except ImportError:
+            return ()
+        else:
+            return Compas.objects.using(self.default)
+    
+    def __getitem__(self, alias):
+        if alias != self.default:
+            compas = self.get_compases().get(pk=alias)
+            return {
+                'NAME': compas.db_name,
+                'ENGINE': compas.db_engine,
+                'USER': compas.db_user,
+                'PASSWORD': compas.db_password,
+                'HOST': compas.db_host,
+                'PORT': compas.db_port,
+                'OPTIONS': {},
+                'TEST_CHARSET': None,
+                'TEST_COLLATION': None,
+                'TEST_NAME': None,
+                'TEST_MIRROR': None,
+                'TIME_ZONE': TIME_ZONE
+            }
+        else:
+            return self.default_db
+    
+    def items(self):
+        return ( (self.default, self.default_db), )
+        
+        #===============================================================================================================
+        # for alias in self:
+        #    yield alias, self[alias]
+        #===============================================================================================================
+    
+    def __iter__(self):
+        yield self.default
+        for compas in self.get_compases():
+            yield compas.pk
+
+DATABASES = DatabasesFormDatabase({
+    'NAME': 'db',
+    'ENGINE': 'django.db.backends.sqlite3',
+    'USER': '',
+    'PASSWORD': '',
+    'HOST': 'localhost',
+})
+
+#Prevent migrations during testing
+SOUTH_TESTS_MIGRATE = False
 
 # Local settings for development / production
 try:
@@ -305,11 +278,3 @@ except ImportError:
 TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 DISABLE_EXPIERED_LTI = DEBUG
-
-
-
-#testing to push again
-
-#=======================================================================================================================
-# INTSTANCE_LABLE = 'Toby Mac Pro'
-#=======================================================================================================================
