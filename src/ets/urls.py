@@ -63,7 +63,8 @@ urlpatterns = patterns("ets.views",
                        
     
     ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
-        'queryset': Waybill.objects.filter(status=Waybill.INFORMED)
+        'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
+                                           receipt__signed_date__isnull=False)
     }, "waybill_finalize_receipt" ),
     
     ( r'^validate_dispatch/$', "dispatch_validate", {
