@@ -129,7 +129,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
         fields = (
-            'stock_item',
+            #'stock_item',
             'number_units_good', 
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
