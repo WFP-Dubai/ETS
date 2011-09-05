@@ -25,6 +25,7 @@ class TagsTestCase(TestCaseMixin, TestCase):
         
     def test_waybill_reception(self):
         """Checks methods compress of waybill instance"""
+        self.user = User.objects.get(username="recepient")
         data = waybill_reception(self.waybill, self.user)
         self.assertTrue(data['success'])
         
