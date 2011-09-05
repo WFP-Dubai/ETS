@@ -27,30 +27,6 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
     
     def get_waybill(self):
         return ets.models.Waybill.objects.get(pk="ISBX00211A")
-    
-    #===========================================================================
-    # def test_read_waybills(self):
-    #    response = self.client.get(reverse("api_waybill"))
-    #    self.assertEqual(response.status_code, 200)
-    #    self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-    #    
-    #    data = simplejson.loads(response.content)
-    #    self.assertTrue(isinstance(data, list))
-    #    self.assertDictEqual(data[0], self.waybill_dict)
-    #===========================================================================
-    
-    #===========================================================================
-    # def test_read_waybill(self):
-    #    response = self.client.get(reverse("api_waybill", kwargs={"slug": self.get_waybill().pk}))
-    #    self.assertEqual(response.status_code, 200)
-    #    self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
-    #    
-    #    data = simplejson.loads(response.content)
-    #    self.assertTrue(isinstance(data, dict))
-    #    self.assertDictEqual(data, self.waybill_dict)
-    #===========================================================================
-    
-    
         
     def test_get_waybills(self):
 

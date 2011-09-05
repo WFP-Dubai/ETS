@@ -40,7 +40,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_serialize(self):
         """Checks methods serialize of waybill instance"""
         data = self.waybill.serialize()
-        self.assertTrue(data.startswith('[{"pk": "ISBX00211A", "model": "ets.waybill", "fields": {"dispatcher_person": "ISBX0020000586"'))
+        self.assertTrue(data.startswith('[{"pk": "ISBX00211A", "model": "ets.waybill", "fields": {'))
     
     def test_compress(self):
         """Checks methods compress of waybill instance"""
@@ -201,7 +201,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
-        self.assertEqual(waybill.status, waybill.SIGNED)
+        self.assertTrue(waybill.transport_dispach_signed_date is not None)
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""

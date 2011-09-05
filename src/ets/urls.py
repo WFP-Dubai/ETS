@@ -47,18 +47,20 @@ urlpatterns = patterns("ets.views",
     
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
-        'queryset': Waybill.objects.filter(status=Waybill.NEW),
+        'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=True),
     }, "waybill_finalize_dispatch" ),
     
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
     #Reception pages
     ( r'^receive/$', "waybill_search", {
-        "queryset": Waybill.objects.filter(status=Waybill.INFORMED, transport_dispach_signed_date__isnull=False)
+        "queryset": Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
+                                           receipt__signed_date__isnull=True)
     }, "waybill_reception_list" ),
     
     ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
-       'queryset': Waybill.objects.filter(status__in=(Waybill.SENT, Waybill.INFORMED))
+       'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=False,
+                                          receipt__signed_date__isnull=True)
     }, "waybill_reception"),
                        
     
@@ -70,14 +72,12 @@ urlpatterns = patterns("ets.views",
     ( r'^validate_dispatch/$', "dispatch_validate", {
         'template': 'validate/dispatch.html',
         'formset_model': ets.models.Waybill,
-        'queryset': ets.models.Waybill.objects.filter(sent_compas=False, 
-                                   status__gte=ets.models.Waybill.SIGNED),
+        'queryset': ets.models.Waybill.objects.filter(sent_compas=False, transport_dispach_signed_date__isnull=False),
     }, "waybill_validate_dispatch_form" ),
     ( r'^validate_receipt/$', "receipt_validate", {
         'template': 'validate/receipt.html',
         'formset_model': ets.models.ReceiptWaybill,
-        'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, 
-                                                             signed_date__isnull=False),
+        'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, signed_date__isnull=False),
     }, "waybill_validate_receipt_form" ),
                        
     #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),

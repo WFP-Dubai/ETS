@@ -113,7 +113,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     fieldsets = (
-        (_('General'), {'fields': ('order', 'destination', 'status',)}),
+        (_('General'), {'fields': ('order', 'destination', )}),
         (_('Types'), {'fields': ('transaction_type', 'transport_type')}),
         (_('Dispatch'), {'fields': ('loading_date', 'dispatch_date', 'dispatcher_person', 'dispatch_remarks')}),
         (_('Transport'), {'fields': ('transport_sub_contractor', 'transport_driver_name', 
@@ -126,11 +126,11 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
         (_("COMPAS"), {'fields': ('validated', 'sent_compas',)}),
     )
     
-    list_display = ('pk', 'status', 'link_to_order', 'date_created', 'dispatch_date',
+    list_display = ('pk', 'link_to_order', 'date_created', 'dispatch_date',
                     'destination', 'active')
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
-    list_filter = ('status', 'date_created',)
+    list_filter = ('date_created',)
     search_fields = ('pk', 'order__pk')
     inlines = (LoadingDetailsInline, ReceiptInline)
     

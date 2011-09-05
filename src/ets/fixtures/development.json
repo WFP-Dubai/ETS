@@ -37,8 +37,6 @@
     "fields": {
       "order": "OURLITORDER",
       
-      "status": 1,
-      
       "date_created": "2011-06-12 05:36:54",
       "loading_date": "2011-06-12",
       "dispatch_date": "2011-06-12",
@@ -100,7 +98,6 @@
     "model": "ets.waybill", 
     "fields": {
       "order": "THEIRORDER",
-      "status": 4,
       
       "date_created": "2011-06-12 05:36:54",
       "loading_date": "2011-06-12",
@@ -167,7 +164,6 @@
       "destination": "ISBX002",
       "container_two_seal_number": "",
       "transport_trailer_registration": "",
-      "status": 5,
       "date_removed": null,
       "loading_date": "2011-06-12",
       "transport_driver_name": "Ahmed",

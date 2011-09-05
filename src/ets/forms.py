@@ -21,7 +21,6 @@ class DispatchWaybillForm( forms.ModelForm ):
         model = ets_models.Waybill
         exclude = (
             'order',
-            'status',
             'validated',
             'sent_compas',
             

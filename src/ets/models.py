@@ -415,7 +415,7 @@ class OrderItem(models.Model):
     
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
-        return LoadingDetail.objects.filter(waybill__status__gte=Waybill.SIGNED, 
+        return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
                                             waybill__order__project_number=self.order.project_number,
                                             waybill__date_removed__isnull=True,
                                             stock_item__si_code = self.si_code, 
@@ -474,14 +474,6 @@ class Waybill( ld_models.Model ):
     DELIVERED = 5
     COMPLETE = 6
     
-    STATUSES = (
-        (NEW, _("New")),
-        (SIGNED, _("Signed")),
-        (SENT, _("Sent")),
-        (INFORMED, _("Informed")),
-        (DELIVERED, _("Delivered")),
-    )
-    
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
                             instance.order.warehouse.pk, instance.date_created.strftime('%y'), LETTER_CODE
                          ), unique=True, slugify=capitalize_slug(slugify),
@@ -490,8 +482,6 @@ class Waybill( ld_models.Model ):
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
     destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
-    
-    status = models.IntegerField(_("Status"), choices=STATUSES, default=NEW)
     
     #Dates
     loading_date = models.DateField(_("Date of loading"), default=datetime.now) #dateOfLoading
@@ -585,13 +575,8 @@ class Waybill( ld_models.Model ):
             return None
 
     def dispatch_sign(self, commit=True):
-        """
-        Signs the waybill as ready to be sent by setting special status SIGNED. 
-        After this system sends it to central server.
-        """
+        """Signs the waybill as ready to be sent."""
         self.transport_dispach_signed_date = datetime.now()
-        
-        self.update_status(self.SIGNED)
         
         if commit:
             self.save()
@@ -636,13 +621,6 @@ class Waybill( ld_models.Model ):
         zippedData = base64.b64decode( data )
         return zlib.decompress( zippedData )
     
-    def update_status(self, status):
-        if self.status > status:
-            raise RuntimeError("You can not decrease status to %s" % status)
-        
-        self.status = status
-        self.save()
-
 
 class ReceiptWaybill(models.Model):
     """Receipt data"""
@@ -674,12 +652,10 @@ class ReceiptWaybill(models.Model):
     
     def sign(self, commit=True):
         """
-        Signs the waybill as delivered by setting special status DELIVERED. 
+        Signs the waybill as delivered. 
         After this system sends it to central server.
         """
         self.signed_date = datetime.now()
-        
-        self.waybill.update_status(self.waybill.DELIVERED)
         
         if commit:
             self.save()
