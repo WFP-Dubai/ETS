@@ -380,10 +380,7 @@ class Order(models.Model):
                                         ).order_by('-warehouse__orders__items__number_of_units')
     
     def get_percent_executed(self):
-        sum = 0 
-        for item in self.items.all():
-            sum += item.get_percent_executed()
-        return sum / self.items.all().count()
+        return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
     
 class OrderItem(models.Model):
@@ -437,16 +434,16 @@ class OrderItem(models.Model):
         """Calculates available stocks"""
         return self.sum_number(self.get_stock_items()) - self.sum_number(self.get_similar_dispatches())
         
+    def get_percent_executed(self):
+        """Calculates percent for executed"""
+        #loading_details_num = self.order.waybills.all().filter(loading_details__stock_item__commodity=self.commodity)\
+        #                    .aggregate(total=Sum('loading_details__number_of_units'))
+        #return round(loading_details_num['total']/self.number_of_units*100)
+        return round(self.sum_number(self.get_order_dispatches())/self.number_of_units*100)
         
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
-    
-    def get_percent_executed(self):
-#        loading_details_num = self.order.waybills.all().filter(loading_details__stock_item__commodity=self.commodity)\
-#                            .aggregate(total=Sum('loading_details__number_of_units'))
-#        return round(loading_details_num['total']/self.number_of_units*100)
-        return round(self.sum_number(self.get_order_dispatches()/self.number_of_units*100) 
 
 
 class Waybill( ld_models.Model ):
