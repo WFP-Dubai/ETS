@@ -5,9 +5,9 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
   <thead>
     <tr>
-      <th>{% trans "LTI" %}</th>
-      <th>{% trans "Waybill Number" %}</th>
-      <th>{% trans "Origin" %}</th>
+      <th>{% trans "Order" %}</th>
+      <th>{% trans "Number" %}</th>
+      <th>{% trans "Warehouse" %}</th>
       <th>{% trans "Consignee" %}</th>
       <th>{% trans "Delivery Location" %}</th>
       <th>{% trans "Dispatch" %}</th> 
@@ -24,11 +24,11 @@
   <tbody>
     {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-        <td>{{ waybill.order.pk }}</td>
+        <td><a href="{{ order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
         <td>{{ waybill.pk }}</td>
-        <td>{{ waybill.order.warehouse.location }}</td>
-        <td>{{ waybill.order.warehouse.organization }}</td>
-        <td>{{ waybill.destination.location }}</td>
+        <td>{{ waybill.order.warehouse }}</td>
+        <td>{{ waybill.order.consignee }}</td>
+        <td>{{ waybill.order.location }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date }}
