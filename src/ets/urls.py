@@ -41,6 +41,8 @@ urlpatterns = patterns("ets.views",
         'waybill_queryset': ets.models.Waybill.objects.filter(status__lt=ets.models.Waybill.SIGNED)
     }, "waybill_edit" ),
     
+    ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
+    
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
@@ -51,7 +53,6 @@ urlpatterns = patterns("ets.views",
         'queryset': Waybill.objects.filter(status=Waybill.NEW),
     }, "waybill_finalize_dispatch" ),
     
-    ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
     #Reception pages
