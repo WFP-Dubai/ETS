@@ -7,15 +7,39 @@
 
 <table cellpadding="0" cellspacing="0" border="0"><tbody>
 <tr><td>{% trans "Waybill Number:" %}</td><td> {{ waybill.pk }}</td></tr>
-<tr><td>{% trans "Dispatch Location" %}</td><td>{{ waybill.warehouse.location }}</td></tr>
+<tr><td>{% trans "Dispatch Location" %}</td><td>{{ waybill.order.warehouse.location }}</td></tr>
 <tr><td>{% trans "Recipient Location:" %}</td><td> {{ waybill.destination.location }}</td></tr>
 <tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.destination.organization }}</td></tr>
 </tbody></table>
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
-  <fieldset>
-    {% uni_form formset formset.helper %}
-  </fieldset>
+  {% include "uni_form/errors_formset.html" %}
+  <table>
+    {{ formset.management_form }}
+    <thead>
+      <tr>
+        <th>Stock item</th>
+        <th>Number Units Good</th>
+        <th>Number Units Lost</th>
+        <th>Lost Reason</th>
+        <th>Number Units Damaged</th>
+        <th>Damaged Reason</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for form in formset %}
+      <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
+      <tr>
+        <td>{{ form.instance.stock_item.coi_code }} {{ form.slug }} {{ form.waybill }}</td>
+        <td>{{ form.number_units_good|as_uni_field }}</td>
+        <td>{{ form.number_units_lost|as_uni_field }}</td>
+        <td>{{ form.units_lost_reason|as_uni_field }}</td>
+        <td>{{ form.number_units_damaged|as_uni_field }}</td>
+        <td>{{ form.units_damaged_reason|as_uni_field }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
     {% uni_form form form.helper %}
     <div class="buttonHolder">
       <input type="submit" name="save" value="{% trans 'Save &amp; Print' %}"/>
