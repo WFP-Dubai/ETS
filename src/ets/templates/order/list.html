@@ -13,6 +13,7 @@
       <th>{% trans "Destination" %}</th>
       <th>{% trans "Consignee" %}</th>
       <th>{% trans "New Waybill" %}</th>
+      <th>{% trans "Percentage" %}</th>
     </tr>
   </thead>
   <tbody>
@@ -24,6 +25,7 @@
       <td>{{ order.location }}</td>
       <td>{{ order.consignee }}</td>
       <td>{% waybill_creation order user %}</td>
+      <td>{{ order.get_percent_executed }}</td>
     </tr>
     {% endfor %}
   </tbody>
