@@ -1,5 +1,6 @@
+{% load i18n %}
 {% if success %}
   <a href={{url}}>{{ text }}</a>
 {% else %}
-  <span>{{ text }}</span>
+  <span title="{% trans 'You are not allowed to do this'%}">{{ text }}</span>
 {% endif %}

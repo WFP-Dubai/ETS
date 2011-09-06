@@ -2,7 +2,7 @@
 {% load i18n %}   
 <html lang="en">
 <head>
-  <title>{% trans "ETS" %} {% block title %}{{ section.title }}{% endblock %}</title>
+  <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
 
   {% block style %}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_page.css" media="screen"/>
@@ -16,11 +16,10 @@
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.4.3.min.js"></script>
 
 </head>
-<body OnKeyPress="return disableEnterKey(event)">
+<body>
   <div class="header">
     <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill{% endblocktrans %}</span>
   </div>
-  
   <div class="menu">
     <a href='{% url index %}'>{% trans "home" %}</a>
     {% if user.is_authenticated %}
@@ -28,8 +27,6 @@
     {% else %} {% trans "Please log in." %}
       <a href='{% url django.contrib.auth.views.login %}?next={% url index %}'>{% trans "login" %}</a>{% endif %}
   </div>
-  
-  <br>
   {% if messages %}
     <ul class="messages">
       {% for message in messages %}
@@ -39,9 +36,8 @@
   {% endif %}
   <div class="content">
     {% block content %}
-    {% endblock%}
+    {% endblock %}
   </div>
-  <br>
   <div class='footer'>
     {% if user.is_authenticated %}
       {% trans  "Logged in as:" %}<span class="highlight">{{ user.username }} </span>.
