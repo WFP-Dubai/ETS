@@ -11,11 +11,8 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
+from ets.views import waybill_list, receipt_view, dispatch_view, person_required
 import ets.models
-
-info_dict_waybill = {
-    'queryset': Waybill.objects.all()
-}
 
 urlpatterns = patterns("ets.views",
                         
@@ -35,39 +32,33 @@ urlpatterns = patterns("ets.views",
     }, "order_detail" ),
     
     #Waybill pages
-    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
-    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {}, "waybill_edit" ),
     
-    ( r'^waybill/viewlog/', "viewLogView", {}, "viewLogView" ),
+    #Listings
+    ( r'^search/$', "waybill_search", {}, "waybill_search" ),
+    ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), 
+      {}, "waybill_dispatch_list" ),
+    ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), 
+      {}, "waybill_reception_list" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
     }, "waybill_view" ),
     
+    #Dispatch
+    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {}, "waybill_edit" ),
     
-    ( r'^waybill/(?P<waybill_pk>[-\w]+)/print_original/$', "waybill_finalize_dispatch", {
-        'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=True),
-    }, "waybill_finalize_dispatch" ),
-    
-    ( r'^search/$', "waybill_search", {}, "waybill_search" ),
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_dispatch/$', "waybill_finalize_dispatch", 
+      {}, "waybill_finalize_dispatch" ),
     
     #Reception pages
-    ( r'^receive/$', "waybill_search", {
-        "queryset": Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                           receipt__signed_date__isnull=True)
-    }, "waybill_reception_list" ),
     
-    ( r'^receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception", {
-       'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=False,
-                                          receipt__signed_date__isnull=True)
-    }, "waybill_reception"),
-                       
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', "waybill_reception", 
+      {}, "waybill_reception"),
     
-    ( r'^waybill/print_original_receipt/(?P<waybill_pk>[-\w]+)/$', "waybill_finalize_receipt", {
-        'queryset': Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                           receipt__signed_date__isnull=False)
-    }, "waybill_finalize_receipt" ),
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
+      {}, "waybill_finalize_receipt" ),
     
     ( r'^validate_dispatch/$', "dispatch_validate", {
         'template': 'validate/dispatch.html',
@@ -80,8 +71,6 @@ urlpatterns = patterns("ets.views",
         'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, signed_date__isnull=False),
     }, "waybill_validate_receipt_form" ),
                        
-    #( r'^waybill/viewwb_reception/(?P<waybill_pk>[-\w]+)/$', "waybill_view_reception", {}, "waybill_view_reception" ),
-    #===================================================================================================================
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
@@ -89,8 +78,10 @@ urlpatterns = patterns("ets.views",
             'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas=True).all,
     }}, "compass_waybill" ),
     
-    ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
-    ( r'^waybill/waybill_delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete",{},"waybill_delete" ),
+    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', 
+      "waybill_delete", {}, "waybill_delete" ),
+    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
+    
     ( r'^view_stock/$', "stock_view", {}, "view_stock" ),
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',

@@ -1,4 +1,5 @@
 import datetime
+from functools import wraps
 
 from django import forms
 #from django.conf import settings
@@ -19,6 +20,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import available_attrs
 
 
 #from uni_form.helpers import FormHelper, Layout, HTML, Row
@@ -50,9 +52,22 @@ def officer_required(function=None, **kwargs):
     return actual_decorator
 
 
+def dispatch_view(view_func):
+    @wraps(view_func, assigned=available_attrs(view_func))
+    def _wrapped_view(request, *args, **kwargs):
+        return view_func(request, queryset=ets.models.Waybill.dispatches(request.user), *args, **kwargs)
+    return _wrapped_view
+
+def receipt_view(view_func):
+    @wraps(view_func, assigned=available_attrs(view_func))
+    def _wrapped_view(request, *args, **kwargs):
+        return view_func(request, queryset=ets.models.Waybill.receptions(request.user), *args, **kwargs)
+    return _wrapped_view
+
+
 @login_required
 @person_required
-def order_list(request, warehouse="", template='order/list.html', 
+def order_list(request, template='order/list.html', 
                queryset=ets.models.Order.objects.all().order_by('-created'), 
                extra_context=None):
     """
@@ -63,14 +78,6 @@ def order_list(request, warehouse="", template='order/list.html',
     queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     
     #TODO: Exclude delivered orders
-    #===================================================================================================================
-    # still_ltis = []
-    # for lti in ltis:
-    #    for si in LtiOriginal.objects.filter( code = lti['code'] ):
-    #        if si.items_left > 0 and lti not in still_ltis:
-    #            still_ltis.append( lti )
-    #===================================================================================================================
-    
     return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
 
 @login_required
@@ -103,21 +110,32 @@ def waybill_view(request, waybill_pk, queryset, template):
 
 @login_required
 @person_required
+@dispatch_view
 def waybill_finalize_dispatch( request, waybill_pk, queryset):
     """
     called when user pushes Print Original on dispatch
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.dispatch_sign(True)
     
     messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
         "waybill": waybill.pk
     })
     
-    return redirect( "order_detail", waybill.order.pk)
+    return redirect(waybill)
 
+
+@login_required
+def waybill_list(request, queryset, template='waybill/list.html'):
+    """Shows waybill listing"""
+    warehouses = ets.models.Warehouse.filter_by_user(request.user)
+    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
+                               | Q(destination__in=warehouses) 
+                               | Q(order__warehouse__compas__officers=request.user)
+                               | Q(destination__compas__officers=request.user))
+    
+    return direct_to_template( request, template, {'object_list': queryset,})
 
 @login_required
 def waybill_search( request, form_class=WaybillSearchForm, 
@@ -126,20 +144,10 @@ def waybill_search( request, form_class=WaybillSearchForm,
     
     form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
-                               | Q(destination__in=warehouses) 
-                               | Q(order__warehouse__compas__officers=request.user)
-                               | Q(destination__compas__officers=request.user))
-    
     queryset = queryset.filter(pk__icontains=search_string)
     
-    return direct_to_template( request, template, {
-        'object_list': queryset, 
-        'user': request.user,
-    })
-
+    return waybill_list(request, queryset=queryset)
+    
 
 @login_required
 @person_required
@@ -214,16 +222,14 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm,
 
 @login_required
 @person_required
+@dispatch_view
 @transaction.commit_on_success
-def waybill_dispatch_edit(request, order_pk, waybill_pk, form_class=DispatchWaybillForm, 
-                      formset_form=LoadingDetailDispatchForm,
-                      formset_class=BaseLoadingDetailFormSet,
-                      waybill_queryset = ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=True), 
-                      template='waybill/edit.html' ):
+def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, form_class=DispatchWaybillForm, 
+                          formset_form=LoadingDetailDispatchForm, formset_class=BaseLoadingDetailFormSet,
+                          template='waybill/edit.html'):
     """Edit not signed dispatching waybill"""
     
-    waybill = get_object_or_404(waybill_queryset, pk=waybill_pk, order__pk=order_pk, 
-                                order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+    waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
     
     order = waybill.order
     
@@ -260,27 +266,29 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, form_class=DispatchWayb
 
 @login_required
 @person_required
+@receipt_view
 def waybill_finalize_receipt(request, waybill_pk, queryset):
     """ Signs reception"""
-    waybill = get_object_or_404(queryset, pk = waybill_pk, destination__in=ets.models.Warehouse.filter_by_user(request.user))
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt.sign()
     
     messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
         'waybill': waybill.pk,
     })
 
-    return redirect( "waybill_reception_list" )
+    return redirect(waybill)
+
 
 @login_required
 @person_required
+@receipt_view
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       formset_class = BaseRecieptFormFormSet,
                       template='waybill/receive.html'):
     
-    waybill = get_object_or_404(queryset, pk=waybill_pk,
-                                destination__in=ets.models.Warehouse.filter_by_user(request.user))
+    waybill = get_object_or_404(queryset, pk=waybill_pk)
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                                             form=formset_form, extra=0, max_num=5,
@@ -312,11 +320,14 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 
 
 @login_required
-def waybill_delete(request, waybill_pk, redirect_to='', queryset=ets.models.Waybill.objects.all()):
+@person_required
+@dispatch_view
+def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.delete()
+    
     messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
+    
     if redirect_to:
         return redirect(redirect_to)
     elif request.META.has_key('HTTP_REFERER'):
@@ -350,9 +361,6 @@ def dispatch_validate(request, queryset, **kwargs):
 @officer_required
 def receipt_validate(request, queryset, **kwargs):
     return waybill_validate(request, queryset=queryset.filter(waybill__destination__compas__officers=request.user), **kwargs)
-
-def viewLogView( request, template='status.html' ):
-    return direct_to_template( request, template, {'status': '<h3>Log view</h3><pre>%s</pre>' % viewLog()})
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):

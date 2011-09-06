@@ -192,7 +192,7 @@
       "arrival_date": "2011-08-22",
       "sent_compas": false,
       "_order": 0,
-      "signed_date": "2011-08-22",
+      "signed_date": null,
       "waybill": "ISBX00312A",
       "start_discharge_date": "2011-08-22",
       "person": "ISBX0020000586",

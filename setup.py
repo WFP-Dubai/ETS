@@ -29,6 +29,7 @@ install_requires = [
         'django-autoslug',
         'django-uni-form >= 0.7.0', #div-based forms
         'django-logicaldelete',
+        'django-native-tags==0.5.0',
 ]
 
 #Extra dependencies for test purposes
