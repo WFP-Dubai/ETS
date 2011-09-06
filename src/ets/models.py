@@ -436,7 +436,10 @@ class OrderItem(models.Model):
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
-        return round(self.sum_number(self.get_order_dispatches())/self.number_of_units*100)
+        if self.number_of_units:
+            return round(100 * self.sum_number(self.get_order_dispatches()) / self.number_of_units)
+        else:
+            return 0
         
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
