@@ -7,11 +7,13 @@
                 <tr><th colspan="5" bgcolor='black' color='white'>{% trans "Transaction Details" %}</th></tr>
             </thead>
             <tr>
-                <td><sup style="font-size:x-small;">{% trans "Origin(location)" %}:</sup><br>{{ object.order.warehouse.location }}</td>
+                <td><sup style="font-size:x-small;">{% trans "Origin(location)" %}:</sup><br>{{ object.order.warehouse.location.name }}</td>
                 <td><sup style="font-size:x-small;" >{% trans "Origin(warehouse)" %}:</sup><br>{{ object.order.warehouse.name }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Destination(location)" %}</sup><br>{{ object.destination.location.name }}</td>
-                <td  rowspan=5>
-                {% include 'waybill/print/barcode.html'%}
+                <td rowspan="4">
+                  <img width='150' height='150' alt="barcode" 
+                    src='http://chart.apis.google.com/chart?cht=qr&chs=150x150&chld=L|2&chl={{ object.compress }}'
+                  />
                 </td>
             
             </tr>
@@ -32,7 +34,7 @@
                 <td><sup style="font-size:x-small;">{% trans "LTI no" %}: </sup><br>{{ object.order.pk }}</td>
             </tr>
             
-            <tr ><td colspan=3 valign="top" style="font-size:small;"><sup style="font-size:x-small;">{% trans "Dispatch Remarks" %}:</sup>{{ object.dispatch_remarks }}
+            <tr ><td colspan=4 valign="top" style="font-size:small;"><sup style="font-size:x-small;">{% trans "Dispatch Remarks" %}:</sup>{{ object.dispatch_remarks }}
                 {% if object.container_one_remarks_dispatch %}
                 <br>{% trans "Container 1 Remarks" %}:{{ object.container_one_remarks_dispatch }}
                 {% endif %}
@@ -49,7 +51,7 @@
             <thead class="wb_head">
                 <tr><th colspan="8">{% trans "Loading Details" %}</th></tr>
             </thead>
-            <tr   style="font-size:x-small;">
+            <tr style="font-size:x-small;">
                 <td rowspan="2"><sup>{% trans "SI No" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Commodity" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Packing" %}</sup></td>
@@ -98,26 +100,26 @@
 </tr>
 <tr>
   <td>
-    <table cellpadding="0" cellspacing="0" border="1px"  style="font-size:small;"  >
+    <table cellpadding="0" cellspacing="0" border="1px">
       <thead class="wb_head">
         <tr><th colspan="3">{% trans "Certification of Commodities Loaded" %}</th></tr>
       </thead>
-      <tbody>
+      <tbody style="font-size:small;">
         <tr>
           <td><sup>{% trans "Warehouse or Dispatch Point" %}</sup></td>
           <td colspan="2">
-            <sup style="font-size:x-small;">{% trans "Transport Contractor" %}:</sup>{{ object.order.transport_name }}
+            <sup style="font-size:x-small;">{% trans "Transport Contractor" %}:</sup> {{ object.order.transport_name }}
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Name" %}:</small>{{ object.dispatcher_person }}</td>
+          <td><small style="font-size:x-small;">{% trans "Name" %}:</small> {{ object.dispatcher_person.user.get_full_name }}</td>
           <td colspan="2">
             <small style="font-size:x-small;">{% trans "Transport Subcontractor" %}:</small>
             {{ object.transport_sub_contractor }}
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Title" %}:</small>{{ object.dispatcher_person.title }}</td>
+          <td><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
           <td colspan="2"><small style="font-size:x-small;">{% trans "Driver's Name" %}:</small> {{ object.transport_driver_name }}</td>
         </tr>
         <tr>
@@ -159,8 +161,7 @@
             <p style='font-size:14px'>{{ object.transport_driver_name|upper }}<br>
               {% trans "Date:" %}{{object.transport_dispach_signed_date|date}}
             </p>
-            {% endif %}&nbsp;
-                
+            {% endif %}
           </td>
         </tr>
       </tbody>

@@ -1,15 +1,26 @@
-#print
-
-body{
+body {
 	height: 100%;
-	border-width: 0px;
-	padding: 0px;
-	margin: 0px;
-	font-size: 12pt;
+	border-width: 0;
+	padding: 0;
+	margin: 0;
 }
-.wb_head{color:white;background-color:black;}
+
+.wb_head{
+  color: white;
+  background-color:black;
+  font-size: medium;
+}
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
+
+.content {
+    border: none;
+    font-family: serif;
+    font-weight: normal;
+    padding: 0;
+    background-color: white;
+}
+
 table {
 	margin: 0px;
 	padding: 0px;
@@ -17,19 +28,13 @@ table {
 	min-width: 100%;
 	width: 100%;
 	height: 100%;
+	font-size: 13px;
 }
 img{position: relative; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
-.hidden{
-	display: none;
-	visibility:hidden;
-	height: 0px;
-	margin: 0px;
-	padding: 0px;
 
-}
-.hidden_print{
+.hidden, .hidden_print, .header, .menu, .messages, .footer {
 	font-size: large;
 	display: none;
 	visibility: hidden;
