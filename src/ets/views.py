@@ -152,7 +152,7 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm,
     """Creates a Waybill"""
     
     order = get_object_or_404(order_queryset, pk=order_pk, warehouse__in=ets.models.Warehouse.filter_by_user(request.user)) 
-    
+
     class FormsetForm(formset_form):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
         
@@ -175,14 +175,14 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm,
         #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
         #            self._errors['numberUnitsLoaded'].append( myerror )
         #            raise forms.ValidationError( myerror )
-        #===============================================================================================================
+        #===============================================================================================================          
     
     loading_formset = modelformset_factory(ets.models.LoadingDetail, 
                        form=FormsetForm,
                        formset = type('LoadingFormSet', (formset_class, forms.models.BaseModelFormSet), {}), 
                        extra=5, max_num=5,
                        can_order=False, can_delete=False)\
-            (request.POST or None, request.FILES or None, prefix='item')
+        (request.POST or None, request.FILES or None, prefix='item', queryset=ets.models.LoadingDetail.objects.none())
     
     form = form_class(data=request.POST or None, files=request.FILES or None, initial={
         'loading_date': order.dispatch_date,
