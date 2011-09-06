@@ -143,17 +143,16 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
 
 class BaseRecieptFormFormSet(BaseInlineFormSet):
     
-    helper = FormHelper()
-    
-    # create the layout object
-    helper.add_layout(Layout(
-        #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
-        Row(
-        'stock_item', 'number_units_good', 
-        'number_units_lost', 'units_lost_reason',
-        'number_units_damaged', 'units_damaged_reason',
-    )))
-    helper.formset_tag = False
+    def clean(self):
+        super(BaseRecieptFormFormSet, self).clean()
+        for form in self.forms:
+            if not hasattr(form, 'cleaned_data'):
+                continue
+
+            if not getattr(form, 'cleaned_data', {}).get('number_units_good')\
+                and not getattr(form, 'cleaned_data', {}).get('number_units_damaged')\
+                and not getattr(form, 'cleaned_data', {}).get('number_units_lost'):
+                raise forms.ValidationError(_("Fields number_units_good, number_units_damaged, number_units_lost are not filling"))
 
 
 class WaybillValidationFormset( BaseModelFormSet ):
