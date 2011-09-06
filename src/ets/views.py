@@ -112,7 +112,7 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
     queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
     waybill.dispatch_sign(True)
     
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
+    messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
         "waybill": waybill.pk
     })
     

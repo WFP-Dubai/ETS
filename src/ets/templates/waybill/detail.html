@@ -11,7 +11,7 @@
 {% block content %}
 
 <div class="hidden_print">
-  <a onclick="javascript:original_lable.className='hidden';copy_lable.className='shown';print();" href="#">Print Copy</a>
+  <a id="print_copy" href="#">Print Copy</a>
   {% waybill_edit object user %}
   <a onclick="javascript:original_lable.className='shown';copy_lable.className='hidden';print();" 
       href="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">Print Original</a>
@@ -31,4 +31,18 @@
   {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
 </table>
 
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.4.3.min.js"></script>
+<script charset="utf-8">
+  $(document).ready(function() {
+    $('#print_copy').click(function(){
+    	$("#original_lable").hide();
+    	$("#copy_lable").show();
+    	print();
+    	return false;
+    });
+  });
+</script>
 {% endblock %}
