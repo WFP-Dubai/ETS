@@ -7,16 +7,16 @@
 <table class="summary">
   <tr>
     <td>{% trans "Code" %}: {{ object.pk }}</td>
-  	<td>{% trans "Created" %}: {{ object.created }}</td>
+    <td>{% trans "Created" %}: {{ object.created }}</td>
   </tr>
   <tr>
     <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
-  	<td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
+    <td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
     <td>{% trans "Percentage" %}: {{ object.get_percent_executed }}</td>
   </tr>
   <tr>
     <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.pk }}</td>
-  </tr>	
+  </tr> 
   <tr>
     <td>{% trans "Project Number" %}: {{ object.project_number }}</td>
     <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
@@ -44,8 +44,8 @@
         <td class='bordered'>&nbsp;{{ item.si_code }}&nbsp;</td>
         <td class='bordered' align="right">{{ item.number_of_units }}</td>
         <td class='bordered' align="right">{{ item.items_left }}</td>
-        <td class='bordered' align="right"> {{ item.get_available_stocks }}</td>
-        <td class='bordered' align="right"> {{ item.get_percent_executed }}</td>
+        <td class='bordered' align="right">{{ item.get_available_stocks }}</td>
+        <td class='bordered' align="right">{{ item.get_percent_executed }}</td>
       </tr>
     {% endfor %}
 </table>
@@ -56,13 +56,13 @@
   <table class='bordered' >
   {% for waybill in object.waybills.all %}
       <tr>
-        <td colspan="3" rowspan="2" class='itemhead bordered'>{% trans "Waybill:" %}{{ waybill.pk }} </td>
-        <td class='bordered' align="center"><a href='{{ waybill.get_absolute_url }}'>{% trans "View Waybill" %}</a></td>
+        <td colspan="3" rowspan="2" class='itemhead bordered'>
+          <a href='{{ waybill.get_absolute_url }}'>{% trans "Waybill:" %}{{ waybill.pk }}</a>
+        </td>
         <td class='bordered' align="center">{% waybill_edit waybill user %}</td>
       </tr>
       <tr>
         <td class='bordered' align="center">{% waybill_delete waybill user %}</td>
-        <td class='bordered' align="center">{% waybill_reception waybill user %}</td>
       </tr>
       <tr class='itemhead'>
         <td></td>
@@ -82,8 +82,8 @@
   </table>
 {% endif %}
 
-<br>
-{% waybill_creation object user %} New Waybill<br>
-<br>
+<br/>
+{% waybill_creation object user _("Create New Waybill") %}<br/>
+<br/>
 
 {% endblock %}

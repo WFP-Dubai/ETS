@@ -1,12 +1,14 @@
 {% extends "order/detail.html" %}
 {% load i18n uni_form_tags %}
 
-{% block title %}{% trans "Waybill Creation" %} {% endblock %}
+{% block title %}{% trans "Waybill Creation" %}{% endblock %}
 
 {% block content %}
 {{ block.super }}
 
 <div class="form">
+
+{% if form.errors or formset.errors %}<span style="color:red;">{% trans "You have some errors. Correct them" %}</span>{% endif %}
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
     {% uni_form form form.helper %}
