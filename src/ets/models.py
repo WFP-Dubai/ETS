@@ -379,6 +379,9 @@ class Order(models.Model):
                                         commodity = F('warehouse__orders__items__commodity'),
                                         ).order_by('-warehouse__orders__items__number_of_units')
     
+    def get_percent_executed(self):
+        return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
+    
     
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
@@ -407,7 +410,7 @@ class OrderItem(models.Model):
                                         project_number=self.order.project_number,
                                         si_code = self.si_code, 
                                         commodity = self.commodity,
-                                        ).order_by('-number_of_units')
+                                        ).order_by('-number_of_units')      
     
     @staticmethod
     def sum_number( queryset ):
@@ -431,6 +434,9 @@ class OrderItem(models.Model):
         """Calculates available stocks"""
         return self.sum_number(self.get_stock_items()) - self.sum_number(self.get_similar_dispatches())
         
+    def get_percent_executed(self):
+        """Calculates percent for executed"""
+        return self.number_of_units and round(100 * self.sum_number(self.get_order_dispatches()) / self.number_of_units)
         
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
