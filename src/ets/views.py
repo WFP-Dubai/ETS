@@ -26,7 +26,7 @@ from django.contrib.auth.decorators import user_passes_test
 #from ets.compas import compas_write
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
+from ets.forms import LoadingDetailRecieptForm
 import ets.models
 from ets.tools import viewLog
 
@@ -276,14 +276,13 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
-                      formset_class = BaseRecieptFormFormSet,
                       template='waybill/receive.html'):
     
     waybill = get_object_or_404(queryset, pk=waybill_pk,
                                 destination__in=ets.models.Warehouse.filter_by_user(request.user))
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
-                                            form=formset_form, formset=formset_class, extra=0, max_num=5,
+                                            form=formset_form, extra=0, max_num=5,
                                             can_order=False, can_delete=False)\
                                 (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
     
