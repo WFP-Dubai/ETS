@@ -12,6 +12,7 @@
   <tr>
     <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
   	<td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
+    <td>{% trans "Percentage" %}: {{ object.get_percent_executed }}</td>
   </tr>
   <tr>
     <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.pk }}</td>
@@ -34,6 +35,7 @@
       <th class='bordered'>{% trans "Number Of Units" %}</th>
       <th class='bordered'>{% trans "To Be Dispatched" %}</th>
       <th  class='bordered'>{% trans "Stock In Warehouse" %}</th>
+      <th  class='bordered'>{% trans "Percentage" %}</th>
     </tr>
     
     {% for item in object.items.all %}
@@ -43,6 +45,7 @@
         <td class='bordered' align="right">{{ item.number_of_units }}</td>
         <td class='bordered' align="right">{{ item.items_left }}</td>
         <td class='bordered' align="right"> {{ item.get_available_stocks }}</td>
+        <td class='bordered' align="right"> {{ item.get_percent_executed }}</td>
       </tr>
     {% endfor %}
 </table>
