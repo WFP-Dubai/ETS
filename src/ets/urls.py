@@ -11,7 +11,8 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
-from ets.views import waybill_list, receipt_view, dispatch_view, person_required, warehouse_related
+from ets.views import waybill_list 
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related
 import ets.models
 
 urlpatterns = patterns("ets.views",

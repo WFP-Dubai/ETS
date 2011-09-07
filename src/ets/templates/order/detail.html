@@ -50,6 +50,7 @@
     {% endfor %}
 </table>
 
+{% block extra_content %}
 <br>
 {% if object.waybills.count %}
   {% trans "Current Waybills:" %}<br>
@@ -101,5 +102,5 @@
 <br/>
 {% waybill_creation object user _("Create New Waybill") %}<br/>
 <br/>
-
+{% endblock %}
 {% endblock %}
