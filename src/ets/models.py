@@ -441,6 +441,7 @@ class OrderItem(models.Model):
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
+    
 
 
 class Waybill( ld_models.Model ):
@@ -756,6 +757,13 @@ class LoadingDetail(models.Model):
 #        return True
 #=======================================================================================================================
     
+    def get_order_item(self):
+        """Retrieves stock items for current order item through warehouse"""
+        return OrderItem.objects.get(order=self.waybill.order,
+                                     order__project_number=self.stock_item.project_number,
+                                     si_code = self.stock_item.si_code, 
+                                     commodity = self.stock_item.commodity,)
+    
     def calculate_total_net( self ):
         return ( self.number_of_units * self.stock_item.unit_weight_net ) / 1000
 
@@ -816,7 +824,7 @@ class LoadingDetail(models.Model):
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
         #overloaded units for dispatch
-        order_item = OrderItem.objects.get(commodity=self.stock_item.commodity)
+        order_item = self.get_order_item()
         if order_item.items_left() < self.number_of_units and not self.overloaded_units\
                                                         and not self.waybill.transport_dispach_signed_date:
             raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
