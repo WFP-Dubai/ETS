@@ -64,21 +64,11 @@ def receipt_view(view_func):
         return view_func(request, queryset=ets.models.Waybill.receptions(request.user), *args, **kwargs)
     return _wrapped_view
 
-
-@login_required
-@person_required
-def order_list(request, template='order/list.html', 
-               queryset=ets.models.Order.objects.all().order_by('-created'), 
-               extra_context=None):
-    """
-    URL: /orders/
-    Shows all orders
-    """
-        
-    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    
-    #TODO: Exclude delivered orders
-    return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
+def order_view(view_func):
+    @wraps(view_func, assigned=available_attrs(view_func))
+    def _wrapped_view(request, *args, **kwargs):
+        return view_func(request, queryset=ets.models.Order.user_related(request.user).order_by('-created'), *args, **kwargs)
+    return _wrapped_view
 
 @login_required
 @person_required

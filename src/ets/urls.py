@@ -4,14 +4,14 @@ from django.conf.urls.defaults import patterns, include, handler404, handler500
 from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
-from django.views.generic.list_detail import object_detail
+from django.views.generic.list_detail import object_detail, object_list
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
-from ets.views import waybill_list, receipt_view, dispatch_view, person_required
+from ets.views import waybill_list, receipt_view, dispatch_view, person_required, order_view
 import ets.models
 
 urlpatterns = patterns("ets.views",
@@ -23,11 +23,12 @@ urlpatterns = patterns("ets.views",
     }}, "index" ),
     
     #Order list
-    ( r'^orders/$', "order_list", {}, "orders"),
+    ( r'^orders/$', login_required(person_required(order_view(object_list))), {
+        'template_name': 'order/list.html',
+    }, "orders"),
     
     #Order detail
-    ( r'^order/(?P<object_id>[-\w]+)/$', login_required(object_detail), {
-        'queryset': ets.models.Order.objects.all(),
+    ( r'^order/(?P<object_id>[-\w]+)/$', login_required(person_required(order_view(object_detail))), {
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     

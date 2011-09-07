@@ -34,6 +34,9 @@ class OrderTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.context['object'].get_percent_executed(), 200)
 
     def test_order_percentage_null(self):
+        self.client.login(username='dispatcher', password='dispatcher')
+        
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')
         response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object'].get_percent_executed(), 0)       

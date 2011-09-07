@@ -382,6 +382,9 @@ class Order(models.Model):
     def get_percent_executed(self):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
+    @classmethod
+    def user_related(cls, user):
+        return cls.objects.filter(warehouse__in=Warehouse.filter_by_user(user))
     
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
