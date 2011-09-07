@@ -30,14 +30,9 @@ from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWayb
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
-from ets.tools import viewLog
 
 LOADING_LINES = 5
 
-
-def prep_req( request ):
-
-    return {'user': request.user}
 
 def person_required(function=None, **kwargs):
     actual_decorator = user_passes_test(lambda u: ets.models.Person.objects.filter(user=u).count(), **kwargs)
