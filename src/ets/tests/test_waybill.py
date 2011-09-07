@@ -224,7 +224,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
             
-            'item-0-number_units_good': 25,
+            'item-0-number_units_good': 0,
             'item-0-number_units_lost': 0,
             'item-0-units_lost_reason': '',
             'item-0-number_units_damaged': 0,
@@ -241,6 +241,11 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'distance': 5,
             'remarks': 'test remarks',
         }
+        response = self.client.post(path, data=data)
+        self.assertContains(response, "At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling")
+        data.update({
+            'item-0-number_units_good': 25,
+        })
         response = self.client.post(path, data=data)
         self.assertContains(response, "35.000 Units loaded but 25.000 units accounted for")
         
