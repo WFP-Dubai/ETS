@@ -57,12 +57,10 @@ class DispatchWaybillForm( forms.ModelForm ):
 
 
 class LoadingDetailDispatchForm( forms.ModelForm ):
-    
-    overload = forms.BooleanField( required = False )
 
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'stock_item', 'number_of_units', 'overloaded_units', 'over_offload_units' )
+        fields = ( 'stock_item', 'number_of_units', 'overloaded_units', )
     
 
 class BaseLoadingDetailFormSet(object):
@@ -88,8 +86,7 @@ class BaseLoadingDetailFormSet(object):
     helper = FormHelper()
     
     # create the layout object
-    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units', 
-                                 'over_offload_units', 'overload',)))
+    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units',)))
     helper.formset_tag = False
 
 
