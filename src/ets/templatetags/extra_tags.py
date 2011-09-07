@@ -3,8 +3,10 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from native_tags.decorators import function
+
 #from ets import settings
-from ets.models import Warehouse
+from ets.models import Warehouse, Waybill
 
 register = template.Library()
 
@@ -48,8 +50,7 @@ def waybill_edit(waybill, user, text=_("Edit")):
     return { 
             'text': text,
             'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
-            'success': waybill.transport_dispach_signed_date is None 
-                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -57,9 +58,7 @@ def waybill_reception(waybill, user, text=_("Receive")):
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
-            'success': waybill.transport_dispach_signed_date \
-                and not (waybill.get_receipt() and waybill.get_receipt().signed_date) 
-                and Warehouse.filter_by_user(user).filter(pk=waybill.destination.pk).count(),
+            'success': Waybill.receptions(user).filter(pk=waybill.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -75,7 +74,15 @@ def waybill_delete(waybill, user, text=_("Delete")):
     return { 
             'text': text,
             'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
-            'success': waybill.transport_dispach_signed_date is None \
-                and Warehouse.filter_by_user(user).filter(pk=waybill.order.warehouse.pk).count(),
+            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
+
+
+@function
+def sign_dispatch(waybill, user):
+    return Waybill.dispatches(user).filter(pk=waybill.pk).count()
+
+@function
+def sign_reception(waybill, user):
+    return Waybill.receptions(user).filter(pk=waybill.pk).count()
     

@@ -1,13 +1,16 @@
 ### -*- coding: utf-8 -*- ####################################################
 
+from datetime import datetime
+
 from django.test import TestCase
 from django.core.management import call_command
 
 import ets.models
 import compas.models as compas_models
-from ets.utils import import_stock
+from ets.utils import import_stock, send_dispatched, send_received
+from .utils import TestCaseMixin
 
-class CommandTestCase(TestCase):
+class CompasTestCase(TestCase):
     
     #multi_db = True
     compas = 'dev_compas'
@@ -84,4 +87,47 @@ class CommandTestCase(TestCase):
         
         #Test order items
         self.assertEqual(order.items.count(), 1)
+
+
+class SendCompasTestCase(TestCaseMixin, TestCase):
+    
+    def test_send_dispatched(self):
+        
+        def call_db_procedure(name, parameters, using):
+            
+            assert name == 'write_waybill.dispatch', "Wrong procedure's name"
+            assert isinstance(parameters, tuple), "Parameters must be a tuple"
+            assert using == self.compas, "Wrong compas"
+        
+        ets.utils.call_db_procedure = call_db_procedure
+        
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        
+        #Validate first waybill
+        waybill.validated = True
+        waybill.transport_dispach_signed_date = datetime.now()
+        waybill.save()
+        
+        #Send all validated waybills to compas
+        send_dispatched(self.compas)
+    
+    def test_send_received(self):
+        
+        def call_db_procedure(name, parameters, using):
+            
+            assert name == 'write_waybill.receipt', "Wrong procedure's name"
+            assert isinstance(parameters, tuple), "Parameters must be a tuple"
+            assert using == self.compas, "Wrong compas"
+        
+        ets.utils.call_db_procedure = call_db_procedure
+        
+        reception = ets.models.ReceiptWaybill.objects.get(pk="isbx00311a")
+        
+        #Validate first waybill
+        reception.validated = True
+        reception.signed_date = datetime.now()
+        reception.save()
+        
+        #Send all validated waybills to compas
+        send_received(self.compas)
         

@@ -30,7 +30,7 @@ class TagsTestCase(TestCaseMixin, TestCase):
         self.assertFalse(data['success'])
         
         #This should be succeeded, because this waybill is signed but not received
-        data = waybill_reception(ets.models.Waybill.objects.get(pk="ISBX00311A"), self.user)
+        data = waybill_reception(ets.models.Waybill.objects.get(pk="ISBX00312A"), self.user)
         self.assertTrue(data['success'])
         
     def test_waybill_creation(self):

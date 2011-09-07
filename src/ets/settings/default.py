@@ -143,6 +143,7 @@ INSTALLED_APPS = (
     'autoslug',
     'uni_form',
     'logicaldelete',
+    'native_tags',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
@@ -206,6 +207,19 @@ LOGGING = {
         },
     }
 }
+
+# native tags
+DJANGO_BUILTIN_TAGS = (
+    'native_tags.templatetags.native',
+)
+NATIVE_TAGS = (
+    'alphabetic.tags',
+)
+
+
+#Loading details settings
+LOADING_LINES = 5
+
 
 class DatabasesFormDatabase(object):
     

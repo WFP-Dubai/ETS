@@ -382,7 +382,7 @@ class Order(models.Model):
     def get_percent_executed(self):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
-    
+
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
@@ -627,7 +627,23 @@ class Waybill( ld_models.Model ):
         zippedData = base64.b64decode( data )
         return zlib.decompress( zippedData )
     
-
+    
+    @classmethod
+    def dispatches(cls, user):
+        """Returns all loaded but not signed waybills, and related to user"""
+        return cls.objects.filter(transport_dispach_signed_date__isnull=True,
+                                  order__warehouse__in=Warehouse.filter_by_user(user))
+    
+    @classmethod
+    def receptions(cls, user):
+        """Returns all waybills, that can be received, and related to user"""
+        return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
+                                  #receipt__isnull=False,
+                                  receipt__signed_date__isnull=True,
+                                  destination__in=Warehouse.filter_by_user(user))
+    
+    
+    
 class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")

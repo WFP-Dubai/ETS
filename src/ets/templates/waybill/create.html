@@ -3,9 +3,7 @@
 
 {% block title %}{% trans "Waybill Creation" %}{% endblock %}
 
-{% block content %}
-{{ block.super }}
-
+{% block extra_content %}
 <div class="form">
 
 {% if form.errors or formset.errors %}<span style="color:red;">{% trans "You have some errors. Correct them" %}</span>{% endif %}

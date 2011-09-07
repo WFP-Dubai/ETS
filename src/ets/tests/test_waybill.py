@@ -67,6 +67,17 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse('waybill_view', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
     
+    def test_waybill_listing(self):
+        """ receive/ and dispatch/ pages"""
+        self.client.login(username='dispatcher', password='dispatcher')
+        response = self.client.get(reverse('waybill_dispatch_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+        
+        response = self.client.get(reverse('waybill_reception_list'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 2)
+    
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
         #from ..forms import WaybillSearchForm
@@ -186,9 +197,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_finalize_dispatch"""
         self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        self.assertEqual(response.status_code, 302)
-        
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+
+        self.assertRedirects(response, waybill.get_absolute_url())
         self.assertTrue(waybill.transport_dispach_signed_date is not None)
     
     def test_waybill_reception(self):
@@ -296,11 +307,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertRedirects(response, reverse('waybill_validate_receipt_form'))
         self.assertEqual(response.context['validated_waybills'].count(), 1)
         
-    def test_viewLogView(self):
-        """ets.views.viewLogView"""
-        response = self.client.get(reverse('viewLogView'))
-        self.assertEqual(response.status_code, 200)  
-        
     #===================================================================================================================
     # def test_barcode_qr(self):
     #    """ets.views.barcode_qr"""
@@ -314,5 +320,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.client.login(username='dispatcher', password='dispatcher')
         
         response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
-        self.assertRedirects(response, reverse("waybill_reception_list"))
-            
+        waybill = ets.models.Waybill.objects.get(pk='ISBX00312A')
+
+        self.assertRedirects(response, waybill.get_absolute_url())
