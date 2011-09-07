@@ -803,7 +803,7 @@ class LoadingDetail(models.Model):
         #clean number of items
         if self.number_of_units \
         and (self.number_units_good or self.number_units_damaged or self.number_units_lost) \
-        and (self.number_of_units != self.number_units_good + self.number_units_damaged + self.number_units_lost):
+        and (self.number_of_units > self.number_units_good + self.number_units_damaged + self.number_units_lost):
             raise ValidationError(_("%(loaded).3f Units loaded but %(offload).3f units accounted for") % {
                     "loaded" : self.number_of_units, 
                     "offload" : self.number_units_good + self.number_units_damaged + self.number_units_lost 
@@ -815,11 +815,16 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
-        #overloaded units
+        #overloaded units for dispatch
         order_item = OrderItem.objects.get(commodity=self.stock_item.commodity)
-        if order_item.items_left() < self.number_of_units and not self.overloaded_units:
-            raise ValidationError(_("Overloaded for %3f units") % (self.number_of_units - order_item.items_left(),))
-        
+        if order_item.items_left() < self.number_of_units and not self.overloaded_units\
+                                                        and not self.waybill.transport_dispach_signed_date:
+            raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+    
+        #overloaded units for reception
+        total = self.number_units_good + self.number_units_damaged + self.number_units_lost
+        if total > self.number_of_units and not self.over_offload_units:
+            raise ValidationError(_("Over offloaded for %.3f units") % (total - self.number_of_units,))
 
 #=======================================================================================================================
 # class CompasLogger( models.Model ):

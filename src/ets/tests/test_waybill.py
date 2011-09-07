@@ -129,7 +129,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'transport_vehicle_registration': 'BG2345',
             
             'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '37',
+            'item-0-number_of_units': '35',
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 0,
@@ -229,8 +229,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-MAX_NUM_FORMS': 5,
             
             'item-0-number_units_good': 25,
-            'item-0-number_units_lost': 0,
-            'item-0-units_lost_reason': '',
+            'item-0-number_units_lost': 11,
+            'item-0-units_lost_reason': 'lsed',
             'item-0-number_units_damaged': 0,
             'item-0-units_damaged_reason': '',
             
@@ -245,6 +245,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'distance': 5,
             'remarks': 'test remarks',
         }
+        response = self.client.post(path, data=data)
+        self.assertContains(response, "Over offloaded for 1")
+        data.update({
+            'item-0-number_units_lost': 0,
+            'item-0-units_lost_reason': '',
+        })
+        
         response = self.client.post(path, data=data)
         self.assertContains(response, "35.000 Units loaded but 25.000 units accounted for")
         

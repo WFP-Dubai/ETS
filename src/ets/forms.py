@@ -96,8 +96,7 @@ class BaseLoadingDetailFormSet(object):
     helper = FormHelper()
     
     # create the layout object
-    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units', 
-                                 'over_offload_units', 'overload',)))
+    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units',)))
     helper.formset_tag = False
 
 
@@ -141,6 +140,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_good', 
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
+            'over_offload_units',
         )
         widgets = {
             'number_units_good': forms.TextInput(attrs={'size': 5}),
@@ -160,6 +160,7 @@ class BaseRecieptFormFormSet(BaseInlineFormSet):
         'stock_item', 'number_units_good', 
         'number_units_lost', 'units_lost_reason',
         'number_units_damaged', 'units_damaged_reason',
+        'over_offload_units',
     )))
     helper.formset_tag = False
 
