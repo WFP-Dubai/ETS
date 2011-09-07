@@ -57,12 +57,10 @@ class DispatchWaybillForm( forms.ModelForm ):
 
 
 class LoadingDetailDispatchForm( forms.ModelForm ):
-    
-    overload = forms.BooleanField( required = False )
 
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'stock_item', 'number_of_units', 'overloaded_units', 'over_offload_units' )
+        fields = ( 'stock_item', 'number_of_units', 'overloaded_units' )
     
 
 class BaseLoadingDetailFormSet(object):
