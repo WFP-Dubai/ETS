@@ -75,15 +75,25 @@ class BaseLoadingDetailFormSet(object):
     def clean(self):
         super(BaseLoadingDetailFormSet, self).clean()
         count = 0
-        for form in self.forms:
+        stock_items = {}
+        for num, form in enumerate(self.forms):
             if not hasattr(form, 'cleaned_data'):
                 continue
 
             if form.is_bound and getattr(form, 'cleaned_data', {}).get('number_of_units'):
                 count += 1
-        
+            
+            if form.cleaned_data.get('stock_item'):
+                stock_item = form.cleaned_data.get('stock_item')
+                if stock_item.pk in stock_items.keys():
+                    raise forms.ValidationError( _('You have the same stock items in rows %s and %s')\
+                                                 % (stock_items[stock_item.pk], num + 1) )
+                stock_items[stock_item.pk] = num + 1
+                
+            
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
+    
     
     helper = FormHelper()
     
@@ -157,6 +167,7 @@ class BaseRecieptFormFormSet(BaseInlineFormSet):
 
 
 class WaybillValidationFormset( BaseModelFormSet ):
+    
     def clean( self ):
         issue = ''
         super( WaybillValidationFormset, self ).clean()
@@ -173,5 +184,6 @@ class WaybillValidationFormset( BaseModelFormSet ):
 
 
 class MyModelChoiceField( forms.ModelChoiceField ):
+    
     def label_from_instance( self, obj ):
         return "%s - %s" % ( obj.si_code , obj.cmmname )

@@ -815,6 +815,11 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
+        #overloaded units
+        order_item = OrderItem.objects.get(commodity=self.stock_item.commodity)
+        if order_item.items_left() < self.number_of_units and not self.overloaded_units:
+            raise ValidationError(_("Overloaded for %3f units") % (self.number_of_units - order_item.items_left(),))
+        
 
 #=======================================================================================================================
 # class CompasLogger( models.Model ):

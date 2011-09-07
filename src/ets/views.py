@@ -164,7 +164,7 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm,
     class FormsetForm(formset_form):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
         
-        #===============================================================================================================
+        #=======================================================================
         # def clean( self ):
         #    try:
         #        cleaned = self.cleaned_data
@@ -183,7 +183,8 @@ def waybill_create(request, order_pk, form_class=DispatchWaybillForm,
         #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
         #            self._errors['numberUnitsLoaded'].append( myerror )
         #            raise forms.ValidationError( myerror )
-        #===============================================================================================================          
+        #=======================================================================
+                 
     
     loading_formset = modelformset_factory(ets.models.LoadingDetail, 
                        form=FormsetForm,
