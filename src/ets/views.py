@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 #from ets.compas import compas_write
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
+from ets.forms import LoadingDetailRecieptForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related
 import ets.models
 
@@ -217,7 +217,6 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
-                      formset_class = BaseRecieptFormFormSet,
                       template='waybill/receive.html'):
     
     waybill = get_object_or_404(queryset, pk=waybill_pk)

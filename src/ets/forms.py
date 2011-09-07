@@ -124,8 +124,16 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         
         for field_name in ('units_lost_reason', 'units_damaged_reason'):
             self.fields[field_name].queryset = self.fields[field_name].queryset.filter(category=self.instance.stock_item.commodity.category)
-        
     
+    def clean(self):
+        super(LoadingDetailRecieptForm, self).clean()
+        if hasattr(self, 'cleaned_data'):
+            if not self.cleaned_data.get('number_units_good')\
+                and not self.cleaned_data.get('number_units_damaged')\
+                and not self.cleaned_data.get('number_units_lost'):
+                raise forms.ValidationError(_("At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling"))
+        return self.cleaned_data    
+
     class Meta:
         model = ets_models.LoadingDetail
         fields = (
@@ -139,21 +147,6 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_lost': forms.TextInput(attrs={'size': 5}),
             'number_units_damaged': forms.TextInput(attrs={'size': 5}),
         }
-
-
-class BaseRecieptFormFormSet(BaseInlineFormSet):
-    
-    helper = FormHelper()
-    
-    # create the layout object
-    helper.add_layout(Layout(
-        #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
-        Row(
-        'stock_item', 'number_units_good', 
-        'number_units_lost', 'units_lost_reason',
-        'number_units_damaged', 'units_damaged_reason',
-    )))
-    helper.formset_tag = False
 
 
 class WaybillValidationFormset( BaseModelFormSet ):
