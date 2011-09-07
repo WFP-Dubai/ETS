@@ -129,12 +129,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'transport_vehicle_registration': 'BG2345',
             
             'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '12',
+            'item-0-number_of_units': '37',
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 0,
             'item-MAX_NUM_FORMS': 5,
         })
+        
         self.assertEqual(response.status_code, 302)
         
         #check created waybill and loading details
@@ -169,13 +170,16 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-slug': 'ISBX00211A1',
             'item-0-waybill': 'ISBX00211A',
             'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '12',
+            'item-0-number_of_units': '37',
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
         }
+        response = self.client.post(edit_url, data=data)
+        self.assertContains(response, "Overloaded for 2")
         
+        data['item-0-number_of_units'] = '12'
         #let's check validation. Provide wrong destination warehouse
         response = self.client.post(edit_url, data=data)
         self.assertEqual(response.status_code, 200)
