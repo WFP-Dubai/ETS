@@ -2,7 +2,7 @@ import datetime
 from functools import wraps
 
 from django import forms
-#from django.conf import settings
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 #from django.core import serializers
 #from django.core.urlresolvers import reverse
@@ -12,7 +12,7 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.shortcuts import redirect, get_object_or_404
 #from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
-from django.views.generic.list_detail import object_list
+#from django.views.generic.list_detail import object_list
 #from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
@@ -22,7 +22,6 @@ from django.db.models import Q
 from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import available_attrs
 
-
 #from uni_form.helpers import FormHelper, Layout, HTML, Row
 
 #from ets.compas import compas_write
@@ -31,66 +30,57 @@ from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillVal
 from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
 import ets.models
 
-LOADING_LINES = 5
+#Authentication decorators. If condition fails user is redirected to login form
+person_required = user_passes_test(lambda u: ets.models.Person.objects.filter(user=u).count())
+officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count())
 
-
-def person_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: ets.models.Person.objects.filter(user=u).count(), **kwargs)
+def user_filtered(function=None, filter=lambda queryset, user: ()):
+    """Decorates view function and inserts queryset filtered by user"""
+    
+    def _decorator(view_func):
+        @wraps(view_func, assigned=available_attrs(view_func))
+        def _wrapped_view(request, queryset=None, *args, **kwargs):
+            return view_func(request, queryset=filter(queryset, request.user), *args, **kwargs)
+        return _wrapped_view
+    
     if function:
-        return actual_decorator(function)
-    return actual_decorator
+        return _decorator(function)
+    
+    return _decorator
 
-def officer_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count(), **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
+#Decorators or views.
+dispatch_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.dispatches(user))
+receipt_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.receptions(user))
 
+warehouse_related = user_filtered(filter=lambda queryset, user: queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(user)))
 
-def dispatch_view(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        return view_func(request, queryset=ets.models.Waybill.dispatches(request.user), *args, **kwargs)
-    return _wrapped_view
+def waybill_user_related_filter(queryset, user):
+    """
+    Returns a queryset with filter by user in widest range: 
+    it could be a dispatcher, a recepient, officer of both compases.
+    Status of waybill does not matter.
+    """
+    warehouses = ets.models.Warehouse.filter_by_user(user)
+    return queryset.filter(Q(order__warehouse__in=warehouses) 
+                                               | Q(destination__in=warehouses) 
+                                               | Q(order__warehouse__compas__officers=user)
+                                               | Q(destination__compas__officers=user))
 
-def receipt_view(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        return view_func(request, queryset=ets.models.Waybill.receptions(request.user), *args, **kwargs)
-    return _wrapped_view
-
-def order_view(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        return view_func(request, queryset=ets.models.Order.user_related(request.user).order_by('-created'), *args, **kwargs)
-    return _wrapped_view
+waybill_user_related = user_filtered(filter=waybill_user_related_filter)
 
 @login_required
-@person_required
-def stock_view(request, queryset=ets.models.StockItem.objects.all(), template='stock/stocklist.html'):
-    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    return direct_to_template( request, template, {
-        'object_list': queryset,
-    })
-
-@login_required
+@waybill_user_related
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
-    #Limit access
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
-                               | Q(destination__in=warehouses) 
-                               | Q(order__warehouse__compas__officers=request.user)
-                               | Q(destination__compas__officers=request.user))
+    items = waybill.loading_details.select_related()
+    items_count = len(items)
     
-    my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
-    
-    return direct_to_template( request, template, {
+    return direct_to_template(request, template, {
         'object': waybill,
-        'extra_lines': my_empty,
-        'items': waybill.loading_details.select_related(),
-        'items_count': waybill.loading_details.count(),
+        'extra_lines': [''] * (settings.LOADING_LINES - items_count),
+        'items': items,
+        'items_count': items_count,
     })
 
 @login_required
@@ -112,19 +102,15 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
 
 
 @login_required
+@waybill_user_related
 def waybill_list(request, queryset, template='waybill/list.html'):
     """Shows waybill listing"""
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
-                               | Q(destination__in=warehouses) 
-                               | Q(order__warehouse__compas__officers=request.user)
-                               | Q(destination__compas__officers=request.user))
-    
-    return direct_to_template( request, template, {'object_list': queryset,})
+    return direct_to_template(request, template, {'object_list': queryset,})
 
 @login_required
 def waybill_search( request, form_class=WaybillSearchForm, 
-                    queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
+                    queryset=ets.models.Waybill.objects.all(), 
+                    template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
     
     form = form_class(request.GET or None)

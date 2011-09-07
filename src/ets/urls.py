@@ -11,7 +11,7 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
-from ets.views import waybill_list, receipt_view, dispatch_view, person_required, order_view
+from ets.views import waybill_list, receipt_view, dispatch_view, person_required, warehouse_related
 import ets.models
 
 urlpatterns = patterns("ets.views",
@@ -23,27 +23,29 @@ urlpatterns = patterns("ets.views",
     }}, "index" ),
     
     #Order list
-    ( r'^orders/$', login_required(person_required(order_view(object_list))), {
+    ( r'^orders/$', login_required(person_required(warehouse_related(object_list))), {
+        'queryset': ets.models.Order.objects.all().order_by('-created'),
         'template_name': 'order/list.html',
     }, "orders"),
     
     #Order detail
-    ( r'^order/(?P<object_id>[-\w]+)/$', login_required(person_required(order_view(object_detail))), {
+    ( r'^order/(?P<object_id>[-\w]+)/$', login_required(person_required(warehouse_related(object_detail))), {
+        'queryset': ets.models.Order.objects.all().order_by('-created'),
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
     #Waybill pages
     
     #Listings
-    ( r'^search/$', "waybill_search", {}, "waybill_search" ),
-    ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), 
-      {}, "waybill_dispatch_list" ),
-    ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), 
-      {}, "waybill_reception_list" ),
+    ( r'^search/$', "waybill_search", {
+        'queryset': ets.models.Waybill.objects.all(),
+    }, "waybill_search" ),
+    ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), {}, "waybill_dispatch_list" ),
+    ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), {}, "waybill_reception_list" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
-        'queryset': ets.models.Waybill.objects.all(),
         "template": 'waybill/detail.html',
+        'queryset': ets.models.Waybill.objects.all(),
     }, "waybill_view" ),
     
     #Dispatch
@@ -83,7 +85,11 @@ urlpatterns = patterns("ets.views",
       "waybill_delete", {}, "waybill_delete" ),
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
     
-    ( r'^view_stock/$', "stock_view", {}, "view_stock" ),
+    ( r'^view_stock/$', login_required(person_required(warehouse_related(object_list))), {
+        'queryset': ets.models.StockItem.objects.all(),
+        'template_name': 'stock/stocklist.html',
+    }, "view_stock" ),
+                       
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',
     }, "select_report" ),
