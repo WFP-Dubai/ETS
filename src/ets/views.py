@@ -2,7 +2,7 @@ import datetime
 from functools import wraps
 
 from django import forms
-#from django.conf import settings
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 #from django.core import serializers
 #from django.core.urlresolvers import reverse
@@ -12,100 +12,36 @@ from django.forms.models import inlineformset_factory, modelformset_factory
 from django.shortcuts import redirect, get_object_or_404
 #from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
-from django.views.generic.list_detail import object_list
+#from django.views.generic.list_detail import object_list
 #from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
 #from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
-from django.db.models import Q
-from django.contrib.auth.decorators import user_passes_test
-from django.utils.decorators import available_attrs
-
 
 #from uni_form.helpers import FormHelper, Layout, HTML, Row
 
 #from ets.compas import compas_write
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, BaseRecieptFormFormSet
+from ets.forms import LoadingDetailRecieptForm
+from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related, warehouse_related
 import ets.models
-from ets.tools import viewLog
-
-LOADING_LINES = 5
-
-
-def prep_req( request ):
-
-    return {'user': request.user}
-
-def person_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: ets.models.Person.objects.filter(user=u).count(), **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
-
-def officer_required(function=None, **kwargs):
-    actual_decorator = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count(), **kwargs)
-    if function:
-        return actual_decorator(function)
-    return actual_decorator
-
-
-def dispatch_view(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        return view_func(request, queryset=ets.models.Waybill.dispatches(request.user), *args, **kwargs)
-    return _wrapped_view
-
-def receipt_view(view_func):
-    @wraps(view_func, assigned=available_attrs(view_func))
-    def _wrapped_view(request, *args, **kwargs):
-        return view_func(request, queryset=ets.models.Waybill.receptions(request.user), *args, **kwargs)
-    return _wrapped_view
 
 
 @login_required
-@person_required
-def order_list(request, template='order/list.html', 
-               queryset=ets.models.Order.objects.all().order_by('-created'), 
-               extra_context=None):
-    """
-    URL: /orders/
-    Shows all orders
-    """
-        
-    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    
-    #TODO: Exclude delivered orders
-    return object_list(request, queryset=queryset, template_name=template, extra_context=extra_context)
-
-@login_required
-@person_required
-def stock_view(request, queryset=ets.models.StockItem.objects.all(), template='stock/stocklist.html'):
-    queryset = queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
-    return direct_to_template( request, template, {
-        'object_list': queryset,
-    })
-
-@login_required
+@waybill_user_related
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
-    #Limit access
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
-                               | Q(destination__in=warehouses) 
-                               | Q(order__warehouse__compas__officers=request.user)
-                               | Q(destination__compas__officers=request.user))
+    items = waybill.loading_details.select_related()
+    items_count = len(items)
     
-    my_empty = [''] * (LOADING_LINES - waybill.loading_details.count())
-    
-    return direct_to_template( request, template, {
+    return direct_to_template(request, template, {
         'object': waybill,
-        'extra_lines': my_empty,
-        'items': waybill.loading_details.select_related(),
-        'items_count': waybill.loading_details.count(),
+        'extra_lines': [''] * (settings.LOADING_LINES - items_count),
+        'items': items,
+        'items_count': items_count,
     })
 
 @login_required
@@ -127,19 +63,15 @@ def waybill_finalize_dispatch( request, waybill_pk, queryset):
 
 
 @login_required
+@waybill_user_related
 def waybill_list(request, queryset, template='waybill/list.html'):
     """Shows waybill listing"""
-    warehouses = ets.models.Warehouse.filter_by_user(request.user)
-    queryset = queryset.filter(Q(order__warehouse__in=warehouses) 
-                               | Q(destination__in=warehouses) 
-                               | Q(order__warehouse__compas__officers=request.user)
-                               | Q(destination__compas__officers=request.user))
-    
-    return direct_to_template( request, template, {'object_list': queryset,})
+    return direct_to_template(request, template, {'object_list': queryset,})
 
 @login_required
 def waybill_search( request, form_class=WaybillSearchForm, 
-                    queryset=ets.models.Waybill.objects.all(), template='waybill/list.html'):
+                    queryset=ets.models.Waybill.objects.all(), 
+                    template='waybill/list.html'):
 #                    param_name='wbnumber', consegnee_code='W200000475' ):
     
     form = form_class(request.GET or None)
@@ -147,102 +79,22 @@ def waybill_search( request, form_class=WaybillSearchForm,
     queryset = queryset.filter(pk__icontains=search_string)
     
     return waybill_list(request, queryset=queryset)
-    
 
-@login_required
-@person_required
+
 @transaction.commit_on_success
-def waybill_create(request, order_pk, form_class=DispatchWaybillForm, 
-                   formset_form=LoadingDetailDispatchForm,
-                   formset_class=BaseLoadingDetailFormSet,
-                   order_queryset=ets.models.Order.objects.all(),
-                   template='waybill/create.html' ):
-    """Creates a Waybill"""
-    
-    order = get_object_or_404(order_queryset, pk=order_pk, warehouse__in=ets.models.Warehouse.filter_by_user(request.user)) 
-
-    class FormsetForm(formset_form):
-        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
-        
-        #=======================================================================
-        # def clean( self ):
-        #    try:
-        #        cleaned = self.cleaned_data
-        #        stock_item = cleaned.get("stock_item")
-        #        units = cleaned.get( "number_of_units" )
-        #        overloaded = cleaned.get('overloaded_units')
-        #        max_items = order_item.lti_line.items_left
-        #        if units > max_items + self.instance.numberUnitsLoaded and  overloaded == False: #and not overloaded:
-        #            myerror = "Overloaded!"
-        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-        #            self._errors['numberUnitsLoaded'].append( myerror )
-        #            raise forms.ValidationError( myerror )
-        #        return cleaned
-        #    except:
-        #            myerror = "Value error!"
-        #            self._errors['numberUnitsLoaded'] = self._errors.get( 'numberUnitsLoaded', [] )
-        #            self._errors['numberUnitsLoaded'].append( myerror )
-        #            raise forms.ValidationError( myerror )
-        #=======================================================================
-                 
-    
-    loading_formset = modelformset_factory(ets.models.LoadingDetail, 
-                       form=FormsetForm,
-                       formset = type('LoadingFormSet', (formset_class, forms.models.BaseModelFormSet), {}), 
-                       extra=5, max_num=5,
-                       can_order=False, can_delete=False)\
-        (request.POST or None, request.FILES or None, prefix='item', queryset=ets.models.LoadingDetail.objects.none())
-    
-    form = form_class(data=request.POST or None, files=request.FILES or None, initial={
-        'loading_date': order.dispatch_date,
-        'dispatch_date': order.dispatch_date,
-    })
-    
-    form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
-                                                              .exclude(pk=order.warehouse.pk)
-    
-    if form.is_valid() and loading_formset.is_valid():
-        waybill = form.save(False)
-        waybill.order = order
-        waybill.dispatcher_person = request.user.person
-        waybill.save()
-        
-        for details in loading_formset.save(False):
-            details.waybill = waybill
-            details.save()
-        
-        messages.success(request, _("Waybill has been created."))
-        return redirect(waybill)
-        
-    return direct_to_template( request, template, {
-        'form': form, 
-        'formset': loading_formset,
-        'object': order,
-    })
-
-
-@login_required
-@person_required
-@dispatch_view
-@transaction.commit_on_success
-def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, form_class=DispatchWaybillForm, 
-                          formset_form=LoadingDetailDispatchForm, formset_class=BaseLoadingDetailFormSet,
-                          template='waybill/edit.html'):
-    """Edit not signed dispatching waybill"""
-    
-    waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
-    
+def _dispatching(request, waybill, template, success_message, form_class=DispatchWaybillForm, 
+                formset_form=LoadingDetailDispatchForm, formset_class=BaseLoadingDetailFormSet):
+    """Private function with common functionality for creating and editing dispatching waybill"""
     order = waybill.order
     
     class FormsetForm(formset_form):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'))
         
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
-                       form=FormsetForm,
-                       formset = type('DispatchLoadingFormSet', (formset_class, forms.models.BaseInlineFormSet), {}), 
+                       form=FormsetForm, formset=formset_class, 
                        extra=5, max_num=5,
                        can_order=False, can_delete=False)\
-            (request.POST or None, request.FILES or None, instance=waybill, prefix='item')
+        (request.POST or None, request.FILES or None, prefix='item', instance=waybill)
     
     form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)
     
@@ -250,19 +102,41 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, form_class=Di
                                                               .exclude(pk=order.warehouse.pk)
     
     if form.is_valid() and loading_formset.is_valid():
-        form.save()
+        waybill = form.save()
         loading_formset.save()
         
-        messages.success(request, _("Waybill has been updated."))
+        messages.success(request, success_message)
         return redirect(waybill)
         
-    return direct_to_template(request, template, {
+    return direct_to_template( request, template, {
         'form': form, 
         'formset': loading_formset,
         'object': order,
         'waybill': waybill,
     })
+
+
+@login_required
+@person_required
+@warehouse_related
+def waybill_create(request, order_pk, queryset, **kwargs):
+    """Creates a Waybill"""
     
+    order = get_object_or_404(queryset, pk=order_pk)
+    waybill = ets.models.Waybill(order=order, dispatcher_person = request.user.person,
+                                 loading_date=order.dispatch_date, dispatch_date=order.dispatch_date)
+
+    return _dispatching(request, waybill, success_message=_("Waybill has been created"), **kwargs)
+
+
+@login_required
+@person_required
+@dispatch_view
+def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
+    """Updates not signed dispatching waybill"""
+    
+    waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
+    return _dispatching(request, waybill, success_message=_("Waybill has been updated"), **kwargs) 
 
 
 @login_required
@@ -286,7 +160,6 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
-                      formset_class = BaseRecieptFormFormSet,
                       template='waybill/receive.html'):
     
     waybill = get_object_or_404(queryset, pk=waybill_pk)

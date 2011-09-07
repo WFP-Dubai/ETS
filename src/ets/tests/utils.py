@@ -8,6 +8,7 @@ from django.core.management import call_command
 
 from windmill.authoring import djangotest
 
+from ets.utils import update_compas
 
 def change_settings(func, **kwargs):
     @wraps(func)
@@ -36,7 +37,7 @@ class TestCaseMixin(object):
         "Hook method for setting up the test fixture before exercising it."
         
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
-        call_command('sync_compas')
+        update_compas(self.compas)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
 
 class WindmillMixin(object):

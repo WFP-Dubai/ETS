@@ -382,7 +382,7 @@ class Order(models.Model):
     def get_percent_executed(self):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
-    
+
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
@@ -739,6 +739,7 @@ class LoadingDetail(models.Model):
         order_with_respect_to = 'waybill'
         verbose_name = _("loading detail")
         verbose_name_plural = _("waybill items")
+        unique_together = ('waybill', 'stock_item')
 
 
 #=======================================================================================================================
@@ -798,15 +799,6 @@ class LoadingDetail(models.Model):
         return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
     
     def clean(self):
-        #Clean units_lost_reason
-        if self.number_units_lost:
-            if not self.units_lost_reason:
-                raise ValidationError(_("You must provide a loss reason"))
-        
-        #Clean units_damaged_reason
-        if self.number_units_damaged:
-            if not self.units_damaged_reason:
-                raise ValidationError(_("You must provide a damaged reason"))
         
         #clean number of items
         if self.number_of_units \
@@ -816,6 +808,26 @@ class LoadingDetail(models.Model):
                     "loaded" : self.number_of_units, 
                     "offload" : self.number_units_good + self.number_units_damaged + self.number_units_lost 
             })
+        
+        #overloaded units for dispatch
+        order_item = self.get_order_item()
+        if order_item.items_left() < self.number_of_units and not self.overloaded_units:
+            raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+    
+        #overloaded units for reception
+        total = self.number_units_good + self.number_units_damaged + self.number_units_lost
+        if total > self.number_of_units and not self.over_offload_units:
+            raise ValidationError(_("Over offloaded for %.3f units") % (total - self.number_of_units,))
+        
+        #Clean units_lost_reason
+        if self.number_units_lost:
+            if not self.units_lost_reason:
+                raise ValidationError(_("You must provide a loss reason"))
+        
+        #Clean units_damaged_reason
+        if self.number_units_damaged:
+            if not self.units_damaged_reason:
+                raise ValidationError(_("You must provide a damaged reason"))
             
         #clean reasons
         if self.units_damaged_reason and self.units_damaged_reason.category != self.stock_item.commodity.category:
@@ -823,16 +835,6 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
-        #overloaded units for dispatch
-        order_item = self.get_order_item()
-        if order_item.items_left() < self.number_of_units and not self.overloaded_units\
-                                                        and not self.waybill.transport_dispach_signed_date:
-            raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
-    
-        #overloaded units for reception
-        total = self.number_units_good + self.number_units_damaged + self.number_units_lost
-        if total > self.number_of_units and not self.over_offload_units:
-            raise ValidationError(_("Over offloaded for %.3f units") % (total - self.number_of_units,))
 
 #=======================================================================================================================
 # class CompasLogger( models.Model ):

@@ -1,8 +1,6 @@
 # Django settings for ets project.
 from .default import *
 
-COUNTRIES = ('586', )
-
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
   
 TEMPLATE_LOADERS = (

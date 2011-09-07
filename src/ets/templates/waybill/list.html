@@ -15,9 +15,7 @@
       <th>{% trans "Validated" %}</th>
       <th>{% trans "In Compas" %}</th>
       <th>{% trans "View" %}</th>
-      <th>{% trans "Edit" %}</th>
       <th>{% trans "Delete" %}</th>
-      <th>{% trans "Receive" %}</th>
     </tr>
   </thead>
   
@@ -33,14 +31,14 @@
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date }}
           {% else %}
-            {% trans "Pending" %}
+            {% waybill_edit waybill user %}
           {% endif %}
         </td>
         <td>
           {% if waybill.receipt.signed_date %}
             {{ waybill.receipt.signed_date }}
           {% else %}
-            {% trans "Pending" %}
+            {% waybill_reception waybill user %}
           {% endif %}
         </td>
         <td>
@@ -55,13 +53,7 @@
           <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>
         </td>
         <td>
-          {% waybill_edit waybill user %}
-        </td>
-        <td>
-          {% waybill_delete waybill user %}    
-        </td>
-        <td>
-          {% waybill_reception waybill user %}   
+          {% waybill_delete waybill user %}
         </td>
       </tr>
     {% endfor %}

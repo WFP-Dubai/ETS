@@ -63,31 +63,17 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
         fields = ( 'stock_item', 'number_of_units', 'overloaded_units' )
     
 
-class BaseLoadingDetailFormSet(object):
-    
-#    def append_non_form_error( self, message ):
-#        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
-#        errors.append( message )
-#        raise forms.ValidationError( errors )
+class BaseLoadingDetailFormSet(BaseInlineFormSet):
     
     def clean(self):
         super(BaseLoadingDetailFormSet, self).clean()
         count = 0
-        stock_items = {}
-        for num, form in enumerate(self.forms):
+        for form in self.forms:
             if not hasattr(form, 'cleaned_data'):
                 continue
 
             if form.is_bound and getattr(form, 'cleaned_data', {}).get('number_of_units'):
                 count += 1
-            
-            if form.cleaned_data.get('stock_item'):
-                stock_item = form.cleaned_data.get('stock_item')
-                if stock_item.pk in stock_items.keys():
-                    raise forms.ValidationError( _('You have the same stock items in rows %s and %s')\
-                                                 % (stock_items[stock_item.pk], num + 1) )
-                stock_items[stock_item.pk] = num + 1
-                
             
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
@@ -131,12 +117,19 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         
         for field_name in ('units_lost_reason', 'units_damaged_reason'):
             self.fields[field_name].queryset = self.fields[field_name].queryset.filter(category=self.instance.stock_item.commodity.category)
-        
     
+    def clean(self):
+        super(LoadingDetailRecieptForm, self).clean()
+        if hasattr(self, 'cleaned_data'):
+            if not self.cleaned_data.get('number_units_good')\
+                and not self.cleaned_data.get('number_units_damaged')\
+                and not self.cleaned_data.get('number_units_lost'):
+                raise forms.ValidationError(_("At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling"))
+        return self.cleaned_data    
+
     class Meta:
         model = ets_models.LoadingDetail
         fields = (
-            #'stock_item',
             'number_units_good', 
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
@@ -149,40 +142,20 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         }
 
 
-class BaseRecieptFormFormSet(BaseInlineFormSet):
-    
-    helper = FormHelper()
-    
-    # create the layout object
-    helper.add_layout(Layout(
-        #HTML('<strong>{{ form.instance.origin_id }}</strong> <strong>{{ form.instance.commodity_name }}</strong>'),
-        Row(
-        'stock_item', 'number_units_good', 
-        'number_units_lost', 'units_lost_reason',
-        'number_units_damaged', 'units_damaged_reason',
-        'over_offload_units',
-    )))
-    helper.formset_tag = False
-
-
-class WaybillValidationFormset( BaseModelFormSet ):
-    
-    def clean( self ):
-        issue = ''
-        super( WaybillValidationFormset, self ).clean()
-        for form in self.forms:
-            if not form.check_lines():
-                #TODO: Refactor it
-                valid = False
-                issue += ' WB: ' + str( form )
-                raise form.ValidationError( _("You have an error") )
-            
-            if not valid:
-                ##TODO: cleanup such things
-                print issue
-
-
-class MyModelChoiceField( forms.ModelChoiceField ):
-    
-    def label_from_instance( self, obj ):
-        return "%s - %s" % ( obj.si_code , obj.cmmname )
+#=======================================================================================================================
+# class WaybillValidationFormset( BaseModelFormSet ):
+#    
+#    def clean( self ):
+#        issue = ''
+#        super( WaybillValidationFormset, self ).clean()
+#        for form in self.forms:
+#            if not form.check_lines():
+#                #TODO: Refactor it
+#                valid = False
+#                issue += ' WB: ' + str( form )
+#                raise form.ValidationError( _("You have an error") )
+#            
+#            if not valid:
+#                ##TODO: cleanup such things
+#                print issue
+#=======================================================================================================================

@@ -129,7 +129,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'transport_vehicle_registration': 'BG2345',
             
             'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '35',
+            'item-0-number_of_units': 12,
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 0,
@@ -170,7 +170,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-slug': 'ISBX00211A1',
             'item-0-waybill': 'ISBX00211A',
             'item-0-stock_item': 'testme0123',
-            'item-0-number_of_units': '37',
+            'item-0-number_of_units': 37,
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 1,
@@ -179,7 +179,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.post(edit_url, data=data)
         self.assertContains(response, "Overloaded for 2")
         
-        data['item-0-number_of_units'] = '12'
+        data['item-0-number_of_units'] = 12
         #let's check validation. Provide wrong destination warehouse
         response = self.client.post(edit_url, data=data)
         self.assertEqual(response.status_code, 200)
@@ -246,12 +246,20 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'remarks': 'test remarks',
         }
         response = self.client.post(path, data=data)
+        print response.context['form'].errors
+        print response.context['formset'].errors
         self.assertContains(response, "Over offloaded for 1")
         data.update({
             'item-0-number_units_lost': 0,
+            'item-0-number_units_good': 0,
             'item-0-units_lost_reason': '',
         })
         
+        self.assertContains(response, "At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling")
+        data.update({
+            'item-0-number_units_good': 25,
+        })
+
         response = self.client.post(path, data=data)
         self.assertContains(response, "35.000 Units loaded but 25.000 units accounted for")
         
