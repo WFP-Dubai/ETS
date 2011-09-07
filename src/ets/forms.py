@@ -131,7 +131,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             if not self.cleaned_data.get('number_units_good')\
                 and not self.cleaned_data.get('number_units_damaged')\
                 and not self.cleaned_data.get('number_units_lost'):
-                raise forms.ValidationError(_("At least щne of the fields number_units_good, number_units_damaged, number_units_lost must be filling"))
+                raise forms.ValidationError(_("At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling"))
         return self.cleaned_data    
 
     class Meta:
