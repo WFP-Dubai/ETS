@@ -34,8 +34,7 @@ def update_compas(using):
 
 
 def import_places(compas):
-    for place in compas_models.Place.objects.using(compas).filter(country_code__in = settings.COUNTRIES,
-                                                               reporting_code=compas):
+    for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
         #Create location
         location = ets_models.Location.objects.get_or_create(code=place.geo_point_code, defaults={

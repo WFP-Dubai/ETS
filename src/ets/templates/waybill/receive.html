@@ -24,6 +24,7 @@
         <th>Lost Reason</th>
         <th>Number Units Damaged</th>
         <th>Damaged Reason</th>
+        <th>Over Offload Units</th>
       </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
         <td>{{ form.units_lost_reason|as_uni_field }}</td>
         <td>{{ form.number_units_damaged|as_uni_field }}</td>
         <td>{{ form.units_damaged_reason|as_uni_field }}</td>
+        <td>{{ form.over_offload_units|as_uni_field }}</td>
       </tr>
     {% endfor %}
     </tbody>

@@ -31,7 +31,7 @@ class OrderTestCase(TestCaseMixin, TestCase):
     
     def test_order_percentage(self):
         response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
-        self.assertEqual(response.context['object'].get_percent_executed(), 200)
+        self.assertEqual(response.context['object'].get_percent_executed(), 100)
 
     def test_order_percentage_null(self):
         self.client.login(username='dispatcher', password='dispatcher')
