@@ -246,8 +246,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'remarks': 'test remarks',
         }
         response = self.client.post(path, data=data)
-        print response.context['form'].errors
-        print response.context['formset'].errors
         self.assertContains(response, "Over offloaded for 1")
         data.update({
             'item-0-number_units_lost': 0,
@@ -255,6 +253,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-units_lost_reason': '',
         })
         
+        response = self.client.post(path, data=data)
         self.assertContains(response, "At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling")
         data.update({
             'item-0-number_units_good': 25,
@@ -266,6 +265,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Let's say we lost 5 units without a reason
         data.update({
             'item-0-number_units_lost': 5,
+            'item-0-number_units_damaged': 5,
         })
         
         response = self.client.post(path, data=data)
@@ -274,7 +274,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         # Let's provide a reason and damaged units
         data.update({
             'item-0-units_lost_reason': 'lsed',
-            'item-0-number_units_damaged': 5,
         })
         
         response = self.client.post(path, data=data)

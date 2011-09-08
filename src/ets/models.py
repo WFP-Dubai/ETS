@@ -810,9 +810,10 @@ class LoadingDetail(models.Model):
             })
         
         #overloaded units for dispatch
-        order_item = self.get_order_item()
-        if order_item.items_left() < self.number_of_units and not self.overloaded_units:
-            raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+        if not self.waybill.transport_dispach_signed_date:
+            order_item = self.get_order_item()
+            if order_item.items_left() < self.number_of_units and not self.overloaded_units:
+                raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
     
         #overloaded units for reception
         total = self.number_units_good + self.number_units_damaged + self.number_units_lost
@@ -820,13 +821,10 @@ class LoadingDetail(models.Model):
             raise ValidationError(_("Over offloaded for %.3f units") % (total - self.number_of_units,))
         
         #Clean units_lost_reason
-        if self.number_units_lost:
-            if not self.units_lost_reason:
+        if self.number_units_lost and not self.units_lost_reason:
                 raise ValidationError(_("You must provide a loss reason"))
-        
         #Clean units_damaged_reason
-        if self.number_units_damaged:
-            if not self.units_damaged_reason:
+        if self.number_units_damaged and not self.units_damaged_reason:
                 raise ValidationError(_("You must provide a damaged reason"))
             
         #clean reasons
