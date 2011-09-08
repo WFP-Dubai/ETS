@@ -12,7 +12,7 @@ admin.autodiscover()
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
 from ets.views import waybill_list 
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required
 import ets.models
 
 urlpatterns = patterns("ets.views",
@@ -71,27 +71,36 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
       {}, "waybill_finalize_receipt" ),
     
-    ( r'^validate_dispatch/$', "dispatch_validate", {
+    #Validation pages
+    
+    ( r'^validate_dispatch/(?P<waybill_pk>[-\w]+)/$', "validate_dispatch", {
+        'queryset': ets.models.Waybill.objects.all(),
+    }, "validate_dispatch" ),
+    ( r'^vvalidate_receipt/(?P<waybill_pk>[-\w]+)/$', "validate_receipt", {
+        'queryset': ets.models.Waybill.objects.all(),
+    }, "validate_receipt" ),
+    
+    
+    ( r'^dispatch_validates/$', 'dispatch_validates', {
         'template': 'validate/dispatch.html',
-        'formset_model': ets.models.Waybill,
-        'queryset': ets.models.Waybill.objects.filter(sent_compas=False, transport_dispach_signed_date__isnull=False),
-    }, "waybill_validate_dispatch_form" ),
-    ( r'^validate_receipt/$', "receipt_validate", {
+        'queryset': ets.models.Waybill.objects.all(),
+    }, "dispatch_validates" ),
+    ( r'^receipt_validates/$', 'receipt_validates', {
         'template': 'validate/receipt.html',
-        'formset_model': ets.models.ReceiptWaybill,
-        'queryset': ets.models.ReceiptWaybill.objects.filter(sent_compas=False, signed_date__isnull=False),
-    }, "waybill_validate_receipt_form" ),
-                       
+        'queryset': ets.models.Waybill.objects.all(),
+    }, "receipt_validates" ),
+    
+    #Delete functionality
+    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', 
+      "waybill_delete", {}, "waybill_delete" ),
+    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
+    
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
             'waybill_list': Waybill.objects.filter(sent_compas=True).all, 
             'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas=True).all,
     }}, "compass_waybill" ),
-    
-    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', 
-      "waybill_delete", {}, "waybill_delete" ),
-    ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
     
     ( r'^view_stock/$', login_required(person_required(warehouse_related(object_list))), {
         'queryset': ets.models.StockItem.objects.all(),

@@ -85,4 +85,32 @@ def sign_dispatch(waybill, user):
 @function
 def sign_reception(waybill, user):
     return Waybill.receptions(user).filter(pk=waybill.pk).count()
-    
+
+
+@register.inclusion_tag('tags/give_link.html')
+def validate_dispatch(waybill, user, link_text=_("Validate dispatch"), forbidden_text=""):
+    queryset = Waybill.objects.filter(sent_compas=False, transport_dispach_signed_date__isnull=False) \
+                          .filter(order__warehouse__compas__officers=user) \
+                          .filter(validated=False)
+
+    return { 
+            'text': link_text,
+            'forbidden_text': forbidden_text,
+            'url': reverse('validate_dispatch', kwargs={'waybill_pk': waybill.pk,}),
+            'success': queryset.filter(pk=waybill.pk).count(),
+    }
+
+
+@register.inclusion_tag('tags/give_link.html')
+def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_text=""):
+    queryset = Waybill.objects.filter(receipt__sent_compas=False, transport_dispach_signed_date__isnull=False) \
+                              .filter(receipt__signed_date__isnull=False) \
+                              .filter(destination__compas__officers=user) \
+                              .filter(receipt__validated=False)
+
+    return { 
+            'text': link_text,
+            'forbidden_text': forbidden_text,
+            'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
+            'success': queryset.filter(pk=waybill.pk).count(),
+    }

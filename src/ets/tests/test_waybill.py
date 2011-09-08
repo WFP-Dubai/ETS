@@ -237,14 +237,27 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-slug': 'ISBX00311A1',
             'item-0-waybill': 'ISBX00311A',
             
-            'arrival_date': '2011-08-24',
-            'start_discharge_date': '2011-08-24',
+            'arrival_date': '2011-08-30',
+            'start_discharge_date': '2011-08-25',
             'end_discharge_date': '2011-08-24',
             'container_one_remarks_reciept': '',
             'container_two_remarks_reciept': '',
             'distance': 5,
             'remarks': 'test remarks',
         }
+        
+        response = self.client.post(path, data=data)
+        self.assertContains(response, "Cargo Discharge started before Arrival?")
+        data.update({
+            'arrival_date': '2011-08-23',
+        })
+        
+        response = self.client.post(path, data=data)
+        self.assertContains(response, "Cargo finished Discharge before Starting?")
+        data.update({
+            'start_discharge_date': '2011-08-24',
+        })
+        
         response = self.client.post(path, data=data)
         self.assertContains(response, "Over offloaded for 1")
         data.update({
@@ -299,26 +312,43 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def waybill_validate(self):
         """ets.views.waybill_validate"""
+        #Let's check access firstly. Login as dispatcher, who is not a officer
+        self.client.login(username='dispatcher', password='dispatcher')
+        response = self.client.get(reverse("dispatch_validates"))
+        self.assertEqual(response.status_code, 302)
+        
         self.client.login(username='admin', password='admin')
-        response = self.client.get(reverse("waybill_validate_dispatch_form"))
+        response = self.client.get(reverse("dispatch_validates"))
         self.assertEqual(response.status_code, 200)
-        
-        
-        response = self.client.get(reverse('waybill_validate_receipt_form'))
-        self.assertEqual(response.status_code, 200)
-        #Check there is no validated waybill
+        self.assertEqual(response.context['object_list'].count(), 2)
         self.assertEqual(response.context['validated_waybills'].count(), 0)
         
-        #Validate some
-        response = self.client.post(reverse('waybill_validate_receipt_form'), data={
-            'form-TOTAL_FORMS': 1,
-            'form-INITIAL_FORMS': 1,
-            'form-MAX_NUM_FORMS': '',
-            'form-0-slug': 'isbx00311a',
-            'form-0-validated': True,
-        }, follow=True)
-        self.assertRedirects(response, reverse('waybill_validate_receipt_form'))
+        #Let's validate some waybill
+        response = self.client.get(reverse("validate_dispatch", kwargs={'waybill_pk': self.reception_waybill.pk}), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
         self.assertEqual(response.context['validated_waybills'].count(), 1)
+        
+        #Receipt validation 
+        response = self.client.get(reverse("receipt_validates"))
+        self.assertEqual(response.status_code, 200)
+        #Check there is no waybill
+        self.assertEqual(response.context['object_list'].count(), 0)
+        self.assertEqual(response.context['validated_waybills'].count(), 0)
+        
+        #Sign a waybill
+        self.delivered_waybill.receipt.sign()
+        response = self.client.get(reverse("receipt_validates"))
+        self.assertEqual(response.status_code, 200)
+        #Check there is a waybill
+        self.assertEqual(response.context['object_list'].count(), 1)
+        
+        #Let's validate it
+        response = self.client.get(reverse("validate_receipt", kwargs={'waybill_pk': self.delivered_waybill.pk}), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 0)
+        self.assertEqual(response.context['validated_waybills'].count(), 1)
+        
         
     #===================================================================================================================
     # def test_barcode_qr(self):

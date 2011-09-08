@@ -14,8 +14,8 @@
   <li><a href='{% url waybill_dispatch_list %}'>{% trans "Dispatching waybills" %}</a></li>
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
   
-  <li><a href='{% url waybill_validate_dispatch_form %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
-  <li><a href='{% url waybill_validate_receipt_form %}'>{% trans "Validate Received Waybill" %}</a></li>
+  <li><a href='{% url dispatch_validates %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
+  <li><a href='{% url receipt_validates %}'>{% trans "Validate Received Waybill" %}</a></li>
 
   <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
   

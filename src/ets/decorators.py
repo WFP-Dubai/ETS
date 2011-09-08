@@ -44,3 +44,15 @@ def waybill_user_related_filter(queryset, user):
                                                | Q(destination__compas__officers=user))
 
 waybill_user_related = user_filtered(filter=waybill_user_related_filter)
+
+#Validation
+dispatch_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
+                        transport_dispach_signed_date__isnull=False, 
+                        sent_compas=False, 
+                        order__warehouse__compas__officers=user))
+
+receipt_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
+                         transport_dispach_signed_date__isnull=False, 
+                         receipt__signed_date__isnull=False, 
+                         receipt__sent_compas=False, 
+                         destination__compas__officers=user))

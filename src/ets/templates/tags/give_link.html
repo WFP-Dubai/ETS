@@ -2,5 +2,5 @@
 {% if success %}
   <a href={{url}}>{{ text }}</a>
 {% else %}
-  <span title="{% trans 'You are not allowed to do this'%}">{{ text }}</span>
+  <span title="{% trans 'You are not allowed to do this'%}">{{ forbidden_text }}</span>
 {% endif %}

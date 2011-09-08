@@ -2,12 +2,9 @@
 {% load i18n extra_tags %}
 {% block content %}
 <h3>{% block page_title %}{% trans "Validate Dispatch" %}{% endblock %}</h3>
-<form method="post" action="">{% csrf_token %}
-    {{ formset.management_form }}
 
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="toplist">
     <thead>
-    {% block thead %}
         <tr>
         <th>{% trans "Order" %}</th>
         <th>{% trans "Waybill Number" %}</th>
@@ -16,20 +13,16 @@
         <th>{% trans "Delivery Location" %}</th>
         <th>{% trans "Dispatched" %}</th>
         <th>{% trans "Received" %}</th>
-        <th>{% trans "Validated" %}</th>
-        <th></th>
+        <th>{% trans "Validate" %}</th>
         </tr>
-    {% endblock %}
     </thead>
-    {% for form in formset.forms %}
+    {% for waybill in object_list %}
     <tr>
-    {% with form.instance as waybill %}
-    {% block waybill-row %}
-       <td>{{ waybill.order.pk }}</td>
-       <td>{{ form.slug }}{{ waybill.pk }}</td>
+       <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
+       <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
        <td>{{ waybill.order.warehouse }}</td>
-       <td>{{ waybill.destination.organization }}</td>
-       <td>{{ waybill.destination.location }}</td>
+       <td>{{ waybill.order.consignee.name }}</td>
+       <td>{{ waybill.order.location.name }}</td>
        <td>
         {% if waybill.transport_dispach_signed_date %}
           {{ waybill.transport_dispach_signed_date }}
@@ -44,33 +37,16 @@
           {% trans "Pending" %}
         {% endif %}
        </td>
-       <td>{{ form.validated }}
-        {% if waybill.hasError %}
-          <span onMouseUp="alert('{{ waybill.errors.errorDisp|escapejs }}')">
-            <span style='color:red;'>{% trans "Error!" %}</span>
-          </span>
-        {% endif %}
-       </td>
-       <td>
-        <a href="{{ waybill.get_absolute_url }}">{% trans "View" %}</a>
-        {% block action-link %}
-          {% waybill_edit waybill user %}
-        {% endblock %}
-       </td>
-    {% endblock %}
-    {% endwith %}
+       <td>{% block validate_link %}{% validate_dispatch waybill user %}{% endblock %}</td>
     </tr>
     {% endfor %}
 </table>
 
-<input type="submit" value="{% trans 'Validate Waybills' %}" />
-</form>
-
 <br>
-<h3>{% trans "Validated, but not sent to COMPAS" %}</h3>
-<table cellpadding="0" cellspacing="0" border="0" class="display" id="example2">
+<h3>{% trans "Validated, but isn't sent to COMPAS" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="validated_waybills">
     <thead>
-        <tr>
+      <tr>
         <th>{% trans "Order" %}</th>
         <th>{% trans "Waybill Number" %}</th>
         <th>{% trans "Origin Warehouse" %}</th>
@@ -78,16 +54,15 @@
         <th>{% trans "Delivery Location" %}</th>
         <th>{% trans "Dispatched" %}</th>
         <th>{% trans "Received" %}</th>
-        </tr>
-        </thead>
+      </tr>
+    </thead>
     {% for waybill in validated_waybills %}
-    {% block validated-item %}
     <tr>
-      <td>{{ waybill.order.pk }}</td>
-      <td>{{ waybill.pk }}</td>
+      <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
+      <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
       <td>{{ waybill.order.warehouse }}</td>
-      <td>{{ waybill.destination.organization.name }}</td>
-      <td>{{ waybill.destination.location.name }}</td>
+      <td>{{ waybill.order.consignee.name }}</td>
+      <td>{{ waybill.order.location.name }}</td>
       <td>
         {% if waybill.transport_dispach_signed_date %}
           {{ waybill.transport_dispach_signed_date }}
@@ -103,7 +78,6 @@
         {% endif %}
       </td>
     </tr>
-    {% endblock %}
     {% endfor %}
 </table>
 {% endblock %}
@@ -118,9 +92,9 @@ $(document).ready(function() {
       "bFilter": false,
       "bSort": false,
       "bInfo": false,
-      "bAutoWidth": false 
+      "bAutoWidth": false
   });
-  $('#example2').dataTable( {
+  $('#validated_waybills').dataTable( {
       "bPaginate": false,
       "bLengthChange": false,
       "bFilter": false,

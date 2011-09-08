@@ -1,31 +1,24 @@
 import datetime
-from functools import wraps
 
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 #from django.core import serializers
-#from django.core.urlresolvers import reverse
-#from django.forms.formsets import formset_factory
 from django.forms.models import inlineformset_factory, modelformset_factory
 #from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
-#from django.utils import simplejson
 from django.views.generic.simple import direct_to_template
 #from django.views.generic.list_detail import object_list
 #from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
-#from django.views.decorators.http import require_POST
 from django.utils.translation import ugettext as _
 
-#from uni_form.helpers import FormHelper, Layout, HTML, Row
-
-#from ets.compas import compas_write
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
 from ets.forms import LoadingDetailRecieptForm
-from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related, warehouse_related
+from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
+from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 
 
@@ -211,30 +204,55 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
         
 
 @login_required
-def waybill_validate(request, queryset, template, formset_model=ets.models.Waybill):
-    
-    formset = modelformset_factory(formset_model, fields = ('validated',), extra=0)\
-                    (request.POST or None, request.FILES or None, queryset=queryset.filter(validated=False))
-                                  
-    if formset.is_valid():
-        formset.save(commit=True)
-        
-        return redirect(request.build_absolute_uri())
-    
+@officer_required
+@dispatch_compas
+def dispatch_validates(request, queryset, template):
     return direct_to_template(request, template, {
-        'formset': formset, 
+        'object_list': queryset.filter(validated=False),
         'validated_waybills': queryset.filter(validated=True),
     })
 
 @login_required
 @officer_required
-def dispatch_validate(request, queryset, **kwargs):
-    return waybill_validate(request, queryset=queryset.filter(order__warehouse__compas__officers=request.user), **kwargs)
+@receipt_compas
+def receipt_validates(request, queryset, template):
+    return direct_to_template(request, template, {
+        'object_list': queryset.filter(receipt__validated=False),
+        'validated_waybills': queryset.filter(receipt__validated=True),
+    })
+
 
 @login_required
 @officer_required
-def receipt_validate(request, queryset, **kwargs):
-    return waybill_validate(request, queryset=queryset.filter(waybill__destination__compas__officers=request.user), **kwargs)
+@dispatch_compas
+def validate_dispatch(request, waybill_pk, queryset):
+    """Sets 'validated' flag"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.validated = True
+    waybill.save()
+    
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s has been validated') % { 
+        'waybill': waybill.pk,
+    })
+
+    return redirect('dispatch_validates')
+
+
+@login_required
+@officer_required
+@receipt_compas
+def validate_receipt(request, waybill_pk, queryset):
+    """Sets 'validated' flag"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.receipt.validated = True
+    waybill.receipt.save()
+    
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s has been validated') % { 
+        'waybill': waybill.pk,
+    })
+
+    return redirect('receipt_validates')
+
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):

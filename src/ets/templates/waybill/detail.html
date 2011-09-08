@@ -24,6 +24,9 @@
   <a class="print_original" href="{% url waybill_finalize_receipt waybill_pk=object.pk %}">Sign reception</a>
   {% endif %}
   
+  {% validate_dispatch object user %}
+  {% validate_receipt object user %}
+  
   {% waybill_reception object user %}
   {% waybill_delete object user %}
 </div>
