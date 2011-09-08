@@ -78,13 +78,6 @@ class BaseLoadingDetailFormSet(BaseInlineFormSet):
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
     
-    
-    helper = FormHelper()
-    
-    # create the layout object
-    helper.add_layout(Layout(Row('stock_item', 'number_of_units', 'overloaded_units',)))
-    helper.formset_tag = False
-
 
 class WaybillRecieptForm( forms.ModelForm ):
     
