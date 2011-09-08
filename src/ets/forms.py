@@ -60,15 +60,10 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
 
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'stock_item', 'number_of_units', 'overloaded_units', )
+        fields = ( 'stock_item', 'number_of_units', 'overloaded_units' )
     
 
-class BaseLoadingDetailFormSet(object):
-    
-#    def append_non_form_error( self, message ):
-#        errors = super( BaseLoadingDetailFormFormSet, self ).non_form_errors()
-#        errors.append( message )
-#        raise forms.ValidationError( errors )
+class BaseLoadingDetailFormSet(BaseInlineFormSet):
     
     def clean(self):
         super(BaseLoadingDetailFormSet, self).clean()
@@ -79,9 +74,10 @@ class BaseLoadingDetailFormSet(object):
 
             if form.is_bound and getattr(form, 'cleaned_data', {}).get('number_of_units'):
                 count += 1
-        
+            
         if count < 1:
             raise forms.ValidationError( _('You must have at least one commodity') )
+    
     
     helper = FormHelper()
     
@@ -134,10 +130,10 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
         fields = (
-            #'stock_item',
             'number_units_good', 
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
+            'over_offload_units',
         )
         widgets = {
             'number_units_good': forms.TextInput(attrs={'size': 5}),
@@ -146,22 +142,20 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         }
 
 
-class WaybillValidationFormset( BaseModelFormSet ):
-    def clean( self ):
-        issue = ''
-        super( WaybillValidationFormset, self ).clean()
-        for form in self.forms:
-            if not form.check_lines():
-                #TODO: Refactor it
-                valid = False
-                issue += ' WB: ' + str( form )
-                raise form.ValidationError( _("You have an error") )
-            
-            if not valid:
-                ##TODO: cleanup such things
-                print issue
-
-
-class MyModelChoiceField( forms.ModelChoiceField ):
-    def label_from_instance( self, obj ):
-        return "%s - %s" % ( obj.si_code , obj.cmmname )
+#=======================================================================================================================
+# class WaybillValidationFormset( BaseModelFormSet ):
+#    
+#    def clean( self ):
+#        issue = ''
+#        super( WaybillValidationFormset, self ).clean()
+#        for form in self.forms:
+#            if not form.check_lines():
+#                #TODO: Refactor it
+#                valid = False
+#                issue += ' WB: ' + str( form )
+#                raise form.ValidationError( _("You have an error") )
+#            
+#            if not valid:
+#                ##TODO: cleanup such things
+#                print issue
+#=======================================================================================================================

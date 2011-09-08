@@ -35,6 +35,12 @@ urlpatterns = patterns("ets.views",
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
+    #Create waybill                   
+    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {
+        'queryset': ets.models.Order.objects.all(),
+        'template': 'waybill/create.html',
+    }, "waybill_create" ),
+    
     #Waybill pages
     
     #Listings
@@ -50,8 +56,9 @@ urlpatterns = patterns("ets.views",
     }, "waybill_view" ),
     
     #Dispatch
-    ( r'^order/(?P<order_pk>[-\w]+)/add/$', "waybill_create", {}, "waybill_create" ),
-    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {}, "waybill_edit" ),
+    ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {
+        'template': 'waybill/edit.html',
+    }, "waybill_edit" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_dispatch/$', "waybill_finalize_dispatch", 
       {}, "waybill_finalize_dispatch" ),

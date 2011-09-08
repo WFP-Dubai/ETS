@@ -212,9 +212,7 @@ LOGGING = {
 DJANGO_BUILTIN_TAGS = (
     'native_tags.templatetags.native',
 )
-NATIVE_TAGS = (
-    'alphabetic.tags',
-)
+NATIVE_TAGS = ()
 
 
 #Loading details settings

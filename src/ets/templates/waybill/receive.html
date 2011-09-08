@@ -24,11 +24,12 @@
         <th>Lost Reason</th>
         <th>Number Units Damaged</th>
         <th>Damaged Reason</th>
+        <th>Over Offload Units</th>
       </tr>
     </thead>
     <tbody>
     {% for form in formset %}
-      <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
+      <tr colspan="7">{% include "uni_form/errors.html" %}</tr>
       <tr>
         <td>{{ form.instance.stock_item.coi_code }} {{ form.slug }} {{ form.waybill }}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_good %}</td>
@@ -36,6 +37,7 @@
         <td>{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_damaged %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.units_damaged_reason %}</td>
+        <td>{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
     {% endfor %}
     </tbody>
