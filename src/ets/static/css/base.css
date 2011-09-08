@@ -121,3 +121,15 @@ table.summary {
 .reports-title td{
   height: 50px;
 }
+
+.uniForm table thead tr {
+  background-color: grey;
+}
+
+.uniForm table tbody .ctrlHolder {
+  padding-left: 2px;
+}
+
+.uniForm .ctrlHolder {
+  border-bottom: none !important;
+}

@@ -9,8 +9,6 @@
 {% if form.errors or formset.errors %}<span style="color:red;">{% trans "You have some errors. Correct them" %}</span>{% endif %}
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
-    {% uni_form form form.helper %}
-    {# {% uni_form formset formset.helper %} #}
     {% include "uni_form/errors_formset.html" %}      
     <table>
       {{ formset.management_form }}
@@ -32,6 +30,7 @@
       {% endfor %}
       </tbody>
     </table>
+    {% uni_form form form.helper %}
     <div class="buttonHolder">
       <input type="submit" name="add" value="{% trans 'Save' %}"/>
     </div>
