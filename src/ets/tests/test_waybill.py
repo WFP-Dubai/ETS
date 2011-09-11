@@ -323,6 +323,16 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.context['object_list'].count(), 2)
         self.assertEqual(response.context['validated_waybills'].count(), 0)
         
+        #
+        stock_item = ets.models.StockItem.objects.get(pk="anotherstock1234")
+        stock_item.number_of_units = 10
+        stock_item.save()
+        response = self.client.get(reverse("validate_dispatch", kwargs={'waybill_pk': self.reception_waybill.pk}), follow=True)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "is not enough")
+        stock_item.number_of_units = 1000
+        stock_item.save()
+        
         #Let's validate some waybill
         response = self.client.get(reverse("validate_dispatch", kwargs={'waybill_pk': self.reception_waybill.pk}), follow=True)
         self.assertEqual(response.status_code, 200)
