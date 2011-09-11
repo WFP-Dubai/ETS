@@ -70,7 +70,7 @@ def import_persons(compas):
                                        email=person.email,
                                        first_name = person.first_name, last_name = person.last_name, 
                                        is_staff=False, is_active=False, is_superuser=False)
-            person = ets_models.Person.objects.create(user=user, person_pk=person.person_pk, title=person.title,
+            person = ets_models.Person.objects.create(pk=person.person_pk, user=user, title=person.title,
                                            code=person.code, compas_id=person.org_unit_code, 
                                            organization_id=person.organization_id, 
                                            location_id=person.location_code)

@@ -113,8 +113,7 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         send_dispatched(self.compas)
         
         self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
-        
-        
+    
     def test_dispatch_failure(self):
         
         def call_db_procedure(name, parameters, using):
@@ -134,8 +133,6 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         #Check compass logger
         logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00211A')
         self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
-        
-        
         
     def test_send_received(self):
         
@@ -176,4 +173,4 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         #Check compass logger
         logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
         self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
-        
+    

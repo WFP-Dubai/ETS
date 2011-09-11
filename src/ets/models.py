@@ -13,7 +13,7 @@ from django.conf import settings
 from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db.models import Q, F
+from django.db.models import F
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -47,7 +47,7 @@ def capitalize_slug(func):
 class Compas(models.Model):
     """ Compas station """
     
-    code = models.CharField(_("Station code"), max_length=7, primary_key=True)
+    code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
     
     #Database settings
@@ -143,23 +143,13 @@ class Person(models.Model):
     
     user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
     
-    person_pk = models.CharField(_("person identifier"), max_length=20, blank=True, primary_key=True, editable=False)
+    external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
     title = models.CharField(_("title"), max_length=50, blank=True)
     code = models.CharField(_("code"), max_length=7)
     
     compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
     location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
-    
-    #===================================================================================================================
-    # officer = models.BooleanField(_('Officer who can validate waybills'), default=False) #isCompasUser
-    #===================================================================================================================
-    #===================================================================================================================
-    # is_all_receiver = models.BooleanField( _('Is MoE Receiver (Can Receipt for All Warehouses Beloning to MoE)') ) #isAllReceiver
-    # super_user = models.BooleanField(_("Super User"), 
-    #        help_text = _('This user has Full Privileges to edit Waybills even after Signatures'), default=False) #super_user
-    # reader_user = models.BooleanField(_( 'Readonly User' ), default=False) #reader_user
-    #===================================================================================================================
     
     class Meta:
         ordering = ('code',)
@@ -170,8 +160,7 @@ class Person(models.Model):
         return "%s %s" % (self.code, self.title)
 
     def get_warehouses(self):
-        return Warehouse.objects.filter(Q(compas=self.compas) | Q (organization=self.organization) \
-                                        |Q(location=self.location))
+        return Warehouse.objects.filter(compas=self.compas, organization=self.organization, location=self.location)
         
 
 class CommodityCategory(models.Model):
