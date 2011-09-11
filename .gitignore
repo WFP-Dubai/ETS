@@ -47,3 +47,5 @@ db
 .DS_Store
 /compas
 /tagfile.tag
+
+sqlnet.log
