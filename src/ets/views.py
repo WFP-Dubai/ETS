@@ -228,6 +228,16 @@ def receipt_validates(request, queryset, template):
 def validate_dispatch(request, waybill_pk, queryset):
     """Sets 'validated' flag"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    
+    for loading_detail in waybill.loading_details.all():
+        if loading_detail.shortage() > 0 :
+            messages.add_message( request, messages.INFO, _('In %(warehouse)s %(number)s units of %(stock_item)s is not enough') % { 
+                'warehouse': waybill.order.warehouse,
+                'number': loading_detail.shortage(),
+                'stock_item': loading_detail.stock_item,
+            })
+            return redirect('dispatch_validates')
+        
     waybill.validated = True
     waybill.save()
     

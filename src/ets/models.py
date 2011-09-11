@@ -742,22 +742,10 @@ class LoadingDetail(models.Model):
         unique_together = ('waybill', 'stock_item')
 
 
-#=======================================================================================================================
-#    def check_stock( self ):
-#        stock = self.order_item.stock_item
-#        if self.order_item.lti_line.is_bulk:
-#            if self.numberUnitsLoaded <= stock.quantity_net:
-#                return True
-#        else:
-#            if self.numberUnitsLoaded <= stock.number_of_units :
-#                return True
-#        
-#        return False
-# 
-#    def check_receipt_item( self ):
-#        return True
-#=======================================================================================================================
-    
+    def shortage( self ):
+        not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False,).aggregate(Sum('number_of_units'))
+        return not_validated_sum['number_of_units__sum'] - self.stock_item.number_of_units
+
     def get_order_item(self):
         """Retrieves stock items for current order item through warehouse"""
         return OrderItem.objects.get(order=self.waybill.order,
