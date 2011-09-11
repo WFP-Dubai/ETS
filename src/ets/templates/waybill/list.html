@@ -46,8 +46,8 @@
           {% if waybill.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
-          {% if waybill.sent_compas %}D{% else %}-{% endif %}/
-          {% if waybill.receipt.sent_compas %}{% trans "R" %}{% else %}-{% endif %}
+          D: {% if waybill.sent_compas %}{{ waybill.sent_compas }}{% else %}-{% endif %}/
+          R: {% if waybill.receipt.sent_compas %}{{ waybill.receipt.sent_compas }}{% else %}-{% endif %}
         </td>
         <td>
           <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>

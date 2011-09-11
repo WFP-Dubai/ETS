@@ -65,7 +65,7 @@
       "destination": "ISBX003",
       
       "validated": false,
-      "sent_compas": false,
+      "sent_compas": null,
       
       "_order": 0
     }
@@ -127,7 +127,7 @@
       "destination": "ISBX002",
       
       "validated": false,
-      "sent_compas": false,
+      "sent_compas": null,
       
       "_order": 0
     }
@@ -167,7 +167,7 @@
       "date_removed": null,
       "loading_date": "2011-06-12",
       "transport_driver_name": "Ahmed",
-      "sent_compas": false,
+      "sent_compas": null,
       "dispatch_remarks": "That was long night",
       "container_one_seal_number": "",
       "transport_sub_contractor": "Arpaso",
@@ -190,7 +190,7 @@
       "container_two_remarks_reciept": "",
       "distance": 5,
       "arrival_date": "2011-08-22",
-      "sent_compas": false,
+      "sent_compas": null,
       "_order": 0,
       "signed_date": null,
       "waybill": "ISBX00312A",

@@ -89,7 +89,7 @@ def sign_reception(waybill, user):
 
 @register.inclusion_tag('tags/give_link.html')
 def validate_dispatch(waybill, user, link_text=_("Validate dispatch"), forbidden_text=""):
-    queryset = Waybill.objects.filter(sent_compas=False, transport_dispach_signed_date__isnull=False) \
+    queryset = Waybill.objects.filter(sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
                           .filter(order__warehouse__compas__officers=user) \
                           .filter(validated=False)
 
@@ -103,7 +103,7 @@ def validate_dispatch(waybill, user, link_text=_("Validate dispatch"), forbidden
 
 @register.inclusion_tag('tags/give_link.html')
 def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_text=""):
-    queryset = Waybill.objects.filter(receipt__sent_compas=False, transport_dispach_signed_date__isnull=False) \
+    queryset = Waybill.objects.filter(receipt__sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
                               .filter(receipt__signed_date__isnull=False) \
                               .filter(destination__compas__officers=user) \
                               .filter(receipt__validated=False)

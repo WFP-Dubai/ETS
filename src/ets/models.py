@@ -522,7 +522,7 @@ class Waybill( ld_models.Model ):
 
     #Extra Fields
     validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
-    sent_compas = models.BooleanField(_("Waybill Sent To Compas"), default=False) #sentToCompas
+    sent_compas = models.DateTimeField(_("Waybill Sent to Compas"), blank=True, null=True)
     
     audit_log = AuditLog()
 
@@ -661,8 +661,8 @@ class ReceiptWaybill(models.Model):
     container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
     container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
     
-    validated = models.BooleanField( _("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
-    sent_compas = models.BooleanField(_("Waybill Reciept Sent to Compas"), default=False) #waybillRecSentToCompas
+    validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
+    sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
     class Meta:
         ordering = ('slug',)
@@ -834,19 +834,24 @@ class LoadingDetail(models.Model):
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
 
-#=======================================================================================================================
-# class CompasLogger( models.Model ):
-#    timestamp = models.DateTimeField(_("Time stamp"), null = True, blank = True )
-#    user = models.ForeignKey( User )
-#    action = models.CharField(_("Action"), max_length = 50, blank = True )
-#    errorRec = models.CharField(_("Error Record"), max_length = 2000, blank = True )
-#    errorDisp = models.CharField(_("Error Disp"), max_length = 2000, blank = True )
-#    wb = models.ForeignKey( Waybill, verbose_name=_("Waybill"), blank = True, primary_key = True )
-#    lti = models.CharField(_("LTI"), max_length = 50, blank = True )
-#    data_in = models.CharField(_("Data in"), max_length = 5000, blank = True )
-#    data_out = models.CharField(_("Data out"), max_length = 5000, blank = True )
-#    #loggercompas
-#    
-#    class Meta:
-#        db_table = u'loggercompas'
-#=======================================================================================================================
+class CompasLogger(models.Model):
+    
+    DISPATCH = 1
+    RECEIPT = 2
+    
+    ACTIONS = (
+        (DISPATCH, _("Dispatch")),
+        (RECEIPT, _("Receipt"))           
+    )
+    
+    action = models.IntegerField(_("procedure name"), choices=ACTIONS)
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="logs")
+    waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill"), related_name="compass_loggers")
+    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
+    code = models.CharField(_("error code"), max_length=20)
+    message = models.CharField(_("error message"), max_length=512)
+    
+    class Meta:
+        ordering = ('-when_attempted',)
+        verbose_name = _("compas logger")
+        verbose_name_plural = _("compas errors")

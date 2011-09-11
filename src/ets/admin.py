@@ -85,6 +85,10 @@ class ModelAdminWithForeignKeyLinksMetaclass(MediaDefiningClass):
         return new_class
 
 
+class CompasLoggerInline(admin.TabularInline):
+    model = ets.models.CompasLogger
+    extra = 0
+
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
@@ -132,7 +136,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
     search_fields = ('pk', 'order__pk')
-    inlines = (LoadingDetailsInline, ReceiptInline)
+    inlines = (LoadingDetailsInline, ReceiptInline, CompasLoggerInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 
@@ -257,5 +261,17 @@ class PersonAdmin(admin.ModelAdmin):
     
     list_display = ('pk', 'code', 'title', 'link_to_user', 'link_to_compas', 'link_to_organization', 'link_to_location')
     search_fields = ('pk', 'code', 'title', 'user__username', 'compas__code', 'organization__name', 'location__name')
+    raw_id_fields = ('user', 'organization', 'location')
 
 admin.site.register(ets.models.Person, PersonAdmin)
+
+
+class CompasLoggerAdmin(admin.ModelAdmin):
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+    
+    list_display = ('pk', 'link_to_compas', 'link_to_waybill', 'when_attempted')
+    search_fields = ('pk', 'compas__pk', 'waybill__pk')
+    date_hierarchy = 'when_attempted'
+    raw_id_fields = ('waybill',)
+
+admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)

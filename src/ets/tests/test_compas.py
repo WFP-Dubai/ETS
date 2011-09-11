@@ -4,6 +4,7 @@ from datetime import datetime
 
 from django.test import TestCase
 from django.core.management import call_command
+from django.core.exceptions import ValidationError
 
 import ets.models
 import compas.models as compas_models
@@ -98,7 +99,7 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
             assert name == 'write_waybill.dispatch', "Wrong procedure's name"
             assert isinstance(parameters, tuple), "Parameters must be a tuple"
             assert using == self.compas, "Wrong compas"
-        
+            
         ets.utils.call_db_procedure = call_db_procedure
         
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
@@ -110,11 +111,35 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         
         #Send all validated waybills to compas
         send_dispatched(self.compas)
-    
-    def test_send_received(self):
+        
+        self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
+        
+        
+    def test_dispatch_failure(self):
         
         def call_db_procedure(name, parameters, using):
             
+            raise ValidationError("Test wrong message", code="123")
+        
+        ets.utils.call_db_procedure = call_db_procedure
+        
+        ets.models.Waybill.objects.filter(pk="ISBX00211A").update(validated=True, 
+                                                        transport_dispach_signed_date=datetime.now())
+        
+        #Send all validated waybills to compas
+        send_dispatched(self.compas)
+        
+        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
+        
+        #Check compass logger
+        logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00211A')
+        self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
+        
+        
+        
+    def test_send_received(self):
+        
+        def call_db_procedure(name, parameters, using):
             assert name == 'write_waybill.receipt', "Wrong procedure's name"
             assert isinstance(parameters, tuple), "Parameters must be a tuple"
             assert using == self.compas, "Wrong compas"
@@ -130,4 +155,25 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         
         #Send all validated waybills to compas
         send_received(self.compas)
+        
+        self.assertTrue(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
+    
+    def test_received_failure(self):
+        
+        def call_db_procedure(name, parameters, using):
+            raise ValidationError("Test wrong message", code="123")
+        
+        ets.utils.call_db_procedure = call_db_procedure
+        
+        ets.models.ReceiptWaybill.objects.filter(pk="isbx00311a").update(validated=True, 
+                                                                         signed_date=datetime.now())
+        
+        #Send all validated waybills to compas
+        send_received(self.compas)
+        
+        self.assertFalse(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
+        
+        #Check compass logger
+        logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
+        self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
         

@@ -48,11 +48,11 @@ waybill_user_related = user_filtered(filter=waybill_user_related_filter)
 #Validation
 dispatch_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
                         transport_dispach_signed_date__isnull=False, 
-                        sent_compas=False, 
+                        sent_compas__isnull=True, 
                         order__warehouse__compas__officers=user))
 
 receipt_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
                          transport_dispach_signed_date__isnull=False, 
                          receipt__signed_date__isnull=False, 
-                         receipt__sent_compas=False, 
+                         receipt__sent_compas__isnull=True, 
                          destination__compas__officers=user))
