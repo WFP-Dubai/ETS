@@ -240,7 +240,7 @@ def send_dispatched(using):
                     ), using)
         
         except ValidationError, err:
-            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
+            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                    compas_id=using, waybill=waybill,
                                                    code=err.code, message='\n'.join(err.messages))
         else:
