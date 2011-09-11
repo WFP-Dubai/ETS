@@ -643,7 +643,12 @@ class Waybill( ld_models.Model ):
                                   receipt__signed_date__isnull=True,
                                   destination__in=Warehouse.filter_by_user(user))
     
-    
+    def get_shortage_loading_details( self ):
+        loading_detail_list = []
+        for loading_detail in self.loading_details.all():
+            if loading_detail.get_shortage() > 0 :
+                loading_detail_list.append(loading_detail)
+                return loading_detail_list
     
 class ReceiptWaybill(models.Model):
     """Receipt data"""
@@ -742,7 +747,7 @@ class LoadingDetail(models.Model):
         unique_together = ('waybill', 'stock_item')
 
 
-    def shortage( self ):
+    def get_shortage( self ):
         not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False,).aggregate(Sum('number_of_units'))
         return not_validated_sum['number_of_units__sum'] - self.stock_item.number_of_units
 
