@@ -12,3 +12,4 @@ except ImportError:
 
 TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
+DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)

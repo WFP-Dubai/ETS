@@ -265,13 +265,14 @@ class DatabasesFormDatabase(object):
         for compas in self.get_compases():
             yield compas.pk
 
-DATABASES = DatabasesFormDatabase({
+
+DEFAULT_DATABASE = {
     'NAME': 'db',
     'ENGINE': 'django.db.backends.sqlite3',
     'USER': '',
     'PASSWORD': '',
     'HOST': 'localhost',
-})
+}
 
 #Prevent migrations during testing
 SOUTH_TESTS_MIGRATE = False
