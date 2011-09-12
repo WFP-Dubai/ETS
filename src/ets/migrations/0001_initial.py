@@ -10,7 +10,7 @@ class Migration(SchemaMigration):
         
         # Adding model 'Compas'
         db.create_table('ets_compas', (
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=7, primary_key=True)),
+            ('code', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
             ('db_engine', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('db_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('db_user', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
@@ -58,7 +58,7 @@ class Migration(SchemaMigration):
         # Adding model 'Person'
         db.create_table('ets_person', (
             ('user', self.gf('django.db.models.fields.related.OneToOneField')(related_name='person', unique=True, to=orm['auth.User'])),
-            ('person_pk', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
+            ('external_ident', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
             ('code', self.gf('django.db.models.fields.CharField')(max_length=7)),
             ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Compas'])),
@@ -154,7 +154,6 @@ class Migration(SchemaMigration):
             ('slug', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=50, populate_from=None, db_index=True)),
             ('order', self.gf('django.db.models.fields.related.ForeignKey')(related_name='_auditlog_waybills', to=orm['ets.Order'])),
             ('destination', self.gf('django.db.models.fields.related.ForeignKey')(related_name='_auditlog_receipt_waybills', to=orm['ets.Warehouse'])),
-            ('status', self.gf('django.db.models.fields.IntegerField')(default=1)),
             ('loading_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime.now)),
             ('dispatch_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime.now)),
             ('transaction_type', self.gf('django.db.models.fields.CharField')(default=u'WIT', max_length=10)),
@@ -174,7 +173,7 @@ class Migration(SchemaMigration):
             ('container_one_remarks_dispatch', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('container_two_remarks_dispatch', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('validated', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('sent_compas', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('sent_compas', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('_order', self.gf('django.db.models.fields.proxy.OrderWrt')()),
             ('action_id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('action_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
@@ -191,7 +190,6 @@ class Migration(SchemaMigration):
             ('slug', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=50, primary_key=True, unique=True, populate_from=None, db_index=True)),
             ('order', self.gf('django.db.models.fields.related.ForeignKey')(related_name='waybills', to=orm['ets.Order'])),
             ('destination', self.gf('django.db.models.fields.related.ForeignKey')(related_name='receipt_waybills', to=orm['ets.Warehouse'])),
-            ('status', self.gf('django.db.models.fields.IntegerField')(default=1)),
             ('loading_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime.now)),
             ('dispatch_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime.now)),
             ('transaction_type', self.gf('django.db.models.fields.CharField')(default=u'WIT', max_length=10)),
@@ -211,7 +209,7 @@ class Migration(SchemaMigration):
             ('container_one_remarks_dispatch', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('container_two_remarks_dispatch', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('validated', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('sent_compas', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('sent_compas', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('ets', ['Waybill'])
@@ -230,7 +228,7 @@ class Migration(SchemaMigration):
             ('container_one_remarks_reciept', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('container_two_remarks_reciept', self.gf('django.db.models.fields.CharField')(max_length=40, blank=True)),
             ('validated', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('sent_compas', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('sent_compas', self.gf('django.db.models.fields.DateTimeField')(null=True, blank=True)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('ets', ['ReceiptWaybill'])
@@ -275,6 +273,18 @@ class Migration(SchemaMigration):
 
         # Adding unique constraint on 'LoadingDetail', fields ['waybill', 'stock_item']
         db.create_unique('ets_loadingdetail', ['waybill_id', 'stock_item_id'])
+
+        # Adding model 'CompasLogger'
+        db.create_table('ets_compaslogger', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('action', self.gf('django.db.models.fields.IntegerField')()),
+            ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='logs', to=orm['ets.Compas'])),
+            ('waybill', self.gf('django.db.models.fields.related.ForeignKey')(related_name='compass_loggers', to=orm['ets.Waybill'])),
+            ('when_attempted', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('code', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('message', self.gf('django.db.models.fields.CharField')(max_length=512)),
+        ))
+        db.send_create_signal('ets', ['CompasLogger'])
 
 
     def backwards(self, orm):
@@ -336,6 +346,9 @@ class Migration(SchemaMigration):
         # Deleting model 'LoadingDetail'
         db.delete_table('ets_loadingdetail')
 
+        # Deleting model 'CompasLogger'
+        db.delete_table('ets_compaslogger')
+
 
     models = {
         'auth.group': {
@@ -386,7 +399,7 @@ class Migration(SchemaMigration):
         },
         'ets.compas': {
             'Meta': {'ordering': "('code',)", 'object_name': 'Compas'},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '7', 'primary_key': 'True'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'db_engine': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'db_host': ('django.db.models.fields.CharField', [], {'default': "'localhost'", 'max_length': '100'}),
             'db_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -394,6 +407,16 @@ class Migration(SchemaMigration):
             'db_port': ('django.db.models.fields.CharField', [], {'max_length': '4', 'blank': 'True'}),
             'db_user': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'officers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'compases'", 'symmetrical': 'False', 'to': "orm['auth.User']"})
+        },
+        'ets.compaslogger': {
+            'Meta': {'ordering': "('-when_attempted',)", 'object_name': 'CompasLogger'},
+            'action': ('django.db.models.fields.IntegerField', [], {}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
+            'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': "orm['ets.Compas']"}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'message': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
+            'waybill': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'compass_loggers'", 'to': "orm['ets.Waybill']"}),
+            'when_attempted': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'})
         },
         'ets.loadingdetail': {
             'Meta': {'ordering': "('_order',)", 'unique_together': "(('waybill', 'stock_item'),)", 'object_name': 'LoadingDetail'},
@@ -481,9 +504,9 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "('code',)", 'object_name': 'Person'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '7'}),
             'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Compas']"}),
+            'external_ident': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Location']"}),
             'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Organization']"}),
-            'person_pk': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'person'", 'unique': 'True', 'to': "orm['auth.User']"})
         },
@@ -497,7 +520,7 @@ class Migration(SchemaMigration):
             'end_discharge_date': ('django.db.models.fields.DateField', [], {}),
             'person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'recipient_waybills'", 'to': "orm['ets.Person']"}),
             'remarks': ('django.db.models.fields.CharField', [], {'max_length': '40', 'blank': 'True'}),
-            'sent_compas': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'sent_compas': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'signed_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),
             'start_discharge_date': ('django.db.models.fields.DateField', [], {}),
@@ -550,9 +573,8 @@ class Migration(SchemaMigration):
             'dispatcher_person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'dispatch_waybills'", 'to': "orm['ets.Person']"}),
             'loading_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'waybills'", 'to': "orm['ets.Order']"}),
-            'sent_compas': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'sent_compas': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),
-            'status': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'transaction_type': ('django.db.models.fields.CharField', [], {'default': "u'WIT'", 'max_length': '10'}),
             'transport_dispach_signed_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'transport_driver_licence': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -585,9 +607,8 @@ class Migration(SchemaMigration):
             'dispatcher_person': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_dispatch_waybills'", 'to': "orm['ets.Person']"}),
             'loading_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now'}),
             'order': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_waybills'", 'to': "orm['ets.Order']"}),
-            'sent_compas': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'sent_compas': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'populate_from': 'None', 'db_index': 'True'}),
-            'status': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'transaction_type': ('django.db.models.fields.CharField', [], {'default': "u'WIT'", 'max_length': '10'}),
             'transport_dispach_signed_date': ('django.db.models.fields.DateTimeField', [], {'null': 'True', 'blank': 'True'}),
             'transport_driver_licence': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
