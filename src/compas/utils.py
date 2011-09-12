@@ -7,7 +7,7 @@ def call_db_procedure(name, parameters, using):
     import cx_Oracle
     cursor = connections[using].cursor()
     Response_Message = cursor.var(cx_Oracle.STRING).var
-    Response_Message.setvalue( 0, u' ' * 200 )
+    Response_Message.setvalue( 0, u' ' * 400 )
     Response_Code = cursor.var(cx_Oracle.STRING).var
     Response_Code.setvalue( 0, u' ' * 2 )
     print "parameters --> ", parameters
