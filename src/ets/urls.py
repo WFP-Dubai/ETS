@@ -5,6 +5,7 @@ from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
+from django.contrib.staticfiles.urls import urlpatterns
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -15,7 +16,7 @@ from ets.views import waybill_list
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required
 import ets.models
 
-urlpatterns = patterns("ets.views",
+urlpatterns += patterns("ets.views",
                         
     ( r'^$', login_required(direct_to_template), {
         'template': 'index.html',
@@ -131,8 +132,3 @@ if settings.DEBUG:
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-
-    #===================================================================================================================
-    # from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-    # urlpatterns += staticfiles_urlpatterns()
-    #===================================================================================================================
