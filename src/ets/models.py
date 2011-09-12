@@ -233,7 +233,8 @@ class StockItem( models.Model ):
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
-    allocation_code = models.CharField(_("Allocation code"), max_length = 10, editable=False)
+    allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
+    #si_record_id = models.CharField(_("SI record id "), max_length=25, editable=False)
     
     objects = StockManager()
 
@@ -833,14 +834,26 @@ class CompasLogger(models.Model):
         (RECEIPT, _("Receipt"))           
     )
     
+    SUCCESS = 0
+    FAILURE = 1
+    
+    STATUSES = (
+        (SUCCESS, _("Success")),
+        (FAILURE, _("Failure"))
+    )
+    
     action = models.IntegerField(_("procedure name"), choices=ACTIONS)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="logs")
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill"), related_name="compass_loggers")
     when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
-    code = models.CharField(_("error code"), max_length=20)
+    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
     message = models.CharField(_("error message"), max_length=512)
     
     class Meta:
         ordering = ('-when_attempted',)
         verbose_name = _("compas logger")
         verbose_name_plural = _("compas errors")
+    
+    def __unicode__(self):
+        return "%s: %s" % (self.code, self.message)
+    

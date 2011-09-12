@@ -113,6 +113,7 @@ def import_stock(compas):
             'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
             
             'allocation_code': stock.allocation_code,
+            #'si_record_id': stock.si_record_id,
             'is_bulk': stock.is_bulk(),
             
             'updated': now,
@@ -198,29 +199,37 @@ def send_dispatched(using):
                     
                     call_db_procedure('write_waybill.dispatch', (
                         CURR_CODE, 
-                        waybill.dispatch_date.strftime( "%Y%m%d" ), 
+                        waybill.dispatch_date.strftime("%Y%m%d"), 
                         waybill.order.origin_type, 
                         waybill.order.warehouse.location.pk, 
                         waybill.order.warehouse.pk,
-                        '', 
-                        waybill.order.location.pk, 
-                        waybill.order.consignee.pk, 
+                        u'', 
+                        waybill.order.location.pk,
+                        waybill.destination.pk,
                         waybill.order.pk, 
-                        waybill.loading_date.strftime( "%Y%m%d" ),
+                        waybill.loading_date.strftime("%Y%m%d"),
                         waybill.order.consignee.pk, 
+                        
                         waybill.transaction_type, 
                         waybill.transport_vehicle_registration, 
                         waybill.transport_type,
                         waybill.dispatch_remarks, 
+                        
                         waybill.dispatcher_person.code, 
                         waybill.dispatcher_person.compas.pk, 
                         waybill.dispatcher_person.title, 
+                        
                         waybill.order.transport_code, 
                         waybill.order.transport_ouc,
+                        
                         waybill.transport_driver_name, 
-                        waybill.transport_driver_licence, 
-                        CONTAINER_NUMBER, 
+                        waybill.transport_driver_licence,
+                        waybill.transport_vehicle_registration, 
+                        waybill.transport_trailer_registration,
+                        CONTAINER_NUMBER,
+                         
                         using,
+                        
                         loading.stock_item.pk, 
                         loading.stock_item.commodity.category.pk, 
                         loading.stock_item.commodity.pk, 
@@ -234,14 +243,22 @@ def send_dispatched(using):
                         u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_net, 
                         u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
                         
-                        '', '', '' 
+                        u'', u''
                     ), using)
         
         except ValidationError, err:
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                    compas_id=using, waybill=waybill,
-                                                   code=err.code, message='\n'.join(err.messages))
+                                                   status=ets_models.CompasLogger.FAILURE, 
+                                                   message='\n'.join(err.messages))
+            
+            waybill.validated = False
+            waybill.save()
         else:
+            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
+                                                   compas_id=using, waybill=waybill,
+                                                   status=ets_models.CompasLogger.SUCCESS)
+            
             waybill.sent_compas = datetime.now()
             waybill.save()
             
@@ -288,7 +305,16 @@ def send_received(using):
         except ValidationError, err:
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                    compas_id=using, waybill=waybill,
-                                                   code=err.code, message='\n'.join(err.messages))
+                                                   status=ets_models.CompasLogger.FAILURE, 
+                                                   message='\n'.join(err.messages))
+            
+            reception.validated = False
+            reception.save()
+            
         else:
+            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
+                                                   compas_id=using, waybill=waybill,
+                                                   status=ets_models.CompasLogger.SUCCESS)
+            
             reception.sent_compas = datetime.now()
             reception.save()

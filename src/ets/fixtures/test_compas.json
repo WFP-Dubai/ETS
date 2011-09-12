@@ -1,0 +1,15 @@
+[ 
+  {
+    "pk": "dev_compas",
+    "model": "ets.compas",
+    "fields": {
+      "officers": [1],
+      
+      "db_engine": "django.db.backends.oracle",
+      "db_name": "10.11.70.50/ISBX002",
+      "db_user": "TESTISBX002",
+      "db_password": "TESTISBX002",
+      "db_host": "10.11.70.50"
+    }
+  }
+]

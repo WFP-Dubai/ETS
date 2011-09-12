@@ -113,12 +113,16 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         send_dispatched(self.compas)
         
         self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
+        
+        #Check compass logger
+        logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00211A')
+        self.assertEqual(logger.status, ets.models.CompasLogger.SUCCESS)
     
     def test_dispatch_failure(self):
         
         def call_db_procedure(name, parameters, using):
             
-            raise ValidationError("Test wrong message", code="123")
+            raise ValidationError("Test wrong message", code="E")
         
         ets.utils.call_db_procedure = call_db_procedure
         
@@ -129,10 +133,11 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         send_dispatched(self.compas)
         
         self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
+        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00211A").validated)
         
         #Check compass logger
         logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00211A')
-        self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
+        self.assertTupleEqual((logger.status, logger.message), (ets.models.CompasLogger.FAILURE, "Test wrong message"))
         
     def test_send_received(self):
         
@@ -154,11 +159,15 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         send_received(self.compas)
         
         self.assertTrue(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
+        
+        #Check compass logger
+        logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
+        self.assertEqual(logger.status, ets.models.CompasLogger.SUCCESS)
     
     def test_received_failure(self):
         
         def call_db_procedure(name, parameters, using):
-            raise ValidationError("Test wrong message", code="123")
+            raise ValidationError("Test wrong message", code="E")
         
         ets.utils.call_db_procedure = call_db_procedure
         
@@ -169,8 +178,9 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         send_received(self.compas)
         
         self.assertFalse(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
+        self.assertFalse(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").validated)
         
         #Check compass logger
         logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
-        self.assertTupleEqual((logger.code, logger.message), ('123', "Test wrong message"))
-    
+        self.assertTupleEqual((logger.status, logger.message), (ets.models.CompasLogger.FAILURE, "Test wrong message"))
+        
