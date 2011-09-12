@@ -62,7 +62,7 @@ Following names of package are called so in debian package system::
 Nginx
 -------------
 
-/etc/nginx/sites-available/ETS
+/etc/nginx/sites-available/ETS::
 
   server {
     listen <REAL_IP>:80;
@@ -88,7 +88,7 @@ Nginx
   }
 
 
-/etc/nginx/proxy.conf
+/etc/nginx/proxy.conf::
   
   proxy_redirect              off;
   proxy_set_header            Host $host;
@@ -108,7 +108,7 @@ Nginx
 Apache
 -------------
 
-/etc/apache2/ports.conf
+/etc/apache2/ports.conf::
   
   NameVirtualHost 127.0.0.1:80
   Listen 127.0.0.1:80
@@ -122,7 +122,7 @@ Apache
   </IfModule>
 
 
-/etc/apache2/sites-available/main
+/etc/apache2/sites-available/main::
   
   <VirtualHost 127.0.0.1:80>
     ServerAdmin admin@ubuntu
@@ -154,7 +154,7 @@ Download project from GitHub
 Setting of Database
 ----------------------------
 
-/opt/ETS/src/ets/settings/local.py
+/opt/ETS/src/ets/settings/local.py::
     
   DEFAULT_DATABASE = {
 	'NAME': 'ets',
@@ -174,8 +174,27 @@ Oracle client
 Ubuntu 64
 ~~~~~~~~~
 
+Installation of packeges::
+
   cd /opt/ETS/oracle/
   sudo dpkg -i *.deb
+  sudo -i pip install cx-Oracle
+
+Set environment variables::
+ 
+  sudo touch /etc/ld.so.conf.d/ora-inst-cl-11.2.0.2.conf
+  sudo echo "/usr/lib/oracle/11.2/client/lib" > /etc/ld.so.conf.d/ora-inst-cl-11.2.0.2.conf
+  
+  
+Add to /etc/bash.bashrc::
+
+  # oracle env
+  export ORACLE_BASE=/usr/lib/oracle
+  export ORACLE_HOME=$ORACLE_BASE/11.2/client64
+  export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+  export PATH=$ORACLE_HOME/bin:$PATH
+  export PATH=$ORACLE_HOME/lib:$PATH
+  
 
 Mac OS X
 ~~~~~~~~
