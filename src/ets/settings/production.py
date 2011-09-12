@@ -2,7 +2,6 @@
 from .default import *
 
 DEBUG = False
-DISABLE_EXPIERED_LTI = True
 
 # Local settings for development / production
 try:

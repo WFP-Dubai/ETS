@@ -11,7 +11,6 @@ TEMPLATE_LOADERS = (
 )
 
 DEBUG = True
-DISABLE_EXPIERED_LTI = True
 TEMPLATE_DEBUG = True
 
 # Local settings for development / production
@@ -22,5 +21,4 @@ except ImportError:
 
 TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
-DISABLE_EXPIERED_LTI = DEBUG
 DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)

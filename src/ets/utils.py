@@ -130,9 +130,7 @@ def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
 
-    original = compas_models.LtiOriginal.objects.using(compas).filter(requested_dispatch_date__gt = settings.MAX_DATE)
-    if not settings.DISABLE_EXPIERED_LTI:
-        original = original.filter( expiry_date__gt = now )
+    original = compas_models.LtiOriginal.objects.using(compas).filter(expiry_date__gt = now)
     
     for lti in original:
         
