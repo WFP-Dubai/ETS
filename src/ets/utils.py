@@ -215,7 +215,7 @@ def send_dispatched(using):
                         waybill.transport_type,
                         waybill.dispatch_remarks, 
                         waybill.dispatcher_person.code, 
-                        waybill.dispatcher_person.compas, 
+                        waybill.dispatcher_person.compas.pk, 
                         waybill.dispatcher_person.title, 
                         waybill.order.transport_code, 
                         waybill.order.transport_ouc,

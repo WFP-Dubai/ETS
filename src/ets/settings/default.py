@@ -276,12 +276,3 @@ DATABASES = DatabasesFormDatabase({
 #Prevent migrations during testing
 SOUTH_TESTS_MIGRATE = False
 
-# Local settings for development / production
-try:
-    from local import *
-except ImportError:
-    pass
-
-TEMPLATE_DEBUG = DEBUG
-ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
-DISABLE_EXPIERED_LTI = DEBUG
