@@ -633,13 +633,9 @@ class Waybill( ld_models.Model ):
                                   receipt__signed_date__isnull=True,
                                   destination__in=Warehouse.filter_by_user(user))
     
-    def get_shortage_loading_details( self ):
-        loading_detail_list = []
-        for loading_detail in self.loading_details.all():
-            if loading_detail.get_shortage() > 0 :
-                loading_detail_list.append(loading_detail)
-                return loading_detail_list
-    
+    def get_shortage_loading_details(self):
+        return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]    
+
 class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
@@ -738,8 +734,9 @@ class LoadingDetail(models.Model):
 
 
     def get_shortage( self ):
-        not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False,).aggregate(Sum('number_of_units'))
-        return not_validated_sum['number_of_units__sum'] - self.stock_item.number_of_units
+        not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False) \
+                                .aggregate(Sum('number_of_units'))['number_of_units__sum']
+        return max(0, not_validated_sum - self.stock_item.number_of_units)
 
     def get_order_item(self):
         """Retrieves stock items for current order item through warehouse"""
