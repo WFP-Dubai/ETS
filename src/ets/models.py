@@ -445,9 +445,10 @@ class Waybill( ld_models.Model ):
     DELIVERED = 5
     COMPLETE = 6
     
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), LETTER_CODE
-                         ), unique_with=('date_removed',), slugify=capitalize_slug(slugify),
+    slug = AutoSlugField(populate_from=lambda instance: "%s%s%s%s" % (
+                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), 
+                            LETTER_CODE, instance.date_removed and instance.date_removed.strftime('%y') or '',
+                         ), unique=True, slugify=capitalize_slug(slugify), always_update=True,
                          sep='', primary_key=True)
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
