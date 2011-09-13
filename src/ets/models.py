@@ -293,11 +293,8 @@ class LossDamageType(models.Model):
     
     @classmethod
     def update(cls, using):
-        for myrecord in cls.objects.using(using).all():
-            if not cls.objects.filter(type=myrecord.type, 
-                                  category__pk=myrecord.category_id, 
-                                  cause=myrecord.cause).count():
-                myrecord.save(using='default')
+        for myrecord in cls.objects.using(using).values('type', 'category', 'cause'):
+            cls.objects.get_or_create(type=myrecord['type'], category_id=myrecord['category'], cause=myrecord['cause'])
 
 #=======================================================================================================================
 # 
