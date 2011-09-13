@@ -382,9 +382,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.client.login(username='dispatcher', password='dispatcher')   
         waybill = ets.models.Waybill.objects.get(pk='ISBX00211A')
         waybill.sent_compas = datetime.datetime.now()
-        
         waybill.save()
-        print ets.models.Waybill.objects.filter(sent_compas__isnull=False).count()
         
         response = self.client.get(reverse('compass_waybill'))
         self.assertEqual(response.status_code, 200)

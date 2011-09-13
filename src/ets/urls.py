@@ -96,7 +96,7 @@ urlpatterns += patterns("ets.views",
       "waybill_delete", {}, "waybill_delete" ),
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
     
-    ( r'^waybill/compass_waybill/$', "direct_to_template", {
+    ( r'^compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
             'waybill_list': Waybill.objects.filter(sent_compas__isnull=False), 
