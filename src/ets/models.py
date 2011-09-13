@@ -357,7 +357,7 @@ class OrderItem(models.Model):
     
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
     
     class Meta:
         ordering = ('si_code',)
