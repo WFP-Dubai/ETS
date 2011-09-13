@@ -145,11 +145,20 @@ Apache
     CustomLog ${APACHE_LOG_DIR}/access.log combined
   </VirtualHost>
 
+
+SSH KEY
+-------
+
+  sudo su
+  cd ~/.ssh
+  ssh-keygen -t rsa -C "<your e-mail>"
+  cat ./id_rsa.pub and copy and paste this key to your github account
+
 Download project from GitHub
 ----------------------------
-
+  
   cd /opt/
-  sudo git clone https://predatell@github.com/WFP-Dubai/ETS.git
+  sudo git clone git@github.com:WFP-Dubai/ETS.git
 
 Setting of Database
 ----------------------------

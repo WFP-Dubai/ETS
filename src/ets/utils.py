@@ -63,7 +63,9 @@ def import_places(compas):
 
 def import_persons(compas):
     with transaction.commit_on_success(compas) as tr:
-        for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas):
+        for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
+            location_code__in=compas_models.Place.objects.using(compas).filter(reporting_code=compas)\
+                                                            .values_list('geo_point_code', flat=True)):
             try:
                 person = ets_models.Person.objects.get(pk=person.person_pk)
             except ets_models.Person.DoesNotExist:
