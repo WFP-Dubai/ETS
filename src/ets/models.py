@@ -213,7 +213,7 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True, editable=False)
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
