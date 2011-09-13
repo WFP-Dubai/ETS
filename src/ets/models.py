@@ -14,6 +14,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
+from django.db import transaction
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -293,8 +294,10 @@ class LossDamageType(models.Model):
     
     @classmethod
     def update(cls, using):
-        for myrecord in cls.objects.using(using).values('type', 'category', 'cause'):
-            cls.objects.get_or_create(type=myrecord['type'], category_id=myrecord['category'], cause=myrecord['cause'])
+        with transaction.commit_on_success(using) as tr:
+            for myrecord in cls.objects.using(using).values('type', 'category', 'cause'):
+                cls.objects.get_or_create(type=myrecord['type'], cause=myrecord['cause'],
+                                category_id=CommodityCategory.objects.get_or_create(pk=myrecord['category'])[0])
 
 #=======================================================================================================================
 # 
