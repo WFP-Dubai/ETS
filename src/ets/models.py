@@ -299,32 +299,6 @@ class LossDamageType(models.Model):
                 cls.objects.get_or_create(type=myrecord['type'], cause=myrecord['cause'],
                                 category_id=CommodityCategory.objects.get_or_create(pk=myrecord['category'])[0])
 
-#=======================================================================================================================
-# 
-# class ReasonBase(models.Model):
-#    """Loss reason"""
-#    
-#    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), related_name="%(class)s")
-#    cause = models.CharField(_("Cause"), max_length=100)
-# 
-#    class Meta:
-#        abstract = True
-# 
-# class LossReason(ReasonBase):
-#    """Loss reason"""
-#    
-#    class Meta:
-#        verbose_name = _("loss reason")
-#        verbose_name_plural = _("loss reasons")
-#    
-# class DamageReason(ReasonBase):
-#    """Damage reason"""
-#    
-#    class Meta:
-#        verbose_name = _("damage reason")
-#        verbose_name_plural = _("damage reasons")
-#=======================================================================================================================
-
 
 class Order(models.Model):
     """Delivery order"""
