@@ -135,7 +135,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
-    search_fields = ('pk', 'order__pk')
+    search_fields = ('order__pk')
     inlines = (LoadingDetailsInline, ReceiptInline, CompasLoggerInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
@@ -149,7 +149,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('pk', 'warehouse', 'consignee', 'created', 'dispatch_date', 'expiry')
     readonly_fields = ('created', 'updated')
     list_filter = ('dispatch_date', 'origin_type')
-    search_fields = ('pk', 'origin_type', 'project_number')
+    search_fields = ('code', 'origin_type', 'project_number')
     inlines = (OrderItemInline,)
 
 admin.site.register( ets.models.Order, OrderAdmin )
@@ -164,7 +164,7 @@ class StockAdmin(admin.ModelAdmin):
                     'package', 'number_of_units', 'unit_weight_net')
     readonly_fields = ('updated',)
     list_filter = ('warehouse',)
-    search_fields = ('pk', 'warehouse__title', 'project_number', 'si_code', 'commodity', 'package',)
+    search_fields = ('warehouse__title', 'project_number', 'si_code', 'commodity', 'package',)
 
 admin.site.register( ets.models.StockItem, StockAdmin )
 
@@ -192,14 +192,14 @@ class WarehouseInline(admin.TabularInline):
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
-    search_fields = list_display
+    search_fields = ('name',)
     inlines = (PersonInline, WarehouseInline, OrderInline)
 
 admin.site.register( ets.models.Organization, OrganizationAdmin )
 
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'country',)
-    search_fields = list_display
+    search_fields = ('name', 'country',)
     inlines = (WarehouseInline, OrderInline)
     list_filter = ('country',)
 
@@ -260,7 +260,7 @@ class PersonAdmin(admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     list_display = ('pk', 'code', 'title', 'link_to_user', 'link_to_compas', 'link_to_organization', 'link_to_location')
-    search_fields = ('pk', 'code', 'title', 'user__username', 'compas__code', 'organization__name', 'location__name')
+    search_fields = ('code', 'title', 'user__username', 'compas__code', 'organization__name', 'location__name')
     raw_id_fields = ('user', 'organization', 'location')
 
 admin.site.register(ets.models.Person, PersonAdmin)
@@ -270,7 +270,7 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     list_display = ('pk', 'link_to_compas', 'link_to_waybill', 'when_attempted')
-    search_fields = ('pk', 'compas__pk', 'waybill__pk')
+    search_fields = ('compas__pk', 'waybill__pk')
     date_hierarchy = 'when_attempted'
     raw_id_fields = ('waybill',)
 
