@@ -207,6 +207,14 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
 @officer_required
 @dispatch_compas
 def dispatch_validates(request, queryset, template):
+    for waybill in queryset.filter(validated=False):
+        if waybill.get_shortage_loading_details():
+            for item in waybill.get_shortage_loading_details():
+                messages.add_message( request, messages.INFO, _('In %(warehouse)s %(number)s units of %(stock_item)s is not enough') % { 
+                        'warehouse': item.waybill.order.warehouse,
+                        'number': item.get_shortage(),
+                        'stock_item': item.stock_item,
+                    })
     return direct_to_template(request, template, {
         'object_list': queryset.filter(validated=False),
         'validated_waybills': queryset.filter(validated=True),
