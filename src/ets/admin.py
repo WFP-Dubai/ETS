@@ -135,7 +135,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     readonly_fields = ('date_created',)
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
-    search_fields = ('order__pk')
+    search_fields = ('slug', 'order__pk',)
     inlines = (LoadingDetailsInline, ReceiptInline, CompasLoggerInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
