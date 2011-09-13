@@ -99,8 +99,8 @@ urlpatterns += patterns("ets.views",
     ( r'^waybill/compass_waybill/$', "direct_to_template", {
         "template": 'compas/list_waybills_compas_all.html',
         "extra_context": {
-            'waybill_list': Waybill.objects.filter(sent_compas__isnull=False).all, 
-            'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas__isnull=False).all,
+            'waybill_list': Waybill.objects.filter(sent_compas__isnull=False), 
+            #'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas__isnull=False),
     }}, "compass_waybill" ),
     
     ( r'^view_stock/$', login_required(person_required(warehouse_related(object_list))), {

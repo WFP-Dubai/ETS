@@ -376,3 +376,18 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         waybill = ets.models.Waybill.objects.get(pk='ISBX00312A')
 
         self.assertRedirects(response, waybill.get_absolute_url())
+        
+    def test_waybill_compass(self):
+        
+        self.client.login(username='dispatcher', password='dispatcher')   
+        waybill = ets.models.Waybill.objects.get(pk='ISBX00211A')
+        waybill.sent_compas = datetime.datetime.now()
+        
+        waybill.save()
+        print ets.models.Waybill.objects.filter(sent_compas__isnull=False).count()
+        
+        response = self.client.get(reverse('compass_waybill'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['waybill_list'].count(), 1)
+        
+
