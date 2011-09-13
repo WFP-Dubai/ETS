@@ -281,7 +281,7 @@ class Migration(SchemaMigration):
             ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='logs', to=orm['ets.Compas'])),
             ('waybill', self.gf('django.db.models.fields.related.ForeignKey')(related_name='compass_loggers', to=orm['ets.Waybill'])),
             ('when_attempted', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=20)),
+            ('status', self.gf('django.db.models.fields.IntegerField')(default=0)),
             ('message', self.gf('django.db.models.fields.CharField')(max_length=512)),
         ))
         db.send_create_signal('ets', ['CompasLogger'])
@@ -411,10 +411,10 @@ class Migration(SchemaMigration):
         'ets.compaslogger': {
             'Meta': {'ordering': "('-when_attempted',)", 'object_name': 'CompasLogger'},
             'action': ('django.db.models.fields.IntegerField', [], {}),
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '20'}),
             'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'logs'", 'to': "orm['ets.Compas']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'message': ('django.db.models.fields.CharField', [], {'max_length': '512'}),
+            'status': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'waybill': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'compass_loggers'", 'to': "orm['ets.Waybill']"}),
             'when_attempted': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'})
         },
