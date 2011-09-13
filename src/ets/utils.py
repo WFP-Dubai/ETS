@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.db import connections, transaction
+from django.db import connections, transaction, models
 from django.db.utils import DatabaseError
 from django.conf import settings
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
@@ -143,8 +143,9 @@ def import_order(compas):
     with transaction.commit_on_success(compas) as tr:
         places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
     
-        for lti in compas_models.LtiOriginal.objects.using(compas).filter(expiry_date__gt=now)\
-                            .filter(consegnee_code__in=places.values_list('organization_id', flat=True),
+        for lti in compas_models.LtiOriginal.objects.using(compas)\
+                            .filter(models.Q(expiry_date__gt=now) | models.Q(expiry_date__isnull=True),
+                                    consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
             
