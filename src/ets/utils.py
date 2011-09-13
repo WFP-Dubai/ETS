@@ -175,12 +175,17 @@ def import_order(compas):
             
             order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
             
-            print "number_of_units --> ", lti.number_of_units
+            #Commodity
+            commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
+                'name': lti.cmmname,
+                'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
+            })
+            
             #Create order item
             defaults = {
                 'order': order,
                 'si_code': lti.si_code,
-                'commodity': ets_models.Commodity.objects.get(pk=lti.commodity_code),
+                'commodity': commodity,
                 'number_of_units': lti.number_of_units,
             }
             
