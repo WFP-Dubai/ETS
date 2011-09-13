@@ -175,6 +175,7 @@ def import_order(compas):
             
             order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
             
+            print "number_of_units --> ", lti.number_of_units
             #Create order item
             defaults = {
                 'order': order,
