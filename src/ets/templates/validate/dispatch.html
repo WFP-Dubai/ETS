@@ -17,6 +17,15 @@
         </tr>
     </thead>
     {% for waybill in object_list %}
+    {% with waybill.get_shortage_loading_details as shortage %}
+    {% if shortage %}
+    <tr class="error"><td colspan="8">
+      {% for item in shortage %}
+        <p>{{ waybill.order.warehouse }} --> {{ item.stock_item.pk }} ({{ item.stock_item.commodity }}). Shortage: {{ item.get_shortage }}</p>
+      {% endfor %}
+    </td></tr>
+    {% endif %}
+    {% endwith %}
     <tr>
        <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
        <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
@@ -86,6 +95,7 @@
 {{ block.super }}
 <script charset="utf-8">
 $(document).ready(function() {
+	/*
   $('#toplist').dataTable( {
       "bPaginate": false,
       "bLengthChange": false,
@@ -93,7 +103,7 @@ $(document).ready(function() {
       "bSort": false,
       "bInfo": false,
       "bAutoWidth": false
-  });
+  });*/
   $('#validated_waybills').dataTable( {
       "bPaginate": false,
       "bLengthChange": false,

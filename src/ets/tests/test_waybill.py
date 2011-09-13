@@ -329,7 +329,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         stock_item.save()
         response = self.client.get(reverse("dispatch_validates"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "is not enough")
+        self.assertContains(response, "anotherstock1234 (WHEET). Shortage: 60.000")
         stock_item.number_of_units = 1000
         stock_item.save()
         
