@@ -379,13 +379,22 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
     def test_waybill_compass(self):
         
-        self.client.login(username='dispatcher', password='dispatcher')   
         waybill = ets.models.Waybill.objects.get(pk='ISBX00211A')
         waybill.sent_compas = datetime.datetime.now()
         waybill.save()
         
         response = self.client.get(reverse('compass_waybill'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['waybill_list'].count(), 1)
+        self.assertEqual(response.context['object_list'].count(), 1)
+        
+    def test_waybill_compass_receipt(self):
+        
+        waybill_reciept = ets.models.ReceiptWaybill.objects.get(pk='isbx00311a')
+        waybill_reciept.sent_compas = datetime.datetime.now()
+        waybill_reciept.save()
+        
+        response = self.client.get(reverse('compass_waybill_receipt'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
         
 

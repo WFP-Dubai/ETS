@@ -3,7 +3,7 @@
 {% load i18n %}
 
 {%block content %}
-<h3>{% trans "Waybills Submitted to Compas" %}</h3>
+<h3>{{ receipt }}{% trans "Waybills Submitted to Compas" %}</h3>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
   <thead>
     <tr>
@@ -12,30 +12,24 @@
       <th>{% trans "Origin" %}</th>
       <th>{% trans "Consignee" %}</th>
       <th>{% trans "Delivery Location" %}</th>
-      <th>{% trans "Compas Updated" %}</th>
     </tr>
   </thead>
   
   <tbody>
-    {% for waybill in waybill_list%}
+    {% for waybill in object_list%}
     <tr>
-      {% include "compas/item.html" %}
-      <td>{% trans "Dispatch" %}</td>
+      <td>{{ waybill.order.pk }}</td>
+      <td>{{ waybill.pk }}</td>
+      <td>{{ waybill.order.warehouse }}</td>
+      <td>{{ waybill.order.consignee }}</td>
+      <td>{{ waybill.destination }}</td>
     </tr>
-    {% endfor%}
-    
-    {% for waybill in waybill_list_rec%}
-    <tr>
-      {% include "compas/item.html" %}
-      <td>{% trans "Receipt" %}</td>        
-    </tr>
-    {% endfor%}
+    {% endfor%} 
   <tbody>
 </table>
 
 {%if error_message %}
 <pre>
-  <div>{{error_message}}</div><br>
   <div>{{error_message}}</div>
 </pre>
 {%endif%}
@@ -45,7 +39,8 @@
 {%block script%}
 <script charset="utf-8">
 $(document).ready(function() {
-                $('#example').dataTable( {                "aoColumns": [ 
+	$('#example').dataTable( 
+		{"aoColumns": [ 
             null,
             null,
             null,
