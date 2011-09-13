@@ -338,7 +338,7 @@ class Order(models.Model):
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         return StockItem.objects.filter(warehouse__orders=self,
-                                        project_number=F('project_number'),
+                                        project_number=self.project_number,
                                         si_code = F('warehouse__orders__items__si_code'), 
                                         commodity = F('warehouse__orders__items__commodity'),
                                         ).order_by('-warehouse__orders__items__number_of_units')
