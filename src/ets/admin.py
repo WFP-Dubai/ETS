@@ -181,7 +181,7 @@ class WarehouseAdmin(admin.ModelAdmin):
     list_filter = ('location', 'start_date')
     date_hierarchy = 'start_date'
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
-    inlines = (StockInline, OrderInline)
+    inlines = (StockInline,)
     
 admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
