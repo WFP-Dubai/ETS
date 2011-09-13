@@ -179,7 +179,7 @@ def import_order(compas):
             commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
                 'name': lti.cmmname,
                 'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
-            })
+            })[0]
             
             #Create order item
             defaults = {
