@@ -101,7 +101,7 @@ urlpatterns += patterns("ets.views",
         "template_name": 'compas/list_waybills_compas_all.html',
         "queryset": Waybill.objects.filter(receipt__sent_compas__isnull=False),
         "extra_context": {
-            "receipt": _("Receipt "),
+            "extra_title": _("Received"),
     }}, "compass_waybill_receipt" ),
                         
     ( r'^compass_waybill/$', login_required(officer_required(waybill_user_related(object_list))), {
