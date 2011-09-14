@@ -9,7 +9,7 @@
 <tr><td>{% trans "Waybill Number:" %}</td><td> {{ waybill.pk }}</td></tr>
 <tr><td>{% trans "Dispatch Location" %}</td><td>{{ waybill.order.warehouse.location }}</td></tr>
 <tr><td>{% trans "Recipient Location:" %}</td><td> {{ waybill.destination.location }}</td></tr>
-<tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.destination.organization }}</td></tr>
+<tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.order.consignee }}</td></tr>
 </tbody></table>
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
