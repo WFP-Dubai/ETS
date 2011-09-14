@@ -93,14 +93,6 @@ class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
     
-    fieldsets = (
-        (_("Stock"), {'fields': ('stock_item',)}),
-        (_('Loading details'), {'fields': ('number_of_units', 'overloaded_units')}),
-        (_('Receipt details'), {'fields': ('number_units_good', 'number_units_lost', 'number_units_damaged', 
-                                           'units_lost_reason', 'units_damaged_reason')}),
-        (_('Utility information'), {'fields': ('over_offload_units',)}),
-    )
-    
 class ReceiptInline(admin.StackedInline):
     model = ets.models.ReceiptWaybill
     extra = 0

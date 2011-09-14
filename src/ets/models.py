@@ -670,7 +670,7 @@ class ReceiptWaybill(models.Model):
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
-    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', editable=True, primary_key=True)
     
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
