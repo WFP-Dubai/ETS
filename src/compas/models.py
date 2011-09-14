@@ -134,7 +134,7 @@ class LtiOriginal( models.Model ):
     commodity_code = models.CharField(_("Commodity Code "), max_length = 18, db_column = 'COMMODITY_CODE' )
     cmmname = models.CharField(_("Commodity Name"), max_length = 100, blank = True, db_column = 'CMMNAME' )
     
-    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 7, decimal_places = 3, db_column = 'NUMBER_OF_UNITS' )
+    number_of_units = models.DecimalField( _("Number of Units"),max_digits = 12, decimal_places = 3, db_column = 'NUMBER_OF_UNITS' )
     quantity_net = models.DecimalField(_("Quantity Net"), max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_NET' )
     quantity_gross = models.DecimalField( _("Quantity Gross"),max_digits = 11, decimal_places = 3, db_column = 'QUANTITY_GROSS' )
     unit_weight_net = models.DecimalField( _("Unit Weight Net"),max_digits = 8, decimal_places = 3, blank = True, null = True, db_column = 'UNIT_WEIGHT_NET' )

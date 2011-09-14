@@ -14,6 +14,7 @@ from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
+from django.db import transaction
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -212,7 +213,7 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True, editable=False)
+    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
@@ -293,37 +294,10 @@ class LossDamageType(models.Model):
     
     @classmethod
     def update(cls, using):
-        for myrecord in cls.objects.using(using).all():
-            if not cls.objects.filter(type=myrecord.type, 
-                                  category__pk=myrecord.category_id, 
-                                  cause=myrecord.cause).count():
-                myrecord.save(using='default')
-
-#=======================================================================================================================
-# 
-# class ReasonBase(models.Model):
-#    """Loss reason"""
-#    
-#    category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), related_name="%(class)s")
-#    cause = models.CharField(_("Cause"), max_length=100)
-# 
-#    class Meta:
-#        abstract = True
-# 
-# class LossReason(ReasonBase):
-#    """Loss reason"""
-#    
-#    class Meta:
-#        verbose_name = _("loss reason")
-#        verbose_name_plural = _("loss reasons")
-#    
-# class DamageReason(ReasonBase):
-#    """Damage reason"""
-#    
-#    class Meta:
-#        verbose_name = _("damage reason")
-#        verbose_name_plural = _("damage reasons")
-#=======================================================================================================================
+        with transaction.commit_on_success(using) as tr:
+            for myrecord in cls.objects.using(using).values('type', 'category', 'cause'):
+                cls.objects.get_or_create(type=myrecord['type'], cause=myrecord['cause'],
+                                category_id=CommodityCategory.objects.get_or_create(pk=myrecord['category'])[0])
 
 
 class Order(models.Model):
@@ -364,7 +338,7 @@ class Order(models.Model):
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         return StockItem.objects.filter(warehouse__orders=self,
-                                        project_number=F('project_number'),
+                                        project_number=self.project_number,
                                         si_code = F('warehouse__orders__items__si_code'), 
                                         commodity = F('warehouse__orders__items__commodity'),
                                         ).order_by('-warehouse__orders__items__number_of_units')
@@ -383,7 +357,7 @@ class OrderItem(models.Model):
     
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
     
     class Meta:
         ordering = ('si_code',)
@@ -433,6 +407,14 @@ class OrderItem(models.Model):
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
     
 
+def waybill_slug_populate(waybill):
+    #Calculate number of similar waybills to ensure uniqueness even for deleted ones
+    count = Waybill.objects.all_with_deleted().filter(order__warehouse=waybill.order.warehouse, 
+                                                      date_created__year=waybill.date_created.year
+                                                      ).count()
+    return "%s%s%s%s" % (waybill.order.warehouse.pk, waybill.date_created.strftime('%y'), 
+                           LETTER_CODE, count+1)
+
 
 class Waybill( ld_models.Model ):
     """
@@ -471,9 +453,8 @@ class Waybill( ld_models.Model ):
     DELIVERED = 5
     COMPLETE = 6
     
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s%s" % (
-                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), LETTER_CODE
-                         ), unique=True, slugify=capitalize_slug(slugify),
+    slug = AutoSlugField(populate_from=waybill_slug_populate, unique=True, 
+                         slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
@@ -633,13 +614,9 @@ class Waybill( ld_models.Model ):
                                   receipt__signed_date__isnull=True,
                                   destination__in=Warehouse.filter_by_user(user))
     
-    def get_shortage_loading_details( self ):
-        loading_detail_list = []
-        for loading_detail in self.loading_details.all():
-            if loading_detail.get_shortage() > 0 :
-                loading_detail_list.append(loading_detail)
-                return loading_detail_list
-    
+    def get_shortage_loading_details(self):
+        return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]    
+
 class ReceiptWaybill(models.Model):
     """Receipt data"""
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
@@ -699,7 +676,7 @@ class ReceiptWaybill(models.Model):
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
-    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True)
+    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', editable=True, primary_key=True)
     
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
@@ -738,8 +715,9 @@ class LoadingDetail(models.Model):
 
 
     def get_shortage( self ):
-        not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False,).aggregate(Sum('number_of_units'))
-        return not_validated_sum['number_of_units__sum'] - self.stock_item.number_of_units
+        not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, waybill__validated=False)\
+                                .aggregate(Sum('number_of_units'))['number_of_units__sum']
+        return max(0, not_validated_sum - self.stock_item.number_of_units)
 
     def get_order_item(self):
         """Retrieves stock items for current order item through warehouse"""
