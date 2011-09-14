@@ -88,7 +88,20 @@ class CompasTestCase(TestCase):
         
         #Test order items
         self.assertEqual(order.items.count(), 1)
-
+    
+    def test_compas_start_date(self):
+        
+        self.assertEqual(ets.models.Compas.objects.count(), 1)
+        self.assertEqual(compas_models.Place.objects.using(self.compas).count(), 3)
+        self.assertEqual(ets.models.Order.objects.count(), 0)
+        self.assertEqual(ets.models.Waybill.objects.count(), 0)
+        
+        call_command('sync_compas')
+        
+        """Test place's update method"""
+        self.assertEqual(ets.models.Order.objects.count(), 2)
+        self.assertEqual(ets.models.Compas.objects.count(), 1)
+    
 
 class SendCompasTestCase(TestCaseMixin, TestCase):
     
