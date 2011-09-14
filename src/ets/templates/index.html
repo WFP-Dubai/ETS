@@ -6,26 +6,35 @@
 
 {% block content %} 
 {% trans "Select an action" %}:
-<ul>
 
+{% person_only user %}
+<ul>
   <li><a href='{% url orders %}'>{% trans "List Of Orders" %}</a></li>
-  <li><a href='{% url view_stock %}'>{% trans "View Stock" %}</a></li>
-  
+</ul>
+<ul>
   <li><a href='{% url waybill_dispatch_list %}'>{% trans "Dispatching waybills" %}</a></li>
   <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
+</ul>
+<ul>  
+  <li><a href='{% url view_stock %}'>{% trans "View Stock" %}</a></li>  
+  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
+</ul>
+{% endperson_only %}
   
+{% officer_only user %}
+<ul>
   <li><a href='{% url dispatch_validates %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
   <li><a href='{% url receipt_validates %}'>{% trans "Validate Received Waybill" %}</a></li>
+</ul>
+{% endofficer_only %}
 
-  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
-  
+<ul>
   <li>
     <form method='GET' action='{% url waybill_search %}'>
       {{ form.as_p }}
       <input type="submit" value="{% trans 'Search Waybill' %}">
     </form>
   </li>
-
 </ul>
 
 {% endblock %}

@@ -3,10 +3,10 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from native_tags.decorators import function
+from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill
+from ets.models import Warehouse, Waybill, Person, Compas
 
 register = template.Library()
 
@@ -114,3 +114,11 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_t
             'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
             'success': queryset.filter(pk=waybill.pk).count(),
     }
+
+@block
+def person_only(context, nodelist, user):
+    return Person.objects.filter(user=user).count() and nodelist.render(context) or ''
+
+@block
+def officer_only(context, nodelist, user):
+    return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
