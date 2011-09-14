@@ -120,11 +120,12 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
         (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
                                        'container_two_remarks_dispatch',)}),
         (_("COMPAS"), {'fields': ('validated', 'sent_compas',)}),
+        (_("Utility"), {'fields': ('date_created', 'date_modified', 'date_removed')}),
     )
     
     list_display = ('pk', 'link_to_order', 'date_created', 'dispatch_date',
                     'destination', 'active')
-    readonly_fields = ('date_created',)
+    readonly_fields = ('date_created', 'date_modified')
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
     search_fields = ('slug', 'order__pk',)
