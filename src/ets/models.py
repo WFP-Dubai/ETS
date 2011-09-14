@@ -820,5 +820,5 @@ class CompasLogger(models.Model):
         verbose_name_plural = _("compas errors")
     
     def __unicode__(self):
-        return "%s: %s" % (self.code, self.message)
+        return "%s: %s" % (self.status, self.message)
     

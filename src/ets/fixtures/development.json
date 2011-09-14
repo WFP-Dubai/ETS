@@ -214,5 +214,17 @@
       "units_lost_reason": "lmix",
       "number_of_units": "35"
     }
+  },
+  {
+    "pk": 1,
+    "model": "ets.compaslogger",
+    "fields": {
+	  "status": 0,
+	  "compas": "dev_compas",
+	  "waybill": "ISBX00311A",
+	  "when_attempted": "2011-09-14 07:41:12",
+	  "action": 1,
+	  "message": "OK-OK-OK"
+    }
   }
 ]
