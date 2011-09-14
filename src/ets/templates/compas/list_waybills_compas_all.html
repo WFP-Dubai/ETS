@@ -1,47 +1,36 @@
 {% extends "base_template.html"%}
+
 {% load i18n %}
+
 {%block content %}
-<h3>{% trans "Waybills Submitted to Compas" %}</h3>
+<h3>{{ extra_title }} {% trans "Waybills Submitted to Compas" %}</h3>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
-    <thead>
-        <tr>
-        <th>{% trans "LTI" %}</th>
-        <th>{% trans "Waybill Number" %}</th>
-        <th>{% trans "Origin" %}</th>
-        <th>{% trans "Consignee" %}</th>
-        <th>{% trans "Delivery Location" %}</th>
-        <th>{% trans "Compas Updated" %}</th>
-        </tr>
-        </thead>
-{% for waybill in waybill_list%}
-
-<tr>
-             <td>{{waybill.ltiNumber}}</td>
-             <td>{{waybill.waybillNumber}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.origin_loc_name}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.consegnee_name}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.destination_loc_name}}</td>
-              <td>{% trans "Dispatch" %}</td>
+  <thead>
+    <tr>
+      <th>{% trans "Order" %}</th>
+      <th>{% trans "Waybill Number" %}</th>
+      <th>{% trans "Origin" %}</th>
+      <th>{% trans "Consignee" %}</th>
+      <th>{% trans "Delivery Location" %}</th>
     </tr>
-{% endfor%}
-{% for waybill in waybill_list_rec%}
-
-<tr>
-             <td>{{waybill.ltiNumber}}</td>
-             <td>{{waybill.waybillNumber}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.origin_loc_name}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.consegnee_name}}</td>
-             <td>{{waybill.loading_details.select_related.0.siNo.destination_loc_name}}</td>
-              <td>{% trans "Receipt" %}</td>
-             
+  </thead>
+  
+  <tbody>
+    {% for waybill in object_list%}
+    <tr>
+      <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
+      <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
+      <td>{{ waybill.order.warehouse }}</td>
+      <td>{{ waybill.order.consignee }}</td>
+      <td>{{ waybill.destination }}</td>
     </tr>
-{% endfor%}
+    {% endfor%} 
+  <tbody>
 </table>
+
 {%if error_message %}
 <pre>
-<div>{{error_message}} 
-</div><br>
-<div>{{error_message}}</div>
+  <div>{{error_message}}</div>
 </pre>
 {%endif%}
 <br>
@@ -50,7 +39,8 @@
 {%block script%}
 <script charset="utf-8">
 $(document).ready(function() {
-                $('#example').dataTable( {                "aoColumns": [ 
+	$('#example').dataTable( 
+		{"aoColumns": [ 
             null,
             null,
             null,

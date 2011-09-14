@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
 from django.contrib.staticfiles.urls import urlpatterns
+from django.utils.translation import ugettext as _
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -13,7 +14,7 @@ admin.autodiscover()
 from ets.forms import WaybillSearchForm
 from ets.models import Waybill
 from ets.views import waybill_list 
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
 urlpatterns += patterns("ets.views",
@@ -96,12 +97,17 @@ urlpatterns += patterns("ets.views",
       "waybill_delete", {}, "waybill_delete" ),
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
     
-    ( r'^waybill/compass_waybill/$', "direct_to_template", {
-        "template": 'compas/list_waybills_compas_all.html',
+    ( r'^compass_waybill_receipt/$', login_required(officer_required(waybill_user_related(object_list))), {
+        "template_name": 'compas/list_waybills_compas_all.html',
+        "queryset": Waybill.objects.filter(receipt__sent_compas__isnull=False),
         "extra_context": {
-            'waybill_list': Waybill.objects.filter(sent_compas__isnull=False).all, 
-            'waybill_list_rec': Waybill.objects.filter(receipt__sent_compas__isnull=False).all,
-    }}, "compass_waybill" ),
+            "extra_title": _("Received"),
+    }}, "compass_waybill_receipt" ),
+                        
+    ( r'^compass_waybill/$', login_required(officer_required(waybill_user_related(object_list))), {
+        "template_name": 'compas/list_waybills_compas_all.html',
+        "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
+    }, "compass_waybill" ),
     
     ( r'^view_stock/$', login_required(person_required(warehouse_related(object_list))), {
         'queryset': ets.models.StockItem.objects.all(),
