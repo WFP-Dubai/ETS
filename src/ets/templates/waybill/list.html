@@ -14,7 +14,6 @@
       <th>{% trans "Received" %}</th>
       <th>{% trans "Validated" %}</th>
       <th>{% trans "In Compas" %}</th>
-      <th>{% trans "View" %}</th>
       <th>{% trans "Delete" %}</th>
     </tr>
   </thead>
@@ -23,7 +22,7 @@
     {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
         <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
-        <td>{{ waybill.pk }}</td>
+        <td><a href='{{ waybill.get_absolute_url }}'>{{ waybill.pk }}</a></td>
         <td>{{ waybill.order.warehouse }}</td>
         <td>{{ waybill.order.consignee }}</td>
         <td>{{ waybill.order.location }}</td>
@@ -48,9 +47,6 @@
         <td>
           D: {% if waybill.sent_compas %}{{ waybill.sent_compas }}{% else %}-{% endif %}/
           R: {% if waybill.receipt.sent_compas %}{{ waybill.receipt.sent_compas }}{% else %}-{% endif %}
-        </td>
-        <td>
-          <a href='{{ waybill.get_absolute_url }}'>{% trans "View" %}</a>
         </td>
         <td>
           {% waybill_delete waybill user %}
