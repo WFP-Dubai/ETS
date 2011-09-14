@@ -407,6 +407,14 @@ class OrderItem(models.Model):
         return self.number_of_units - self.sum_number(self.get_order_dispatches())
     
 
+def waybill_slug_populate(waybill):
+    #Calculate number of similar waybills to ensure uniqueness even for deleted ones
+    count = Waybill.objects.all_with_deleted().filter(order__warehouse=waybill.order.warehouse, 
+                                                      date_created__year=waybill.date_created.year
+                                                      ).count()
+    return "%s%s%s%s" % (waybill.order.warehouse.pk, waybill.date_created.strftime('%y'), 
+                           LETTER_CODE, count)
+
 
 class Waybill( ld_models.Model ):
     """
@@ -445,10 +453,8 @@ class Waybill( ld_models.Model ):
     DELIVERED = 5
     COMPLETE = 6
     
-    slug = AutoSlugField(populate_from=lambda instance: "%s%s%s%s" % (
-                            instance.order.warehouse.pk, instance.date_created.strftime('%y'), 
-                            LETTER_CODE, instance.date_removed and 'DEL' or '',
-                         ), unique=True, slugify=capitalize_slug(slugify), always_update=True,
+    slug = AutoSlugField(populate_from=waybill_slug_populate, unique=True, 
+                         slugify=capitalize_slug(slugify),
                          sep='', primary_key=True)
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
