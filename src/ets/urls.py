@@ -97,14 +97,14 @@ urlpatterns += patterns("ets.views",
       "waybill_delete", {}, "waybill_delete" ),
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
     
-    ( r'^compass_waybill_receipt/$', waybill_user_related(officer_required(object_list)), {
+    ( r'^compass_waybill_receipt/$', login_required(officer_required(waybill_user_related(object_list))), {
         "template_name": 'compas/list_waybills_compas_all.html',
         "queryset": Waybill.objects.filter(receipt__sent_compas__isnull=False),
         "extra_context": {
             "receipt": _("Receipt "),
     }}, "compass_waybill_receipt" ),
                         
-    ( r'^compass_waybill/$', waybill_user_related(officer_required(object_list)), {
+    ( r'^compass_waybill/$', login_required(officer_required(waybill_user_related(object_list))), {
         "template_name": 'compas/list_waybills_compas_all.html',
         "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
     }, "compass_waybill" ),

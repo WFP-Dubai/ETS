@@ -7,7 +7,7 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
   <thead>
     <tr>
-      <th>{% trans "LTI" %}</th>
+      <th>{% trans "Order" %}</th>
       <th>{% trans "Waybill Number" %}</th>
       <th>{% trans "Origin" %}</th>
       <th>{% trans "Consignee" %}</th>
@@ -18,8 +18,8 @@
   <tbody>
     {% for waybill in object_list%}
     <tr>
-      <td>{{ waybill.order.pk }}</td>
-      <td>{{ waybill.pk }}</td>
+      <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
+      <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
       <td>{{ waybill.order.warehouse }}</td>
       <td>{{ waybill.order.consignee }}</td>
       <td>{{ waybill.destination }}</td>
