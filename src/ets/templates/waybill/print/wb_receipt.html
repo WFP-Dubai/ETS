@@ -47,7 +47,7 @@
         </tr>
         
         {% for lineitem in items %}
-          <tr style="font-size:small; text-align:right;">
+          <tr style="font-size:x-small; text-align:right;">
             <td style="text-align:left;"><span>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</span></td>
             <td>&nbsp;
               {% if lineitem.number_units_good %}
@@ -109,7 +109,7 @@
         {% endfor %}
                                         
         {%for lineitem in extra_lines%}
-          <tr  style="font-size:small;">
+          <tr  style="font-size:x-small;">
               <td>{% trans 'ID' %} {{ forloop.counter|add:items_count }}.</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
