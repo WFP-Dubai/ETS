@@ -413,7 +413,7 @@ def waybill_slug_populate(waybill):
                                                       date_created__year=waybill.date_created.year
                                                       ).count()
     return "%s%s%s%s" % (waybill.order.warehouse.pk, waybill.date_created.strftime('%y'), 
-                           LETTER_CODE, count)
+                           LETTER_CODE, count+1)
 
 
 class Waybill( ld_models.Model ):
