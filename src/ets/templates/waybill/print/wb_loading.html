@@ -130,7 +130,7 @@
             </p>
             <p style='font-size:14px'>
               {{ object.dispatcher_person.user.get_full_name }}<br>
-              {% trans "Date:" %} {{ object.transport_dispach_signed_date }}
+              {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
             </p>
           </td>
           <td colspan="2">
