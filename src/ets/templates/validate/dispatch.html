@@ -48,7 +48,6 @@
        </td>
        <td>{% block validate_link %}{% validate_dispatch waybill user %}{% endblock %}</td>
     </tr>
-    {% if waybill.compass_loggers.count %}
       {% for log in waybill.compass_loggers.all %}
         {% if log.action == 1 %}
           <tr class="logger">
@@ -57,11 +56,11 @@
             <td>{{ log.message }}</td>
             <td>{{ log.compas }}</td>
             <td>{{ log.when_attempted }}</td>
-            <td>{% if log.status %}Success{% else %}Failure{% endif %}</td>
+            <td>{{ log.get_status_display }}</td>
+            <td>{{ log.get_action_display }}</td>
           </tr>
         {% endif %}
       {% endfor %}
-    {% endif %}
     {% endfor %}
 </table>
 
@@ -101,7 +100,6 @@
         {% endif %}
       </td>
     </tr>
-    {% if waybill.compass_loggers.count %}
       {% for log in waybill.compass_loggers.all %}
         {% if log.action == 1 %}
           <tr class="logger">
@@ -110,11 +108,11 @@
             <td>{{ log.message }}</td>
             <td>{{ log.compas }}</td>
             <td>{{ log.when_attempted }}</td>
-            <td>{% if log.status %}Success{% else %}Failure{% endif %}</td>
+            <td>{{ log.get_status_display }}</td>
+            <td>{{ log.get_action_display }}</td>
           </tr>
         {% endif %}
       {% endfor %}
-    {% endif %}
     {% endfor %}
 </table>
 {% endblock %}
