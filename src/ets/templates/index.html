@@ -12,11 +12,11 @@
   <li><a href='{% url orders %}'>{% trans "List Of Orders" %}</a></li>
 </ul>
 <ul>
-  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Dispatching waybills" %}</a></li>
-  <li><a href='{% url waybill_reception_list %}'>{% trans "Receive Waybill" %}</a></li>
+  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Dispatch" %}</a></li>
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Receipt" %}</a></li>
 </ul>
 <ul>  
-  <li><a href='{% url view_stock %}'>{% trans "View Stock" %}</a></li>  
+  <li><a href='{% url view_stock %}'>{% trans "Stocks" %}</a></li>  
   <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
 </ul>
 {% endperson_only %}
