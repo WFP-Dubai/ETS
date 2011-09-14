@@ -447,7 +447,7 @@ class Waybill( ld_models.Model ):
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s%s%s" % (
                             instance.order.warehouse.pk, instance.date_created.strftime('%y'), 
-                            LETTER_CODE, instance.date_removed and instance.date_removed.strftime('%y') or '',
+                            LETTER_CODE, instance.date_removed and 'DEL' or '',
                          ), unique=True, slugify=capitalize_slug(slugify), always_update=True,
                          sep='', primary_key=True)
     
