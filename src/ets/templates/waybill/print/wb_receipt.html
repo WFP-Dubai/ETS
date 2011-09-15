@@ -29,7 +29,7 @@
         <thead class="wb_head"><tr><th colspan="11">{% trans "Observations" %}</th></tr></thead>
         <tbody>
         <tr style="font-size:x-small;">
-          <td><sup>{% trans "Receipt Condition" %}</sup></td>
+          <td><sup>{% trans "Condition" %}</sup></td>
           <td colspan="2"><sup>{% trans "Good" %}</sup></td>
           <td colspan="4"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
           <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
@@ -37,13 +37,13 @@
         <tr style="font-size:x-small;">
           <td><sup>{% trans "SI No" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
-          <td><sup>{% trans "Net MT " %}</sup></td>    
+          <td><sup>{% trans "Net" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>    
-          <td><sup >{% trans "(L)oss or (D)amage" %}</sup></td>    
+          <td><sup >{% trans "L/D" %}</sup></td>    
           <td>{% trans "Reason" %}</td>    
           <td><sup>{% trans "Units" %}</sup></td>    
-          <td><sup>{% trans "Net MT" %}</sup></td>
+          <td><sup>{% trans "Net" %}</sup></td>
         </tr>
         
         {% for lineitem in items %}

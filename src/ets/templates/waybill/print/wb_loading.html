@@ -119,8 +119,13 @@
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
+          <td rowspan="2"><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
           <td colspan="2"><small style="font-size:x-small;">{% trans "Driver's Name" %}:</small> {{ object.transport_driver_name }}</td>
+        </tr>  
+        <tr>  
+          <td colspan="2">
+            <small style="font-size:x-small;">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
+          </td>
         </tr>
         <tr>
           <td valign=top rowspan="4">
@@ -133,9 +138,7 @@
               {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
             </p>
           </td>
-          <td colspan="2">
-            <small style="font-size:x-small;">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
-          </td>
+          
         </tr>
 
         <tr>
@@ -152,8 +155,8 @@
         </tr>
         <tr>
           <td  valign=top  rowspan="2" colspan="2">
-            <p style="font-size: x-small">{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}<br>
-              {% trans "Name, signature and stamp:" %}<br>
+            <p style="font-size: x-small">
+              {% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above. Name, signature and stamp:" %}<br>
             </p>
             <p style='font-size:small'>{{ object.transport_driver_name|upper }}<br>
               {% trans "Date:" %}{{object.transport_dispach_signed_date|date}}
