@@ -594,10 +594,14 @@ class Waybill( ld_models.Model ):
         """
         return base64.b64encode( zlib.compress( simplejson.dumps( self.serialize(), use_decimal=True ) ) )
     
-    def decompress(self, data):
-        data = string.replace( data, ' ', '+' )
-        zippedData = base64.b64decode( data )
-        return zlib.decompress( zippedData )
+    @classmethod
+    def decompress(cls, data):
+        
+        wb_serialized = zlib.decompress( base64.b64decode( data.replace( ' ', '+' ) ) )
+        for obj in serializers.deserialize("json", wb_serialized):
+            if isinstance(obj.object, cls):
+                return obj.object.pk
+         
     
     
     @classmethod

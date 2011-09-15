@@ -44,4 +44,13 @@
   </li>
 </ul>
 
+<ul>
+  <li>
+    <form method='GET' action='{% url deserialize %}'>
+      {{ form_scan.as_p }}
+      <input type="submit" value="{% trans 'Receive Scanned Waybill' %}" />
+   </form>
+  </li>
+</ul>
+
 {% endblock %}
