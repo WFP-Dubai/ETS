@@ -409,10 +409,10 @@ class OrderItem(models.Model):
 
 def waybill_slug_populate(waybill):
     #Calculate number of similar waybills to ensure uniqueness even for deleted ones
-    count = Waybill.objects.all_with_deleted().filter(order__warehouse=waybill.order.warehouse, 
+    count = Waybill.objects.all_with_deleted().filter(order__warehouse__compas=waybill.order.warehouse.compas, 
                                                       date_created__year=waybill.date_created.year
                                                       ).count()
-    return "%s%s%s%s" % (waybill.order.warehouse.pk, waybill.date_created.strftime('%y'), 
+    return "%s%s%s%s" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
                            LETTER_CODE, count+1)
 
 
