@@ -50,6 +50,7 @@ class Compas(models.Model):
     
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
+    start_date = models.DateField(_("Start date"), default=datetime.now)
     
     #Database settings
     db_engine = models.CharField(_("Database engine"), max_length=100)

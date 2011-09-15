@@ -249,5 +249,40 @@
       "origin_type": "2", 
       "si_code": "123"
     }
+  },
+  {
+    "pk": "QANX001000000000000005217HQX0001000000000000984143", 
+    "model": "compas.ltioriginal", 
+    "fields": {
+      "origin_location_code": "ISBX", 
+      "origin_wh_code": "ISBX003", 
+      "origin_wh_name": "ISLAMABAD CITY OFFICE", 
+      "si_record_id": "HQX0001000000000000984141", 
+      "origin_loc_name": "ISLAMABAD_CAP", 
+      "code": "THEIRORDEROLD", 
+      "destination_location_code": "ISBX", 
+      "quantity_net": "1.750", 
+      "consegnee_code": "DOEAF", 
+      "consegnee_name": "First consignee in our system", 
+      "quantity_gross": "1.762", 
+      "destination_loc_name": "ISLAMABAD_CAP", 
+      "requested_dispatch_date": "2009-11-03", 
+      "transport_name": "MUSLIM TRANSPORT", 
+      "unit_weight_net": "50.000",
+      "transport_ouc": "ISBX001", 
+      "lti_id": "QANX001000000000000005218", 
+      "number_of_units": "70", 
+      "unit_weight_gross": "50.330", 
+      "commodity_code": "wheet", 
+      "comm_category_code": "MIX", 
+      "cmmname": "WHEET", 
+      "expiry_date": "2011-11-14", 
+      "project_wbs_element": "1", 
+      "lti_date": "2010-11-02", 
+      "origintype_desc": "Warehouse", 
+      "transport_code": "M001", 
+      "origin_type": "2", 
+      "si_code": "123"
+    }
   }
 ]
