@@ -264,10 +264,10 @@ def validate_receipt(request, waybill_pk, queryset):
 def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
     wb_data = form.cleaned_data['data'] if form.is_valid() else ''
-    try:
-        waybill = ets.models.Waybill.decompress(wb_data)
+    waybill = ets.models.Waybill.decompress(wb_data)
+    if waybill: 
         return waybill_detail(request, waybill)
-    except:
+    else:
         messages.error(request, _('Data Incorrect!!!'))
         return redirect('index')
 
