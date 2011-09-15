@@ -119,7 +119,7 @@ urlpatterns += patterns("ets.views",
         "template": 'reporting/select_report.html',
     }, "select_report" ),
                         
-    ( r'^waybill/deserialize/$', "deserialize", {}, "deserialize" ),
+    ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
 
     #===================================================================================================================
     # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),

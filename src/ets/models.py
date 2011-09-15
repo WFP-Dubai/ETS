@@ -596,8 +596,7 @@ class Waybill( ld_models.Model ):
     
     @classmethod
     def decompress(cls, data):
-        
-        wb_serialized = zlib.decompress( base64.b64decode( data.replace( ' ', '+' ) ) )
+        wb_serialized = eval( zlib.decompress( base64.b64decode( data.replace( ' ', '+' ) ) ) )
         for obj in serializers.deserialize("json", wb_serialized):
             if isinstance(obj.object, cls):
                 return obj.object.pk

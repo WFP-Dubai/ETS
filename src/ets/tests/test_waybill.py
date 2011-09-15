@@ -399,20 +399,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_deserialize(self):
         """ets.views.deserialize"""
-        #Test with get request
-        response = self.client.get(reverse('deserialize'))
-        self.assertTrue(isinstance(response, HttpResponseNotAllowed))
-        
-        #Test without post parameters
-        self.assertRaises(MultiValueDictKeyError, lambda: self.client.post(reverse('deserialize')))
-        
-        #Test with post parameters
-        data = self.waybill.serialize()
-        response = self.client.post(reverse('deserialize'), data={'wbdata': data,})
-        self.assertEqual(response.status_code, 302)
         
         #Test with compressed data
         data = self.waybill.compress()
-        response = self.client.post(reverse('deserialize'), data={'wbdata': data,})
+        response = self.client.get(reverse('deserialize'), data={'wb_data': data,})
         self.assertEqual(response.status_code, 302)    
 

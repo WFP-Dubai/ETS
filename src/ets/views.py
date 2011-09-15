@@ -261,15 +261,14 @@ def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
     wb_data = form.cleaned_data['wb_data'] if form.is_valid() else ''
     
-    waybill = ets.models.Waybill.decompress(wb_data)
-    
-#    if wb_serialized is not None:
-#        wb_serialized = eval(wb_serialized)
-    if not waybill:
+    try:
+        waybill = ets.models.Waybill.decompress(wb_data)
+        return redirect("waybill_view", waybill_pk=waybill )
+    except:
         messages.error(request, _('Data Incorrect!!!'))
-        return redirect(reverse('index'))
+        return redirect('index')
 
-    return redirect("waybill_view", waybill_pk=waybill )
+    
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
