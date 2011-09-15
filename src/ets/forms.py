@@ -14,6 +14,8 @@ UNDEFINED_MESSAGE = "N/A"
 class WaybillSearchForm( forms.Form ):
     q = forms.CharField(required=False, label=_('Waybill code'))
 
+class WaybillScanForm( forms.Form ):
+    data = forms.CharField(required=False, label=_('Scan Waybill'))
 
 class DispatchWaybillForm( forms.ModelForm ):
     

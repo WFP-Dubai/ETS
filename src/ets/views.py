@@ -3,8 +3,10 @@ import datetime
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.core.urlresolvers import reverse
 #from django.core import serializers
-from django.forms.models import inlineformset_factory, modelformset_factory
+from django.forms.models import inlineformset_factory
 #from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
@@ -16,17 +18,13 @@ from django.utils.translation import ugettext as _
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm
+from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 
 
-@login_required
-@waybill_user_related
-def waybill_view(request, waybill_pk, queryset, template):
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    
+def waybill_detail(request, waybill, template="waybill/detail.html"):    
     items = waybill.loading_details.select_related()
     items_count = len(items)
     
@@ -36,6 +34,14 @@ def waybill_view(request, waybill_pk, queryset, template):
         'items': items,
         'items_count': items_count,
     })
+
+
+@login_required
+@waybill_user_related
+def waybill_view(request, waybill_pk, queryset, template):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    return waybill_detail(request, waybill, template)
+    
 
 @login_required
 @person_required
@@ -253,6 +259,19 @@ def validate_receipt(request, waybill_pk, queryset):
 
     return redirect('receipt_validates')
 
+
+@login_required
+def deserialize(request, form_class=WaybillScanForm):
+    form = form_class(request.GET or None)
+    wb_data = form.cleaned_data['data'] if form.is_valid() else ''
+    waybill = ets.models.Waybill.decompress(wb_data)
+    if waybill: 
+        return waybill_detail(request, waybill)
+    else:
+        messages.error(request, _('Data Incorrect!!!'))
+        return redirect('index')
+
+    
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
