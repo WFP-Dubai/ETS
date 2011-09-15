@@ -52,3 +52,7 @@ img{position: relative; text-align: right;}
 	display: inline;
 	height: 0px;
 }
+
+p {
+  margin: 0;
+}
