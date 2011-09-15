@@ -31,19 +31,18 @@
         <tr style="font-size:x-small;">
           <td><sup>{% trans "Condition" %}</sup></td>
           <td colspan="2"><sup>{% trans "Good" %}</sup></td>
-          <td colspan="4"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
+          <td colspan="3"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
           <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
         </tr>
         <tr style="font-size:x-small;">
           <td><sup>{% trans "SI No" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
-          <td><sup>{% trans "Net" %}</sup></td>    
+          <td><sup>{% trans "Net MT" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>    
-          <td><sup >{% trans "L/D" %}</sup></td>    
           <td>{% trans "Reason" %}</td>    
           <td><sup>{% trans "Units" %}</sup></td>    
-          <td><sup>{% trans "Net" %}</sup></td>
+          <td><sup>{% trans "Net MT" %}</sup></td>
         </tr>
         
         {% for lineitem in items %}
@@ -80,13 +79,6 @@
               {% endif %}
             </td>
     
-            <td style="text-align:center;">&nbsp;
-              {% if lineitem.number_units_lost %}
-                L{% if lineitem.number_units_damaged %}/{% endif %}
-              {% endif %} 
-              {% if lineitem.number_units_damaged %}D{% endif %}
-            </td>
-
             <td style="text-align:left;">&nbsp;<!--reason-->
               {% if lineitem.number_units_lost %}
                 L:{{ lineitem.units_lost_reason|truncatesmart:20 }} 
@@ -111,7 +103,6 @@
         {%for lineitem in extra_lines%}
           <tr  style="font-size:x-small;">
               <td>{% trans 'ID' %} {{ forloop.counter|add:items_count }}.</td>
-              <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
