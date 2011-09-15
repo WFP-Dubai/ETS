@@ -10,9 +10,9 @@
                 <td><sup style="font-size:x-small;">{% trans "Origin(location)" %}:</sup><br>{{ object.order.warehouse.location.name }}</td>
                 <td><sup style="font-size:x-small;" >{% trans "Origin(warehouse)" %}:</sup><br>{{ object.order.warehouse.name }}</td>
                 <td><sup style="font-size:x-small;">{% trans "Destination(location)" %}</sup><br>{{ object.destination.location.name }}</td>
-                <td rowspan="4">
-                  <img width='150' height='150' alt="barcode" 
-                    src='http://chart.apis.google.com/chart?cht=qr&chs=150x150&chld=L|2&chl={{ object.compress }}'
+                <td rowspan="5">
+                  <img width='200' height='200' alt="barcode" 
+                    src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&chl={{ object.compress }}'
                   />
                 </td>
             
@@ -34,7 +34,7 @@
                 <td><sup style="font-size:x-small;">{% trans "LTI no" %}: </sup><br>{{ object.order.pk }}</td>
             </tr>
             
-            <tr ><td colspan=4 valign="top" style="font-size:small;"><sup style="font-size:x-small;">{% trans "Dispatch Remarks" %}:</sup>{{ object.dispatch_remarks }}
+            <tr ><td colspan="3" valign="top" style="font-size:small;"><sup style="font-size:x-small;">{% trans "Dispatch Remarks" %}:</sup>{{ object.dispatch_remarks }}
                 {% if object.container_one_remarks_dispatch %}
                 <br>{% trans "Container 1 Remarks" %}:{{ object.container_one_remarks_dispatch }}
                 {% endif %}
@@ -66,7 +66,7 @@
                 <td><sup>{% trans "Gross" %}</sup></td>
             </tr>
             {% for lineitem in items %}
-            <tr style="font-size:small;">
+            <tr style="font-size:x-small;">
                 <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
                 <td>{{ lineitem.stock_item.commodity.name }}</td>
                 <td>{{ lineitem.stock_item.package.name }}</td>
@@ -80,7 +80,7 @@
             
             {% for lineitem in extra_lines %}
 
-            <tr  style="font-size:small;border-collapse: separate;">
+            <tr  style="font-size:x-small;border-collapse: separate;">
                 <td>{% trans "ID" %} {{ forloop.counter|add:items_count }}.</td>
                 <td>&nbsp;</td>
                 <td>&nbsp;</td>
@@ -119,8 +119,13 @@
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
+          <td rowspan="2"><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
           <td colspan="2"><small style="font-size:x-small;">{% trans "Driver's Name" %}:</small> {{ object.transport_driver_name }}</td>
+        </tr>  
+        <tr>  
+          <td colspan="2">
+            <small style="font-size:x-small;">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
+          </td>
         </tr>
         <tr>
           <td valign=top rowspan="4">
@@ -128,14 +133,12 @@
               {% trans "I hereby certify the loading of the commodities described above." %}<br><br>
               {% trans "Name, signature and stamp:" %}
             </p>
-            <p style='font-size:14px'>
+            <p style='font-size:small'>
               {{ object.dispatcher_person.user.get_full_name }}<br>
               {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
             </p>
           </td>
-          <td colspan="2">
-            <small style="font-size:x-small;">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
-          </td>
+          
         </tr>
 
         <tr>
@@ -152,10 +155,10 @@
         </tr>
         <tr>
           <td  valign=top  rowspan="2" colspan="2">
-            <p style="font-size: x-small">{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}<br>
-              {% trans "Name, signature and stamp:" %}<br>
+            <p style="font-size: x-small">
+              {% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above. Name, signature and stamp:" %}<br>
             </p>
-            <p style='font-size:14px'>{{ object.transport_driver_name|upper }}<br>
+            <p style='font-size:small'>{{ object.transport_driver_name|upper }}<br>
               {% trans "Date:" %}{{object.transport_dispach_signed_date|date}}
             </p>
           </td>

@@ -29,25 +29,24 @@
         <thead class="wb_head"><tr><th colspan="11">{% trans "Observations" %}</th></tr></thead>
         <tbody>
         <tr style="font-size:x-small;">
-          <td><sup>{% trans "Receipt Condition" %}</sup></td>
+          <td><sup>{% trans "Condition" %}</sup></td>
           <td colspan="2"><sup>{% trans "Good" %}</sup></td>
-          <td colspan="4"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
+          <td colspan="3"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
           <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
         </tr>
         <tr style="font-size:x-small;">
           <td><sup>{% trans "SI No" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
-          <td><sup>{% trans "Net MT " %}</sup></td>    
+          <td><sup>{% trans "Net MT" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>    
-          <td><sup >{% trans "(L)oss or (D)amage" %}</sup></td>    
           <td>{% trans "Reason" %}</td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>
         </tr>
         
         {% for lineitem in items %}
-          <tr style="font-size:small; text-align:right;">
+          <tr style="font-size:x-small; text-align:right;">
             <td style="text-align:left;"><span>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</span></td>
             <td>&nbsp;
               {% if lineitem.number_units_good %}
@@ -80,13 +79,6 @@
               {% endif %}
             </td>
     
-            <td style="text-align:center;">&nbsp;
-              {% if lineitem.number_units_lost %}
-                L{% if lineitem.number_units_damaged %}/{% endif %}
-              {% endif %} 
-              {% if lineitem.number_units_damaged %}D{% endif %}
-            </td>
-
             <td style="text-align:left;">&nbsp;<!--reason-->
               {% if lineitem.number_units_lost %}
                 L:{{ lineitem.units_lost_reason|truncatesmart:20 }} 
@@ -109,9 +101,8 @@
         {% endfor %}
                                         
         {%for lineitem in extra_lines%}
-          <tr  style="font-size:small;">
+          <tr  style="font-size:x-small;">
               <td>{% trans 'ID' %} {{ forloop.counter|add:items_count }}.</td>
-              <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
               <td>&nbsp;</td>
@@ -145,7 +136,7 @@
 					<p style="font-size: x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
 					<p style="font-size: x-small">{% trans "Name, signature and stamp:" %}</p>
 				  {% if object.end_discharge_date %}
-            <p style='font-size:14px'>{{ object.person.user.get_full_name }}</p>
+            <p style='font-size:small'>{{ object.person.user.get_full_name }}</p>
             <p>{% trans "Date:" %}{{ object.end_discharge_date|date }}</p>
           {% endif %}
 					
@@ -155,7 +146,7 @@
           <p style="font-size: x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
           <p style="font-size: x-small">{% trans "Name, signature and stamp" %}</p>
 	        {% if object.end_discharge_date %}
-				  <p style='font-size:14px'>{{ object.waybill.transport_driver_name|upper}}</p>
+				  <p style='font-size:small'>{{ object.waybill.transport_driver_name|upper}}</p>
           <p>{% trans "Date:" %} {{ object.end_discharge_date|date }}</p>
           {%endif%}
 					<p style="font-size: x-small">{% trans "Endorse this section with an official stamp" %}</p>
