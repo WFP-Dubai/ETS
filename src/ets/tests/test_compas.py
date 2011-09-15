@@ -93,7 +93,8 @@ class CompasTestCase(TestCase):
         self.assertEqual(order.items.count(), 1)
     
     def test_compas_start_date(self):
-         
+        
+        self.assertEqual(compas_models.LtiOriginal.objects.using(self.compas).filter(code="THEIRORDEROLD").count(), 1) 
         call_command('sync_compas')
         self.assertEqual(ets.models.Order.objects.filter(pk="THEIRORDEROLD").count(), 0)
 
