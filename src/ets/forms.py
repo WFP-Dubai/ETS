@@ -15,7 +15,7 @@ class WaybillSearchForm( forms.Form ):
     q = forms.CharField(required=False, label=_('Waybill code'))
 
 class WaybillScanForm( forms.Form ):
-    wb_data = forms.CharField(required=False, label=_('Scan Waybill'))
+    data = forms.CharField(required=False, label=_('Scan Waybill'))
 
 class DispatchWaybillForm( forms.ModelForm ):
     

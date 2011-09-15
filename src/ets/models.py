@@ -599,7 +599,7 @@ class Waybill( ld_models.Model ):
         wb_serialized = eval( zlib.decompress( base64.b64decode( data.replace( ' ', '+' ) ) ) )
         for obj in serializers.deserialize("json", wb_serialized):
             if isinstance(obj.object, cls):
-                return obj.object.pk
+                return obj.object
          
     
     

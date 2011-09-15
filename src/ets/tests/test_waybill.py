@@ -400,8 +400,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_deserialize(self):
         """ets.views.deserialize"""
         
+        #Test with get request
+        response = self.client.get(reverse('deserialize'))
+        self.assertEqual(response.status_code, 302)
+        
         #Test with compressed data
         data = self.waybill.compress()
-        response = self.client.get(reverse('deserialize'), data={'wb_data': data,})
-        self.assertEqual(response.status_code, 302)    
+        response = self.client.get(reverse('deserialize'), data={'data': data,})
+        self.assertEqual(response.context['object'], self.waybill)    
 

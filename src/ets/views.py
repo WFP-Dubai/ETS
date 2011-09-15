@@ -24,11 +24,7 @@ from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 
 
-@login_required
-@waybill_user_related
-def waybill_view(request, waybill_pk, queryset, template):
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    
+def waybill_detail(request, waybill, template="waybill/detail.html"):    
     items = waybill.loading_details.select_related()
     items_count = len(items)
     
@@ -38,6 +34,14 @@ def waybill_view(request, waybill_pk, queryset, template):
         'items': items,
         'items_count': items_count,
     })
+
+
+@login_required
+@waybill_user_related
+def waybill_view(request, waybill_pk, queryset, template):
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    return waybill_detail(request, waybill, template)
+    
 
 @login_required
 @person_required
@@ -259,11 +263,10 @@ def validate_receipt(request, waybill_pk, queryset):
 @login_required
 def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
-    wb_data = form.cleaned_data['wb_data'] if form.is_valid() else ''
-    
+    wb_data = form.cleaned_data['data'] if form.is_valid() else ''
     try:
         waybill = ets.models.Waybill.decompress(wb_data)
-        return redirect("waybill_view", waybill_pk=waybill )
+        return waybill_detail(request, waybill)
     except:
         messages.error(request, _('Data Incorrect!!!'))
         return redirect('index')
