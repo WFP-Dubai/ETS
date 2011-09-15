@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
-from ets.forms import WaybillSearchForm
+from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
 from ets.views import waybill_list 
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
@@ -23,6 +23,7 @@ urlpatterns += patterns("ets.views",
         'template': 'index.html',
         'extra_context': {
             'form': WaybillSearchForm,
+            'form_scan': WaybillScanForm,
     }}, "index" ),
     
     #Order list
@@ -117,6 +118,9 @@ urlpatterns += patterns("ets.views",
     ( r'^waybill/report/select/$', "direct_to_template", {
         "template": 'reporting/select_report.html',
     }, "select_report" ),
+                        
+    ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
+
     #===================================================================================================================
     # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
     # ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
