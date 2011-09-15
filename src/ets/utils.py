@@ -146,7 +146,7 @@ def import_order(compas):
     
         for lti in compas_models.LtiOriginal.objects.using(compas)\
                             .filter(models.Q(expiry_date__gt=now) | models.Q(expiry_date__isnull=True),
-                                    requested_dispatch_date__gt=compas_station.start_date,
+                                    requested_dispatch_date__gte=compas_station.start_date,
                                     consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
