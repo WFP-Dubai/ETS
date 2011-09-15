@@ -5,6 +5,9 @@ from datetime import datetime
 from django.test import TestCase
 from django.core.management import call_command
 from django.core.exceptions import ValidationError
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+
 
 import ets.models
 import compas.models as compas_models
@@ -90,10 +93,9 @@ class CompasTestCase(TestCase):
         self.assertEqual(order.items.count(), 1)
     
     def test_compas_start_date(self):
-        
-        self.assertEqual(ets.models.Order.objects.count(), 0)     
+         
         call_command('sync_compas')
-        self.assertEqual(ets.models.Order.objects.count(), 2)
+        self.assertEqual(ets.models.Order.objects.filter(pk="THEIRORDEROLD").count(), 0)
 
     
 class SendCompasTestCase(TestCaseMixin, TestCase):
