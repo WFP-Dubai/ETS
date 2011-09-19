@@ -1,3 +1,4 @@
+import datetime
 
 from django import template
 from django.core.urlresolvers import reverse
@@ -129,7 +130,9 @@ def history_waybill(entry, waybill_changes="", loading_details=""):
     if entry.action_type == "U":
         previous = Waybill.audit_log.filter(slug=entry.slug, action_id__lt=entry.action_id).order_by('-action_id')[0]
         waybill_changes = changed_fields(Waybill, entry, previous) #waybill__pk=entry.slug, 
-        loading_details = LoadingDetail.audit_log.filter(waybill__pk=entry.slug, action_user=entry.action_user)
+        max_datetime = entry.action_date + datetime.timedelta(seconds=10)
+        loading_details = LoadingDetail.audit_log.filter(waybill__pk=entry.slug, action_user=entry.action_user\
+                        , action_date__gte=entry.action_date, action_date__lte=max_datetime )
     print entry.action_date       
     return {
             'item': entry,
