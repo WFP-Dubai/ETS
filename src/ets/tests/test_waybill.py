@@ -267,7 +267,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         })
         
         response = self.client.post(path, data=data)
-        self.assertContains(response, "At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling")
+        self.assertContains(response, "At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filled")
         data.update({
             'item-0-number_units_good': 25,
         })
@@ -295,6 +295,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Provide a reason of damage
         data.update({
             'item-0-units_damaged_reason': 'dsed',
+        })
+        
+        response = self.client.post(path, data=data)
+        #Provide a reception warehouse
+        data.update({
+            'warehouse': 'ISBX002',
         })
         
         response = self.client.post(path, data=data)

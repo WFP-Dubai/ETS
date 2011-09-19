@@ -174,7 +174,12 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'arrival_date': today,
         'start_discharge_date': today,
         'end_discharge_date': today,
+        'warehouse': waybill.destination,
     }, instance=waybill.get_receipt())
+    
+    form.fields['warehouse'].queryset = ets.models.Warehouse.get_warehouses(request.user.person.location, 
+                                                                            request.user.person.organization)\
+                                                            .exclude(pk=waybill.order.warehouse.pk)
     
     if form.is_valid() and loading_formset.is_valid():
         receipt = form.save(False)

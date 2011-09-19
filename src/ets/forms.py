@@ -97,6 +97,7 @@ class WaybillRecieptForm( forms.ModelForm ):
     
     # create the layout object
     helper.add_layout(Layout(
+        Fieldset(ugettext('Warehouse'), 'warehouse'),
         Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
         Fieldset(ugettext('Containers'), Row('container_one_remarks_reciept', 'container_two_remarks_reciept')),
         Fieldset('', Row('distance', 'remarks')),
@@ -119,7 +120,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             if not self.cleaned_data.get('number_units_good')\
                 and not self.cleaned_data.get('number_units_damaged')\
                 and not self.cleaned_data.get('number_units_lost'):
-                raise forms.ValidationError(_("At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filling"))
+                raise forms.ValidationError(_("At least one of the fields number_units_good, number_units_damaged, number_units_lost must be filled"))
         return self.cleaned_data    
 
     class Meta:

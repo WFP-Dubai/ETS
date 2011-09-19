@@ -595,6 +595,7 @@ class ReceiptWaybill(models.Model):
     waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True, editable=False)
     
+    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="receipts")
     person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills") #recipientName
     arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
     start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate

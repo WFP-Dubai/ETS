@@ -195,7 +195,8 @@
       "end_discharge_date": "2011-08-22",
       "remarks": "",
       "validated": false,
-      "container_one_remarks_reciept": ""
+      "container_one_remarks_reciept": "",
+      "warehouse": "ISBX002"
     }
   },
   {
