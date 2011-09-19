@@ -24,7 +24,8 @@ from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 
 
-def waybill_detail(request, waybill, template="waybill/detail.html"):    
+def waybill_detail(request, waybill, template="waybill/detail.html"):
+    """utility that shows waybill's details"""    
     items = waybill.loading_details.select_related()
     items_count = len(items)
     
