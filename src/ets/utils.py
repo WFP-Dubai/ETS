@@ -343,17 +343,19 @@ def send_received(using):
             reception.save()
 
 
-def test_compas():
-    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True, sent_compas=None)
-    send_dispatched('ISBX002')
-        
-    print ets_models.CompasLogger.objects.all()
-    ets_models.CompasLogger.objects.all().delete()
-    
-    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, sent_compas=None, 
-                                                                             signed_date=datetime.now())
-    send_received('ISBX002')
-    
-    print ets_models.CompasLogger.objects.all()
-    ets_models.CompasLogger.objects.all().delete()
-    
+#=======================================================================================================================
+# def test_compas():
+#    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True, sent_compas=None)
+#    send_dispatched('ISBX002')
+#        
+#    print ets_models.CompasLogger.objects.all()
+#    ets_models.CompasLogger.objects.all().delete()
+#    
+#    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, sent_compas=None, 
+#                                                                             signed_date=datetime.now())
+#    send_received('ISBX002')
+#    
+#    print ets_models.CompasLogger.objects.all()
+#    ets_models.CompasLogger.objects.all().delete()
+#    
+#=======================================================================================================================
