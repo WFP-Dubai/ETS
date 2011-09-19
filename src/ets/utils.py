@@ -260,8 +260,8 @@ def send_dispatched(using):
                         u'%.3f' % loading.calculate_total_net(), 
                         u'%.3f' % loading.calculate_total_gross(), 
                         u'%.3f' % (1 if is_bulk else loading.number_of_units), 
-                        None if is_bulk else u'%.3f' % loading.stock_item.unit_weight_net, 
-                        None if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
+                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
+                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
                         
                         None, #p_odaid
                         None, #p_losstype
@@ -312,11 +312,11 @@ def send_received(using):
                         reception.person.compas.pk, 
                         reception.person.code, 
                         reception.arrival_date.strftime("%Y%m%d"),
-                        loading.number_units_good, 
-                        loading.units_damaged_reason and loading.units_damaged_reason.cause or '', 
-                        loading.number_units_damaged or '', 
-                        loading.units_lost_reason and loading.units_lost_reason.cause or '', 
-                        loading.number_units_lost or '', 
+                        u'%.3f' % loading.number_units_good, 
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause, 
+                        u'%.3f' % loading.number_units_damaged, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause, 
+                        u'%.3f' % loading.number_units_lost, 
                         loading.stock_item.pk, 
                         loading.stock_item.commodity.category.pk,
                         loading.stock_item.commodity.pk, 
@@ -344,18 +344,16 @@ def send_received(using):
 
 
 def test_compas():
-    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True)
+    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True, sent_compas=None)
     send_dispatched('ISBX002')
         
     print ets_models.CompasLogger.objects.all()
     ets_models.CompasLogger.objects.all().delete()
     
-    #===================================================================================================================
-    # ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, 
-    #                                                                          signed_date=datetime.now())
-    # send_received('ISBX002')
-    # 
-    # print ets_models.CompasLogger.objects.all()
-    # ets_models.CompasLogger.objects.all().delete()
-    #===================================================================================================================
+    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, sent_compas=None, 
+                                                                             signed_date=datetime.now())
+    send_received('ISBX002')
+    
+    print ets_models.CompasLogger.objects.all()
+    ets_models.CompasLogger.objects.all().delete()
     

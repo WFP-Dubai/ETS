@@ -8,9 +8,7 @@ def call_db_procedure(name, parameters, using):
     cursor = connections[using].cursor()
     Response_Message = cursor.var(cx_Oracle.STRING, 2000).var
     Response_Code = cursor.var(cx_Oracle.STRING, 1).var
-    print "parameters --> ", parameters
     cursor.callproc( name, (Response_Message, Response_Code)+parameters)
     
     if Response_Code.getvalue() != 'S':
-        print "%s: %s " % (Response_Code.getvalue(), Response_Message.getvalue())
         raise ValidationError(Response_Message.getvalue(), code=Response_Code.getvalue())

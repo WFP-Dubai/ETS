@@ -67,7 +67,7 @@
     "pk": "LMIX", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "VARIANCE IN WEIGHT", 
+      "cause": "INFESTATION", 
       "type": "L", 
       "category": "MIX"
     }
@@ -85,7 +85,7 @@
     "pk": "DMIX", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "WET BY GASOIL", 
+      "cause": "BAG WET BY WATER",
       "type": "D", 
       "category": "MIX"
     }
@@ -94,7 +94,7 @@
     "pk": "DSED", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "BROKEN", 
+      "cause": "POOR HANDLING", 
       "type": "D", 
       "category": "SED"
     }

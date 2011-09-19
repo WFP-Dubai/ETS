@@ -209,9 +209,9 @@
       "stock_item": "anotherstock1234",
       "number_units_damaged": "2",
       "number_units_lost": "10",
-      "units_damaged_reason": "dmix",
+      "units_damaged_reason": "dsed",
       "overloaded_units": false,
-      "units_lost_reason": "lmix",
+      "units_lost_reason": "lsed",
       "number_of_units": "35"
     }
   },

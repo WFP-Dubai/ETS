@@ -135,22 +135,3 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_lost': forms.TextInput(attrs={'size': 5}),
             'number_units_damaged': forms.TextInput(attrs={'size': 5}),
         }
-
-
-#=======================================================================================================================
-# class WaybillValidationFormset( BaseModelFormSet ):
-#    
-#    def clean( self ):
-#        issue = ''
-#        super( WaybillValidationFormset, self ).clean()
-#        for form in self.forms:
-#            if not form.check_lines():
-#                #TODO: Refactor it
-#                valid = False
-#                issue += ' WB: ' + str( form )
-#                raise form.ValidationError( _("You have an error") )
-#            
-#            if not valid:
-#                ##TODO: cleanup such things
-#                print issue
-#=======================================================================================================================
