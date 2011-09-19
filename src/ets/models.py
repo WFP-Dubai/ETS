@@ -287,12 +287,8 @@ class LossDamageType(models.Model):
         verbose_name_plural = _("Losses/Damages")
     
     def  __unicode__( self ):
-        cause = self.cause
-        length_c = len( cause ) - 10
-        if length_c > 20:
-            cause = "%s...%s" % (cause[0:20], cause[length_c:])
-        return cause
-    
+        return "%s (%s): %s" % (self.category, self.get_type_display(), self.cause)
+        
     @classmethod
     def update(cls, using):
         with transaction.commit_on_success(using) as tr:

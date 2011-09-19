@@ -81,10 +81,11 @@
     
             <td style="text-align:left;">&nbsp;<!--reason-->
               {% if lineitem.number_units_lost %}
-                L:{{ lineitem.units_lost_reason|truncatesmart:20 }} 
+                L:{{ lineitem.units_lost_reason.cause }} 
               {% endif %} 
               {% if lineitem.number_units_damaged %}
-                D:{{ lineitem.units_damaged_reason|truncatesmart:20}} 
+                {% if lineitem.number_units_lost %}/{% endif %}
+                D:{{ lineitem.units_damaged_reason.cause }} 
               {% endif %}
             </td>
             <td>&nbsp;
