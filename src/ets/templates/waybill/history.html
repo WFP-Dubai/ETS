@@ -1,0 +1,34 @@
+{% extends "base_template.html" %}
+
+{% load i18n extra_tags %}
+
+{% block content %}
+<h3>{% trans "Waybill history" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id='waybill_log'>
+  <thead>
+    <tr>
+      <th>{% trans "Waybill" %}</th>
+      <th>{% trans "User" %}</th>
+      <th>{% trans "Action" %}</th>
+      <th>{% trans "Time" %}</th>
+      <th>{% trans "Changes" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in object_list %}
+      {% history_waybill item %}
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script charset="utf-8">
+  $(document).ready(function() {
+    $('#waybill_log').dataTable(
+      	"bSort": false,
+  	});
+  } );
+</script>
+{% endblock script %}

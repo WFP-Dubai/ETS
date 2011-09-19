@@ -6,7 +6,8 @@ from django.utils.translation import ugettext_lazy as _
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail
+from ets.utils import changed_fields
 
 register = template.Library()
 
@@ -122,3 +123,28 @@ def person_only(context, nodelist, user):
 @block
 def officer_only(context, nodelist, user):
     return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
+
+@register.inclusion_tag('tags/history_waybill.html')
+def history_waybill(entry, waybill_changes="", loading_details=""):
+    if entry.action_type == "U":
+        previous = Waybill.audit_log.filter(slug=entry.slug, action_id__lt=entry.action_id).order_by('-action_id')[0]
+        waybill_changes = changed_fields(Waybill, entry, previous) #waybill__pk=entry.slug, 
+        loading_details = LoadingDetail.audit_log.filter(waybill__pk=entry.slug, action_user=entry.action_user)
+    print entry.action_date       
+    return {
+            'item': entry,
+            'changes': waybill_changes,
+            'loading_details': loading_details,
+    }
+        
+@register.inclusion_tag('tags/changed_fields.html')
+def history_loading_details(entry, loading_details_changes=""):
+    print "OK"
+    print entry.action_date
+    if entry.action_type == "U":
+        previous = LoadingDetail.audit_log.filter(waybill__pk=entry.waybill_id, slug=entry.slug, action_id__lt=entry.action_id).order_by('-action_id')[0]
+        loading_details_changes = changed_fields(LoadingDetail, entry, previous)        
+    return {
+            'item': entry,
+            'changes': loading_details_changes,
+    }

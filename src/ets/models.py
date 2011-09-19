@@ -623,7 +623,9 @@ class Waybill( ld_models.Model ):
                                   destination__in=Warehouse.filter_by_user(user))
     
     def get_shortage_loading_details(self):
-        return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]    
+        return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   
+    
+
 
 class ReceiptWaybill(models.Model):
     """Receipt data"""

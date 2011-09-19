@@ -271,8 +271,6 @@ def deserialize(request, form_class=WaybillScanForm):
         messages.error(request, _('Data Incorrect!!!'))
         return redirect('index')
 
-    
-
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
 # #    import sys

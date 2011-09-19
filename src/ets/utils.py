@@ -340,3 +340,12 @@ def send_received(using):
             
             reception.sent_compas = datetime.now()
             reception.save()
+
+
+def changed_fields(cls, base, previous):
+    changes = {}
+    for field in cls._meta.fields:
+        if not getattr(base, field.name) == getattr(previous, field.name):
+            changes[field.verbose_name] = str(getattr(base, field.name))
+    return changes
+    
