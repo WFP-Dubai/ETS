@@ -220,12 +220,12 @@
     "pk": 1,
     "model": "ets.compaslogger",
     "fields": {
-	  "status": 0,
+	  "status": 1,
 	  "compas": "ISBX002",
 	  "waybill": "ISBX00311A",
 	  "when_attempted": "2011-09-14 07:41:12",
 	  "action": 1,
-	  "message": "OK-OK-OK"
+	  "message": "Error-Error-Error"
     }
   }
 ]
