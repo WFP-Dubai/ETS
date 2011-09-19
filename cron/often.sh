@@ -14,4 +14,7 @@ if test -r $PIDFILE ; then
 fi
 echo $$ > $PIDFILE
 
+echo "Synchronize with compas database"
+./bin/instance sync_compas --verbosity=2 2>&1
+
 rm -f $PIDFILE
