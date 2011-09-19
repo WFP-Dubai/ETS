@@ -1,0 +1,14 @@
+<tr>
+  {% for col in item %}
+    <td>
+    {% ifequal forloop.counter 4 %}
+      {% for key,field in col.items %}
+        {{ key }}: {{ field }}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    {% else %}
+      {{ col }}
+    {% endifequal %}
+    </td>
+  {% endfor %}
+</tr>
+

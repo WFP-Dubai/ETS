@@ -7,7 +7,6 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id='waybill_log'>
   <thead>
     <tr>
-      <th>{% trans "Waybill" %}</th>
       <th>{% trans "User" %}</th>
       <th>{% trans "Action" %}</th>
       <th>{% trans "Time" %}</th>
@@ -15,11 +14,29 @@
     </tr>
   </thead>
   <tbody>
-    {% for item in object_list %}
-      {% history_waybill item %}
+    {% for item in waybill_history %}
+      {% include "waybill/fragment_history.html" %}
     {% endfor %}
   </tbody>
 </table>
+
+<h3>{% trans "Loading details history" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id='waybill_log'>
+  <thead>
+    <tr>
+      <th>{% trans "User" %}</th>
+      <th>{% trans "Action" %}</th>
+      <th>{% trans "Time" %}</th>
+      <th>{% trans "Changes" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in loading_detail_history %}
+      {% include "waybill/fragment_history.html" %}
+    {% endfor %}
+  </tbody>
+</table>
+
 {% endblock %}
 
 {% block script %}

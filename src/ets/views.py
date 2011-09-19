@@ -22,6 +22,7 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
+from ets.utils import changed_fields
 
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):    
@@ -271,6 +272,39 @@ def deserialize(request, form_class=WaybillScanForm):
         messages.error(request, _('Data Incorrect!!!'))
         return redirect('index')
 
+def waybill_history(request, template, waybill_pk, loading_detail_queryset=ets.models.LoadingDetail.audit_log.all()):
+    
+    ACTIONS = {
+        'I': _('Created'),
+        'U': _('Changed'),
+        'D': _('Deleted'),
+    }
+    
+    waybill_history = []
+    waybill = get_object_or_404(ets.models.Waybill, pk=waybill_pk)
+    waybill_log = ets.models.Waybill.audit_log.filter(slug=waybill_pk).order_by('-action_id')
+    zipped = zip(waybill_log, waybill_log[1:])
+    for iter, (prev, next) in enumerate(zipped, start=1):
+        waybill_history.append((prev.action_user, ACTIONS[prev.action_type], \
+                                prev.action_date, changed_fields(ets.models.Waybill, prev, next)))
+        if iter == len(zipped):
+            waybill_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+        
+    loading_detail_history = []
+    loading_detail_queryset = loading_detail_queryset.filter(waybill__pk=waybill_pk).order_by('-action_id')
+    zipped = zip(loading_detail_queryset, loading_detail_queryset[1:])
+    for iter, (prev, next) in enumerate(zipped, start=1):
+        loading_detail_history.append((prev.action_user, ACTIONS[prev.action_type], \
+                                       prev.action_date, changed_fields(ets.models.LoadingDetail, prev, next)))
+        if iter == len(zipped):
+            loading_detail_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+            
+    return direct_to_template(request, template, {
+            'waybill': waybill,
+            'waybill_history': waybill_history,
+            'loading_detail_history': loading_detail_history,
+    })
+    
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
 # #    import sys

@@ -74,9 +74,8 @@ urlpatterns += patterns("ets.views",
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
       {}, "waybill_finalize_receipt" ),
     
-    ( r'^waybill_history/$', object_list, {
-        'queryset': ets.models.Waybill.audit_log.all(),
-        'template_name': 'waybill/history.html',
+    ( r'^waybill_history/(?P<waybill_pk>[-\w]+)/$', "waybill_history", {
+        'template': 'waybill/history.html',
     }, "waybill_history" ),
     
     #Validation pages
