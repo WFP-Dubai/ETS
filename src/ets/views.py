@@ -31,7 +31,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     
     return direct_to_template(request, template, {
         'object': waybill,
-        'extra_lines': [''] * (settings.LOADING_LINES - items_count),
+        'extra_lines': (),#[''] * (settings.LOADING_LINES - items_count),
         'items': items,
         'items_count': items_count,
     })
@@ -266,9 +266,8 @@ def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
     if form.is_valid():
         data = form.cleaned_data['data']
-     
         waybill = ets.models.Waybill.decompress(data)
-        if waybill: 
+        if waybill:
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Data Incorrect!!!'))

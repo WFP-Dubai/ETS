@@ -511,14 +511,6 @@ class Waybill( ld_models.Model ):
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
 
-    #===================================================================================================================
-    # def errors(self):
-    #    try:
-    #        return CompasLogger.objects.get( wb = self )
-    #    except CompasLogger.DoesNotExist:
-    #        return ''
-    #===================================================================================================================
-    
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
         if self.loading_date > self.dispatch_date:
@@ -528,29 +520,6 @@ class Waybill( ld_models.Model ):
         if self.container_two_number and not self.container_one_number:
             raise ValidationError(_("Type container 1 number"))
     
-    def check_lines( self ):
-        lines = LoadingDetail.objects.filter( wbNumber = self )
-        for line in lines:
-            if not line.check_stock():
-                return False
-        return True
-
-    def check_lines_receipt( self ):
-        lines = LoadingDetail.objects.filter( wbNumber = self )
-        for line in lines:
-            if not line.check_receipt_item():
-                return False
-        return True
-
-    @property
-    def hasError( self ):
-        myerror = self.errors()
-        try:
-            if ( myerror.errorRec != '' or myerror.errorDisp != '' ):
-                return True
-        except:
-            return None
-
     def dispatch_sign(self, commit=True):
         """Signs the waybill as ready to be sent."""
         self.transport_dispach_signed_date = datetime.now()
@@ -589,14 +558,14 @@ class Waybill( ld_models.Model ):
         This method compress the Waybill using zipBase64 algorithm.
     
         @param self: the Waybill instance
-        @return: a string containing the compressed representation of the Waybill with related LoadingDetails, LtiOriginals and EpicStocks
+        @return: a string containing the compressed representation of the Waybill with items
         """
-        return base64.b64encode( zlib.compress( simplejson.dumps( self.serialize(), use_decimal=True ) ) )
+        return base64.b64encode( zlib.compress( self.serialize() ) )
     
     @classmethod
     def decompress(cls, data):
         try:
-            wb_serialized = eval( zlib.decompress( base64.b64decode( data ) ) )
+            wb_serialized = zlib.decompress( base64.b64decode( data ) )
         except TypeError:
             pass
         else:
