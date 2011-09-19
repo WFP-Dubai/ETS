@@ -596,15 +596,13 @@ class Waybill( ld_models.Model ):
     @classmethod
     def decompress(cls, data):
         try:
-            wb_serialized = eval( zlib.decompress( base64.b64decode( data.replace( ' ', '+' ) ) ) )
+            wb_serialized = eval( zlib.decompress( base64.b64decode( data ) ) )
         except TypeError:
             pass
         else:
             for obj in serializers.deserialize("json", wb_serialized):
-                if isinstance(obj.object, cls):
+                if isinstance(obj.object, cls) and cls.objects.filter(pk=obj.object.pk).count():
                     return obj.object
-             
-    
     
     @classmethod
     def dispatches(cls, user):

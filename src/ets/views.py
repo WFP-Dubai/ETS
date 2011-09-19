@@ -263,15 +263,16 @@ def validate_receipt(request, waybill_pk, queryset):
 @login_required
 def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
-    wb_data = form.cleaned_data['data'] if form.is_valid() else ''
-    waybill = ets.models.Waybill.decompress(wb_data)
-    if waybill: 
-        return waybill_detail(request, waybill)
-    else:
-        messages.error(request, _('Data Incorrect!!!'))
-        return redirect('index')
+    if form.is_valid():
+        data = form.cleaned_data['data']
+     
+        waybill = ets.models.Waybill.decompress(data)
+        if waybill: 
+            return waybill_detail(request, waybill)
 
-    
+    messages.error(request, _('Data Incorrect!!!'))
+    return redirect('index')
+
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):

@@ -408,4 +408,3 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         data = self.waybill.compress()
         response = self.client.get(reverse('deserialize'), data={'data': data,})
         self.assertEqual(response.context['object'], self.waybill)    
-
