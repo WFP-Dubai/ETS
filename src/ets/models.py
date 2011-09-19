@@ -360,6 +360,8 @@ class OrderItem(models.Model):
     
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
     
+    lti_id = models.CharField(_("LTI ID"), max_length=40, editable=False, blank=True, null=True)
+    
     class Meta:
         ordering = ('si_code',)
         order_with_respect_to = 'order'

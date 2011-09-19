@@ -6,12 +6,8 @@ from django.core.exceptions import ValidationError
 def call_db_procedure(name, parameters, using):
     import cx_Oracle
     cursor = connections[using].cursor()
-    Response_Message = cursor.var(cx_Oracle.STRING).var
-    Response_Message.setvalue( 0, u' ' * 200 )
-    print Response_Message.bufferSize
-    Response_Code = cursor.var(cx_Oracle.STRING).var
-    Response_Code.setvalue( 0, u'x' * 2 )
-    print Response_Code.bufferSize
+    Response_Message = cursor.var(cx_Oracle.STRING, 2000).var
+    Response_Code = cursor.var(cx_Oracle.STRING, 1).var
     print "parameters --> ", parameters
     cursor.callproc( name, (Response_Message, Response_Code)+parameters)
     

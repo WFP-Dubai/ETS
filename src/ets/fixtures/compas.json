@@ -4,7 +4,7 @@
     "model": "compas.place", 
     "fields": {
       "name": "PAKISTAN COUNTRY OFFICE",
-      "reporting_code": "dev_compas",
+      "reporting_code": "ISBX002",
       "organization_id": "WFP",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -16,7 +16,7 @@
     "model": "compas.place", 
     "fields": {
       "name": "ISLAMABAD CITY OFFICE",
-      "reporting_code": "dev_compas",
+      "reporting_code": "ISBX002",
       "organization_id": "DOEAF",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -28,7 +28,7 @@
     "model": "compas.place", 
     "fields": {
       "name": "EDO OFFICE MEHTI", 
-      "reporting_code": "dev_compas", 
+      "reporting_code": "ISBX002", 
       "organization_id": "", 
       "geo_point_code": "OE7X", 
       "country_code": "586", 
@@ -39,7 +39,7 @@
     "pk": "ISBX0020000586", 
     "model": "compas.compasperson", 
     "fields": {
-      "org_unit_code": "dev_compas",
+      "org_unit_code": "ISBX002",
       "location_code": "ISBX",
       "organization_id": "WFP", 
       "first_name": "RIAZ", 
@@ -53,7 +53,7 @@
     "pk": "ISBX0020000613", 
     "model": "compas.compasperson", 
     "fields": {
-      "org_unit_code": "dev_compas", 
+      "org_unit_code": "ISBX002", 
       "first_name": "DIDIER", 
       "code": "0000613", 
       "title": "REGIONAL LOGISTICS COORDINATOR", 

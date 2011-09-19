@@ -17,7 +17,7 @@ from .utils import TestCaseMixin
 class CompasTestCase(TestCase):
     
     #multi_db = True
-    compas = 'dev_compas'
+    compas = 'ISBX002'
     fixtures = ('db_compas.json',)
     
     def setUp(self):

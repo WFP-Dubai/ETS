@@ -225,10 +225,10 @@ def send_dispatched(using):
                         waybill.order.origin_type, 
                         waybill.order.warehouse.location.pk, 
                         waybill.order.warehouse.pk,
-                        u'', 
+                        waybill.order.warehouse.name, 
                         waybill.order.location.pk,
                         waybill.destination.pk,
-                        waybill.order.pk, 
+                        loading.get_order_item().lti_id, #waybill.order.pk, 
                         waybill.loading_date.strftime("%Y%m%d"),
                         waybill.order.consignee.pk, 
                         
@@ -246,8 +246,6 @@ def send_dispatched(using):
                         
                         waybill.transport_driver_name, 
                         waybill.transport_driver_licence,
-                        waybill.transport_vehicle_registration, 
-                        waybill.transport_trailer_registration,
                         CONTAINER_NUMBER,
                          
                         using,
@@ -262,10 +260,13 @@ def send_dispatched(using):
                         u'%.3f' % loading.calculate_total_net(), 
                         u'%.3f' % loading.calculate_total_gross(), 
                         u'%.3f' % (1 if is_bulk else loading.number_of_units), 
-                        u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_net, 
-                        u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
+                        None if is_bulk else u'%.3f' % loading.stock_item.unit_weight_net, 
+                        None if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
                         
-                        u'', u''
+                        None, #p_odaid
+                        None, #p_losstype
+                        None, #p_lossreason
+                        None, #p_loannumber
                     ), using)
         
         except ValidationError, err:
@@ -344,15 +345,17 @@ def send_received(using):
 
 def test_compas():
     ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True)
-    send_dispatched('dev_compas')
+    send_dispatched('ISBX002')
         
     print ets_models.CompasLogger.objects.all()
     ets_models.CompasLogger.objects.all().delete()
     
-    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, 
-                                                                              signed_date=datetime.now())
-    send_received('dev_compas')
-    
-    print ets_models.CompasLogger.objects.all()
-    ets_models.CompasLogger.objects.all().delete()
+    #===================================================================================================================
+    # ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, 
+    #                                                                          signed_date=datetime.now())
+    # send_received('ISBX002')
+    # 
+    # print ets_models.CompasLogger.objects.all()
+    # ets_models.CompasLogger.objects.all().delete()
+    #===================================================================================================================
     

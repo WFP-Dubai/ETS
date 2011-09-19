@@ -220,7 +220,7 @@
     "model": "ets.compaslogger",
     "fields": {
 	  "status": 0,
-	  "compas": "dev_compas",
+	  "compas": "ISBX002",
 	  "waybill": "ISBX00311A",
 	  "when_attempted": "2011-09-14 07:41:12",
 	  "action": 1,
