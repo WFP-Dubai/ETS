@@ -283,22 +283,28 @@ def waybill_history(request, template, waybill_pk, loading_detail_queryset=ets.m
     waybill_history = []
     waybill = get_object_or_404(ets.models.Waybill, pk=waybill_pk)
     waybill_log = ets.models.Waybill.audit_log.filter(slug=waybill_pk).order_by('-action_id')
-    zipped = zip(waybill_log, waybill_log[1:])
-    for iter, (prev, next) in enumerate(zipped, start=1):
-        waybill_history.append((prev.action_user, ACTIONS[prev.action_type], \
-                                prev.action_date, changed_fields(ets.models.Waybill, prev, next)))
-        if iter == len(zipped):
-            waybill_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
-        
+    if waybill_log.count() == 1:
+        waybill_history.append((waybill_log[0].action_user, ACTIONS[waybill_log[0].action_type], waybill_log[0].action_date))
+    else:
+        zipped = zip(waybill_log, waybill_log[1:])
+        for iter, (prev, next) in enumerate(zipped, start=1):
+            waybill_history.append((prev.action_user, ACTIONS[prev.action_type], \
+                                    prev.action_date, changed_fields(ets.models.Waybill, prev, next)))
+            if iter == len(zipped):
+                waybill_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+                
     loading_detail_history = []
     loading_detail_queryset = loading_detail_queryset.filter(waybill__pk=waybill_pk).order_by('-action_id')
-    zipped = zip(loading_detail_queryset, loading_detail_queryset[1:])
-    for iter, (prev, next) in enumerate(zipped, start=1):
-        loading_detail_history.append((prev.action_user, ACTIONS[prev.action_type], \
-                                       prev.action_date, changed_fields(ets.models.LoadingDetail, prev, next)))
-        if iter == len(zipped):
-            loading_detail_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
-            
+    if loading_detail_queryset.count() == 1:
+        loading_detail_history.append((loading_detail_queryset[0].action_user, ACTIONS[loading_detail_queryset[0].action_type], loading_detail_queryset[0].action_date))
+    else:
+        zipped = zip(loading_detail_queryset, loading_detail_queryset[1:])
+        for iter, (prev, next) in enumerate(zipped, start=1):
+            loading_detail_history.append((prev.action_user, ACTIONS[prev.action_type], \
+                                           prev.action_date, changed_fields(ets.models.LoadingDetail, prev, next)))
+            if iter == len(zipped):
+                loading_detail_history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+                
     return direct_to_template(request, template, {
             'waybill': waybill,
             'waybill_history': waybill_history,
