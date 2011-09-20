@@ -418,6 +418,11 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""
         
-        data = self.waybill.compress()
+        self.client.login(username='dispatcher', password='dispatcher')
+        data = self.reception_waybill.compress()
         response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
+        
+        data = "-123143"
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
+        self.assertEqual(response.status_code, 404)

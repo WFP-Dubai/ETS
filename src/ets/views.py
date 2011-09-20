@@ -10,6 +10,7 @@ from django.forms.models import inlineformset_factory
 #from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
+from django.http import Http404
 #from django.views.generic.list_detail import object_list
 #from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
@@ -158,7 +159,7 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    
+    print "OK"
     waybill = get_object_or_404(queryset, pk=waybill_pk)
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
@@ -198,6 +199,8 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
     waybill = ets.models.Waybill.decompress(scanned_code)
+    if not waybill:
+        raise Http404
     return waybill_reception(request, waybill.pk, queryset)
 
 

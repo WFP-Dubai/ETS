@@ -71,13 +71,13 @@ urlpatterns += patterns("ets.views",
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', login_required(person_required(receipt_view(waybill_reception))), 
       {}, "waybill_reception"),
                         
-    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", 
-      {}, "waybill_reception_scanned"),
-    
-    ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", {
+    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
         'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
                                                       receipt__signed_date__isnull=True)
-    }, "waybill_finalize_receipt" ),
+    }, "waybill_reception_scanned"),
+    
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
+      {}, "waybill_finalize_receipt" ),
     
     #Validation pages
     
