@@ -414,3 +414,10 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         data = self.waybill.compress()
         response = self.client.get(reverse('deserialize'), data={'data': data,})
         self.assertEqual(response.context['object'], self.waybill)    
+    
+    def test_dispatch_validates(self):
+        """ets.views.dispatch_validates"""
+        
+        response = self.client.get(reverse('dispatch_validates'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Failure")
