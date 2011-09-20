@@ -39,10 +39,10 @@ def waybill_user_related_filter(queryset, user):
     """
     warehouses = ets.models.Warehouse.filter_by_user(user)
     return queryset.filter(Q(order__warehouse__in=warehouses) 
-                                               | Q(destination__in=warehouses) 
-                                               | Q(order__warehouse__compas__officers=user)
-                                               | Q(destination__compas__officers=user))
-
+                           | Q(order__warehouse__compas__officers=user)
+                           | Q(destination__in=warehouses)
+                           | Q(destination__compas__officers=user))
+                           
 waybill_user_related = user_filtered(filter=waybill_user_related_filter)
 
 #Validation
@@ -53,6 +53,6 @@ dispatch_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
 
 receipt_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
                          transport_dispach_signed_date__isnull=False, 
-                         receipt__signed_date__isnull=False, 
-                         receipt__sent_compas__isnull=True, 
+                         receipt_signed_date__isnull=False, 
+                         receipt_sent_compas__isnull=True, 
                          destination__compas__officers=user))

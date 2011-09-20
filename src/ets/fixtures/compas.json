@@ -29,7 +29,7 @@
     "fields": {
       "name": "EDO OFFICE MEHTI", 
       "reporting_code": "ISBX002", 
-      "organization_id": "", 
+      "organization_id": "DOEAF", 
       "geo_point_code": "OE7X", 
       "country_code": "586", 
       "geo_name": "THARPARKAR"
@@ -61,6 +61,20 @@
       "location_code": "ISBX", 
       "last_name": "FRISCH", 
       "email": "DIDIER.FRISCH@WFP.ORG" 
+    }
+  },
+  {
+    "pk": "OE7X001020000613", 
+    "model": "compas.compasperson", 
+    "fields": {
+      "org_unit_code": "ISBX002", 
+      "first_name": "OE7X001", 
+      "code": "0000615", 
+      "title": "REGIONAL LOGISTICS COORDINATOR", 
+      "organization_id": "DOEAF", 
+      "location_code": "OE7X", 
+      "last_name": "FRISCH", 
+      "email": "TEST.FRISCH@WFP.ORG" 
     }
   },
   {

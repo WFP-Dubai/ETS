@@ -474,13 +474,17 @@ class Waybill( ld_models.Model ):
     dispatcher_person = models.ForeignKey(Person, verbose_name=_("Dispatch person"), 
                                           related_name="dispatch_waybills") #dispatcherName
     
+    #Recepient
+    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills", 
+                                        blank=True, null=True) #recipientName
+    receipt_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
+    
     #Transporter
     transport_sub_contractor = models.CharField(_("Transport Sub contractor"), max_length=40, blank=True) #transportSubContractor
     transport_driver_name = models.CharField(_("Transport Driver Name"), max_length=40) #transportDriverName
     transport_driver_licence = models.CharField(_("Transport Driver LicenceID "), max_length=40) #transportDriverLicenceID
     transport_vehicle_registration = models.CharField(_("Transport Vehicle Registration "), max_length=40) #transportVehicleRegistration
     transport_trailer_registration = models.CharField( _("Transport Trailer Registration"), max_length=40, blank=True) #transportTrailerRegistration
-    transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
 
     #Container        
     container_one_number = models.CharField(_("Container One Number"), max_length=40, blank=True) #containerOneNumber
@@ -489,10 +493,23 @@ class Waybill( ld_models.Model ):
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
     container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
     container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
+    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
+    
+    arrival_date = models.DateField(_("Recipient Arrival Date"), blank=True, null=True) #recipientArrivalDate
+    start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), blank=True, null=True) #recipientStartDischargeDate
+    end_discharge_date = models.DateField(_("Recipient End Discharge Date"), blank=True, null=True) #recipientEndDischargeDate
 
-    #Extra Fields
+    distance = models.IntegerField(_("Recipient Distance (km)"), blank=True, null=True) #recipientDistance
+    
+    transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
+    receipt_signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
+    
     validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
     sent_compas = models.DateTimeField(_("Waybill Sent to Compas"), blank=True, null=True)
+    
+    receipt_validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
+    receipt_sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
     audit_log = AuditLog()
 
@@ -519,6 +536,17 @@ class Waybill( ld_models.Model ):
         #If second container exists, first must exist also
         if self.container_two_number and not self.container_one_number:
             raise ValidationError(_("Type container 1 number"))
+        
+        if self.arrival_date and self.arrival_date < self.dispatch_date:
+            raise ValidationError(_("Cargo arrived before being dispatched"))
+
+        if self.start_discharge_date and self.arrival_date \
+        and self.start_discharge_date < self.arrival_date:
+            raise ValidationError(_("Cargo Discharge started before Arrival?"))
+
+        if self.start_discharge_date and self.end_discharge_date \
+        and self.end_discharge_date < self.start_discharge_date:
+            raise ValidationError(_("Cargo finished Discharge before Starting?"))
     
     def dispatch_sign(self, commit=True):
         """Signs the waybill as ready to be sent."""
@@ -527,14 +555,12 @@ class Waybill( ld_models.Model ):
         if commit:
             self.save()
     
-    def get_receipt(self):
-        """Returns receipt instance if exists or None otherwise"""
-        try:
-            receipt = self.receipt
-        except ReceiptWaybill.DoesNotExist:
-            receipt = None
+    def receipt_sign(self, commit=True):
+        """Signs the receipt waybill as ready to be sent."""
+        self.receipt_signed_date = datetime.now()
         
-        return receipt
+        if commit:
+            self.save()
     
     
     def serialize(self):
@@ -545,13 +571,7 @@ class Waybill( ld_models.Model ):
         @return the serialized json data.
         """
         
-        items = chain((self,), self.loading_details.all())
-        
-        receipt = self.get_receipt()
-        if receipt:
-            items = chain((receipt,), items)
-        
-        return serializers.serialize( 'json', items)
+        return serializers.serialize( 'json', chain((self,), self.loading_details.all()))
         
     def compress(self):
         """
@@ -583,68 +603,11 @@ class Waybill( ld_models.Model ):
     def receptions(cls, user):
         """Returns all waybills, that can be received, and related to user"""
         return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                  #receipt__isnull=False,
-                                  receipt__signed_date__isnull=True,
+                                  receipt_signed_date__isnull=True,
                                   destination__in=Warehouse.filter_by_user(user))
     
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]    
-
-class ReceiptWaybill(models.Model):
-    """Receipt data"""
-    waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="receipt")
-    slug = AutoSlugField(populate_from='waybill', unique=True, sep='', primary_key=True, editable=False)
-    
-    warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="receipts")
-    person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills") #recipientName
-    arrival_date = models.DateField(_("Recipient Arrival Date")) #recipientArrivalDate
-    start_discharge_date = models.DateField(_("Recipient Start Discharge Date")) #recipientStartDischargeDate
-    end_discharge_date = models.DateField(_("Recipient End Discharge Date")) #recipientEndDischargeDate
-    distance = models.IntegerField(_("Recipient Distance (km)"), blank=True, null=True) #recipientDistance
-    remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
-    signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
-    
-    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
-    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
-    
-    validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
-    sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
-    
-    class Meta:
-        ordering = ('slug',)
-        order_with_respect_to = 'waybill'
-        verbose_name = _("reception")
-        verbose_name_plural = _("reception")
-    
-    def __unicode__(self):
-        return "Reception of waybill: %s" % self.waybill_id
-    
-    def sign(self, commit=True):
-        """
-        Signs the waybill as delivered. 
-        After this system sends it to central server.
-        """
-        self.signed_date = datetime.now()
-        
-        if commit:
-            self.save()
-    
-    def clean(self):
-        """Validates Waybill instance. Checks different dates"""
-    
-        #===============================================================================================================
-        # if self.arrival_date \
-        # and self.arrival_date < self.waybill.dispatch_date:
-        #    raise ValidationError(_("Cargo arrived before being dispatched"))
-        #===============================================================================================================
-
-        if self.start_discharge_date and self.arrival_date \
-        and self.start_discharge_date < self.arrival_date:
-            raise ValidationError(_("Cargo Discharge started before Arrival?"))
-
-        if self.start_discharge_date and self.end_discharge_date \
-        and self.end_discharge_date < self.start_discharge_date:
-            raise ValidationError(_("Cargo finished Discharge before Starting?"))
 
     
 class LoadingDetail(models.Model):
