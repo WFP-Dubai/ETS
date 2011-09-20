@@ -194,7 +194,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'waybill': waybill,
     })
 
-
+@login_required
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
     waybill = ets.models.Waybill.decompress(scanned_code)
