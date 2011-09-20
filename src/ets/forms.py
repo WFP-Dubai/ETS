@@ -21,16 +21,26 @@ class DispatchWaybillForm( forms.ModelForm ):
     
     class Meta:
         model = ets_models.Waybill
-        exclude = (
-            'order',
-            'validated',
-            'sent_compas',
+        fields = (
+            'destination',
+            'loading_date',
+            'dispatch_date',
+            'transaction_type',
+            'transport_type',
+            'dispatch_remarks',
+
+            'transport_sub_contractor',
+            'transport_driver_name',
+            'transport_driver_licence',
+            'transport_vehicle_registration',
+            'transport_trailer_registration',
             
-            'date_created',
-            'date_modified',
-            'date_removed',
-            'dispatcher_person',
-            'transport_dispach_signed_date',
+            'container_one_number',
+            'container_two_number',
+            'container_one_seal_number',
+            'container_two_seal_number',
+            'container_one_remarks_dispatch',
+            'container_two_remarks_dispatch',
         )
     
     helper = FormHelper()
@@ -83,24 +93,31 @@ class BaseLoadingDetailFormSet(BaseInlineFormSet):
 
 class WaybillRecieptForm( forms.ModelForm ):
     
+    def __init__(self, *args, **kwargs):
+        super(WaybillRecieptForm, self).__init__(*args, **kwargs)
+        for field_name in ('arrival_date', 'start_discharge_date', 'end_discharge_date',):
+            self.fields[field_name].required = True
+    
     class Meta:
-        model = ets_models.ReceiptWaybill
-        exclude = (
-            'waybill',
-            'validated',
-            'sent_compas',
-            'person',
-            'signed_date',
+        model = ets_models.Waybill
+        fields = (
+            'destination',
+            'receipt_remarks',
+            'arrival_date',
+            'start_discharge_date',
+            'end_discharge_date',
+            'distance',
+            
         )
     
     helper = FormHelper()
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset(ugettext('Warehouse'), 'warehouse'),
+        Fieldset(ugettext('Warehouse'), 'destination'),
         Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
         Fieldset(ugettext('Containers'), Row('container_one_remarks_reciept', 'container_two_remarks_reciept')),
-        Fieldset('', Row('distance', 'remarks')),
+        Fieldset('', Row('distance', 'receipt_remarks')),
     ))
     
     helper.form_tag = False

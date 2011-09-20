@@ -157,20 +157,20 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         
         ets.utils.call_db_procedure = call_db_procedure
         
-        reception = ets.models.ReceiptWaybill.objects.get(pk="isbx00311a")
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00312A")
         
         #Validate first waybill
-        reception.validated = True
-        reception.signed_date = datetime.now()
-        reception.save()
+        waybill.receipt_validated = True
+        waybill.receipt_signed_date = datetime.now()
+        waybill.save()
         
         #Send all validated waybills to compas
         send_received(self.compas)
         
-        self.assertTrue(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
+        self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_sent_compas)
         
         #Check compass logger
-        logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
+        logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00312A')
         self.assertEqual(logger.status, ets.models.CompasLogger.SUCCESS)
     
     def test_received_failure(self):
@@ -180,16 +180,16 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         
         ets.utils.call_db_procedure = call_db_procedure
         
-        ets.models.ReceiptWaybill.objects.filter(pk="isbx00311a").update(validated=True, 
-                                                                         signed_date=datetime.now())
+        ets.models.Waybill.objects.filter(pk="ISBX00312A").update(receipt_validated=True, 
+                                                                  receipt_signed_date=datetime.now())
         
         #Send all validated waybills to compas
         send_received(self.compas)
         
-        self.assertFalse(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").sent_compas)
-        self.assertFalse(ets.models.ReceiptWaybill.objects.get(pk="isbx00311a").validated)
+        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_sent_compas)
+        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_validated)
         
         #Check compass logger
-        logger = ets.models.CompasLogger.objects.get(waybill__receipt__pk='isbx00311a')
+        logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00312A')
         self.assertTupleEqual((logger.status, logger.message), (ets.models.CompasLogger.FAILURE, "Test wrong message"))
         

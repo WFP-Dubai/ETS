@@ -93,17 +93,6 @@ class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
     
-class ReceiptInline(admin.StackedInline):
-    model = ets.models.ReceiptWaybill
-    extra = 0
-    
-    fieldsets = (
-        (_('Dates'), {'fields': ('arrival_date', 'start_discharge_date', 
-                                 'end_discharge_date', 'signed_date',)}),
-        (_("Reception details"), {'fields': ('person', 'distance', 'remarks',)}),
-        (_('Containers'), {'fields': ('container_one_remarks_reciept', 'container_two_remarks_reciept',)}),
-        (_("Utility information"), {'fields': ('validated', 'sent_compas')}),
-    )
 
 class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
@@ -116,10 +105,13 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                    'transport_driver_licence', 'transport_vehicle_registration', 
                                    'transport_trailer_registration', 'transport_dispach_signed_date',)}),
         (_('Container 1'), {'fields': ('container_one_number', 'container_one_seal_number', 
-                                       'container_one_remarks_dispatch',)}),
+                                       'container_one_remarks_dispatch', 'container_one_remarks_reciept')}),
         (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
-                                       'container_two_remarks_dispatch',)}),
-        (_("COMPAS"), {'fields': ('validated', 'sent_compas',)}),
+                                       'container_two_remarks_dispatch', 'container_two_remarks_reciept')}),
+        (_("Receipt"), {'fields': ('arrival_date', 'start_discharge_date', 
+                                   'end_discharge_date', 'receipt_signed_date', 
+                                   'receipt_person', 'distance', 'receipt_remarks',)}),
+        (_("COMPAS"), {'fields': ('validated', 'sent_compas', 'receipt_validated', 'receipt_sent_compas')}),
         (_("Utility"), {'fields': ('date_created', 'date_modified', 'date_removed')}),
     )
     
@@ -129,7 +121,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
     search_fields = ('slug', 'order__pk',)
-    inlines = (LoadingDetailsInline, ReceiptInline, CompasLoggerInline)
+    inlines = (LoadingDetailsInline, CompasLoggerInline)
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 

@@ -140,27 +140,13 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
     return _dispatching(request, waybill, success_message=_("Waybill has been updated"), **kwargs) 
 
 
-@login_required
-@person_required
-@receipt_view
-def waybill_finalize_receipt(request, waybill_pk, queryset):
-    """ Signs reception"""
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.receipt.sign()
-    
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
-        'waybill': waybill.pk,
-    })
-
-    return redirect(waybill)
-
-
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    print "OK"
+    
     waybill = get_object_or_404(queryset, pk=waybill_pk)
+    waybill.receipt_person = request.user.person
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                                             form=formset_form, extra=0, max_num=5,
@@ -172,20 +158,13 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'arrival_date': today,
         'start_discharge_date': today,
         'end_discharge_date': today,
-        'warehouse': waybill.destination,
-    }, instance=waybill.get_receipt())
+    }, instance=waybill)
     
-    form.fields['warehouse'].queryset = ets.models.Warehouse.get_warehouses(request.user.person.location, 
-                                                                            request.user.person.organization)\
-                                                            .exclude(pk=waybill.order.warehouse.pk)
+    form.fields['destination'].queryset = request.user.person.get_warehouses().exclude(pk=waybill.order.warehouse.pk)
     
     if form.is_valid() and loading_formset.is_valid():
-        receipt = form.save(False)
-        receipt.waybill = waybill
-        receipt.person = request.user.person
-        receipt.save()
-        
-        loading_formset.save(True)
+        waybill = form.save()
+        loading_formset.save()
         
         return redirect(waybill)
     
@@ -194,6 +173,22 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'formset': loading_formset,
         'waybill': waybill,
     })
+
+
+@login_required
+@person_required
+@receipt_view
+def waybill_finalize_receipt(request, waybill_pk, queryset):
+    """ Signs reception"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.receipt_sign()
+    
+    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
+        'waybill': waybill.pk,
+    })
+
+    return redirect(waybill)
+
 
 @login_required
 @person_required
@@ -235,8 +230,8 @@ def dispatch_validates(request, queryset, template):
 @receipt_compas
 def receipt_validates(request, queryset, template):
     return direct_to_template(request, template, {
-        'object_list': queryset.filter(receipt__validated=False),
-        'validated_waybills': queryset.filter(receipt__validated=True),
+        'object_list': queryset.filter(receipt_validated=False),
+        'validated_waybills': queryset.filter(receipt_validated=True),
     })
 
 

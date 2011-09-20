@@ -20,9 +20,9 @@
     <tr>
       <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
       <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
-      <td>{{ waybill.order.warehouse }}</td>
+      <td>{{ waybill.order.warehouse.location.name }}</td>
       <td>{{ waybill.order.consignee }}</td>
-      <td>{{ waybill.destination }}</td>
+      <td>{{ waybill.order.location }}</td>
     </tr>
     {% endfor%} 
   <tbody>
