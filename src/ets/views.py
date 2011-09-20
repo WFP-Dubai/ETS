@@ -159,7 +159,7 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    print "OK"
+    
     waybill = get_object_or_404(queryset, pk=waybill_pk)
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
