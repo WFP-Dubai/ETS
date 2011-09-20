@@ -1,0 +1,17 @@
+{% load i18n %}
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" class='history_log'>
+  <thead>
+    <tr>
+      <th>{% trans "User" %}</th>
+      <th>{% trans "Action" %}</th>
+      <th>{% trans "Time" %}</th>
+      <th>{% trans "Changes" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in history_list %}
+      {% include "waybill/fragment_history.html" %}
+    {% endfor %}
+  </tbody>
+</table>
