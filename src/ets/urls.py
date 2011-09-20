@@ -13,7 +13,7 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
-from ets.views import waybill_list 
+from ets.views import waybill_list, waybill_reception
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
@@ -68,8 +68,11 @@ urlpatterns += patterns("ets.views",
     
     #Reception pages
     
-    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', "waybill_reception", 
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', login_required(person_required(receipt_view(waybill_reception))), 
       {}, "waybill_reception"),
+                        
+    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/receive/$', "waybill_reception_scanned", 
+      {}, "waybill_reception_scanned"),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
       {}, "waybill_finalize_receipt" ),

@@ -154,9 +154,6 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
     return redirect(waybill)
 
 
-@login_required
-@person_required
-@receipt_view
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
@@ -196,6 +193,12 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'formset': loading_formset,
         'waybill': waybill,
     })
+
+
+@person_required
+def waybill_reception_scanned(request, scanned_code, queryset):
+    waybill = ets.models.Waybill.decompress(scanned_code)
+    return waybill_reception(request, waybill.pk, queryset)
 
 
 @login_required
