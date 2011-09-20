@@ -54,7 +54,7 @@
 {{ block.super }}
 <script charset="utf-8" type="text/javascript">
 $(document).ready(function() {
-   $('#{{ form.arrival_date.auto_id }}, ##{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });
+   $('#{{ form.arrival_date.auto_id }}, #{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ dateFormat: 'yy-mm-dd' });
 });
 </script>
 {% endblock %}

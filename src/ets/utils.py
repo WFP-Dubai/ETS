@@ -287,11 +287,9 @@ def send_dispatched(using):
             
 
 def send_received(using):
-    for reception in ets_models.ReceiptWaybill.objects.filter(signed_date__lte=datetime.now(), 
-                                                              validated=True, sent_compas__isnull=True,
-                                                              waybill__destination__compas__pk=using):
-        waybill = reception.waybill
-        
+    for waybill in ets_models.Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
+                                                     receipt_validated=True, receipt_sent_compas__isnull=True,
+                                                     destination__compas__pk=using):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -309,9 +307,9 @@ def send_received(using):
                     
                     call_db_procedure('write_waybill.receipt', (
                         CURR_CODE, 
-                        reception.person.compas.pk, 
-                        reception.person.code, 
-                        reception.arrival_date.strftime("%Y%m%d"),
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
                         u'%.3f' % loading.number_units_good, 
                         loading.units_damaged_reason and loading.units_damaged_reason.cause, 
                         u'%.3f' % loading.number_units_damaged, 
@@ -331,16 +329,16 @@ def send_received(using):
                                                    status=ets_models.CompasLogger.FAILURE, 
                                                    message='\n'.join(err.messages))
             
-            reception.validated = False
-            reception.save()
+            waybill.receipt_validated = False
+            waybill.save()
             
         else:
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                    compas_id=using, waybill=waybill,
                                                    status=ets_models.CompasLogger.SUCCESS)
             
-            reception.sent_compas = datetime.now()
-            reception.save()
+            waybill.receipt_sent_compas = datetime.now()
+            waybill.save()
 
 
 #=======================================================================================================================

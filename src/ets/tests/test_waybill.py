@@ -243,7 +243,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'container_one_remarks_reciept': '',
             'container_two_remarks_reciept': '',
             'distance': 5,
-            'remarks': 'test remarks',
+            'receipt_remarks': 'test remarks',
         }
         
         response = self.client.post(path, data=data)
@@ -300,13 +300,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.post(path, data=data)
         #Provide a reception warehouse
         data.update({
-            'warehouse': 'ISBX002',
+            'destination': 'ISBX002',
         })
         
         response = self.client.post(path, data=data)
         # Now everything should be all right
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
-        self.assertEqual(self.reception_waybill.get_receipt().remarks, 'test remarks')
+        self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
     
     def test_waybill_delete(self):
         """ets.views.waybill_delete"""  
@@ -395,8 +395,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
     def test_waybill_compass_receipt(self):
         
-        waybill_reciept = ets.models.ReceiptWaybill.objects.get(pk='isbx00311a')
-        waybill_reciept.sent_compas = datetime.datetime.now()
+        waybill_reciept = ets.models.Waybill.objects.get(pk='ISBX00311A')
+        waybill_reciept.receipt_sent_compas = datetime.datetime.now()
         waybill_reciept.save()
         
         response = self.client.get(reverse('compass_waybill_receipt'))
@@ -414,6 +414,48 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         data = self.waybill.compress()
         response = self.client.get(reverse('deserialize'), data={'data': data,})
         self.assertEqual(response.context['object'], self.waybill)    
+        
+    def test_waybill_reception_scanned(self):
+        """ets.views.waybill_reception_scanned"""
+        
+        self.client.login(username='foreigner', password='recepient')
+        data = self.reception_waybill.compress()
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
+        self.assertEqual(response.status_code, 200)
+        
+        form_data = {
+            'item-TOTAL_FORMS': 1,
+            'item-INITIAL_FORMS': 1,
+            'item-MAX_NUM_FORMS': 5,
+            
+            'item-0-number_units_good': 35,
+            'item-0-number_units_lost': 0,
+            'item-0-units_lost_reason': '',
+            'item-0-number_units_damaged': 0,
+            'item-0-units_damaged_reason': '',
+            
+            'item-0-slug': 'ISBX00311A1',
+            'item-0-waybill': 'ISBX00311A',
+            
+            'arrival_date': '2011-08-10',
+            'start_discharge_date': '2011-08-25',
+            'end_discharge_date': '2011-08-26',
+            'container_one_remarks_reciept': '',
+            'container_two_remarks_reciept': '',
+            'distance': 5,
+            'receipt_remarks': 'test remarks',
+            'destination': 'OE7X001',
+        }
+        
+        response = self.client.post(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}), 
+                                    data=form_data)
+        # Everything should be fine
+        self.assertRedirects(response, self.reception_waybill.get_absolute_url())
+        self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
+        
+        data = "-123143"
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
+        self.assertEqual(response.status_code, 404)
     
     def test_dispatch_validates(self):
         """ets.views.dispatch_validates"""

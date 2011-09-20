@@ -13,7 +13,7 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
-from ets.views import waybill_list 
+from ets.views import waybill_list, waybill_reception
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
@@ -68,8 +68,13 @@ urlpatterns += patterns("ets.views",
     
     #Reception pages
     
-    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', "waybill_reception", 
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', login_required(person_required(receipt_view(waybill_reception))), 
       {}, "waybill_reception"),
+                        
+    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
+        'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
+                                                      receipt_signed_date__isnull=True)
+    }, "waybill_reception_scanned"),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
       {}, "waybill_finalize_receipt" ),
@@ -100,7 +105,7 @@ urlpatterns += patterns("ets.views",
     
     ( r'^compass_waybill_receipt/$', login_required(officer_required(waybill_user_related(object_list))), {
         "template_name": 'compas/list_waybills_compas_all.html',
-        "queryset": Waybill.objects.filter(receipt__sent_compas__isnull=False),
+        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False),
         "extra_context": {
             "extra_title": _("Received"),
     }}, "compass_waybill_receipt" ),
