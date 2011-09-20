@@ -132,8 +132,7 @@ def history_waybill(entry, waybill_changes="", loading_details=""):
         waybill_changes = changed_fields(Waybill, entry, previous) #waybill__pk=entry.slug, 
         max_datetime = entry.action_date + datetime.timedelta(seconds=10)
         loading_details = LoadingDetail.audit_log.filter(waybill__pk=entry.slug, action_user=entry.action_user\
-                        , action_date__gte=entry.action_date, action_date__lte=max_datetime )
-    print entry.action_date       
+                        , action_date__gte=entry.action_date, action_date__lte=max_datetime )     
     return {
             'item': entry,
             'changes': waybill_changes,
@@ -142,8 +141,6 @@ def history_waybill(entry, waybill_changes="", loading_details=""):
         
 @register.inclusion_tag('tags/changed_fields.html')
 def history_loading_details(entry, loading_details_changes=""):
-    print "OK"
-    print entry.action_date
     if entry.action_type == "U":
         previous = LoadingDetail.audit_log.filter(waybill__pk=entry.waybill_id, slug=entry.slug, action_id__lt=entry.action_id).order_by('-action_id')[0]
         loading_details_changes = changed_fields(LoadingDetail, entry, previous)        
@@ -151,3 +148,7 @@ def history_loading_details(entry, loading_details_changes=""):
             'item': entry,
             'changes': loading_details_changes,
     }
+
+@register.inclusion_tag('tags/history.html')    
+def history(history_list):
+    return { 'history_list': history_list }

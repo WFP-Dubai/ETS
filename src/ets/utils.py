@@ -5,6 +5,7 @@ from django.db.utils import DatabaseError
 from django.conf import settings
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext as _
 
 from compas.utils import call_db_procedure
 import compas.models as compas_models
@@ -349,3 +350,21 @@ def changed_fields(cls, base, previous):
             changes[field.verbose_name] = str(getattr(base, field.name))
     return changes
     
+def history_list(log_queryset, model):
+    
+    ACTIONS = {
+        'I': _('Created'),
+        'U': _('Changed'),
+        'D': _('Deleted'),
+    }
+    history=[]
+    if log_queryset.count() == 1:
+        history.append((log_queryset[0].action_user, ACTIONS[log_queryset[0].action_type], log_queryset[0].action_date))
+    else:
+        zipped = zip(log_queryset, log_queryset[1:])
+        for iter, (prev, next) in enumerate(zipped, start=1):
+            history.append((prev.action_user, ACTIONS[prev.action_type], \
+                                    prev.action_date, changed_fields(model, prev, next)))
+            if iter == len(zipped):
+                history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+    return history

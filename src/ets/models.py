@@ -646,6 +646,8 @@ class ReceiptWaybill(models.Model):
     validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
+    audit_log = AuditLog()
+    
     class Meta:
         ordering = ('slug',)
         order_with_respect_to = 'waybill'
