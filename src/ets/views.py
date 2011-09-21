@@ -153,7 +153,6 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    
     waybill = get_object_or_404(queryset, pk=waybill_pk)
     waybill.receipt_person = request.user.person
     
@@ -283,6 +282,8 @@ def deserialize(request, form_class=WaybillScanForm):
         data = form.cleaned_data['data']
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
+            if request.GET.get("receipt",""):
+                return redirect('waybill_reception_scanned', scanned_code=data )
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Data Incorrect!!!'))
