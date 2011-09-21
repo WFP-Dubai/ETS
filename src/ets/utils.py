@@ -341,12 +341,10 @@ def send_received(using):
         waybill.save()
             
 
-def changed_fields(cls, base, previous):
-    changes = {}
-    for field in cls._meta.fields:
-        if not getattr(base, field.name) == getattr(previous, field.name):
-            changes[field.verbose_name] = str(getattr(base, field.name))
-    return changes
+def changed_fields(next, previous):
+    for field in next._meta.fields:
+        if getattr(next, field.name) != getattr(previous, field.name):
+            yield field.verbose_name, getattr(next, field.name)
     
 def history_list(log_queryset, model):
     
@@ -362,7 +360,7 @@ def history_list(log_queryset, model):
         zipped = zip(log_queryset, log_queryset[1:])
         for iter, (prev, next) in enumerate(zipped, start=1):
             history.append((prev.action_user, ACTIONS[prev.action_type], \
-                                    prev.action_date, changed_fields(model, prev, next)))
+                                    prev.action_date, changed_fields(next, prev)))
             if iter == len(zipped):
                 history.append((next.action_user, ACTIONS[next.action_type], next.action_date, {}))
     return history

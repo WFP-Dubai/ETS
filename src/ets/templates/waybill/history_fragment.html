@@ -16,7 +16,7 @@
           <td>{{ action_type }}</td>
           <td>{{ action_date }}</td>
           <td>
-            {% for key, field in changes.items %}
+            {% for key, field in changes %}
               {{ key }}: {{ field }}{% if not forloop.last %},{% endif %}
             {% endfor %}
           </td>
