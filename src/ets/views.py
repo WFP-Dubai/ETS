@@ -23,6 +23,7 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
+from ets.utils import changed_fields, history_list
 
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):
@@ -279,6 +280,22 @@ def deserialize(request, form_class=WaybillScanForm):
     messages.error(request, _('Data Incorrect!!!'))
     return redirect('index')
 
+
+def waybill_history(request, template, waybill_pk, loading_detail_queryset=ets.models.LoadingDetail.audit_log.all()):
+    
+    waybill = get_object_or_404(ets.models.Waybill, pk=waybill_pk)
+    waybill_log = waybill.audit_log.all().order_by('-action_id')
+    waybill_history = history_list(waybill_log, ets.models.Waybill)
+            
+    loading_detail_queryset = loading_detail_queryset.filter(waybill__pk=waybill_pk).order_by('-action_id')
+    loading_detail_history = history_list(loading_detail_queryset, ets.models.LoadingDetail)
+                
+    return direct_to_template(request, template, {
+        'waybill': waybill,
+        'waybill_history': waybill_history,
+        'loading_detail_history': loading_detail_history,       
+    })
+    
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
