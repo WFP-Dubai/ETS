@@ -7,10 +7,10 @@
 <h2>{% trans "History for Waybill" %} {{ waybill.pk }}</h2>
 
 <h3>{% trans "Waybill history" %}</h3>
-{% history waybill_history %}
+{% include "history_fragment.html" with history_list=waybill_history %}
 
 <h3>{% trans "Loading details history" %}</h3>
-{% history loading_detail_history %}
+{% include "history_fragment.html" with history_list=loading_detail_history %}
 
 {% endblock content %}
 

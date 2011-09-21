@@ -284,16 +284,16 @@ def deserialize(request, form_class=WaybillScanForm):
 def waybill_history(request, template, waybill_pk, loading_detail_queryset=ets.models.LoadingDetail.audit_log.all()):
     
     waybill = get_object_or_404(ets.models.Waybill, pk=waybill_pk)
-    waybill_log = ets.models.Waybill.audit_log.filter(slug=waybill_pk).order_by('-action_id')
+    waybill_log = waybill.audit_log.all().order_by('-action_id')
     waybill_history = history_list(waybill_log, ets.models.Waybill)
             
     loading_detail_queryset = loading_detail_queryset.filter(waybill__pk=waybill_pk).order_by('-action_id')
     loading_detail_history = history_list(loading_detail_queryset, ets.models.LoadingDetail)
                 
     return direct_to_template(request, template, {
-            'waybill': waybill,
-            'waybill_history': waybill_history,
-            'loading_detail_history': loading_detail_history,       
+        'waybill': waybill,
+        'waybill_history': waybill_history,
+        'loading_detail_history': loading_detail_history,       
     })
     
 

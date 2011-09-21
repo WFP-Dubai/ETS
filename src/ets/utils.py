@@ -357,14 +357,14 @@ def history_list(log_queryset, model):
     }
     history=[]
     if log_queryset.count() == 1:
-        history.append((log_queryset[0].action_user, ACTIONS[log_queryset[0].action_type], log_queryset[0].action_date))
+        history.append((log_queryset[0].action_user, ACTIONS[log_queryset[0].action_type], log_queryset[0].action_date, {}))
     else:
         zipped = zip(log_queryset, log_queryset[1:])
         for iter, (prev, next) in enumerate(zipped, start=1):
             history.append((prev.action_user, ACTIONS[prev.action_type], \
                                     prev.action_date, changed_fields(model, prev, next)))
             if iter == len(zipped):
-                history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
+                history.append((next.action_user, ACTIONS[next.action_type], next.action_date, {}))
     return history
 
 
