@@ -413,7 +413,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Test with compressed data
         data = self.waybill.compress()
         response = self.client.get(reverse('deserialize'), data={'data': data,})
-        self.assertEqual(response.context['object'], self.waybill)    
+        self.assertEqual(response.context['object'], self.waybill)   
+        
+        #Test receipt get request
+        data = self.waybill.compress()
+        response = self.client.get(reverse('deserialize'), data={'data': data, 'receipt': 'Receipt Waybill'})
+        self.assertEqual(response.status_code, 302)     
 
     def test_waybill_history(self):
         """ets.views.waybill_history"""

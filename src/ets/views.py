@@ -273,10 +273,10 @@ def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
     if form.is_valid():
         data = form.cleaned_data['data']
-        if request.GET.get("receipt",""):
-            return redirect('waybill_reception_scanned', scanned_code=data )
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
+            if request.GET.get("receipt",""):
+                return redirect('waybill_reception_scanned', scanned_code=data )
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Data Incorrect!!!'))
