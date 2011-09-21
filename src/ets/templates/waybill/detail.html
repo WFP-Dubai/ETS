@@ -10,6 +10,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="hidden_print actions">
   <a class="print_copy" href="#">Print Copy</a>
   {% waybill_edit object user %}
@@ -30,13 +31,25 @@
   {% waybill_reception object user %}
   {% waybill_delete object user %}
   
-  <a href="{% url waybill_history waybill_pk=object.pk %}">{% trans "History" %}</a>
 </div>
-<table cellpadding="0" cellspacing="0" border="0px" >
+<table id="details" cellpadding="0" cellspacing="0" border="0px" >
   {% include 'waybill/print/wb_header.html'%}
   {% include 'waybill/print/wb_loading.html'%}
   {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
 </table>
+
+<div id="history" class="hidden_print">
+  <h3>{% trans "Waybill history" %}</h3>
+  {% include "waybill/history_fragment.html" with history_list=waybill_history %}
+  
+  <h3>{% trans "Loading details history" %}</h3>
+  
+  {% for loading, history in loading_detail_history %}
+  <h4>{{ loading.stock_item.coi_code }} - {{ loading.stock_item.commodity }}</h4>
+  {% include "waybill/history_fragment.html" with history_list=history %}
+  {% endfor %}
+</div>
+
 {% endblock %}
 
 {% block script %}
