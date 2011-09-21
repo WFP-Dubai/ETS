@@ -226,10 +226,10 @@ def send_dispatched(using):
                         waybill.order.origin_type, 
                         waybill.order.warehouse.location.pk, 
                         waybill.order.warehouse.pk,
-                        u'', 
+                        waybill.order.warehouse.name, 
                         waybill.order.location.pk,
                         waybill.destination.pk,
-                        waybill.order.pk, 
+                        loading.get_order_item().lti_id, #waybill.order.pk, 
                         waybill.loading_date.strftime("%Y%m%d"),
                         waybill.order.consignee.pk, 
                         
@@ -247,8 +247,6 @@ def send_dispatched(using):
                         
                         waybill.transport_driver_name, 
                         waybill.transport_driver_licence,
-                        waybill.transport_vehicle_registration, 
-                        waybill.transport_trailer_registration,
                         CONTAINER_NUMBER,
                          
                         using,
@@ -263,10 +261,13 @@ def send_dispatched(using):
                         u'%.3f' % loading.calculate_total_net(), 
                         u'%.3f' % loading.calculate_total_gross(), 
                         u'%.3f' % (1 if is_bulk else loading.number_of_units), 
-                        u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_net, 
-                        u'' if is_bulk else u'%.3f' % loading.stock_item.unit_weight_gross, 
+                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
+                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
                         
-                        u'', u''
+                        None, #p_odaid
+                        None, #p_losstype
+                        None, #p_lossreason
+                        None, #p_loannumber
                     ), using)
         
         except ValidationError, err:
@@ -287,11 +288,9 @@ def send_dispatched(using):
             
 
 def send_received(using):
-    for reception in ets_models.ReceiptWaybill.objects.filter(signed_date__lte=datetime.now(), 
-                                                              validated=True, sent_compas__isnull=True,
-                                                              waybill__destination__compas__pk=using):
-        waybill = reception.waybill
-        
+    for waybill in ets_models.Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
+                                                     receipt_validated=True, receipt_sent_compas__isnull=True,
+                                                     destination__compas__pk=using):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -309,14 +308,14 @@ def send_received(using):
                     
                     call_db_procedure('write_waybill.receipt', (
                         CURR_CODE, 
-                        reception.person.compas.pk, 
-                        reception.person.code, 
-                        reception.arrival_date.strftime("%Y%m%d"),
-                        loading.number_units_good, 
-                        loading.units_damaged_reason and loading.units_damaged_reason.cause or '', 
-                        loading.number_units_damaged or '', 
-                        loading.units_lost_reason and loading.units_lost_reason.cause or '', 
-                        loading.number_units_lost or '', 
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
+                        u'%.3f' % loading.number_units_good, 
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause, 
+                        u'%.3f' % loading.number_units_damaged, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause, 
+                        u'%.3f' % loading.number_units_lost, 
                         loading.stock_item.pk, 
                         loading.stock_item.commodity.category.pk,
                         loading.stock_item.commodity.pk, 
@@ -331,17 +330,16 @@ def send_received(using):
                                                    status=ets_models.CompasLogger.FAILURE, 
                                                    message='\n'.join(err.messages))
             
-            reception.validated = False
-            reception.save()
-            
+            waybill.receipt_validated = False
         else:
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                    compas_id=using, waybill=waybill,
                                                    status=ets_models.CompasLogger.SUCCESS)
             
-            reception.sent_compas = datetime.now()
-            reception.save()
-
+            waybill.receipt_sent_compas = datetime.now()
+        
+        waybill.save()
+            
 
 def changed_fields(cls, base, previous):
     changes = {}
@@ -368,3 +366,21 @@ def history_list(log_queryset, model):
             if iter == len(zipped):
                 history.append((next.action_user, ACTIONS[next.action_type], next.action_date))
     return history
+
+
+#=======================================================================================================================
+# def test_compas():
+#    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True, sent_compas=None)
+#    send_dispatched('ISBX002')
+#        
+#    print ets_models.CompasLogger.objects.all()
+#    ets_models.CompasLogger.objects.all().delete()
+#    
+#    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, sent_compas=None, 
+#                                                                             signed_date=datetime.now())
+#    send_received('ISBX002')
+#    
+#    print ets_models.CompasLogger.objects.all()
+#    ets_models.CompasLogger.objects.all().delete()
+#    
+#=======================================================================================================================

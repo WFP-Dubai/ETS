@@ -4,7 +4,7 @@
     "model": "compas.place", 
     "fields": {
       "name": "PAKISTAN COUNTRY OFFICE",
-      "reporting_code": "dev_compas",
+      "reporting_code": "ISBX002",
       "organization_id": "WFP",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -16,7 +16,7 @@
     "model": "compas.place", 
     "fields": {
       "name": "ISLAMABAD CITY OFFICE",
-      "reporting_code": "dev_compas",
+      "reporting_code": "ISBX002",
       "organization_id": "DOEAF",
       "geo_point_code": "ISBX",
       "country_code": "586",
@@ -28,8 +28,8 @@
     "model": "compas.place", 
     "fields": {
       "name": "EDO OFFICE MEHTI", 
-      "reporting_code": "dev_compas", 
-      "organization_id": "", 
+      "reporting_code": "ISBX002", 
+      "organization_id": "DOEAF", 
       "geo_point_code": "OE7X", 
       "country_code": "586", 
       "geo_name": "THARPARKAR"
@@ -39,7 +39,7 @@
     "pk": "ISBX0020000586", 
     "model": "compas.compasperson", 
     "fields": {
-      "org_unit_code": "dev_compas",
+      "org_unit_code": "ISBX002",
       "location_code": "ISBX",
       "organization_id": "WFP", 
       "first_name": "RIAZ", 
@@ -53,7 +53,7 @@
     "pk": "ISBX0020000613", 
     "model": "compas.compasperson", 
     "fields": {
-      "org_unit_code": "dev_compas", 
+      "org_unit_code": "ISBX002", 
       "first_name": "DIDIER", 
       "code": "0000613", 
       "title": "REGIONAL LOGISTICS COORDINATOR", 
@@ -64,10 +64,24 @@
     }
   },
   {
+    "pk": "OE7X001020000613", 
+    "model": "compas.compasperson", 
+    "fields": {
+      "org_unit_code": "ISBX002", 
+      "first_name": "OE7X001", 
+      "code": "0000615", 
+      "title": "REGIONAL LOGISTICS COORDINATOR", 
+      "organization_id": "DOEAF", 
+      "location_code": "OE7X", 
+      "last_name": "FRISCH", 
+      "email": "TEST.FRISCH@WFP.ORG" 
+    }
+  },
+  {
     "pk": "LMIX", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "VARIANCE IN WEIGHT", 
+      "cause": "INFESTATION", 
       "type": "L", 
       "category": "MIX"
     }
@@ -85,7 +99,7 @@
     "pk": "DMIX", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "WET BY GASOIL", 
+      "cause": "BAG WET BY WATER",
       "type": "D", 
       "category": "MIX"
     }
@@ -94,7 +108,7 @@
     "pk": "DSED", 
     "model": "ets.lossdamagetype", 
     "fields": {
-      "cause": "BROKEN", 
+      "cause": "POOR HANDLING", 
       "type": "D", 
       "category": "SED"
     }

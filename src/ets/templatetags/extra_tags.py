@@ -13,38 +13,40 @@ from ets.utils import changed_fields
 register = template.Library()
 
 
-@register.filter
-def truncatesmart( value, limit = 80 ):
-    """
-    Truncates a string after a given number of chars keeping whole words.
-    
-    Usage:
-        {{ string|truncatesmart }}
-        {{ string|truncatesmart:50 }}
-    """
-
-    try:
-        limit = int( limit )
-    # invalid literal for int()
-    except ValueError:
-        # Fail silently.
-        return value
-
-    # Make sure it's unicode
-    value = unicode( value )
-
-    # Return the string itself if length is smaller or equal to the limit
-    if len( value ) <= limit:
-        return value
-
-    # Cut the string
-    value = value[:limit]
-
-    # Break into words and remove the last
-    words = value.split( ' ' )[:-1]
-
-    # Join the words and return
-    return ' '.join( words ) + '...'
+#=======================================================================================================================
+# @register.filter
+# def truncatesmart( value, limit = 80 ):
+#    """
+#    Truncates a string after a given number of chars keeping whole words.
+#    
+#    Usage:
+#        {{ string|truncatesmart }}
+#        {{ string|truncatesmart:50 }}
+#    """
+# 
+#    try:
+#        limit = int( limit )
+#    # invalid literal for int()
+#    except ValueError:
+#        # Fail silently.
+#        return value
+# 
+#    # Make sure it's unicode
+#    value = unicode( value )
+# 
+#    # Return the string itself if length is smaller or equal to the limit
+#    if len( value ) <= limit:
+#        return value
+# 
+#    # Cut the string
+#    value = value[:limit]
+# 
+#    # Break into words and remove the last
+#    words = value.split( ' ' )[:-1]
+# 
+#    # Join the words and return
+#    return ' '.join( words ) + '...'
+#=======================================================================================================================
 
 
 @register.inclusion_tag('tags/give_link.html')
@@ -105,10 +107,10 @@ def validate_dispatch(waybill, user, link_text=_("Validate dispatch"), forbidden
 
 @register.inclusion_tag('tags/give_link.html')
 def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_text=""):
-    queryset = Waybill.objects.filter(receipt__sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
-                              .filter(receipt__signed_date__isnull=False) \
+    queryset = Waybill.objects.filter(receipt_sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
+                              .filter(receipt_signed_date__isnull=False) \
                               .filter(destination__compas__officers=user) \
-                              .filter(receipt__validated=False)
+                              .filter(receipt_validated=False)
 
     return { 
             'text': link_text,

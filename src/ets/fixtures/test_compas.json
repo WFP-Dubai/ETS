@@ -1,9 +1,10 @@
 [ 
   {
-    "pk": "dev_compas",
+    "pk": "ISBX002",
     "model": "ets.compas",
     "fields": {
       "officers": [1],
+      "start_date": "2005-11-14",
       
       "db_engine": "django.db.backends.oracle",
       "db_name": "10.11.70.50/ISBX002",

@@ -16,7 +16,7 @@
     }
   },
   {
-    "pk": "dev_compas",
+    "pk": "ISBX002",
     "model": "ets.compas",
     "fields": {
       "officers": [1],

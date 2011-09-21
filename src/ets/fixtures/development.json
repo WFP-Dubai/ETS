@@ -32,6 +32,22 @@
     }
   },
   {
+    "pk": 4,
+    "model": "auth.user",
+    "fields": {
+        "username": "foreigner",
+        "first_name": "Foreigner",
+        "last_name": "foreignerovich",
+        "is_active": true,
+        "is_superuser": false,
+        "is_staff": false,
+        "groups": [],
+        "user_permissions": [],
+        "password": "sha1$7cf39$b9630a8123646e991cfbd961f27606f4017c18d0",
+        "email": "foreigner@example.com"
+    }
+  },
+  {
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
@@ -177,25 +193,18 @@
       "container_one_number": "",
       "date_created": "2011-06-12 05:36:54",
       
-      "_order": 0
-    }
-  },
-  {
-    "pk": "isbx00311a",
-    "model": "ets.receiptwaybill",
-    "fields": {
       "container_two_remarks_reciept": "",
+      "container_one_remarks_reciept": "",
       "distance": 5,
       "arrival_date": "2011-08-22",
-      "_order": 0,
-      "signed_date": null,
-      "waybill": "ISBX00312A",
+      "receipt_signed_date": null,
       "start_discharge_date": "2011-08-22",
-      "person": "ISBX0020000586",
       "end_discharge_date": "2011-08-22",
-      "remarks": "",
-      "validated": false,
-      "container_one_remarks_reciept": ""
+      "receipt_person": "ISBX0020000586",
+      "receipt_remarks": "",
+      "receipt_validated": false,
+      
+      "_order": 0
     }
   },
   {
@@ -209,9 +218,9 @@
       "stock_item": "anotherstock1234",
       "number_units_damaged": "2",
       "number_units_lost": "10",
-      "units_damaged_reason": "dmix",
+      "units_damaged_reason": "dsed",
       "overloaded_units": false,
-      "units_lost_reason": "lmix",
+      "units_lost_reason": "lsed",
       "number_of_units": "35"
     }
   },
@@ -219,12 +228,12 @@
     "pk": 1,
     "model": "ets.compaslogger",
     "fields": {
-	  "status": 0,
-	  "compas": "dev_compas",
+	  "status": 1,
+	  "compas": "ISBX002",
 	  "waybill": "ISBX00311A",
 	  "when_attempted": "2011-09-14 07:41:12",
 	  "action": 1,
-	  "message": "OK-OK-OK"
+	  "message": "Error-Error-Error"
     }
   }
 ]
