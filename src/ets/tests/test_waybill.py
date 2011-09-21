@@ -419,8 +419,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_history"""
         response = self.client.get(reverse('waybill_history', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['waybill_history']), 1)
-        self.assertEqual(len(response.context['loading_detail_history']), 1)
+        self.assertContains(response, "Created", count=2, status_code=200)
         
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""

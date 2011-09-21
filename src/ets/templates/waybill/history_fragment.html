@@ -17,7 +17,7 @@
           <td>{{ action_date }}</td>
           <td>
             {% for key, field in changes %}
-              {{ key }}: {{ field }}{% if not forloop.last %},{% endif %}
+              {{ key }}: &quot;{{ field }}&quot;{% if not forloop.last %},{% endif %}
             {% endfor %}
           </td>
       </tr>
