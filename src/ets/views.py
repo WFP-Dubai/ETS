@@ -145,8 +145,9 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    
+    print "entered 2222222222"
     waybill = get_object_or_404(queryset, pk=waybill_pk)
+    print waybill
     waybill.receipt_person = request.user.person
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
@@ -194,8 +195,11 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 @login_required
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
+    print "Entered"
     waybill = ets.models.Waybill.decompress(scanned_code)
+    print waybill
     if not waybill:
+        print "Don't exist"
         raise Http404
     return waybill_reception(request, waybill.pk, queryset)
 
@@ -276,6 +280,7 @@ def deserialize(request, form_class=WaybillScanForm):
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
             if request.GET.get("receipt",""):
+                print "Redirect on receipt"
                 return redirect('waybill_reception_scanned', scanned_code=data )
             return waybill_detail(request, waybill)
 
