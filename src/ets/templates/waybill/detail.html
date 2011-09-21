@@ -29,6 +29,8 @@
   
   {% waybill_reception object user %}
   {% waybill_delete object user %}
+  
+  <a href="{% url waybill_history waybill_pk=object.pk %}">{% trans "History" %}</a>
 </div>
 <table cellpadding="0" cellspacing="0" border="0px" >
   {% include 'waybill/print/wb_header.html'%}

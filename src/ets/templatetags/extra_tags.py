@@ -1,3 +1,4 @@
+import datetime
 
 from django import template
 from django.core.urlresolvers import reverse
@@ -6,7 +7,8 @@ from django.utils.translation import ugettext_lazy as _
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail
+from ets.utils import changed_fields
 
 register = template.Library()
 
