@@ -53,12 +53,7 @@
   {% include "waybill/history_fragment.html" with history_list=history %}
   {% endfor %}
 </div>
-
-<table border="0px" >
-  {% include 'waybill/print/wb_header.html'%}
-  {% include 'waybill/print/wb_loading.html'%}
-  {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
-</table>
+{% endblock %}
 
 {% block script %}
 {{ block.super }}
