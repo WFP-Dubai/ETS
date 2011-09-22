@@ -9,6 +9,24 @@ table {
 	font-family: serif;
 	font-size: 13px;
 }
+
+.border {
+	padding: 0px;
+	border-spacing: 0px;
+	border-width: 1px;
+	border-style: ridge;
+	border-color: black;
+}
+
+.border td {
+	
+	padding: 0px;
+	border-spacing: 0px;
+	border-width: 1px;
+	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
+}
+
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
@@ -40,4 +58,16 @@ p {
   float: left;
   max-width: 500px;
   margin-left: 20px;
+}
+
+sup {
+  font-size: x-small;
+}
+
+.small {
+  font-size: small;
+}
+
+.x-small {
+  font-size: x-small;
 }
