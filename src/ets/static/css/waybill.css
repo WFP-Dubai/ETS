@@ -28,19 +28,6 @@ img{position: relative; left: 20px; text-align: right;}
 	font-size: x-large;
 }
 
-.actions {
-  font-size: large;
-}
-
-.actions a {
-  padding-right: 5px;
-  border-right: 1px solid #B2B2B2;
-}
-
-.actions a:last-child {
-  border-right: 0 none;
-}
-
 p {
   margin: 0;
 }
@@ -49,7 +36,7 @@ p {
   float: left;
 }
 
-#history {
+#sidebar {
   float: left;
   max-width: 500px;
   margin-left: 20px;

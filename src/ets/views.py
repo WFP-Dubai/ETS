@@ -57,13 +57,13 @@ def waybill_view(request, waybill_pk, queryset, template):
 @login_required
 @person_required
 @dispatch_view
-def waybill_finalize_dispatch( request, waybill_pk, queryset):
+def waybill_finalize_dispatch(request, waybill_pk, queryset):
     """
     called when user pushes Print Original on dispatch
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.dispatch_sign(True)
+    waybill.dispatch_sign()
     
     messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
         "waybill": waybill.pk

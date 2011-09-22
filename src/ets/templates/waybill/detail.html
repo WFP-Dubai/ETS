@@ -11,34 +11,38 @@
 
 {% block content %}
 
-<div class="hidden_print actions">
-  <a class="print_copy" href="#">Print Copy</a>
-  {% waybill_edit object user %}
-
-  {% sign_dispatch object user as may_sign_dispatch %}
-  {% if may_sign_dispatch %}
-  <a class="print_original" href="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">Sign dispatch</a>
-  {% endif %}
-  
-  {% sign_reception object user as may_sign_reception %}
-  {% if may_sign_reception %}
-  <a class="print_original" href="{% url waybill_finalize_receipt waybill_pk=object.pk %}">Sign reception</a>
-  {% endif %}
-  
-  {% validate_dispatch object user %}
-  {% validate_receipt object user %}
-  
-  {% waybill_reception object user %}
-  {% waybill_delete object user %}
-  
-</div>
 <table id="details" cellpadding="0" cellspacing="0" border="0px" >
   {% include 'waybill/print/wb_header.html'%}
   {% include 'waybill/print/wb_loading.html'%}
   {% include 'waybill/print/wb_receipt.html' with object=object.receipt %}
 </table>
 
-<div id="history" class="hidden_print">
+<div id="sidebar" class="hidden_print">
+  <div class="hidden_print actions">
+    {% waybill_edit object user %}
+  
+    {% validate_dispatch object user %}
+    {% validate_receipt object user %}
+    
+    {% waybill_reception object user %}
+    {% waybill_delete object user %}
+  </div>
+  <div class="hidden_print actions">
+  <button class="print_copy">Print Copy</button>
+  {% sign_dispatch object user as may_sign_dispatch %}
+  {% if may_sign_dispatch %}
+  <form method="POST" action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">
+    <input class="print_original" type="submit" name="print_original" value="Sign dispatch" />
+  </form>
+  {% endif %}
+  
+  {% sign_reception object user as may_sign_reception %}
+  {% if may_sign_reception %}
+  <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
+    <input class="print_original" type="submit" name="print_original" value="Sign reception" />
+  </form>
+  {% endif %}
+  </div>
   <h3>{% trans "Waybill history" %}</h3>
   {% include "waybill/history_fragment.html" with history_list=waybill_history %}
   
@@ -56,14 +60,14 @@
 {{ block.super }}
 <script charset="utf-8">
   $(document).ready(function() {
-    $('a.print_copy').click(function(){
+    $('.print_copy').click(function(){
     	$("#original_lable").addClass('hidden').removeClass('shown');
     	$("#copy_lable").addClass('shown').removeClass('hidden');
     	print();
     	return false;
     });
     
-    $('a.print_original').click(function() {
+    $('.print_original').click(function() {
       $("#original_lable").addClass('shown').removeClass('hidden');
       $("#copy_lable").addClass('hidden').removeClass('shown');
       print();
