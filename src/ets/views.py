@@ -31,11 +31,19 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     items = waybill.loading_details.select_related()
     items_count = len(items)
     
+    loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
+    
+    loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), 
+                                              ets.models.LoadingDetail))
+                       for loading in waybill.loading_details.all())
+        
     return direct_to_template(request, template, {
         'object': waybill,
         'extra_lines': (),#[''] * (settings.LOADING_LINES - items_count),
         'items': items,
         'items_count': items_count,
+        'waybill_history': history_list(waybill.audit_log.all(), ets.models.Waybill),
+        'loading_detail_history': loading_details,
     })
 
 
@@ -49,13 +57,13 @@ def waybill_view(request, waybill_pk, queryset, template):
 @login_required
 @person_required
 @dispatch_view
-def waybill_finalize_dispatch( request, waybill_pk, queryset):
+def waybill_finalize_dispatch(request, waybill_pk, queryset):
     """
     called when user pushes Print Original on dispatch
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.dispatch_sign(True)
+    waybill.dispatch_sign()
     
     messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
         "waybill": waybill.pk
@@ -145,7 +153,6 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
-    
     waybill = get_object_or_404(queryset, pk=waybill_pk)
     waybill.receipt_person = request.user.person
     
@@ -275,27 +282,13 @@ def deserialize(request, form_class=WaybillScanForm):
         data = form.cleaned_data['data']
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
+            if request.GET.get("receipt",""):
+                return redirect('waybill_reception_scanned', scanned_code=data )
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Data Incorrect!!!'))
     return redirect('index')
 
-
-def waybill_history(request, template, waybill_pk, loading_detail_queryset=ets.models.LoadingDetail.audit_log.all()):
-    
-    waybill = get_object_or_404(ets.models.Waybill, pk=waybill_pk)
-    waybill_log = waybill.audit_log.all().order_by('-action_id')
-    waybill_history = history_list(waybill_log, ets.models.Waybill)
-            
-    loading_detail_queryset = loading_detail_queryset.filter(waybill__pk=waybill_pk).order_by('-action_id')
-    loading_detail_history = history_list(loading_detail_queryset, ets.models.LoadingDetail)
-                
-    return direct_to_template(request, template, {
-        'waybill': waybill,
-        'waybill_history': waybill_history,
-        'loading_detail_history': loading_detail_history,       
-    })
-    
 
 #=======================================================================================================================
 # def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):

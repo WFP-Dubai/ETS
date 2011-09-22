@@ -411,17 +411,15 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         
         #Test with compressed data
-        data = self.waybill.compress()
+        data = self.reception_waybill.compress()
         response = self.client.get(reverse('deserialize'), data={'data': data,})
-        self.assertEqual(response.context['object'], self.waybill)    
-
-    def test_waybill_history(self):
-        """ets.views.waybill_history"""
-        response = self.client.get(reverse('waybill_history', kwargs={'waybill_pk': self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['waybill_history']), 1)
-        self.assertEqual(len(response.context['loading_detail_history']), 1)
+        self.assertEqual(response.context['object'], self.reception_waybill)   
         
+        #Test receipt get request
+        self.client.login(username='recepient', password='recepient')
+        response = self.client.get(reverse('deserialize'), data={'data': data, 'receipt': 'Receipt Waybill'})
+        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'scanned_code': data,})) 
+
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""
         

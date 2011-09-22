@@ -1,19 +1,21 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-{% load i18n %}   
+{% load i18n compress %}   
 <html lang="en">
 <head>
   <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
 
   {% block style %}
+    {% compress css %}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_page.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_table.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" media="screen"/>
-    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.8.2.custom.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.8.16.custom.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}uni_form/default.uni-form.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}uni_form/dark.uni-form.css" media="screen"/>
+    {% endcompress %}
   {% endblock %}
 
-  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.4.3.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.2.min.js"></script>
 
 </head>
 <body>
@@ -47,9 +49,11 @@
   </div>
   
 {% block script %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.2.custom.min.js"></script>
+{% compress js %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}uni_form/uni-form.jquery.js"></script>
+{% endcompress %}
 {% endblock %}
 
 </body>

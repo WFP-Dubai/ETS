@@ -4,8 +4,6 @@
 .centric h1{ font-weight: bold; text-align: center;}
 .centric p{font-size: small; text-align: center;}
 table {
-	max-width: 850px;
-	min-width: 850px;
 	width: 850px;
 	background-color: white;
 	font-family: serif;
@@ -48,21 +46,18 @@ img{position: relative; left: 20px; text-align: right;}
 	font-size: x-large;
 }
 
-.actions {
-  font-size: large;
-}
-
-.actions a {
-  padding-right: 5px;
-  border-right: 1px solid #B2B2B2;
-}
-
-.actions a:last-child {
-  border-right: 0 none;
-}
-
 p {
   margin: 0;
+}
+
+#details {
+  float: left;
+}
+
+#sidebar {
+  float: left;
+  max-width: 500px;
+  margin-left: 20px;
 }
 
 sup {

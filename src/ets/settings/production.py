@@ -2,6 +2,7 @@
 from .default import *
 
 DEBUG = False
+COMPRESS_OFFLINE = True
 
 # Local settings for development / production
 try:

@@ -80,6 +80,7 @@ STATICFILES_FINDERS = (
   "django.contrib.staticfiles.finders.FileSystemFinder",
   "django.contrib.staticfiles.finders.AppDirectoriesFinder",
   "ets.finders.AppMediaDirectoriesFinder",
+  "compressor.finders.CompressorFinder",
 )
 
 SITE_ID = 1
@@ -139,6 +140,7 @@ INSTALLED_APPS = (
     'uni_form',
     'logicaldelete',
     'native_tags',
+    'compressor',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

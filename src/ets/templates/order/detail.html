@@ -74,8 +74,8 @@
           {% endif %}
         </td>
         <td class='bordered' align="center">
-          {% if waybill.receipt.signed_date %}
-            {{ waybill.receipt.signed_date }}
+          {% if waybill.receipt_signed_date %}
+            {{ waybill.receipt_signed_date }}
           {% else %}
             {% waybill_reception waybill user %}
           {% endif %}

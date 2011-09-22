@@ -1,5 +1,4 @@
-{% load extra_tags %}
-{% load i18n %} 
+{% load extra_tags i18n %}
 <tr>
   <td>
     <table border="0px" >
@@ -9,7 +8,7 @@
         </td>
         <td valign="top" align="center" width="60%">
             <h1 >{% trans "Waybill" %}</h1>
-            <span style="font-size:small;">{% trans "Conditions of carriage as indicated overleaf are applicable" %}</span>
+            <span id="top_note" style="font-size:small;">{% trans "Conditions of carriage as indicated overleaf are applicable" %}</span>
             <span id='original_lable' class="hidden">{% trans "ORIGINAL" %}</span>
             <span id='copy_lable' class="shown">{% trans "COPY" %}</span>
             

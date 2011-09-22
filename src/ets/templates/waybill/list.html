@@ -34,19 +34,19 @@
           {% endif %}
         </td>
         <td>
-          {% if waybill.receipt.signed_date %}
-            {{ waybill.receipt.signed_date }}
+          {% if waybill.receipt_signed_date %}
+            {{ waybill.receipt_signed_date }}
           {% else %}
             {% waybill_reception waybill user _("Receive this waybil") %}
           {% endif %}
         </td>
         <td>
           {% if waybill.validated %}{% trans "D" %}{% else %}-{% endif %}/
-          {% if waybill.receipt.validated %}{% trans "R" %}{% else %}-{% endif %}
+          {% if waybill.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
           D: {% if waybill.sent_compas %}{{ waybill.sent_compas }}{% else %}-{% endif %}/
-          R: {% if waybill.receipt.sent_compas %}{{ waybill.receipt.sent_compas }}{% else %}-{% endif %}
+          R: {% if waybill.receipt_sent_compas %}{{ waybill.receipt_sent_compas }}{% else %}-{% endif %}
         </td>
         <td>
           {% waybill_delete waybill user %}

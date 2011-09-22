@@ -287,7 +287,7 @@ class LossDamageType(models.Model):
         verbose_name_plural = _("Losses/Damages")
     
     def  __unicode__( self ):
-        return "%s (%s): %s" % (self.category, self.get_type_display(), self.cause)
+        return self.cause
         
     @classmethod
     def update(cls, using):
@@ -511,7 +511,7 @@ class Waybill( ld_models.Model ):
     receipt_validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     receipt_sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
-    audit_log = AuditLog()
+    audit_log = AuditLog(exclude=())
 
     objects = ld_models.managers.LogicalDeletedManager()
     
@@ -548,19 +548,15 @@ class Waybill( ld_models.Model ):
         and self.end_discharge_date < self.start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
     
-    def dispatch_sign(self, commit=True):
+    def dispatch_sign(self):
         """Signs the waybill as ready to be sent."""
         self.transport_dispach_signed_date = datetime.now()
-        
-        if commit:
-            self.save()
+        self.save()
     
-    def receipt_sign(self, commit=True):
+    def receipt_sign(self):
         """Signs the receipt waybill as ready to be sent."""
         self.receipt_signed_date = datetime.now()
-        
-        if commit:
-            self.save()
+        self.save()
     
     
     def serialize(self):
