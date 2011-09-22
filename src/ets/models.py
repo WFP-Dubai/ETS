@@ -511,7 +511,7 @@ class Waybill( ld_models.Model ):
     receipt_validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     receipt_sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
-    audit_log = AuditLog()
+    audit_log = AuditLog(exclude=())
 
     objects = ld_models.managers.LogicalDeletedManager()
     

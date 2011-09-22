@@ -40,8 +40,8 @@
         {% endif %}
        </td>
        <td>
-        {% if waybill.receipt.signed_date %}
-          {{ waybill.receipt.signed_date }}
+        {% if waybill.receipt_signed_date %}
+          {{ waybill.receipt_signed_date }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
@@ -93,8 +93,8 @@
         {% endif %}
       </td>
       <td>
-        {% if waybill.receipt.signed_date %}
-          {{ waybill.receipt.signed_date }}
+        {% if waybill.receipt_signed_date %}
+          {{ waybill.receipt_signed_date }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
