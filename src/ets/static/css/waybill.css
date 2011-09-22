@@ -10,7 +10,11 @@ table {
 	background-color: white;
 	font-family: serif;
 	font-size: 13px;
+	cellpadding: 0;
+	cellspacing: 0;
+	border: 1px ridge black;
 }
+
 img{position: relative; left: 20px; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
@@ -45,4 +49,16 @@ img{position: relative; left: 20px; text-align: right;}
 
 p {
   margin: 0;
+}
+
+sup {
+  font-size: x-small;
+}
+
+.small {
+  font-size: small;
+}
+
+.x-small {
+  font-size: x-small;
 }

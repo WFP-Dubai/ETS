@@ -1,40 +1,42 @@
 {% load extra_tags %}
 {% load i18n %}
 <tr>
-    <td>
-        <table cellpadding="0" cellspacing="0" border="1px"  >
-            <thead class="wb_head"><tr><th colspan="2">{% trans "Certification of Commodities Received" %}</th></tr></thead>
-            <tr>
-                <td><small  style="font-size:x-small;">{% trans "Location:" %}</small> {{ object.waybill.order.location }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date }}</td>
-            </tr>
-            <tr>
-                <td><small style="font-size:x-small;">{% trans "Consignee:" %}</small> {{ object.waybill.order.consignee }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date }}</td>
-            </tr>
-            <tr>
-                <td><small style="font-size:x-small;">{% trans "Name:" %} </small> {{ object.person }}</td>
-                <td ><small style="font-size:x-small;">{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date }}</td>
-            </tr>
-            <tr>
-                <td><small style="font-size:x-small;">{% trans "Title:" %} </small> {{ object.person.title }}</td>
-                <td ><small style="font-size:x-small;">{% trans "Distance in KM:" %}</small> {{ object.distance }}</td>
-            </tr>
-        </table>
-    </td>
+  <td>
+    <table>
+      <thead class="wb_head"><tr><th colspan="2">{% trans "Certification of Commodities Received" %}</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><small>{% trans "Location:" %}</small> {{ object.waybill.order.location }}</td>
+          <td><small>{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date }}</td>
+        </tr>
+        <tr>
+          <td><small>{% trans "Consignee:" %}</small> {{ object.waybill.order.consignee }}</td>
+          <td><small>{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date }}</td>
+        </tr>
+        <tr>
+          <td><small>{% trans "Name:" %}</small> {{ object.person }}</td>
+          <td><small>{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date }}</td>
+        </tr>
+        <tr>
+          <td><small>{% trans "Title:" %}</small> {{ object.person.title }}</td>
+          <td><small>{% trans "Distance in KM:" %}</small> {{ object.distance }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </td>
 </tr>
 <tr>
   <td>
-    <table cellpadding="0" cellspacing="0" border="1px" >
-        <thead class="wb_head"><tr><th colspan="11">{% trans "Observations" %}</th></tr></thead>
-        <tbody>
-        <tr style="font-size:x-small;">
+    <table>
+      <thead class="wb_head"><tr><th colspan="11">{% trans "Observations" %}</th></tr></thead>
+      <tbody>
+        <tr>
           <td><sup>{% trans "Condition" %}</sup></td>
           <td colspan="2"><sup>{% trans "Good" %}</sup></td>
           <td colspan="3"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
           <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
         </tr>
-        <tr style="font-size:x-small;">
+        <tr>
           <td><sup>{% trans "SI No" %}</sup></td>    
           <td><sup>{% trans "Units" %}</sup></td>    
           <td><sup>{% trans "Net MT" %}</sup></td>    
@@ -71,7 +73,7 @@
 
             <td style="text-align:center;">&nbsp;
               {% if lineitem.number_units_lost %}
-                  L:{{ lineitem.calculate_net_received_lost|floatformat:3 }}
+                L:{{ lineitem.calculate_net_received_lost|floatformat:3 }}
               {% endif %}
               {% if lineitem.number_units_damaged %}
                 {% if lineitem.number_units_lost %}/{% endif %}
@@ -114,45 +116,44 @@
           </tr>
         {% endfor %}
 
-          <tr>
-              <td colspan="10">
-                <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.remarks }}
-                {% if object.container_one_remarks_reciept%}
-                  <p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
-                {%endif%}
-                {% if object.container_two_remarks_reciept %}
-                  <p>{% trans "Container 2 Remarks:" %}{{ object.container_two_remarks_reciept }}</p>
-                {%endif%}
-              </td>
-          </tr>
+        <tr>
+          <td colspan="10">
+            <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.remarks }}
+            {% if object.container_one_remarks_reciept%}
+              <p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
+            {%endif%}
+            {% if object.container_two_remarks_reciept %}
+              <p>{% trans "Container 2 Remarks:" %}{{ object.container_two_remarks_reciept }}</p>
+            {%endif%}
+          </td>
+        </tr>
       </tbody>
     </table>
   </td>
 </tr>
 <tr>
-	<td>
-		<table cellpadding="0" cellspacing="0" border="1px" >
-			<tr>
-				<td>
-					<p style="font-size: x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
-					<p style="font-size: x-small">{% trans "Name, signature and stamp:" %}</p>
-				  {% if object.end_discharge_date %}
-            <p style='font-size:small'>{{ object.person.user.get_full_name }}</p>
-            <p>{% trans "Date:" %}{{ object.end_discharge_date|date }}</p>
-          {% endif %}
-					
-		      <p style="font-size: x-small">{% trans "Endorse this section with an official stamp" %}</p>
-			  </td>
-		    <td>
-          <p style="font-size: x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
-          <p style="font-size: x-small">{% trans "Name, signature and stamp" %}</p>
-	        {% if object.end_discharge_date %}
-				  <p style='font-size:small'>{{ object.waybill.transport_driver_name|upper}}</p>
+  <td>
+  	<table>
+      <tr>
+    	<td>
+    	  <p class="x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
+    	  <p class="x-small">{% trans "Name, signature and stamp:" %}</p>
+    	  {% if object.end_discharge_date %}
+          <p class="small">{{ object.person.user.get_full_name }}</p>
+          <p>{% trans "Date:" %}{{ object.end_discharge_date|date }}</p>
+          {% endif %}	
+          <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>
+    	</td>
+        <td>
+          <p class="x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
+          <p class="x-small">{% trans "Name, signature and stamp" %}</p>
+          {% if object.end_discharge_date %}
+    	  <p class="small">{{ object.waybill.transport_driver_name|upper}}</p>
           <p>{% trans "Date:" %} {{ object.end_discharge_date|date }}</p>
           {%endif%}
-					<p style="font-size: x-small">{% trans "Endorse this section with an official stamp" %}</p>
-				</td>
-			</tr>
-		</table>
-	</td>
+    	  <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>
+    	</td>
+      </tr>
+  	</table>
+  </td>
 </tr>
