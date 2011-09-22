@@ -200,7 +200,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     def test_waybill_finalize_dispatch(self):
         """ets.views.waybill_finalize_dispatch"""
         self.client.login(username='dispatcher', password='dispatcher')
-        response = self.client.get(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
+        response = self.client.post(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
 
         self.assertRedirects(response, waybill.get_absolute_url())
@@ -312,7 +312,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_delete"""  
         self.client.login(username='dispatcher', password='dispatcher')
         col = ets.models.Waybill.objects.all().count()     
-        response = self.client.get(reverse('waybill_delete', kwargs={'waybill_pk': self.waybill.pk,}))
+        response = self.client.post(reverse('waybill_delete', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 302)  
         self.assertEqual(ets.models.Waybill.objects.all().count(), col-1)
     
@@ -378,7 +378,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         self.client.login(username='dispatcher', password='dispatcher')
         
-        response = self.client.get(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
+        response = self.client.post(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
         waybill = ets.models.Waybill.objects.get(pk='ISBX00312A')
 
         self.assertRedirects(response, waybill.get_absolute_url())

@@ -247,7 +247,7 @@ class StockItem( models.Model ):
         verbose_name_plural = _("stocks")
 
     def  __unicode__( self ):
-        return "%s-%s-%s" % (self.warehouse.name, self.commodity.pk, self.number_of_units)
+        return "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
         
     def coi_code(self):
         return self.origin_id[7:]
