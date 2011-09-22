@@ -17,13 +17,16 @@ table {
 	border-spacing: 0px;
 	border-width: 1px;
 	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
 }
 
-.border td { 
+.border td {
+	
 	padding: 0px;
 	border-spacing: 0px;
 	border-width: 1px;
-	border-style: ridge; 
+	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
 }
 
 img{position: relative; left: 20px; text-align: right;}

@@ -31,14 +31,22 @@ table {
 	font-size: 11px;
 }
 
-.border td { 
+.border {
 	padding: 0px;
 	border-spacing: 0px;
 	border-width: 1px;
 	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
 }
 
-.border td { border: 1px ridge black; border-collapse: collapse;}
+.border td {
+	
+	padding: 0px;
+	border-spacing: 0px;
+	border-width: 1px;
+	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
+}
 
 img{position: relative; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
