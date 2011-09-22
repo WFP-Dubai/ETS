@@ -6,6 +6,8 @@
 import os.path
 from django.conf import global_settings
 
+from ets.utils import prefix_url
+
 PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
 EGG_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../')
 
@@ -186,6 +188,14 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
 
+URL_PREFIX = "ets"
+
+MEDIA_URL = prefix_url(MEDIA_URL, URL_PREFIX)
+STATIC_URL = prefix_url(STATIC_URL, URL_PREFIX)
+LOGIN_URL = prefix_url(LOGIN_URL, URL_PREFIX)
+LOGOUT_URL = prefix_url(LOGOUT_URL, URL_PREFIX)
+LOGIN_REDIRECT_URL = prefix_url(LOGIN_REDIRECT_URL, URL_PREFIX)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -277,4 +287,3 @@ DEFAULT_DATABASE = {
 
 #Prevent migrations during testing
 SOUTH_TESTS_MIGRATE = False
-
