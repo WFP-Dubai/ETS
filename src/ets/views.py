@@ -16,6 +16,7 @@ from django.http import Http404
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from django.views.decorators.http import require_POST
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -54,6 +55,7 @@ def waybill_view(request, waybill_pk, queryset, template):
     return waybill_detail(request, waybill, template)
     
 
+@require_POST
 @login_required
 @person_required
 @dispatch_view
@@ -183,6 +185,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     })
 
 
+@require_POST
 @login_required
 @person_required
 @receipt_view
@@ -207,6 +210,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
     return waybill_reception(request, waybill.pk, queryset)
 
 
+@require_POST
 @login_required
 @person_required
 @dispatch_view
@@ -243,6 +247,7 @@ def receipt_validates(request, queryset, template):
     })
 
 
+@require_POST
 @login_required
 @officer_required
 @dispatch_compas
@@ -259,6 +264,7 @@ def validate_dispatch(request, waybill_pk, queryset):
     return redirect('dispatch_validates')
 
 
+@require_POST
 @login_required
 @officer_required
 @receipt_compas
