@@ -73,14 +73,6 @@ def waybill_creation(order, user, text=_("Create")):
             'success': Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count(),
     }
     
-@register.inclusion_tag('tags/give_link.html')
-def waybill_delete(waybill, user, text=_("Delete")):
-    return { 
-            'text': text,
-            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
-            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
-    }
-
 
 @function
 def sign_dispatch(waybill, user):
@@ -91,22 +83,21 @@ def sign_reception(waybill, user):
     return Waybill.receptions(user).filter(pk=waybill.pk).count()
 
 
-@register.inclusion_tag('tags/give_link.html')
-def validate_dispatch(waybill, user, link_text=_("Validate dispatch"), forbidden_text=""):
+@register.inclusion_tag('tags/form.html')
+def validate_dispatch(waybill, user, link_text=_("Validate dispatch")):
     queryset = Waybill.objects.filter(sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
                           .filter(order__warehouse__compas__officers=user) \
                           .filter(validated=False)
 
     return { 
             'text': link_text,
-            'forbidden_text': forbidden_text,
             'url': reverse('validate_dispatch', kwargs={'waybill_pk': waybill.pk,}),
             'success': queryset.filter(pk=waybill.pk).count(),
     }
 
 
-@register.inclusion_tag('tags/give_link.html')
-def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_text=""):
+@register.inclusion_tag('tags/form.html')
+def validate_receipt(waybill, user, link_text=_("Validate receipt")):
     queryset = Waybill.objects.filter(receipt_sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
                               .filter(receipt_signed_date__isnull=False) \
                               .filter(destination__compas__officers=user) \
@@ -114,10 +105,19 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt"), forbidden_t
 
     return { 
             'text': link_text,
-            'forbidden_text': forbidden_text,
             'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
             'success': queryset.filter(pk=waybill.pk).count(),
     }
+
+@register.inclusion_tag('tags/form.html')
+def waybill_delete(waybill, user, text=_("Delete")):
+    return { 
+            'text': text,
+            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
+            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+    }
+
+
 
 @block
 def person_only(context, nodelist, user):
