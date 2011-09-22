@@ -30,6 +30,7 @@ install_requires = [
         'django-uni-form >= 0.7.0', #div-based forms
         'django-logicaldelete',
         'django-native-tags==0.5.0',
+        'django_compressor',
 ]
 
 #Extra dependencies for test purposes
