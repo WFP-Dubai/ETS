@@ -30,6 +30,24 @@ table {
 	height: 100%;
 	font-size: 11px;
 }
+
+.border {
+	padding: 0px;
+	border-spacing: 0px;
+	border-width: 1px;
+	border-style: ridge;
+	border-color: black;
+}
+
+.border td {
+	
+	padding: 0px;
+	border-spacing: 0px;
+	border-width: 1px;
+	border-style: ridge;
+	border-color: black #B5B5B5 #B5B5B5 black;
+}
+
 img{position: relative; text-align: right;}
 .right{ position: absolute; right: 20px; text-align: right;}
 .centric{display: inline-block; position: relative; left:200px; text-align: center; }
