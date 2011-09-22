@@ -61,24 +61,16 @@
           <a href='{{ waybill.get_absolute_url }}'>{% trans "Waybill:" %}{{ waybill.pk }}</a>
         </td>
         <td class='bordered' align="center">{% waybill_edit waybill user %}</td>
-        <td class='bordered' align="center">{% trans "Dispatch:" %}</td>
-        <td class='bordered' align="center">{% trans "Received:" %}</td>
+        <td class='bordered' align="center">{% trans "Dispatched date" %}</td>
+        <td class='bordered' align="center">{% trans "Received date" %}</td>
       </tr>
       <tr>
         <td class='bordered' align="center">{% waybill_delete waybill user %}</td>
         <td class='bordered' align="center">
-          {% if waybill.transport_dispach_signed_date %}
-            {{ waybill.transport_dispach_signed_date }}
-          {% else %}
-            {% waybill_edit waybill user %}
-          {% endif %}
+          {{ waybill.transport_dispach_signed_date|date }}
         </td>
         <td class='bordered' align="center">
-          {% if waybill.receipt_signed_date %}
-            {{ waybill.receipt_signed_date }}
-          {% else %}
-            {% waybill_reception waybill user %}
-          {% endif %}
+          {{ waybill.receipt_signed_date|date }}
         </td>
       </tr>
       <tr class='itemhead'>
