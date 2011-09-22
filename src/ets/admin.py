@@ -2,8 +2,8 @@ import datetime
 from functools import partial
 
 from django.contrib import admin
-#from django.contrib.auth.models import User
-#from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
+from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
@@ -260,3 +260,10 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     raw_id_fields = ('waybill',)
 
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
+
+
+class PersonedUserAdmin(UserAdmin):
+    inlines = UserAdmin.inlines + [PersonInline,]
+
+admin.site.unregister(User)
+admin.site.register(User, PersonedUserAdmin)
