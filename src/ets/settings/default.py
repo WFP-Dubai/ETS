@@ -6,8 +6,6 @@
 import os.path
 from django.conf import global_settings
 
-from ets.utils import prefix_url
-
 PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
 EGG_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../')
 
@@ -187,6 +185,12 @@ DEBUG_TOOLBAR_PANELS = (
 DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
+
+def prefix_url(path, prefix):
+    if path.startswith('/'):
+        path = path[1:]
+    
+    return "/%s/%s" % (prefix, path)
 
 URL_PREFIX = "ets"
 

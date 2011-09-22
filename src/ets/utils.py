@@ -3,7 +3,6 @@ from itertools import chain, izip
 
 from django.db import connections, transaction, models
 from django.db.utils import DatabaseError
-from django.conf import settings
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _
@@ -358,11 +357,6 @@ def history_list(log_queryset, model):
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev)
 
-def prefix_url(path, prefix):
-    if path.startswith('/'):
-        path = path[1:]
-    
-    return "/%s/%s" % (prefix, path)
 
 #=======================================================================================================================
 # def test_compas():
