@@ -1,2 +1,4 @@
 .uniForm .ctrlHolder{ padding: 1px; }
 .uniForm legend{ padding: 5px 0; }
+    
+    .uniForm .error p { margin: 1px 1px 1px 1px; }
