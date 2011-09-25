@@ -1,0 +1,8 @@
+.uniForm .ctrlHolder{ padding: 1px; }
+.uniForm legend{ padding: 5px 0; }
+    
+    .uniForm .error p { margin: 1px 1px 1px 1px; }
+    
+.uniForm .error input, .uniForm .error textarea {
+  border-color: red;
+}
