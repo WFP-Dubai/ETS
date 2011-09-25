@@ -3,7 +3,6 @@ from itertools import chain, izip
 
 from django.db import connections, transaction, models
 from django.db.utils import DatabaseError
-from django.conf import settings
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext as _

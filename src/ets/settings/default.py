@@ -186,6 +186,20 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
 
+def prefix_url(path, prefix):
+    if path.startswith('/'):
+        path = path[1:]
+    
+    return "/%s/%s" % (prefix, path)
+
+URL_PREFIX = "ets"
+
+MEDIA_URL = prefix_url(MEDIA_URL, URL_PREFIX)
+STATIC_URL = prefix_url(STATIC_URL, URL_PREFIX)
+LOGIN_URL = prefix_url(LOGIN_URL, URL_PREFIX)
+LOGOUT_URL = prefix_url(LOGOUT_URL, URL_PREFIX)
+LOGIN_REDIRECT_URL = prefix_url(LOGIN_REDIRECT_URL, URL_PREFIX)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -277,4 +291,3 @@ DEFAULT_DATABASE = {
 
 #Prevent migrations during testing
 SOUTH_TESTS_MIGRATE = False
-
