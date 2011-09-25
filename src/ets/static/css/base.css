@@ -143,8 +143,10 @@ table.summary {
 }
 
 .actions {
+  float: right;
   font-size: large;
   margin-bottom: 10px;
+  margin-right: 260px;
 }
 
 .actions a {

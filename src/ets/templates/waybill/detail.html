@@ -11,6 +11,33 @@
 
 {% block content %}
 
+<div class="hidden_print actions">
+    
+  {% waybill_edit object user %}
+  {% waybill_reception object user %}
+
+  <button class="print_copy">Print Copy</button>
+  
+  {% validate_dispatch object user %}
+  {% validate_receipt object user %}
+  
+  {% sign_dispatch object user as may_sign_dispatch %}
+  {% if may_sign_dispatch %}
+  <form method="POST" action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">
+    <input class="print_original" type="submit" name="print_original" value="Sign dispatch" />
+  </form>
+  {% endif %}
+  
+  {% sign_reception object user as may_sign_reception %}
+  {% if may_sign_reception %}
+  <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
+    <input class="print_original" type="submit" name="print_original" value="Sign reception" />
+  </form>
+  {% endif %}
+  
+  {% waybill_delete object user %}
+</div>
+
 <table id="details" cellpadding="0" cellspacing="0" border="0px" >
   {% include 'waybill/print/wb_header.html' %}
   {% include 'waybill/print/wb_loading.html' %}
@@ -18,32 +45,6 @@
 </table>
 
 <div id="sidebar" class="hidden_print">
-  <div class="hidden_print actions">
-    
-    {% waybill_edit object user %}
-    {% waybill_reception object user %}
-  
-    <button class="print_copy">Print Copy</button>
-    
-    {% validate_dispatch object user %}
-    {% validate_receipt object user %}
-    
-    {% sign_dispatch object user as may_sign_dispatch %}
-    {% if may_sign_dispatch %}
-    <form method="POST" action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">
-      <input class="print_original" type="submit" name="print_original" value="Sign dispatch" />
-    </form>
-    {% endif %}
-    
-    {% sign_reception object user as may_sign_reception %}
-    {% if may_sign_reception %}
-    <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
-      <input class="print_original" type="submit" name="print_original" value="Sign reception" />
-    </form>
-    {% endif %}
-    
-    {% waybill_delete object user %}
-  </div>
   <h3>{% trans "Waybill history" %}</h3>
   {% include "waybill/history_fragment.html" with history_list=waybill_history %}
   
