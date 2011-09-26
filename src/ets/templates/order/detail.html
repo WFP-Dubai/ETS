@@ -6,7 +6,7 @@
 {% block content %}
 <table class="summary">
   <tr>
-    <td>{% trans "Code" %}: {{ object.pk }}</td>
+    <td>{% trans "Code" %}: <a href="{{ object.get_absolute_url }}" >{{ object.pk }}</a></td>
     <td>{% trans "Created" %}: {{ object.created }}</td>
   </tr>
   <tr>
