@@ -161,7 +161,7 @@ class ReadJSONOfflineHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = ets.models.Waybill
     
-    def read(self, request, warehouse_pk, start_date=""):
+    def read(self, request, warehouse_pk, start_date=None):
         """Return loading details for waybills in CSV"""
         result = []
         warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)    
