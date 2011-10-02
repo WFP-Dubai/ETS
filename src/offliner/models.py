@@ -30,15 +30,4 @@ class UpdateLog( models.Model ):
                 'last_updated': start_date or cls.objects.aggregate(max_date=Max('date'))['max_date']
         }).read()
         cls.updata_data(data)
-        
-    
-    @classmethod    
-    def import_data(cls, data):
-        """Accepts compressed string, decompresses it and updates data"""
-        try:
-            data_serialized = zlib.decompress( base64.b64decode(data) )
-        except TypeError:
-            pass
-        else:
-            cls.updata_data(data_serialized)
     
