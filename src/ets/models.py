@@ -105,8 +105,6 @@ class Warehouse(models.Model):
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
-    start_date = models.DateField(_("start date"), null=True, blank=True)
-    
     
     class Meta:
         ordering = ('name',)
