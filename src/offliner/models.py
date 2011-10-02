@@ -20,6 +20,10 @@ class UpdateLog( models.Model ):
     @classmethod    
     def import_data(cls, data):
         try:
-            data_serialized = zlib.decompress( base64.b64decode(data) )
+            data_deserialized = zlib.decompress( base64.b64decode(data) )
         except TypeError:
             pass
+        else:
+            for obj in serializers.deserialize("json", data_serialized):
+                if isinstance(obj.object, cls) and cls.objects.filter(pk=obj.object.pk).count():
+                    return obj.object

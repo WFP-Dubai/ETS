@@ -11,7 +11,7 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 
 
-from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler
+from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler, ReadJSONOfflineHandler
 from .handlers import ReadCSVOrdersHandler, ReadCSVOrderItemsHandler, ReadCSVWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
@@ -94,6 +94,10 @@ urlpatterns = patterns('',
     # For StockItems CSV API
     (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
+    
+    # For offline client in JSON
+    (r'^offline/(?P<warehouse_pk>[-\w]+)/(?P<start_date>[-\w]+)/$', Resource(ReadJSONOfflineHandler), {'emitter_format': 'django_json'}, "api_offline"),
+    (r'^offline/(?P<warehouse_pk>[-\w]+)/$', Resource(ReadJSONOfflineHandler), {'emitter_format': 'django_json'}, "api_offline"),
     
     (r'^docs/$', documentation_view),
 
