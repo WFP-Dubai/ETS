@@ -282,7 +282,7 @@ class DatabasesFormDatabase(object):
 
 
 DEFAULT_DATABASE = {
-    'NAME': 'db',
+    'NAME': os.path.join(EGG_ROOT, 'db'),
     'ENGINE': 'django.db.backends.sqlite3',
     'USER': '',
     'PASSWORD': '',

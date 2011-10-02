@@ -136,21 +136,22 @@ class PrefixedPatterns:
     )
 
 
-urlpatterns += patterns('',
-    ( r'^accounts/', include('django.contrib.auth.urls') ),
-    ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
-    ( r'^rosetta/', include('rosetta.urls') ),
-    ( r'^admin/', include( admin.site.urls ) ),
-    ( r'^api/', include('ets.api.urls')),                    
-)
+    urlpatterns += patterns('',
+        ( r'^accounts/', include('django.contrib.auth.urls') ),
+        ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
+        ( r'^rosetta/', include('rosetta.urls') ),
+        ( r'^admin/', include( admin.site.urls ) ),
+        ( r'^api/', include('ets.api.urls')),                    
+    )
+    
+    if settings.DEBUG:
+        urlpatterns += patterns('',
+            (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+                'document_root': settings.MEDIA_ROOT,
+            }),
+        )
 
+    
 urlpatterns = patterns('',
     (r'^%s/' % settings.URL_PREFIX, include(PrefixedPatterns)),
 )
-
-if settings.DEBUG:
-    urlpatterns += patterns('',
-        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
-            'document_root': settings.MEDIA_ROOT,
-        }),
-    )
