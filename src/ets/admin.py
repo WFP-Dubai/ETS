@@ -162,9 +162,8 @@ class PersonInline(admin.TabularInline):
     extra = 0
 
 class WarehouseAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date',)
-    list_filter = ('location', 'start_date')
-    date_hierarchy = 'start_date'
+    list_display = ('pk', 'name', 'organization', 'location', 'compas',)
+    list_filter = ('location',)
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
     inlines = (StockInline,)
     
