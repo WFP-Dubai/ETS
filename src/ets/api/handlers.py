@@ -155,6 +155,46 @@ class ReadCSVStockItemsHandler(BaseHandler):
             result.append(stock_items_data)  
         return result
 
+class ReadJSONHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.LoadingDetail
+    
+    def read(self, request, waybill="", warehouse="", destination=""):
+        """Return loading details for waybills in CSV"""
+        load_details = self.model.objects.filter(waybill__order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        filter_arg = {}
+        if warehouse: 
+            filter_arg['waybill__order__warehouse__pk'] = warehouse
+        if destination:
+            filter_arg['waybill__destination__pk'] = destination
+        if waybill:
+            filter_arg['waybill'] = waybill
+        if filter_arg:
+            load_details = load_details.filter(**filter_arg)            
+        titles = get_titles(self.model)
+        titles.update(get_titles(ets.models.Waybill))      
+        result = [titles]
+        for detail in load_details:
+            waybills_data = ets.models.Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
+            waybills_data.update(detail)
+            result.append(waybills_data)  
+        return result
+    
+    def create(self, request):
+        if request.content_type:
+            data = request.data
+            
+            em = self.model(title=data['title'], content=data['content'])
+            em.save()
+            
+            for comment in data['comments']:
+                Comment(parent=em, content=comment['content']).save()
+                
+            return rc.CREATED
+        else:
+            super(ExpressiveTestModel, self).create(request)
+
 
 class CSVEmitter(Emitter):
     """
@@ -176,3 +216,4 @@ class CSVEmitter(Emitter):
         return result.getvalue()
             
 Emitter.register('csv', CSVEmitter, 'application/csv')
+
