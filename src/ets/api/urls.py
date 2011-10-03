@@ -33,6 +33,7 @@ CSV_LOADING_DETAILS_HEADERS = {'Content-Disposition': 'attachment; filename=load
 CSV_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.csv' % datetime.date.today() }
 CSV_ORDER_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=order-items-%s.csv' % datetime.date.today() }
 CSV_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.csv' % datetime.date.today() }
+
 FORMAT_CSV = {'emitter_format': 'csv'}
 
 waybills_resource = login_required(expand_response(Resource(ReadCSVWaybillHandler), CSV_WAYBILLS_HEADERS))
@@ -40,6 +41,7 @@ loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadin
 orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
 order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
 stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
+
 
 #history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
 #history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)

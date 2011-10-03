@@ -54,4 +54,13 @@
   </li>
 </ul>
 
+<ul>
+  <li>
+    <form method='POST' action='{% url import_data %}' enctype="multipart/form-data">
+      {{ form_import.as_p }}
+      <input type="submit" value="{% trans 'Import' %}" />
+   </form>
+  </li>
+</ul>
+
 {% endblock %}
