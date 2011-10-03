@@ -11,7 +11,7 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 
 
-from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler, ReadJSONOfflineHandler
+from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler
 from .handlers import ReadCSVOrdersHandler, ReadCSVOrderItemsHandler, ReadCSVWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
@@ -33,16 +33,15 @@ CSV_LOADING_DETAILS_HEADERS = {'Content-Disposition': 'attachment; filename=load
 CSV_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.csv' % datetime.date.today() }
 CSV_ORDER_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=order-items-%s.csv' % datetime.date.today() }
 CSV_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.csv' % datetime.date.today() }
-JSON_OFFLINE_HEADERS = {'Content-Disposition': 'attachment; filename=server-export-%s.json' % datetime.date.today() }
+
 FORMAT_CSV = {'emitter_format': 'csv'}
-FORMAT_JSON = {'emitter_format': 'django_json'}
 
 waybills_resource = login_required(expand_response(Resource(ReadCSVWaybillHandler), CSV_WAYBILLS_HEADERS))
 loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
 orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
 order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
 stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
-offline_resource = login_required(expand_response(Resource(ReadJSONOfflineHandler), JSON_OFFLINE_HEADERS))
+
 
 #history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
 #history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)
@@ -97,10 +96,6 @@ urlpatterns = patterns('',
     # For StockItems CSV API
     (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
-    
-    # For offline client in JSON
-    (r'^offline/(?P<warehouse_pk>[-\w]+)/(?P<start_date>[-\w]+)/$', offline_resource, FORMAT_JSON, "api_offline"),
-    (r'^offline/(?P<warehouse_pk>[-\w]+)/$', offline_resource, FORMAT_JSON, "api_offline"),
     
     (r'^docs/$', documentation_view),
 

@@ -155,57 +155,7 @@ class ReadCSVStockItemsHandler(BaseHandler):
             stock_items_data.update(item)
             result.append(stock_items_data)  
         return result
-
-class ReadJSONOfflineHandler(BaseHandler):
-
-    allowed_methods = ('GET',)
-    model = ets.models.Waybill
     
-    def read(self, request, warehouse_pk, start_date=None):
-        """Return loading details for waybills in CSV"""
-        result = []
-        warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)    
-        orders = ets.models.Order.objects.filter(warehouse__pk=warehouse_pk)
-        waybills = ets.models.Waybill.objects.filter(order__warehouse__pk=warehouse_pk)
-        waybills_log = ets.models.Waybill.audit_log.all()
-        lodaing_details_log = ets.models.Waybill.audit_log.all()
-        if start_date:
-            orders = orders.filter(Q(created__gte=start_date) | Q(updated__gte=start_date))
-            waybills = waybills.filter(Q(date_created__gte=start_date) | Q(date_modified__gte=start_date))
-            waybills_log = waybills_log.filter(action_date__gte=start_date)
-            lodaing_details_log = lodaing_details_log.filter(action_date__gte=start_date)
-        for i in chain(ets.models.Person.objects.distinct().filter(Q(compas__warehouses__pk=warehouse_pk) |
-                  Q(location__warehouses__in=warehouse_pk) | Q(organization__warehouses__pk=warehouse_pk)),
-                  ets.models.StockItem.objects.filter(warehouse__pk=warehouse_pk),   
-                  orders, ets.models.OrderItem.objects.filter(order__in=orders), 
-                  waybills, ets.models.LoadingDetail.objects.filter(waybill__in=waybills),
-                  waybills_log, lodaing_details_log
-        ):
-            result.append(i)
-        result.append(warehouse.location)
-        result.append(warehouse.compas)
-        result.append(warehouse.organization)
-        return result
- 
-class CreateJSONHandler(BaseHandler):
-
-    allowed_methods = ('PUT',)
-    model = ets.models.Waybill
-       
-    def create(self, request):
-        if request.content_type:
-            data = request.data
-            
-            em = self.model(title=data['title'], content=data['content'])
-            em.save()
-            
-            for loading_detail in data['loading_details']:
-                Loading_detail(parent=em, content=comment['content']).save()
-                
-            return rc.CREATED
-        else:
-            super(ExpressiveTestModel, self).create(request)
-
 
 class CSVEmitter(Emitter):
     """
@@ -225,15 +175,7 @@ class CSVEmitter(Emitter):
             writer = csv.writer(result)
             writer.writerows(self.construct())
         return result.getvalue()
-            
+
 Emitter.register('csv', CSVEmitter, 'application/csv')
 
-class DjangoJSONEmitter(DjangoEmitter):
-    """
-    Emitter for the Django serialized format in JSON.
-    """
-    def render(self, request, format='json'):
-        return super(DjangoJSONEmitter,self).render(request, format=format)
-
-Emitter.register('django_json', DjangoJSONEmitter, 'text/json; charset=utf-8')
 

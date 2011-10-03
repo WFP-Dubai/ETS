@@ -28,8 +28,6 @@ def request_update(request):
 @login_required
 def import_file(request, form_class=ImportDataForm):
     """imports file with data"""    
-    print request.POST
-    print request.FILES
     form = form_class(request.POST or None, request.FILES or None)
     if form.is_valid():
         file = form.cleaned_data['file']

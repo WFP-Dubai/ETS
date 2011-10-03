@@ -145,7 +145,8 @@ class PrefixedPatterns:
         ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
         ( r'^rosetta/', include('rosetta.urls') ),
         ( r'^admin/', include( admin.site.urls ) ),
-        ( r'^api/', include('ets.api.urls')),                    
+        ( r'^api/offline/', include('ets.offliner.api.urls')),
+        ( r'^api/', include('ets.api.urls')),                        
     )
     
     if settings.DEBUG:
