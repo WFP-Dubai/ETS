@@ -233,7 +233,6 @@ class DjangoJSONEmitter(DjangoEmitter):
     Emitter for the Django serialized format in JSON.
     """
     def render(self, request, format='json'):
-        print format
         return super(DjangoJSONEmitter,self).render(request, format=format)
 
 Emitter.register('django_json', DjangoJSONEmitter, 'text/json; charset=utf-8')

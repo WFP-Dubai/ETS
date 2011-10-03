@@ -1,9 +1,7 @@
 # Django settings for ets project.
-from ets.settings.default import *
+import os.path
 
-DEBUG = False
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = False
+from .default import *
 
 # Local settings for development / production
 try:
