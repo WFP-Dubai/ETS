@@ -468,14 +468,14 @@ class Waybill( ld_models.Model ):
                                       choices=TRANSPORT_TYPES, default=u'02') #transportType
     
     #Dispatcher
-    dispatch_remarks = models.CharField(_("Dispatch Remarks"), max_length=400, blank=True)
+    dispatch_remarks = models.TextField(_("Dispatch Remarks"), blank=True)
     dispatcher_person = models.ForeignKey(Person, verbose_name=_("Dispatch person"), 
                                           related_name="dispatch_waybills") #dispatcherName
     
     #Recepient
     receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills", 
                                         blank=True, null=True) #recipientName
-    receipt_remarks = models.CharField(_("Recipient Remarks"), max_length=40, blank=True) #recipientRemarks
+    receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     
     #Transporter
     transport_sub_contractor = models.CharField(_("Transport Sub contractor"), max_length=40, blank=True) #transportSubContractor
@@ -489,11 +489,11 @@ class Waybill( ld_models.Model ):
     container_two_number = models.CharField( _("Container Two Number"), max_length=40, blank=True) #containerTwoNumber
     container_one_seal_number = models.CharField(_("Container One Seal Number"), max_length=40, blank=True) #containerOneSealNumber
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
-    container_one_remarks_dispatch = models.TextField( _("Container One Remarks Dispatch"), blank=True) #containerOneRemarksDispatch
-    container_two_remarks_dispatch = models.TextField( _("Container Two Remarks Dispatch"), blank=True) #containerTwoRemarksDispatch
-    container_one_remarks_reciept = models.TextField( _("Container One Remarks Reciept"), blank=True) #containerOneRemarksReciept
-    container_two_remarks_reciept = models.TextField(_("Container Two Remarks Reciept"), blank=True) #containerTwoRemarksReciept
-    
+    container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
+    container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
+    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
+
     arrival_date = models.DateField(_("Recipient Arrival Date"), blank=True, null=True) #recipientArrivalDate
     start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), blank=True, null=True) #recipientStartDischargeDate
     end_discharge_date = models.DateField(_("Recipient End Discharge Date"), blank=True, null=True) #recipientEndDischargeDate
