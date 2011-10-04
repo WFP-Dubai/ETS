@@ -489,10 +489,10 @@ class Waybill( ld_models.Model ):
     container_two_number = models.CharField( _("Container Two Number"), max_length=40, blank=True) #containerTwoNumber
     container_one_seal_number = models.CharField(_("Container One Seal Number"), max_length=40, blank=True) #containerOneSealNumber
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
-    container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
-    container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
-    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
-    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
+    container_one_remarks_dispatch = models.TextField( _("Container One Remarks Dispatch"), blank=True) #containerOneRemarksDispatch
+    container_two_remarks_dispatch = models.TextField( _("Container Two Remarks Dispatch"), blank=True) #containerTwoRemarksDispatch
+    container_one_remarks_reciept = models.TextField( _("Container One Remarks Reciept"), blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.TextField(_("Container Two Remarks Reciept"), blank=True) #containerTwoRemarksReciept
     
     arrival_date = models.DateField(_("Recipient Arrival Date"), blank=True, null=True) #recipientArrivalDate
     start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), blank=True, null=True) #recipientStartDischargeDate
@@ -753,7 +753,7 @@ class CompasLogger(models.Model):
     waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill"), related_name="compass_loggers")
     when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
     status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
-    message = models.CharField(_("error message"), max_length=512)
+    message = models.TextField(_("error message"))
     
     class Meta:
         ordering = ('-when_attempted',)
