@@ -130,8 +130,9 @@ class PrefixedPatterns:
                             
         ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
     
+        ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
+        
         #===================================================================================================================
-        # ( r'^waybill/images/qrcode/(.*)/$', "barcode_qr", {}, "barcode_qr" ),
         # ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
         #===================================================================================================================
         
