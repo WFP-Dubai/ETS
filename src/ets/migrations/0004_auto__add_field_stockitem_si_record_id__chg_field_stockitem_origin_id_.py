@@ -8,11 +8,11 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding field 'StockItem.si_record_id'
-        db.add_column('ets_stockitem', 'si_record_id', self.gf('django.db.models.fields.CharField')(default=1, max_length=25, primary_key=True), keep_default=False)
-
         # Changing field 'StockItem.origin_id'
         db.alter_column('ets_stockitem', 'origin_id', self.gf('django.db.models.fields.CharField')(max_length=23))
+
+        # Adding field 'StockItem.si_record_id'
+        db.add_column('ets_stockitem', 'si_record_id', self.gf('django.db.models.fields.CharField')(default=1, max_length=25, primary_key=True), keep_default=False)
 
         # Removing unique constraint on 'StockItem', fields ['origin_id']
         db.delete_unique('ets_stockitem', ['origin_id'])
