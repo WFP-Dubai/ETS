@@ -41,7 +41,7 @@ def waybill_user_related_filter(queryset, user):
     return queryset.filter(Q(order__warehouse__in=warehouses) 
                            | Q(order__warehouse__compas__officers=user)
                            | Q(destination__in=warehouses)
-                           | Q(destination__compas__officers=user))
+                           | Q(destination__compas__officers=user)).distinct()
                            
 waybill_user_related = user_filtered(filter=waybill_user_related_filter)
 
