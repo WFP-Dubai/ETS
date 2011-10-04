@@ -2,3 +2,4 @@
 /django-mailer
 /django-debug-toolbar
 /django-logicaldelete
+/pyqrcode

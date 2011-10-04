@@ -1,4 +1,6 @@
 import datetime
+import pyqrcode
+import cStringIO
 
 from django import forms
 from django.conf import settings
@@ -7,7 +9,7 @@ from django.views.decorators.http import require_POST
 from django.core.urlresolvers import reverse
 #from django.core import serializers
 from django.forms.models import inlineformset_factory
-#from django.http import HttpResponse
+from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import Http404
@@ -37,7 +39,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), 
                                               ets.models.LoadingDetail))
                        for loading in waybill.loading_details.all())
-        
+    
     return direct_to_template(request, template, {
         'object': waybill,
         'extra_lines': (),#[''] * (settings.LOADING_LINES - items_count),
@@ -296,28 +298,22 @@ def deserialize(request, form_class=WaybillScanForm):
     return redirect('index')
 
 
-#=======================================================================================================================
-# def barcode_qr( request, waybill_pk, queryset=Waybill.objects.all() ):
-# #    import sys
-# #    if sys.platform == 'darwin':
-# #        from qrencode import Encoder
-# #        enc = Encoder()
-# #        myz = wb_compress( wb )
-# #        im = enc.encode( myz, { 'width': 350 } )
-# #        response = HttpResponse( mimetype = "image/png" )
-# #        im.save( response, "PNG" )
-# #    else:
-#    
-#    waybill = get_object_or_404(queryset, pk=waybill_pk)
-# 
-#    import subprocess
-#    myz = waybill.compress()
-#    print myz
-#    mydata = subprocess.Popen( ['zint', '--directpng', '--barcode=58', '-d%s' % myz ], stdout = subprocess.PIPE )
-#    image = mydata.communicate()[0]
-#    #print mydata.communicate()
-#    return HttpResponse( image, mimetype = "Image/png" )
-#=======================================================================================================================
+def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() ):
+    
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    
+    file_out = cStringIO.StringIO()
+    
+    image = pyqrcode.MakeQRImage(waybill.compress(), minTypeNumber = 24, 
+                                 errorCorrectLevel = pyqrcode.QRErrorCorrectLevel.L)
+    image.save(file_out, 'JPEG')
+    file_out.reset()
+    
+    result = file_out.read()
+    
+    file_out.close()
+    
+    return HttpResponse(result, mimetype="image/jpeg")
 
 #=======================================================================================================================
 # @csrf_exempt
