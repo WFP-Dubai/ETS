@@ -193,7 +193,9 @@ admin.site.register( ets.models.Location, LocationAdmin )
 class CompasAdmin(admin.ModelAdmin):
     list_display = ('pk',)
     search_fields = list_display
+    filter_horizontal = ('officers',)
     inlines = (WarehouseInline, PersonInline)
+    
 
 admin.site.register( ets.models.Compas, CompasAdmin )
 
