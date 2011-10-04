@@ -120,6 +120,7 @@ INSTALLED_APPS = (
     
     'ets',
     'compas',
+    'ets.offliner',
     
     'django.contrib.auth',
     'django.contrib.admin',

@@ -11,6 +11,8 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
+from .forms import ImportDataForm
+
 
 from .models import UpdateLog
 
@@ -24,13 +26,11 @@ def request_update(request):
 
 @require_POST
 @login_required
-def import_file(request, form_class):
+def import_file(request, form_class=ImportDataForm):
     """imports file with data"""    
-    
     form = form_class(request.POST or None, request.FILES or None)
     if form.is_valid():
         file = form.cleaned_data['file']
-        with file.open() as f:
-            UpdateLog.updata_data(f.read())
+        UpdateLog.updata_data(file.read())
     
     return redirect('index')

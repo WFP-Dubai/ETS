@@ -16,6 +16,7 @@ from ets.models import Waybill
 from ets.views import waybill_list, waybill_reception
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
 import ets.models
+from ets.offliner.forms import ImportDataForm
 
 
 class PrefixedPatterns:
@@ -26,6 +27,7 @@ class PrefixedPatterns:
             'extra_context': {
                 'form': WaybillSearchForm,
                 'form_scan': WaybillScanForm,
+                'form_import': ImportDataForm,
         }}, "index" ),
         
         #Order list
@@ -135,14 +137,17 @@ class PrefixedPatterns:
         #===================================================================================================================
         
     )
-
-
+    urlpatterns += patterns("ets.offliner.views",
+        ( r'^import_data/$', "import_file", {}, "import_data" ),
+    )
+    
     urlpatterns += patterns('',
         ( r'^accounts/', include('django.contrib.auth.urls') ),
         ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
         ( r'^rosetta/', include('rosetta.urls') ),
         ( r'^admin/', include( admin.site.urls ) ),
-        ( r'^api/', include('ets.api.urls')),                    
+        ( r'^api/offline/', include('ets.offliner.api.urls')),
+        ( r'^api/', include('ets.api.urls')),                        
     )
     
     if settings.DEBUG:

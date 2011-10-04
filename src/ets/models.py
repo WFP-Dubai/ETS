@@ -525,6 +525,10 @@ class Waybill( ld_models.Model ):
     @models.permalink
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
+    
+    def save(self, force_insert=False, force_update=False, using=None):
+        self.date_modified = datetime.now()
+        return super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
     def clean(self):
         """Validates Waybill instance. Checks different dates"""

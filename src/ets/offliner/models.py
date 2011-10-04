@@ -30,4 +30,3 @@ class UpdateLog( models.Model ):
                 'last_updated': start_date or cls.objects.aggregate(max_date=Max('date'))['max_date']
         }).read()
         cls.updata_data(data)
-    
