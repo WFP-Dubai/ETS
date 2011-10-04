@@ -12,7 +12,7 @@
                 <td><sup>{% trans "Destination(location)" %}</sup><br>{{ object.destination.location.name }}</td>
                 <td rowspan="5">
                   <img width='200' height='200' alt="barcode" 
-                    src='http://chart.apis.google.com/chart?cht=qr&chs=250x250&chld=L|2&chl={{ object.compress }}'
+                    src='{% url barcode_qr waybill_pk=object.pk %}'
                   />
                 </td>
             

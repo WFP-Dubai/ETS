@@ -31,6 +31,8 @@ install_requires = [
         'django-logicaldelete',
         'django-native-tags==0.5.0',
         'django_compressor',
+        'PIL',
+        'pyqrcode',
 ]
 
 #Extra dependencies for test purposes
