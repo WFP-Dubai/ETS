@@ -23,10 +23,10 @@ class OfflinerTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response["Content-Type"], "text/json; charset=utf-8")
         self.assertContains(response, 'ISBX00211A', status_code=200)
         
-#        response = self.client.get(reverse("api_offline", kwargs={"warehouse_pk": 'ISBX002', "start_date": datetime.date.today()}))
-#        self.assertEqual(response["Content-Type"], "text/json; charset=utf-8")
-#        self.assertContains(response, 'ISBX002', status_code=200)
-#        self.assertNotContains(response, 'ISBX00211A', status_code=200)
+        response = self.client.get(reverse("api_offline", kwargs={"warehouse_pk": 'ISBX002', "start_date": "2012-01-01"}))
+        self.assertEqual(response["Content-Type"], "text/json; charset=utf-8")
+        self.assertContains(response, 'ISBX002', status_code=200)
+        self.assertNotContains(response, 'ISBX00211A', status_code=200)
         
     def test_import_data(self):
         f = open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'server-export.json'))
