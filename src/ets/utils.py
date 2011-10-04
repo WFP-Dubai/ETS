@@ -123,15 +123,15 @@ def import_stock(compas):
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
                 'allocation_code': stock.allocation_code,
-                #'si_record_id': stock.si_record_id,
+                'origin_id': stock.origin_id,
                 'is_bulk': stock.is_bulk(),
                 
                 'updated': now,
             }
             
-            rows = ets_models.StockItem.objects.filter(origin_id=stock.origin_id).update(**defaults)
+            rows = ets_models.StockItem.objects.filter(si_record_id=stock.si_record_id).update(**defaults)
             if not rows:
-                ets_models.StockItem.objects.create(origin_id=stock.origin_id, **defaults)
+                ets_models.StockItem.objects.create(si_record_id=stock.si_record_id, **defaults)
         
         #Flush empty stocks
         ets_models.StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
