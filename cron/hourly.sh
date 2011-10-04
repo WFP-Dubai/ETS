@@ -1,6 +1,6 @@
 #!/bin/sh
 
-PIDFILE="./cron/often.pid"
+PIDFILE="./cron/hourly.pid"
 
 if test -r $PIDFILE ; then
 
