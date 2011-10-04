@@ -9,7 +9,7 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Removing unique constraint on 'StockItem', fields ['origin_id']
-        db.delete_unique('ets_stockitem', ['origin_id'])
+        #db.delete_unique('ets_stockitem', ['origin_id'])
 
         # Changing field 'StockItem.origin_id'
         db.alter_column('ets_stockitem', 'origin_id', self.gf('django.db.models.fields.CharField')(max_length=23))
