@@ -54,7 +54,7 @@ class Compas(models.Model):
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
-    db_engine = models.CharField(_("Database engine"), max_length=100)
+    db_engine = models.CharField(_("Database engine"), max_length=100, default="django.db.backends.oracle")
     db_name = models.CharField(_("Database name"), max_length=100)
     db_user = models.CharField(_("Database user"), max_length=100, blank=True)
     db_password = models.CharField(_("Database password"), max_length=100, blank=True)
