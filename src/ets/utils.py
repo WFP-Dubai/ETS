@@ -200,7 +200,8 @@ def import_order(compas):
 def send_dispatched(using):
     for waybill in ets_models.Waybill.objects.filter(transport_dispach_signed_date__lte=datetime.now(), 
                                                      validated=True, sent_compas__isnull=True,
-                                                     order__warehouse__compas__pk=using):
+                                                     order__warehouse__compas__pk=using,
+                                                     order__warehouse__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -289,7 +290,8 @@ def send_dispatched(using):
 def send_received(using):
     for waybill in ets_models.Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
                                                      receipt_validated=True, receipt_sent_compas__isnull=True,
-                                                     destination__compas__pk=using):
+                                                     destination__compas__pk=using,
+                                                     destination__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -344,6 +346,7 @@ def changed_fields(model, next, previous):
     for field in model._meta.fields:
         if previous is not None and getattr(next, field.name) != getattr(previous, field.name):
             yield field.verbose_name, getattr(next, field.name)
+    
     
 def history_list(log_queryset, model):
     
