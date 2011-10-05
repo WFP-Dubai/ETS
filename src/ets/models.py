@@ -588,9 +588,13 @@ class Waybill( ld_models.Model ):
             pass
         else:
             for obj in serializers.deserialize("json", wb_serialized):
-                if isinstance(obj.object, cls) and cls.objects.filter(pk=obj.object.pk).count():
-                    return obj.object
-    
+                if isinstance(obj.object, cls):
+                    if cls.objects.filter(pk=obj.object.pk).count():
+                        return obj.object
+                    else:
+                        obj.object.save()
+                        return obj.object
+
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
