@@ -219,7 +219,8 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.delete()
-    
+    redirect_to = redirect_to or request.GET.get('redirect_to', '')
+        
     messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
 
     if redirect_to:
