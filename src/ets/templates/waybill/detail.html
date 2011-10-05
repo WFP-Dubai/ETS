@@ -34,8 +34,9 @@
     <input class="print_original" type="submit" name="print_original" value="Sign reception" />
   </form>
   {% endif %}
-  
-  {% waybill_delete object user %}
+
+  {% url order_detail object.order.pk as delete_redirect %}
+  {% waybill_delete object user _('Delete') delete_redirect %}
 </div>
 
 <table id="details" cellpadding="0" cellspacing="0" border="0px" >

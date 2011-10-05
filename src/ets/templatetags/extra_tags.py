@@ -3,6 +3,7 @@ import datetime
 from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils.http import urlencode
 
 from native_tags.decorators import function, block
 
@@ -110,10 +111,10 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
     }
 
 @register.inclusion_tag('tags/form.html')
-def waybill_delete(waybill, user, text=_("Delete")):
+def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
     return { 
             'text': text,
-            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}),
+            'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
             'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
 
