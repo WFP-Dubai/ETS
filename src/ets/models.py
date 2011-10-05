@@ -589,14 +589,13 @@ class Waybill( ld_models.Model ):
         else:
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized):
+                #Save object if it does not exist
+                if obj.object.__class__.objects.filter(pk=obj.object.pk).count() == 0:
+                    obj.save()
+                        
+                #Remember waybill instance to return from the method
                 if isinstance(obj.object, cls):
-                    if cls.objects.filter(pk=obj.object.pk).count():
-                        return obj.object
-                    else:
-                        waybill = obj.object
-            
-            for obj in serializers.deserialize("json", wb_serialized):
-                obj.save()
+                    waybill = obj.object
             
             return waybill
                     
