@@ -587,10 +587,19 @@ class Waybill( ld_models.Model ):
         except TypeError:
             pass
         else:
+            waybill = None
             for obj in serializers.deserialize("json", wb_serialized):
-                if isinstance(obj.object, cls) and cls.objects.filter(pk=obj.object.pk).count():
-                    return obj.object
-    
+                #Save object if it does not exist
+                if obj.object.__class__.objects.filter(pk=obj.object.pk).count() == 0:
+                    obj.save()
+                        
+                #Remember waybill instance to return from the method
+                if isinstance(obj.object, cls):
+                    waybill = obj.object
+            
+            return waybill
+                    
+
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
