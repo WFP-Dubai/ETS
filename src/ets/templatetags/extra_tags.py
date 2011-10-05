@@ -113,7 +113,7 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
 def waybill_delete(waybill, user, text=_("Delete")):
     return { 
             'text': text,
-            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk,}),
+            'url': reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk, 'redirect_to': "index" }),
             'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
 
