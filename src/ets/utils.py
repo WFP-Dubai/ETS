@@ -29,11 +29,11 @@ def update_compas(using):
     #Update stocks
     import_stock(using)
     
-    #Update loss/damage types
-    ets_models.LossDamageType.update(using)
-    
     #Update orders
     import_order(using)
+    
+    #Update loss/damage types
+    ets_models.LossDamageType.update(using)
 
 
 def import_places(compas):
