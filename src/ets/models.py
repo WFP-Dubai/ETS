@@ -587,13 +587,22 @@ class Waybill( ld_models.Model ):
         except TypeError:
             pass
         else:
+            list_pk = []
             for obj in serializers.deserialize("json", wb_serialized):
                 if isinstance(obj.object, cls):
                     if cls.objects.filter(pk=obj.object.pk).count():
                         return obj.object
                     else:
                         obj.object.save()
-                        return obj.object
+                        list_pk.append(obj.object.pk)
+            for obj in serializers.deserialize("json", wb_serialized):
+                if isinstance(obj.object, LoadingDetail):
+                    if obj.object.waybill.pk in list_pk:
+                        obj.object.save()
+            if list_pk:
+                waybill = cls.objects.get(pk=list_pk[0])
+                return waybill
+                    
 
     @classmethod
     def dispatches(cls, user):

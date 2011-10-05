@@ -221,7 +221,7 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     waybill.delete()
     
     messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
-    
+
     if redirect_to:
         return redirect(redirect_to)
     elif request.META.has_key('HTTP_REFERER'):
