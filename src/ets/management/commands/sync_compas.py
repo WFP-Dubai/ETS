@@ -4,7 +4,7 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand
 
-from ets.utils import update_compas
+from ets.utils import update_compas, update_loss_damage
 from ets.models import Compas
 
 class Command(BaseCommand):
@@ -15,6 +15,9 @@ class Command(BaseCommand):
     )
 
     help = 'Import data from COMPAS stations'
+
+    def update_main(self, using):
+        update_compas(using)
 
     def handle(self, compas='', *args, **options):
         
@@ -27,4 +30,7 @@ class Command(BaseCommand):
         for compas in stations:
             if verbosity >= 2:
                 print "Updating compas: %s" % compas
-            update_compas(using=compas.pk)
+            self.update_main(using=compas.pk)
+            
+
+    
