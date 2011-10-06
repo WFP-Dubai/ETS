@@ -34,6 +34,7 @@ class CompasTestCase(TestCase):
         self.assertEqual(ets.models.Organization.objects.count(), 0)
         
         call_command('sync_compas')
+        call_command('update_loss_damages')
         
         """Test place's update method"""
         self.assertEqual(ets.models.Location.objects.count(), 2)
@@ -96,6 +97,7 @@ class CompasTestCase(TestCase):
         
         self.assertEqual(compas_models.LtiOriginal.objects.using(self.compas).filter(code="THEIRORDEROLD").count(), 1) 
         call_command('sync_compas')
+        call_command('update_loss_damages')
         self.assertEqual(ets.models.Order.objects.filter(pk="THEIRORDEROLD").count(), 0)
 
     
