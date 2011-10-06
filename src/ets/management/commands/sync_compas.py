@@ -16,6 +16,9 @@ class Command(BaseCommand):
 
     help = 'Import data from COMPAS stations'
 
+    def synchronize(self, compas):
+        update_compas(compas)
+
     def handle(self, compas='', *args, **options):
         
         verbosity = int(options.get('verbosity', 1))
@@ -27,4 +30,7 @@ class Command(BaseCommand):
         for compas in stations:
             if verbosity >= 2:
                 print "Updating compas: %s" % compas
-            update_compas(using=compas.pk)
+            self.synchronize(compas=compas.pk)
+            
+
+    
