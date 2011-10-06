@@ -8,7 +8,7 @@ from django.core.management import call_command
 
 from windmill.authoring import djangotest
 
-from ets.utils import update_compas, update_loss_damages
+from ets.utils import update_compas
 from ets.models import LossDamageType
 
 def change_settings(func, **kwargs):
