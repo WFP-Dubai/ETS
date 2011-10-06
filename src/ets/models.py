@@ -51,9 +51,10 @@ class Compas(models.Model):
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
     start_date = models.DateField(_("Start date"), default=datetime.now)
+    read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
-    db_engine = models.CharField(_("Database engine"), max_length=100)
+    db_engine = models.CharField(_("Database engine"), max_length=100, default="django.db.backends.oracle")
     db_name = models.CharField(_("Database name"), max_length=100)
     db_user = models.CharField(_("Database user"), max_length=100, blank=True)
     db_password = models.CharField(_("Database password"), max_length=100, blank=True)
@@ -212,7 +213,7 @@ class StockManager( models.Manager ):
 
 class StockItem( models.Model ):
     """Accessible stocks"""
-    origin_id = models.CharField(_("Origin identifier"), max_length=23, primary_key=True)
+    si_record_id = models.CharField(_("SI record id "), max_length=25, primary_key=True)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
@@ -233,8 +234,8 @@ class StockItem( models.Model ):
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
+    origin_id = models.CharField(_("Origin identifier"), max_length=23)
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
-    #si_record_id = models.CharField(_("SI record id "), max_length=25, editable=False)
     
     objects = StockManager()
 
@@ -587,10 +588,19 @@ class Waybill( ld_models.Model ):
         except TypeError:
             pass
         else:
+            waybill = None
             for obj in serializers.deserialize("json", wb_serialized):
-                if isinstance(obj.object, cls) and cls.objects.filter(pk=obj.object.pk).count():
-                    return obj.object
-    
+                #Save object if it does not exist
+                if obj.object.__class__.objects.filter(pk=obj.object.pk).count() == 0:
+                    obj.save()
+                        
+                #Remember waybill instance to return from the method
+                if isinstance(obj.object, cls):
+                    waybill = obj.object
+            
+            return waybill
+                    
+
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""

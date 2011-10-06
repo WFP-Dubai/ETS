@@ -33,6 +33,7 @@ install_requires = [
         'django_compressor',
         'PIL',
         'pyqrcode',
+        'pygments',
 ]
 
 #Extra dependencies for test purposes

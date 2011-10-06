@@ -8,38 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Changing field 'CompasLogger.message'
-        db.alter_column('ets_compaslogger', 'message', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'WaybillAuditLogEntry.receipt_remarks'
-        db.alter_column('ets_waybillauditlogentry', 'receipt_remarks', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'WaybillAuditLogEntry.dispatch_remarks'
-        db.alter_column('ets_waybillauditlogentry', 'dispatch_remarks', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Waybill.receipt_remarks'
-        db.alter_column('ets_waybill', 'receipt_remarks', self.gf('django.db.models.fields.TextField')())
-
-        # Changing field 'Waybill.dispatch_remarks'
-        db.alter_column('ets_waybill', 'dispatch_remarks', self.gf('django.db.models.fields.TextField')())
+        # Adding field 'Compas.read_only'
+        db.add_column('ets_compas', 'read_only', self.gf('django.db.models.fields.BooleanField')(default=False), keep_default=False)
 
 
     def backwards(self, orm):
         
-        # Changing field 'CompasLogger.message'
-        db.alter_column('ets_compaslogger', 'message', self.gf('django.db.models.fields.CharField')(max_length=512))
-
-        # Changing field 'WaybillAuditLogEntry.receipt_remarks'
-        db.alter_column('ets_waybillauditlogentry', 'receipt_remarks', self.gf('django.db.models.fields.CharField')(max_length=40))
-
-        # Changing field 'WaybillAuditLogEntry.dispatch_remarks'
-        db.alter_column('ets_waybillauditlogentry', 'dispatch_remarks', self.gf('django.db.models.fields.CharField')(max_length=400))
-
-        # Changing field 'Waybill.receipt_remarks'
-        db.alter_column('ets_waybill', 'receipt_remarks', self.gf('django.db.models.fields.CharField')(max_length=40))
-
-        # Changing field 'Waybill.dispatch_remarks'
-        db.alter_column('ets_waybill', 'dispatch_remarks', self.gf('django.db.models.fields.CharField')(max_length=400))
+        # Deleting field 'Compas.read_only'
+        db.delete_column('ets_compas', 'read_only')
 
 
     models = {
@@ -99,6 +75,7 @@ class Migration(SchemaMigration):
             'db_port': ('django.db.models.fields.CharField', [], {'max_length': '4', 'blank': 'True'}),
             'db_user': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'officers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'compases'", 'symmetrical': 'False', 'to': "orm['auth.User']"}),
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'start_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now'})
         },
         'ets.compaslogger': {
@@ -211,12 +188,13 @@ class Migration(SchemaMigration):
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Commodity']"}),
             'is_bulk': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'number_of_units': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
-            'origin_id': ('django.db.models.fields.CharField', [], {'max_length': '23', 'primary_key': 'True'}),
+            'origin_id': ('django.db.models.fields.CharField', [], {'max_length': '23'}),
             'package': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Package']"}),
             'project_number': ('django.db.models.fields.CharField', [], {'max_length': '24', 'blank': 'True'}),
             'quality_code': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'quality_description': ('django.db.models.fields.CharField', [], {'max_length': '11', 'blank': 'True'}),
             'si_code': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
+            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'primary_key': 'True'}),
             'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
             'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),

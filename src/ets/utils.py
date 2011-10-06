@@ -31,6 +31,9 @@ def update_compas(using):
     
     #Update orders
     import_order(using)
+    
+    #Update loss/damage types
+    ets_models.LossDamageType.update(using)
 
 def update_loss_damages(using):
     """Update loss/damage types"""
@@ -124,15 +127,15 @@ def import_stock(compas):
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
                 'allocation_code': stock.allocation_code,
-                #'si_record_id': stock.si_record_id,
+                'origin_id': stock.origin_id,
                 'is_bulk': stock.is_bulk(),
                 
                 'updated': now,
             }
             
-            rows = ets_models.StockItem.objects.filter(origin_id=stock.origin_id).update(**defaults)
+            rows = ets_models.StockItem.objects.filter(si_record_id=stock.si_record_id).update(**defaults)
             if not rows:
-                ets_models.StockItem.objects.create(origin_id=stock.origin_id, **defaults)
+                ets_models.StockItem.objects.create(si_record_id=stock.si_record_id, **defaults)
         
         #Flush empty stocks
         ets_models.StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
@@ -201,7 +204,8 @@ def import_order(compas):
 def send_dispatched(using):
     for waybill in ets_models.Waybill.objects.filter(transport_dispach_signed_date__lte=datetime.now(), 
                                                      validated=True, sent_compas__isnull=True,
-                                                     order__warehouse__compas__pk=using):
+                                                     order__warehouse__compas__pk=using,
+                                                     order__warehouse__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -275,8 +279,7 @@ def send_dispatched(using):
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                    compas_id=using, waybill=waybill,
                                                    status=ets_models.CompasLogger.FAILURE, 
-                                                   message='\n'.join(err.messages))
-            
+                                                   message=err.messages[0])
             waybill.validated = False
             waybill.save()
         else:
@@ -291,7 +294,8 @@ def send_dispatched(using):
 def send_received(using):
     for waybill in ets_models.Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
                                                      receipt_validated=True, receipt_sent_compas__isnull=True,
-                                                     destination__compas__pk=using):
+                                                     destination__compas__pk=using,
+                                                     destination__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
                 
@@ -329,7 +333,7 @@ def send_received(using):
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                    compas_id=using, waybill=waybill,
                                                    status=ets_models.CompasLogger.FAILURE, 
-                                                   message='\n'.join(err.messages))
+                                                   message=err.messages[0])
             
             waybill.receipt_validated = False
         else:
@@ -346,6 +350,7 @@ def changed_fields(model, next, previous):
     for field in model._meta.fields:
         if previous is not None and getattr(next, field.name) != getattr(previous, field.name):
             yield field.verbose_name, getattr(next, field.name)
+    
     
 def history_list(log_queryset, model):
     
