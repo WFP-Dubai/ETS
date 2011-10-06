@@ -35,10 +35,6 @@ def update_compas(using):
     #Update loss/damage types
     ets_models.LossDamageType.update(using)
 
-def update_loss_damages(using):
-    """Update loss/damage types"""
-    ets_models.LossDamageType.update(using)
-    
 
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
