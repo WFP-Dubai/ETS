@@ -8,7 +8,7 @@ from django.core.management import call_command
 
 from windmill.authoring import djangotest
 
-from ets.utils import update_compas
+from ets.utils import update_compas, update_loss_damages
 
 def change_settings(func, **kwargs):
     @wraps(func)
@@ -38,6 +38,7 @@ class TestCaseMixin(object):
         
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
         update_compas(self.compas)
+        update_loss_damages(self.compas)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
 
 class WindmillMixin(object):

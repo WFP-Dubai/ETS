@@ -30,7 +30,7 @@ class Command(BaseCommand):
         for compas in stations:
             if verbosity >= 2:
                 print "Updating compas: %s" % compas
-            self.update_main(using=compas.pk)
+            self.synchronize(compas=compas.pk)
             
 
     

@@ -32,8 +32,8 @@ def update_compas(using):
     #Update orders
     import_order(using)
 
-def update_loss_damaged(using):
-    #Update loss/damage types
+def update_loss_damages(using):
+    """Update loss/damage types"""
     ets_models.LossDamageType.update(using)
     
 
