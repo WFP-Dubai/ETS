@@ -97,7 +97,7 @@ class CompasTestCase(TestCase):
         
         self.assertEqual(compas_models.LtiOriginal.objects.using(self.compas).filter(code="THEIRORDEROLD").count(), 1) 
         call_command('sync_compas')
-        call_command('update_loss_demages')        
+        call_command('update_loss_demages')
         self.assertEqual(ets.models.Order.objects.filter(pk="THEIRORDEROLD").count(), 0)
 
     
