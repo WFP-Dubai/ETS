@@ -5,9 +5,8 @@ from .sync_compas import Command as UpdateCompas
 
 class Command(UpdateCompas):
 
-    help = 'Import data from COMPAS stations with loss damage data'
+    help = 'Import data from COMPAS stations with loss/damage data'
 
-    def update_main(self, using):
+    def synchronize(self, using):
         update_loss_damage(using)
         
-
