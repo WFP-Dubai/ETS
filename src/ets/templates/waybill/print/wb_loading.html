@@ -119,21 +119,21 @@
           </td>
         </tr>
         <tr>
-          <td rowspan="2"><small style="font-size:x-small;">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
-          <td colspan="2"><small style="font-size:x-small;">{% trans "Driver's Name" %}:</small> {{ object.transport_driver_name }}</td>
+          <td rowspan="2"><small class="x-small">{% trans "Title" %}:</small> {{ object.dispatcher_person.title }}</td>
+          <td colspan="2"><small class="x-small">{% trans "Driver's Name" %}:</small> {{ object.transport_driver_name }}</td>
         </tr>  
         <tr>  
           <td colspan="2">
-            <small style="font-size:x-small;">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
+            <small class="x-small">{% trans "Driver's Licence/ID:" %}</small>{{ object.transport_driver_licence }}
           </td>
         </tr>
         <tr>
           <td valign=top rowspan="4">
-            <p style="font-size: x-small; align:top;">
+            <p class="x-small" style="align:top;">
               {% trans "I hereby certify the loading of the commodities described above." %}<br><br>
               {% trans "Name, signature and stamp:" %}
             </p>
-            <p style='font-size:small'>
+            <p class="x-small">
               {{ object.dispatcher_person.user.get_full_name }}<br>
               {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
             </p>

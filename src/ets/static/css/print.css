@@ -74,3 +74,7 @@ img{position: relative; text-align: right;}
 p {
   margin: 0;
 }
+
+.x-small {
+  font-size: x-small;
+}
