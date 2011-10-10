@@ -17,7 +17,6 @@ class UpdateLog( models.Model ):
     def updata_data(cls, data):
         """Deserializes data and saves them"""
         objects = serializers.deserialize('json', data)
-        
         for wrapper in objects:
             wrapper.save()
         
