@@ -6,3 +6,7 @@
 .uniForm .error input, .uniForm .error textarea {
   border-color: red;
 }
+
+.uniForm textarea {
+    height: inherit;
+}

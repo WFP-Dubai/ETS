@@ -178,6 +178,8 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         waybill = form.save()
         loading_formset.save()
         
+        messages.add_message(request, messages.INFO, _('Waybill has been discharged'))
+        
         return redirect(waybill)
     
     return direct_to_template(request, template, {

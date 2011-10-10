@@ -44,4 +44,4 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 1)
+        self.assertEqual(response.context['object_list'].count(), 5)

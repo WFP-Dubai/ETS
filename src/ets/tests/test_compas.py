@@ -60,7 +60,7 @@ class CompasTestCase(TestCase):
         self.assertEqual(ets.models.LossDamageType.objects.count(), 4)
         
         """test stock update"""
-        self.assertEqual(ets.models.StockItem.objects.count(), 3)
+        self.assertEqual(ets.models.StockItem.objects.count(), 7)
         stock_item = ets.models.StockItem.objects.get(pk='testme0124')
         
         #Commodity name and category

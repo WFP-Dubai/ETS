@@ -212,16 +212,76 @@
     "model": "ets.loadingdetail",
     "fields": {
       "_order": 0,
-      "number_units_good": "23",
+      "number_units_good": "0",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
       "stock_item": "anotherstock1234",
       "number_units_damaged": "2",
-      "number_units_lost": "10",
+      "number_units_lost": "0",
       "units_damaged_reason": "dsed",
       "overloaded_units": false,
+      "number_of_units": "2"
+    }
+  },
+  {
+    "pk": "ISBX00311A13",
+    "model": "ets.loadingdetail",
+    "fields": {
+      "_order": 1,
+      "number_units_good": "0",
+      "over_offload_units": false,
+      "waybill": "ISBX00312A",
+      "stock_item": "anotherstock12345",
+      "number_units_damaged": "0",
+      "number_units_lost": "10",
+      "overloaded_units": false,
       "units_lost_reason": "lsed",
-      "number_of_units": "35"
+      "number_of_units": "10"
+    }
+  },
+  {
+    "pk": "ISBX00311A14",
+    "model": "ets.loadingdetail",
+    "fields": {
+      "_order": 1,
+      "number_units_good": "3",
+      "over_offload_units": false,
+      "waybill": "ISBX00312A",
+      "stock_item": "testme01231",
+      "number_units_damaged": "0",
+      "number_units_lost": "0",
+      "overloaded_units": false,
+      "number_of_units": "3"
+    }
+  },
+  {
+    "pk": "ISBX00311A15",
+    "model": "ets.loadingdetail",
+    "fields": {
+      "_order": 2,
+      "number_units_good": "5",
+      "over_offload_units": false,
+      "waybill": "ISBX00312A",
+      "stock_item": "testme01232",
+      "number_units_damaged": "0",
+      "number_units_lost": "0",
+      "overloaded_units": false,
+      "number_of_units": "5"
+    }
+  },
+  {
+    "pk": "ISBX00311A16",
+    "model": "ets.loadingdetail",
+    "fields": {
+      "_order": 3,
+      "number_units_good": "15",
+      "over_offload_units": false,
+      "waybill": "ISBX00312A",
+      "stock_item": "testme01233",
+      "number_units_damaged": "0",
+      "number_units_lost": "0",
+      "overloaded_units": false,
+      "number_of_units": "15"
     }
   },
   {
