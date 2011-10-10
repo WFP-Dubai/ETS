@@ -42,6 +42,9 @@ class DispatchWaybillForm( forms.ModelForm ):
             'container_one_remarks_dispatch',
             'container_two_remarks_dispatch',
         )
+        widgets = {
+            'dispatch_remarks': forms.Textarea(attrs={'rows': "3"}),
+        }
     
     helper = FormHelper()
     
