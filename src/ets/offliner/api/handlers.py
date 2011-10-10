@@ -2,15 +2,16 @@ from itertools import chain
 
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
+from django.core import serializers
 
 from piston.emitters import Emitter, DjangoEmitter
 from piston.handler import BaseHandler
 import ets.models
 
 
-class ReadJSONOfflineHandler(BaseHandler):
+class JSONOfflineHandler(BaseHandler):
 
-    allowed_methods = ('GET',)
+    allowed_methods = ('GET','POST')
     model = ets.models.Waybill
     
     def read(self, request, warehouse_pk, start_date=None):
@@ -39,6 +40,15 @@ class ReadJSONOfflineHandler(BaseHandler):
         result.append(warehouse.organization)
         return result
 
+    def create(self, request, warehouse_pk):
+
+        if request.content_type:
+            data = request.data
+            objects = serializers.deserialize('python', data)
+            for wrapper in objects:
+                wrapper.save()
+    
+
 class DjangoJSONEmitter(DjangoEmitter):
     """
     Emitter for the Django serialized format in JSON.
@@ -46,4 +56,4 @@ class DjangoJSONEmitter(DjangoEmitter):
     def render(self, request, format='json'):
         return super(DjangoJSONEmitter,self).render(request, format=format)
 
-Emitter.register('django_json', DjangoJSONEmitter, 'text/json; charset=utf-8')
+Emitter.register('django_json', DjangoJSONEmitter, 'application/json; charset=utf-8')

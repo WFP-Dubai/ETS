@@ -32,5 +32,4 @@ def import_file(request, form_class=ImportDataForm):
     if form.is_valid():
         file = form.cleaned_data['file']
         UpdateLog.updata_data(file.read())
-    
     return redirect('index')

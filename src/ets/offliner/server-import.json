@@ -1,0 +1,62 @@
+[
+ {
+  "pk": "ISBX00211G",
+  "model": "ets.waybill",
+  "fields": {
+   "_order": 0,
+   "receipt_signed_date": null,
+   "dispatch_date": "2011-06-12",
+   "transport_dispach_signed_date": null,
+   "end_discharge_date": null,
+   "validated": false,
+   "transport_driver_licence": "EG234454",
+   "container_two_remarks_reciept": "",
+   "arrival_date": null,
+   "container_two_number": "",
+   "destination": "ISBX003",
+   "container_two_seal_number": "",
+   "transport_trailer_registration": "",
+   "dispatcher_person": "ISBX0020000586",
+   "receipt_person": null,
+   "distance": null,
+   "date_removed": null,
+   "receipt_validated": false,
+   "loading_date": "2011-06-12",
+   "receipt_sent_compas": null,
+   "transport_driver_name": "Mahmud",
+   "sent_compas": null,
+   "dispatch_remarks": "",
+   "container_one_seal_number": "",
+   "container_one_remarks_reciept": "",
+   "receipt_remarks": "",
+   "transport_sub_contractor": "",
+   "container_two_remarks_dispatch": "",
+   "date_modified": "2011-10-04 09:09:46",
+   "transport_vehicle_registration": "AE234454",
+   "start_discharge_date": null,
+   "transaction_type": "WIT",
+   "container_one_remarks_dispatch": "",
+   "transport_type": "02",
+   "container_one_number": "",
+   "date_created": "2011-06-12 05:36:54",
+   "order": "OURLITORDER"
+  }
+ },
+ {
+  "pk": "ISBX00211G1",
+  "model": "ets.loadingdetail",
+  "fields": {
+   "_order": 0,
+   "number_units_good": "0",
+   "stock_item": "testme0123",
+   "waybill": "ISBX00211G",
+   "number_units_damaged": "0",
+   "number_units_lost": "0",
+   "over_offload_units": false,
+   "units_damaged_reason": null,
+   "overloaded_units": false,
+   "units_lost_reason": null,
+   "number_of_units": "1"
+  }
+ }
+]
