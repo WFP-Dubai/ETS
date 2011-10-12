@@ -129,7 +129,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
                                                               .exclude(pk=order.warehouse.pk)
-    v
+    
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
