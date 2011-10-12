@@ -19,7 +19,7 @@ class JSONOfflineHandler(BaseHandler):
         result = []
         warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)    
         orders = ets.models.Order.objects.filter(warehouse__pk=warehouse_pk)
-        waybills = ets.models.Waybill.objects.filter(order__warehouse__pk=warehouse_pk)
+        waybills = ets.models.Waybill.objects.filter(order__warehouse__pk=warehouse_pk, transport_dispach_signed_date__isnull=False)
         waybills_log = ets.models.Waybill.audit_log.all()
         lodaing_details_log = ets.models.Waybill.audit_log.all()
         if start_date:
