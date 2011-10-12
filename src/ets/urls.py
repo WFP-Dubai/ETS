@@ -16,19 +16,21 @@ from ets.models import Waybill
 from ets.views import waybill_list, waybill_reception
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
 import ets.models
-from ets.offliner.forms import ImportDataForm
+from ets.offliner.forms import ImportDataForm, ExportDataForm
 
 
 class PrefixedPatterns:
     urlpatterns += patterns("ets.views",
-                            
-        ( r'^$', login_required(direct_to_template), {
-            'template': 'index.html',
-            'extra_context': {
-                'form': WaybillSearchForm,
-                'form_scan': WaybillScanForm,
-                'form_import': ImportDataForm,
-        }}, "index" ),
+
+        ( r'^$', 'main_page', {}, 'index'),
+        # ( r'^$', login_required(direct_to_template), {
+        #     'template': 'index.html',
+        #     'extra_context': {
+        #         'form': WaybillSearchForm,
+        #         'form_scan': WaybillScanForm,
+        #         'form_import': ImportDataForm,
+        #         'form_export': ExportDataForm,
+        # }}, "index" ),
         
         #Order list
         ( r'^orders/$', login_required(person_required(warehouse_related(object_list))), {
@@ -139,6 +141,7 @@ class PrefixedPatterns:
     )
     urlpatterns += patterns("ets.offliner.views",
         ( r'^import_data/$', "import_file", {}, "import_data" ),
+        ( r'^export_data/$', "export_file", {}, "export_data" ),
     )
     
     urlpatterns += patterns('',

@@ -27,7 +27,23 @@ from .decorators import person_required, officer_required, dispatch_view, receip
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from ets.utils import changed_fields, history_list
+from ets.offliner.forms import ImportDataForm, ExportDataForm
 
+@login_required
+def main_page(request, template="index.html", export_form=ExportDataForm, search_form=WaybillSearchForm,
+              import_form=ImportDataForm, scan_form=WaybillScanForm):
+    """
+    Main page of the project
+    """
+    class ExportForm(export_form):
+        warehouse = forms.ModelChoiceField(queryset=ets.models.Warehouse.filter_by_user(request.user), label=_('Warehouse'))
+    
+    return direct_to_template(request, template, {
+        'form': search_form,
+        'form_scan': scan_form,
+        'form_import': import_form,
+        'form_export': ExportForm,
+    })
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):
     """utility that shows waybill's details"""    

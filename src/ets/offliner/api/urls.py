@@ -16,5 +16,5 @@ urlpatterns = patterns('',
                        
     # For offline client in JSON
     (r'^(?P<warehouse_pk>[-\w]+)/(?P<start_date>[-\w]+)/$', offline_resource, FORMAT_JSON, "api_offline"),
-    (r'^(?P<warehouse_pk>[-\w]+)/$', Resource(JSONOfflineHandler), FORMAT_JSON, "api_offline"),                       
+    (r'^(?P<warehouse_pk>[-\w]+)/$', offline_resource, FORMAT_JSON, "api_offline"),
 )    
