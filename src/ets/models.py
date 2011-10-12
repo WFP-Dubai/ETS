@@ -64,7 +64,7 @@ class Compas(models.Model):
     class Meta:
         ordering = ('code',)
         verbose_name = _('Compas station')
-        verbose_name_plural = _("compases")
+        verbose_name_plural = _("Compas stations")
         
     def __unicode__(self):
         return self.pk
@@ -170,8 +170,8 @@ class CommodityCategory(models.Model):
     
     class Meta:
         ordering = ('code',)
-        verbose_name = _('commodity category')
-        verbose_name_plural = _("commodity categories")
+        verbose_name = _('Commodity Category')
+        verbose_name_plural = _("Commodity Categories")
         
     def __unicode__(self):
         return self.pk
@@ -199,8 +199,8 @@ class Package(models.Model):
     
     class Meta:
         ordering = ('code',)
-        verbose_name = _('package')
-        verbose_name_plural = _("packages")
+        verbose_name = _('Packaging')
+        verbose_name_plural = _("Packaging")
     
     def __unicode__(self):
         return self.name
@@ -242,8 +242,8 @@ class StockItem( models.Model ):
     class Meta:
         ordering = ('si_code', 'commodity__name')
         order_with_respect_to = 'warehouse'
-        verbose_name = _("stock item")
-        verbose_name_plural = _("stocks")
+        verbose_name = _("Stock Item")
+        verbose_name_plural = _("Stock Itemss")
 
     def  __unicode__( self ):
         return "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
