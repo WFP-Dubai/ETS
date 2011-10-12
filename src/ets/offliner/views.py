@@ -1,14 +1,6 @@
 
-from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
-#from django.core import serializers
-from django.shortcuts import redirect, get_object_or_404
-from django.views.generic.simple import direct_to_template
-from django.contrib import messages
-from django.db import transaction
-from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 from django.views.decorators.http import require_POST, require_GET
 
 from .forms import ImportDataForm, ExportDataForm
@@ -38,11 +30,8 @@ def import_file(request, form_class=ImportDataForm):
 @login_required
 def export_file(request, form_class=ExportDataForm):
     """exports file with data"""
-    print 'KILL'
     form = form_class(request.GET or None)
     if form.is_valid():
-        print "VALID"
         warehouse = form.cleaned_data['warehouse']
-        print warehouse
         return redirect('api_offline', warehouse_pk=warehouse.pk)
     return redirect('index')

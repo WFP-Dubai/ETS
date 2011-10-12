@@ -35,14 +35,13 @@ def main_page(request, template="index.html", export_form=ExportDataForm, search
     """
     Main page of the project
     """
-    class ExportForm(export_form):
-        warehouse = forms.ModelChoiceField(queryset=ets.models.Warehouse.filter_by_user(request.user), label=_('Warehouse'))
-    
+    export_form.base_fields['warehouse'].queryset = ets.models.Warehouse.filter_by_user(request.user)
+        
     return direct_to_template(request, template, {
         'form': search_form,
         'form_scan': scan_form,
         'form_import': import_form,
-        'form_export': ExportForm,
+        'form_export': export_form,
     })
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):
@@ -130,7 +129,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
                                                               .exclude(pk=order.warehouse.pk)
-    
+    v
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
