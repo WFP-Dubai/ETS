@@ -184,7 +184,7 @@ admin.site.register( ets.models.Organization, OrganizationAdmin )
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'country',)
     search_fields = ('name', 'country',)
-    inlines = (WarehouseInline, OrderInline)
+    inlines = (WarehouseInline,)
     list_filter = ('country',)
 
 admin.site.register( ets.models.Location, LocationAdmin )

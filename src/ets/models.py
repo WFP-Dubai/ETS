@@ -346,7 +346,7 @@ class Order(models.Model):
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
-    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, editable=False, primary_key=True)
+    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, primary_key=True)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
