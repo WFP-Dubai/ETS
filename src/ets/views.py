@@ -127,8 +127,11 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)
     
-    form.fields['destination'].queryset = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
-                                                              .exclude(pk=order.warehouse.pk)
+    warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
+    if not warehouses.exists():
+        warehouses = ets.models.Warehouse.objects.filter(location=order.location).exclude(pk=order.warehouse.pk)
+    
+    form.fields['destination'].queryset = warehouses
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
@@ -152,8 +155,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     """Creates a Waybill"""
     
     order = get_object_or_404(queryset, pk=order_pk)
-    waybill = ets.models.Waybill(order=order, dispatcher_person = request.user.person,
-                                 loading_date=order.dispatch_date, dispatch_date=order.dispatch_date)
+    waybill = ets.models.Waybill(order=order, dispatcher_person=request.user.person)
 
     return _dispatching(request, waybill, success_message=_("Waybill has been created"), **kwargs)
 
