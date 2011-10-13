@@ -137,8 +137,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     """Creates a Waybill"""
     
     order = get_object_or_404(queryset, pk=order_pk)
-    waybill = ets.models.Waybill(order=order, dispatcher_person = request.user.person,
-                                 loading_date=order.dispatch_date, dispatch_date=order.dispatch_date)
+    waybill = ets.models.Waybill(order=order, dispatcher_person=request.user.person)
 
     return _dispatching(request, waybill, success_message=_("Waybill has been created"), **kwargs)
 
