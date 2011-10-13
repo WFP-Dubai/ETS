@@ -1,6 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import chain, izip
 
+from django.conf import settings
 from django.db import connections, transaction, models
 from django.db.utils import DatabaseError
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
@@ -12,7 +13,7 @@ import compas.models as compas_models
 import models as ets_models
 
 TOTAL_WEIGHT_METRIC = 1000
-
+DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
@@ -160,7 +161,7 @@ def import_order(compas):
             #Create Order
             defaults = {
                 'created': lti.lti_date,
-                'expiry': lti.expiry_date,
+                'expiry': lti.expiry_date or lti.lti_date + timedelta(30*DEFAULT_ORDER_LIFE),
                 'dispatch_date': lti.requested_dispatch_date,
                 'transport_code': lti.transport_code,
                 'transport_ouc': lti.transport_ouc,
@@ -173,7 +174,11 @@ def import_order(compas):
                 'updated': now,
             }
             
-            order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
+            order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
+            #===========================================================================================================
+            # if not created:
+            #    ets_models.Order.objects.filter(code=lti.code).update(**defaults)
+            #===========================================================================================================
             
             #Commodity
             commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={

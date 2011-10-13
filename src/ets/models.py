@@ -284,7 +284,7 @@ class Order(models.Model):
     code = models.CharField(_("Code"), max_length=40, primary_key=True, editable=False)
     
     created = models.DateField(_("Created date")) #lti_date
-    expiry = models.DateField(_("expire date"), blank=True, null=True) #expiry_date
+    expiry = models.DateField(_("expire date")) #expiry_date
     dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True)
     
     transport_code = models.CharField(_("Transport Code"), max_length = 4, editable=False)
