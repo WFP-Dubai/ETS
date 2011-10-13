@@ -279,9 +279,10 @@ def validate_dispatch(request, waybill_pk, queryset):
     waybill.validated = True
     waybill.save()
     
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s has been validated') % { 
-        'waybill': waybill.pk,
-    })
+    messages.add_message(request, messages.INFO, 
+                        _('Waybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
+                            'waybill': waybill.pk,
+                        })
 
     return redirect('dispatch_validates')
 
@@ -296,9 +297,10 @@ def validate_receipt(request, waybill_pk, queryset):
     waybill.receipt.validated = True
     waybill.receipt.save()
     
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s has been validated') % { 
-        'waybill': waybill.pk,
-    })
+    messages.add_message(request, messages.INFO, 
+                        _('Waybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
+                            'waybill': waybill.pk,
+                        })
 
     return redirect('receipt_validates')
 
