@@ -39,7 +39,6 @@ class TestCaseMixin(object):
         
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
         update_compas(self.compas)
-        LossDamageType.update(self.compas)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')
 
 class WindmillMixin(object):

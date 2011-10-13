@@ -17,9 +17,9 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    send_dispatched(using)
+    #send_dispatched(using)
     
-    send_received(using)
+    #send_received(using)
     
     #Update places
     import_places(using)
@@ -29,6 +29,9 @@ def update_compas(using):
     
     #Update stocks
     import_stock(using)
+    
+    #Update loss, damage reasons
+    ets_models.LossDamageType.update(using)
     
     #Update orders
     import_order(using)
