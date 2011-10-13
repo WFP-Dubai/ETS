@@ -174,7 +174,7 @@ def import_order(compas):
                 'updated': now,
             }
             
-            order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
+            order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
             #===========================================================================================================
             # if not created:
             #    ets_models.Order.objects.filter(code=lti.code).update(**defaults)

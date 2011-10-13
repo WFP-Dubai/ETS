@@ -281,7 +281,7 @@ class LossDamageType(models.Model):
 class Order(models.Model):
     """Delivery order"""
     
-    code = models.CharField(_("Code"), max_length=40, primary_key=True, editable=False)
+    code = models.CharField(_("Code"), max_length=40, primary_key=True)
     
     created = models.DateField(_("Created date"), default=date.today) #lti_date
     expiry = models.DateField(_("expire date"), default=date.today) #expiry_date
