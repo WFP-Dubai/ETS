@@ -1,4 +1,3 @@
-import datetime
 import os.path
 
 from django.test import TestCase
@@ -41,6 +40,12 @@ class OfflinerTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)  
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         self.assertEqual(waybill.transport_driver_name, "Mahmud")
+
+    def test_export_data(self):
+        warehouse = ets.models.Warehouse.objects.get(pk="ISBX002")
+        response = self.client.get(reverse("export_data"), data={'warehouse': warehouse.pk})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('api_offline', kwargs={"warehouse_pk": warehouse.pk}))
+
+
         
-    
-    
