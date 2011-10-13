@@ -8,6 +8,10 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        for t in orm.Order.objects.all():
+            t.expiry = datetime.date(2011, 10, 13)
+            t.save()
+        
         # Changing field 'Order.expiry'
         db.alter_column('ets_order', 'expiry', self.gf('django.db.models.fields.DateField')(default=datetime.date(2011, 10, 13)))
 
