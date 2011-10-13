@@ -3,7 +3,7 @@ import zlib, base64, string
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import datetime
+from datetime import datetime, date
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -283,8 +283,8 @@ class Order(models.Model):
     
     code = models.CharField(_("Code"), max_length=40, primary_key=True, editable=False)
     
-    created = models.DateField(_("Created date")) #lti_date
-    expiry = models.DateField(_("expire date")) #expiry_date
+    created = models.DateField(_("Created date"), default=date.today) #lti_date
+    expiry = models.DateField(_("expire date"), default=date.today) #expiry_date
     dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True)
     
     transport_code = models.CharField(_("Transport Code"), max_length = 4, editable=False)
