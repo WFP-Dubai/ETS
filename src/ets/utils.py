@@ -355,21 +355,3 @@ def history_list(log_queryset, model):
     
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev)
-
-
-#=======================================================================================================================
-# def test_compas():
-#    ets_models.Waybill.objects.filter(pk='ISBX00312A').update(validated=True, sent_compas=None)
-#    send_dispatched('ISBX002')
-#        
-#    print ets_models.CompasLogger.objects.all()
-#    ets_models.CompasLogger.objects.all().delete()
-#    
-#    ets_models.ReceiptWaybill.objects.filter(waybill__pk='ISBX00312A').update(validated=True, sent_compas=None, 
-#                                                                             signed_date=datetime.now())
-#    send_received('ISBX002')
-#    
-#    print ets_models.CompasLogger.objects.all()
-#    ets_models.CompasLogger.objects.all().delete()
-#    
-#=======================================================================================================================

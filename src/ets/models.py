@@ -131,14 +131,6 @@ class Warehouse(models.Model):
                                   compas__persons__user=user)
 
     
-    #===================================================================================================================
-    # def serialize(self):
-    #    #wh = DispatchPoint.objects.get( id = warehouse )
-    #    return serializers.serialize('json', list( LtiOriginal.objects.filter( origin_wh_code = self.origin_wh_code ) )\
-    #                                        + list( EpicStock.objects.filter( wh_code = self.origin_wh_code ) ) )
-    #===================================================================================================================
-
-    
 class Person(models.Model):
     """Person model"""
     
@@ -251,17 +243,7 @@ class StockItem( models.Model ):
     def coi_code(self):
         return self.origin_id[7:]
     
-    #===================================================================================================================
-    # def number_of_units_ordered(self, order):
-    #    """Calculates maximum possible loading ordered amount"""
-    #    order.get_stock_items().filter()
-    #    return StockItem.objects.filter(warehouse__orders=self,
-    #                                    project_number=F('project_number'),
-    #                                    si_code = F('warehouse__orders__items__si_code'), 
-    #                                    commodity_code = F('warehouse__orders__items__commodity_code'),
-    #                                    ).order_by('-warehouse__orders__items__number_of_units')
-    #===================================================================================================================
-
+    
 class LossDamageType(models.Model):
     
     LOSS = 'L'

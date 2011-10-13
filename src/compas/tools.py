@@ -1,17 +1,5 @@
 
 #=======================================================================================================================
-# def removeNonAsciiChars( s ):
-#    return s if s == '' else ''.join( [i for i in s if s in string.printable] )
-#=======================================================================================================================
-
-def viewLog(logfile = 'logg.txt'):
-    try:
-        with open( logfile, "r" ) as f:
-            return f.read()
-    except IOError, msg:
-        return msg
-
-#=======================================================================================================================
 # # TODO: get old wb for current ltis.... (filter local)
 # def get_old_waybills():
 #    all_ltis = LtiOriginal.objects.all()

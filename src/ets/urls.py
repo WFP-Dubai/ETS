@@ -23,14 +23,6 @@ class PrefixedPatterns:
     urlpatterns += patterns("ets.views",
 
         ( r'^$', 'main_page', {}, 'index'),
-        # ( r'^$', login_required(direct_to_template), {
-        #     'template': 'index.html',
-        #     'extra_context': {
-        #         'form': WaybillSearchForm,
-        #         'form_scan': WaybillScanForm,
-        #         'form_import': ImportDataForm,
-        #         'form_export': ExportDataForm,
-        # }}, "index" ),
         
         #Order list
         ( r'^orders/$', login_required(person_required(warehouse_related(object_list))), {
@@ -133,10 +125,6 @@ class PrefixedPatterns:
         ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
     
         ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
-        
-        #===================================================================================================================
-        # ( r'^waybill/synchro/upload/', "post_synchronize_waybill", {}, "post_synchronize_waybill" ),
-        #===================================================================================================================
         
     )
     urlpatterns += patterns("ets.offliner.views",
