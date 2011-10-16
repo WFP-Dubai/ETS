@@ -235,7 +235,7 @@ class StockItem( models.Model ):
         ordering = ('si_code', 'commodity__name')
         order_with_respect_to = 'warehouse'
         verbose_name = _("Stock Item")
-        verbose_name_plural = _("Stock Itemss")
+        verbose_name_plural = _("Stock Items")
 
     def  __unicode__( self ):
         return "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
@@ -256,7 +256,7 @@ class LossDamageType(models.Model):
     
     slug = AutoSlugField(populate_from=lambda instance: "%s%s" % (
                             instance.type, instance.category_id
-                         ), unique=True, primary_key=True)
+                         ), unique=True, editable=True, primary_key=True)
     type = models.CharField(_("Type"), max_length=1, choices=TYPE_CHOICE)
     category = models.ForeignKey(CommodityCategory, verbose_name=_("Commodity category"), 
                                  related_name="loss_damages", db_column='comm_category_code')

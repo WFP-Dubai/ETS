@@ -108,9 +108,14 @@ table.summary {
   clear: both;
 }
 
+.uniForm .formRow .ctrlHolder:FIRST-CHILD {
+  margin-left: 0;
+}
+
 .uniForm .formRow .ctrlHolder {
   float: left;
   clear: none;
+  margin-left: 10px;
 }
 
 .reports-title {
