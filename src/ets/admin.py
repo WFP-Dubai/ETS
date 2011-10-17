@@ -255,7 +255,7 @@ admin.site.register(ets.models.Person, PersonAdmin)
 class CompasLoggerAdmin(admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
-    list_display = ('pk', 'link_to_compas', 'link_to_waybill', 'when_attempted')
+    list_display = ('pk', 'link_to_compas', 'link_to_waybill', 'when_attempted', 'status')
     search_fields = ('compas__pk', 'waybill__pk')
     date_hierarchy = 'when_attempted'
     raw_id_fields = ('waybill',)
