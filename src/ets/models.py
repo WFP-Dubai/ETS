@@ -749,8 +749,8 @@ class CompasLogger(models.Model):
     
     class Meta:
         ordering = ('-when_attempted',)
-        verbose_name = _("compas logger")
-        verbose_name_plural = _("compas errors")
+        verbose_name = _("COMPAS logger")
+        verbose_name_plural = _("COMPAS log")
     
     def __unicode__(self):
         return "%s: %s" % (self.get_status_display(), self.message)
