@@ -161,11 +161,3 @@ table.summary {
 ul.messages li.info {
   color: green;
 }
-
-.left { 
-  float: left;
-}
-
-.margin { 
-  margin-left: 10%
-}
