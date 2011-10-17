@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.forms import MediaDefiningClass
 
 import logicaldelete.admin
+from piston.models import Consumer
 
 import ets.models
 
@@ -268,3 +269,4 @@ class PersonedUserAdmin(UserAdmin):
 
 admin.site.unregister(User)
 admin.site.register(User, PersonedUserAdmin)
+

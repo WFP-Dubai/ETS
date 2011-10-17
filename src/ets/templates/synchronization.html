@@ -1,0 +1,35 @@
+{% extends "base_template.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Synchronization with server" %}{% endblock %}
+
+{% block content %}
+{% trans "Synchronization with server" %} 
+
+<ul>
+  <li>
+    <form method='POST' action='{% url import_data %}' enctype="multipart/form-data">
+      {{ form_import.as_p }}
+      <input type="submit" value="{% trans 'Import' %}" />
+    </form>
+  </li>
+</ul>
+
+<ul>
+  <li>
+    <form method='GET' action='{% url export_data %}' enctype="multipart/form-data">
+      {{ form_export.as_p }}
+      <input type="submit" value="{% trans 'Export' %}" />
+    </form>
+  </li>
+</ul>
+
+<ul>
+  <li>
+    <form method='GET' action='{% url synchronize %}' enctype="multipart/form-data">
+      <input type="submit" value="{% trans 'Synchronize' %}" />
+    </form>
+  </li>
+</ul>
+{% endblock %}
