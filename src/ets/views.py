@@ -3,10 +3,8 @@ import pyqrcode
 import cStringIO
 
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from django.core.urlresolvers import reverse
 #from django.core import serializers
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
@@ -18,7 +16,6 @@ from django.http import Http404
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
-from django.views.decorators.http import require_POST
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -26,23 +23,8 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import changed_fields, history_list
-from ets.offliner.forms import ImportDataForm, ExportDataForm
+from ets.utils import history_list
 
-@login_required
-def main_page(request, template="index.html", export_form=ExportDataForm, search_form=WaybillSearchForm,
-              import_form=ImportDataForm, scan_form=WaybillScanForm):
-    """
-    Main page of the project
-    """
-    export_form.base_fields['warehouse'].queryset = ets.models.Warehouse.filter_by_user(request.user)
-        
-    return direct_to_template(request, template, {
-        'form': search_form,
-        'form_scan': scan_form,
-        'form_import': import_form,
-        'form_export': export_form,
-    })
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):
     """utility that shows waybill's details"""    
