@@ -2,9 +2,13 @@
 
 {% load i18n extra_tags %}
 
+
+
 {% block title %}{% trans "Select Action" %}{% endblock %}
 
-{% block content %} 
+{% block content %}
+
+
 {% trans "Select an action" %}:
 
 {% person_only user %}
@@ -32,6 +36,7 @@
   <li><a href='{% url compass_waybill_receipt %}'>{% trans "Receipt Waybills Submitted to Compas" %}</a></li>
 
   <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
+  <li><a href="{% url synchronization %}">{% trans "Synchronization" %}</a></li>
 </ul>  
 {% endofficer_only %}
 
@@ -54,24 +59,5 @@
   </li>
 </ul>
 
-{% trans "Import / export data:" %} 
-
-<ul>
-  <li>
-    <form method='POST' action='{% url import_data %}' enctype="multipart/form-data">
-      {{ form_import.as_p }}
-      <input type="submit" value="{% trans 'Import' %}" />
-   </form>
-  </li>
-</ul>
-
-<ul>
-  <li>
-    <form method='GET' action='{% url export_data %}' enctype="multipart/form-data">
-      {{ form_export.as_p }}
-      <input type="submit" value="{% trans 'Export' %}" />
-   </form>
-  </li>
-</ul>
-
+  
 {% endblock %}
