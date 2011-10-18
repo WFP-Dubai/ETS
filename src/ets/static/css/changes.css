@@ -10,3 +10,39 @@
 .uniForm textarea {
     height: inherit;
 }
+
+.uniForm table input {
+  width: 95%;
+}
+
+.uniForm input.number {
+  text-align: right;
+}
+
+.uniForm #errorMsg {
+  margin: 0;
+  padding: 0;
+}
+
+.uniForm #errorMsg ol {
+    margin: 0;
+}
+
+.uniForm #errorMsg ol li {
+  margin: 0;
+}
+
+.uniForm .buttonHolder {
+  margin: 0;
+}
+
+.uniForm .buttonHolder input {
+  font-size: 18px;
+}
+
+.uniForm fieldset {
+  border-top: grey solid 1px;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+}

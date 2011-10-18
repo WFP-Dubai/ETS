@@ -4,18 +4,17 @@
 {% block title %}{% trans "Waybill Creation" %}{% endblock %}
 
 {% block extra_content %}
-<br />
-<br />
 <div class="form">
 
 {% if form.errors or formset.errors %}<span style="color:red;">{% trans "You have some errors. Correct them" %}</span>{% endif %}
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
-    {% include "uni_form/errors_formset.html" %}    
-    <br />  
+    {% include "uni_form/errors_formset.html" %}
+    <fieldset>
+    <legend>{% trans "Loading details" %}</legend>    
     <table>
       {{ formset.management_form }}
-      <thead>
+      <thead class="bordered">
         <tr>
           <th>Stock item</th>
           <th>Number of Units</th>
@@ -33,6 +32,7 @@
       {% endfor %}
       </tbody>
     </table>
+    </fieldset>
     {% uni_form form form.helper %}
     <div class="buttonHolder">
       <input type="submit" name="add" value="{% trans 'Save' %}"/>

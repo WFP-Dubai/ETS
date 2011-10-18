@@ -27,64 +27,66 @@
   </tr>
 </table>
 
+<br/>
 {% trans "Order items:" %}
 <table class='bordered' >
-    <tr class='itemhead'>
-      <th class='bordered'>{% trans "Commodity" %}</th>
+  <thead>
+    <tr>
+      <th>{% trans "Commodity" %}</th>
       <th>{% trans "SI" %}</th>
-      <th class='bordered'>{% trans "Number Of Units" %}</th>
-      <th class='bordered'>{% trans "To Be Dispatched" %}</th>
-      <th  class='bordered'>{% trans "Stock In Warehouse" %}</th>
-      <th  class='bordered'>{% trans "Percentage" %}</th>
+      <th>{% trans "Number Of Units" %}</th>
+      <th>{% trans "To Be Dispatched" %}</th>
+      <th>{% trans "Stock In Warehouse" %}</th>
+      <th>{% trans "Percentage" %}</th>
     </tr>
-    
-    {% for item in object.items.all %}
-      <tr class='bordered'>
-        <td class='bordered'>{{ item.commodity }}&nbsp;</td>
-        <td class='bordered'>&nbsp;{{ item.si_code }}&nbsp;</td>
-        <td class='bordered' align="right">{{ item.number_of_units }}</td>
-        <td class='bordered' align="right">{{ item.items_left }}</td>
-        <td class='bordered' align="right">{{ item.get_available_stocks }}</td>
-        <td class='bordered' align="right">{{ item.get_percent_executed }}</td>
-      </tr>
-    {% endfor %}
+  </thead>
+  <tbody>
+  {% for item in object.items.all %}
+    <tr>
+      <td>{{ item.commodity }}&nbsp;</td>
+      <td>&nbsp;{{ item.si_code }}&nbsp;</td>
+      <td align="right">{{ item.number_of_units }}</td>
+      <td align="right">{{ item.items_left }}</td>
+      <td align="right">{{ item.get_available_stocks }}</td>
+      <td align="right">{{ item.get_percent_executed }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
 </table>
 
 {% block extra_content %}
-<br>
+<br/>
 {% if object.waybills.count %}
   {% trans "Current Waybills:" %}<br>
-  <table class='bordered' >
+  <table class='bordered'>
   {% for waybill in object.waybills.all %}
       <tr>
-        <td colspan="3" rowspan="2" class='itemhead bordered'>
+        <th colspan="2" rowspan="2">
           <a href='{{ waybill.get_absolute_url }}'>{% trans "Waybill:" %}{{ waybill.pk }}</a>
-        </td>
-        <td class='bordered' align="center">{% waybill_edit waybill user %}</td>
-        <td class='bordered' align="center">{% trans "Dispatched date" %}</td>
-        <td class='bordered' align="center">{% trans "Received date" %}</td>
+        </th>
+        <td align="center">{% waybill_edit waybill user %}</td>
+        <th>{% trans "Dispatched date" %}</th>
+        <th>{% trans "Received date" %}</th>
       </tr>
       <tr>
-        <td class='bordered' align="center">{% waybill_delete waybill user %}</td>
-        <td class='bordered' align="center">
+        <td align="center">{% waybill_delete waybill user %}</td>
+        <td align="center">
           {{ waybill.transport_dispach_signed_date|date }}
         </td>
-        <td class='bordered' align="center">
+        <td align="center">
           {{ waybill.receipt_signed_date|date }}
         </td>
       </tr>
-      <tr class='itemhead'>
-        <td></td>
-        <td class='bordered'>{% trans "Commodity" %}</td>
-        <td class='bordered'>{% trans "SI" %}</td>
-        <td class='bordered'>{% trans "Number of units" %}</td>
+      <tr>
+        <th>{% trans "Commodity" %}</th>
+        <th>{% trans "SI" %}</th>
+        <th>{% trans "Number of units" %}</th>
       </tr>
       {% for loading in waybill.loading_details.all %}
-      <tr class='bordered'>
-        <td class='bordered'>&nbsp;</td>
-        <td class='bordered'>&nbsp;{{ loading.stock_item.commodity }}&nbsp;</td>
-        <td class='bordered' >&nbsp;{{ loading.stock_item.si_code }}&nbsp;</td>
-        <td class='bordered' align="right">{{ loading.number_of_units }}</td>
+      <tr>
+        <td>&nbsp;{{ loading.stock_item.commodity }}&nbsp;</td>
+        <td>&nbsp;{{ loading.stock_item.si_code }}&nbsp;</td>
+        <td align="right">{{ loading.number_of_units }}</td>
       </tr>
       {% endfor %}
   {% endfor %}

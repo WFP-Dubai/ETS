@@ -18,9 +18,11 @@
 
 <form method="POST" action="" class="uniForm">{% csrf_token %}
   {% include "uni_form/errors_formset.html" %}
+  <fieldset>
+  <legend>{% trans "Loading details" %}</legend>
   <table>
     {{ formset.management_form }}
-    <thead>
+    <thead class="bordered">
       <tr>
         <th>Stock item</th>
         <th>Number Units Good</th>
@@ -46,10 +48,11 @@
     {% endfor %}
     </tbody>
   </table>
-    {% uni_form form form.helper %}
-    <div class="buttonHolder">
-      <input type="submit" name="save" value="{% trans 'Save &amp; Print' %}"/>
-    </div>
+  </fieldset>
+  {% uni_form form form.helper %}
+  <div class="buttonHolder">
+    <input type="submit" name="save" value="{% trans 'Save' %}"/>
+  </div>
 </form>
 
 {% endblock %}

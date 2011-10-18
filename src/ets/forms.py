@@ -76,7 +76,9 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
     class Meta:
         model = ets_models.LoadingDetail
         fields = ( 'stock_item', 'number_of_units', 'overloaded_units' )
-    
+        widgets = {
+            'number_of_units': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
+        }
 
 class BaseLoadingDetailFormSet(BaseInlineFormSet):
     
@@ -114,7 +116,8 @@ class WaybillRecieptForm( forms.ModelForm ):
             'container_two_remarks_reciept',
         )
         widgets = {
-            'receipt_remarks': forms.Textarea(attrs={'rows': "3"}),           
+            'receipt_remarks': forms.Textarea(attrs={'rows': "3"}),
+            'distance': forms.TextInput(attrs={'size': 5, 'class': 'number'}),           
         }
     
     helper = FormHelper()
@@ -156,7 +159,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'over_offload_units',
         )
         widgets = {
-            'number_units_good': forms.TextInput(attrs={'size': 5}),
-            'number_units_lost': forms.TextInput(attrs={'size': 5}),
-            'number_units_damaged': forms.TextInput(attrs={'size': 5}),
+            'number_units_good': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
+            'number_units_lost': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
+            'number_units_damaged': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
         }

@@ -73,15 +73,22 @@ x {
 
 
 /* Order detail */
-.itemhead {
+.bordered tr th, .bordered .itemhead {
+  text-align: center;
   background-color: #0ee6ff;
 }
 
-.bordered {
+.bordered tr, .bordered tr td, .bordered tr th {
   border-collapse: collapse;
   border-color: black;
   border-width: 1px;
   border-style: solid;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+div.form {
+  margin-top: 5px;
 }
 
 table.summary {
