@@ -47,6 +47,10 @@ body {
   text-align: right;
 }
 
+.menu a {
+  margin-left: 5px;
+}
+
 a,a.visited {
   color:rgb(45,45,45); 
 }
