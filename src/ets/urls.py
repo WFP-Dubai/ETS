@@ -21,7 +21,10 @@ import ets.models
 class PrefixedPatterns:
     urlpatterns += patterns("ets.views",
 
-        ( r'^$', login_required(direct_to_template), {'template': 'index.html', 'scan_form': WaybillScanForm, 'search_form': WaybillSearchForm}, "index"),
+        ( r'^$', login_required(direct_to_template), {
+            'template': 'index.html',
+            'extra_context': {'form_scan': WaybillScanForm, 'form': WaybillSearchForm },
+        }, "index"),
         
         #Order list
         ( r'^orders/$', login_required(person_required(warehouse_related(object_list))), {
