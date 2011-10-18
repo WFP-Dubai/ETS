@@ -1,3 +1,4 @@
+import base64
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -33,10 +34,18 @@ def import_file(request, form_class=ImportDataForm):
 @login_required
 def export_file(request, form_class=ExportDataForm):
     """exports file with data"""
+
+    auth = '%s:%s' % ('admin', 'admin')
+    auth = 'Basic %s' % base64.encodestring(auth)
+    auth = auth.strip()
+    extra = {
+        'HTTP_AUTHORIZATION': auth,
+    }
     form = form_class(request.GET or None)
     if form.is_valid():
         warehouse = form.cleaned_data['warehouse']
-        return redirect('api_offline', warehouse_pk=warehouse.pk)
+        #return redirect('api_offline', warehouse_pk=warehouse.pk)
+        return redirect('api_offline', warehouse_pk=warehouse.pk, **extra)
     return redirect('synchronization')
 
 @login_required
