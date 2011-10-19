@@ -31,7 +31,7 @@ def update_compas(using):
     import_stock(using)
     
     #Update loss, damage reasons
-    ets_models.LossDamageType.update(using)
+    #ets_models.LossDamageType.update(using)
     
     #Update orders
     import_order(using)
