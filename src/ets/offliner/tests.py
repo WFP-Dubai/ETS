@@ -55,3 +55,9 @@ class OfflinerTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("export_data"), data={'warehouse': warehouse.pk})
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse('api_offline', kwargs={"warehouse_pk": warehouse.pk}))
+
+    def test_export_data_protect(self):
+        warehouse = ets.models.Warehouse.objects.get(pk="ISBX002")
+        response = self.client.get(reverse("export_data"), data={'warehouse': warehouse.pk})
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse('api_offline', kwargs={"warehouse_pk": warehouse.pk}))

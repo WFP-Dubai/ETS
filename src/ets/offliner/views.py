@@ -1,4 +1,3 @@
-import base64
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
@@ -9,6 +8,17 @@ from ..models import Warehouse
 
 from .forms import ImportDataForm, ExportDataForm
 from .models import UpdateLog
+from .api.utils import connect_server
+
+API_URL = 'http://10.11.208.242/ets/api/offline/oauth/%s/'
+WAREHOUSE = 'ISBX002'
+
+def syncro(request):
+    """requests data at server and import them localy"""
+    print 'syncro'
+    data = connect_server(request, API_URL % WAREHOUSE)
+
+    return data
 
 @login_required
 def request_update(request):
@@ -35,17 +45,17 @@ def import_file(request, form_class=ImportDataForm):
 def export_file(request, form_class=ExportDataForm):
     """exports file with data"""
 
-    auth = '%s:%s' % ('admin', 'admin')
-    auth = 'Basic %s' % base64.encodestring(auth)
-    auth = auth.strip()
-    extra = {
-        'HTTP_AUTHORIZATION': auth,
-    }
+    # auth = '%s:%s' % ('admin', 'admin')
+    # auth = 'Basic %s' % base64.encodestring(auth)
+    # auth = auth.strip()
+    # extra = {
+    #     'HTTP_AUTHORIZATION': auth,
+    # }
     form = form_class(request.GET or None)
     if form.is_valid():
         warehouse = form.cleaned_data['warehouse']
         #return redirect('api_offline', warehouse_pk=warehouse.pk)
-        return redirect('api_offline', warehouse_pk=warehouse.pk, **extra)
+        return redirect('api_offline', warehouse_pk=warehouse.pk)
     return redirect('synchronization')
 
 @login_required

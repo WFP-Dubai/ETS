@@ -6,7 +6,7 @@ from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Max
 
-API_URL = 'http://10.11.208.242/ets/api/offline/%s/'
+API_URL = 'http://10.11.208.242/ets/api/offline/oauth/%s/'
 WAREHOUSE = 'ISBX002'
 
 class UpdateLog( models.Model ):

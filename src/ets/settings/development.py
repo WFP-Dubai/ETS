@@ -24,3 +24,6 @@ ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)
 
 COMPRESS_ENABLED = False
+
+CONSUMER_KEY="mine_key"
+CONSUMER_SECRET="sdvvfddsvabapb_Dsfih7gb"
