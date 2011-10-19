@@ -50,7 +50,6 @@ class Compas(models.Model):
     
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
-    start_date = models.DateField(_("Start date"), default=datetime.now)
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
@@ -106,6 +105,7 @@ class Warehouse(models.Model):
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
+    start_date = models.DateField(_("Start date"), blank=True, null=True)
     
     class Meta:
         ordering = ('name',)

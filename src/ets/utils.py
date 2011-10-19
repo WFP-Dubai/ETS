@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from itertools import chain, izip
 
 from django.conf import settings
@@ -141,14 +141,16 @@ def import_stock(compas):
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
-    compas_station = ets_models.Compas.objects.get(pk=compas)
+    today = date.today()
+    
+    warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=today)\
+                                             .values_list('pk', flat=True))
     
     with transaction.commit_on_success(compas) as tr:
-        places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
-    
+        places = compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
+        
         for lti in compas_models.LtiOriginal.objects.using(compas)\
-                            .filter(models.Q(expiry_date__gt=now) | models.Q(expiry_date__isnull=True),
-                                    requested_dispatch_date__gte=compas_station.start_date,
+                            .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                     consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):

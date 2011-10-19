@@ -1,0 +1,38 @@
+[ 
+  {
+    "pk": "OE7X001",
+    "model": "ets.warehouse",
+    "fields": {
+      "_order": 0,
+      "name": "EDO OFFICE MEHTI",
+      "compas": "ISBX002",
+      "location": "OE7X",
+      "organization": "DOEAF",
+      "start_date": "2011-10-18"
+    }
+  },
+  {
+    "pk": "ISBX003",
+    "model": "ets.warehouse",
+    "fields": {
+      "_order": 0,
+      "name": "ISLAMABAD CITY OFFICE",
+      "compas": "ISBX002",
+      "location": "ISBX",
+      "organization": "DOEAF",
+      "start_date": "2011-10-18"
+    }
+  },
+  {
+    "pk": "ISBX002",
+    "model": "ets.warehouse",
+    "fields": {
+      "_order": 1,
+      "name": "PAKISTAN COUNTRY OFFICE",
+      "compas": "ISBX002",
+      "location": "ISBX",
+      "organization": "WFP",
+      "start_date": "2011-10-17"
+    }
+  }
+]

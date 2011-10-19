@@ -18,7 +18,7 @@ class CompasTestCase(TestCase):
     
     #multi_db = True
     compas = 'ISBX002'
-    fixtures = ('db_compas.json',)
+    fixtures = ('db_compas.json', 'warehouse.json')
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."
@@ -30,7 +30,7 @@ class CompasTestCase(TestCase):
         self.assertEqual(ets.models.Compas.objects.count(), 1)
         self.assertEqual(compas_models.Place.objects.using(self.compas).count(), 3)
         self.assertEqual(ets.models.Location.objects.count(), 0)
-        self.assertEqual(ets.models.Warehouse.objects.count(), 0)
+        self.assertEqual(ets.models.Warehouse.objects.count(), 3)
         self.assertEqual(ets.models.Organization.objects.count(), 0)
         
         call_command('sync_compas')
@@ -92,12 +92,6 @@ class CompasTestCase(TestCase):
         #Test order items
         self.assertEqual(order.items.count(), 1)
     
-    def test_compas_start_date(self):
-        
-        self.assertEqual(compas_models.LtiOriginal.objects.using(self.compas).filter(code="THEIRORDEROLD").count(), 1) 
-        call_command('sync_compas')
-        self.assertEqual(ets.models.Order.objects.filter(pk="THEIRORDEROLD").count(), 0)
-
     
 class SendCompasTestCase(TestCaseMixin, TestCase):
     
