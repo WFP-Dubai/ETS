@@ -10,7 +10,7 @@ from .forms import ImportDataForm, ExportDataForm
 from .models import UpdateLog
 from .api.utils import connect_server
 
-API_URL = 'http://10.11.208.242/ets/api/offline/oauth/%s/'
+API_URL = 'http://127.0.0.1:8000/ets/api/offline/oauth/%s/'
 WAREHOUSE = 'ISBX002'
 
 def syncro(request):
