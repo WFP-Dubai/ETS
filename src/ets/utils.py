@@ -37,6 +37,13 @@ def update_compas(using):
     import_order(using)
     
 
+def _get_places(compas):
+    warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
+                                            .values_list('pk', flat=True))
+    
+    return compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
+
+
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
@@ -89,6 +96,7 @@ def import_stock(compas):
     
     now = datetime.now()
     with transaction.commit_on_success(compas) as tr:
+        #places = _get_places(compas)
         places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
         
         for stock in compas_models.EpicStock.objects.using(compas)\
@@ -143,11 +151,8 @@ def import_order(compas):
     now = datetime.now()
     today = date.today()
     
-    warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=today)\
-                                             .values_list('pk', flat=True))
-    
     with transaction.commit_on_success(compas) as tr:
-        places = compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
+        places = _get_places(compas)
         
         for lti in compas_models.LtiOriginal.objects.using(compas)\
                             .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
