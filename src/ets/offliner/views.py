@@ -1,24 +1,58 @@
+import urllib2
+import oauth2 as oauth
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.views.generic.simple import direct_to_template
 from django.views.decorators.http import require_POST, require_GET
+from django.conf import settings
+from django.http import HttpResponseRedirect
 
 from ..models import Warehouse
 
 from .forms import ImportDataForm, ExportDataForm
 from .models import UpdateLog
-from .api.utils import connect_server
+
 
 API_URL = 'http://127.0.0.1:8000/ets/api/offline/oauth/%s/'
 WAREHOUSE = 'ISBX002'
+SERVER = "127.0.0.1:8000"
+request_token_url = 'http://%s/ets/oauth/request_token' % SERVER
+access_token_url = 'http://%s/ets/oauth/access_token' % SERVER
+authorize_url = 'http://%s/ets/oauth/authorize' % SERVER
 
 def syncro(request):
     """requests data at server and import them localy"""
-    print 'syncro'
-    data = connect_server(request, API_URL % WAREHOUSE)
+    if not 'oauth_token' in request.session or not 'oauth_token_secret' in request.session:
 
-    return data
+        consumer = oauth.Consumer(settings.CONSUMER_KEY,  settings.CONSUMER_SECRET)
+
+        if 'oauth_token' not in request.GET :
+            client = oauth.Client(consumer)
+            resp, content = client.request(request_token_url)
+            request_token = dict(urllib2.urlparse.parse_qsl(content))
+            request.session['roauth_token'] = request_token['oauth_token']
+            request.session['roauth_token_secret'] = request_token['oauth_token_secret']
+            return HttpResponseRedirect(authorize_url+'?oauth_token='+request_token['oauth_token']+'&oauth_callback=http://127.0.0.1:8000/ets/mine/') 
+        elif request.GET['oauth_token']:
+            oauth_verifier = request.GET['oauth_token']
+            token = oauth.Token(request.session.get('roauth_token', None), request.session.get('roauth_token_secret', None))
+            token.set_verifier(oauth_verifier)
+            client = oauth.Client(consumer, token)          
+            resp, content = client.request(access_token_url)
+            access_token = dict(urllib2.urlparse.parse_qsl(content))
+            del request.session['roauth_token']
+            del request.session['roauth_token_secret']
+            request.session['oauth_token'] = access_token['oauth_token']
+            request.session['oauth_token_secret'] = access_token['oauth_token_secret']
+        
+    consumer = oauth.Consumer(settings.CONSUMER_KEY,  settings.CONSUMER_SECRET)
+    token = oauth.Token(request.session['oauth_token'], request.session['oauth_token_secret'])
+    client = oauth.Client(consumer,token)
+    resp, content = client.request(API_URL % WAREHOUSE)
+    print content
+    UpdateLog.update_data(content)
+    return redirect('synchronization')
 
 @login_required
 def request_update(request):
