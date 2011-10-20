@@ -31,7 +31,7 @@ def update_compas(using):
     import_stock(using)
     
     #Update loss, damage reasons
-    #ets_models.LossDamageType.update(using)
+    ets_models.LossDamageType.update(using)
     
     #Update orders
     import_order(using)
@@ -138,9 +138,9 @@ def import_stock(compas):
                 'updated': now,
             }
             
-            rows = ets_models.StockItem.objects.filter(si_record_id=stock.si_record_id).update(**defaults)
+            rows = ets_models.StockItem.objects.filter(code=stock.pk).update(**defaults)
             if not rows:
-                ets_models.StockItem.objects.create(si_record_id=stock.si_record_id, **defaults)
+                ets_models.StockItem.objects.create(code=stock.pk, **defaults)
         
         #Flush empty stocks
         ets_models.StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
@@ -264,7 +264,7 @@ def send_dispatched(using):
                          
                         using,
                         
-                        loading.stock_item.pk, 
+                        loading.stock_item.si_record_id, 
                         loading.stock_item.commodity.category.pk, 
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 

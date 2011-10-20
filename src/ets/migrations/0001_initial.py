@@ -11,8 +11,8 @@ class Migration(SchemaMigration):
         # Adding model 'Compas'
         db.create_table('ets_compas', (
             ('code', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('start_date', self.gf('django.db.models.fields.DateField')(default=datetime.datetime.now)),
-            ('db_engine', self.gf('django.db.models.fields.CharField')(max_length=100)),
+            ('read_only', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('db_engine', self.gf('django.db.models.fields.CharField')(default='django.db.backends.oracle', max_length=100)),
             ('db_name', self.gf('django.db.models.fields.CharField')(max_length=100)),
             ('db_user', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
             ('db_password', self.gf('django.db.models.fields.CharField')(max_length=100, blank=True)),
@@ -51,6 +51,7 @@ class Migration(SchemaMigration):
             ('location', self.gf('django.db.models.fields.related.ForeignKey')(related_name='warehouses', to=orm['ets.Location'])),
             ('organization', self.gf('django.db.models.fields.related.ForeignKey')(blank=True, related_name='warehouses', null=True, to=orm['ets.Organization'])),
             ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='warehouses', to=orm['ets.Compas'])),
+            ('start_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('ets', ['Warehouse'])
@@ -90,7 +91,7 @@ class Migration(SchemaMigration):
 
         # Adding model 'StockItem'
         db.create_table('ets_stockitem', (
-            ('si_record_id', self.gf('django.db.models.fields.CharField')(max_length=25, primary_key=True)),
+            ('code', self.gf('django.db.models.fields.CharField')(max_length=128, primary_key=True)),
             ('warehouse', self.gf('django.db.models.fields.related.ForeignKey')(related_name='stock_items', to=orm['ets.Warehouse'])),
             ('project_number', self.gf('django.db.models.fields.CharField')(max_length=24, blank=True)),
             ('si_code', self.gf('django.db.models.fields.CharField')(max_length=8)),
@@ -103,6 +104,7 @@ class Migration(SchemaMigration):
             ('unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(max_digits=12, decimal_places=3)),
             ('is_bulk', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('updated', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime.now)),
+            ('si_record_id', self.gf('django.db.models.fields.CharField')(max_length=25)),
             ('origin_id', self.gf('django.db.models.fields.CharField')(max_length=23)),
             ('allocation_code', self.gf('django.db.models.fields.CharField')(max_length=10)),
             ('_order', self.gf('django.db.models.fields.IntegerField')(default=0)),
@@ -121,8 +123,8 @@ class Migration(SchemaMigration):
         # Adding model 'Order'
         db.create_table('ets_order', (
             ('code', self.gf('django.db.models.fields.CharField')(max_length=40, primary_key=True)),
-            ('created', self.gf('django.db.models.fields.DateField')()),
-            ('expiry', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
+            ('created', self.gf('django.db.models.fields.DateField')(default=datetime.date.today)),
+            ('expiry', self.gf('django.db.models.fields.DateField')(default=datetime.date.today)),
             ('dispatch_date', self.gf('django.db.models.fields.DateField')(null=True, blank=True)),
             ('transport_code', self.gf('django.db.models.fields.CharField')(max_length=4)),
             ('transport_ouc', self.gf('django.db.models.fields.CharField')(max_length=13)),
@@ -402,14 +404,14 @@ class Migration(SchemaMigration):
         'ets.compas': {
             'Meta': {'ordering': "('code',)", 'object_name': 'Compas'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
-            'db_engine': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'db_engine': ('django.db.models.fields.CharField', [], {'default': "'django.db.backends.oracle'", 'max_length': '100'}),
             'db_host': ('django.db.models.fields.CharField', [], {'default': "'localhost'", 'max_length': '100'}),
             'db_name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'db_password': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'db_port': ('django.db.models.fields.CharField', [], {'max_length': '4', 'blank': 'True'}),
             'db_user': ('django.db.models.fields.CharField', [], {'max_length': '100', 'blank': 'True'}),
             'officers': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'compases'", 'symmetrical': 'False', 'to': "orm['auth.User']"}),
-            'start_date': ('django.db.models.fields.DateField', [], {'default': 'datetime.datetime.now'})
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         'ets.compaslogger': {
             'Meta': {'ordering': "('-when_attempted',)", 'object_name': 'CompasLogger'},
@@ -472,9 +474,9 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "('code',)", 'object_name': 'Order'},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '40', 'primary_key': 'True'}),
             'consignee': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'orders'", 'to': "orm['ets.Organization']"}),
-            'created': ('django.db.models.fields.DateField', [], {}),
+            'created': ('django.db.models.fields.DateField', [], {'default': 'datetime.date.today'}),
             'dispatch_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'expiry': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
+            'expiry': ('django.db.models.fields.DateField', [], {'default': 'datetime.date.today'}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'orders'", 'to': "orm['ets.Location']"}),
             'origin_type': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'project_number': ('django.db.models.fields.CharField', [], {'max_length': '24', 'blank': 'True'}),
@@ -518,6 +520,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
+            'code': ('django.db.models.fields.CharField', [], {'max_length': '128', 'primary_key': 'True'}),
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Commodity']"}),
             'is_bulk': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'number_of_units': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
@@ -527,7 +530,7 @@ class Migration(SchemaMigration):
             'quality_code': ('django.db.models.fields.CharField', [], {'max_length': '1'}),
             'quality_description': ('django.db.models.fields.CharField', [], {'max_length': '11', 'blank': 'True'}),
             'si_code': ('django.db.models.fields.CharField', [], {'max_length': '8'}),
-            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25', 'primary_key': 'True'}),
+            'si_record_id': ('django.db.models.fields.CharField', [], {'max_length': '25'}),
             'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
             'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
             'updated': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
@@ -540,7 +543,8 @@ class Migration(SchemaMigration):
             'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'warehouses'", 'to': "orm['ets.Compas']"}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'warehouses'", 'to': "orm['ets.Location']"}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'organization': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'warehouses'", 'null': 'True', 'to': "orm['ets.Organization']"})
+            'organization': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'warehouses'", 'null': 'True', 'to': "orm['ets.Organization']"}),
+            'start_date': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'})
         },
         'ets.waybill': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'Waybill'},

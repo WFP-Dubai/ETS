@@ -91,7 +91,7 @@
     "fields": {
       "waybill": "ISBX00211A",
       
-      "stock_item": "testme0123",
+      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15586",
       
       "number_of_units": 35,
       
@@ -151,7 +151,7 @@
     "model": "ets.loadingdetail", 
     "fields": {
       "waybill": "ISBX00311A",
-      "stock_item": "anotherstock1234",
+      "stock_item": "KARX025KARX0011234EBCG15587",
       "number_of_units": 35,
       "number_units_good": "0",
       "number_units_lost": "0",
@@ -215,7 +215,7 @@
       "number_units_good": "0",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "stock_item": "anotherstock1234",
+      "stock_item": "KARX025KARX0011234EBCG15587",
       "number_units_damaged": "2",
       "number_units_lost": "0",
       "units_damaged_reason": "dsed",
@@ -231,7 +231,7 @@
       "number_units_good": "0",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "stock_item": "anotherstock12345",
+      "stock_item": "KARX025KARX0011234EBCG15582",
       "number_units_damaged": "0",
       "number_units_lost": "10",
       "overloaded_units": false,
@@ -247,7 +247,7 @@
       "number_units_good": "3",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "stock_item": "testme01231",
+      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15587",
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,
@@ -262,7 +262,7 @@
       "number_units_good": "5",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "stock_item": "testme01232",
+      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15588",
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,
@@ -277,7 +277,7 @@
       "number_units_good": "15",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
-      "stock_item": "testme01233",
+      "stock_item": "KARX025KARX0010000944801MIXMIXHEBCG15589",
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,

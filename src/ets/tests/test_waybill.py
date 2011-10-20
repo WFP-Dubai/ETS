@@ -128,7 +128,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'transport_driver_licence': 'KE23455',
             'transport_vehicle_registration': 'BG2345',
             
-            'item-0-stock_item': 'testme0123',
+            'item-0-stock_item': 'KARX025KARX0010000944801MIXMIXHEBCG15586',
             'item-0-number_of_units': 12,
             
             'item-TOTAL_FORMS': 5,
@@ -181,7 +181,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             
             'item-0-slug': 'ISBX00211A1',
             'item-0-waybill': 'ISBX00211A',
-            'item-0-stock_item': 'testme0123',
+            'item-0-stock_item': 'KARX025KARX0010000944801MIXMIXHEBCG15586',
             'item-0-number_of_units': 37,
             
             'item-TOTAL_FORMS': 5,

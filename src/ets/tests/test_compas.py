@@ -60,7 +60,7 @@ class CompasTestCase(TestCase):
         
         """test stock update"""
         self.assertEqual(ets.models.StockItem.objects.count(), 7)
-        stock_item = ets.models.StockItem.objects.get(pk='testme0124')
+        stock_item = ets.models.StockItem.objects.get(pk='KARX025KARX0010000944801MIXMIXHEBCG1558')
         
         #Commodity name and category
         self.assertTupleEqual((stock_item.commodity.name, stock_item.commodity.category.pk), (u'WHEET', u'SED'))
@@ -72,13 +72,13 @@ class CompasTestCase(TestCase):
         compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
         import_stock(self.compas)
         
-        self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 700)
+        self.assertEqual(ets.models.StockItem.objects.get(pk='KARX025KARX0010000944801MIXMIXHEBCG1558').number_of_units, 700)
         
         #Deleted stock
         compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').delete()
         import_stock(self.compas)
         
-        self.assertEqual(ets.models.StockItem.objects.get(pk='testme0124').number_of_units, 0)
+        self.assertEqual(ets.models.StockItem.objects.get(pk='KARX025KARX0010000944801MIXMIXHEBCG1558').number_of_units, 0)
         
         """Update orders"""
         order = ets.models.Order.objects.all()[0]

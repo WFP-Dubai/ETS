@@ -21,7 +21,7 @@
     {% if shortage %}
     <tr class="error"><td colspan="8">
       {% for item in shortage %}
-        <p>{{ waybill.order.warehouse }} --> {{ item.stock_item.pk }} ({{ item.stock_item.commodity }}). Shortage: {{ item.get_shortage }}</p>
+        <p>{{ waybill.order.warehouse }} --> {{ item.stock_item.coi_code }} ({{ item.stock_item.commodity }}). Shortage: {{ item.get_shortage }}</p>
       {% endfor %}
     </td></tr>
     {% endif %}
