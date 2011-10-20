@@ -132,6 +132,7 @@ def import_stock(compas):
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
                 'allocation_code': stock.allocation_code,
+                'si_record_id': stock.si_record_id,
                 'origin_id': stock.origin_id,
                 'is_bulk': stock.is_bulk(),
                 
