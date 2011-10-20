@@ -144,7 +144,8 @@ def import_stock(compas):
                 ets_models.StockItem.objects.create(code=stock.pk, **defaults)
         
         #Flush empty stocks
-        ets_models.StockItem.objects.filter(number_of_units__gt=0).exclude(updated=now).update(number_of_units=0)
+        ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse_compas_pk=compas)\
+                                    .exclude(updated=now).update(number_of_units=0)
 
 
 def import_order(compas):
