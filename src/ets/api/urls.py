@@ -11,7 +11,7 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 
 
-from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler
+from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler, ReadCSVWarehouseHandler
 from .handlers import ReadCSVOrdersHandler, ReadCSVOrderItemsHandler, ReadCSVWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
@@ -33,6 +33,7 @@ CSV_LOADING_DETAILS_HEADERS = {'Content-Disposition': 'attachment; filename=load
 CSV_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.csv' % datetime.date.today() }
 CSV_ORDER_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=order-items-%s.csv' % datetime.date.today() }
 CSV_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.csv' % datetime.date.today() }
+CSV_WH_HEADERS = {'Content-Disposition': 'attachment; filename=warehouses-%s.csv' % datetime.date.today() }
 
 FORMAT_CSV = {'emitter_format': 'csv'}
 
@@ -41,11 +42,7 @@ loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadin
 orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
 order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
 stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
-
-
-#history_id = Resource(HistoryIdHandler, authentication=AUTHENTICATORS)
-#history_date = Resource(HistoryDateHandler, authentication=AUTHENTICATORS)
-#history_user = Resource(HistoryUserHandler, authentication=AUTHENTICATORS)
+warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))
 
 
 urlpatterns = patterns('',
@@ -96,6 +93,9 @@ urlpatterns = patterns('',
     # For StockItems CSV API
     (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
+    
+    #Warehouses
+    (r'^warehouses/$', warehouses_resource, FORMAT_CSV, "api_warehouses"),
     
     (r'^docs/$', documentation_view),
 

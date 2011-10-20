@@ -17,9 +17,13 @@
     <td><a href='{% url api_order_items %}'>
       {% trans "download" %}</a>
     </td>
-  </tr> 
+  </tr>
   <tr class='reports-title'>
-    <td>{% trans "Stock reports" %}</td>
+    <td>{% trans "Warehouse" %}</td>
+  </tr>
+  <tr>
+    <td>{% trans "All warehouses" %}</td>
+    <td><a href='{% url api_warehouses %}'>{% trans "download" %}</a></td>
   </tr>
   <tr>
     <td>{% trans "Stock Report: All items for warehouses" %} </td>

@@ -155,6 +155,26 @@ class ReadCSVStockItemsHandler(BaseHandler):
             stock_items_data.update(item)
             result.append(stock_items_data)  
         return result
+
+
+class ReadCSVWarehouseHandler(BaseHandler):
+
+    allowed_methods = ('GET',)
+    model = ets.models.Warehouse
+    
+    def read(self, request):
+        """country, location. warehouse information"""
+        
+        result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse'}]
+        
+        for warehouse in self.model.objects.all(): #filter_by_user(request.user):
+            result.append({
+                'country': warehouse.location.get_country_display(), 
+                'location': warehouse.location.name, 
+                'warehouse': warehouse.name
+            })
+              
+        return result
     
 
 class CSVEmitter(Emitter):
