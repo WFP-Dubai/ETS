@@ -166,7 +166,7 @@ class ReadCSVWarehouseHandler(BaseHandler):
     def read(self, request):
         """country, location. warehouse information"""
         
-        result = [SortedDict((('country', 'Country'), ('location', 'Location'), ('warehouse', 'Warehouse')))]
+        result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse'}]
         
         for warehouse in self.model.objects.all(): #filter_by_user(request.user):
             result.append({
