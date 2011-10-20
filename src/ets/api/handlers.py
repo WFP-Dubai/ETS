@@ -166,13 +166,14 @@ class ReadCSVWarehouseHandler(BaseHandler):
     def read(self, request):
         """country, location. warehouse information"""
         
-        result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse'}]
+        result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse', 'code': 'Warehouse code'}]
         
         for warehouse in self.model.objects.all(): #filter_by_user(request.user):
             result.append({
                 'country': warehouse.location.get_country_display(), 
                 'location': warehouse.location.name, 
-                'warehouse': warehouse.name
+                'warehouse': warehouse.name,
+                'code': warehouse.code,
             })
               
         return result
