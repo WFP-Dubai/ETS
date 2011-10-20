@@ -14,6 +14,7 @@ from django.db import transaction
 from django.db.models import Q, Sum, Count, ForeignKey
 from django.utils.html import escape
 from django.http import HttpResponse
+from django.utils.datastructures import SortedDict
 
 from piston.handler import BaseHandler
 from piston.utils import rc
@@ -165,7 +166,7 @@ class ReadCSVWarehouseHandler(BaseHandler):
     def read(self, request):
         """country, location. warehouse information"""
         
-        result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse'}]
+        result = [SortedDict((('country', 'Country'), ('location', 'Location'), ('warehouse', 'Warehouse')))]
         
         for warehouse in self.model.objects.all(): #filter_by_user(request.user):
             result.append({
