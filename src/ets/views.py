@@ -32,7 +32,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     items_count = len(items)
     waybill_history = ""
     loading_details = ""
-    if waybill.order.warehouse in ets.models.Warehouse.filter_by_user(request.user):
+    if ets.models.Warehouse.filter_by_user(request.user).filter(pk=waybill.order.warehouse.pk).count():
         
         waybill_history = history_list(waybill.audit_log.all(), ets.models.Waybill)
         loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
