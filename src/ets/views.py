@@ -38,7 +38,6 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
                                                   ets.models.LoadingDetail))
                            for loading in waybill.loading_details.all())
     else:
-        print waybill_log[1].action_user.pk
         waybill_log = waybill_log.exclude(action_user__pk__in=waybill.order.warehouse.get_persons().values_list('user__pk', flat=True))
         loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item) \
                         .exclude(action_user__pk__in=loading.waybill.order.warehouse.get_persons().values_list('user__pk', flat=True)),
