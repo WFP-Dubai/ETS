@@ -134,7 +134,7 @@ class PrefixedPatterns:
         ( r'^import_data/$', "import_file", {}, "import_data" ),
         ( r'^export_data/$', "export_file", {}, "export_data" ),
         ( r'^synchronize/$', "request_update", {}, "synchronize" ),
-        ( r'^mine/$', "syncro", {}, "syncro" ),
+        ( r'^syncro/$', "syncro", {}, "syncro" ),
     )
 
     urlpatterns += patterns('piston.authentication',

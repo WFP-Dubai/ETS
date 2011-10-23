@@ -14,7 +14,7 @@ auth = OAuthAuthentication(realm='API')
 auth1 = DjangoAuthentication()
 
 JSON_OFFLINE_HEADERS = {'Content-Disposition': 'attachment; filename=server-export-%s.json' % datetime.date.today() }
-FORMAT_JSON = {'emitter_format': 'json'}
+FORMAT_JSON = {'emitter_format': 'django_json'}
 offline_resource_oauth = expand_response(Resource(handler=JSONOfflineHandler, authentication=auth), JSON_OFFLINE_HEADERS)
 offline_resource = login_required(expand_response(Resource(JSONOfflineHandler), JSON_OFFLINE_HEADERS))
 
