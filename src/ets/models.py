@@ -130,6 +130,9 @@ class Warehouse(models.Model):
         return cls.objects.filter(location__persons__user=user, organization__persons__user=user,\
                                   compas__persons__user=user)
 
+    def get_persons(self):
+        return Person.objects.filter(compas=self.compas, organization=self.organization, location=self.location)
+
     
 class Person(models.Model):
     """Person model"""

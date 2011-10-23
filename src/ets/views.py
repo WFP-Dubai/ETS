@@ -30,23 +30,27 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     """utility that shows waybill's details"""    
     items = waybill.loading_details.select_related()
     items_count = len(items)
-    waybill_history = ""
-    loading_details = ""
+    loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
+    waybill_log = waybill.audit_log.all()
+
     if ets.models.Warehouse.filter_by_user(request.user).filter(pk=waybill.order.warehouse.pk).count():
-        
-        waybill_history = history_list(waybill.audit_log.all(), ets.models.Waybill)
-        loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
-    
         loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), 
-                                              ets.models.LoadingDetail))
+                                                  ets.models.LoadingDetail))
                            for loading in waybill.loading_details.all())
-    
+    else:
+        print waybill_log[1].action_user.pk
+        waybill_log = waybill_log.exclude(action_user__pk__in=waybill.order.warehouse.get_persons().values_list('user__pk', flat=True))
+        loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item) \
+                        .exclude(action_user__pk__in=loading.waybill.order.warehouse.get_persons().values_list('user__pk', flat=True)),
+                                                  ets.models.LoadingDetail))
+                           for loading in waybill.loading_details.all())
+
     return direct_to_template(request, template, {
         'object': waybill,
         'extra_lines': (),#[''] * (settings.LOADING_LINES - items_count),
         'items': items,
         'items_count': items_count,
-        'waybill_history': waybill_history,
+        'waybill_history': history_list(waybill_log, ets.models.Waybill),
         'loading_detail_history': loading_details,
     })
 
