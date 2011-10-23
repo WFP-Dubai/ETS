@@ -84,7 +84,7 @@ class PrefixedPatterns:
         ( r'^validate_dispatch/(?P<waybill_pk>[-\w]+)/$', "validate_dispatch", {
             'queryset': ets.models.Waybill.objects.all(),
         }, "validate_dispatch" ),
-        ( r'^vvalidate_receipt/(?P<waybill_pk>[-\w]+)/$', "validate_receipt", {
+        ( r'^validate_receipt/(?P<waybill_pk>[-\w]+)/$', "validate_receipt", {
             'queryset': ets.models.Waybill.objects.all(),
         }, "validate_receipt" ),
         
