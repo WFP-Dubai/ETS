@@ -8,12 +8,16 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Adding field 'Person.user_ptr'
+        db.add_column('ets_person', 'user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['auth.User'], unique=False), keep_default=False)
+        for obj in orm.Person.objects.all():
+            obj.user_ptr = obj.user_id
+            obj.save()
+        
+        db.add_column('ets_person', 'user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['auth.User'], unique=True), keep_default=False)
+        
         # Deleting field 'Person.user'
         db.delete_column('ets_person', 'user_id')
-
-        # Adding field 'Person.user_ptr'
-        db.add_column('ets_person', 'user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['auth.User'], unique=True), keep_default=False)
-
 
     def backwards(self, orm):
         

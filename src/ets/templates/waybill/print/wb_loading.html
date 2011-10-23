@@ -112,7 +112,7 @@
           </td>
         </tr>
         <tr>
-          <td><small style="font-size:x-small;">{% trans "Name" %}:</small> {{ object.dispatcher_person.user.get_full_name }}</td>
+          <td><small style="font-size:x-small;">{% trans "Name" %}:</small> {{ object.dispatcher_person.get_full_name }}</td>
           <td colspan="2">
             <small style="font-size:x-small;">{% trans "Transport Subcontractor" %}:</small>
             {{ object.transport_sub_contractor }}
@@ -134,7 +134,7 @@
               {% trans "Name, signature and stamp:" %}
             </p>
             <p class="x-small">
-              {{ object.dispatcher_person.user.get_full_name }}<br>
+              {{ object.dispatcher_person.get_full_name }}<br>
               {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
             </p>
           </td>
