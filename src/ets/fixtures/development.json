@@ -295,5 +295,17 @@
 	  "action": 1,
 	  "message": "Error-Error-Error"
     }
+  },
+  {
+    "pk": 1, 
+    "model": "piston.consumer", 
+    "fields": {
+          "status": "accepted", 
+          "name": "Client", 
+          "secret": "sdvvfddsvabapb_Dsfih7gb", 
+          "user": null, 
+          "key": "mine_key", 
+          "description": "Client"
+    }
   }
 ]

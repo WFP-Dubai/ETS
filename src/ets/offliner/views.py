@@ -19,6 +19,7 @@ WAREHOUSE = 'ISBX002'
 request_token_url = 'http://%s/ets/oauth/request_token' % SERVER
 access_token_url = 'http://%s/ets/oauth/access_token' % SERVER
 authorize_url = 'http://%s/ets/oauth/authorize' % SERVER
+callback_url = 'http://%s/ets/syncro/' % SERVER
 
 def syncro(request):
     """requests data at server and import them localy"""
@@ -32,7 +33,7 @@ def syncro(request):
             request_token = dict(urllib2.urlparse.parse_qsl(content))
             request.session['roauth_token'] = request_token['oauth_token']
             request.session['roauth_token_secret'] = request_token['oauth_token_secret']
-            return HttpResponseRedirect(authorize_url+'?oauth_token='+request_token['oauth_token']+'&oauth_callback=http://127.0.0.1:8000/ets/syncro/') 
+            return HttpResponseRedirect(authorize_url+'?oauth_token='+request_token['oauth_token']+'&oauth_callback='+callback_url) 
         elif request.GET['oauth_token']:
             oauth_verifier = request.GET['oauth_token']
             token = oauth.Token(request.session.get('roauth_token', None), request.session.get('roauth_token_secret', None))
@@ -49,7 +50,6 @@ def syncro(request):
     token = oauth.Token(request.session['oauth_token'], request.session['oauth_token_secret'])
     client = oauth.Client(consumer,token)
     resp, content = client.request("%s%s" % (API_URL, WAREHOUSE))
-#    print content
     UpdateLog.updata_data(content)
     return redirect('synchronization')
     
