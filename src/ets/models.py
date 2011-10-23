@@ -131,10 +131,10 @@ class Warehouse(models.Model):
                                   compas__persons__user=user)
 
     
-class Person(models.Model):
+class Person(User):
     """Person model"""
     
-    user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
+    #user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
     
     external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
     title = models.CharField(_("title"), max_length=50, blank=True)

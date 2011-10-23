@@ -77,14 +77,13 @@ def import_persons(compas):
             try:
                 person = ets_models.Person.objects.get(pk=person.person_pk)
             except ets_models.Person.DoesNotExist:
-                user = User.objects.create(username=person.person_pk, password=UNUSABLE_PASSWORD,
-                                           email=person.email,
-                                           first_name = person.first_name, last_name = person.last_name, 
-                                           is_staff=False, is_active=False, is_superuser=False)
-                person = ets_models.Person.objects.create(pk=person.person_pk, user=user, title=person.title,
+                person = ets_models.Person.objects.create(pk=person.person_pk, title=person.title,
                                                code=person.code, compas_id=person.org_unit_code, 
                                                organization_id=person.organization_id, 
-                                               location_id=person.location_code)
+                                               location_id=person.location_code, username=person.person_pk, 
+                                               password=UNUSABLE_PASSWORD, email=person.email,
+                                               first_name = person.first_name, last_name = person.last_name, 
+                                               is_staff=False, is_active=False, is_superuser=False)
 
 
 def import_stock(compas):

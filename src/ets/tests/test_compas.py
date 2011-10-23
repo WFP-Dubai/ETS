@@ -49,7 +49,7 @@ class CompasTestCase(TestCase):
         
         #Persons
         person = ets.models.Person.objects.get(pk="ISBX0020000586")
-        self.assertTupleEqual((person.organization, person.location, person.compas, person.user.username),
+        self.assertTupleEqual((person.organization, person.location, person.compas, person.username),
                               (ets.models.Organization.objects.get(pk='WFP'), 
                                ets.models.Location.objects.get(pk='ISBX'),
                                ets.models.Compas.objects.get(pk=self.compas),
