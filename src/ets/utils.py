@@ -17,10 +17,6 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    #send_dispatched(using)
-    
-    #send_received(using)
-    
     #Update places
     import_places(using)
     
