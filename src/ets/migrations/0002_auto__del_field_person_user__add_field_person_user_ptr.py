@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding field 'Person.user_ptr'
         db.add_column('ets_person', 'user_ptr', self.gf('django.db.models.fields.related.ForeignKey')(default=1, to=orm['auth.User'], unique=False), keep_default=False)
         for obj in orm.Person.objects.all():
-            obj.user_ptr = obj.user_id
+            obj.user_ptr = obj.user.id
             obj.save()
         
         db.alter_column('ets_person', 'user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(default=1, to=orm['auth.User'], unique=True))
