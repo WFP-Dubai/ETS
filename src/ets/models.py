@@ -329,7 +329,12 @@ class Order(models.Model):
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
-    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, primary_key=True)
+    #===================================================================================================================
+    # slug = AutoSlugField(populate_from=lambda obj: "%s%s%s" % (obj.lti_pk, obj.si_code, obj.commodity), 
+    #                     unique=True, editable=True, primary_key=True)
+    #===================================================================================================================
+    
+    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
@@ -345,6 +350,7 @@ class OrderItem(models.Model):
         order_with_respect_to = 'order'
         verbose_name = _("order item")
         verbose_name_plural = _("order items")
+        unique_together = ('lti_pk', 'si_code', 'commodity')
     
     def  __unicode__( self ):
         return u"%s -  %.0f " % ( self.commodity, self.items_left() )
