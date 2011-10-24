@@ -135,7 +135,7 @@ class Warehouse(models.Model):
 class Person(User):
     """Person model"""
     
-    code = models.CharField(_("code"), max_length=7, unique=True)
+    code = models.CharField(_("code"), max_length=7)
     title = models.CharField(_("title"), max_length=50, blank=True)
     
     compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
@@ -146,6 +146,7 @@ class Person(User):
         ordering = ('code',)
         verbose_name = _('person')
         verbose_name_plural = _("persons")
+        unique_together = ('compas', 'code')
     
     def __unicode__(self):
         return "%s %s" % (self.code, self.title)
