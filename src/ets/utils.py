@@ -61,9 +61,7 @@ def import_places(compas):
             'compas': ets_models.Compas.objects.get(pk=place.reporting_code),
         }
         
-        rows = ets_models.Warehouse.objects.filter(code=place.org_code).update(**defaults)
-        if not rows:
-            ets_models.Warehouse.objects.create(code=place.org_code, **defaults)
+        ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
 
 
 def import_persons(compas):
@@ -196,16 +194,19 @@ def import_order(compas):
             })[0]
             
             #Create order item
-            defaults = {
+            key_data = {
                 'order': order,
-                'si_code': lti.si_code,
+                'lti_pk': lti.lti_pk, 
+                'si_code': lti.si_code, 
                 'commodity': commodity,
+            }
+            defaults = {
                 'number_of_units': lti.number_of_units,
             }
             
-            rows = ets_models.OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
+            rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
             if not rows:
-                ets_models.OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
+                ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
 
 
 def send_dispatched(using):
