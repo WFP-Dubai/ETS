@@ -247,13 +247,12 @@ admin.site.register( ets.models.CommodityCategory, CommodityCategoryAdmin )
 class PersonAdmin(UserAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
-#    fieldsets = (
-#        (None, {'fields': ('username', 'is_active',)}),
-#        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
-#        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
-#    )
-    fieldsets = None
-    fields = ('username', 'is_active', 'first_name', 'last_name', 'email', 'title', 'code', 'last_login', 'date_joined')
+    fieldsets = (
+        (None, {'fields': ('username', 'is_active',)}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+    
     list_display = (
         'username', 'code', 'title', 'get_full_name', 'link_to_compas', 
         'link_to_organization', 'link_to_location', 'is_active'
@@ -271,7 +270,7 @@ class PersonAdmin(UserAdmin):
     def queryset(self, request):
         queryset = super(PersonAdmin, self).queryset(request)
         if not request.user.is_superuser:
-            pass
+            queryset.filter(compas__officers=request.user)
         return queryset
     
 admin.site.register(ets.models.Person, PersonAdmin)
