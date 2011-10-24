@@ -135,9 +135,8 @@ class Warehouse(models.Model):
 class Person(User):
     """Person model"""
     
-    external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
-    title = models.CharField(_("title"), max_length=50, blank=True)
     code = models.CharField(_("code"), max_length=7)
+    title = models.CharField(_("title"), max_length=50, blank=True)
     
     compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
@@ -147,6 +146,7 @@ class Person(User):
         ordering = ('code',)
         verbose_name = _('person')
         verbose_name_plural = _("persons")
+        unique_together = ('compas', 'code')
     
     def __unicode__(self):
         return "%s %s" % (self.code, self.title)
@@ -463,7 +463,8 @@ class Waybill( ld_models.Model ):
                                           related_name="dispatch_waybills") #dispatcherName
     
     #Recepient
-    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills", 
+    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), 
+                                        related_name="recipient_waybills", 
                                         blank=True, null=True) #recipientName
     receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     

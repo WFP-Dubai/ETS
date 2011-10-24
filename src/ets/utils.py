@@ -73,15 +73,15 @@ def import_persons(compas):
                                 location_code__in=places.values_list('geo_point_code', flat=True), 
                                 organization_id__in=places.values_list('organization_id', flat=True)):
             try:
-                ets_models.Person.objects.get(pk=person.person_pk)
+                ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
             except ets_models.Person.DoesNotExist:
-                obj = ets_models.Person(pk=person.person_pk, title=person.title,
-                                               code=person.code, compas_id=person.org_unit_code, 
-                                               organization_id=person.organization_id, 
-                                               location_id=person.location_code, username=person.person_pk, 
-                                               email=person.email,
-                                               first_name = person.first_name, last_name = person.last_name, 
-                                               is_staff=True, is_active=False, is_superuser=False)
+                obj = ets_models.Person(title=person.title,
+                                       code=person.code, compas_id=person.org_unit_code, 
+                                       organization_id=person.organization_id, 
+                                       location_id=person.location_code, username=person.person_pk, 
+                                       email=person.email,
+                                       first_name = person.first_name, last_name = person.last_name, 
+                                       is_staff=True, is_active=False, is_superuser=False)
                 obj.set_password(person.person_pk)
                 obj.save()
 

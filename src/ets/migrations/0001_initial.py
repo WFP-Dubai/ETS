@@ -58,15 +58,17 @@ class Migration(SchemaMigration):
 
         # Adding model 'Person'
         db.create_table('ets_person', (
-            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('external_ident', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
+            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
             ('code', self.gf('django.db.models.fields.CharField')(max_length=7)),
+            ('title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
             ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Compas'])),
             ('organization', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Organization'])),
             ('location', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Location'])),
         ))
         db.send_create_signal('ets', ['Person'])
+
+        # Adding unique constraint on 'Person', fields ['compas', 'code']
+        db.create_unique('ets_person', ['compas_id', 'code'])
 
         # Adding model 'CommodityCategory'
         db.create_table('ets_commoditycategory', (
@@ -306,6 +308,9 @@ class Migration(SchemaMigration):
         # Removing unique constraint on 'OrderItem', fields ['lti_pk', 'si_code', 'commodity']
         db.delete_unique('ets_orderitem', ['lti_pk', 'si_code', 'commodity_id'])
 
+        # Removing unique constraint on 'Person', fields ['compas', 'code']
+        db.delete_unique('ets_person', ['compas_id', 'code'])
+
         # Deleting model 'Compas'
         db.delete_table('ets_compas')
 
@@ -515,14 +520,13 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '50'})
         },
         'ets.person': {
-            'Meta': {'ordering': "('code',)", 'object_name': 'Person', '_ormbases': ['auth.User']},
+            'Meta': {'ordering': "('code',)", 'unique_together': "(('compas', 'code'),)", 'object_name': 'Person', '_ormbases': ['auth.User']},
             'code': ('django.db.models.fields.CharField', [], {'max_length': '7'}),
             'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Compas']"}),
-            'external_ident': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Location']"}),
             'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Organization']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'ets.stockitem': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},

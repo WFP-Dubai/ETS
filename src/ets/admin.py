@@ -252,7 +252,7 @@ class PersonAdmin(UserAdmin):
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
-    
+
     list_display = (
         'username', 'code', 'title', 'get_full_name', 'link_to_compas', 
         'link_to_organization', 'link_to_location', 'is_active'
@@ -263,7 +263,7 @@ class PersonAdmin(UserAdmin):
         'code', 'title', 'username', 'first_name', 'last_name', 'email',
         'compas__code', 'organization__name', 'location__name'
     )
-    readonly_fields = ('external_ident', 'last_login', 'date_joined')
+    readonly_fields = ('last_login', 'date_joined')
     raw_id_fields = ('organization', 'location')
     form = ets.forms.PersonChangeForm
     
