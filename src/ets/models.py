@@ -135,7 +135,7 @@ class Warehouse(models.Model):
 class Person(User):
     """Person model"""
     
-    user = models.ForeignKey(User)
+    user = models.ForeignKey(User, related_name="test_person")
     
     external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
     title = models.CharField(_("title"), max_length=50, blank=True)
