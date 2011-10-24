@@ -53,7 +53,7 @@ class Compas(models.Model):
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
-    db_engine = "django.db.backends.oracle"
+    db_engine = models.CharField(_("Database engine"), max_length=100, default="django.db.backends.oracle")
     db_name = models.CharField(_("Database name"), max_length=100)
     db_user = models.CharField(_("Database user"), max_length=100, blank=True)
     db_password = models.CharField(_("Database password"), max_length=100, blank=True)
@@ -135,9 +135,8 @@ class Warehouse(models.Model):
 class Person(User):
     """Person model"""
     
-    external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
+    code = models.CharField(_("code"), max_length=7, unique=True)
     title = models.CharField(_("title"), max_length=50, blank=True)
-    code = models.CharField(_("code"), max_length=7)
     
     compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
@@ -463,7 +462,8 @@ class Waybill( ld_models.Model ):
                                           related_name="dispatch_waybills") #dispatcherName
     
     #Recepient
-    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills", 
+    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), 
+                                        related_name="recipient_waybills", 
                                         blank=True, null=True) #recipientName
     receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     

@@ -58,10 +58,9 @@ class Migration(SchemaMigration):
 
         # Adding model 'Person'
         db.create_table('ets_person', (
-            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True)),
-            ('external_ident', self.gf('django.db.models.fields.CharField')(max_length=20, primary_key=True)),
+            ('user_ptr', self.gf('django.db.models.fields.related.OneToOneField')(to=orm['auth.User'], unique=True, primary_key=True)),
+            ('code', self.gf('django.db.models.fields.CharField')(unique=True, max_length=7)),
             ('title', self.gf('django.db.models.fields.CharField')(max_length=50, blank=True)),
-            ('code', self.gf('django.db.models.fields.CharField')(max_length=7)),
             ('compas', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Compas'])),
             ('organization', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Organization'])),
             ('location', self.gf('django.db.models.fields.related.ForeignKey')(related_name='persons', to=orm['ets.Location'])),
@@ -516,13 +515,12 @@ class Migration(SchemaMigration):
         },
         'ets.person': {
             'Meta': {'ordering': "('code',)", 'object_name': 'Person', '_ormbases': ['auth.User']},
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '7'}),
+            'code': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '7'}),
             'compas': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Compas']"}),
-            'external_ident': ('django.db.models.fields.CharField', [], {'max_length': '20', 'primary_key': 'True'}),
             'location': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Location']"}),
             'organization': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'persons'", 'to': "orm['ets.Organization']"}),
             'title': ('django.db.models.fields.CharField', [], {'max_length': '50', 'blank': 'True'}),
-            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True'})
+            'user_ptr': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'})
         },
         'ets.stockitem': {
             'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},
