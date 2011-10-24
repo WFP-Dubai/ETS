@@ -135,6 +135,8 @@ class Warehouse(models.Model):
 class Person(User):
     """Person model"""
     
+    user = models.ForeignKey(User)
+    
     external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
     title = models.CharField(_("title"), max_length=50, blank=True)
     code = models.CharField(_("code"), max_length=7)
