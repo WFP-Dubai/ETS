@@ -28,21 +28,23 @@ from ets.utils import history_list
 
 def waybill_detail(request, waybill, template="waybill/detail.html"):
     """utility that shows waybill's details"""    
-    items = waybill.loading_details.select_related()
-    items_count = len(items)
     
     loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
-    
-    loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), 
-                                              ets.models.LoadingDetail))
-                       for loading in waybill.loading_details.all())
+    waybill_log = waybill.audit_log.all()
+
+    #Recepient should not see dispatcher's history
+    if not ets.models.Warehouse.filter_by_user(request.user).filter(pk=waybill.order.warehouse.pk).count():
+        persons = waybill.order.warehouse.get_persons()
+        waybill_log = waybill_log.exclude(action_user__in=persons)
+        loading_log = loading_log.exclude(action_user__in=persons)
+        
+    loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), ets.models.LoadingDetail))
+                        for loading in waybill.loading_details.all())
     
     return direct_to_template(request, template, {
         'object': waybill,
-        'extra_lines': (),#[''] * (settings.LOADING_LINES - items_count),
-        'items': items,
-        'items_count': items_count,
-        'waybill_history': history_list(waybill.audit_log.all(), ets.models.Waybill),
+        'items': waybill.loading_details.select_related(),
+        'waybill_history': history_list(waybill_log, ets.models.Waybill),
         'loading_detail_history': loading_details,
     })
 
