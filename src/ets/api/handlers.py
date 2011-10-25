@@ -44,7 +44,9 @@ class ReadCSVWaybillHandler(BaseHandler):
     def read(self, request, slug="", warehouse="", destination=""):
         """Return waybills in CSV"""
         #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
-        waybills = self.model.objects.filter(order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        waybills = self.model.objects.all()
+        if not request.user.is_superuser:
+            waybills = waybills.filter(order__warehouse__in=Warehouse.filter_by_user(request.user))
         filter_arg = {}
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
@@ -65,7 +67,9 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     
     def read(self, request, waybill="", warehouse="", destination=""):
         """Return loading details for waybills in CSV"""
-        load_details = self.model.objects.filter(waybill__order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        load_details = self.model.objects.all()
+        if not request.user.is_superuser:
+            load_details = load_details.filter(waybill__order__warehouse__in=Warehouse.filter_by_user(request.user))
         filter_arg = {}
         if warehouse: 
             filter_arg['waybill__order__warehouse__pk'] = warehouse
@@ -78,7 +82,7 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Waybill))      
         result = [titles]
-        for detail in load_details:
+        for detail in load_details.values():
             waybills_data = ets.models.Waybill.objects.filter(pk=detail['waybill_id']).values()[0]
             waybills_data.update(detail)
             result.append(waybills_data)  
@@ -92,7 +96,9 @@ class ReadCSVOrdersHandler(BaseHandler):
     
     def read(self, request, code="", warehouse="", destination="", consignee=""):
         """Return orders in CSV"""
-        orders = self.model.objects.filter(warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        orders = self.model.objects.all()
+        if not request.user.is_superuser:
+            orders = orders.filter(warehouse__in=Warehouse.filter_by_user(request.user))
         filter_arg = {}
         if warehouse: 
             filter_arg['warehouse__pk'] = warehouse
@@ -115,7 +121,9 @@ class ReadCSVOrderItemsHandler(BaseHandler):
     
     def read(self, request, order="", warehouse="", destination="", consignee=""):
         """Return order items in CSV"""
-        order_items = self.model.objects.filter(order__warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        order_items = self.model.objects.all()
+        if not request.user.is_superuser:
+            order_items = order_items.filter(order__warehouse__in=Warehouse.filter_by_user(request.user))
         filter_arg = {}
         #queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
         if warehouse: 
@@ -131,7 +139,7 @@ class ReadCSVOrderItemsHandler(BaseHandler):
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Order))                     
         result = [titles]
-        for item in order_items:
+        for item in order_items.values():
             order_items_data = ets.models.Order.objects.filter(code=item['order_id']).values()[0]
             order_items_data.update(item)
             result.append(order_items_data)         
@@ -145,13 +153,16 @@ class ReadCSVStockItemsHandler(BaseHandler):
     
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
-        stock_items = self.model.objects.filter(warehouse__in=Warehouse.filter_by_user(request.user)).values()
+        stock_items = self.model.objects.all()
+        if not request.user.is_superuser:
+            stock_items = stock_items.filter(warehouse__in=Warehouse.filter_by_user(request.user))
+        
         if warehouse: 
-            stock_items = stock_items.filter(warehouse=warehouse)       
+            stock_items = stock_items.filter(warehouse=warehouse)
         titles = get_titles(self.model)
         titles.update(get_titles(ets.models.Warehouse))   
         result = [titles]
-        for item in stock_items:
+        for item in stock_items.values():
             stock_items_data = ets.models.Warehouse.objects.filter(pk=item['warehouse_id']).values()[0]
             stock_items_data.update(item)
             result.append(stock_items_data)  
@@ -167,8 +178,12 @@ class ReadCSVWarehouseHandler(BaseHandler):
         """country, location. warehouse information"""
         
         result = [{'country': 'Country', 'location': 'Location', 'warehouse': 'Warehouse', 'code': 'Warehouse code'}]
+
+        warehouses = self.model.objects.all()
+        if not request.user.is_superuser:
+            warehouses = self.model.filter_by_user(request.user)
         
-        for warehouse in self.model.objects.all(): #filter_by_user(request.user):
+        for warehouse in warehouses:
             result.append({
                 'country': warehouse.location.get_country_display(), 
                 'location': warehouse.location.name, 

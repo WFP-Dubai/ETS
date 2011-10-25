@@ -90,7 +90,7 @@
       "transport_type": "02",
       
       "dispatch_remarks": "",
-      "dispatcher_person": "ISBX0020000586",
+      "dispatcher_person": "2",
       
       "transport_sub_contractor": "", 
       "transport_driver_name": "Ahmed",
@@ -151,7 +151,7 @@
       "transport_type": "02",
       
       "dispatch_remarks": "That was long night",
-      "dispatcher_person": "ISBX0020000613",
+      "dispatcher_person": "3",
       
       "transport_sub_contractor": "Arpaso", 
       "transport_driver_name": "Ahmed",
@@ -198,7 +198,7 @@
     "fields": {
       "order": "THEIRORDER",
     
-      "dispatcher_person": "ISBX0020000613",
+      "dispatcher_person": "3",
       "dispatch_date": "2011-06-12",
       "transport_dispach_signed_date": "2011-06-12 05:36:54",
       "validated": false,
@@ -229,7 +229,7 @@
       "receipt_signed_date": null,
       "start_discharge_date": "2011-08-22",
       "end_discharge_date": "2011-08-22",
-      "receipt_person": "ISBX0020000586",
+      "receipt_person": "2",
       "receipt_remarks": "",
       "receipt_validated": false,
       
