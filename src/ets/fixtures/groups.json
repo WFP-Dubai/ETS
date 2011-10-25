@@ -1,0 +1,21 @@
+[
+    {
+        "pk": 1,
+        "model": "auth.group", 
+        "fields": {
+            "name": "Officer", 
+            "permissions": [
+                [
+                    "change_person", 
+                    "ets", 
+                    "person"
+                ], 
+                [
+                    "change_warehouse", 
+                    "ets", 
+                    "warehouse"
+                ]
+            ]
+        }
+    }
+]
