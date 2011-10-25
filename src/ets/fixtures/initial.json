@@ -1,0 +1,31 @@
+[
+  {
+    "pk": 68, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_warehouse", 
+        "name": "Can change warehouse", 
+        "content_type": ["warehouse"]
+    }
+  },   
+  {
+    "pk": 71, 
+    "model": "auth.permission", 
+    "fields": {
+        "codename": "change_person", 
+        "name": "Can change person", 
+        "content_type": ["person"]
+    }
+  },   
+  {
+    "pk": 1, 
+    "model": "auth.group", 
+    "fields": {
+        "name": "Officer", 
+        "permissions": [
+ 	    71, 
+            68
+        ]
+    }
+  },
+]
