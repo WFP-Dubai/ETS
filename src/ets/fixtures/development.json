@@ -1,34 +1,5 @@
 [
   {
-    "pk": 68, 
-    "model": "auth.permission", 
-    "fields": {
-        "codename": "change_warehouse", 
-        "name": "Can change warehouse", 
-        "content_type": 23
-    }
-  },   
-  {
-    "pk": 71, 
-    "model": "auth.permission", 
-    "fields": {
-        "codename": "change_person", 
-        "name": "Can change person", 
-        "content_type": 24
-    }
-  },   
-  {
-    "pk": 1, 
-    "model": "auth.group", 
-    "fields": {
-        "name": "Officer", 
-        "permissions": [
- 	    71, 
-            68
-        ]
-    }
-  }, 
-  {
     "pk": 2,
     "model": "auth.user",
     "fields": {
@@ -90,7 +61,7 @@
       "transport_type": "02",
       
       "dispatch_remarks": "",
-      "dispatcher_person": "2",
+      "dispatcher_person": "ISBX0020000586",
       
       "transport_sub_contractor": "", 
       "transport_driver_name": "Ahmed",
@@ -151,7 +122,7 @@
       "transport_type": "02",
       
       "dispatch_remarks": "That was long night",
-      "dispatcher_person": "3",
+      "dispatcher_person": "ISBX0020000613",
       
       "transport_sub_contractor": "Arpaso", 
       "transport_driver_name": "Ahmed",
@@ -198,7 +169,7 @@
     "fields": {
       "order": "THEIRORDER",
     
-      "dispatcher_person": "3",
+      "dispatcher_person": "ISBX0020000613",
       "dispatch_date": "2011-06-12",
       "transport_dispach_signed_date": "2011-06-12 05:36:54",
       "validated": false,
@@ -229,7 +200,7 @@
       "receipt_signed_date": null,
       "start_discharge_date": "2011-08-22",
       "end_discharge_date": "2011-08-22",
-      "receipt_person": "2",
+      "receipt_person": "ISBX0020000586",
       "receipt_remarks": "",
       "receipt_validated": false,
       
