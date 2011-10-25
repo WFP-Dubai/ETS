@@ -270,7 +270,7 @@ class PersonAdmin(UserAdmin):
     def queryset(self, request):
         queryset = super(PersonAdmin, self).queryset(request)
         if not request.user.is_superuser:
-            queryset.filter(compas__officers=request.user)
+            queryset = queryset.filter(compas__officers=request.user)
         return queryset
     
 admin.site.register(ets.models.Person, PersonAdmin)
