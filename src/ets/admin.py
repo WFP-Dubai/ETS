@@ -169,6 +169,12 @@ class WarehouseAdmin(admin.ModelAdmin):
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
     inlines = (StockInline,)
     
+    def queryset(self, request):
+        queryset = super(WarehouseAdmin, self).queryset(request)
+        if not request.user.is_superuser:
+            queryset = queryset.filter(compas__officers=request.user)
+        return queryset
+    
 admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
 
