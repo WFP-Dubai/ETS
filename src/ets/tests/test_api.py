@@ -20,10 +20,6 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
 
         self.client.login(username="dispatcher", password="dispatcher")
         self.user = User.objects.get(username="dispatcher")
-        #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
-        #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
-        #self.dispatch_point = Warehouse.objects.get(pk=1)
-        self.maxDiff = None
     
     def get_waybill(self):
         return ets.models.Waybill.objects.get(pk="ISBX00211A")
@@ -131,4 +127,16 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
         self.assertEqual(item['Warehouse'], warehouse.code)
+    
+    def test_warehouses(self):
+        
+        # All stock items
+        response = self.client.get(reverse("api_warehouses"))
+        self.assertContains(response, "ISBX002", status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        # Stock items for one warehouse
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        item = dict_reader.next()
+        self.assertEqual(item['Warehouse code'], "ISBX002")
         
