@@ -14,7 +14,7 @@
           <td><small>{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date }}</td>
         </tr>
         <tr>
-          <td><small>{% trans "Name:" %}</small> {{ object.receipt_person.user.get_full_name }}</td>
+          <td><small>{% trans "Name:" %}</small> {{ object.receipt_person.get_full_name }}</td>
           <td><small>{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date }}</td>
         </tr>
         <tr>
@@ -103,19 +103,6 @@
           </tr>
         {% endfor %}
                                         
-        {%for lineitem in extra_lines%}
-          <tr  style="font-size:x-small;">
-              <td>{% trans 'ID' %} {{ forloop.counter|add:items_count }}.</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-              <td>&nbsp;</td>
-          </tr>
-        {% endfor %}
-
         <tr>
           <td colspan="10">
             <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.receipt_remarks }}
@@ -139,7 +126,7 @@
     	  <p class="x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
     	  <p class="x-small">{% trans "Name, signature and stamp:" %}</p>
     	  {% if object.end_discharge_date %}
-          <p class="small">{{ object.receipt_person.user.get_full_name }}</p>
+          <p class="small">{{ object.receipt_person.get_full_name }}</p>
           <p>{% trans "Date:" %}{{ object.end_discharge_date|date }}</p>
           {% endif %}	
           <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>

@@ -139,7 +139,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         
         #check created waybill and loading details
-        waybill = ets.models.Waybill.objects.all()[1]
+        waybill = ets.models.Waybill.objects.get(pk='ISBX00211A000004')
         self.assertEqual(waybill.loading_details.count(), 1)
         
         #check case when queryset for warehouse is None with filter by consignee

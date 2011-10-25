@@ -1,6 +1,7 @@
 
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
 #from django.forms.formsets import formset_factory, BaseFormSet
+from django.contrib.auth.forms import UserChangeForm
 from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext, ugettext_lazy as _
@@ -10,6 +11,10 @@ from uni_form.helpers import FormHelper, Layout, Fieldset, Row
 from ets import models as ets_models
 
 UNDEFINED_MESSAGE = "N/A"
+
+class PersonChangeForm(UserChangeForm):
+    class Meta:
+        model = ets_models.Person
 
 class WaybillSearchForm( forms.Form ):
     q = forms.CharField(required=True, label=_('Waybill code'))

@@ -127,21 +127,19 @@ class Warehouse(models.Model):
     
     @classmethod
     def filter_by_user(cls, user):
-        return cls.objects.filter(location__persons__user=user, organization__persons__user=user,\
-                                  compas__persons__user=user)
+        return cls.objects.filter(location__persons__username=user.username, 
+                                  organization__persons__username=user.username,
+                                  compas__persons__username=user.username)
 
     def get_persons(self):
         return Person.objects.filter(compas=self.compas, organization=self.organization, location=self.location)
 
     
-class Person(models.Model):
+class Person(User):
     """Person model"""
     
-    user = models.OneToOneField(User, verbose_name=_("User"), related_name='person')
-    
-    external_ident = models.CharField(_("person identifier"), max_length=20, primary_key=True)
-    title = models.CharField(_("title"), max_length=50, blank=True)
     code = models.CharField(_("code"), max_length=7)
+    title = models.CharField(_("title"), max_length=50, blank=True)
     
     compas = models.ForeignKey('ets.Compas', verbose_name=_("compas station"), related_name="persons")
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
@@ -151,6 +149,7 @@ class Person(models.Model):
         ordering = ('code',)
         verbose_name = _('person')
         verbose_name_plural = _("persons")
+        unique_together = ('compas', 'code')
     
     def __unicode__(self):
         return "%s %s" % (self.code, self.title)
@@ -333,7 +332,12 @@ class Order(models.Model):
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
-    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50, primary_key=True)
+    #===================================================================================================================
+    # slug = AutoSlugField(populate_from=lambda obj: "%s%s%s" % (obj.lti_pk, obj.si_code, obj.commodity), 
+    #                     unique=True, editable=True, primary_key=True)
+    #===================================================================================================================
+    
+    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
@@ -349,6 +353,7 @@ class OrderItem(models.Model):
         order_with_respect_to = 'order'
         verbose_name = _("order item")
         verbose_name_plural = _("order items")
+        unique_together = ('lti_pk', 'si_code', 'commodity')
     
     def  __unicode__( self ):
         return u"%s -  %.0f " % ( self.commodity, self.items_left() )
@@ -397,7 +402,7 @@ def waybill_slug_populate(waybill):
     count = Waybill.objects.all_with_deleted().filter(order__warehouse__compas=waybill.order.warehouse.compas, 
                                                       date_created__year=waybill.date_created.year
                                                       ).count()
-    return "%s%s%s%s" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
+    return "%s%s%s%06d" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
                            LETTER_CODE, count+1)
 
 
@@ -461,7 +466,8 @@ class Waybill( ld_models.Model ):
                                           related_name="dispatch_waybills") #dispatcherName
     
     #Recepient
-    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), related_name="recipient_waybills", 
+    receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), 
+                                        related_name="recipient_waybills", 
                                         blank=True, null=True) #recipientName
     receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     

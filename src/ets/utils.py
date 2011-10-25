@@ -61,9 +61,7 @@ def import_places(compas):
             'compas': ets_models.Compas.objects.get(pk=place.reporting_code),
         }
         
-        rows = ets_models.Warehouse.objects.filter(code=place.org_code).update(**defaults)
-        if not rows:
-            ets_models.Warehouse.objects.create(code=place.org_code, **defaults)
+        ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
 
 
 def import_persons(compas):
@@ -75,16 +73,17 @@ def import_persons(compas):
                                 location_code__in=places.values_list('geo_point_code', flat=True), 
                                 organization_id__in=places.values_list('organization_id', flat=True)):
             try:
-                person = ets_models.Person.objects.get(pk=person.person_pk)
+                ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
             except ets_models.Person.DoesNotExist:
-                user = User.objects.create(username=person.person_pk, password=UNUSABLE_PASSWORD,
-                                           email=person.email,
-                                           first_name = person.first_name, last_name = person.last_name, 
-                                           is_staff=False, is_active=False, is_superuser=False)
-                person = ets_models.Person.objects.create(pk=person.person_pk, user=user, title=person.title,
-                                               code=person.code, compas_id=person.org_unit_code, 
-                                               organization_id=person.organization_id, 
-                                               location_id=person.location_code)
+                obj = ets_models.Person(title=person.title,
+                                       code=person.code, compas_id=person.org_unit_code, 
+                                       organization_id=person.organization_id, 
+                                       location_id=person.location_code, username=person.person_pk, 
+                                       email=person.email,
+                                       first_name = person.first_name, last_name = person.last_name, 
+                                       is_staff=True, is_active=False, is_superuser=False)
+                obj.set_password(person.person_pk)
+                obj.save()
 
 
 def import_stock(compas):
@@ -195,16 +194,19 @@ def import_order(compas):
             })[0]
             
             #Create order item
-            defaults = {
+            key_data = {
                 'order': order,
-                'si_code': lti.si_code,
+                'lti_pk': lti.lti_pk, 
+                'si_code': lti.si_code, 
                 'commodity': commodity,
+            }
+            defaults = {
                 'number_of_units': lti.number_of_units,
             }
             
-            rows = ets_models.OrderItem.objects.filter(lti_pk=lti.lti_pk).update(**defaults)
+            rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
             if not rows:
-                ets_models.OrderItem.objects.create(lti_pk=lti.lti_pk, **defaults)
+                ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
 
 
 def send_dispatched(using):

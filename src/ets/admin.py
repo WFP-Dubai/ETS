@@ -13,6 +13,7 @@ from django.forms import MediaDefiningClass
 import logicaldelete.admin
 
 import ets.models
+import ets.forms
 
 
 class ButtonableModelAdmin(admin.ModelAdmin):
@@ -243,13 +244,35 @@ class CommodityCategoryAdmin(admin.ModelAdmin):
 admin.site.register( ets.models.CommodityCategory, CommodityCategoryAdmin )
 
 
-class PersonAdmin(admin.ModelAdmin):
+class PersonAdmin(UserAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
-    list_display = ('pk', 'code', 'title', 'link_to_user', 'link_to_compas', 'link_to_organization', 'link_to_location')
-    search_fields = ('code', 'title', 'user__username', 'compas__code', 'organization__name', 'location__name')
-    raw_id_fields = ('user', 'organization', 'location')
+    fieldsets = (
+        (None, {'fields': ('username', 'is_active',)}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
+        (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
 
+    list_display = (
+        'username', 'code', 'title', 'get_full_name', 'link_to_compas', 
+        'link_to_organization', 'link_to_location', 'is_active'
+    )
+    list_editable = ('is_active',)
+    list_filter = ('is_active',)
+    search_fields = (
+        'code', 'title', 'username', 'first_name', 'last_name', 'email',
+        'compas__code', 'organization__name', 'location__name'
+    )
+    readonly_fields = ('last_login', 'date_joined')
+    raw_id_fields = ('organization', 'location')
+    form = ets.forms.PersonChangeForm
+    
+    def queryset(self, request):
+        queryset = super(PersonAdmin, self).queryset(request)
+        if not request.user.is_superuser:
+            queryset = queryset.filter(compas__officers=request.user)
+        return queryset
+    
 admin.site.register(ets.models.Person, PersonAdmin)
 
 
@@ -267,6 +290,6 @@ admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
 class PersonedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PersonInline,]
 
-admin.site.unregister(User)
-admin.site.register(User, PersonedUserAdmin)
+#admin.site.unregister(User)
+#admin.site.register(User, PersonedUserAdmin)
 

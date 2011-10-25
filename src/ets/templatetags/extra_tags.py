@@ -85,7 +85,7 @@ def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
 
 @block
 def person_only(context, nodelist, user):
-    return Person.objects.filter(user=user).count() and nodelist.render(context) or ''
+    return hasattr(user, 'person') and nodelist.render(context) or ''
 
 @block
 def officer_only(context, nodelist, user):
