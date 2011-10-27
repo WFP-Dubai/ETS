@@ -1,5 +1,5 @@
 
-import zlib, base64, string
+import zlib, base64, string, decimal
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
@@ -563,7 +563,7 @@ class Waybill( ld_models.Model ):
         @return the serialized json data.
         """
         
-        return serializers.serialize( 'json', chain((self,), self.loading_details.all()))
+        return serializers.serialize('json', chain((self,), self.loading_details.all()), use_decimal=False)
     
     
     def compress(self):
@@ -573,7 +573,32 @@ class Waybill( ld_models.Model ):
         @param self: the Waybill instance
         @return: a string containing the compressed representation of the Waybill with items
         """
-        data = self.serialize()
+        #Collect all related objects
+        objects = set([
+            #Waybill itself
+            self, 
+            
+            #Dispatch person
+            self.dispatcher_person, self.dispatcher_person.location, 
+            self.dispatcher_person.organization, self.dispatcher_person.compas,
+            
+            #Order
+            self.order, self.order.location, self.order.consignee, 
+            
+            #Warehouse
+            self.order.warehouse, self.order.warehouse.compas, 
+            self.order.warehouse.location, self.order.warehouse.organization,
+        ])
+        
+        #Loading details
+        for ld in self.loading_details.select_related():
+            objects.update((
+                ld, ld.stock_item, ld.stock_item.package, 
+                ld.stock_item.commodity, ld.stock_item.commodity.category,
+            ))
+        
+        #Serialize
+        data = serializers.serialize('json', objects, use_decimal=False)
         
         #Cut field names
         for full_field, cut_field in COMPRESS_MAPPING:
@@ -591,9 +616,9 @@ class Waybill( ld_models.Model ):
             #Extend field names
             for full_field, cut_field in COMPRESS_MAPPING:
                 wb_serialized = wb_serialized.replace(cut_field, full_field)
-
+            
             waybill = None
-            for obj in serializers.deserialize("json", wb_serialized):
+            for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):
                 #Save object if it does not exist
                 if obj.object.__class__.objects.filter(pk=obj.object.pk).count() == 0:
                     obj.save()
