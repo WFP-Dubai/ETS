@@ -1,3 +1,4 @@
+### -*- coding: utf-8 -*- ####################################################
 
 from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
 #from django.forms.formsets import formset_factory, BaseFormSet
@@ -6,7 +7,8 @@ from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from uni_form.helpers import FormHelper, Layout, Fieldset, Row
+from uni_form.helper import FormHelper
+from uni_form.layout import Layout, Fieldset, Row
 
 from ets import models as ets_models
 

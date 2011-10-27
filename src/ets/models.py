@@ -21,7 +21,7 @@ from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models 
 
-
+from .compress import COMPRESS_MAPPING
 from .country import COUNTRY_CHOICES
 
 #name = "1234"
@@ -564,7 +564,8 @@ class Waybill( ld_models.Model ):
         """
         
         return serializers.serialize( 'json', chain((self,), self.loading_details.all()))
-        
+    
+    
     def compress(self):
         """
         This method compress the Waybill using zipBase64 algorithm.
@@ -572,7 +573,13 @@ class Waybill( ld_models.Model ):
         @param self: the Waybill instance
         @return: a string containing the compressed representation of the Waybill with items
         """
-        return base64.b64encode( zlib.compress( self.serialize() ) )
+        data = self.serialize()
+        
+        #Cut field names
+        for full_field, cut_field in COMPRESS_MAPPING:
+            data = data.replace(full_field, cut_field)
+        
+        return base64.b64encode( zlib.compress( data ) )
     
     @classmethod
     def decompress(cls, data):
@@ -581,6 +588,10 @@ class Waybill( ld_models.Model ):
         except TypeError:
             pass
         else:
+            #Extend field names
+            for full_field, cut_field in COMPRESS_MAPPING:
+                wb_serialized = wb_serialized.replace(cut_field, full_field)
+
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized):
                 #Save object if it does not exist
