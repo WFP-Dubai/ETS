@@ -111,9 +111,13 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)
     
-    warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
+    warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee)\
+                                    .filter(start_date__lte=datetime.date.today)\
+                                    .exclude(pk=order.warehouse.pk)
     if not warehouses.exists():
-        warehouses = ets.models.Warehouse.objects.filter(location=order.location).exclude(pk=order.warehouse.pk)
+        warehouses = ets.models.Warehouse.objects.filter(location=order.location)\
+                                    .filter(start_date__lte=datetime.date.today)\
+                                    .exclude(pk=order.warehouse.pk)
     
     form.fields['destination'].queryset = warehouses
     
