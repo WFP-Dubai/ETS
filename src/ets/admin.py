@@ -135,7 +135,8 @@ class OrderAdmin(admin.ModelAdmin):
     list_display = ('pk', 'warehouse', 'consignee', 'created', 'dispatch_date', 'expiry')
     readonly_fields = ('created', 'updated')
     list_filter = ('dispatch_date', 'origin_type')
-    search_fields = ('code', 'origin_type', 'project_number')
+    search_fields = ('code', 'origin_type', 'project_number', 'warehouse__pk', 
+                     'warehouse__compas__pk', 'warehouse__location__pk', 'warehouse__organization__pk')
     inlines = (OrderItemInline,)
 
 admin.site.register( ets.models.Order, OrderAdmin )
