@@ -121,8 +121,10 @@
               {% trans "Name, signature and stamp:" %}
             </p>
             <p class="x-small">
+            {% if object.transport_dispach_signed_date %}
               {{ object.dispatcher_person.get_full_name }}<br>
               {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
+            {% endif %}
             </p>
           </td>
           
@@ -145,8 +147,11 @@
             <p class="x-small">
               {% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above. Name, signature and stamp:" %}<br>
             </p>
-            <p class="small"'>{{ object.transport_driver_name|upper }}<br>
+            <p class="small">
+            {% if object.transport_dispach_signed_date %}
+              {{ object.transport_driver_name|upper }}<br>
               {% trans "Date:" %}{{object.transport_dispach_signed_date|date}}
+            {% endif %}
             </p>
           </td>
         </tr>

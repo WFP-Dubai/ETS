@@ -9,9 +9,11 @@
         <td valign="top" align="center" width="60%">
             <h1 >{% trans "Waybill" %}</h1>
             <span id="top_note" style="font-size:small;">{% trans "Conditions of carriage as indicated overleaf are applicable" %}</span>
-            <span id='original_lable' class="hidden">{% trans "ORIGINAL" %}</span>
-            <span id='copy_lable' class="shown">{% trans "COPY" %}</span>
-            
+            {% if print_original %}
+              <span id='original_lable' class="shown">{% trans "ORIGINAL" %}</span>
+            {% else %}
+              <span id='copy_lable' class="shown">{% trans "COPY" %}</span>
+            {% endif %}
         </td>
         <td width="20%" align="right">
             <span valign=top style="font-size:x-large;">{% trans "No:" %}{{ object.pk }}</span>

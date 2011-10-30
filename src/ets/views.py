@@ -12,7 +12,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import Http404
 #from django.views.generic.list_detail import object_list
-#from django.views.generic.create_update import apply_extra_context
+from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
@@ -26,7 +26,7 @@ import ets.models
 from ets.utils import history_list
 
 
-def waybill_detail(request, waybill, template="waybill/detail.html"):
+def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
     loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
@@ -41,12 +41,14 @@ def waybill_detail(request, waybill, template="waybill/detail.html"):
     loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), ets.models.LoadingDetail))
                         for loading in waybill.loading_details.all())
     
-    return direct_to_template(request, template, {
+    context = {
         'object': waybill,
         'items': waybill.loading_details.select_related(),
         'waybill_history': history_list(waybill_log, ets.models.Waybill),
         'loading_detail_history': loading_details,
-    })
+    }
+    apply_extra_context(extra_context or {}, context)
+    return direct_to_template(request, template, context)
 
 
 @login_required
@@ -72,7 +74,7 @@ def waybill_finalize_dispatch(request, waybill_pk, queryset):
         "waybill": waybill.pk
     })
     
-    return redirect(waybill)
+    return waybill_detail(request, waybill, extra_context={'print_original': True})
 
 
 @login_required
@@ -207,7 +209,7 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
         'waybill': waybill.pk,
     })
 
-    return redirect(waybill)
+    return waybill_detail(request, waybill, extra_context={'print_original': True})
 
 
 @login_required

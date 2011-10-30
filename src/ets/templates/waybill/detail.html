@@ -60,22 +60,17 @@
 {% block script %}
 {{ block.super }}
 <script charset="utf-8">
-  $(document).ready(function() {
+  $(window).load(function() {
+	  
+	  {% if print_original %}
+      print();
+      window.location = '{{ object.get_absolute_url }}';
+    {% else %}
     $('.print_copy').click(function(){
-    	$("#original_lable").addClass('hidden').removeClass('shown');
-    	$("#copy_lable").addClass('shown').removeClass('hidden');
     	print();
     	return false;
     });
-    
-    $('.print_original').click(function() {
-      $("#original_lable").addClass('shown').removeClass('hidden');
-      $("#copy_lable").addClass('hidden').removeClass('shown');
-      print();
-      $("#original_lable").addClass('hidden').removeClass('shown');
-      $("#copy_lable").addClass('shown').removeClass('hidden');
-    });
-    
+    {% endif %}
   });
 </script>
 {% endblock %}
