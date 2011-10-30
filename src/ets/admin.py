@@ -150,6 +150,7 @@ class StockAdmin(admin.ModelAdmin):
     list_display = ('si_code', 'warehouse', 'project_number', 'commodity', 
                     'package', 'number_of_units')
     readonly_fields = ('updated',)
+    raw_id_fields = ('warehouse',)
     list_filter = ('warehouse',)
     search_fields = ('code', 'warehouse__code', 'project_number', 'si_code', 'commodity__name', 'package__name', 'si_record_id', 'origin_id')
 
