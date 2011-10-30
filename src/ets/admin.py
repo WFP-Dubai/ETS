@@ -265,7 +265,7 @@ class PersonAdmin(UserAdmin):
         'username', 'code', 'title', 'get_full_name', 'link_to_compas', 
         'link_to_organization', 'link_to_location', 'is_active'
     )
-    list_editable = ('is_active',)
+    list_editable = ('is_active', 'organization')
     list_filter = ('is_active',)
     search_fields = (
         'code', 'title', 'username', 'first_name', 'last_name', 'email',
