@@ -256,7 +256,7 @@ class PersonAdmin(UserAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     fieldsets = (
-        (None, {'fields': ('username', 'is_active',)}),
+        (None, {'fields': ('username', 'compas', 'organization', 'location', 'is_active',)}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
