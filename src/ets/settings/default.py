@@ -187,6 +187,8 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
 
+DATE_FORMAT = "Y/m/d"
+
 def prefix_url(path, prefix):
     if path.startswith('/'):
         path = path[1:]

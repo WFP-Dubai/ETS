@@ -19,8 +19,8 @@
             </tr>
             <tr>
                 <td><sup>{% trans "Project no." %}</sup> {{ object.order.project_number }}</td>
-                <td><sup>{% trans "Date of Loading" %}:</sup> {{ object.loading_date }}</td>
-                <td><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date }}</td>
+                <td><sup>{% trans "Date of Loading" %}:</sup> {{ object.loading_date|date  }}</td>
+                <td><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date|date }}</td>
             </tr>
             <tr>
                 <td><sup>{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination.name }}</td>

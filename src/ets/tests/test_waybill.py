@@ -213,10 +213,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         """ets.views.waybill_finalize_dispatch"""
         self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.post(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
-
-        self.assertRedirects(response, waybill.get_absolute_url())
-        self.assertTrue(waybill.transport_dispach_signed_date is not None)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['print_original'])
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
@@ -391,9 +389,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.client.login(username='dispatcher', password='dispatcher')
         
         response = self.client.post(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
-        waybill = ets.models.Waybill.objects.get(pk='ISBX00312A')
-
-        self.assertRedirects(response, waybill.get_absolute_url())
+        
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['print_original'])
         
     def test_waybill_compass(self):
         

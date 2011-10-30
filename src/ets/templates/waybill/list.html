@@ -28,14 +28,14 @@
         <td>{{ waybill.order.location }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
-            {{ waybill.transport_dispach_signed_date }}
+            {{ waybill.transport_dispach_signed_date|date }}
           {% else %}
             {% waybill_edit waybill user %}
           {% endif %}
         </td>
         <td>
           {% if waybill.receipt_signed_date %}
-            {{ waybill.receipt_signed_date }}
+            {{ waybill.receipt_signed_date|date }}
           {% else %}
             {% waybill_reception waybill user _("Receive this waybil") %}
           {% endif %}
