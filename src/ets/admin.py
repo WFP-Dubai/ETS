@@ -132,7 +132,7 @@ class OrderItemInline(admin.TabularInline):
     extra = 0
 
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'warehouse', 'consignee', 'created', 'dispatch_date', 'expiry')
+    list_display = ('pk', 'warehouse', 'project_number', 'consignee', 'created', 'dispatch_date', 'expiry')
     readonly_fields = ('created', 'updated')
     list_filter = ('dispatch_date', 'origin_type')
     search_fields = ('code', 'origin_type', 'project_number', 'warehouse__pk', 
