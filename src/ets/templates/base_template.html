@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-{% load i18n compress %}   
+{% load i18n compress extra_tags %}   
 <html lang="en">
 <head>
   <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
@@ -43,6 +43,8 @@
     {% endblock %}
   </div>
   <div class='footer'>
+    {% get_last_update as last_updated %}
+    {% trans "Last updated" %}: {{ last_updated|date:"DATETIME_FORMAT" }}
     {% if user.is_authenticated %}
       {% trans  "Logged in as:" %}<span class="highlight">{{ user.username }} </span>.
     {% else %}
