@@ -4,6 +4,7 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.http import urlencode
+from django.db.models import Sum
 
 from native_tags.decorators import function, block
 
@@ -90,3 +91,9 @@ def person_only(context, nodelist, user):
 @block
 def officer_only(context, nodelist, user):
     return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
+
+
+@register.simple_tag
+def get_last_update():
+    result = StockItem.objects.aggregate(date_updated=Max('updated'))
+    return result['date_updated']
