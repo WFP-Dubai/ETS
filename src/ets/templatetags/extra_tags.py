@@ -4,11 +4,13 @@ from django import template
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.utils.http import urlencode
+from django.db.models import Sum
+from django.db.models.aggregates import Max
 
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem
 from ets.utils import changed_fields
 
 register = template.Library()
@@ -90,3 +92,9 @@ def person_only(context, nodelist, user):
 @block
 def officer_only(context, nodelist, user):
     return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
+
+
+def get_last_update():
+    return StockItem.objects.aggregate(max_date=Max('updated'))['max_date']
+
+get_last_update = function(get_last_update, cache=3600)

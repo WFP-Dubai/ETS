@@ -64,7 +64,7 @@ LANGUAGES = (
 )
 
 USE_I18N = True
-USE_L10N = True
+USE_L10N = False
 
 TIME_ZONE = 'Europe/Rome'
 
@@ -188,6 +188,7 @@ DEBUG_TOOLBAR_CONFIG = {
 }
 
 DATE_FORMAT = "Y/m/d"
+DATETIME_FORMAT = "Y/m/d H:i"
 
 def prefix_url(path, prefix):
     if path.startswith('/'):
