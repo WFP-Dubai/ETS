@@ -5,7 +5,7 @@ from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
-from django.contrib.staticfiles.urls import urlpatterns
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.utils.translation import ugettext as _
 
 from django.contrib import admin #@Reimport
@@ -19,7 +19,7 @@ import ets.models
 
 
 class PrefixedPatterns:
-    urlpatterns += patterns("ets.views",
+    urlpatterns = patterns("ets.views",
 
         ( r'^$', login_required(direct_to_template), {
             'template': 'index.html',
@@ -145,12 +145,13 @@ class PrefixedPatterns:
         ( r'^api/', include('ets.api.urls')),                        
     )
     
-    if settings.DEBUG:
-        urlpatterns += patterns('',
-            (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
-                'document_root': settings.MEDIA_ROOT,
-            }),
-        )
+    #Serve media fields
+    urlpatterns += patterns('',
+        (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    )
+    urlpatterns += staticfiles_urlpatterns()
 
     
 urlpatterns = patterns('',
