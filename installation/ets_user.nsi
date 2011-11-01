@@ -98,7 +98,7 @@ Section "Main" MainProgram
   SetOutPath "$INSTDIR\ETS"
   File /r "${pkgdir}\ETS\*"
   FileOpen $8 $INSTDIR\ETS\runserver.bat w 
-  FileWrite $8 "$\"$INSTDIR\ETS\bin\instance.exe$\" runserver"
+  FileWrite $8 "$\"$INSTDIR\ETS\bin\instance.exe$\" runserver --insecure"
   FileClose $8
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
 SectionEnd
