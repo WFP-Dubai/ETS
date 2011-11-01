@@ -8,6 +8,7 @@
 Name "${PRODUCT_NAME}"
 Caption "Installation ${PRODUCT_NAME} - ${PRODUCT_DESCRIPTION} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}.exe" 
+RequestExecutionLevel admin
 InstallDir "$PROGRAMFILES\ETS"
 
 !define MUI_ABORTWARNING
