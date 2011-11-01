@@ -23,7 +23,7 @@ InstallDir "$PROGRAMFILES\ETS"
      'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"' 
 
 InstType "Auto"
-InstType "Custom"
+InstType "Manual"
 
 SectionGroup /e "Requirements"
 
@@ -96,5 +96,9 @@ Section "Main" MainProgram
   SectionIn 1 2
   SetOutPath "$INSTDIR\ETS"
   File /r "${pkgdir}\ETS\*"
+  FileOpen $8 $INSTDIR\ETS\runserver.bat w 
+  FileWrite $8 "$\"$INSTDIR\ETS\bin\instance.exe$\" runserver"
+  FileClose $8
+  CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
 SectionEnd
  

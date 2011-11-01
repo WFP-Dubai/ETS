@@ -31,9 +31,9 @@ InstallDir "$PROGRAMFILES\ETS"
      'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"' 
 
 InstType "Auto"
-InstType "Custom"
+InstType "Manual"
 InstType "Auto (ETS from Internet)"
-InstType "Custom (ETS from Internet)"
+InstType "Manual (ETS from Internet)"
 
 SectionGroup /e "Requirements"
 
@@ -114,7 +114,6 @@ SectionEnd
 SectionGroupEnd
 
 Section "PIL" SecPIL
-  SectionIn 1 2 3 4
   SetOutPath "$TEMP"
   File "${pkgdir}\PIL-1.1.7.win32-py2.7.exe"
   ExecWait "$TEMP\PIL-1.1.7.win32-py2.7.exe"
@@ -173,7 +172,7 @@ SectionGroup "ETS"
 Section "Main" MainProgram
   SectionIn 1 2
   SetOutPath "$INSTDIR\ETS"
-  File /r "${pkgdir}\ETS\*"
+;  File /r "${pkgdir}\ETS\*"
 SectionEnd
  
 Section "From Internet" MainProgramInternet
