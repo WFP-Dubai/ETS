@@ -239,3 +239,83 @@ Build project using buildout and run it::
   sudo ./bin/buildout -c production.cfg
   sudo chown -R www-dada:www-data /opt/ETS
   sudo ./bin/instance createsuperuser
+
+Offliner on Windows XP
+======================
+
+Requirements
+------------
+
+Python
+~~~~~~
+
+Installation links:
+
+http://www.python.org/download/
+http://www.python.org/ftp/python/2.7.2/python-2.7.2.msi
+
+Post install:
+
+Add Python binary("C:\Python27" and "C:\Python27\Scripts") on the system PATH
+
+Pywin
+~~~~~
+
+Installation links:
+
+http://starship.python.net/crew/mhammond/win32/Downloads.html
+http://sourceforge.net/projects/pywin32/files/pywin32/Build216/pywin32-216.win32-py2.7.exe/download
+
+MinGW
+~~~~~
+
+Installation links:
+
+http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/
+http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110802/mingw-get-inst-20110802.exe/download
+
+Post install:
+
+Make sure to copy "cc1.exe" and "collect2.exe" from the "C:\MinGW\libexec\gcc\mingw32\3.4.5" folder to the "C:\MinGW\bin" folder.
+Now put the install location's bin subfolder (for example "C:\MinGW\bin") in your system PATH in the same way you put Python in it.
+Create a file called 'distutils.cfg' in "C:\Python26\Lib\distutils".
+[build]
+compiler=mingw32
+
+PIL
+~~~
+
+You must have istalled Python before
+
+Installation links:
+
+http://www.pythonware.com/products/pil/
+http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe
+
+
+Git
+~~~
+
+Installation links:
+
+http://code.google.com/p/msysgit/downloads/list
+http://msysgit.googlecode.com/files/Git-1.7.4-preview20110204.exe
+
+Subversion
+~~~~~~~~~~
+
+Installation links:
+(it's require registration)
+
+http://www.collab.net/downloads/subversion/
+
+Build project
+-------------
+
+python bootstrap.py
+bin\buildout -c windows.cfg
+
+Run project
+-----------
+
+bin\instance runserver
