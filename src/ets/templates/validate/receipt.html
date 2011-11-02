@@ -1,6 +1,8 @@
 {% extends "validate/dispatch.html" %}
 {% load i18n extra_tags %}
 
+{% block title %}{% trans "Submit Receipt to Compas" %}{% endblock %}
+
 {% block page_title %}{% trans "Validate Receipt" %}{% endblock %}
 
 {% block validate_link %}{% validate_receipt waybill user %}{% endblock %}

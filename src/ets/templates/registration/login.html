@@ -1,5 +1,8 @@
 {% extends "base_template.html"%}
 {% load i18n %}
+
+{% block title %}{% trans "Authentication" %}{% endblock %}
+
 {% block content %}
 
 {% if form.errors %}
