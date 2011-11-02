@@ -1,6 +1,8 @@
 {% extends "base_template.html"%}
 {% load i18n extra_tags %}
 
+{% block title %}{% trans "Orders" %}{% endblock %}
+
 {% block content %}
 
 <h3>{% trans "Orders" %} {% if warehouse_pk %} to warehouse: {{ warehouse_pk }}{% endif %}</h3>
