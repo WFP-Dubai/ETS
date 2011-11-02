@@ -610,7 +610,7 @@ class Waybill( ld_models.Model ):
     def decompress(cls, data):
         try:
             wb_serialized = zlib.decompress( base64.b64decode( data ) )
-        except TypeError:
+        except:
             pass
         else:
             #Extend field names
