@@ -6,6 +6,7 @@ from django.core import serializers
 
 from piston.emitters import Emitter, DjangoEmitter
 from piston.handler import BaseHandler
+
 import ets.models
 
 
@@ -47,6 +48,7 @@ class JSONOfflineHandler(BaseHandler):
             objects = serializers.deserialize('python', data)
             for wrapper in objects:
                 wrapper.save()
+        return True
     
 
 class DjangoJSONEmitter(DjangoEmitter):

@@ -1,9 +1,14 @@
 {% extends "base_template.html"%}
 
-<h1>Authorize Token</h1>
+{% load i18n %}
+
+{% block title %}{% trans "Authorize Token" %}{% endblock %}
+
+{% block content %}
 
 <form action="{% url piston.authentication.oauth_user_auth %}" method="POST">
   {{ form.as_table }}
   <button type="submit">Confirm</button>
 </form>
 
+{% endblock %}

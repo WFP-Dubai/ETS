@@ -34,6 +34,9 @@ install_requires = [
         'PIL',
         'pyqrcode',
         'pygments',
+        'httplib2 >= 0.7.1',
+        'oauth2',
+        'django_concurrent_test_server',
 ]
 
 #Extra dependencies for test purposes

@@ -134,7 +134,15 @@ class PrefixedPatterns:
         ( r'^import_data/$', "import_file", {}, "import_data" ),
         ( r'^export_data/$', "export_file", {}, "export_data" ),
         ( r'^synchronize/$', "request_update", {}, "synchronize" ),
+        ( r'^syncro/$', "syncro", {}, "syncro" ),
     )
+
+    urlpatterns += patterns('piston.authentication',
+        (r'^oauth/request_token/$','oauth_request_token'),
+        (r'^oauth/authorize/$','oauth_user_auth'),
+        (r'^oauth/access_token/$','oauth_access_token'),
+    )
+
     
     urlpatterns += patterns('',
         ( r'^accounts/', include('django.contrib.auth.urls') ),
