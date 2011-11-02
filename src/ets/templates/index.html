@@ -13,7 +13,7 @@
 
 {% person_only user %}
 <ul>
-  <li><a href='{% url orders %}'>{% trans "View LTIs and Create Waybills" %}</a></li>
+  <li><a href='{% url orders %}'>{% trans "Dispatch Waybills" %}</a></li>
 </ul>
 <ul>
   <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waiting for Dispatch" %}</a></li>
@@ -26,13 +26,13 @@
   
 {% officer_only user %}
 <ul>
-  <li><a href='{% url dispatch_validates %}'>{% trans "Submit Dispatch to Compas" %}</a></li>
-  <li><a href='{% url receipt_validates %}'>{% trans "Submit Receipt to Compas" %}</a></li>
+  <li><a href='{% url dispatch_validates %}'>{% trans "Validate Dispatched Waybills" %}</a></li>
+  <li><a href='{% url receipt_validates %}'>{% trans "Validate Received Waybills" %}</a></li>
 </ul>
 
 <ul>
-  <li><a href='{% url compass_waybill %}'>{% trans "Waybills Submitted to Compas" %}</a></li>
-  <li><a href='{% url compass_waybill_receipt %}'>{% trans "Receipt Waybills Submitted to Compas" %}</a></li>
+  <li><a href='{% url compass_waybill %}'>{% trans "List Dispatches Submitted to COMPAS" %}</a></li>
+  <li><a href='{% url compass_waybill_receipt %}'>{% trans "List Receipts Submitted to COMPAS" %}</a></li>
 
   <li><a href="{% url synchronization %}">{% trans "Synchronization with offline instances" %}</a></li>
 </ul>  
