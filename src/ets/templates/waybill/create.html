@@ -48,5 +48,6 @@ $(document).ready(function() {
   $('#{{ form.dispatch_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
   $('#{{ form.loading_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });                
 });
+$(document).keydown(omit_enter);
 </script>
 {% endblock %}
