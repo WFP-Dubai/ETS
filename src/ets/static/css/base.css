@@ -19,13 +19,13 @@ body {
 }
 
 .footer {
-  font-size: 10px;
-  font-family: sans-serif; 
+  font-size: 13px;
   border-top-width: 1px; 
   border-top-style: solid; 
   border-top: black;
   text-align: right;
   clear: both;
+  font-family: serif; 
 }
     
 .content {
@@ -43,7 +43,6 @@ body {
 .menu { 
   font-weight: bold; 
   font-family: serif; 
-  text-shadow: 1px 1px 1px; 
   text-align: right;
 }
 

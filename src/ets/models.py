@@ -417,22 +417,19 @@ class Waybill( ld_models.Model ):
                         ( u'SWA', _(u'Swap' )),
                         ( u'REP', _(u'Repayment' )),
                         ( u'SAL', _(u'Sale' )),
-                        ( u'ADR', _(u'Air drop' )),
-                        ( u'INL', _(u'Inland Shipment' )),
                         ( u'DIS', _(u'Distribution' )),
                         ( u'LON', _(u'Loan' )),
                         ( u'DSP', _(u'Disposal' )),
                         ( u'PUR', _(u'Purchase' )),
                         ( u'SHU', _(u'Shunting' )),
-                        ( u'COS', _(u'Costal Transshipment' )),
                 )
     TRANSPORT_TYPES = ( 
                         ( u'02', _(u'Road' )),
-                        ( u'01', _(u'Rail' )),
-                        ( u'04', _(u'Air' )),
-                        ( u'I', _(u'Inland Waterways' )),
-                        ( u'C', _(u'Costal Waterways' )),
-                        ( u'07', _(u'Multi-mode' )),
+                        #( u'01', _(u'Rail' )),
+                        #( u'04', _(u'Air' )),
+                        #( u'I', _(u'Inland Waterways' )),
+                        #( u'C', _(u'Costal Waterways' )),
+                        #( u'07', _(u'Multi-mode' )),
 #                        (u'O', _(u'Other Please Specify'))
                 )
     
@@ -655,15 +652,15 @@ class LoadingDetail(models.Model):
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=7, decimal_places=3)
+    number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
 
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 
-                                            max_digits=10, decimal_places=3) #numberUnitsGood
+                                            max_digits=12, decimal_places=3) #numberUnitsGood
     number_units_lost = models.DecimalField(_("number Units Lost"), default=0, 
-                                            max_digits=10, decimal_places=3 ) #numberUnitsLost
+                                            max_digits=12, decimal_places=3 ) #numberUnitsLost
     number_units_damaged = models.DecimalField(_("number Units Damaged"), default=0, 
-                                               max_digits=10, decimal_places=3 ) #numberUnitsDamaged
+                                               max_digits=12, decimal_places=3 ) #numberUnitsDamaged
     
     #Reasons
     units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("Lost Reason"), 

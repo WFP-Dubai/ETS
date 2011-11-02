@@ -83,7 +83,7 @@ class EpicStock( models.Model ):
     
     qualitycode = models.CharField(_("Quality code"), max_length = 1 )
     qualitydescr = models.CharField(_("Quality descr "), max_length = 11, blank = True )
-    quantity_net = models.DecimalField(_("Quantity net"), null = True, max_digits = 12, decimal_places = 3, blank = True )
+    quantity_net = models.DecimalField(_("Quantity net"), max_digits = 12, decimal_places = 3, blank = True, null=True)
     quantity_gross = models.DecimalField(_("Quantity gross"), null = True, max_digits = 12, decimal_places = 3, blank = True )
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     

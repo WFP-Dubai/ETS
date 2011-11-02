@@ -13,30 +13,28 @@
 
 {% person_only user %}
 <ul>
-  <li><a href='{% url orders %}'>{% trans "List Of Orders" %}</a></li>
+  <li><a href='{% url orders %}'>{% trans "View LTIs and Create Waybills" %}</a></li>
 </ul>
 <ul>
-  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Dispatch" %}</a></li>
-  <li><a href='{% url waybill_reception_list %}'>{% trans "Receipt" %}</a></li>
+  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waiting for Dispatch" %}</a></li>
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Wayting for Receipt" %}</a></li>
 </ul>
 <ul>  
-  <li><a href='{% url view_stock %}'>{% trans "Stocks" %}</a></li>  
-  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
+  <li><a href='{% url view_stock %}'>{% trans "List of Stock Items" %}</a></li>  
 </ul>
 {% endperson_only %}
   
 {% officer_only user %}
 <ul>
-  <li><a href='{% url dispatch_validates %}'>{% trans "Validate Dispatch Waybill" %}</a></li>
-  <li><a href='{% url receipt_validates %}'>{% trans "Validate Received Waybill" %}</a></li>
+  <li><a href='{% url dispatch_validates %}'>{% trans "Submit Dispatch to Compas" %}</a></li>
+  <li><a href='{% url receipt_validates %}'>{% trans "Submit Receipt to Compas" %}</a></li>
 </ul>
 
 <ul>
   <li><a href='{% url compass_waybill %}'>{% trans "Waybills Submitted to Compas" %}</a></li>
   <li><a href='{% url compass_waybill_receipt %}'>{% trans "Receipt Waybills Submitted to Compas" %}</a></li>
 
-  <li><a href="{% url select_report %}">{% trans "Reports" %}</a></li>
-  <li><a href="{% url synchronization %}">{% trans "Synchronization" %}</a></li>
+  <li><a href="{% url synchronization %}">{% trans "Synchronization with offline instances" %}</a></li>
 </ul>  
 {% endofficer_only %}
 
@@ -59,5 +57,8 @@
   </li>
 </ul>
 
+<ul>
+  <li><a href="{% url select_report %}">{% trans "Request Reports in CSV Format" %}</a></li>
+</ul>
   
 {% endblock %}
