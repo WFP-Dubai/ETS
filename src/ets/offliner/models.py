@@ -6,12 +6,20 @@ from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Max
 
+from ets.models import Waybill
+
 API_URL = 'http://10.11.208.242/ets/api/offline/%s/'
 WAREHOUSE = 'ISBX002'
 
 class UpdateLog( models.Model ):
+    
     date = models.DateTimeField(_("Update date"), default=datetime.datetime.now(), editable=False)
     serialized_data = models.TextField(_("Serialized data"))
+    
+    class Meta:
+        ordering = ('date',)
+        verbose_name = _('Offline import logger')
+        verbose_name_plural = _("Loggers")
     
     @classmethod
     def updata_data(cls, data):
@@ -29,3 +37,9 @@ class UpdateLog( models.Model ):
                 'last_updated': start_date or cls.objects.aggregate(max_date=Max('date'))['max_date']
         }).read()
         cls.updata_data(data)
+
+    
+class WaybillSync(models.Model):
+    
+    waybill = models.OneToOneField(Waybill, verbose_name=_("Waybill"), related_name="offline_sync")
+    date = models.DateTimeField(_("date/time"), default=datetime.datetime.now)
