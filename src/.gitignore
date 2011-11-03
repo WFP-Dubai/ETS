@@ -3,3 +3,4 @@
 /django-debug-toolbar
 /django-logicaldelete
 /pyqrcode
+/django-google-analytics

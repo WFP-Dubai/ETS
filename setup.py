@@ -34,6 +34,7 @@ install_requires = [
         'PIL',
         'pyqrcode',
         'pygments',
+        'google_analytics',
 ]
 
 #Extra dependencies for test purposes

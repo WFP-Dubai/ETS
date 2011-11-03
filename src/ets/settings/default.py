@@ -135,6 +135,7 @@ INSTALLED_APPS = (
     'logicaldelete',
     'native_tags',
     'compressor',
+    'google_analytics',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
