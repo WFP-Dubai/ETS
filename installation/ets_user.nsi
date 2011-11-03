@@ -147,16 +147,6 @@ Section "Main" MainProgram
   FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "GenericRead + GenericWrite"
-  nsExec::Exec 'python $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\"'
+  nsExec::Exec "$\"$INSTDIR\Python27\python$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
 SectionEnd
-
- 
-Function .onSelChange
-
-  !insertmacro StartRadioButtons $1
-    !insertmacro RadioButton ${SecPythonAuto}
-    !insertmacro RadioButton ${SecPythonManual}
-  !insertmacro EndRadioButtons
-
-FunctionEnd 
