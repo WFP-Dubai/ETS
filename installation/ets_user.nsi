@@ -2,14 +2,23 @@
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
 !define PRODUCT_VERSION "0.0.1"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
+Var SYSTEMDRIVE
 
 !include "MUI2.nsh"
 !include "WriteEnvStr.nsh"
+!include LogicLib.nsh
 Name "${PRODUCT_NAME}"
 Caption "Installation ${PRODUCT_NAME} - ${PRODUCT_DESCRIPTION} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}.exe" 
+InstallDir ""
 ;RequestExecutionLevel admin
-InstallDir "$PROGRAMFILES\ETS"
+
+Function .onInit
+  StrCpy $SYSTEMDRIVE $PROGRAMFILES 2
+  StrCpy $INSTDIR "$SYSTEMDRIVE\ETS" 
+FunctionEnd 
+
+
 
 !define MUI_ABORTWARNING
 
@@ -22,6 +31,75 @@ InstallDir "$PROGRAMFILES\ETS"
 
 !define ReadEnvStr_RegKey \
      'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"' 
+
+
+
+
+!define StrStr "!insertmacro StrStr"
+ 
+!macro StrStr ResultVar String SubString
+  Push `${String}`
+  Push `${SubString}`
+  Call StrStr
+  Pop `${ResultVar}`
+!macroend
+ 
+
+
+Function StrStr
+/*After this point:
+  ------------------------------------------
+  $R0 = SubString (input)
+  $R1 = String (input)
+  $R2 = SubStringLen (temp)
+  $R3 = StrLen (temp)
+  $R4 = StartCharPos (temp)
+  $R5 = TempStr (temp)*/
+ 
+  ;Get input from user
+  Exch $R0
+  Exch
+  Exch $R1
+  Push $R2
+  Push $R3
+  Push $R4
+  Push $R5
+ 
+  ;Get "String" and "SubString" length
+  StrLen $R2 $R0
+  StrLen $R3 $R1
+  ;Start "StartCharPos" counter
+  StrCpy $R4 0
+ 
+  ;Loop until "SubString" is found or "String" reaches its end
+  ${Do}
+    ;Remove everything before and after the searched part ("TempStr")
+    StrCpy $R5 $R1 $R2 $R4
+ 
+    ;Compare "TempStr" with "SubString"
+    ${IfThen} $R5 == $R0 ${|} ${ExitDo} ${|}
+    ;If not "SubString", this could be "String"'s end
+    ${IfThen} $R4 >= $R3 ${|} ${ExitDo} ${|}
+    ;If not, continue the loop
+    IntOp $R4 $R4 + 1
+  ${Loop}
+ 
+/*After this point:
+  ------------------------------------------
+  $R0 = ResultVar (output)*/
+ 
+  ;Remove part before "SubString" on "String" (if there has one)
+  StrCpy $R0 $R1 `` $R4
+ 
+  ;Return output to user
+  Pop $R5
+  Pop $R4
+  Pop $R3
+  Pop $R2
+  Pop $R1
+  Exch $R0
+FunctionEnd
+
 
 InstType "Auto"
 InstType "Manual"
@@ -40,7 +118,10 @@ Section "Auto" SecPythonAuto
   File "${pkgdir}\python-2.7.2.msi"
   ExecWait "msiexec.exe /i $\"$TEMP\python-2.7.2.msi$\" /qn TARGETDIR=$\"$INSTDIR\Python27$\""
   Delete "$TEMP\python-2.7.2.msi" 
-  StrCpy $R0 '$R0;$INSTDIR\Python27\;$INSTDIR\Python27\Scripts'
+  ${StrStr} $R1 $R0 '$INSTDIR\Python27\;$INSTDIR\Python27\Scripts'
+  ${If} $R1 == ""
+    StrCpy $R0 '$R0;$INSTDIR\Python27\;$INSTDIR\Python27\Scripts'
+  ${EndIf}
 SectionEnd
 
 Section "Manual" SecPythonManual
@@ -74,17 +155,10 @@ Section "Main" MainProgram
   SetOutPath "$INSTDIR\ETS"
   File /r "${pkgdir}\ETS\*"
   FileOpen $8 $INSTDIR\ETS\runserver.bat w 
-  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure"
+  FileWrite $8 "explorer http://127.0.0.1:8000/ets$\r$\n"
+  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
+  AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
+  nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
 SectionEnd
-
- 
-Function .onSelChange
-
-  !insertmacro StartRadioButtons $1
-    !insertmacro RadioButton ${SecPythonAuto}
-    !insertmacro RadioButton ${SecPythonManual}
-  !insertmacro EndRadioButtons
-
-FunctionEnd 
