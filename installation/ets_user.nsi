@@ -2,6 +2,7 @@
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
 !define PRODUCT_VERSION "0.0.1"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
+Var SYSTEMDRIVE
 
 !include "MUI2.nsh"
 !include "WriteEnvStr.nsh"
@@ -9,8 +10,15 @@
 Name "${PRODUCT_NAME}"
 Caption "Installation ${PRODUCT_NAME} - ${PRODUCT_DESCRIPTION} ${PRODUCT_VERSION}"
 OutFile "${PRODUCT_NAME}-${PRODUCT_VERSION}.exe" 
+InstallDir ""
 ;RequestExecutionLevel admin
-InstallDir "$PROGRAMFILES\ETS"
+
+Function .onInit
+  StrCpy $SYSTEMDRIVE $PROGRAMFILES 2
+  StrCpy $INSTDIR "$SYSTEMDRIVE\ETS" 
+FunctionEnd 
+
+
 
 !define MUI_ABORTWARNING
 
@@ -25,6 +33,8 @@ InstallDir "$PROGRAMFILES\ETS"
      'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"' 
 
 
+
+
 !define StrStr "!insertmacro StrStr"
  
 !macro StrStr ResultVar String SubString
@@ -34,6 +44,8 @@ InstallDir "$PROGRAMFILES\ETS"
   Pop `${ResultVar}`
 !macroend
  
+
+
 Function StrStr
 /*After this point:
   ------------------------------------------
@@ -146,7 +158,7 @@ Section "Main" MainProgram
   FileWrite $8 "explorer http://127.0.0.1:8000/ets$\r$\n"
   FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
-  AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "GenericRead + GenericWrite"
-  nsExec::Exec "$\"$INSTDIR\Python27\python$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
+  AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
+  nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
 SectionEnd
