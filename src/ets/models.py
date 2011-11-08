@@ -591,12 +591,13 @@ class Waybill( ld_models.Model ):
 
         ])
         
-        if self.receipt_person:
+        if self.receipt_signed_date:
             objects.update((
                 self.receipt_person, self.receipt_person.location,
                 self.receipt_person.organization, self.receipt_person.compas,
                 
-                self.destination, self.destination.location, self.destination.organization,
+                self.destination, self.destination.location,
+                self.destination.organization, self.destination.compas,
             ))
         #Loading details
         for ld in self.loading_details.select_related():
@@ -604,9 +605,10 @@ class Waybill( ld_models.Model ):
                 ld, ld.stock_item, ld.stock_item.package, 
                 ld.stock_item.commodity, ld.stock_item.commodity.category,
             ))
-            if self.receipt_person:
+            if self.receipt_signed_date:
                 objects.update((
-                    ld.units_damaged_reason, ld.units_lost_reason
+                    ld.units_damaged_reason, ld.units_damaged_reason.category,
+                    ld.units_lost_reason, ld.units_lost_reason.category,
                 ))
         
         #Serialize
