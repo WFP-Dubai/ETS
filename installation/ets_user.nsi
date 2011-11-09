@@ -18,8 +18,6 @@ Function .onInit
   StrCpy $INSTDIR "$SYSTEMDRIVE\ETS" 
 FunctionEnd 
 
-
-
 !define MUI_ABORTWARNING
 
 !insertmacro MUI_PAGE_WELCOME
@@ -33,8 +31,6 @@ FunctionEnd
      'HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment"' 
 
 
-
-
 !define StrStr "!insertmacro StrStr"
  
 !macro StrStr ResultVar String SubString
@@ -44,8 +40,6 @@ FunctionEnd
   Pop `${ResultVar}`
 !macroend
  
-
-
 Function StrStr
 /*After this point:
   ------------------------------------------

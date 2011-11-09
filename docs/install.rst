@@ -258,13 +258,6 @@ Post install:
 
 Add Python binary("C:\Python27" and "C:\Python27\Scripts") on the system PATH
 
-Pywin
-~~~~~
-
-Installation links:
-
-http://starship.python.net/crew/mhammond/win32/Downloads.html
-http://sourceforge.net/projects/pywin32/files/pywin32/Build216/pywin32-216.win32-py2.7.exe/download
 
 MinGW
 ~~~~~
@@ -309,13 +302,50 @@ Installation links:
 
 http://www.collab.net/downloads/subversion/
 
-Build project
--------------
 
-python bootstrap.py
-bin\buildout -c windows.cfg
+Building EXE
+------------
 
-Run project
------------
+Install NSIS
+~~~~~~~~~~~~
 
-bin\instance runserver
+Run command::
+  apt-get install nsis
+
+Go to directory ETS/installation
+
+AccessControl.dll, AccessControlW.dll - for access rights on files
+copy to nsis folder - Plugins (/usr/share/nsis/Include/)
+
+WriteEnvStr.nsh - additional function for writing variables to system PATH
+copy to nsis folder - Include (/usr/share/nsis/Plugins/)
+
+Open ets_admin.nsi or ets_users.nsi and check variable "pkgdir" (path for exe-files and ETS):
+/home/werty/django_apps/ETS/windows/
+
+For making package for users you must make package for admins (makensis ets_admin.nsi) or to use prepared exe.
+This package will install only dependencies for compiling main program. You can check its in requirment section before.
+
+Compiling ETS-folder on Windows:
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+- Install exe-file on Windows 
+- Check internet connection
+- Go to directory ETS 
+- Run this commands in console::
+    git clone http://github.com/WFP-Dubai/ETS.git
+    python bootstrap.py
+    bin\buildout -c windows.cfg
+
+Copy sub-directory ETS to "pkgdir"
+You can clean this directory(without .pyo, .pyc, windows)::
+  rm -r ETS/windows
+  find ETS/ -type f -name "*.pyo" -delete
+  find ETS/ -type f -name "*.pyc" -delete
+
+Build exe for users::
+  makensis ets_users.nsi
+
+You can use result exe-file for installation on user's computers.
+You must put initial.json to directory with exe-file.
+It will load fixtures (start data for user)
