@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.aggregates import Max
 
 from ets.models import Waybill
+from ets.compress import decompress_json
 
 API_URL = 'http://10.11.208.242/ets/api/offline/%s/'
 WAREHOUSE = 'ISBX002'
@@ -24,7 +25,12 @@ class UpdateLog( models.Model ):
     @classmethod
     def updata_data(cls, data):
         """Deserializes data and saves them"""
+        
+        #Decompress field names
+        data = decompress_json(data)
+        #Deserialize them
         objects = serializers.deserialize('json', data)
+        #And save
         for wrapper in objects:
             wrapper.save()
         

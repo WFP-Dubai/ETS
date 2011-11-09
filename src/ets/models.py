@@ -611,20 +611,13 @@ class Waybill( ld_models.Model ):
         #Serialize
         data = serializers.serialize('json', objects, use_decimal=False)
         
-        #Cut field names
-        data = compress_json(data)
+        return compress_json(data)
         
-        return base64.b64encode( zlib.compress( data ) )
     
     @classmethod
     def decompress(cls, data):
-        try:
-            wb_serialized = zlib.decompress( base64.b64decode( data ) )
-        except (zlib.error, TypeError):
-            pass
-        else:
-            #Extend field names
-            wb_serialized = decompress_json(wb_serialized)
+        wb_serialized = decompress_json(data)
+        if wb_serialized:
             
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):

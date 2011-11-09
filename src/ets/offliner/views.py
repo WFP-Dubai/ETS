@@ -28,10 +28,11 @@ def request_update(request):
 @require_POST
 @login_required
 def import_file(request, form_class=ImportDataForm):
-    """imports file with data"""    
+    """Imports file with data."""    
     form = form_class(request.POST or None, request.FILES or None)
     if form.is_valid():
         file = form.cleaned_data['file']
+        #File is supposed to be small (< 4Mb)
         UpdateLog.updata_data(file.read())
     return redirect('synchronization')
 
@@ -48,7 +49,7 @@ def export_file(request, form_class=ExportDataForm):
 
 @login_required
 def export_waybills(request, template, form_class=DateRangeForm):
-    """exports all waybills from selected period"""
+    """exports all offline waybills from selected period"""
     
     end_date = datetime.date.today()
     start_date = end_date - datetime.timedelta(days=7)
@@ -60,7 +61,7 @@ def export_waybills(request, template, form_class=DateRangeForm):
         start_date = form.cleaned_data['start_date']
         end_date = form.cleaned_data['end_date']
         
-        waybills = Waybill.objects.filter(transport_dispach_signed_date__range=(start_date, end_date+datetime.timedelta(1)))
+        waybills = Waybill.objects.filter(date_modified__range=(start_date, end_date+datetime.timedelta(1)))
         items = LoadingDetail.objects.filter(waybill__in=waybills)
         
         data = serializers.serialize('json', chain(waybills, items), use_decimal=False)

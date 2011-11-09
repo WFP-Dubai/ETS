@@ -1,5 +1,7 @@
 ### -*- coding: utf-8 -*- ####################################################
 
+import base64, zlib
+
 COMPRESS_MAPPING = (
     ('"_order":', '"_o":'),
     ('"receipt_signed_date":', '"r":'),
@@ -93,16 +95,23 @@ COMPRESS_MAPPING = (
 )
 
 def compress_json(data):
-    """Replaces all long field names with short ones"""
+    """Replaces all long field names with short ones, than compresses it with zlib and base64"""
     for full_field, cut_field in COMPRESS_MAPPING:
         data = data.replace(full_field, cut_field)
 
-    return data
+    return base64.b64encode( zlib.compress( data ) )
 
 
 def decompress_json(data):
     """Replaces all short abbreviations with real field names"""
-    for full_field, cut_field in COMPRESS_MAPPING:
-        data = data.replace(cut_field, full_field)
+    
+    try:
+        data = zlib.decompress( base64.b64decode( data ) )
+    except (zlib.error, TypeError):
+        pass
+    else:
+        #Extend field names
+        for full_field, cut_field in COMPRESS_MAPPING:
+            data = data.replace(cut_field, full_field)
     
     return data 
