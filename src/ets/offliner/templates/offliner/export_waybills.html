@@ -1,0 +1,26 @@
+{% extends "base_template.html"%}
+
+{% load i18n extra_tags uni_form_tags %}
+
+{% block title %}{% trans "Export waybills" %}{% endblock %}
+
+{% block content %}
+
+<h1>{% trans "Export waybills" %}</h1>
+
+{% uni_form form form.helper %}
+
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function() {
+  $('#{{ form.start_date.auto_id }}, #{{ form.end_date.auto_id }}').datepicker({ 
+	   maxDate: '{% now "y-m-d" %}', 
+	   dateFormat: 'yy-mm-dd'
+	});
+});
+$(document).keydown(omit_enter);
+</script>
+{% endblock %}

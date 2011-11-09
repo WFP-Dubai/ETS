@@ -91,3 +91,18 @@ COMPRESS_MAPPING = (
     ('"fields":', '"f":'),
     ('"model":', '"m":'),
 )
+
+def compress_json(data):
+    """Replaces all long field names with short ones"""
+    for full_field, cut_field in COMPRESS_MAPPING:
+        data = data.replace(full_field, cut_field)
+
+    return data
+
+
+def decompress_json(data):
+    """Replaces all short abbreviations with real field names"""
+    for full_field, cut_field in COMPRESS_MAPPING:
+        data = data.replace(cut_field, full_field)
+    
+    return data 

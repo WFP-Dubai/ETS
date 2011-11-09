@@ -21,7 +21,7 @@ from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models 
 
-from .compress import COMPRESS_MAPPING
+from .compress import compress_json, decompress_json
 from .country import COUNTRY_CHOICES
 
 #name = "1234"
@@ -612,8 +612,7 @@ class Waybill( ld_models.Model ):
         data = serializers.serialize('json', objects, use_decimal=False)
         
         #Cut field names
-        for full_field, cut_field in COMPRESS_MAPPING:
-            data = data.replace(full_field, cut_field)
+        data = compress_json(data)
         
         return base64.b64encode( zlib.compress( data ) )
     
@@ -625,8 +624,7 @@ class Waybill( ld_models.Model ):
             pass
         else:
             #Extend field names
-            for full_field, cut_field in COMPRESS_MAPPING:
-                wb_serialized = wb_serialized.replace(cut_field, full_field)
+            wb_serialized = decompress_json(wb_serialized)
             
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):

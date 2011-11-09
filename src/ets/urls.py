@@ -129,12 +129,6 @@ class PrefixedPatterns:
         ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
         
     )
-    urlpatterns += patterns("ets.offliner.views",
-        ( r'^synchronization/$', "synchronization", {}, "synchronization"),
-        ( r'^import_data/$', "import_file", {}, "import_data" ),
-        ( r'^export_data/$', "export_file", {}, "export_data" ),
-        ( r'^synchronize/$', "request_update", {}, "synchronize" ),
-    )
     
     urlpatterns += patterns('',
         ( r'^accounts/', include('django.contrib.auth.urls') ),
@@ -142,7 +136,8 @@ class PrefixedPatterns:
         ( r'^rosetta/', include('rosetta.urls') ),
         ( r'^admin/', include( admin.site.urls ) ),
         ( r'^api/offline/', include('ets.offliner.api.urls')),
-        ( r'^api/', include('ets.api.urls')),                        
+        ( r'^api/', include('ets.api.urls')),
+        ( r'^offliner/', include('ets.offliner.urls')),                        
     )
     
     #Serve media fields
