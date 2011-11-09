@@ -1,14 +1,10 @@
 # Django settings for ets project.
-import os.path
-
 from .default import *
 
-# Local settings for development / production
-try:
-    from local_settings import *
-except ImportError:
-    pass
-
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
-DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)
+COMPRESS_ENABLED = False
+
+DATABASES = {
+    'default': DEFAULT_DATABASE,
+}

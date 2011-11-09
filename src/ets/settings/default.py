@@ -182,6 +182,8 @@ LOGIN_URL = prefix_url(LOGIN_URL, URL_PREFIX)
 LOGOUT_URL = prefix_url(LOGOUT_URL, URL_PREFIX)
 LOGIN_REDIRECT_URL = prefix_url(LOGIN_REDIRECT_URL, URL_PREFIX)
 
+ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
+
 #Default life time of order (months)
 DEFAULT_ORDER_LIFE = 3
 
