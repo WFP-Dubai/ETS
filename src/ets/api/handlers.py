@@ -66,13 +66,10 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     def read(self, request, waybill="", warehouse="", destination=""):
         """Return loading details for waybills in CSV"""
         load_details = self.model.objects.all()
-        print "perm --> ", request.user.has_perm("ets.loadingetail_api_full_access")
         if not request.user.has_perm("ets.loadingetail_api_full_access"):
             warehouses = Warehouse.filter_by_user(request.user)
             load_details = load_details.filter(Q(waybill__order__warehouse__in=warehouses) 
                                                | Q(waybill__destination__in=warehouses))
-        
-        print "load_details --> ", load_details
         
         filter_arg = {}
         if warehouse: 
