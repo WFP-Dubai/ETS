@@ -104,9 +104,9 @@ urlpatterns = patterns('',
     (r'^order_items/$', order_items_resource, FORMAT_CSV, "api_order_items"),
     
     # For StockItems CSV API
-    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/basic/$', stock_items_resource_basic, FORMAT_CSV, "api_stock_items_basic_auth"),
+    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     
     #Warehouses
     (r'^warehouses/$', warehouses_resource, FORMAT_CSV, "api_warehouses"),
