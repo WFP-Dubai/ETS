@@ -41,7 +41,6 @@ class ReadCSVWaybillHandler(BaseHandler):
 
     def read(self, request, slug="", warehouse="", destination=""):
         """Return waybills in CSV"""
-        #return self.model.objects.all().annotate(total_net=Sum('loading_details__calculate_total_net'))
         waybills = self.model.objects.all()
         if not request.user.is_superuser:
             waybills = waybills.filter(order__warehouse__in=Warehouse.filter_by_user(request.user))
@@ -126,7 +125,7 @@ class ReadCSVOrderItemsHandler(BaseHandler):
         if not request.user.is_superuser:
             order_items = order_items.filter(order__warehouse__in=Warehouse.filter_by_user(request.user))
         filter_arg = {}
-        #queryset = queryset.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+        
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
         if destination:
