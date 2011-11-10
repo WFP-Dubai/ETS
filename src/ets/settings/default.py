@@ -215,7 +215,6 @@ NATIVE_TAGS = ()
 #Loading details settings
 LOADING_LINES = 5
 
-
 class DatabasesFormDatabase(object):
     
     default = 'default'

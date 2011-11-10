@@ -9,6 +9,7 @@ from itertools import chain
 
 #from django.http import Http404
 #import httplib, logging
+from django.conf import settings
 from django.core import serializers
 from django.db.models import Q, Sum, Count, ForeignKey
 from django.http import HttpResponse
@@ -65,8 +66,14 @@ class ReadCSVLoadingDetailHandler(BaseHandler):
     def read(self, request, waybill="", warehouse="", destination=""):
         """Return loading details for waybills in CSV"""
         load_details = self.model.objects.all()
-        if not request.user.is_superuser:
-            load_details = load_details.filter(waybill__order__warehouse__in=Warehouse.filter_by_user(request.user))
+        print "perm --> ", request.user.has_perm("ets.loadingetail_api_full_access")
+        if not request.user.has_perm("ets.loadingetail_api_full_access"):
+            warehouses = Warehouse.filter_by_user(request.user)
+            load_details = load_details.filter(Q(waybill__order__warehouse__in=warehouses) 
+                                               | Q(waybill__destination__in=warehouses))
+        
+        print "load_details --> ", load_details
+        
         filter_arg = {}
         if warehouse: 
             filter_arg['waybill__order__warehouse__pk'] = warehouse
@@ -151,7 +158,8 @@ class ReadCSVStockItemsHandler(BaseHandler):
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
         stock_items = self.model.objects.all()
-        if not request.user.is_superuser:
+        
+        if not request.user.has_perm("ets.stockitem_api_full_access"):
             stock_items = stock_items.filter(warehouse__in=Warehouse.filter_by_user(request.user))
         
         if warehouse: 

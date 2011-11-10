@@ -219,7 +219,7 @@ class StockItem( models.Model ):
     package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
     quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
-    quality_description = models.CharField(_("Quality description "), max_length=11, blank=True) #qualitydescr
+    quality_description = models.CharField(_("Quality description"), max_length=11, blank=True) #qualitydescr
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
@@ -229,7 +229,7 @@ class StockItem( models.Model ):
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
-    si_record_id = models.CharField(_("SI record id "), max_length=25, primary_key=False)
+    si_record_id = models.CharField(_("SI record id"), max_length=25, primary_key=False)
     origin_id = models.CharField(_("Origin identifier"), max_length=23)
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
     

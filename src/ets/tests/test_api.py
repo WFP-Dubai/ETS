@@ -4,7 +4,8 @@ import StringIO
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Permission
+from django.conf import settings
 
 #from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
@@ -67,6 +68,26 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         
+        #Super user has access to all data
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse("api_loading_details"))
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        self.assertEqual(len(list(dict_reader)), 7)
+        
+        #Test user with special permissions
+        user = User.objects.get(username="admin")
+        user.is_superuser = False
+        user.save()
+        
+        user.user_permissions.add(Permission.objects.get(codename="loadingetail_api_full_access"))
+        
+        response = self.client.get(reverse("api_loading_details"))
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        self.assertEqual(len(list(dict_reader)), 7)
+        
+        
     def test_get_orders(self):
 
         order = ets.models.Order.objects.get(pk='OURLITORDER')
@@ -127,6 +148,25 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
         self.assertEqual(item['Warehouse'], warehouse.code)
+        
+        #Super user has access to all data
+        self.client.login(username="admin", password="admin")
+        response = self.client.get(reverse("api_stock_items"))
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        self.assertEqual(len(list(dict_reader)), 7)
+        
+        #Test user with special permissions
+        user = User.objects.get(username="admin")
+        user.is_superuser = False
+        user.save()
+        
+        user.user_permissions.add(Permission.objects.get(codename="stockitem_api_full_access"))
+        
+        response = self.client.get(reverse("api_stock_items"))
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result)
+        self.assertEqual(len(list(dict_reader)), 7)
     
     def test_warehouses(self):
         

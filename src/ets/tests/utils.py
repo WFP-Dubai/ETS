@@ -32,7 +32,7 @@ class TestCaseMixin(object):
     
     #multi_db = True
     compas = 'ISBX002'
-    fixtures = ('db_compas.json', 'warehouse.json')
+    fixtures = ('db_compas.json', 'warehouse.json', 'groups.json', 'permissions.json')
     
     def setUp(self):
         "Hook method for setting up the test fixture before exercising it."

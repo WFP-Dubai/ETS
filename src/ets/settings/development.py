@@ -14,6 +14,8 @@ MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
 DEBUG = True
 
+COMPRESS_ENABLED = False
+
 DEBUG_TOOLBAR_PANELS = (
         #'debug_toolbar.panels.version.VersionDebugPanel',
         'debug_toolbar.panels.timer.TimerDebugPanel',
@@ -40,5 +42,3 @@ except ImportError:
 TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)
-
-#COMPRESS_ENABLED = True

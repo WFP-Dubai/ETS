@@ -1,0 +1,26 @@
+[
+    {
+        "pk": 1,
+        "model": "auth.permission", 
+        "fields": {
+          "codename": "loadingetail_api_full_access",
+          "content_type": [
+            "ets", 
+            "loadingdetail"
+          ],
+          "name": "Can download full waybill details"
+        }
+    },
+    {
+        "pk": 2,
+        "model": "auth.permission", 
+        "fields": {
+          "codename": "stockitem_api_full_access",
+          "content_type": [
+            "ets", 
+            "stockitem"
+          ],
+          "name": "Can download full stock report"
+        }
+    }
+]

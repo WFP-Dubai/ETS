@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 #import piston.authentication
 from piston.resource import Resource
 from piston.doc import documentation_view
+from piston.authentication import HttpBasicAuthentication
 
 
 from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler, ReadCSVWarehouseHandler
@@ -37,11 +38,22 @@ CSV_WH_HEADERS = {'Content-Disposition': 'attachment; filename=warehouses-%s.csv
 
 FORMAT_CSV = {'emitter_format': 'csv'}
 
+authentication = HttpBasicAuthentication(realm='ETS API HTTP')
+
+#Waybills
 waybills_resource = login_required(expand_response(Resource(ReadCSVWaybillHandler), CSV_WAYBILLS_HEADERS))
 loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
+loading_details_resource_basic = expand_response(Resource(ReadCSVLoadingDetailHandler, authentication=authentication), 
+                                                 CSV_LOADING_DETAILS_HEADERS)
+
+#Orders
 orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
 order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
+
 stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
+stock_items_resource_basic = expand_response(Resource(ReadCSVStockItemsHandler, authentication=authentication), 
+                                             CSV_STOCK_ITEMS_HEADERS)
+
 warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))
 
 
@@ -65,8 +77,9 @@ urlpatterns = patterns('',
         FORMAT_CSV, "api_loading_details"),
     (r'^loading_details/destination/(?P<destination>[-\w]+)/$', loading_details_resource, 
         FORMAT_CSV, "api_loading_details"),                 
-    (r'^loading_details/(?P<waybill>[-\w]+)/$', loading_details_resource, FORMAT_CSV, "api_loading_details"),
     (r'^loading_details/$', loading_details_resource, FORMAT_CSV, "api_loading_details"),
+    (r'^loading_details/basic/$', loading_details_resource_basic, FORMAT_CSV, "api_loading_details_basic_auth"),
+    (r'^loading_details/(?P<waybill>[-\w]+)/$', loading_details_resource, FORMAT_CSV, "api_loading_details"),
     
     # For Order CSV API
     (r'^orders/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', orders_resource, 
@@ -93,6 +106,7 @@ urlpatterns = patterns('',
     # For StockItems CSV API
     (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
+    (r'^stock_items/basic/$', stock_items_resource_basic, FORMAT_CSV, "api_stock_items_basic_auth"),
     
     #Warehouses
     (r'^warehouses/$', warehouses_resource, FORMAT_CSV, "api_warehouses"),
