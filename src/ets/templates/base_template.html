@@ -44,7 +44,7 @@
   <div class='footer'>
     {% get_last_update as last_updated %}
     {% trans "Last updated" %}: <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong> |
-    {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.
+    {% if is_logged_in %}{% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
   </div>
 {% endspaceless %}
   

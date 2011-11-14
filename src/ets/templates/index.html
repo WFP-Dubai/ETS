@@ -13,11 +13,11 @@
 
 {% person_only user %}
 <ul>
-  <li><a href='{% url orders %}'>{% trans "Dispatch Waybills" %}</a></li>
+  <li><a href='{% url orders %}'>{% trans "List LTIs / Dispatch Waybills" %}</a></li>
 </ul>
 <ul>
-  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waiting for Dispatch" %}</a></li>
-  <li><a href='{% url waybill_reception_list %}'>{% trans "Wayting for Receipt" %}</a></li>
+  <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waybills waiting for Dispatch signature" %}</a></li>
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Waybills pending Receipting" %}</a></li>
 </ul>
 <ul>  
   <li><a href='{% url view_stock %}'>{% trans "List of Stock Items" %}</a></li>  
@@ -41,8 +41,8 @@
 <ul>
   <li>
     <form method='GET' action='{% url waybill_search %}'>
-      {{ form.as_p }}
-      <input type="submit" value="{% trans 'Search Waybill' %}">
+      {{ form }}
+       <input type="submit" value="{% trans 'Search for Waybill' %}">
     </form>
   </li>
 </ul>
@@ -50,7 +50,7 @@
 <ul>
   <li>
     <form method='GET' action='{% url deserialize %}'>
-      {{ form_scan.as_p }}
+      {{ form_scan.as_p }} ( Paste scanned barcode into box )
       <input type="submit" value="{% trans 'Scan Waybill' %}" />
       <input type="submit" name="receipt" value="{% trans 'Receipt Waybill' %}" />
    </form>

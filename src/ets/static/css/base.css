@@ -176,3 +176,7 @@ table.summary {
 ul.messages li.info {
   color: green;
 }
+
+li {
+padding-bottom: 10px;
+}
