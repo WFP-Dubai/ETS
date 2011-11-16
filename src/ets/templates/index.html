@@ -50,7 +50,7 @@
 <ul>
   <li>
     <form method='GET' action='{% url deserialize %}'>
-      {{ form_scan.as_p }} ( Paste scanned barcode into box )
+      {{ form_scan }} ( Paste scanned barcode into box )
       <input type="submit" value="{% trans 'Scan Waybill' %}" />
       <input type="submit" name="receipt" value="{% trans 'Receipt Waybill' %}" />
    </form>
