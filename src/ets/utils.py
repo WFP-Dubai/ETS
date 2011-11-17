@@ -24,23 +24,23 @@ def update_compas(using):
     try:
         import_persons(using)
     except:
-        pass
+        print 'Problem importing Person'
     #Update stocks
     try:
         import_stock(using)
     except:
-        pass
+        print 'Problem importing Stock'
     #Update loss, damage reasons
     try:
         ets_models.LossDamageType.update(using)
     except:
-        pass
+        print 'Problem importing LossDamageType'
     
     #Update orders
     try:
         import_order(using)
     except:
-        pass
+        print 'Problem importing LTIs'
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
