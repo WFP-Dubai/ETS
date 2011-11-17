@@ -17,8 +17,6 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    #Update places
-    import_places(using)
     
     #Update persons
     try:
@@ -35,6 +33,8 @@ def update_compas(using):
         ets_models.LossDamageType.update(using)
     except:
         print 'Problem importing LossDamageType'
+    #Update places
+    import_places(using)
     
     #Update orders
     try:
