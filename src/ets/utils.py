@@ -21,17 +21,23 @@ def update_compas(using):
     import_places(using)
     
     #Update persons
-    import_persons(using)
-    
+    try:
+        import_persons(using)
+    except:
+        pass
     #Update stocks
-    import_stock(using)
-    
+    try:
+        import_stock(using)
+    except:
+        pass
     #Update loss, damage reasons
     ets_models.LossDamageType.update(using)
     
     #Update orders
-    import_order(using)
-    
+    try:
+        import_order(using)
+    except:
+        pass
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
