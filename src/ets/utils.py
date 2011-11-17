@@ -31,7 +31,10 @@ def update_compas(using):
     except:
         pass
     #Update loss, damage reasons
-    ets_models.LossDamageType.update(using)
+    try:
+        ets_models.LossDamageType.update(using)
+    except:
+        pass
     
     #Update orders
     try:
