@@ -306,7 +306,7 @@ def deserialize(request, form_class=WaybillScanForm):
                 return redirect('waybill_reception_scanned', scanned_code=data )
             return waybill_detail(request, waybill)
 
-    messages.error(request, _('Data Incorrect!!!'))
+    messages.error(request, _('Incorrect Data !!!! Ensure a valid barcode information is pasted'))
     return redirect('index')
 
 
