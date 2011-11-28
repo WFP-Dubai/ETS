@@ -79,9 +79,11 @@ def waybill_finalize_dispatch(request, waybill_pk, queryset):
 
 @login_required
 @waybill_user_related
-def waybill_list(request, queryset, template='waybill/list.html'):
+def waybill_list(request, queryset, template='waybill/list.html', extra_context=None):
     """Shows waybill listing"""
-    return direct_to_template(request, template, {'object_list': queryset,})
+    context = {'object_list': queryset,}
+    apply_extra_context(extra_context or {}, context)
+    return direct_to_template(request, template, context)
 
 @login_required
 def waybill_search( request, form_class=WaybillSearchForm, 

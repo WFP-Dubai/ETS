@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy, ugettext as _
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -50,8 +50,12 @@ class PrefixedPatterns:
         ( r'^search/$', "waybill_search", {
             'queryset': ets.models.Waybill.objects.all(),
         }, "waybill_search" ),
-        ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), {}, "waybill_dispatch_list" ),
-        ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), {}, "waybill_reception_list" ),
+        ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), {
+            "extra_context": {"extra_title": _("Waybills waiting for Dispatch signature")}
+        }, "waybill_dispatch_list" ),
+        ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), {
+            "extra_context": {"extra_title": _("Waybills pending Receipting")}
+        }, "waybill_reception_list" ),
         
         ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
             "template": 'waybill/detail.html',

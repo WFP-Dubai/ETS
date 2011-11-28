@@ -4,7 +4,7 @@
 {% block title %}{% trans "List of waybills" %}{% endblock %}
 
 {% block content %}
-<h3>{% trans "List of waybills" %}</h3>
+<h3>{% if extra_title %}{{ extra_title }}{% else %}{% trans "List of waybills" %}{% endif %}</h3>
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
   <thead>
     <tr>
