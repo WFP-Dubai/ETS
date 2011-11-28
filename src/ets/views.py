@@ -3,7 +3,7 @@ import pyqrcode
 import cStringIO
 
 from django import forms
-from django.contrib.auth.decorators import login_required
+#from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 #from django.core import serializers
 from django.forms.models import inlineformset_factory

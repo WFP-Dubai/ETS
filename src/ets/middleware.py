@@ -9,8 +9,8 @@ class RequiredAuthenticationMiddleware(AuthenticationMiddleware):
     def process_request(self, request):
         super(RequiredAuthenticationMiddleware, self).process_request(request)
         
-        if not request.user.id:
-            return login(request, extra_context={"extra_error": ugettext("The system requires you to be authorized.")})
+        if not request.user.is_authenticated():
+            return login(request, extra_context={"extra_error": ugettext("The system requires you to be authenticated.")})
         elif not request.user.is_active:
             return login(request, extra_context={"extra_error": ugettext("Your account is not active.")})
         else:
