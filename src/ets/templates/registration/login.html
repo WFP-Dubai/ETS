@@ -5,6 +5,10 @@
 
 {% block content %}
 
+{% if extra_error %}
+<p class="error">{{ extra_error }}</p>
+{% endif %}
+
 {% if form.errors %}
 <p class="error">{% trans "Your username and password didn't match. Please try again. If you have forgotten your username or password please contact your Compas Contact person" %}</p>
 {% endif %}

@@ -99,8 +99,10 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    
+    'ets.middleware.RequiredAuthenticationMiddleware',
+    
     
     'audit_log.middleware.UserLoggingMiddleware',
 )
@@ -152,6 +154,7 @@ LOGOUT_URL = '/accounts/logout/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_NAME = 'ets'
+SESSION_COOKIE_AGE = 60 * 30 # 30 minutes ago of cookie
 
 WAYBILL_LETTER = 'A'
 
