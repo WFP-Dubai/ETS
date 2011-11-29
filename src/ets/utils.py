@@ -353,13 +353,17 @@ def send_received(using):
         waybill.save()
             
 
-def changed_fields(model, next, previous):
+def changed_fields(model, next, previous, exclude=()):
+    print exclude
     for field in model._meta.fields:
-        if previous is not None and getattr(next, field.name) != getattr(previous, field.name):
+        print field.name
+        if previous is not None \
+        and getattr(next, field.name) != getattr(previous, field.name) \
+        and field.name not in exclude:
             yield field.verbose_name, getattr(next, field.name)
     
     
-def history_list(log_queryset, model):
+def history_list(log_queryset, model, exclude=()):
     
     ACTIONS = {
         'I': _('Created'),
@@ -368,4 +372,4 @@ def history_list(log_queryset, model):
     }
     
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
-        yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev)
+        yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)

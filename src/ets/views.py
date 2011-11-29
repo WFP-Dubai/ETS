@@ -44,7 +44,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
     context = {
         'object': waybill,
         'items': waybill.loading_details.select_related(),
-        'waybill_history': history_list(waybill_log, ets.models.Waybill),
+        'waybill_history': history_list(waybill_log, ets.models.Waybill, ('date_modified',)),
         'loading_detail_history': loading_details,
     }
     apply_extra_context(extra_context or {}, context)

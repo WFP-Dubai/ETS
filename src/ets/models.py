@@ -683,7 +683,7 @@ class LoadingDetail(models.Model):
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
-    audit_log = AuditLog()
+    audit_log = AuditLog(exclude=('date_modified',))
 
     class Meta:
         ordering = ('slug',)
@@ -739,7 +739,8 @@ class LoadingDetail(models.Model):
         return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
     
     def clean(self):
-        
+        super(LoadingDetail, self).clean()
+
         #clean number of items
         if self.number_of_units \
         and (self.number_units_good or self.number_units_damaged or self.number_units_lost) \
@@ -750,14 +751,14 @@ class LoadingDetail(models.Model):
             })
         
         #overloaded units for dispatch
-        if not self.waybill.transport_dispach_signed_date:
+        if self.stock_item_id and not self.waybill.transport_dispach_signed_date:
             order_item = self.get_order_item()
             if order_item.items_left() < self.number_of_units and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
     
         #overloaded units for reception
         total = self.number_units_good + self.number_units_damaged + self.number_units_lost
-        if total > self.number_of_units and not self.over_offload_units:
+        if self.number_of_units and total > self.number_of_units and not self.over_offload_units:
             raise ValidationError(_("Over offloaded for %.3f units") % (total - self.number_of_units,))
         
         #Clean units_lost_reason
