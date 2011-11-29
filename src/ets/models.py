@@ -145,6 +145,9 @@ class Person(User):
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
     location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
     
+    dispatch = models.BooleanField(_("Can dispatch"), default=True)
+    receive = models.BooleanField(_("Can receive"), default=True)
+    
     class Meta:
         ordering = ('code',)
         verbose_name = _('person')

@@ -259,6 +259,7 @@ class PersonAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'compas', 'organization', 'location', 'is_active',)}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
+        (_('Actions'), {'fields': ('dispatch', 'receive')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
 
