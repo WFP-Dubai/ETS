@@ -16,18 +16,20 @@
       {{ formset.management_form }}
       <thead class="bordered">
         <tr>
-          <th>Stock item</th>
-          <th>Number of Units</th>
-          <th>Overloaded Units</th>
+          <th>{% trans "Stock item" %}</th>
+          <th>{% trans "Number of Units" %}</th>
+          <th>{% trans "Overloaded Units" %}</th>
+          {% if formset.can_delete %}<th style="background-color: red;">{% trans "Delete" %}</th>{% endif %}
         </tr>
       </thead>
       <tbody>
         {% for form in formset %}
-          <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
+          <tr colspan="{% if formset.can_delete %}7{% else %}6{% endif %}">{% include "uni_form/errors.html" %}</tr>
           <tr>
             <td>{% include "uni_form/uni_field.html" with field=form.stock_item %} {{ form.slug }}</td>
             <td>{% include "uni_form/uni_field.html" with field=form.number_of_units %}</td>
             <td>{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
+            {% if formset.can_delete %}<th>{{ form.DELETE }}</th>{% endif %}
           </tr>
         {% endfor %}
         
@@ -36,6 +38,7 @@
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.stock_item %}</td>
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.number_of_units %}</td>
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.overloaded_units %}</td>
+          {% if formset.can_delete %}<th>{{ formset.empty_form.DELETE }}</th>{% endif %}
         </tr>
       
       </tbody>
@@ -71,7 +74,7 @@
 	        	 el.attr('name', el.attr('name').replace('__prefix__', count_forms));
 	       });
 	       countFormsField.val(parseInt(count_forms) + 1);
-	       var holder = empty_form.insertBefore(etalon);
+	       var holder = empty_form.removeClass(etalonClass).insertBefore(etalon);
 	       
 	       if (success) success(holder);
 	       return false;

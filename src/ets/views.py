@@ -110,7 +110,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                        form=FormsetForm, formset=formset_class, 
                        extra=5, max_num=5,
-                       can_order=False, can_delete=False)\
+                       can_order=False, can_delete=True)\
         (request.POST or None, request.FILES or None, prefix='item', instance=waybill)
     
     form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)

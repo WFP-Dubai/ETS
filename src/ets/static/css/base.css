@@ -180,3 +180,7 @@ ul.messages li.info {
 li {
 padding-bottom: 10px;
 }
+
+.etalon {
+  display: none;
+}
