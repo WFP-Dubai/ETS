@@ -19,28 +19,19 @@ def update_compas(using):
     
     
     #Update persons
-    try:
-        import_persons(using)
-    except:
-        print 'Problem importing Person'
+    import_persons(using)
+
     #Update stocks
-    try:
-        import_stock(using)
-    except:
-        print 'Problem importing Stock'
+    import_stock(using)
+
     #Update loss, damage reasons
-    try:
-        ets_models.LossDamageType.update(using)
-    except:
-        print 'Problem importing LossDamageType'
+    ets_models.LossDamageType.update(using)
+
     #Update places
     import_places(using)
     
     #Update orders
-    try:
-        import_order(using)
-    except:
-        print 'Problem importing LTIs'
+    import_order(using)
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
@@ -159,13 +150,12 @@ def import_order(compas):
     
     with transaction.commit_on_success(compas) as tr:
         places = _get_places(compas)
-        
+
         for lti in compas_models.LtiOriginal.objects.using(compas)\
                             .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                     consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
-            
             #Update Consignee
             # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
             consignee = ets_models.Organization.objects.get(pk=lti.consegnee_code)

@@ -51,7 +51,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.client.logout()
         #Check login
         response = self.client.get(reverse('index'))
-        self.assertEqual(response.status_code, 302)
+        self.assertContains(response, "The system requires you to be authenticated.")
         
         response = self.client.get(reverse('index'), follow=True)
         self.assertEqual(response.status_code, 200)
