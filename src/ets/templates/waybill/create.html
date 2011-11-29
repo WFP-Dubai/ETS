@@ -12,7 +12,7 @@
     {% include "uni_form/errors_formset.html" %}
     <fieldset>
     <legend>{% trans "Loading details" %}</legend>    
-    <table>
+    <table id="loadingdetails">
       {{ formset.management_form }}
       <thead class="bordered">
         <tr>
@@ -22,16 +22,25 @@
         </tr>
       </thead>
       <tbody>
-      {% for form in formset %}
-        <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
-        <tr>
-          <td>{% include "uni_form/uni_field.html" with field=form.stock_item %} {{ form.slug }}</td>
-          <td>{% include "uni_form/uni_field.html" with field=form.number_of_units %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
+        {% for form in formset %}
+          <tr colspan="6">{% include "uni_form/errors.html" %}</tr>
+          <tr>
+            <td>{% include "uni_form/uni_field.html" with field=form.stock_item %} {{ form.slug }}</td>
+            <td>{% include "uni_form/uni_field.html" with field=form.number_of_units %}</td>
+            <td>{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
+          </tr>
+        {% endfor %}
+        
+        {# empty image formset form #}
+        <tr class="etalon">
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.stock_item %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.number_of_units %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.overloaded_units %}</td>
         </tr>
-      {% endfor %}
+      
       </tbody>
     </table>
+    <a href="#" class="items-add-more" id="add-item-link">{% trans "Append more items" %}</a>
     </fieldset>
     {% uni_form form form.helper %}
     <div class="buttonHolder">
@@ -44,9 +53,39 @@
 {% block script %}
 {{ block.super }}
 <script charset="utf-8" type="text/javascript">
+
+(function($) {
+	  $.fn.formset = function(addLink, etalonClass, countFormsField, success) {
+	    var container = $(this);
+	    var etalon = container.find('.'+etalonClass);
+	    
+	    addLink.click(function(){
+	       var empty_form = etalon.clone();
+	       var count_forms = countFormsField.val();
+
+	       empty_form.find('div, select, input').each(function(index, domEle){
+	         var el = $(domEle);
+	         if (el.attr('id')) 
+	        	 el.attr('id', el.attr('id').replace('__prefix__', count_forms));
+	         if (el.attr('name')) 
+	        	 el.attr('name', el.attr('name').replace('__prefix__', count_forms));
+	       });
+	       countFormsField.val(parseInt(count_forms) + 1);
+	       var holder = empty_form.insertBefore(etalon);
+	       
+	       if (success) success(holder);
+	       return false;
+	    });
+	  };
+	})(jQuery);
+
 $(document).ready(function() {
   $('#{{ form.dispatch_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
-  $('#{{ form.loading_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });                
+  $('#{{ form.loading_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
+  
+  $("#loadingdetails").formset($("#add-item-link"), 'etalon', 
+		  $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
+  
 });
 $(document).keydown(omit_enter);
 </script>
