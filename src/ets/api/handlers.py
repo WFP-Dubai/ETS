@@ -5,6 +5,7 @@ import csv
 import StringIO
 from types import DictType
 from itertools import chain
+import sys
 
 
 #from django.http import Http404
@@ -14,6 +15,7 @@ from django.core import serializers
 from django.db.models import Q, Sum, Count, ForeignKey
 from django.http import HttpResponse
 from django.utils.datastructures import SortedDict
+from django.utils.translation import ugettext
 
 from piston.handler import BaseHandler
 from piston.utils import rc
@@ -154,19 +156,24 @@ class ReadCSVStockItemsHandler(BaseHandler):
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
         stock_items = self.model.objects.all()
-        
+            
         if not request.user.has_perm("ets.stockitem_api_full_access"):
             stock_items = stock_items.filter(warehouse__in=Warehouse.filter_by_user(request.user))
         
         if warehouse: 
             stock_items = stock_items.filter(warehouse=warehouse)
+            
         titles = get_titles(self.model)
-        titles.update(get_titles(ets.models.Warehouse))   
+        titles.update(get_titles(ets.models.Warehouse))
+        titles['commodity'] = ugettext("Commodity name")
         result = [titles]
-        for item in stock_items.values():
-            stock_items_data = ets.models.Warehouse.objects.filter(pk=item['warehouse_id']).values()[0]
-            stock_items_data.update(item)
-            result.append(stock_items_data)  
+        for item in stock_items:
+            data = dict((t, unicode(getattr(item, t, None))) for t in titles.keys() if hasattr(item, t))
+            
+            stock_items_data = ets.models.Warehouse.objects.filter(pk=item.warehouse.pk).values()[0]
+            data.update(stock_items_data)
+            
+            result.append(data)
         return result
 
 
