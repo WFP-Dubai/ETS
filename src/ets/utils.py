@@ -354,9 +354,7 @@ def send_received(using):
             
 
 def changed_fields(model, next, previous, exclude=()):
-    print exclude
     for field in model._meta.fields:
-        print field.name
         if previous is not None \
         and getattr(next, field.name) != getattr(previous, field.name) \
         and field.name not in exclude:
