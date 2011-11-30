@@ -269,7 +269,7 @@ def get_flattened_field_names(fields):
             yield field_name
         elif isinstance(field_name, (tuple, list)):
             for wrapped_field in get_flattened_field_names(field_name[1]):
-                yield "%s/%s" % (field_name[0], wrapped_field)
+                yield "%s.%s" % (field_name[0], wrapped_field)
 
 
 def get_flattened_data(data):
@@ -280,7 +280,7 @@ def get_flattened_dict(data):
     for name, value in data.items():
         if isinstance(value, dict):
             for wrapped_key, wrapped_value in get_flattened_dict(value):
-                yield "%s/%s" % (name, wrapped_key), wrapped_value
+                yield "%s.%s" % (name, wrapped_key), wrapped_value
         else:
             yield name, value
 
