@@ -9,11 +9,11 @@
     <td>{% trans "Orders reports" %}</td>
   </tr>
   <tr>
-    <td>{% trans "Orders Report" %} </td>
+    <td>{% trans "Order Report" %} </td>
     <td><a href='{% url api_orders %}'>{% trans "download" %}</a></td>
   </tr>
   <tr>
-    <td>{% trans "Recipient Report: All items for warehouses" %}</td>
+    <td>{% trans "Detailed Order Report: All items for warehouses" %}</td>
     <td><a href='{% url api_order_items %}'>
       {% trans "download" %}</a>
     </td>
@@ -35,9 +35,6 @@
   <tr>
     <td>{% trans "Waybill Report: All items for warehouses" %} </td>
     <td><a href='{% url api_waybills %}'>{% trans "download" %}</a></td>
-  </tr>
-  <tr class='reports-title'>
-    <td>{% trans "Detailed Waybill Reports" %}</td>
   </tr>
   <tr>
     <td>{% trans "Detailed Waybill Report: All items for warehouses" %} </td>

@@ -11,9 +11,8 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 from piston.authentication import HttpBasicAuthentication
 
-
-from .handlers import ReadCSVLoadingDetailHandler, ReadCSVStockItemsHandler, ReadCSVWarehouseHandler
-from .handlers import ReadCSVOrdersHandler, ReadCSVOrderItemsHandler, ReadCSVWaybillHandler
+from .handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadCSVWarehouseHandler
+from .handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandler
 #from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
@@ -41,17 +40,17 @@ FORMAT_CSV = {'emitter_format': 'csv'}
 authentication = HttpBasicAuthentication(realm='ETS API HTTP')
 
 #Waybills
-waybills_resource = login_required(expand_response(Resource(ReadCSVWaybillHandler), CSV_WAYBILLS_HEADERS))
-loading_details_resource = login_required(expand_response(Resource(ReadCSVLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
-loading_details_resource_basic = expand_response(Resource(ReadCSVLoadingDetailHandler, authentication=authentication), 
+waybills_resource = login_required(expand_response(Resource(ReadWaybillHandler), CSV_WAYBILLS_HEADERS))
+loading_details_resource = login_required(expand_response(Resource(ReadLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
+loading_details_resource_basic = expand_response(Resource(ReadLoadingDetailHandler, authentication=authentication), 
                                                  CSV_LOADING_DETAILS_HEADERS)
 
 #Orders
-orders_resource = login_required(expand_response(Resource(ReadCSVOrdersHandler), CSV_ORDERS_HEADERS))
-order_items_resource = login_required(expand_response(Resource(ReadCSVOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
+orders_resource = login_required(expand_response(Resource(ReadOrdersHandler), CSV_ORDERS_HEADERS))
+order_items_resource = login_required(expand_response(Resource(ReadOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
 
-stock_items_resource = login_required(expand_response(Resource(ReadCSVStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
-stock_items_resource_basic = expand_response(Resource(ReadCSVStockItemsHandler, authentication=authentication), 
+stock_items_resource = login_required(expand_response(Resource(ReadStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
+stock_items_resource_basic = expand_response(Resource(ReadStockItemsHandler, authentication=authentication), 
                                              CSV_STOCK_ITEMS_HEADERS)
 
 warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))

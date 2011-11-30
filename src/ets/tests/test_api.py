@@ -60,7 +60,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['Order'], self.get_waybill().order.pk)
+        self.assertEqual(item['waybill/order/code'], self.get_waybill().order.pk)
         # Loading details for some destination and some warehouse
         response = self.client.get(reverse("api_loading_details", kwargs={"warehouse": self.get_waybill().order.warehouse.code, 
                                                                     "destination": self.get_waybill().destination.code}))
@@ -102,7 +102,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['Code'], order.code)
+        self.assertEqual(item['code'], order.code)
         # Orders with destination and warehouse
         response = self.client.get(reverse("api_orders", kwargs={"warehouse": order.warehouse.code, 
                                                         "destination": order.consignee.warehouses.all()[0].code}))
@@ -125,7 +125,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['Code'], order.code)
+        self.assertEqual(item['order/code'], order.code)
         # Order items for some destination and some warehouse
         response = self.client.get(reverse("api_order_items", kwargs={"warehouse": order.warehouse.code, 
                                                         "destination": order.consignee.warehouses.all()[0].code}))
@@ -147,7 +147,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['Warehouse'], warehouse.code)
+        self.assertEqual(item['warehouse/code'], warehouse.code)
         
         #Super user has access to all data
         self.client.login(username="admin", password="admin")
@@ -178,5 +178,5 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result)
         item = dict_reader.next()
-        self.assertEqual(item['Warehouse code'], "ISBX002")
+        self.assertEqual(item['code'], "ISBX002")
         
