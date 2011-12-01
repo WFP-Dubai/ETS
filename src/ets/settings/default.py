@@ -156,7 +156,7 @@ LOGOUT_URL = '/accounts/logout/'
 
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_COOKIE_NAME = 'ets'
-SESSION_COOKIE_AGE = 60 * 30 # 30 minutes ago of cookie
+SESSION_COOKIE_AGE = 60 * 30 # 30 minutes age of cookie
 
 WAYBILL_LETTER = 'A'
 
