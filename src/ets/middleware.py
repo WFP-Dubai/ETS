@@ -11,7 +11,6 @@ class RequiredAuthenticationMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         
         #DIRTY HACK. CHANGE IT LATER.
-        print view_func
         if hasattr(view_func, 'authentication') and  isinstance(view_func.authentication, HttpBasicAuthentication):
             return
         
