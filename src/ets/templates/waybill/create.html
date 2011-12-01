@@ -8,7 +8,7 @@
 
 {% if form.errors or formset.errors %}<span style="color:red;">{% trans "You have some errors. Correct them" %}</span>{% endif %}
 
-<form method="POST" action="" class="uniForm">
+<form method="POST" action="" class="uniForm">{% csrf_token %}
     {% include "uni_form/errors_formset.html" %}
     <fieldset>
     <legend>{% trans "Loading details" %}</legend>    
