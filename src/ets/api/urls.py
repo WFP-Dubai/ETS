@@ -19,7 +19,7 @@ from .handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandl
 class ExpandedResource(Resource):
     
     def __init__(self, handler, authentication=None, headers=None):
-        super(ExpandedResource, self).__init__(handler, authentication)
+        super(ExpandedResource, self).__init__(handler=handler, authentication=authentication)
         self.headers = headers or {}
     
     @vary_on_headers('Authorization')
