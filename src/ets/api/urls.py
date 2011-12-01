@@ -4,6 +4,7 @@ import datetime
 from django.conf.urls.defaults import patterns
 #from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.vary import vary_on_headers
 #from django.core.urlresolvers import reverse
 
 #import piston.authentication
@@ -21,6 +22,7 @@ class ExpandedResource(Resource):
         super(ExpandedResource, self).__init__(handler, authentication)
         self.headers = headers or {}
     
+    @vary_on_headers('Authorization')
     def __call__(self, request, *args, **kwargs):
         response = super(ExpandedResource, self).__call__(request, *args, **kwargs)
         for header, value in self.headers.items():
