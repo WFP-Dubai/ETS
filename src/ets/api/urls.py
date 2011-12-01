@@ -13,12 +13,20 @@ from piston.authentication import HttpBasicAuthentication
 
 from .handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadCSVWarehouseHandler
 from .handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandler
-#from cj.authenticators import PermissibleHttpBasicAuthentication
 
 
-#permhttpauth = PermissibleHttpBasicAuthentication(realm='eTVnet mall API http')
+class ExpandedResource(Resource):
+    
+    def __init__(self, handler, authentication=None, headers=None):
+        super(ExpandedResource, self).__init__(handler, authentication)
+        self.headers = headers or {}
+    
+    def __call__(self, request, *args, **kwargs):
+        response = super(ExpandedResource, self).__call__(request, *args, **kwargs)
+        for header, value in self.headers.items():
+            response[header] = value
+        return response
 
-#AUTHENTICATORS = [permhttpauth, ]
 def expand_response(view, headers):
     #@wraps(view)
     def wrapper(request, *args, **kwargs):
@@ -42,16 +50,19 @@ authentication = HttpBasicAuthentication(realm='ETS API HTTP')
 #Waybills
 waybills_resource = login_required(expand_response(Resource(ReadWaybillHandler), CSV_WAYBILLS_HEADERS))
 loading_details_resource = login_required(expand_response(Resource(ReadLoadingDetailHandler), CSV_LOADING_DETAILS_HEADERS))
-loading_details_resource_basic = expand_response(Resource(ReadLoadingDetailHandler, authentication=authentication), 
-                                                 CSV_LOADING_DETAILS_HEADERS)
+
+loading_details_resource_basic = ExpandedResource(ReadLoadingDetailHandler, 
+                                                  authentication=authentication, 
+                                                  headers=CSV_LOADING_DETAILS_HEADERS)
 
 #Orders
 orders_resource = login_required(expand_response(Resource(ReadOrdersHandler), CSV_ORDERS_HEADERS))
 order_items_resource = login_required(expand_response(Resource(ReadOrderItemsHandler), CSV_ORDER_ITEMS_HEADERS))
 
 stock_items_resource = login_required(expand_response(Resource(ReadStockItemsHandler), CSV_STOCK_ITEMS_HEADERS))
-stock_items_resource_basic = expand_response(Resource(ReadStockItemsHandler, authentication=authentication), 
-                                             CSV_STOCK_ITEMS_HEADERS)
+stock_items_resource_basic = ExpandedResource(ReadStockItemsHandler, 
+                                              authentication=authentication, 
+                                              headers=CSV_STOCK_ITEMS_HEADERS) 
 
 warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))
 
