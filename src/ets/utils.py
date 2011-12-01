@@ -232,6 +232,11 @@ def send_dispatched(using):
                 
                     is_bulk = loading.stock_item.is_bulk
                     
+                    try:
+                        order_item = loading.get_order_item()
+                    except ets_models.OrderItem.DoesNotExist:
+                        raise ValidationError("System can not find order item. Check database.")
+                    
                     call_db_procedure('write_waybill.dispatch', (
                         CURR_CODE, 
                         waybill.dispatch_date.strftime("%Y%m%d"), 
@@ -241,7 +246,7 @@ def send_dispatched(using):
                         waybill.order.warehouse.name, 
                         waybill.order.location.pk,
                         waybill.destination.pk,
-                        loading.get_order_item().lti_id, #waybill.order.pk, 
+                        order_item.lti_id, #waybill.order.pk, 
                         waybill.loading_date.strftime("%Y%m%d"),
                         waybill.order.consignee.pk, 
                         
