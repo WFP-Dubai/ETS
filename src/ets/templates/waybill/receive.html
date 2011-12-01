@@ -16,7 +16,7 @@
 <tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.order.consignee }}</td></tr>
 </tbody></table>
 
-<form method="POST" action="" class="uniForm">{% csrf_token %}
+<form method="POST" action="" class="uniForm">
   {% include "uni_form/errors_formset.html" %}
   <fieldset>
   <legend>{% trans "Loading details" %}</legend>
