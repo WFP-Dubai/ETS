@@ -13,6 +13,7 @@ class RequiredAuthenticationMiddleware(object):
         #DIRTY HACK. CHANGE IT LATER.
         print "hasattr(view_func, 'authentication') --> %s " % hasattr(view_func, 'authentication')
         print "isinstance(view_func.authentication, HttpBasicAuthentication) --> %s" % isinstance(view_func.authentication, HttpBasicAuthentication)
+        print "view_func.authentication --> %s " % view_func.authentication
         print "view_func.authentication --> %s " % type(view_func.authentication)
         if hasattr(view_func, 'authentication') and  isinstance(view_func.authentication, HttpBasicAuthentication):
             return
