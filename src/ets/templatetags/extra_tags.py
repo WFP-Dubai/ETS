@@ -20,7 +20,7 @@ def waybill_edit(waybill, user, text=_("Edit")):
     return { 
             'text': text,
             'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
-            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+            'success': user.person.dispatch and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -28,7 +28,7 @@ def waybill_reception(waybill, user, text=_("Receive")):
     return { 
             'text': text,
             'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
-            'success': Waybill.receptions(user).filter(pk=waybill.pk).count(),
+            'success': user.person.receive and Waybill.receptions(user).filter(pk=waybill.pk).count(),
     }
 
 @register.inclusion_tag('tags/give_link.html')
@@ -36,17 +36,17 @@ def waybill_creation(order, user, text=_("Create")):
     return { 
             'text': text,
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
-            'success': Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count(),
+            'success': user.person.dispatch and Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count(),
     }
     
 
 @function
 def sign_dispatch(waybill, user):
-    return Waybill.dispatches(user).filter(pk=waybill.pk).count()
+    return user.person.dispatch and Waybill.dispatches(user).filter(pk=waybill.pk).count()
 
 @function
 def sign_reception(waybill, user):
-    return Waybill.receptions(user).filter(pk=waybill.pk).count()
+    return user.person.receive and Waybill.receptions(user).filter(pk=waybill.pk).count()
 
 
 @register.inclusion_tag('tags/form.html')
@@ -80,7 +80,7 @@ def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
     return { 
             'text': text,
             'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
-            'success': Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+            'success': user.person.dispatch and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
     }
 
 

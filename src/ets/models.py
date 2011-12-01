@@ -638,6 +638,7 @@ class Waybill( ld_models.Model ):
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
+        #dispatch_person=user.person
         return cls.objects.filter(transport_dispach_signed_date__isnull=True,
                                   order__warehouse__in=Warehouse.filter_by_user(user))
     

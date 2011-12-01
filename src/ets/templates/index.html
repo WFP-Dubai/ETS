@@ -12,14 +12,20 @@
 {% trans "Select an action" %}:
 
 {% person_only user %}
+{% if request.user.person.dispatch %}
 <ul>
   <li><a href='{% url orders %}'>{% trans "List LTIs / Dispatch Waybills" %}</a></li>
 </ul>
+{% endif %}
 <ul>
+  {% if request.user.person.dispatch %}
   <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waybills waiting for Dispatch signature" %}</a></li>
+  {% endif %}
+  {% if request.user.person.receive %}
   <li><a href='{% url waybill_reception_list %}'>{% trans "Waybills pending Receipting" %}</a></li>
+  {% endif%}
 </ul>
-<ul>  
+<ul>
   <li><a href='{% url view_stock %}'>{% trans "List of Stock Items" %}</a></li>  
 </ul>
 {% endperson_only %}
@@ -47,6 +53,7 @@
   </li>
 </ul>
 
+{% if request.user.person.receive %}
 <ul>
   <li>
     <form method='GET' action='{% url deserialize %}'>
@@ -56,6 +63,7 @@
    </form>
   </li>
 </ul>
+{% endif %}
 
 <ul>
   <li><a href="{% url select_report %}">{% trans "Request Reports in CSV Format" %}</a></li>
