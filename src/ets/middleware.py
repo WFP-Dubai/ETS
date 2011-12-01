@@ -4,18 +4,14 @@ from django.utils.translation import ugettext
 
 from django.contrib.auth.middleware import AuthenticationMiddleware
 
-from piston.authentication import HttpBasicAuthentication
+from piston.authentication import NoAuthentication
 
 class RequiredAuthenticationMiddleware(object):
     
     def process_view(self, request, view_func, view_args, view_kwargs):
         
         #DIRTY HACK. CHANGE IT LATER.
-        print "hasattr(view_func, 'authentication') --> %s " % hasattr(view_func, 'authentication')
-        print "isinstance(view_func.authentication, HttpBasicAuthentication) --> %s" % isinstance(view_func.authentication, HttpBasicAuthentication)
-        print "view_func.authentication --> %s " % view_func.authentication
-        print "view_func.authentication --> %s " % type(view_func.authentication)
-        if hasattr(view_func, 'authentication') and  isinstance(view_func.authentication, HttpBasicAuthentication):
+        if hasattr(view_func, 'authentication') and not isinstance(view_func.authentication, NoAuthentication):
             return
         
         if not request.user.is_authenticated():
