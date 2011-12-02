@@ -25,6 +25,7 @@
   {% if may_sign_dispatch %}
   <form method="POST" action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">
     <input class="print_original" type="submit" name="print_original" value="Sign dispatch" />
+    {% csrf_token %}
   </form>
   {% endif %}
   
@@ -32,6 +33,7 @@
   {% if may_sign_reception %}
   <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
     <input class="print_original" type="submit" name="print_original" value="Sign receipt" />
+    {% csrf_token %}
   </form>
   {% endif %}
 
