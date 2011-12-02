@@ -17,10 +17,7 @@ def user_filtered(function=None, filter=lambda queryset, user: ()):
     def _decorator(view_func):
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, queryset=None, *args, **kwargs):
-            try:
-                return view_func(request, queryset=filter(queryset, request.user), *args, **kwargs)
-            except:
-                return view_func(request, queryset=queryset, *args, **kwargs)
+            return view_func(request, queryset=filter(queryset, request.user), *args, **kwargs)
         return _wrapped_view
     
     if function:
