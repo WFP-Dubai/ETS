@@ -83,8 +83,6 @@ def import_persons(compas):
                                        first_name = person.first_name, last_name = person.last_name, 
                                        is_staff=True, is_active=False, is_superuser=False)
                 obj.set_password(person.person_pk)
-                ## TEMP 
-                print person.code
                 obj.save()
 
 
