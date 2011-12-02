@@ -83,7 +83,10 @@ def import_persons(compas):
                                        first_name = person.first_name, last_name = person.last_name, 
                                        is_staff=True, is_active=False, is_superuser=False)
                 obj.set_password(person.person_pk)
-                obj.save()
+                try:
+                    obj.save()
+                except:
+                    pass
 
 
 def import_stock(compas):
