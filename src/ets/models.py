@@ -344,7 +344,7 @@ class OrderItem(models.Model):
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
-    
+    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
     number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
