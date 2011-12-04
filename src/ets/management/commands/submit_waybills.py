@@ -13,5 +13,3 @@ class Command(UpdateCompas):
         send_dispatched(compas)
         send_received(compas)
         import_stock(compas)
-
-        
