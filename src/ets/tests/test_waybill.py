@@ -398,7 +398,14 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.client.login(username='dispatcher', password='dispatcher')
         
         response = self.client.post(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
+        #Dispatcher can not do this, so system redirects him to login page
+        self.assertEqual(response.status_code, 302)
         
+        #Make him receive goods
+        self.dispatcher.person.receive = True
+        self.dispatcher.person.save()
+        
+        response = self.client.post(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': 'ISBX00312A',}))
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['print_original'])
         
