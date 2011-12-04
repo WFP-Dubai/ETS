@@ -172,7 +172,6 @@ def import_order(compas):
                 'transport_ouc': lti.transport_ouc,
                 'transport_name': lti.transport_name,
                 'origin_type': lti.origin_type,
-                'project_number': lti.project_wbs_element,
                 'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
                 'consignee': consignee,
                 'location': ets_models.Location.objects.get(pk=lti.destination_location_code),
@@ -195,7 +194,8 @@ def import_order(compas):
             key_data = {
                 'order': order,
                 'lti_pk': lti.lti_pk, 
-                'si_code': lti.si_code, 
+                'si_code': lti.si_code,
+                'project_number': lti.project_wbs_element, 
                 'commodity': commodity,
             }
             defaults = {

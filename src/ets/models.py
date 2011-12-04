@@ -300,8 +300,6 @@ class Order(models.Model):
     
     origin_type = models.CharField(_("Origin Type"), max_length = 1, editable=False)
     
-    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
-    
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("dispatch warehouse"), related_name="orders")
     consignee = models.ForeignKey(Organization, verbose_name=_("consignee"), related_name="orders")
     location = models.ForeignKey(Location, verbose_name=_("consignee's location"), related_name="orders")
@@ -323,9 +321,9 @@ class Order(models.Model):
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         return StockItem.objects.filter(warehouse__orders=self,
-                                        project_number=self.project_number,
-                                        si_code = F('warehouse__orders__items__si_code'), 
-                                        commodity = F('warehouse__orders__items__commodity'),
+                                        project_number=F('warehouse__orders__items__project_number'),
+                                        si_code=F('warehouse__orders__items__si_code'), 
+                                        commodity=F('warehouse__orders__items__commodity'),
                                         ).order_by('-warehouse__orders__items__number_of_units')
     
     def get_percent_executed(self):
@@ -364,7 +362,7 @@ class OrderItem(models.Model):
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
         return StockItem.objects.filter(warehouse__orders__items=self,
-                                        project_number=self.order.project_number,
+                                        project_number=self.project_number,
                                         si_code = self.si_code, 
                                         commodity = self.commodity,
                                         ).order_by('-number_of_units')      
@@ -376,8 +374,8 @@ class OrderItem(models.Model):
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
-                                            waybill__order__project_number=self.order.project_number,
                                             waybill__date_removed__isnull=True,
+                                            stock_item__project_number=self.project_number,
                                             stock_item__si_code = self.si_code, 
                                             stock_item__commodity = self.commodity,
                                             ).order_by('-waybill__dispatch_date')
@@ -702,7 +700,7 @@ class LoadingDetail(models.Model):
     def get_order_item(self):
         """Retrieves stock items for current order item through warehouse"""
         return OrderItem.objects.get(order=self.waybill.order,
-                                     order__project_number=self.stock_item.project_number,
+                                     project_number=self.stock_item.project_number,
                                      si_code = self.stock_item.si_code, 
                                      commodity = self.stock_item.commodity,)
     

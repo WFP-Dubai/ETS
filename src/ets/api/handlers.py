@@ -29,7 +29,7 @@ class ReadWaybillHandler(BaseHandler):
     fields = (
         'slug',
         ('order', (
-            'code', 'transport_code', 'transport_name', 'origin_type', 'project_number', 
+            'code', 'transport_code', 'transport_name', 'origin_type', 
             ('warehouse', ('code', 'name')),
             ('consignee', ('code', 'name')),
             ('location', ('code', 'name')),
@@ -83,7 +83,7 @@ class ReadLoadingDetailHandler(BaseHandler):
         ('waybill', (
             'slug',
             ('order', (
-                'code', 'transport_code', 'transport_name', 'origin_type', 'project_number', 
+                'code', 'transport_code', 'transport_name', 'origin_type',
                 ('warehouse', ('code', 'name')),
                 ('consignee', ('code', 'name')),
                 ('location', ('code', 'name')),
@@ -107,7 +107,7 @@ class ReadLoadingDetailHandler(BaseHandler):
             'receipt_validated', 'receipt_sent_compas',
         )),
         ('stock_item', (
-            'code', 'si_code', 
+            'code', 'si_code', 'project_number',
             ('commodity', ('code', 'name')),
         )),
         'number_of_units', 'number_units_good', 'number_units_lost', 'number_units_damaged', 
@@ -145,7 +145,7 @@ class ReadOrdersHandler(BaseHandler):
     fields = (
         'code', 'created', 'expiry', 'dispatch_date', 
         'transport_code', 'transport_ouc', 'transport_name', 
-        'origin_type', 'project_number', 
+        'origin_type', 
         ('warehouse', ('code', 'name')),
         ('consignee', ('code', 'name')),
         ('location', ('code', 'name')),
@@ -178,11 +178,11 @@ class ReadOrderItemsHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = ets.models.OrderItem
     fields = (
-        'lti_pk', 'si_code',
+        'lti_pk', 'si_code', 'project_number',
         ('order', (
             'code', 'created', 'expiry', 'dispatch_date', 
             'transport_code', 'transport_ouc', 'transport_name', 
-            'origin_type', 'project_number', 
+            'origin_type',
             ('warehouse', ('code',)),
             ('consignee', ('code',)),
             ('location', ('code',)),
