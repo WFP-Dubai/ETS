@@ -34,6 +34,6 @@ class Command(BaseCommand):
             
             try:
                 self.synchronize(compas=compas.pk)
-            except DatabaseError, err:
+            except Exception, err:
                 if verbosity >= 2:
                     print err
