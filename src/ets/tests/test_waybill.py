@@ -69,9 +69,14 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
         
+        #Dispatcher can not see reception list
+        response = self.client.get(reverse('waybill_reception_list'))
+        self.assertEqual(response.status_code, 302)
+        
+        self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('waybill_reception_list'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 2)
+        self.assertEqual(response.context['object_list'].count(), 0)
     
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
@@ -219,6 +224,15 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         path = reverse('waybill_reception', kwargs={'waybill_pk': self.reception_waybill.pk,})
         #check it with dispatching waybill. It must fail
+        response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
+        #System redirects user to login page because he can't receive
+        self.assertFalse(self.dispatcher.person.receive)
+        self.assertEqual(response.status_code, 302)
+        
+        #Set receive permit
+        self.dispatcher.person.receive = True
+        self.dispatcher.person.save()
+        
         response = self.client.get(reverse('waybill_reception', kwargs={'waybill_pk': self.waybill.pk,}))
         self.assertEqual(response.status_code, 404)
         

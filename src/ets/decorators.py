@@ -11,10 +11,11 @@ import ets.models
 person_required = user_passes_test(lambda u: hasattr(u, 'person'))
 officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count())
 
-def user_filtered(function=None, filter=lambda queryset, user: ()):
+def user_filtered(function=None, filter=lambda queryset, user: (), user_test=lambda u: True):
     """Decorates view function and inserts queryset filtered by user"""
     
     def _decorator(view_func):
+        @user_passes_test(user_test)
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, queryset=None, *args, **kwargs):
             return view_func(request, queryset=filter(queryset, request.user), *args, **kwargs)
@@ -26,8 +27,11 @@ def user_filtered(function=None, filter=lambda queryset, user: ()):
     return _decorator
 
 #Decorators or views.
-dispatch_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.dispatches(user))
-receipt_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.receptions(user))
+dispatch_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.dispatches(user), 
+                              user_test=lambda u: (not hasattr(u, 'person') or u.person.dispatch))
+
+receipt_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.receptions(user),
+                             user_test=lambda u: (not hasattr(u, 'person') or u.person.receive))
 
 warehouse_related = user_filtered(filter=lambda queryset, user: queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(user)))
 
