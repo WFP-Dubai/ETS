@@ -76,6 +76,8 @@ MEDIA_ROOT = os.path.join(EGG_ROOT, 'media')
 
 SERVE_STATIC = True
 
+SERVE_STATIC = True
+
 STATICFILES_FINDERS = (
   "django.contrib.staticfiles.finders.FileSystemFinder",
   "django.contrib.staticfiles.finders.AppDirectoriesFinder",

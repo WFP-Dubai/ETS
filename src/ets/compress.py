@@ -108,7 +108,7 @@ def decompress_json(data):
     try:
         data = zlib.decompress( base64.b64decode( data ) )
     except (zlib.error, TypeError):
-        pass
+        return
     else:
         #Extend field names
         for full_field, cut_field in COMPRESS_MAPPING:

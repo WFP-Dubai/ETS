@@ -13,8 +13,11 @@ TEMPLATE_LOADERS = (
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
 DEBUG = True
+TEMPLATE_DEBUG = True
 
 COMPRESS_ENABLED = False
+
+SERVE_STATIC = False
 
 DEBUG_TOOLBAR_PANELS = (
         #'debug_toolbar.panels.version.VersionDebugPanel',
@@ -39,6 +42,5 @@ try:
 except ImportError:
     pass
 
-TEMPLATE_DEBUG = DEBUG
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)

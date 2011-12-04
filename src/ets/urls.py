@@ -5,7 +5,6 @@ from django.contrib import databrowse
 from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.utils.translation import ugettext_lazy, ugettext as _
 
 from django.contrib import admin #@Reimport
@@ -150,7 +149,10 @@ class PrefixedPatterns:
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-    urlpatterns += staticfiles_urlpatterns()
+    
+    if settings.SERVE_STATIC:
+        from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+        urlpatterns += staticfiles_urlpatterns()
 
     
 urlpatterns = patterns('',

@@ -29,13 +29,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.delivered_waybill = ets.models.Waybill.objects.get(pk="ISBX00312A")
         self.order = ets.models.Order.objects.get(pk='OURLITORDER')
         self.warehouse = ets.models.Warehouse.objects.get(pk="ISBX002")
-        #self.lti = LtiOriginal.objects.get(pk="QANX001000000000000005217HQX0001000000000000984141")
         #self.stock = EpicStock.objects.get(pk="KARX025KARX0010000944801MIXMIXHEBCG15586")
      
-    #===================================================================================================================
-    # def tearDown(self):
-    #    "Hook method for deconstructing the test fixture after testing it."
-    #===================================================================================================================
     
     def test_serialize(self):
         """Checks methods serialize of waybill instance"""

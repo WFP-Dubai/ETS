@@ -48,6 +48,45 @@
     }
   },
   {
+    "pk": 2,
+    "model": "ets.person",
+    "fields": {
+      "code": "0000586",
+      "compas": "ISBX002",
+      "receive": false,
+      "title": "LOGISTICS OFFICER",
+      "dispatch": true,
+      "location": "ISBX",
+      "organization": "WFP"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "ets.person",
+    "fields": {
+      "code": "0000613",
+      "compas": "ISBX002",
+      "receive": true,
+      "title": "REGIONAL LOGISTICS COORDINATOR",
+      "dispatch": false,
+      "location": "ISBX",
+      "organization": "DOEAF"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "ets.person",
+    "fields": {
+      "code": "0000615",
+      "compas": "ISBX002",
+      "receive": false,
+      "title": "REGIONAL LOGISTICS COORDINATOR",
+      "dispatch": false,
+      "location": "OE7X",
+      "organization": "DOEAF"
+    }
+  },
+  {
     "pk": "ISBX00211A", 
     "model": "ets.waybill", 
     "fields": {
@@ -81,6 +120,8 @@
       "destination": "ISBX003",
       
       "validated": false,
+      
+      "receipt_signed_date": null,
       
       "_order": 0
     }

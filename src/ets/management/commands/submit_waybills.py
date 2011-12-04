@@ -1,6 +1,5 @@
 ### -*- coding: utf-8 -*- ####################################################
 
-from ets.models import LossDamageType
 from .sync_compas import Command as UpdateCompas
 
 from ets.utils import send_dispatched, send_received, import_stock
