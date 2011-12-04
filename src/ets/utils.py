@@ -17,7 +17,6 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    
     #Update persons
     import_persons(using)
 

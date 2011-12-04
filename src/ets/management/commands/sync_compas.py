@@ -3,6 +3,7 @@
 from optparse import make_option
 
 from django.core.management.base import BaseCommand
+from django.db.utils import DatabaseError
 
 from ets.utils import update_compas
 from ets.models import Compas
@@ -30,7 +31,9 @@ class Command(BaseCommand):
         for compas in stations:
             if verbosity >= 2:
                 print "Updating compas: %s" % compas
-            self.synchronize(compas=compas.pk)
             
-
-    
+            try:
+                self.synchronize(compas=compas.pk)
+            except DatabaseError, err:
+                if verbosity >= 2:
+                    print err
