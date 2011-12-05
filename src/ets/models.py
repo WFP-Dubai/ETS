@@ -309,7 +309,7 @@ class Order(models.Model):
     class Meta:
         verbose_name = _("order")
         verbose_name_plural = _("orders")
-        ordering = ('code',)
+        ordering = ('-created',)
     
     def  __unicode__(self):
         return self.code
