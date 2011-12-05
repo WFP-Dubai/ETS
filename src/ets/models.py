@@ -150,6 +150,8 @@ class Person(User):
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
     location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
     
+    #warehouses = models.ManyToManyField('ets.Warehouse', verbose_name=_("Warehouses"), )
+    
     dispatch = models.BooleanField(_("Can dispatch"), default=False)
     receive = models.BooleanField(_("Can receive"), default=False)
     
@@ -614,25 +616,27 @@ class Waybill( ld_models.Model ):
 
         ])
         
-        if self.receipt_signed_date:
+        if self.receipt_person:
             objects.update((
-                self.receipt_person, self.receipt_person.location,
+                self.receipt_person, self.receipt_person.location, 
                 self.receipt_person.organization, self.receipt_person.compas,
-                
+            ))
+        if self.destination:
+            objects.update((
                 self.destination, self.destination.location,
                 self.destination.organization, self.destination.compas,
             ))
+        
         #Loading details
         for ld in self.loading_details.select_related():
             objects.update((
                 ld, ld.stock_item, ld.stock_item.package, 
                 ld.stock_item.commodity, ld.stock_item.commodity.category,
             ))
-            if self.receipt_signed_date:
-                objects.update((
-                    ld.units_damaged_reason, ld.units_damaged_reason.category,
-                    ld.units_lost_reason, ld.units_lost_reason.category,
-                ))
+            if ld.units_damaged_reason:
+                objects.update((ld.units_damaged_reason, ld.units_damaged_reason.category,))
+            if ld.units_lost_reason:
+                objects.update((ld.units_lost_reason, ld.units_lost_reason.category,))
         
         #Serialize
         data = serializers.serialize('json', objects, use_decimal=False)
