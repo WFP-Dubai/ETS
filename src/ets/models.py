@@ -253,6 +253,13 @@ class StockItem( models.Model ):
     def coi_code(self):
         return self.origin_id[7:]
     
+    def calculate_total_net(self):    
+        return (self.number_of_units * self.unit_weight_net)/1000
+    
+    def calculate_total_gross(self):
+        return (self.number_of_units * self.unit_weight_gross)/1000
+    
+    
     
 class LossDamageType(models.Model):
     

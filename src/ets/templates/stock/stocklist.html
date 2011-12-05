@@ -8,23 +8,34 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id='stocklist'>
   <thead>
     <tr>
+      <th>{% trans "Location" %}</th>
       <th>{% trans "Warehouse" %}</th>
+      <th>{% trans "Project Number" %}</th>
       <th>{% trans "Commodity" %}</th>
       <th>{% trans "SI" %}</th>
-      <th>{% trans "Items" %}</th>
-      <th>{% trans "MT Net" %}</th>
-      <th>{% trans "Quality" %}</th>
+      <th>{% trans "State" %}</th>
+      <th>{% trans "Units" %}</th>
+      <th>{% trans "Unit Net Weight (kg)" %}</th>
+      <th>{% trans "Unit Gross Weight (kg)"%}</th>
+      <th>{% trans "Net Tonnage"%}</th>
+      <th>{% trans "Gross Tonnage"%}</th>
+      
     </tr>
   </thead>
   <tbody>
     {% for item in object_list %}
     <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
-      <td>{{ item.warehouse }}</td>
+      <td>{{ item.warehouse.location.name }}</td>
+      <td>{{ item.warehouse.name }}</td>
+      <td>{{item.project_number}}</td>
       <td>{{ item.commodity }}</td>
       <td>{{ item.si_code }}</td>
+      <td>{{ item.quality_description }}</td>
       <td>{{ item.number_of_units }}</td>
       <td>{{ item.unit_weight_net }}</td>
-      <td>{{ item.quality_description }}</td>
+      <td>{{ item.unit_weight_gross }}</td>
+      <td>{{ item.calculate_total_net}} </td>      
+      <td>{{ item.calculate_total_gross}}</td>
     </tr>
     {% endfor %}
   </tbody>
