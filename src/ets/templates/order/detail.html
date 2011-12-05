@@ -19,10 +19,10 @@
   </tr> 
   <tr>
     <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
-    <td>{% trans "Destination Location:" %} {{ object.location }}</td>
+    <td>{% trans "Destination Location:" %} {{ object.location.name }}</td>
   </tr>
   <tr>
-    <td>{% trans "Contractor:" %} {{ object.transport_name }}</td>
+    <td>{% trans "Transporter:" %} {{ object.transport_name }}</td>
   </tr>
 </table>
 
