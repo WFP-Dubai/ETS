@@ -39,7 +39,7 @@
   "pk": "testme0123",
   "model": "ets.stockitem",
   "fields": {
-   "quality_code": "G",
+   "quality": "G",
    "updated": "2011-10-04 09:09:43",
    "si_code": "123",
    "unit_weight_net": "0.2",
@@ -58,7 +58,7 @@
   "pk": "testme0124",
   "model": "ets.stockitem",
   "fields": {
-   "quality_code": "G",
+   "quality": "G",
    "updated": "2011-10-04 09:09:43",
    "si_code": "123",
    "unit_weight_net": "1",

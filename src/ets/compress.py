@@ -89,7 +89,7 @@ COMPRESS_MAPPING = (
     ('"commodity":', '"cy":'),
     ('"unit_weight_net":', '"uwn":'),
     ('"si_code":', '"sic":'),
-    ('"quality_code":', '"qc":'),
+    ('"quality":', '"qc":'),
     ('"si_record_id":', '"sri":'),
     ('"fields":', '"f":'),
     ('"model":', '"m":'),

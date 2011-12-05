@@ -238,7 +238,6 @@ class StockItem( models.Model ):
     package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
     quality = models.CharField(_("Quality"), max_length=1, choices=QUALITY_CHOICE) #qualitycode
-    quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
@@ -262,8 +261,8 @@ class StockItem( models.Model ):
 
     def  __unicode__( self ):
         name = "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
-        if self.quality_code == 'D':
-            return "%s (D)" % name
+        if self.quality != self.GOOD_QUALITY:
+            return "%s (%s)" % (name, self.get_quality_display())
         return name
         
     def coi_code(self):

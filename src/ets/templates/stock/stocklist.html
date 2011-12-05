@@ -24,13 +24,13 @@
   </thead>
   <tbody>
     {% for item in object_list %}
-    <tr style="{%if item.quality_code != 'G'%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
+    <tr style="{%if item.quality != item.GOOD_QUALITY%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
       <td>{{ item.warehouse.location.name }}</td>
       <td>{{ item.warehouse.name }}</td>
       <td>{{item.project_number}}</td>
       <td>{{ item.commodity }}</td>
       <td>{{ item.si_code }}</td>
-      <td>{{ item.get_quality_code_display }}</td>
+      <td>{{ item.get_quality_display }}</td>
       <td>{%if item.is_bulk%}{{ item.number_of_units}}kg{%endif%}
       {%if not item.is_bulk%}{{ item.number_of_units|floatformat:0 }}{%endif%}
       </td>

@@ -120,7 +120,7 @@ def import_stock(compas):
                 'commodity': commodity,
                 'package': package,
                 'number_of_units': number_of_units,
-                'quality_code': stock.qualitycode,
+                'quality': stock.qualitycode,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
@@ -271,7 +271,7 @@ def send_dispatched(using):
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 
                         loading.stock_item.allocation_code, 
-                        loading.stock_item.quality_code,
+                        loading.stock_item.quality,
                         
                         u'%.3f' % loading.calculate_total_net(), 
                         u'%.3f' % loading.calculate_total_gross(), 
@@ -336,7 +336,7 @@ def send_received(using):
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 
                         loading.stock_item.allocation_code, 
-                        loading.stock_item.quality_code
+                        loading.stock_item.quality
                     ), using)
                     
         except ValidationError, err:
