@@ -9,8 +9,9 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="listing">
   <thead>
     <tr>
-      <th>{% trans "LTI Code" %}</th>
+      <th>{% trans "LTI Number" %}</th>
       <th>{% trans "Dispatch Date" %}</th>
+      <th>{% trans "Expiry Date" %}</th>      
       <th>{% trans "Dispatch Warehouse" %}</th>
       <th>{% trans "Destination" %}</th>
       <th>{% trans "Consignee" %}</th>
@@ -24,8 +25,9 @@
     <tr>
       <td><a href='{{ order.get_absolute_url }}'>{{ order.code }}</a></td>
       <td>{{ order.dispatch_date|date }}</td>
-      <td>{{ order.warehouse }}</td>
-      <td>{{ order.location }}</td>
+      <td>{{ order.expiry|date }}</td>
+      <td>{{ order.warehouse.name }}</td>
+      <td>{{ order.location.name }}</td>
       <td>{{ order.consignee }}</td>
       <td>{{ order.transport_name }}</td>
       <td>{{ order.get_percent_executed }}</td>
