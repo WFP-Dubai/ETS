@@ -5,14 +5,14 @@
   <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
 
   {% block style %}
-    {% compress css %}
+    {# compress css #}
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_page.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/demo_table.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/base.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.8.16.custom.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}uni_form/default.uni-form.css" media="screen"/>
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/changes.css" media="screen"/>
-    {% endcompress %}
+    {# endcompress #}
   {% endblock %}
 
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.2.min.js"></script>
@@ -49,12 +49,12 @@
 {% endspaceless %}
   
 {% block script %}
-{% compress js %}
+{# compress js #}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.16.custom.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}uni_form/uni-form.jquery.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/utils.js"></script>
-{% endcompress %}
+{# endcompress #}
 {% analytics_async "UA-26504412-3" %}
 {% endblock %}
 

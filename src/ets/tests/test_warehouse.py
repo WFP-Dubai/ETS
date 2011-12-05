@@ -26,7 +26,7 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         # Get warehouses without organization, only location 
         location = ets.models.Location.objects.get(pk="OE7X")
         warehouses = ets.models.Warehouse.get_warehouses(location=location)
-        self.assertEqual(warehouses.count(), 0)
+        self.assertEqual(warehouses.count(), 1)
         
         # Get warehouses with organization and location
         location = ets.models.Location.objects.get(code="ISBX")

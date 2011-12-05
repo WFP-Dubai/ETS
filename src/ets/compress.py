@@ -58,6 +58,7 @@ COMPRESS_MAPPING = (
     ('"user_permissions":', '"up":'),
     ('"organization":', '"or":'),
     ('"start_date":', '"sd":'),
+    ('"end_date":', '"ed":'),
     ('"transport_name":', '"tn":'),
     ('"consignee":', '"con1":'),
     ('"transport_ouc":', '"to":'),
