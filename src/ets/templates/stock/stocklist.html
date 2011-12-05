@@ -31,7 +31,9 @@
       <td>{{ item.commodity }}</td>
       <td>{{ item.si_code }}</td>
       <td>{{ item.quality_description }}</td>
-      <td>{{ item.number_of_units }}</td>
+      <td>{%if item.is_bulk%}{{ item.number_of_units}}kg{%endif%}
+      {%if item.is_bulk%}{{ item.number_of_units|floatformat:0 }}{%endif%}
+      </td>
       <td>{{ item.unit_weight_net }}</td>
       <td>{{ item.unit_weight_gross }}</td>
       <td>{{ item.calculate_total_net}} </td>      
