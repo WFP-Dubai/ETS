@@ -62,6 +62,7 @@ class CompasPerson( models.Model ):
     
 class EpicStock( models.Model ):
     """COMPAS stock. We retrieve it from Oracle database view."""
+    
     wh_pk = models.CharField(_("warehouse primary key"), max_length = 90, blank = True, primary_key = True)
     wh_regional = models.CharField(_("warehouse regional"), max_length = 4, blank = True )
     wh_country = models.CharField(_("warehouse country"), max_length = 15 )

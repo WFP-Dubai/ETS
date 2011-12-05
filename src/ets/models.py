@@ -218,6 +218,15 @@ class StockManager( models.Manager ):
 class StockItem( models.Model ):
     """Accessible stocks"""
     
+    GOOD_QUALITY = 'G'
+    
+    QUALITY_CHOICE = (
+        ('D', u'Damaged'), 
+        (GOOD_QUALITY, u'Good'), 
+        ('S', u'Spoiled'), 
+        ('U', u'Unavailable'),
+    )
+    
     code = models.CharField(_("Code"), max_length=128, primary_key=True) 
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
@@ -228,8 +237,8 @@ class StockItem( models.Model ):
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
     package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
+    quality = models.CharField(_("Quality"), max_length=1, choices=QUALITY_CHOICE) #qualitycode
     quality_code = models.CharField(_("Quality code"), max_length=1) #qualitycode
-    quality_description = models.CharField(_("Quality description"), max_length=11, blank=True) #qualitydescr
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)

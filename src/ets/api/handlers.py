@@ -225,7 +225,7 @@ class ReadStockItemsHandler(BaseHandler):
       'project_number', 'si_code', 
       ('commodity', ('code', 'name')),
       ('package', ('code', 'name')),
-      'quality_code', 'quality_description',
+      'quality_code',
       'number_of_units', 'unit_weight_net', 'unit_weight_gross',
       'is_bulk', 'si_record_id', 'origin_id', 'allocation_code',
     )

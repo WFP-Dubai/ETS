@@ -121,7 +121,6 @@ def import_stock(compas):
                 'package': package,
                 'number_of_units': number_of_units,
                 'quality_code': stock.qualitycode,
-                'quality_description': stock.qualitydescr,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 

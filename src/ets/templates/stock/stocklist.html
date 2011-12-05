@@ -30,7 +30,7 @@
       <td>{{item.project_number}}</td>
       <td>{{ item.commodity }}</td>
       <td>{{ item.si_code }}</td>
-      <td>{{ item.quality_description }}</td>
+      <td>{{ item.get_quality_code_display }}</td>
       <td>{%if item.is_bulk%}{{ item.number_of_units}}kg{%endif%}
       {%if not item.is_bulk%}{{ item.number_of_units|floatformat:0 }}{%endif%}
       </td>
