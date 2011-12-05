@@ -127,6 +127,10 @@ class LtiOriginal( models.Model ):
     consegnee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
     consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
     
+    #Destination warehouse
+    remarks = models.CharField(_("Remarks"), max_length = 12, db_column = 'REMARKS')
+    remarks_b = models.CharField(_("RemarksBB"), max_length = 12, db_column = 'REMARKS_B')
+    
     requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
     project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
     si_record_id = models.CharField( _("SI Record ID "),max_length = 25, blank = True, db_column = 'SI_RECORD_ID' )
