@@ -423,7 +423,7 @@ class Waybill( ld_models.Model ):
     """
     
     TRANSACTION_TYPES = ( 
-                        ( u'WIT', _(u'WFP Internal') ),
+                        ( u'WIT', _(u'WFP Internal Transfer') ),
                         ( u'DEL',_( u'Delivery' )),
                         ( u'SWA', _(u'Swap' )),
                         ( u'REP', _(u'Repayment' )),
