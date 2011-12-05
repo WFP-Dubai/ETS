@@ -1,6 +1,6 @@
 ### -*- coding: utf-8 -*- ####################################################
 
-from django.forms.models import  BaseModelFormSet, BaseInlineFormSet
+from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 #from django.forms.formsets import formset_factory, BaseFormSet
 from django.contrib.auth.forms import UserChangeForm
 from django import forms
@@ -13,6 +13,29 @@ from uni_form.layout import Layout, Fieldset, Row
 from ets import models as ets_models
 
 UNDEFINED_MESSAGE = "N/A"
+
+#=======================================================================================================================
+# class StrippedCharField(forms.CharField):
+#    """CharField that strips trailing and leading spaces."""
+#    def clean(self, value):
+#        if value is not None:
+#            value = value.strip()
+#        return super(StrippedCharField, self).clean(value) 
+#=======================================================================================================================
+
+class StrippedTextInput(forms.TextInput):
+    
+    def value_from_datadict(self, data, files, name):
+        """
+        Given a dictionary of data and this widget's name, returns the value
+        of this widget. Returns None if it's not provided.
+        """
+        value = data.get(name, None)
+        if value is not None:
+            value = value.strip()
+        
+        return value
+
 
 class PersonChangeForm(UserChangeForm):
     class Meta:
@@ -51,6 +74,9 @@ class DispatchWaybillForm( forms.ModelForm ):
         )
         widgets = {
             'dispatch_remarks': forms.Textarea(attrs={'rows': "3"}),
+            'transport_driver_name': StrippedTextInput(),
+            'transport_driver_licence': StrippedTextInput(),
+            'transport_vehicle_registration': StrippedTextInput(),
         }
     
     helper = FormHelper()
