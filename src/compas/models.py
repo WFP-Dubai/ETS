@@ -127,7 +127,7 @@ class LtiOriginal( models.Model ):
     consegnee_code = models.CharField(_("Consignee Code"), max_length = 12, db_column = 'CONSEGNEE_CODE' )
     consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
     
-    #Destination warehouse
+    #Remarks
     remarks = models.TextField(_("Remarks"), blank=True, db_column = 'REMARKS')
     remarks_b = models.TextField(_("RemarksBB"), blank=True, db_column = 'REMARKS_B')
     

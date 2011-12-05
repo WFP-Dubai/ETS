@@ -175,6 +175,8 @@ def import_order(compas):
                 'consignee': consignee,
                 'location': ets_models.Location.objects.get(pk=lti.destination_location_code),
                 'updated': now,
+                'remarks': lti.remarks,
+                'remarks_b': lti.remarks_b,
             }
             
             order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]

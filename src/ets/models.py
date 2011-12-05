@@ -331,6 +331,9 @@ class Order(models.Model):
     consignee = models.ForeignKey(Organization, verbose_name=_("consignee"), related_name="orders")
     location = models.ForeignKey(Location, verbose_name=_("consignee's location"), related_name="orders")
     
+    remarks = models.TextField(_("Remarks"), blank=True)
+    remarks_b = models.TextField(_("More Remarks"), blank=True)
+    
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
     class Meta:

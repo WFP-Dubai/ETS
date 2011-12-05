@@ -18,12 +18,19 @@
     <td>{% trans "Dispatch Warehouse" %}: {{ object.warehouse.name }}</td>
   </tr> 
   <tr>
-    <td>{% trans "Consignee:" %} {{ object.consignee }}</td>
-    <td>{% trans "Destination Location:" %} {{ object.location.name }}</td>
+    <td>{% trans "Consignee" %}: {{ object.consignee }}</td>
+    <td>{% trans "Destination Location" %}: {{ object.location.name }}</td>
   </tr>
   <tr>
-    <td>{% trans "Transporter:" %} {{ object.transport_name }}</td>
+    <td>{% trans "Transporter" %}: {{ object.transport_name }}</td>
   </tr>
+  
+  {% if object.remarks or object.remarks_b %}
+  <tr>
+    <td>{% trans "Remarks" %}: {{ object.remarks }} {{ object.remarks_b }}</td>
+  </tr>
+  {% endif %}
+  
 </table>
 
 <br/>
