@@ -165,9 +165,9 @@ class PersonInline(admin.TabularInline):
     extra = 0
 
 class WarehouseAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date')
-    list_editable = ('organization', 'start_date',)
-    list_filter = ('start_date', 'compas', )
+    list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date', 'end_date')
+    list_editable = ('organization', 'start_date', 'end_date')
+    list_filter = ('start_date', 'compas',)
     raw_id_fields = ('location',)
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
     inlines = (StockInline,)
