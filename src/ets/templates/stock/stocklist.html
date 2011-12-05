@@ -36,8 +36,8 @@
       </td>
       <td>{{ item.unit_weight_net }}</td>
       <td>{{ item.unit_weight_gross }}</td>
-      <td>{{ item.calculate_total_net}} </td>      
-      <td>{{ item.calculate_total_gross}}</td>
+      <td>{{ item.calculate_total_net|floatformat:3}} </td>      
+      <td>{{ item.calculate_total_gross|floatformat:3}}</td>
     </tr>
     {% endfor %}
   </tbody>
