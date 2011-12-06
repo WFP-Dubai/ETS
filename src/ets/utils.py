@@ -195,6 +195,7 @@ def import_order(compas):
             key_data = {
                 'order': order,
                 'lti_pk': lti.lti_pk, 
+                'lti_id': lti.lti_id,
                 'si_code': lti.si_code,
                 'project_number': lti.project_wbs_element, 
                 'commodity': commodity,
@@ -247,7 +248,7 @@ def send_dispatched(using):
                         waybill.order.warehouse.name, 
                         waybill.order.location.pk,
                         waybill.destination.pk,
-                        order_item.lti_id, #waybill.order.pk, 
+                        order_item.lti_id, 
                         waybill.loading_date.strftime("%Y%m%d"),
                         waybill.order.consignee.pk, 
                         
@@ -265,11 +266,15 @@ def send_dispatched(using):
                         
                         waybill.transport_driver_name, 
                         waybill.transport_driver_licence,
+                        
+                        waybill.transport_vehicle_registration,
+                        waybill.transport_vehicle_registration,
+                        
                         CONTAINER_NUMBER,
-                         
+                        
                         using,
                         
-                        loading.stock_item.si_record_id, 
+                        loading.stock_item.origin_id, 
                         loading.stock_item.commodity.category.pk, 
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 
@@ -282,10 +287,10 @@ def send_dispatched(using):
                         u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
                         u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
                         
-                        None, #p_odaid
+                        #None, #p_odaid
                         None, #p_losstype
                         None, #p_lossreason
-                        None, #p_loannumber
+                        #None, #p_loannumber
                     ), using)
         
         except ValidationError, err:
