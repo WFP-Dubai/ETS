@@ -252,7 +252,7 @@ def send_dispatched(using):
                         waybill.order.consignee.pk, 
                         
                         waybill.transaction_type, 
-                        '', 
+                        waybill.transport_vehicle_registration,
                         waybill.transport_type,
                         waybill.dispatch_remarks, 
                         
@@ -265,9 +265,6 @@ def send_dispatched(using):
                         
                         waybill.transport_driver_name, 
                         waybill.transport_driver_licence,
-                        
-                        waybill.transport_vehicle_registration,
-                        waybill.transport_trailer_registration,
                         
                         CONTAINER_NUMBER,
                         
@@ -286,10 +283,10 @@ def send_dispatched(using):
                         u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
                         u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
                         
-                        #None, #p_odaid
+                        None, #p_odaid
                         None, #p_losstype
                         None, #p_lossreason
-                        #None, #p_loannumber
+                        '', #p_loannumber
                     ), using)
         
         except ValidationError, err:
