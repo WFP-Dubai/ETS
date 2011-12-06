@@ -148,10 +148,9 @@ def import_order(compas):
     
     with transaction.commit_on_success(compas) as tr:
         places = _get_places(compas)
-
+        #models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True)
         for lti in compas_models.LtiOriginal.objects.using(compas)\
-                            .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
-                                    consegnee_code__in=places.values_list('organization_id', flat=True),
+                            .filter(consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
             #Update Consignee
