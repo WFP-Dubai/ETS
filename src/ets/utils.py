@@ -253,7 +253,7 @@ def send_dispatched(using):
                         waybill.order.consignee.pk, 
                         
                         waybill.transaction_type, 
-                        waybill.transport_vehicle_registration, 
+                        '', 
                         waybill.transport_type,
                         waybill.dispatch_remarks, 
                         
@@ -268,7 +268,7 @@ def send_dispatched(using):
                         waybill.transport_driver_licence,
                         
                         waybill.transport_vehicle_registration,
-                        waybill.transport_vehicle_registration,
+                        waybill.transport_trailer_registration,
                         
                         CONTAINER_NUMBER,
                         
