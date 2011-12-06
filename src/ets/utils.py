@@ -215,7 +215,7 @@ def send_dispatched(using):
                                                      order__warehouse__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
-                current_wb = waybill.pk[14:]
+                current_wb = waybill.pk
                 #ISBX00211 strip
                 CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), current_wb)
                 
