@@ -195,10 +195,10 @@ def import_order(compas):
             key_data = {
                 'order': order,
                 'lti_pk': lti.lti_pk, 
-                'lti_id': lti.lti_id,
                 'si_code': lti.si_code,
-                'project_number': lti.project_wbs_element, 
                 'commodity': commodity,
+                'lti_id': lti.lti_id,
+                'project_number': lti.project_wbs_element,
             }
             defaults = {
                 'number_of_units': lti.number_of_units,

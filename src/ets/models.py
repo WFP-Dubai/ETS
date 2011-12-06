@@ -384,7 +384,7 @@ class OrderItem(models.Model):
         order_with_respect_to = 'order'
         verbose_name = _("order item")
         verbose_name_plural = _("order items")
-        unique_together = ('lti_pk', 'si_code', 'commodity')
+        #unique_together = ('lti_pk', 'si_code', 'commodity')
     
     def  __unicode__( self ):
         return u"%s -  %.0f " % ( self.commodity, self.items_left() )
