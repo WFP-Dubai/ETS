@@ -215,18 +215,17 @@ def send_dispatched(using):
                                                      order__warehouse__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
-                current_wb = waybill.pk
-                #ISBX00211 strip
-                CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), current_wb)
+                CURR_CODE = waybill.pk
                 
                 CONTAINER_NUMBER = waybill.container_one_number
+                
                 special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
                 code_letter = u'A'
         
                 for index, loading in enumerate( waybill.loading_details.all() ):
                     
                     if special_case:
-                        CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
+                        CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
                         code_letter = u'B'
                         if index == 1:
                             CONTAINER_NUMBER = waybill.container_two_number
