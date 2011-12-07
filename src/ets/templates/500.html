@@ -3,6 +3,10 @@
 {% get_static_prefix as STATIC_URL %}
 {% block title %}{% trans "Internal Server Error" %}{% endblock %}
 
+{% block style %}{% endblock %}
+
 {% block content %}
   <p style="font-size: 32px;">{% trans "Internal server error. Inform the administrator" %}</p>
 {% endblock %}
+
+{% block script %}{% endblock %}
