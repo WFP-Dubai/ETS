@@ -642,7 +642,7 @@ class Waybill( ld_models.Model ):
                 objects.update((ld.units_lost_reason, ld.units_lost_reason.category,))
         
         #Serialize
-        data = serializers.serialize('json', objects, use_decimal=False)
+        data = serializers.serialize('json', filter(None, objects), use_decimal=False)
         
         return compress_json(data)
         
