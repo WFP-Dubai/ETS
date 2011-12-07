@@ -12,7 +12,7 @@
   <tbody>
     {% for action_user, action_type, action_date, changes in history_list %}
       <tr>
-          <td>{{ action_user }}</td>
+          <td>{% if action_user %}{{ action_user }}{% else %}{% trans "System" %}{% endif %}</td>
           <td>{{ action_type }}</td>
           <td>{{ action_date|date:"DATETIME_FORMAT" }}</td>
           <td>
