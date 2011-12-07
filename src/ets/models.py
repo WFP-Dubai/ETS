@@ -150,7 +150,7 @@ class Person(User):
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
     location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
     
-    #warehouses = models.ManyToManyField('ets.Warehouse', verbose_name=_("Warehouses"), )
+    warehouses = models.ManyToManyField('ets.Warehouse', verbose_name=_("Warehouses"), related_name="persons")
     
     dispatch = models.BooleanField(_("Can dispatch"), default=False)
     receive = models.BooleanField(_("Can receive"), default=False)
@@ -164,10 +164,12 @@ class Person(User):
     def __unicode__(self):
         return "%s %s" % (self.code, self.title)
 
-    def get_warehouses(self):
-        return Warehouse.objects.filter(compas=self.compas, organization=self.organization, location=self.location) \
-                                .filter(start_date__lte=date.today)\
-                                .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+    #===================================================================================================================
+    # def get_warehouses(self):
+    #    return Warehouse.objects.filter(compas=self.compas, organization=self.organization, location=self.location) \
+    #                            .filter(start_date__lte=date.today)\
+    #                            .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+    #===================================================================================================================
         
 
 class CommodityCategory(models.Model):

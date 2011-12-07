@@ -170,7 +170,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'end_discharge_date': today,
     }, instance=waybill)
     
-    form.fields['destination'].queryset = request.user.person.get_warehouses().exclude(pk=waybill.order.warehouse.pk)
+    form.fields['destination'].queryset = request.user.person.warehouses.all().exclude(pk=waybill.order.warehouse.pk)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()

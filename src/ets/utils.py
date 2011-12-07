@@ -83,6 +83,11 @@ def import_persons(compas):
                                        is_staff=True, is_active=False, is_superuser=False)
                 obj.set_password(person.person_pk)
                 obj.save()
+                
+                for wh in ets_models.Warehouse.objects.filter(compas=obj.compas, 
+                                                   organization=obj.organization, 
+                                                   location=obj.location):
+                    obj.warehouses.add(wh)
 
 
 def import_stock(compas):

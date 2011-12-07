@@ -257,7 +257,7 @@ class PersonAdmin(UserAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
     fieldsets = (
-        (None, {'fields': ('username', 'compas', 'organization', 'location', 'is_active',)}),
+        (None, {'fields': ('username', 'compas', 'organization', 'location', 'warehouses', 'is_active',)}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email', 'title', 'code')}),
         (_('Actions'), {'fields': ('dispatch', 'receive')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
@@ -275,6 +275,7 @@ class PersonAdmin(UserAdmin):
     )
     readonly_fields = ('last_login', 'date_joined')
     raw_id_fields = ('organization', 'location')
+    filter_horizontal = ('warehouses',)
     form = ets.forms.PersonChangeForm
     
     def queryset(self, request):
