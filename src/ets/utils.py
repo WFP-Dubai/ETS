@@ -311,8 +311,7 @@ def send_received(using):
                                                      destination__compas__read_only=False):
         try:
             with transaction.commit_on_success(using=using) as tr:
-                current_wb = waybill.pk[11:]
-                CURR_CODE = u"%s%s" % (datetime.now().strftime( '%y' ), current_wb)
+                CURR_CODE = waybill.pk
     
                 ## check if containers = 2 & lines = 2
                 special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -334,7 +333,7 @@ def send_received(using):
                         u'%.3f' % loading.number_units_damaged, 
                         loading.units_lost_reason and loading.units_lost_reason.cause, 
                         u'%.3f' % loading.number_units_lost, 
-                        loading.stock_item.pk, 
+                        loading.stock_item.origin_id, 
                         loading.stock_item.commodity.category.pk,
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 
