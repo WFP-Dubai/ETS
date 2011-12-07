@@ -148,9 +148,9 @@ def import_order(compas):
     
     with transaction.commit_on_success(compas) as tr:
         places = _get_places(compas)
-        #models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True)
         for lti in compas_models.LtiOriginal.objects.using(compas)\
-                            .filter(consegnee_code__in=places.values_list('organization_id', flat=True),
+                            .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
+                                    consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
             #Update Consignee
@@ -208,154 +208,152 @@ def import_order(compas):
                 ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
 
 
-def send_dispatched(using):
-    for waybill in ets_models.Waybill.objects.filter(transport_dispach_signed_date__lte=datetime.now(), 
-                                                     validated=True, sent_compas__isnull=True,
-                                                     order__warehouse__compas__pk=using,
-                                                     order__warehouse__compas__read_only=False):
-        try:
-            with transaction.commit_on_success(using=using) as tr:
-                CURR_CODE = waybill.pk
-                
-                CONTAINER_NUMBER = waybill.container_one_number
-                
-                special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
-                code_letter = u'A'
-        
-                for index, loading in enumerate( waybill.loading_details.all() ):
-                    
-                    if special_case:
-                        CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
-                        code_letter = u'B'
-                        if index == 1:
-                            CONTAINER_NUMBER = waybill.container_two_number
-                
-                    is_bulk = loading.stock_item.is_bulk
-                    
-                    try:
-                        order_item = loading.get_order_item()
-                    except ets_models.OrderItem.DoesNotExist:
-                        raise ValidationError("System can not find order item. Check database.")
-                    
-                    call_db_procedure('write_waybill.dispatch', (
-                        CURR_CODE, 
-                        waybill.dispatch_date.strftime("%Y%m%d"), 
-                        waybill.order.origin_type, 
-                        waybill.order.warehouse.location.pk, 
-                        waybill.order.warehouse.pk,
-                        waybill.order.warehouse.name, 
-                        waybill.order.location.pk,
-                        waybill.destination.pk,
-                        order_item.lti_id, 
-                        waybill.loading_date.strftime("%Y%m%d"),
-                        waybill.order.consignee.pk, 
-                        
-                        waybill.transaction_type, 
-                        waybill.transport_vehicle_registration,
-                        waybill.transport_type,
-                        waybill.dispatch_remarks, 
-                        
-                        waybill.dispatcher_person.code, 
-                        waybill.dispatcher_person.compas.pk, 
-                        waybill.dispatcher_person.title, 
-                        
-                        waybill.order.transport_code, 
-                        waybill.order.transport_ouc,
-                        
-                        waybill.transport_driver_name, 
-                        waybill.transport_driver_licence,
-                        
-                        CONTAINER_NUMBER,
-                        
-                        using,
-                        
-                        loading.stock_item.origin_id, 
-                        loading.stock_item.commodity.category.pk, 
-                        loading.stock_item.commodity.pk, 
-                        loading.stock_item.package.pk, 
-                        loading.stock_item.allocation_code, 
-                        loading.stock_item.quality,
-                        
-                        u'%.3f' % loading.calculate_total_net(), 
-                        u'%.3f' % loading.calculate_total_gross(), 
-                        u'%.3f' % (1 if is_bulk else loading.number_of_units), 
-                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
-                        u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
-                        
-                        None, #p_odaid
-                        None, #p_losstype
-                        None, #p_lossreason
-                        '', #p_loannumber
-                    ), using)
-        
-        except ValidationError, err:
-            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
-                                                   compas_id=using, waybill=waybill,
-                                                   status=ets_models.CompasLogger.FAILURE, 
-                                                   message=err.messages[0])
-            waybill.validated = False
-            waybill.save()
-        else:
-            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
-                                                   compas_id=using, waybill=waybill,
-                                                   status=ets_models.CompasLogger.SUCCESS)
+def send_dispatched(waybill, compas=None):
+    if not compas:
+        compas = waybill.order.warehouse.compas.pk
+     
+    try:
+        with transaction.commit_on_success(using=compas) as tr:
+            CURR_CODE = waybill.pk
             
-            waybill.sent_compas = datetime.now()
-            waybill.save()
+            CONTAINER_NUMBER = waybill.container_one_number
             
-
-def send_received(using):
-    for waybill in ets_models.Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
-                                                     receipt_validated=True, receipt_sent_compas__isnull=True,
-                                                     destination__compas__pk=using,
-                                                     destination__compas__read_only=False):
-        try:
-            with transaction.commit_on_success(using=using) as tr:
-                CURR_CODE = waybill.pk
+            special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
+            code_letter = u'A'
     
-                ## check if containers = 2 & lines = 2
-                special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
-                code_letter = u'A'
+            for index, loading in enumerate( waybill.loading_details.all() ):
                 
-                for loading in waybill.loading_details.all():
-                    
-                    if special_case:
-                        CURR_CODE = u"%s%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
-                        code_letter = u'B'
-                    
-                    call_db_procedure('write_waybill.receipt', (
-                        CURR_CODE, 
-                        waybill.receipt_person.compas.pk, 
-                        waybill.receipt_person.code, 
-                        waybill.arrival_date.strftime("%Y%m%d"),
-                        u'%.3f' % loading.number_units_good, 
-                        loading.units_damaged_reason and loading.units_damaged_reason.cause, 
-                        u'%.3f' % loading.number_units_damaged, 
-                        loading.units_lost_reason and loading.units_lost_reason.cause, 
-                        u'%.3f' % loading.number_units_lost, 
-                        loading.stock_item.origin_id, 
-                        loading.stock_item.commodity.category.pk,
-                        loading.stock_item.commodity.pk, 
-                        loading.stock_item.package.pk, 
-                        loading.stock_item.allocation_code, 
-                        loading.stock_item.quality
-                    ), using)
-                    
-        except ValidationError, err:
-            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
-                                                   compas_id=using, waybill=waybill,
-                                                   status=ets_models.CompasLogger.FAILURE, 
-                                                   message=err.messages[0])
+                if special_case:
+                    CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
+                    code_letter = u'B'
+                    if index == 1:
+                        CONTAINER_NUMBER = waybill.container_two_number
             
-            waybill.receipt_validated = False
-        else:
-            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
-                                                   compas_id=using, waybill=waybill,
-                                                   status=ets_models.CompasLogger.SUCCESS)
-            
-            waybill.receipt_sent_compas = datetime.now()
-        
+                is_bulk = loading.stock_item.is_bulk
+                
+                try:
+                    order_item = loading.get_order_item()
+                except ets_models.OrderItem.DoesNotExist:
+                    raise ValidationError("System can not find order item. Check database.")
+                
+                call_db_procedure('write_waybill.dispatch', (
+                    CURR_CODE, 
+                    waybill.dispatch_date.strftime("%Y%m%d"), 
+                    waybill.order.origin_type, 
+                    waybill.order.warehouse.location.pk, 
+                    waybill.order.warehouse.pk,
+                    waybill.order.warehouse.name, 
+                    waybill.order.location.pk,
+                    waybill.destination.pk,
+                    order_item.lti_id, 
+                    waybill.loading_date.strftime("%Y%m%d"),
+                    waybill.order.consignee.pk, 
+                    
+                    waybill.transaction_type, 
+                    waybill.transport_vehicle_registration,
+                    waybill.transport_type,
+                    waybill.dispatch_remarks, 
+                    
+                    waybill.dispatcher_person.code, 
+                    waybill.dispatcher_person.compas.pk, 
+                    waybill.dispatcher_person.title, 
+                    
+                    waybill.order.transport_code, 
+                    waybill.order.transport_ouc,
+                    
+                    waybill.transport_driver_name, 
+                    waybill.transport_driver_licence,
+                    
+                    CONTAINER_NUMBER,
+                    
+                    compas,
+                    
+                    loading.stock_item.origin_id, 
+                    loading.stock_item.commodity.category.pk, 
+                    loading.stock_item.commodity.pk, 
+                    loading.stock_item.package.pk, 
+                    loading.stock_item.allocation_code, 
+                    loading.stock_item.quality,
+                    
+                    u'%.3f' % loading.calculate_total_net(), 
+                    u'%.3f' % loading.calculate_total_gross(), 
+                    u'%.3f' % (1 if is_bulk else loading.number_of_units), 
+                    u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
+                    u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
+                    
+                    None, #p_odaid
+                    None, #p_losstype
+                    None, #p_lossreason
+                    '', #p_loannumber
+                ), compas)
+    
+    except ValidationError, err:
+        ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
+                                               compas_id=compas, waybill=waybill,
+                                               status=ets_models.CompasLogger.FAILURE, 
+                                               message=err.messages[0])
+        waybill.validated = False
         waybill.save()
+    else:
+        ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
+                                               compas_id=compas, waybill=waybill,
+                                               status=ets_models.CompasLogger.SUCCESS)
+        
+        waybill.sent_compas = datetime.now()
+        waybill.save()
+        
+
+def send_received(waybill, compas=None):
+    if not compas:
+        compas = waybill.destination.compas.pk
+    
+    try:
+        with transaction.commit_on_success(using=compas) as tr:
+            CURR_CODE = waybill.pk
+
+            ## check if containers = 2 & lines = 2
+            special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
+            code_letter = u'A'
+            
+            for loading in waybill.loading_details.all():
+                
+                if special_case:
+                    CURR_CODE = u"%s%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
+                    code_letter = u'B'
+                
+                call_db_procedure('write_waybill.receipt', (
+                    CURR_CODE, 
+                    waybill.receipt_person.compas.pk, 
+                    waybill.receipt_person.code, 
+                    waybill.arrival_date.strftime("%Y%m%d"),
+                    u'%.3f' % loading.number_units_good, 
+                    loading.units_damaged_reason and loading.units_damaged_reason.cause, 
+                    u'%.3f' % loading.number_units_damaged, 
+                    loading.units_lost_reason and loading.units_lost_reason.cause, 
+                    u'%.3f' % loading.number_units_lost, 
+                    loading.stock_item.origin_id, 
+                    loading.stock_item.commodity.category.pk,
+                    loading.stock_item.commodity.pk, 
+                    loading.stock_item.package.pk, 
+                    loading.stock_item.allocation_code, 
+                    loading.stock_item.quality
+                ), compas)
+                
+    except ValidationError, err:
+        ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
+                                               compas_id=compas, waybill=waybill,
+                                               status=ets_models.CompasLogger.FAILURE, 
+                                               message=err.messages[0])
+        
+        waybill.receipt_validated = False
+    else:
+        ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
+                                               compas_id=compas, waybill=waybill,
+                                               status=ets_models.CompasLogger.SUCCESS)
+        
+        waybill.receipt_sent_compas = datetime.now()
+    
+    waybill.save()
             
 
 def changed_fields(model, next, previous, exclude=()):

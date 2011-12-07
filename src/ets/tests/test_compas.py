@@ -113,7 +113,7 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         waybill.save()
         
         #Send all validated waybills to compas
-        send_dispatched(self.compas)
+        send_dispatched(waybill, self.compas)
         
         self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
         
@@ -132,11 +132,13 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         ets.models.Waybill.objects.filter(pk="ISBX00211A").update(validated=True, 
                                                         transport_dispach_signed_date=datetime.now())
         
-        #Send all validated waybills to compas
-        send_dispatched(self.compas)
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
         
-        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00211A").sent_compas)
-        self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00211A").validated)
+        #Send all validated waybills to compas
+        send_dispatched(waybill, self.compas)
+        
+        self.assertFalse(waybill.sent_compas)
+        self.assertFalse(waybill.validated)
         
         #Check compass logger
         logger = ets.models.CompasLogger.objects.get(waybill__pk='ISBX00211A')
@@ -159,7 +161,7 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         waybill.save()
         
         #Send all validated waybills to compas
-        send_received(self.compas)
+        send_received(waybill, self.compas)
         
         self.assertTrue(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_sent_compas)
         
@@ -178,7 +180,7 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
                                                                   receipt_signed_date=datetime.now())
         
         #Send all validated waybills to compas
-        send_received(self.compas)
+        send_received(ets.models.Waybill.objects.get(pk="ISBX00312A"), self.compas)
         
         self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_sent_compas)
         self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_validated)

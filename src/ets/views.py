@@ -24,7 +24,7 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list
+from ets.utils import history_list, send_dispatched, send_received
 
 
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
@@ -52,7 +52,6 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
     return direct_to_template(request, template, context)
 
 
-##@login_required
 @waybill_user_related
 def waybill_view(request, waybill_pk, queryset, template):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -60,7 +59,6 @@ def waybill_view(request, waybill_pk, queryset, template):
     
 
 @require_POST
-##@login_required
 @person_required
 @dispatch_view
 def waybill_finalize_dispatch(request, waybill_pk, queryset):
@@ -78,7 +76,6 @@ def waybill_finalize_dispatch(request, waybill_pk, queryset):
     return waybill_detail(request, waybill, extra_context={'print_original': True})
 
 
-##@login_required
 @waybill_user_related
 def waybill_list(request, queryset, template='waybill/list.html', extra_context=None):
     """Shows waybill listing"""
@@ -86,7 +83,6 @@ def waybill_list(request, queryset, template='waybill/list.html', extra_context=
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
-##@login_required
 def waybill_search( request, form_class=WaybillSearchForm, 
                     queryset=ets.models.Waybill.objects.all(), 
                     template='waybill/list.html'):
@@ -135,7 +131,6 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     })
 
 
-#@login_required
 @person_required
 @warehouse_related
 def waybill_create(request, order_pk, queryset, **kwargs):
@@ -147,7 +142,6 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     return _dispatching(request, waybill, success_message=_("Waybill has been created"), **kwargs)
 
 
-#@login_required
 @person_required
 @dispatch_view
 def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
@@ -194,7 +188,6 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 
 
 @require_POST
-#@login_required
 @person_required
 @receipt_view
 def waybill_finalize_receipt(request, waybill_pk, queryset):
@@ -209,7 +202,6 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
     return waybill_detail(request, waybill, extra_context={'print_original': True})
 
 
-#@login_required
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
     waybill = ets.models.Waybill.decompress(scanned_code)
@@ -219,7 +211,6 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 
 
 @require_POST
-#@login_required
 @person_required
 @dispatch_view
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
@@ -237,7 +228,6 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
         return redirect('index')
         
 
-#@login_required
 @officer_required
 @dispatch_compas
 def dispatch_validates(request, queryset, template):
@@ -246,7 +236,6 @@ def dispatch_validates(request, queryset, template):
         'validated_waybills': queryset.filter(validated=True),
     })
 
-#@login_required
 @officer_required
 @receipt_compas
 def receipt_validates(request, queryset, template):
@@ -257,7 +246,6 @@ def receipt_validates(request, queryset, template):
 
 
 @require_POST
-#@login_required
 @officer_required
 @dispatch_compas
 def validate_dispatch(request, waybill_pk, queryset):
@@ -274,8 +262,23 @@ def validate_dispatch(request, waybill_pk, queryset):
     return redirect('dispatch_validates')
 
 
+@officer_required
+@dispatch_compas
+def send_dispatched(request, waybill_pk, queryset):
+    """Sets 'validated' flag and submits to compas"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.validated = True
+    send_dispatched(waybill)
+    
+    messages.add_message(request, messages.INFO, 
+                        _('Waybill %(waybill)s has been submitted.') % { 
+                            'waybill': waybill.pk,
+                        })
+
+    return redirect('dispatch_validates')
+
+
 @require_POST
-#@login_required
 @officer_required
 @receipt_compas
 def validate_receipt(request, waybill_pk, queryset):
@@ -292,7 +295,6 @@ def validate_receipt(request, waybill_pk, queryset):
     return redirect('receipt_validates')
 
 
-#@login_required
 def deserialize(request, form_class=WaybillScanForm):
     form = form_class(request.GET or None)
     if form.is_valid():
