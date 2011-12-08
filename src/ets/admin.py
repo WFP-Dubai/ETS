@@ -265,15 +265,15 @@ class PersonAdmin(UserAdmin):
 
     list_display = (
         'username', 'code', 'title', 'get_full_name', 'link_to_compas', 
-        'organization', 'link_to_location', 'dispatch', 'receive', 'is_active'
+        'link_to_organization', 'link_to_location', 'dispatch', 'receive', 'is_active'
     )
-    list_editable = ('is_active', 'organization', 'dispatch', 'receive')
+    list_editable = ('is_active', 'dispatch', 'receive')
     list_filter = ('is_active',)
     search_fields = (
         'code', 'title', 'username', 'first_name', 'last_name', 'email',
         'compas__code', 'organization__name', 'location__name'
     )
-    readonly_fields = ('last_login', 'date_joined')
+    readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location')
     raw_id_fields = ('organization', 'location')
     filter_horizontal = ('warehouses',)
     form = ets.forms.PersonChangeForm
