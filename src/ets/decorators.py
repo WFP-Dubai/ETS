@@ -33,7 +33,7 @@ dispatch_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.d
 receipt_view = user_filtered(filter=lambda queryset, user: ets.models.Waybill.receptions(user),
                              user_test=lambda u: (not hasattr(u, 'person') or u.person.receive))
 
-warehouse_related = user_filtered(filter=lambda queryset, user: queryset.filter(warehouse__in=ets.models.Warehouse.filter_by_user(user)))
+warehouse_related = user_filtered(filter=lambda queryset, user: queryset.filter(warehouse__persons__pk=user.pk))
 
 def waybill_user_related_filter(queryset, user):
     """
@@ -41,10 +41,9 @@ def waybill_user_related_filter(queryset, user):
     it could be a dispatcher, a recepient, officer of both compases.
     Status of waybill does not matter.
     """
-    warehouses = ets.models.Warehouse.filter_by_user(user)
-    return queryset.filter(Q(order__warehouse__in=warehouses) 
+    return queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
                            | Q(order__warehouse__compas__officers=user)
-                           | Q(destination__in=warehouses)
+                           | Q(destination__persons__pk=user.pk)
                            | Q(destination__compas__officers=user)).distinct()
                            
 waybill_user_related = user_filtered(filter=waybill_user_related_filter)

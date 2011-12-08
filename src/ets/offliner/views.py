@@ -81,7 +81,7 @@ def synchronization(request, template="synchronization.html", export_form=Export
     """
     Page for synchronization
     """
-    export_form.base_fields['warehouse'].queryset = Warehouse.filter_by_user(request.user)
+    export_form.base_fields['warehouse'].queryset = Warehouse.objects.filter(persons__pk=request.user.pk)
         
     return direct_to_template(request, template, {
         'form_import': import_form,

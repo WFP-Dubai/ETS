@@ -141,17 +141,6 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #check created waybill and loading details
         waybill = ets.models.Waybill.objects.get(pk='ISBX00211A000004')
         self.assertEqual(waybill.loading_details.count(), 1)
-        
-        #check case when queryset for warehouse is None with filter by consignee
-        warehouse = ets.models.Warehouse.objects.get(pk="ISBX003")
-        organization = ets.models.Organization.objects.get(pk="WFP")
-        warehouse.organization = organization
-        warehouse.save()
-        response = self.client.get(reverse('waybill_create', kwargs={'order_pk': "THEIRORDER",}))
-        form = response.context['form']
-        self.assertTrue(isinstance(form, DispatchWaybillForm))
-        self.assertEqual(form.fields['destination'].queryset.count(), 1)
-        self.assertEqual(form.fields['destination'].queryset[0].pk, "ISBX002")
 
     
     def test_waybill_edit(self):

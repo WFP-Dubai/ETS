@@ -36,7 +36,7 @@ def waybill_creation(order, user, text=_("Create")):
     return { 
             'text': text,
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
-            'success': (not hasattr(user, 'person') or user.person.dispatch) and Warehouse.filter_by_user(user).filter(pk=order.warehouse.pk).count(),
+            'success': (not hasattr(user, 'person') or user.person.dispatch) and order.warehouse.persons.filter(pk=user.pk).count(),
     }
     
 

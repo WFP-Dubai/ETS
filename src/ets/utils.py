@@ -17,18 +17,18 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    #Update persons
-    import_persons(using)
-
-    #Update stocks
-    import_stock(using)
-
-    #Update loss, damage reasons
-    ets_models.LossDamageType.update(using)
-
     #Update places
     import_places(using)
     
+    #Update persons
+    import_persons(using)
+    
+    #Update loss, damage reasons
+    ets_models.LossDamageType.update(using)
+    
+    #Update stocks
+    import_stock(using)
+
     #Update orders
     import_order(using)
 

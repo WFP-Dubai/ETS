@@ -128,13 +128,15 @@ class Warehouse(models.Model):
         
         return queryset
             
-    @classmethod
-    def filter_by_user(cls, user):
-        return cls.objects.filter(location__persons__username=user.username, 
-                                  organization__persons__username=user.username,
-                                  compas__persons__username=user.username,
-                                  start_date__lte=date.today)\
-                .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
+    #===================================================================================================================
+    # @classmethod
+    # def filter_by_user(cls, user):
+    #    return cls.objects.filter(location__persons__username=user.username, 
+    #                              organization__persons__username=user.username,
+    #                              compas__persons__username=user.username,
+    #                              start_date__lte=date.today)\
+    #            .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
+    #===================================================================================================================
 
     def get_persons(self):
         return Person.objects.filter(compas=self.compas, organization=self.organization, location=self.location)
@@ -672,14 +674,14 @@ class Waybill( ld_models.Model ):
         """Returns all loaded but not signed waybills, and related to user"""
         #dispatch_person=user.person
         return cls.objects.filter(transport_dispach_signed_date__isnull=True,
-                                  order__warehouse__in=Warehouse.filter_by_user(user))
+                                  order__warehouse__persons__pk=user.pk)
     
     @classmethod
     def receptions(cls, user):
         """Returns all waybills, that can be received, and related to user"""
         return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
                                   receipt_signed_date__isnull=True,
-                                  destination__in=Warehouse.filter_by_user(user))
+                                  destination__persons__pk=user.pk)
     
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   

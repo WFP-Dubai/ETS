@@ -58,7 +58,7 @@ class ReadWaybillHandler(BaseHandler):
         waybills = self.model.objects.all()
         
         if not request.user.has_perm("ets.waybill_api_full_access"):
-            waybills = waybills.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+            waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
         
         filter_arg = {}
         if warehouse: 
@@ -121,9 +121,8 @@ class ReadLoadingDetailHandler(BaseHandler):
         load_details = self.model.objects.all()
         
         if not request.user.has_perm("ets.loadingetail_api_full_access"):
-            warehouses = ets.models.Warehouse.filter_by_user(request.user)
-            load_details = load_details.filter(Q(waybill__order__warehouse__in=warehouses) 
-                                               | Q(waybill__destination__in=warehouses))
+            load_details = load_details.filter(Q(waybill__order__warehouse__persons__pk=request.user.pk) 
+                                               | Q(waybill__destination__persons__pk=request.user.pk))
         
         filter_arg = {}
         if warehouse: 
@@ -156,7 +155,7 @@ class ReadOrdersHandler(BaseHandler):
         orders = self.model.objects.all()
      
         if not request.user.has_perm("ets.order_api_full_access"):
-            orders = orders.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+            orders = orders.filter(warehouse__persons__pk=request.user.pk)
         
         filter_arg = {}
         if warehouse: 
@@ -196,7 +195,7 @@ class ReadOrderItemsHandler(BaseHandler):
         order_items = self.model.objects.all()
         
         if not request.user.has_perm("ets.orderitem_api_full_access"):
-            order_items = order_items.filter(order__warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+            order_items = order_items.filter(order__warehouse__persons__pk=request.user.pk)
         
         filter_arg = {}
         
@@ -236,7 +235,7 @@ class ReadStockItemsHandler(BaseHandler):
         stock_items = self.model.objects.all()
             
         if not request.user.has_perm("ets.stockitem_api_full_access"):
-            stock_items = stock_items.filter(warehouse__in=ets.models.Warehouse.filter_by_user(request.user))
+            stock_items = stock_items.filter(warehouse__persons__pk=request.user.pk)
         
         if warehouse: 
             stock_items = stock_items.filter(warehouse=warehouse)
@@ -258,7 +257,7 @@ class ReadCSVWarehouseHandler(BaseHandler):
         warehouses = self.model.objects.all()
         
         if not request.user.has_perm("ets.warehouse_api_full_access"):
-            warehouses = self.model.filter_by_user(request.user)
+            warehouses = self.model.objects.filter(persons__pk=request.user.pk)
         
         return warehouses
     
