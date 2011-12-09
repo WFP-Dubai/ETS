@@ -325,3 +325,13 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
     file_out.close()
     
     return HttpResponse(result, mimetype="image/jpeg")
+
+
+def stock_items(request, template_name, queryset):
+    
+    if not request.user.has_perm("ets.warehouse_api_full_access"):
+        queryset = queryset.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
+    
+    return direct_to_template(request, template_name, {
+        'object_list': queryset,
+    })

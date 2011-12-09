@@ -20,19 +20,19 @@ import ets.models
 class PrefixedPatterns:
     urlpatterns = patterns("ets.views",
 
-        ( r'^$', login_required(direct_to_template), {
+        ( r'^$', direct_to_template, {
             'template': 'index.html',
             'extra_context': {'form_scan': WaybillScanForm, 'form': WaybillSearchForm },
         }, "index"),
         
         #Order list
-        ( r'^orders/$', login_required(person_required(warehouse_related(object_list))), {
+        ( r'^orders/$', person_required(warehouse_related(object_list)), {
             'queryset': ets.models.Order.objects.all().order_by('-created'),
             'template_name': 'order/list.html',
         }, "orders"),
         
         #Order detail
-        ( r'^order/(?P<object_id>[-\w]+)/$', login_required(person_required(warehouse_related(object_detail))), {
+        ( r'^order/(?P<object_id>[-\w]+)/$', object_detail, {
             'queryset': ets.models.Order.objects.all().order_by('-created'),
             'template_name': 'order/detail.html',
         }, "order_detail" ),
@@ -49,10 +49,10 @@ class PrefixedPatterns:
         ( r'^search/$', "waybill_search", {
             'queryset': ets.models.Waybill.objects.all(),
         }, "waybill_search" ),
-        ( r'^dispatch/$', login_required(person_required(dispatch_view(waybill_list))), {
+        ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
             "extra_context": {"extra_title": _("Waybills waiting for Dispatch signature")}
         }, "waybill_dispatch_list" ),
-        ( r'^receive/$', login_required(person_required(receipt_view(waybill_list))), {
+        ( r'^receive/$', person_required(receipt_view(waybill_list)), {
             "extra_context": {"extra_title": _("Waybills pending Receipting")}
         }, "waybill_reception_list" ),
         
@@ -71,7 +71,7 @@ class PrefixedPatterns:
         
         #Reception pages
         
-        ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', login_required(person_required(receipt_view(waybill_reception))), 
+        ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', person_required(receipt_view(waybill_reception)), 
           {}, "waybill_reception"),
                             
         ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
@@ -106,19 +106,19 @@ class PrefixedPatterns:
           "waybill_delete", {}, "waybill_delete" ),
         ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
         
-        ( r'^compass_waybill_receipt/$', login_required(officer_required(waybill_user_related(object_list))), {
+        ( r'^compass_waybill_receipt/$', officer_required(waybill_user_related(object_list)), {
             "template_name": 'compas/list_waybills_compas_all.html',
             "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False),
             "extra_context": {
                 "extra_title": _("Received"),
         }}, "compass_waybill_receipt" ),
                             
-        ( r'^compass_waybill/$', login_required(officer_required(waybill_user_related(object_list))), {
+        ( r'^compass_waybill/$', officer_required(waybill_user_related(object_list)), {
             "template_name": 'compas/list_waybills_compas_all.html',
             "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
         }, "compass_waybill" ),
         
-        ( r'^view_stock/$', login_required(person_required(warehouse_related(object_list))), {
+        ( r'^stock/$', 'stock_items', {
             'queryset': ets.models.StockItem.objects.all(),
             'template_name': 'stock/stocklist.html',
         }, "view_stock" ),
@@ -135,7 +135,7 @@ class PrefixedPatterns:
     
     urlpatterns += patterns('',
         ( r'^accounts/', include('django.contrib.auth.urls') ),
-        ( r'^databrowse/(.*)', login_required(databrowse.site.root) ),
+        ( r'^databrowse/(.*)', databrowse.site.root ),
         ( r'^rosetta/', include('rosetta.urls') ),
         ( r'^admin/', include( admin.site.urls ) ),
         ( r'^api/offline/', include('ets.offliner.api.urls')),

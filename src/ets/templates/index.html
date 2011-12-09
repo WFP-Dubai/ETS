@@ -25,11 +25,8 @@
   <li><a href='{% url waybill_reception_list %}'>{% trans "Waybills pending Receipting" %}</a></li>
   {% endif%}
 </ul>
-<ul>
-  <li><a href='{% url view_stock %}'>{% trans "List of Stock Items" %}</a></li>  
-</ul>
 {% endperson_only %}
-  
+
 {% officer_only user %}
 <ul>
   <li><a href='{% url dispatch_validates %}'>{% trans "Validate Dispatched Waybills" %}</a></li>
@@ -66,6 +63,7 @@
 {% endif %}
 
 <ul>
+  <li><a href='{% url view_stock %}'>{% trans "List of Stock Items" %}</a></li>  
   <li><a href="{% url select_report %}">{% trans "Request Reports in CSV Format" %}</a></li>
 </ul>
   
