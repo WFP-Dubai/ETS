@@ -69,7 +69,6 @@ $(document).ready(function() {
   	$.ajax({
   		url: $(this).attr('href'),
   		context: container,
-  		timeout: 1000*60*15,
       success: function (data) {
       	$(this).find('strong').text(data);
       	container.deleteIndicator();
