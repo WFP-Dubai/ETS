@@ -339,5 +339,7 @@ def stock_items(request, template_name, queryset):
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
 def sync_compas(request):
-    call_command('sync_compas')
+    last_updated = ets.models.StockItem.get_last_update()
+    if (datetime.datetime.now()-last_updated).minutes > 3:
+        call_command('sync_compas')
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
