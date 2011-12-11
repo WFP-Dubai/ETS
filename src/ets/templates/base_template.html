@@ -62,23 +62,26 @@
 {% endblock %}
 
 <script charset="utf-8">
-  $(document).ready(function() {
-    $('#sync_compas a').click(function(){
-    	var container = $(this).parent();
-    	container.loadIndicator()
-    	$.ajax({
-    		url: $(this).attr('href'),
-    		context: container,
-    		timeoutNumber: 1000*60*15,
-        success: function (data) {
-        	$(this).find('strong').text(data);
-        	container.deleteIndicator();
-        }
-      });
-    	
-    	return false;
+$(document).ready(function() {
+  $('#sync_compas a').click(function(){
+  	var container = $(this).parent();
+  	container.loadIndicator()
+  	$.ajax({
+  		url: $(this).attr('href'),
+  		context: container,
+  		timeoutNumber: 1000*60*15,
+      success: function (data) {
+      	$(this).find('strong').text(data);
+      	container.deleteIndicator();
+      }
     });
+  	
+  	return false;
   });
+});
+$(window).load(function() {
+	$('.dataTables_filter input:first').focus();
+});
 </script>
 
 </body>
