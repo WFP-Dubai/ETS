@@ -1,6 +1,8 @@
 import datetime
 import pyqrcode
 import cStringIO
+import os
+from subprocess import call, Popen
 
 from django import forms
 from django.db.models import Q
@@ -275,11 +277,6 @@ def send_dispatched(request, waybill_pk, queryset):
     waybill.validated = True
     send_dispatched(waybill)
     
-    messages.add_message(request, messages.INFO, 
-                        _('Waybill %(waybill)s has been submitted.') % { 
-                            'waybill': waybill.pk,
-                        })
-
     return redirect('dispatch_validates')
 
 
@@ -342,7 +339,13 @@ def stock_items(request, template_name, queryset):
 
 @permission_required("ets.sync_compas")
 def sync_compas(request):
-    last_updated = ets.models.StockItem.get_last_update()
-    if (datetime.datetime.now()-last_updated).seconds > 60*3:
-        call_command('sync_compas')
+    #call_command('sync_compas')
+    
+    #instance_path = os.path.join(settings.EGG_ROOT, 'bin', 'instance')
+    
+    proc = Popen('./cron/hourly.sh', shell=True, executable='/bin/sh', cwd=settings.EGG_ROOT) 
+    #stdout=open(os.path.join(settings.EGG_ROOT, 'logs', 'hourly.log')))
+    
+    #proc.wait()
+    
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
