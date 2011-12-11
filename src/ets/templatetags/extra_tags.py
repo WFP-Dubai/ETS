@@ -98,4 +98,4 @@ def get_last_update():
     """dummy function, just a wrapper"""
     return StockItem.get_last_update()
 
-get_last_update = function(get_last_update, cache=3600)
+get_last_update = function(get_last_update, cache=360)
