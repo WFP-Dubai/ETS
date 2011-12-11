@@ -323,7 +323,7 @@ def send_received(waybill, compas=None):
             for loading in waybill.loading_details.all():
                 
                 if special_case:
-                    CURR_CODE = u"%s%s%s" % (datetime.now().strftime( '%y' ), code_letter, waybill.pk)
+                    CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
                     code_letter = u'B'
                 
                 call_db_procedure('write_waybill.receipt', (
