@@ -286,8 +286,8 @@ def send_dispatched(request, waybill_pk, queryset):
 def validate_receipt(request, waybill_pk, queryset):
     """Sets 'validated' flag"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.receipt.validated = True
-    waybill.receipt.save()
+    waybill.receipt_validated = True
+    waybill.save()
     
     messages.add_message(request, messages.INFO, 
                         _('Waybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
