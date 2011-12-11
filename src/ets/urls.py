@@ -119,7 +119,7 @@ class PrefixedPatterns:
         }, "compass_waybill" ),
         
         ( r'^stock/$', 'stock_items', {
-            'queryset': ets.models.StockItem.objects.all(),
+            'queryset': ets.models.Warehouse.objects.all(),
             'template_name': 'stock/stocklist.html',
         }, "view_stock" ),
                            

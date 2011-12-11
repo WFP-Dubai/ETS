@@ -142,6 +142,7 @@ INSTALLED_APPS = (
     'native_tags',
     'compressor',
     'google_analytics',
+    'pagination',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (

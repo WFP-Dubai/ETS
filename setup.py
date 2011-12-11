@@ -35,6 +35,7 @@ install_requires = [
         'pyqrcode',
         'pygments',
         'google_analytics',
+        'django-pagination',
 ]
 
 #Extra dependencies for test purposes

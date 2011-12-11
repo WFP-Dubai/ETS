@@ -59,7 +59,14 @@ li {
 }
 
 .dataTables_wrapper {
-  min-height:0px
+  min-height:0px;
+}
+
+.sep {
+  clear: both;
+  min-height: 1px;
+  border-top-style: solid; 
+  border-top-color: grey;
 }
 
 .display thead tr th {
@@ -182,5 +189,18 @@ padding-bottom: 10px;
 }
 
 .etalon {
+  display: none;
+}
+
+.pagination {
+  clear: both;
+  text-align: center;
+}
+
+.pagination span, .pagination a {
+  padding: 3px;
+}
+
+.pagination span.disabled {
   display: none;
 }

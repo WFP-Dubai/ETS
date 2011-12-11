@@ -1,17 +1,17 @@
 {% extends "base_template.html" %}
-{% load i18n %}
+{% load i18n pagination_tags %}
 
 {% block title %}{% trans "Stock items" %}{% endblock %}
 
 {% block content %}
 <h3>{% trans "Stock List" %}</h3>
-<table cellpadding="0" cellspacing="0" border="0" class="display" id='stocklist'>
+{% for wh in object_list %}
+<h4>{% trans "Warehouse" %}: {{ wh }}</h4>
+<table cellpadding="0" cellspacing="0" border="0" class="stocklist display">
   <thead>
     <tr>
-      <th>{% trans "Location" %}</th>
-      <th>{% trans "Warehouse" %}</th>
-      <th>{% trans "Project Number" %}</th>
       <th>{% trans "Commodity" %}</th>
+      <th>{% trans "Project Number" %}</th>
       <th>{% trans "SI" %}</th>
       <th>{% trans "State" %}</th>
       <th>{% trans "Units" %}</th>
@@ -23,32 +23,32 @@
     </tr>
   </thead>
   <tbody>
-    {% for item in object_list %}
-    <tr style="{%if item.quality != item.GOOD_QUALITY%}color:red;{%endif%}{%if item.number_of_units == 0%}background-color:red;{%endif%}" >
-      <td>{{ item.warehouse.location.name }}</td>
-      <td>{{ item.warehouse.name }}</td>
-      <td>{{item.project_number}}</td>
+    {% for item in wh.stock_items.all %}
+    <tr style="{% if item.quality != item.GOOD_QUALITY %}color:red;{% endif %}{% if item.number_of_units == 0 %}background-color:red;{% endif %}" >
       <td>{{ item.commodity }}</td>
+      <td>{{ item.project_number }}</td>
       <td>{{ item.si_code }}</td>
       <td>{{ item.get_quality_display }}</td>
-      <td>{%if item.is_bulk%}{{ item.number_of_units}}kg{%endif%}
-      {%if not item.is_bulk%}{{ item.number_of_units|floatformat:0 }}{%endif%}
-      </td>
+      <td>{{ item.number_of_units|floatformat:0 }}</td>
       <td>{{ item.unit_weight_net }}</td>
       <td>{{ item.unit_weight_gross }}</td>
-      <td>{{ item.calculate_total_net|floatformat:3}} </td>      
-      <td>{{ item.calculate_total_gross|floatformat:3}}</td>
+      <td>{{ item.calculate_total_net|floatformat:3 }}</td>      
+      <td>{{ item.calculate_total_gross|floatformat:3 }}</td>
     </tr>
     {% endfor %}
   </tbody>
 </table>
+{% if not forloop.last %}<div class="sep"></div>{% endif %}
+{% endfor %}
+
+{% paginate %}
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
 <script charset="utf-8">
   $(document).ready(function() {
-    $('#stocklist').dataTable();
-  } );
+    $('.stocklist').dataTable();
+  });
 </script>
 {% endblock script %}

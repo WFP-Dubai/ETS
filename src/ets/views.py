@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import Http404
-#from django.views.generic.list_detail import object_list
+from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
@@ -329,9 +329,7 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
 
 def stock_items(request, template_name, queryset):
     
-    if not request.user.has_perm("ets.warehouse_api_full_access"):
-        queryset = queryset.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
+    if not request.user.has_perm("ets.stockitem_api_full_access"):
+        queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
     
-    return direct_to_template(request, template_name, {
-        'object_list': queryset,
-    })
+    return object_list(request, queryset, paginate_by=5, template_name=template_name)
