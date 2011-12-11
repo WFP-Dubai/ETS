@@ -94,8 +94,10 @@ def officer_only(context, nodelist, user):
     return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
 
 
-def get_last_update():
+@register.inclusion_tag('last_updated.html')
+def get_last_update(user):
     """dummy function, just a wrapper"""
-    return StockItem.get_last_update()
-
-get_last_update = function(get_last_update, cache=360)
+    return {
+        'last_updated': StockItem.get_last_update(),
+        'sync_compas': user.has_perm("ets.sync_compas"),
+    }

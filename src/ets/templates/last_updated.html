@@ -1,0 +1,26 @@
+{% load i18n %}   
+<span id="sync_compas">
+  {% trans "Last updated" %}: <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
+  {% if sync_compas %}(<a href="{% url sync_compas %}">Sync</a>){% endif %}
+</span>
+
+<script charset="utf-8">
+$(document).ready(function() {
+  $('#sync_compas a').click(function(){
+  	var container = $(this).parent();
+  	container.loadIndicator()
+  	$.ajax({
+  		url: $(this).attr('href'),
+  		context: container,
+  		cache: false,
+  		timeout: 60000*15,
+      success: function (data) {
+      	$(this).find('strong').text(data);
+      	container.deleteIndicator();
+      }
+    });
+  	
+  	return false;
+  });
+});
+</script>

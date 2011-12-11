@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-{% load i18n compress extra_tags analytics %}   
+{% load i18n compress extra_tags analytics cache %}   
 <html lang="en">
 <head>
   <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
@@ -42,11 +42,9 @@
     {% endblock %}
   </div>
   <div class='footer'>
-    <span id="sync_compas">
-      {% get_last_update as last_updated %}
-      {% trans "Last updated" %}: <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
-      {% if request.user.is_superuser %}(<a href="{% url sync_compas %}">Sync</a>){% endif %}
-    </span>
+    {% cache 180 last_updated user.is_authenticated %}
+    {% get_last_update request.user %}
+    {% endcache %}
     {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
   </div>
 {% endspaceless %}
@@ -62,24 +60,6 @@
 {% endblock %}
 
 <script charset="utf-8">
-$(document).ready(function() {
-  $('#sync_compas a').click(function(){
-  	var container = $(this).parent();
-  	container.loadIndicator()
-  	$.ajax({
-  		url: $(this).attr('href'),
-  		context: container,
-  		cache: false,
-  		timeout: 60000*15,
-      success: function (data) {
-      	$(this).find('strong').text(data);
-      	container.deleteIndicator();
-      }
-    });
-  	
-  	return false;
-  });
-});
 $(window).load(function() {
 	$('.dataTables_filter input:first').focus();
 });

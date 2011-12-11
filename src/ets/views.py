@@ -21,6 +21,7 @@ from django.utils import formats
 from django.utils.dateformat import format
 from django.utils.translation import ugettext as _
 from django.core.management import call_command
+from django.contrib.auth.decorators import permission_required
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -338,8 +339,10 @@ def stock_items(request, template_name, queryset):
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
+
+@permission_required("ets.sync_compas")
 def sync_compas(request):
     last_updated = ets.models.StockItem.get_last_update()
-    if (datetime.datetime.now()-last_updated).minutes > 3:
+    if (datetime.datetime.now()-last_updated).seconds > 60*3:
         call_command('sync_compas')
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
