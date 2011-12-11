@@ -133,6 +133,8 @@ class PrefixedPatterns:
     
         ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
         
+        ( r'^sync_compas/$', "sync_compas", {}, "sync_compas"),
+        
     )
     
     urlpatterns += patterns('',

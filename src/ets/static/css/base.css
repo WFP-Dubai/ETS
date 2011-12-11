@@ -204,3 +204,29 @@ padding-bottom: 10px;
 .pagination span.disabled {
   display: none;
 }
+
+/* AJAX */
+div.loader {
+  background-image: url("../images/ajax-loader.gif");
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 2;
+  position: absolute;
+}
+div.loader div {
+  text-align: center;
+  background-color: #FFFE36;
+  color: #484848;
+}
+
+.ajax-loading {
+  -moz-opacity: .2;
+  opacity: .2;
+  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
+  filter: alpha(opacity=20);
+
+}
+
+.footer div.loader {
+  display: inline;
+}

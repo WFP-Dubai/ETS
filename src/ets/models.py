@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.db import transaction
+from django.db.models.aggregates import Max
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
@@ -280,7 +281,9 @@ class StockItem( models.Model ):
     def calculate_total_gross(self):
         return (self.number_of_units * self.unit_weight_gross)/1000
     
-    
+    @classmethod
+    def get_last_update(cls):
+        return cls.objects.aggregate(max_date=Max('updated'))['max_date']
     
 class LossDamageType(models.Model):
     

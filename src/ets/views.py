@@ -12,11 +12,15 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.views.generic.simple import direct_to_template
 from django.http import Http404
+from django.conf import settings
 from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
+from django.utils import formats
+from django.utils.dateformat import format
 from django.utils.translation import ugettext as _
+from django.core.management import call_command
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -333,3 +337,7 @@ def stock_items(request, template_name, queryset):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
+
+def sync_compas(request):
+    call_command('sync_compas')
+    return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))

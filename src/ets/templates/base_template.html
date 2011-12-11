@@ -42,8 +42,11 @@
     {% endblock %}
   </div>
   <div class='footer'>
-    {% get_last_update as last_updated %}
-    {% trans "Last updated" %}: <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong> 
+    <span id="sync_compas">
+      {% get_last_update as last_updated %}
+      {% trans "Last updated" %}: <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
+      {% if request.user.is_superuser %}(<a href="{% url sync_compas %}">Sync</a>){% endif %}
+    </span>
     {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
   </div>
 {% endspaceless %}
@@ -57,6 +60,25 @@
 {% endcompress %}
 {% analytics_async "UA-26504412-3" %}
 {% endblock %}
+
+<script charset="utf-8">
+  $(document).ready(function() {
+    $('#sync_compas a').click(function(){
+    	var container = $(this).parent();
+    	container.loadIndicator()
+    	$.ajax({
+    		url: $(this).attr('href'),
+    		context: container,
+        success: function (data) {
+        	$(this).find('strong').text(data);
+        	container.deleteIndicator();
+        }
+      });
+    	
+    	return false;
+    });
+  });
+</script>
 
 </body>
 </html>

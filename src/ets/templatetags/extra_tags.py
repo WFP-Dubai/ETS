@@ -95,6 +95,7 @@ def officer_only(context, nodelist, user):
 
 
 def get_last_update():
-    return StockItem.objects.aggregate(max_date=Max('updated'))['max_date']
+    """dummy function, just a wrapper"""
+    return StockItem.get_last_update()
 
 get_last_update = function(get_last_update, cache=3600)
