@@ -339,13 +339,8 @@ def stock_items(request, template_name, queryset):
 
 @permission_required("ets.sync_compas")
 def sync_compas(request):
-    #call_command('sync_compas')
     
-    #instance_path = os.path.join(settings.EGG_ROOT, 'bin', 'instance')
-    
-    proc = Popen('./cron/hourly.sh', shell=True, executable='/bin/sh', cwd=settings.EGG_ROOT) 
-    #stdout=open(os.path.join(settings.EGG_ROOT, 'logs', 'hourly.log')))
-    
-    #proc.wait()
+    #Execute external command
+    Popen('./cron/hourly.sh', shell=True, executable='/bin/sh', cwd=settings.EGG_ROOT) 
     
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
