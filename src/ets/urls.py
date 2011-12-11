@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
 from django.utils.translation import ugettext_lazy, ugettext as _
+from django.db.models.aggregates import Count
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -119,7 +120,8 @@ class PrefixedPatterns:
         }, "compass_waybill" ),
         
         ( r'^stock/$', 'stock_items', {
-            'queryset': ets.models.Warehouse.objects.all(),
+            'queryset': ets.models.Warehouse.objects.all().annotate(stock_count=Count('stock_items'))\
+                                                .filter(stock_count__gt=0),
             'template_name': 'stock/stocklist.html',
         }, "view_stock" ),
                            
