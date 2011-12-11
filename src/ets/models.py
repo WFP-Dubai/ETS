@@ -227,8 +227,8 @@ class StockItem( models.Model ):
     GOOD_QUALITY = 'G'
     
     QUALITY_CHOICE = (
-        ('D', u'Damaged'), 
         (GOOD_QUALITY, u'Good'), 
+        ('D', u'Damaged'), 
         ('S', u'Spoiled'), 
         ('U', u'Unavailable'),
     )

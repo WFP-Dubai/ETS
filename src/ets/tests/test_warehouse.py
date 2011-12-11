@@ -37,11 +37,17 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
     
     def test_stock_view(self):
         """ets.views.stock_view"""
-        self.client.login(username='dispatcher', password='dispatcher')
+        self.client.login(username='admin', password='admin')
         response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 2)
+        
+        self.client.login(username='dispatcher', password='dispatcher')
+        response = self.client.get(reverse('view_stock'))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 1)
+        
         self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 5)
+        self.assertEqual(response.context['object_list'].count(), 1)
