@@ -269,17 +269,6 @@ def validate_dispatch(request, waybill_pk, queryset):
     return redirect('dispatch_validates')
 
 
-@officer_required
-@dispatch_compas
-def send_dispatched(request, waybill_pk, queryset):
-    """Sets 'validated' flag and submits to compas"""
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.validated = True
-    send_dispatched(waybill)
-    
-    return redirect('dispatch_validates')
-
-
 @require_POST
 @officer_required
 @receipt_compas
@@ -344,3 +333,39 @@ def sync_compas(request):
     Popen('./cron/hourly.sh', shell=True, executable='/bin/sh', cwd=settings.EGG_ROOT) 
     
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
+
+
+@officer_required
+@dispatch_compas
+def send_dispatched_view(request, queryset):
+    """Submits dispatch waybills to compas"""
+    total = 0
+    for waybill in queryset:
+        send_dispatched(waybill)
+        if waybill.sent_compas:
+            total += 1
+    
+    messages.add_message(request, messages.INFO, 
+                        _('Number of submitted waybills: %(total)s') % { 
+                            'total': total,
+                        })
+    
+    if len(queryset) - total:
+        messages.add_message(request, messages.ERROR, 
+                        _('Number of wrong waybills: %(count)s') % { 
+                            'count': len(queryset) - total,
+                        })
+    
+    return redirect('dispatch_validates')
+
+
+@officer_required
+@receipt_compas
+def send_received_view(request, queryset):
+    """Submits received waybills to compas"""
+    for waybill in queryset:
+        send_received(waybill)
+    
+    
+    
+    return redirect('receipt_validates')

@@ -14,7 +14,7 @@ admin.autodiscover()
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
 from ets.views import waybill_list, waybill_reception
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
 

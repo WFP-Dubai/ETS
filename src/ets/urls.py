@@ -14,7 +14,7 @@ admin.autodiscover()
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
 from ets.views import waybill_list, waybill_reception
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, dispatch_compas, receipt_compas, officer_required, waybill_user_related
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
 
@@ -101,6 +101,14 @@ class PrefixedPatterns:
             'template': 'validate/receipt.html',
             'queryset': ets.models.Waybill.objects.all(),
         }, "receipt_validates" ),
+        
+        #Submit waybills to compas
+        ( r'^send_dispatched/$', 'send_dispatched_view', {
+            'queryset': ets.models.Waybill.objects.filter(validated=True),
+        }, "send_dispatched" ),
+        ( r'^send_received/$', 'send_received_view', {
+            'queryset': ets.models.Waybill.objects.filter(receipt_validated=True),
+        }, "send_received" ),
         
         #Delete functionality
         ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', 

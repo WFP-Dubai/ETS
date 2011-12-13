@@ -6,3 +6,11 @@
 {% block page_title %}{% trans "Validate Receipt" %}{% endblock %}
 
 {% block validate_link %}{% validate_receipt waybill user %}{% endblock %}
+
+{% block submit_form %}
+{% if validated_waybills %}
+<form method="POST" action="{% url send_received %}">{% csrf_token %}
+	<input name="submit" value="{% trans 'Submit to COMPAS' %}" type="submit" />
+</form>
+{% endif %}
+{% endblock %}

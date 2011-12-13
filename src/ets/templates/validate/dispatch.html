@@ -105,6 +105,15 @@
     </tr>
     {% endfor %}
 </table>
+
+{% block submit_form %}
+{% if validated_waybills %}
+<form method="POST" action="{% url send_dispatched %}">{% csrf_token %}
+	<input name="submit" value="{% trans 'Submit to COMPAS' %}" type="submit" />
+</form>
+{% endif %}
+{% endblock %}
+
 {% endblock %}
 
 {% block script %}

@@ -42,7 +42,6 @@ install_requires = [
 extras_require = dict(
     test=[
         'coverage', #checks code coverage by tests 
-        'windmill', #browser tests
     ]
 )
 
