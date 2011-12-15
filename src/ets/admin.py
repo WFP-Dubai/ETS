@@ -124,6 +124,8 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     search_fields = ('slug', 'order__pk',)
     inlines = (LoadingDetailsInline, CompasLoggerInline)
     
+    actions = None
+    
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 
 
