@@ -153,6 +153,7 @@ class StockAdmin(admin.ModelAdmin):
     raw_id_fields = ('warehouse',)
     list_filter = ('warehouse',)
     search_fields = ('code', 'warehouse__code', 'project_number', 'si_code', 'commodity__name', 'package__name', 'si_record_id', 'origin_id')
+    inlines = (LoadingDetailsInline,)
 
 admin.site.register( ets.models.StockItem, StockAdmin )
 
