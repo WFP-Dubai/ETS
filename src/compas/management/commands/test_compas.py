@@ -14,7 +14,7 @@ class Command(BaseCommand):
         make_option('--user', dest='db_user', help='Database user name'),
         make_option('--password', dest='db_password', help='Database user password'),
         make_option('--host', dest='db_host', help='Database host'),
-        #make_option('--port', dest='db_port', help='Database port'),
+        make_option('--port', dest='db_port', default='', help='Database port'),
     )
     
     help = 'Tests connection to COMPAS stations'
@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 'USER': db_user,
                 'PASSWORD': db_password,
                 'HOST': db_host,
-                #'PORT': db_port,
+                'PORT': db_port,
                 'OPTIONS': {},
         }, 'test_connection')
         
