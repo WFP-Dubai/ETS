@@ -63,15 +63,14 @@
 {{ block.super }}
 <script charset="utf-8">
   $(window).load(function() {
-	  
-	  {% if print_original %}
+	{% if print_original %}
       print();
       window.location = '{{ object.get_absolute_url }}';
     {% else %}
-    $('.print_copy').click(function(){
-    	print();
-    	return false;
-    });
+      $('.print_copy').click(function(){
+      	print();
+      	return false;
+      });
     {% endif %}
   });
 </script>
