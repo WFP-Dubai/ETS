@@ -37,6 +37,7 @@ class Command(BaseCommand):
         try:
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM organizations;")
+            cursor.execute("SELECT COUNT(*) FROM organizations;")
         except Exception, err:
             if verbosity >= 2:
                 print err
