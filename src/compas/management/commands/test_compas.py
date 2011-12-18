@@ -36,6 +36,7 @@ class Command(BaseCommand):
         
         try:
             cursor = conn.cursor()
+            print "!"*100
             cursor.execute("Set role epic_all identified by writeon;")
         except Exception, err:
             if verbosity >= 2:
