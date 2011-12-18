@@ -23,16 +23,6 @@ class Command(BaseCommand):
         
         verbosity = int(options.get('verbosity', 1))
         
-        print {
-                'NAME': db_name,
-                'ENGINE': db_engine,
-                'USER': db_user,
-                'PASSWORD': db_password,
-                'HOST': db_host,
-                'PORT': db_port,
-                'OPTIONS': {},
-        }
-        
         backend = load_backend(db_engine)
         conn = backend.DatabaseWrapper({
                 'NAME': db_name,
@@ -46,7 +36,6 @@ class Command(BaseCommand):
         
         try:
             cursor = conn.cursor()
-            print "!"*100
             cursor.execute("SELECT COUNT(*) FROM organizations;")
         except Exception, err:
             if verbosity >= 2:
