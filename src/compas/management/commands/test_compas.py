@@ -10,11 +10,11 @@ class Command(BaseCommand):
 
     option_list = BaseCommand.option_list + ( 
         make_option('--engine', dest='db_engine', default='django.db.backends.oracle', help='Database engine'),
-        make_option('--name', dest='db_name', required=True, help='Database name'),
-        make_option('--user', dest='db_user', required=True, help='Database user name'),
-        make_option('--password', dest='db_password', required=True, help='Database user password'),
-        make_option('--host', dest='db_host', required=True, help='Database host'),
-        make_option('--port', dest='db_port', required=False, help='Database port'),
+        make_option('--name', dest='db_name', help='Database name'),
+        make_option('--user', dest='db_user', help='Database user name'),
+        make_option('--password', dest='db_password', help='Database user password'),
+        make_option('--host', dest='db_host', help='Database host'),
+        make_option('--port', dest='db_port', help='Database port'),
     )
     
     help = 'Tests connection to COMPAS stations'
@@ -35,7 +35,7 @@ class Command(BaseCommand):
         }, 'test_connection')
         
         try:
-            cursor = conn.cursor()
+            cursor = conn.make_debug_cursor()
             cursor.execute("Set role epic_all identified by writeon;")
         except Exception, err:
             if verbosity >= 2:
