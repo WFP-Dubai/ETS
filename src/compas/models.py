@@ -9,6 +9,16 @@ BULK_NAME = "BULK"
 # Models based on compas Views & Tables
 #=======================================================================================================================
 
+class Partner(models.Model):
+    """Partner organization""" 
+    name = models.CharField(_("Name"), max_length=100)
+    
+    class Meta:
+        db_table = 'organizations'
+        verbose_name=_("partner")
+        verbose_name_plural = _("partners")
+    
+
 class Place( models.Model ):
     """
     Location model.

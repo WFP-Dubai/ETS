@@ -162,6 +162,7 @@ def import_order(compas):
             # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
             consignee = ets_models.Organization.objects.get(pk=lti.consegnee_code)
             
+            #ORGANIZATIONS id, name
             if not consignee.name:
                 consignee.name = lti.consegnee_name
                 consignee.save()
