@@ -45,7 +45,7 @@ def _get_places(compas):
 
 def import_partners(compas):
     for partner in compas_models.Partner.objects.using(compas).all():
-        Organization.objects.get_or_create(code=partner.id, name=partner.name)
+        Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
