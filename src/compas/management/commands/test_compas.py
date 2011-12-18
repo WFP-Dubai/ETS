@@ -35,7 +35,7 @@ class Command(BaseCommand):
         }, 'test_connection')
         
         try:
-            cursor = conn.make_debug_cursor()
+            cursor = conn.cursor()
             cursor.execute("Set role epic_all identified by writeon;")
         except Exception, err:
             if verbosity >= 2:
