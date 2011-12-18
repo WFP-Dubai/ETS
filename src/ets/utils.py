@@ -11,11 +11,15 @@ from django.utils.translation import ugettext as _
 from compas.utils import call_db_procedure
 import compas.models as compas_models
 import models as ets_models
+from ets.models import Organization
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
+    
+    #Import organizations
+    import_partners(using)
     
     #Update places
     import_places(using)
@@ -39,6 +43,10 @@ def _get_places(compas):
     return compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
 
 
+def import_partners(compas):
+    for partner in compas_models.Partner.objects.using(compas).all():
+        Organization.objects.get_or_create(code=partner.id, name=partner.name)
+
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
@@ -48,15 +56,11 @@ def import_places(compas):
             'country': place.country_code,
         })[0]
         
-        #Create consignee organization
-        organization = ets_models.Organization.objects.get_or_create(code=place.organization_id)[0]\
-                        if place.organization_id else None
-        
         #Update warehouse
         defaults = {
             'name': place.name,
             'location': location,
-            'organization': organization,
+            'organization': ets_models.Organization.objects.get(code=place.organization_id) if place.organization_id else None,
             'compas': ets_models.Compas.objects.get(pk=place.reporting_code),
         }
         
@@ -158,14 +162,6 @@ def import_order(compas):
                                     consegnee_code__in=places.values_list('organization_id', flat=True),
                                     origin_wh_code__in=places.values_list('org_code', flat=True),
                                     destination_location_code__in=places.values_list('geo_point_code', flat=True)):
-            #Update Consignee
-            # TODO: correct epic_geo view. It should contain organization name field. Then we will be able to delete this
-            consignee = ets_models.Organization.objects.get(pk=lti.consegnee_code)
-            
-            #ORGANIZATIONS id, name
-            if not consignee.name:
-                consignee.name = lti.consegnee_name
-                consignee.save()
             
             #Create Order
             defaults = {
@@ -177,7 +173,7 @@ def import_order(compas):
                 'transport_name': lti.transport_name,
                 'origin_type': lti.origin_type,
                 'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
-                'consignee': consignee,
+                'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
                 'location': ets_models.Location.objects.get(pk=lti.destination_location_code),
                 'updated': now,
                 'remarks': lti.remarks,

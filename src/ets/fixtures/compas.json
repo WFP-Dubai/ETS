@@ -1,5 +1,19 @@
 [
   {
+    "pk": "WFP", 
+    "model": "compas.partner", 
+    "fields": {
+      "name": "World Food Program"
+    }
+  },
+  {
+    "pk": "DOEAF", 
+    "model": "compas.partner", 
+    "fields": {
+      "name": "First consignee in our system"
+    }
+  },
+  {
     "pk": "ISBX002", 
     "model": "compas.place", 
     "fields": {
