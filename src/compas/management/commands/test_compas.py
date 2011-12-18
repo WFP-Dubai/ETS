@@ -47,7 +47,7 @@ class Command(BaseCommand):
         try:
             cursor = conn.cursor()
             print "!"*100
-            cursor.execute("SELECT * FROM organizations LIMIT 1;")
+            cursor.execute("SELECT COUNT(*) FROM organizations;")
         except Exception, err:
             if verbosity >= 2:
                 print err
