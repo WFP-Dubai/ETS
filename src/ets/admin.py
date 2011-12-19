@@ -143,7 +143,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('dispatch_date', 'origin_type')
     search_fields = ('code', 'origin_type', 'warehouse__pk', 
                      'warehouse__compas__pk', 'warehouse__location__pk', 'warehouse__organization__pk')
-    raw_id_fields = ('warehouse',)
+    raw_id_fields = ('warehouse', 'consignee', 'location')
     inlines = (OrderItemInline, WaybillInline)
 
 admin.site.register( ets.models.Order, OrderAdmin )
