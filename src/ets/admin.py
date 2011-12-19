@@ -90,6 +90,10 @@ class CompasLoggerInline(admin.TabularInline):
     model = ets.models.CompasLogger
     extra = 0
 
+class WaybillInline(admin.TabularInline):
+    model = ets.models.Waybill
+    extra = 0
+
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
@@ -139,7 +143,7 @@ class OrderAdmin(admin.ModelAdmin):
     list_filter = ('dispatch_date', 'origin_type')
     search_fields = ('code', 'origin_type', 'warehouse__pk', 
                      'warehouse__compas__pk', 'warehouse__location__pk', 'warehouse__organization__pk')
-    inlines = (OrderItemInline,)
+    inlines = (OrderItemInline, WaybillInline)
 
 admin.site.register( ets.models.Order, OrderAdmin )
 

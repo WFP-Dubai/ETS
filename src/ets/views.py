@@ -366,6 +366,4 @@ def send_received_view(request, queryset):
     for waybill in queryset:
         send_received(waybill)
     
-    
-    
     return redirect('receipt_validates')
