@@ -6,9 +6,11 @@ from django.contrib.auth.forms import UserChangeForm
 from django import forms
 #from django.forms.extras.widgets import SelectDateWidget
 from django.utils.translation import ugettext, ugettext_lazy as _
+from django.contrib.contenttypes.models import ContentType
+from django.conf import settings
 
 from uni_form.helper import FormHelper
-from uni_form.layout import Layout, Fieldset, Row
+from uni_form.layout import Layout, Fieldset, Row, Submit
 
 from ets import models as ets_models
 
@@ -196,3 +198,28 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_lost': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
             'number_units_damaged': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
         }
+        
+
+class DateRangeForm(forms.Form):
+    
+    start_date = forms.DateField(label=_('Start date'))
+    end_date = forms.DateField(label=_('End date'))
+    
+    helper = FormHelper()
+    
+    # create the layout object
+    helper.add_layout(Layout(
+        Fieldset(_('Select date range'), Row('start_date', 'end_date')),
+    ))
+    
+    helper.add_input(Submit(_("Download"), 'download'))
+    
+
+class ImportDataForm( forms.Form ):
+    
+    file = forms.FileField(required=True, label=_('Import Data'))
+
+    helper = FormHelper()
+    
+    helper.add_input(Submit(_("Submit"), 'submit'))
+    

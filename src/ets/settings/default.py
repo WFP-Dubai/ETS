@@ -223,6 +223,16 @@ NATIVE_TAGS = ()
 #Loading details settings
 LOADING_LINES = 5
 
+#List of possible content types to export
+#===============================================================================
+# EXPORT_CONTENT_TYPES = (
+#    'waybill', 'location', 'organization', 'oranization', 
+#    'warehouse', 'person', 'compas', 'Commodity Category', 
+#    'Commodity', 'Package', 'Stock Item', 'Loss/Damages Reason',
+#    'Order', 'OrderItem', 'LoadingDetail',
+# )
+#===============================================================================
+
 class DatabasesFormDatabase(object):
     
     default = 'default'

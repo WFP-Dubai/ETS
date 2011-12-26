@@ -2,19 +2,30 @@ from datetime import datetime, timedelta, date
 from itertools import chain, izip
 
 from django.conf import settings
+from django.http import HttpResponse
 from django.db import connections, transaction, models
 from django.db.utils import DatabaseError
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
+from django.core import serializers
 from django.utils.translation import ugettext as _
 
 from compas.utils import call_db_procedure
 import compas.models as compas_models
 import models as ets_models
-from ets.models import Organization
+from .compress import compress_json
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
+
+
+def _data_to_response(data, file_name):
+    data = compress_json( serializers.serialize('json', data, use_decimal=False) )
+        
+    response = HttpResponse(data, content_type='application/data')
+    response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
+    return response
+
 
 def update_compas(using):
     
@@ -45,7 +56,7 @@ def _get_places(compas):
 
 def import_partners(compas):
     for partner in compas_models.Partner.objects.using(compas).all():
-        Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
+        ets_models.Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):

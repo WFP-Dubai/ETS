@@ -2,7 +2,9 @@ import datetime
 import pyqrcode
 import cStringIO
 import os
+import decimal
 from subprocess import call, Popen
+from itertools import chain
 
 from django import forms
 from django.db.models import Q
@@ -19,19 +21,21 @@ from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
-from django.utils import formats
 from django.utils.dateformat import format
 from django.utils.translation import ugettext as _
 from django.core.management import call_command
 from django.contrib.auth.decorators import permission_required
+from django.views.generic.edit import FormView
+from django.core import serializers
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, WaybillScanForm
+from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, DateRangeForm, ImportDataForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list, send_dispatched, send_received
+from .utils import history_list, send_dispatched, send_received, _data_to_response
+from .compress import compress_json, decompress_json
 
 
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
@@ -367,3 +371,81 @@ def send_received_view(request, queryset):
         send_received(waybill)
     
     return redirect('receipt_validates')
+
+
+class ExportDataBase(FormView):
+    
+    template_name = 'sync/export_file.html'
+    form_class = DateRangeForm
+    file_name = 'data-%(start_date)s-%(end_date)s'
+    
+    #===========================================================================
+    # def get_context_data(self, **kwargs):
+    #    context = super(ExportDataBase, self).get_context_data(**kwargs)
+    #    context['']
+    #===========================================================================
+    
+    def get_initial(self):
+        end_date = datetime.date.today()
+        start_date = end_date - datetime.timedelta(days=7)
+        return {'start_date': start_date, 'end_date': end_date}
+    
+    def construct_data(self):
+        raise NotImplementedError()
+    
+    def form_valid(self, form):
+        start_date = form.cleaned_data['start_date'] 
+        end_date = form.cleaned_data['end_date']
+            
+        return _data_to_response(self.construct_data(start_date, end_date), self.file_name % {
+            'start_date': start_date, 
+            'end_date': end_date,
+        })
+    
+
+class ExportWaybillData(ExportDataBase):
+    
+    file_name = 'waybills-%(start_date)s-%(end_date)s'
+    
+    def construct_data(self, start_date, end_date):
+        #Append log entry 
+        return chain(
+            ets.models.Waybill.objects.filter(date_modified__range=(start_date, end_date+datetime.timedelta(1))),
+            ets.models.LoadingDetail.objects.filter(waybill__date_modified__range=(start_date, end_date+datetime.timedelta(1)),
+                                                    waybill__date_removed__isnull=True)
+        )
+
+
+def export_compas_file(request):
+    return _data_to_response(chain(
+        ets.models.Organization.objects.all(),
+        ets.models.Compas.objects.all(),
+        ets.models.Location.objects.all(),
+        ets.models.Person.objects.all(),
+        ets.models.Warehouse.objects.filter(start_date__gte=datetime.date.today, end_date__lt=datetime.date.today),
+        ets.models.LossDamageType.objects.all(),
+        ets.models.Commodity.objects.all(),
+        ets.models.CommodityCategory.objects.all(),
+        ets.models.Package.objects.all(),
+        ets.models.StockItem.objects.all(),
+        ets.models.Order.objects.filter(expiry__lte=datetime.date.today),
+        ets.models.OrderItem.objects.filter(order__expiry__lte=datetime.date.today),
+    ), 'ets_data-%s' % datetime.date.today())
+
+
+class ImportData(FormView):
+    
+    template_name = 'sync/import_file.html'
+    form_class = ImportDataForm
+    
+    def form_valid(self, form):
+        _file = form.cleaned_data['file']
+        #File is supposed to be small (< 4Mb)
+        data = decompress_json(_file.read())
+        for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
+            print obj
+            obj.save()
+        
+        messages.add_message(self.request, messages.INFO, _('File has been imported successfully.'))
+        
+        return self.get(self.request)

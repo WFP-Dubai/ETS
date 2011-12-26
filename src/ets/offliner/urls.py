@@ -19,11 +19,6 @@ import ets.models
 
 
 urlpatterns = patterns("ets.offliner.views",
-    ( r'^synchronization/$', "synchronization", {}, "synchronization"),
-    ( r'^import_data/$', "import_file", {}, "import_data" ),
-    ( r'^export_data/$', "export_file", {}, "export_data" ),
+    #( r'^synchronization/$', "synchronization", {}, "synchronization"),
     ( r'^synchronize/$', "request_update", {}, "synchronize" ),
-    ( r'^export_waybills/$', "export_waybills", {
-        'template': 'offliner/export_waybills.html',
-    }, "export_waybills" ),
 )
