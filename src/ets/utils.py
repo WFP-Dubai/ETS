@@ -133,8 +133,10 @@ def import_stock(compas):
             number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
                                             else (stock.number_of_units, stock.quantity_net)
             
+            warehouse = ets_models.Warehouse.objects.get(pk=stock.wh_code)
+            
             defaults = {
-                'warehouse': ets_models.Warehouse.objects.get(pk=stock.wh_code),
+                'warehouse': warehouse,
                 'project_number': stock.project_wbs_element,
                 'si_code': stock.si_code,
                 'commodity': commodity,
@@ -154,10 +156,16 @@ def import_stock(compas):
             
             rows = ets_models.StockItem.objects.filter(code=stock.pk).update(**defaults)
             if not rows:
+                
+                #Clean virtual stocks
+                ets_models.StockItem.objects.filter(warehouse=warehouse, project_number=stock.project_wbs_element,
+                                                    si_code=stock.si_code, commodity=commodity,
+                                                    virtual=True).delete()
+                
                 ets_models.StockItem.objects.create(code=stock.pk, **defaults)
         
         #Flush empty stocks
-        ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse__compas__pk=compas)\
+        ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse__compas__pk=compas, virtual=False)\
                                     .exclude(updated=now).update(number_of_units=0)
 
 

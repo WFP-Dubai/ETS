@@ -258,6 +258,8 @@ class StockItem( models.Model ):
     origin_id = models.CharField(_("Origin identifier"), max_length=23)
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
     
+    virtual = models.BooleanField(_("Virtual stock"), default=False)
+    
     objects = StockManager()
 
     class Meta:
@@ -588,6 +590,27 @@ class Waybill( ld_models.Model ):
         """Signs the receipt waybill as ready to be sent."""
         self.receipt_signed_date = datetime.now()
         self.save()
+        
+        #Create virtual stock item
+        for item in self.loading_details.all():
+            StockItem.objects.get_or_create(warehouse=self.destination,
+                                          project_number=item.stock_item.project_number,
+                                          si_code=item.stock_item.si_code, 
+                                          commodity=item.stock_item.commodity,
+                                          defaults={
+                                                'code': "%s%s" % (self.destination, item.stock_item.code),
+                                                'quality': item.stock_item.quality,
+                                                'package': item.stock_item.package,
+                                                'number_of_units': item.stock_item.number_of_units,
+                                                'unit_weight_net': item.stock_item.unit_weight_net, 
+                                                'unit_weight_gross': item.stock_item.unit_weight_gross, 
+                                                'is_bulk': item.stock_item.is_bulk,
+                                                'si_record_id': item.stock_item.si_record_id,
+                                                'origin_id': item.stock_item.origin_id,
+                                                'allocation_code': item.stock_item.allocation_code,
+                                                'virtual': True,
+                                          })
+                
     
     
     def serialize(self):
