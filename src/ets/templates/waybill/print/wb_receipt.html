@@ -19,7 +19,7 @@
         </tr>
         <tr>
           <td><small>{% trans "Title:" %}</small> {{ object.receipt_person.title }}</td>
-          <td><small>{% trans "Distance in KM:" %}</small> {{ object.distance }}</td>
+          <td><small>{% trans "Distance in KM:" %}</small> {{ object.distance|default:"" }}</td>
         </tr>
       </tbody>
     </table>
