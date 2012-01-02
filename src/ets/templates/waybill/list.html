@@ -26,9 +26,9 @@
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
         <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
         <td><a href='{{ waybill.get_absolute_url }}'>{{ waybill.pk }}</a></td>
-        <td>{{ waybill.order.warehouse }}</td>
+        <td>{{ waybill.order.warehouse.name }}</td>
         <td>{{ waybill.order.consignee }}</td>
-        <td>{{ waybill.order.location }}</td>
+        <td>{{ waybill.order.location.name }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date|date }}
@@ -48,8 +48,8 @@
           {% if waybill.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}
         </td>
         <td>
-          D: {% if waybill.sent_compas %}{{ waybill.sent_compas }}{% else %}-{% endif %}/
-          R: {% if waybill.receipt_sent_compas %}{{ waybill.receipt_sent_compas }}{% else %}-{% endif %}
+          {% if waybill.sent_compas %}D: {{ waybill.sent_compas }}{% else %}-{% endif %}/
+          {% if waybill.receipt_sent_compas %}R: {{ waybill.receipt_sent_compas }}{% else %}-{% endif %}
         </td>
         <td>
           {% waybill_delete waybill user %}

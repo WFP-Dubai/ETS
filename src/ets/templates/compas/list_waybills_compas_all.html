@@ -22,7 +22,7 @@
       <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
       <td>{{ waybill.order.warehouse.location.name }}</td>
       <td>{{ waybill.order.consignee }}</td>
-      <td>{{ waybill.order.location }}</td>
+      <td>{{ waybill.order.location.name }}</td>
     </tr>
     {% endfor%} 
   <tbody>

@@ -6,7 +6,7 @@
       <thead class="wb_head"><tr><th colspan="2">{% trans "Certification of Commodities Received" %}</th></tr></thead>
       <tbody>
         <tr>
-          <td><small>{% trans "Location:" %}</small> {{ object.destination.location }}</td>
+          <td><small>{% trans "Location:" %}</small> {{ object.destination.location.name }}</td>
           <td><small>{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date }}</td>
         </tr>
         <tr>
