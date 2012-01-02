@@ -23,13 +23,17 @@
   <div class="header">
     <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill{% endblocktrans %}</span>
   </div>
+  {% block menu %}
   <div class="menu">
-    <a href='{% url index %}'>{% trans "home" %}</a>
+    {% url index as index_url %}
+    {% if request.path != index_url %}<a href='{{ index_url }}'>{% trans "home" %}</a>{% endif %}
     {% if user.is_authenticated %}
-      <a href='{% url admin:password_change %}'>{% trans "Change password" %}</a>
-      <a href='{% url django.contrib.auth.views.logout %}?next={% url index %}'>{% trans "Logout" %}</a>
+      {% url admin:password_change as passwd_url %}
+      {% if request.path != passwd_url %}<a href='{{ passwd_url }}'>{% trans "Change password" %}</a>{% endif %}
+      <a href='{% url django.contrib.auth.views.logout %}?next={{ request.path }}'>{% trans "Logout" %}</a>
     {% endif %}
   </div>
+  {% endblock %}
   {% if messages %}
     <ul class="messages">
       {% for message in messages %}
