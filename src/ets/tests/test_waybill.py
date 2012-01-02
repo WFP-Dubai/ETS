@@ -139,7 +139,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         
         #check created waybill and loading details
-        waybill = ets.models.Waybill.objects.get(pk='ISBX00211A000004')
+        waybill = ets.models.Waybill.objects.get(pk=u'ISBX00212A000001')
         self.assertEqual(waybill.loading_details.count(), 1)
 
     

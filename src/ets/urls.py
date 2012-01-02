@@ -54,7 +54,7 @@ class PrefixedPatterns:
             "extra_context": {"extra_title": _("Waybills waiting for Dispatch signature")}
         }, "waybill_dispatch_list" ),
         ( r'^receive/$', person_required(receipt_view(waybill_list)), {
-            "extra_context": {"extra_title": _("Waybills pending Receipting")}
+            "extra_context": {"extra_title": _("Expected Consignments")}
         }, "waybill_reception_list" ),
         
         ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {

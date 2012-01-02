@@ -22,7 +22,7 @@
   <li><a href='{% url waybill_dispatch_list %}'>{% trans "Waybills waiting for Dispatch signature" %}</a></li>
   {% endif %}
   {% if request.user.person.receive %}
-  <li><a href='{% url waybill_reception_list %}'>{% trans "Waybills pending Receipting" %}</a></li>
+  <li><a href='{% url waybill_reception_list %}'>{% trans "Expected Consignments" %}</a></li>
   {% endif%}
 </ul>
 {% endperson_only %}

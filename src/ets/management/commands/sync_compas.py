@@ -1,14 +1,36 @@
 ### -*- coding: utf-8 -*- ####################################################
 
 from optparse import make_option
+import lockfile
+import os
+import logging
 
 from django.core.management.base import BaseCommand
 from django.db.utils import DatabaseError
+from django.conf import settings
 
 from ets.utils import update_compas
 from ets.models import Compas
 
-class Command(BaseCommand):
+LOG_DIRECTORY = getattr(settings, 'LOG_DIRECTORY', 'logs')
+
+class LockedBaseCommandMixin(object):
+
+    lock_file_name = 'lock.lock'
+    
+    def execute(self, *args, **options):
+        
+        lock = lockfile.FileLock(os.path.join(settings.EGG_ROOT, self.lock_file_name))
+        
+        lock.acquire(60)
+        
+        try:
+            super(LockedBaseCommandMixin, self).execute(*args, **options)
+        finally:
+            lock.release()
+
+
+class Command(LockedBaseCommandMixin, BaseCommand):
 
     option_list = BaseCommand.option_list + ( 
         make_option('--compas', dest='compas', default='',
@@ -16,24 +38,23 @@ class Command(BaseCommand):
     )
 
     help = 'Import data from COMPAS stations'
+    lock_file_name = 'sync_compas.lock'
+    log_name = 'sync_compas.log'
 
     def synchronize(self, compas):
         update_compas(compas)
 
     def handle(self, compas='', *args, **options):
         
-        verbosity = int(options.get('verbosity', 1))
-        
-        stations = Compas.objects.all()
-        if compas:
-            stations = stations.filter(pk=compas)
-            
-        for compas in stations:
-            if verbosity >= 2:
-                print "Updating compas: %s" % compas
-            
-            try:
-                self.synchronize(compas=compas.pk)
-            except Exception, err:
-                if verbosity >= 2:
-                    print err
+        with open(os.path.join(settings.EGG_ROOT, LOG_DIRECTORY, self.log_name), 'w') as f:
+            stations = Compas.objects.all()
+            if compas:
+                stations = stations.filter(pk=compas)
+                
+            for compas in stations:
+                f.writelines(["Updating COMPAS: %s" % compas])
+                
+                try:
+                    self.synchronize(compas=compas.pk)
+                except Exception, err:
+                    f.writelines([err])

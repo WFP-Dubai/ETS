@@ -6,7 +6,7 @@
 {% block content %}
 <table class="summary">
   <tr>
-    <td>{% trans "Code" %}: <a href="{{ object.get_absolute_url }}" >{{ object.pk }}</a></td>
+    <td>{% trans "LTI Number" %}: <a href="{{ object.get_absolute_url }}" >{{ object.pk }}</a></td>
     <td>{% trans "Created" %}: {{ object.created }}</td>
   </tr>
   <tr>
@@ -34,7 +34,7 @@
 </table>
 
 <br/>
-{% trans "Order items:" %}
+{% trans "Commodity details:" %}
 <table class='bordered' >
   <thead>
     <tr>
