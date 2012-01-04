@@ -70,7 +70,7 @@
                 <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
                 <td>{{ lineitem.stock_item.commodity.name }}</td>
                 <td>{{ lineitem.stock_item.package.name }}</td>
-                <td style="text-align:right;">{{ lineitem.number_of_units|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.number_of_units }}</td>
                 <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_net|floatformat:3 }}</td>
                 <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_gross|floatformat:3 }}</td>
                 <td style="text-align:right;">{{ lineitem.calculate_total_net|floatformat:3 }}</td>

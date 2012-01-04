@@ -384,7 +384,7 @@ class OrderItem(models.Model):
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
+    number_of_units = models.IntegerField(_("Number of Units"))
     
     lti_id = models.CharField(_("LTI ID"), max_length=40, editable=False, blank=True, null=True)
     
@@ -721,7 +721,7 @@ class LoadingDetail(models.Model):
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-    number_of_units = models.DecimalField(_("Number of Units"), max_digits=12, decimal_places=3)
+    number_of_units = models.IntegerField(_("Number of Units"))
 
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 

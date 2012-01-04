@@ -53,9 +53,9 @@
       <td>{{ item.commodity }}&nbsp;</td>
       <td>&nbsp;{{ item.si_code }}&nbsp;</td><!-- fixme: for bulk show 3 decimals-->
       <td align="right">&nbsp;{{ item.project_number }}&nbsp;</td>
-      <td align="right">{{ item.number_of_units|floatformat:0 }}</td>
-      <td align="right">{{ item.items_left|floatformat:0}}</td>
-      <td align="right">{{ item.get_available_stocks|floatformat:0}}</td>
+      <td align="right">{{ item.number_of_units }}</td>
+      <td align="right">{{ item.items_left }}</td>
+      <td align="right">{{ item.get_available_stocks|floatformat:0 }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
   {% endfor %}
