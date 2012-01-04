@@ -18,9 +18,8 @@
             
             </tr>
             <tr>
-                <td><sup>{% trans "Project no." %}</sup> {{ object.order.project_number }}</td>
                 <td><sup>{% trans "Date of Loading" %}:</sup> {{ object.loading_date|date  }}</td>
-                <td><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date|date }}</td>
+                <td colspan="2"><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date|date }}</td>
             </tr>
             <tr>
                 <td><sup>{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination.name }}</td>
@@ -49,11 +48,12 @@
     <td>
         <table class="border" style='border-collapse: separate;'  >
             <thead class="wb_head">
-                <tr><th colspan="8">{% trans "Loading Details" %}</th></tr>
+                <tr><th colspan="9">{% trans "Loading Details" %}</th></tr>
             </thead>
             <tr>
                 <td rowspan="2"><sup>{% trans "SI No" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Commodity" %}</sup></td>
+                <td rowspan="2"><sup>{% trans "Project no." %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Packing" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Number of Units" %}</sup></td>
                 <td colspan="2"><sup>{% trans "Unit Weight (kg)" %}</sup></td>
@@ -69,6 +69,7 @@
             <tr style="font-size:x-small;">
                 <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
                 <td>{{ lineitem.stock_item.commodity.name }}</td>
+                <td>{{ lineitem.stock_item.project_number }}</td>
                 <td>{{ lineitem.stock_item.package.name }}</td>
                 <td style="text-align:right;">{{ lineitem.number_of_units }}</td>
                 <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_net|floatformat:3 }}</td>
@@ -79,7 +80,7 @@
             {% endfor %}
             
             <tr>
-                <td colspan="8">
+                <td colspan="9">
                 </td>
             </tr>
         </table>
