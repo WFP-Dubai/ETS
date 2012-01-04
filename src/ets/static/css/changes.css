@@ -46,3 +46,14 @@
   border-right: none;
   border-bottom: none;
 }
+
+/* Password change form */
+#password-change-form.uniForm .error p {
+	float: right;
+}
+
+#password-change-form.uniForm .ctrlHolder label {
+	display: block;
+    float: left;
+    width: 250px;
+}
