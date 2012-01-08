@@ -36,6 +36,7 @@ from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from .utils import history_list, send_dispatched, send_received, _data_to_response
 from .compress import compress_json, decompress_json
+import simplejson
 
 
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
@@ -329,6 +330,20 @@ def stock_items(request, template_name, queryset):
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
+
+def get_stock_data(request, queryset):
+    
+    object_pk = request.GET.get('stock_item')
+    
+    if not request.user.has_perm("ets.stockitem_api_full_access"):
+        queryset = queryset.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
+    
+    stock_item = get_object_or_404(queryset, pk=object_pk)
+    return HttpResponse(simplejson.dumps({
+        'unit_weight_net': stock_item.unit_weight_net,
+        'unit_weight_gross': stock_item.unit_weight_gross,
+        'number_of_units': stock_item.number_of_units,
+    }))
 
 @permission_required("ets.sync_compas")
 def sync_compas(request):

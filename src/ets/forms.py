@@ -110,9 +110,17 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
 
     class Meta:
         model = ets_models.LoadingDetail
-        fields = ( 'stock_item', 'number_of_units', 'overloaded_units' )
+        fields = (
+            'stock_item', 'number_of_units', 'overloaded_units', 
+            'unit_weight_net', 'unit_weight_gross', 
+            'total_weight_net', 'total_weight_gross',
+        )
         widgets = {
             'number_of_units': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
+            'unit_weight_net': forms.TextInput(attrs={'size': 5, 'class': 'unit-weight-net'}),
+            'unit_weight_gross': forms.TextInput(attrs={'size': 5, 'class': 'unit-weight-gross'}),
+            'total_weight_net': forms.TextInput(attrs={'size': 5, 'class': 'weight-total-net'}),
+            'total_weight_gross': forms.TextInput(attrs={'size': 5, 'class': 'weight-total-gross'}),
         }
 
 class BaseLoadingDetailFormSet(BaseInlineFormSet):

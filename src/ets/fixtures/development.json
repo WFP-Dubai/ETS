@@ -136,6 +136,11 @@
       
       "number_of_units": 35,
       
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.035",
+      "total_weight_gross": "0.035",
+      
       "number_units_good": "0",
       "number_units_lost": "0",
       "number_units_damaged": "0",
@@ -194,6 +199,10 @@
       "waybill": "ISBX00311A",
       "stock_item": "KARX025KARX0011234EBCG15587",
       "number_of_units": 35,
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.035",
+      "total_weight_gross": "0.035",
       "number_units_good": "0",
       "number_units_lost": "0",
       "number_units_damaged": "0",
@@ -254,6 +263,10 @@
     "fields": {
       "_order": 0,
       "number_units_good": "0",
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.002",
+      "total_weight_gross": "0.002",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
       "stock_item": "KARX025KARX0011234EBCG15587",
@@ -277,7 +290,11 @@
       "number_units_lost": "10",
       "overloaded_units": false,
       "units_lost_reason": "lsed",
-      "number_of_units": "10"
+      "number_of_units": "10",
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.010",
+      "total_weight_gross": "0.010"
     }
   },
   {
@@ -292,7 +309,11 @@
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,
-      "number_of_units": "3"
+      "number_of_units": "3",
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.003",
+      "total_weight_gross": "0.003"
     }
   },
   {
@@ -307,7 +328,11 @@
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,
-      "number_of_units": "5"
+      "number_of_units": "5",
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.005",
+      "total_weight_gross": "0.005"
     }
   },
   {
@@ -322,7 +347,11 @@
       "number_units_damaged": "0",
       "number_units_lost": "0",
       "overloaded_units": false,
-      "number_of_units": "15"
+      "number_of_units": "15",
+      "unit_weight_net": "1",
+      "unit_weight_gross": "1",
+      "total_weight_net": "0.015",
+      "total_weight_gross": "0.015"
     }
   },
   {

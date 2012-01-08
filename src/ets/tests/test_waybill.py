@@ -130,6 +130,10 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             
             'item-0-stock_item': 'KARX025KARX0010000944801MIXMIXHEBCG15586',
             'item-0-number_of_units': 12,
+            'item-0-unit_weight_net': 1,
+            'item-0-unit_weight_gross': 1.02,
+            'item-0-total_weight_net': 12,
+            'item-0-total_weight_gross': 12.24,
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 0,
@@ -172,6 +176,10 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-waybill': 'ISBX00211A',
             'item-0-stock_item': 'KARX025KARX0010000944801MIXMIXHEBCG15586',
             'item-0-number_of_units': 37,
+            'item-0-unit_weight_net': 1,
+            'item-0-unit_weight_gross': 1.02,
+            'item-0-total_weight_net': 37,
+            'item-0-total_weight_gross': 37.24,
             
             'item-TOTAL_FORMS': 5,
             'item-INITIAL_FORMS': 1,

@@ -52,8 +52,8 @@
             </thead>
             <tr>
                 <td rowspan="2"><sup>{% trans "SI No" %}</sup></td>
-                <td rowspan="2"><sup>{% trans "Commodity" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Project no." %}</sup></td>
+                <td rowspan="2"><sup>{% trans "Commodity" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Packing" %}</sup></td>
                 <td rowspan="2"><sup>{% trans "Number of Units" %}</sup></td>
                 <td colspan="2"><sup>{% trans "Unit Weight (kg)" %}</sup></td>
@@ -68,14 +68,14 @@
             {% for lineitem in items %}
             <tr style="font-size:x-small;">
                 <td>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
-                <td>{{ lineitem.stock_item.commodity.name }}</td>
                 <td>{{ lineitem.stock_item.project_number }}</td>
+                <td>{{ lineitem.stock_item.commodity.name }}</td>
                 <td>{{ lineitem.stock_item.package.name }}</td>
                 <td style="text-align:right;">{{ lineitem.number_of_units }}</td>
-                <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_net|floatformat:3 }}</td>
-                <td style="text-align:right;">{{ lineitem.stock_item.unit_weight_gross|floatformat:3 }}</td>
-                <td style="text-align:right;">{{ lineitem.calculate_total_net|floatformat:3 }}</td>
-                <td style="text-align:right;">{{ lineitem.calculate_total_gross|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.unit_weight_net|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.unit_weight_gross|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.total_weight_net|floatformat:3 }}</td>
+                <td style="text-align:right;">{{ lineitem.total_weight_gross|floatformat:3 }}</td>
             </tr>
             {% endfor %}
             

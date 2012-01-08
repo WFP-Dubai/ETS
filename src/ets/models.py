@@ -722,6 +722,12 @@ class LoadingDetail(models.Model):
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
     number_of_units = models.IntegerField(_("Number of Units"))
+    
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    
+    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=3)
+    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=3)
 
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 
@@ -768,12 +774,6 @@ class LoadingDetail(models.Model):
                                      si_code = self.stock_item.si_code, 
                                      commodity = self.stock_item.commodity,)
     
-    def calculate_total_net( self ):
-        return ( self.number_of_units * self.stock_item.unit_weight_net ) / 1000
-
-    def calculate_total_gross( self ):
-        return ( self.number_of_units * self.stock_item.unit_weight_gross ) / 1000
-
     def calculate_net_received_good( self ):
         return ( self.number_units_good * self.stock_item.unit_weight_net ) / 1000
 

@@ -18,6 +18,10 @@
         <tr>
           <th>{% trans "Stock item" %}</th>
           <th>{% trans "Number of Units" %}</th>
+          <th>{% trans "Unit weight net" %}</th>
+          <th>{% trans "Unit weight gross" %}</th>
+          <th>{% trans "Total weight net" %}</th>
+          <th>{% trans "Total weight gross" %}</th>
           <th>{% trans "Overloaded Units" %}</th>
           {% if formset.can_delete %}<th style="background-color: red;">{% trans "Delete" %}</th>{% endif %}
         </tr>
@@ -25,9 +29,15 @@
       <tbody>
         {% for form in formset %}
           <tr colspan="{% if formset.can_delete %}7{% else %}6{% endif %}">{% include "uni_form/errors.html" %}</tr>
-          <tr>
+          <tr class="row">
             <td>{% include "uni_form/uni_field.html" with field=form.stock_item %} {{ form.slug }}</td>
             <td>{% include "uni_form/uni_field.html" with field=form.number_of_units %}</td>
+            
+            <td>{% include "uni_form/uni_field.html" with field=form.unit_weight_net %}</td>
+            <td>{% include "uni_form/uni_field.html" with field=form.unit_weight_gross %}</td>
+            <td>{% include "uni_form/uni_field.html" with field=form.total_weight_net %}</td>
+            <td>{% include "uni_form/uni_field.html" with field=form.total_weight_gross %}</td>
+            
             <td>{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
             {% if formset.can_delete %}<th>{{ form.DELETE }}</th>{% endif %}
           </tr>
@@ -37,6 +47,10 @@
         <tr class="etalon">
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.stock_item %}</td>
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.number_of_units %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_net %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_gross %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_net %}</td>
+          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_gross %}</td>
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.overloaded_units %}</td>
           {% if formset.can_delete %}<th>{{ formset.empty_form.DELETE }}</th>{% endif %}
         </tr>
@@ -58,36 +72,75 @@
 <script charset="utf-8" type="text/javascript">
 
 (function($) {
-	  $.fn.formset = function(addLink, etalonClass, countFormsField, success) {
-	    var container = $(this);
-	    var etalon = container.find('.'+etalonClass);
-	    
-	    addLink.click(function(){
-	       var empty_form = etalon.clone();
-	       var count_forms = countFormsField.val();
+  $.fn.formset = function(addLink, etalonClass, countFormsField, success) {
+    var container = $(this);
+    var etalon = container.find('.'+etalonClass);
+    
+    addLink.click(function(){
+       var empty_form = etalon.clone();
+       var count_forms = countFormsField.val();
 
-	       empty_form.find('div, select, input').each(function(index, domEle){
-	         var el = $(domEle);
-	         if (el.attr('id')) 
-	        	 el.attr('id', el.attr('id').replace('__prefix__', count_forms));
-	         if (el.attr('name')) 
-	        	 el.attr('name', el.attr('name').replace('__prefix__', count_forms));
-	       });
-	       countFormsField.val(parseInt(count_forms) + 1);
-	       var holder = empty_form.removeClass(etalonClass).insertBefore(etalon);
-	       
-	       if (success) success(holder);
-	       return false;
-	    });
-	  };
-	})(jQuery);
+       empty_form.find('div, select, input').each(function(index, domEle){
+         var el = $(domEle);
+         if (el.attr('id')) 
+        	 el.attr('id', el.attr('id').replace('__prefix__', count_forms));
+         if (el.attr('name')) 
+        	 el.attr('name', el.attr('name').replace('__prefix__', count_forms));
+       });
+       countFormsField.val(parseInt(count_forms) + 1);
+       var holder = empty_form.removeClass(etalonClass).insertBefore(etalon);
+       
+       if (success) success(holder);
+       return false;
+    });
+  };
+  $.fn.handleWeights = function() {
+	  var container = $(this);
+	  var stockItem = $(this).find('select');
+	  var numberUnits = $(this).find("div.ctrlHolder.number input");
+	  var unitWeight = $(this).find("div.ctrlHolder.unit-weight-net input");
+	  var unitWeightGross = $(this).find("div.ctrlHolder.unit-weight-gross input");
+	  var weightTotal = $(this).find("div.ctrlHolder.weight-total-net input");
+	  var weightTotalGross = $(this).find("div.ctrlHolder.weight-total-gross input");
+	  
+	  stockItem.change(function(){
+		  container.find('div.ctrlHolder').loadIndicator();
+		  $.getJSON('{% url get_stock_data %}',{stock_item: $(this).val()}, function(data){
+			  
+    		  unitWeight.val(data['unit_weight_net']);
+    		  unitWeightGross.val(data['unit_weight_gross']);
+			  numberUnits.val(data['number_of_units']);
+	    		  
+    		  numberUnits.change();
+		  }).complete(function(){ container.find('div.ctrlHolder').deleteIndicator(); });
+	  });
+	  
+	  function updateWeights(){
+		  weightTotal.val(parseInt(numberUnits.val()) * parseFloat(unitWeight.val()) / 1000);
+		  weightTotalGross.val(parseInt(numberUnits.val()) * parseFloat(unitWeightGross.val()) / 1000);
+	  }
+	  
+	  numberUnits.change(updateWeights);
+	  unitWeight.change(updateWeights);
+	  unitWeightGross.change(updateWeights);
+	  
+	  weightTotal.change(function(){
+		  unitWeight.val(1000 * parseFloat($(this).val()) / parseInt(numberUnits.val()));
+	  });
+	  weightTotalGross.change(function(){
+		  unitWeightGross.val(1000 * parseFloat($(this).val()) / parseInt(numberUnits.val()));
+	  });
+	  
+  }
+})(jQuery);
 
 $(document).ready(function() {
   $('#{{ form.dispatch_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
   $('#{{ form.loading_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
   
-  $("#loadingdetails").formset($("#add-item-link"), 'etalon', 
-		  $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
+  $("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
+  
+  $("#loadingdetails tbody tr.row").each(function() {$(this).handleWeights();});
   
 });
 $(document).keydown(omit_enter);

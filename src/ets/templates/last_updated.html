@@ -16,6 +16,7 @@ $(document).ready(function() {
   		timeout: 60000*15,
       success: function (data) {
       	$(this).find('strong').text(data);
+      	alert("{% trans 'Import process has been initiated. It might take several minutes.' %}");
       	container.deleteIndicator();
       }
     });

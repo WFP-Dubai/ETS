@@ -296,11 +296,11 @@ def send_dispatched(waybill, compas=None):
                     loading.stock_item.allocation_code, 
                     loading.stock_item.quality,
                     
-                    u'%.3f' % loading.calculate_total_net(), 
-                    u'%.3f' % loading.calculate_total_gross(), 
+                    u'%.3f' % loading.total_weight_net, 
+                    u'%.3f' % loading.total_weight_gross, 
                     u'%.3f' % (1 if is_bulk else loading.number_of_units), 
-                    u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_net), 
-                    u'%.3f' % (1 if is_bulk else loading.stock_item.unit_weight_gross), 
+                    u'%.3f' % (1 if is_bulk else loading.unit_weight_net), 
+                    u'%.3f' % (1 if is_bulk else loading.unit_weight_gross), 
                     
                     None, #p_odaid
                     None, #p_losstype
