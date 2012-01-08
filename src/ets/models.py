@@ -775,22 +775,22 @@ class LoadingDetail(models.Model):
                                      commodity = self.stock_item.commodity,)
     
     def calculate_net_received_good( self ):
-        return ( self.number_units_good * self.stock_item.unit_weight_net ) / 1000
+        return ( self.number_units_good * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_good( self ):
-        return ( self.number_units_good * self.stock_item.unit_weight_gross ) / 1000
+        return ( self.number_units_good * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_damaged( self ):
-        return ( self.number_units_damaged * self.stock_item.unit_weight_net ) / 1000
+        return ( self.number_units_damaged * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_damaged( self ):
-        return ( self.number_units_damaged * self.stock_item.unit_weight_gross ) / 1000
+        return ( self.number_units_damaged * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_lost( self ):
-        return ( self.number_units_lost * self.stock_item.unit_weight_net ) / 1000
+        return ( self.number_units_lost * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_lost( self ):
-        return ( self.number_units_lost * self.stock_item.unit_weight_gross ) / 1000
+        return ( self.number_units_lost * self.unit_weight_gross ) / 1000
     
     def calculate_total_received_units( self ):
         return self.number_units_good + self.number_units_damaged
