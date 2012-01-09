@@ -363,13 +363,15 @@ def view_logs(request, template_name="logs.html"):
     
     sync_command = sync_compas.Command()
     try:
-        logs.append(('sync_compas', open(sync_command.get_log_name()).read(), sync_command.help))
+        with open(sync_command.get_log_name()) as f:
+            logs.append(('sync_compas', f.read(), sync_command.help))
     except IOError:
         pass
     
     submit_command = submit_waybills.Command()
     try:
-        logs.append(('submit_waybills', open(submit_command.get_log_name()).read(), submit_command.help))
+        with open(submit_command.get_log_name()) as f:
+            logs.append(('submit_waybills', f.read(), submit_command.help))
     except IOError:
         pass
     
