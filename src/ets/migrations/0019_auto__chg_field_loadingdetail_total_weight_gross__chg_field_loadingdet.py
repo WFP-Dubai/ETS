@@ -21,18 +21,6 @@ class Migration(SchemaMigration):
         # Changing field 'LoadingDetail.unit_weight_net'
         db.alter_column('ets_loadingdetail', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
-        # Changing field 'LoadingDetailAuditLogEntry.total_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.unit_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.unit_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.total_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
-
 
     def backwards(self, orm):
         
@@ -47,18 +35,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'LoadingDetail.unit_weight_net'
         db.alter_column('ets_loadingdetail', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.total_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.unit_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.unit_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3))
-
-        # Changing field 'LoadingDetailAuditLogEntry.total_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(null=True, max_digits=12, decimal_places=3))
 
 
     models = {
@@ -164,10 +140,10 @@ class Migration(SchemaMigration):
             'overloaded_units': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'slug': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '50', 'populate_from': 'None', 'db_index': 'True'}),
             'stock_item': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_dispatches'", 'to': "orm['ets.StockItem']"}),
-            'total_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
-            'total_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
-            'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
-            'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3'}),
+            'total_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3', 'null': 'True'}),
+            'total_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3', 'null': 'True'}),
+            'unit_weight_gross': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3', 'null': 'True'}),
+            'unit_weight_net': ('django.db.models.fields.DecimalField', [], {'max_digits': '12', 'decimal_places': '3', 'null': 'True'}),
             'units_damaged_reason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_damage_reason'", 'null': 'True', 'to': "orm['ets.LossDamageType']"}),
             'units_lost_reason': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'_auditlog_lost_reason'", 'null': 'True', 'to': "orm['ets.LossDamageType']"}),
             'waybill': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'_auditlog_loading_details'", 'to': "orm['ets.Waybill']"})
