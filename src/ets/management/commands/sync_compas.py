@@ -60,6 +60,6 @@ class Command(LockedBaseCommandMixin, BaseCommand):
                 try:
                     self.synchronize(compas=compas.pk)
                 except Exception, err:
-                    f.writelines([err])
+                    f.write(unicode(err))
                 
                 f.write("\nsuccess")
