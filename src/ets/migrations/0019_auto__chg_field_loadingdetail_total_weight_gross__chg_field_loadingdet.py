@@ -1,5 +1,6 @@
 # encoding: utf-8
 import datetime
+from decimal import Decimal
 from south.db import db
 from south.v2 import SchemaMigration
 from django.db import models
@@ -9,28 +10,28 @@ class Migration(SchemaMigration):
     def forwards(self, orm):
         
         # Changing field 'LoadingDetail.total_weight_gross'
-        db.alter_column('ets_loadingdetail', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetail', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetail.unit_weight_gross'
-        db.alter_column('ets_loadingdetail', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetail', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetail.total_weight_net'
-        db.alter_column('ets_loadingdetail', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetail', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetail.unit_weight_net'
-        db.alter_column('ets_loadingdetail', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetail', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetailAuditLogEntry.total_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetailAuditLogEntry.unit_weight_gross'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_gross', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetailAuditLogEntry.unit_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetailauditlogentry', 'unit_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
         # Changing field 'LoadingDetailAuditLogEntry.total_weight_net'
-        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(default=0, max_digits=12, decimal_places=3))
+        db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_net', self.gf('django.db.models.fields.DecimalField')(default=Decimal("1.0"), max_digits=12, decimal_places=3))
 
 
     def backwards(self, orm):
