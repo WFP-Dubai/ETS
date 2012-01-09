@@ -223,6 +223,9 @@ NATIVE_TAGS = ()
 #Loading details settings
 LOADING_LINES = 5
 
+LOG_DIRECTORY = os.path.join(EGG_ROOT, 'logs') 
+ALLOWED_INCLUDE_ROOTS = (LOG_DIRECTORY,)
+
 #List of possible content types to export
 #===============================================================================
 # EXPORT_CONTENT_TYPES = (

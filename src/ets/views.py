@@ -349,11 +349,32 @@ def get_stock_data(request, queryset):
 def sync_compas(request):
     
     #Execute external command
-    Popen('./cron/hourly.sh', shell=True, executable='/bin/sh', cwd=settings.EGG_ROOT) 
+    Popen(['./bin/instance', 'sync_compas'], cwd=settings.EGG_ROOT) 
     
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
 
-
+@permission_required("ets.sync_compas")
+def view_logs(request, template_name="logs.html"):
+    
+    from .management.commands import sync_compas
+    from .management.commands import submit_waybills
+    
+    logs = []
+    
+    sync_command = sync_compas.Command()
+    try:
+        logs.append(('sync_compas', open(sync_command.get_log_name()).read(), sync_command.help))
+    except IOError:
+        pass
+    
+    submit_command = submit_waybills.Command()
+    try:
+        logs.append(('submit_waybills', open(submit_command.get_log_name()).read(), submit_command.help))
+    except IOError:
+        pass
+    
+    return direct_to_template(request, template=template_name, extra_context={'logs': logs})
+    
 @officer_required
 @dispatch_compas
 def send_dispatched_view(request, queryset):

@@ -12,7 +12,7 @@ from django.conf import settings
 from ets.utils import update_compas
 from ets.models import Compas
 
-LOG_DIRECTORY = getattr(settings, 'LOG_DIRECTORY', 'logs')
+LOG_DIRECTORY = settings.LOG_DIRECTORY
 
 class LockedBaseCommandMixin(object):
 
@@ -44,17 +44,22 @@ class Command(LockedBaseCommandMixin, BaseCommand):
     def synchronize(self, compas):
         update_compas(compas)
 
+    def get_log_name(self):
+        return os.path.join(LOG_DIRECTORY, self.log_name)
+    
     def handle(self, compas='', *args, **options):
         
-        with open(os.path.join(settings.EGG_ROOT, LOG_DIRECTORY, self.log_name), 'w') as f:
+        with open(self.get_log_name(), 'w') as f:
             stations = Compas.objects.all()
             if compas:
                 stations = stations.filter(pk=compas)
                 
             for compas in stations:
-                f.writelines(["Updating COMPAS: %s" % compas])
+                f.write("\nUpdating COMPAS: %s" % compas)
                 
                 try:
                     self.synchronize(compas=compas.pk)
                 except Exception, err:
                     f.writelines([err])
+                
+                f.write("\nsuccess")

@@ -1,0 +1,17 @@
+{% extends "base_template.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Logs" %}{% endblock %}
+
+{% block content %}
+<h1>{% trans "Logs" %}</h1> 
+
+{% for name, content, help in logs %}
+<div class="{{ name }}">
+<h2>{{ help }}</h2>
+<div>{{ content|linebreaks }}</div>
+</div>
+{% endfor %}
+
+{% endblock %}
