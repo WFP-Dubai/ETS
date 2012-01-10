@@ -172,6 +172,7 @@ class StockInline(admin.TabularInline):
 class PersonInline(admin.TabularInline):
     model = ets.models.Person
     extra = 0
+    readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location', 'code')
 
 class WarehouseAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date', 'end_date')
@@ -312,4 +313,3 @@ class PersonedUserAdmin(UserAdmin):
 
 #admin.site.unregister(User)
 #admin.site.register(User, PersonedUserAdmin)
-
