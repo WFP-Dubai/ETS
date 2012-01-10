@@ -81,13 +81,14 @@ def import_places(compas):
 def import_persons(compas):
     
     with transaction.commit_on_success(compas) as tr:
+        now = datetime.now()
         places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
     
         for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
                                 location_code__in=places.values_list('geo_point_code', flat=True), 
                                 organization_id__in=places.values_list('organization_id', flat=True)):
             try:
-                ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
+                obj = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
             except ets_models.Person.DoesNotExist:
                 obj = ets_models.Person(title=person.title,
                                        code=person.code, compas_id=person.org_unit_code, 
@@ -103,7 +104,12 @@ def import_persons(compas):
                                                    organization=obj.organization, 
                                                    location=obj.location):
                     obj.warehouses.add(wh)
-
+            
+            obj.updated = now
+            obj.save()
+        
+        #Disable deleted persons
+        ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
 
 def import_stock(compas):
     """Executes Imports of Stock"""
