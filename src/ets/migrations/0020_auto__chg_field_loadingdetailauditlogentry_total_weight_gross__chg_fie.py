@@ -8,13 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        for item in orm.LoadingDetail.audit_log.all():
+        for loading in orm.LoadingDetail.objects.all():
+            for item in loading.audit_log.all():
             
-            item.unit_weight_net = item.stock_item.unit_weight_net or "1.0"
-            item.unit_weight_gross = item.stock_item.unit_weight_gross or "1.0"
-            item.total_weight_net = ( item.number_of_units * item.stock_item.unit_weight_net ) / 1000 or "1.0"
-            item.total_weight_gross = ( item.number_of_units * item.stock_item.unit_weight_gross ) / 1000 or "1.0"
-            item.save()
+                item.unit_weight_net = item.stock_item.unit_weight_net or "1.0"
+                item.unit_weight_gross = item.stock_item.unit_weight_gross or "1.0"
+                item.total_weight_net = ( item.number_of_units * item.stock_item.unit_weight_net ) / 1000 or "1.0"
+                item.total_weight_gross = ( item.number_of_units * item.stock_item.unit_weight_gross ) / 1000 or "1.0"
+                item.save()
         
         # Changing field 'LoadingDetailAuditLogEntry.total_weight_gross'
         db.alter_column('ets_loadingdetailauditlogentry', 'total_weight_gross', self.gf('django.db.models.fields.DecimalField')(default='1.0', max_digits=12, decimal_places=3))
