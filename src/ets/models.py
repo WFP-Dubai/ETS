@@ -158,6 +158,8 @@ class Person(User):
     dispatch = models.BooleanField(_("Can dispatch"), default=False)
     receive = models.BooleanField(_("Can receive"), default=False)
     
+    updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+    
     class Meta:
         ordering = ('code',)
         verbose_name = _('person')
