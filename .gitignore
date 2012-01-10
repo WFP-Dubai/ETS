@@ -49,3 +49,5 @@ db
 /tagfile.tag
 
 sqlnet.log
+
+logs/sync_compas.log
