@@ -51,3 +51,5 @@ db
 sqlnet.log
 
 logs/sync_compas.log
+
+logs/sync_compas.log

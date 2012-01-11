@@ -140,7 +140,7 @@ class LtiOriginal( models.Model ):
     
     #Remarks
     remarks = models.TextField(_("Remarks"), blank=True, db_column = 'REMARKS')
-    remarks_b = models.TextField(_("RemarksBB"), blank=True, db_column = 'REMARKS_B')
+    #remarks_b = models.TextField(_("RemarksBB"), blank=True, db_column = 'REMARKS_B')
     
     requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
     project_wbs_element = models.CharField(_("Project work breakdown structure element"), max_length = 24, blank = True, db_column = 'PROJECT_WBS_ELEMENT' )
