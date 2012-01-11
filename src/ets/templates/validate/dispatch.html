@@ -54,13 +54,9 @@
       {% for log in waybill.compass_loggers.all %}
         {% if log.action == 1 %}
           <tr class="logger">
-            <td></td>
-            <td></td>
-            <td>{{ log.message }}</td>
-            <td>{{ log.compas }}</td>
             <td>{{ log.when_attempted }}</td>
-            <td>{{ log.get_status_display }}</td>
-            <td>{{ log.get_action_display }}</td>
+            <td>{{ log.compas }}</td>
+            <td colspan="6">{{ log.message }}</td>
           </tr>
         {% endif %}
       {% endfor %}
