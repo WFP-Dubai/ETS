@@ -135,7 +135,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-total_weight_net': 12,
             'item-0-total_weight_gross': 12.24,
             
-            'item-TOTAL_FORMS': 5,
+            'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 0,
             'item-MAX_NUM_FORMS': 5,
         })
@@ -181,7 +181,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-total_weight_net': 37,
             'item-0-total_weight_gross': 37.24,
             
-            'item-TOTAL_FORMS': 5,
+            'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 1,
             'item-MAX_NUM_FORMS': 5,
         }

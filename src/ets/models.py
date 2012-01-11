@@ -388,6 +388,16 @@ class OrderItem(models.Model):
     
     number_of_units = models.IntegerField(_("Number of Units"))
     
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, 
+                                          editable=False, blank=True, null=True)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3, 
+                                            editable=False, blank=True, null=True)
+    
+    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=3,
+                                           editable=False, blank=True, null=True)
+    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=3,
+                                             editable=False, blank=True, null=True)
+    
     lti_id = models.CharField(_("LTI ID"), max_length=40, editable=False, blank=True, null=True)
     
     class Meta:
@@ -428,7 +438,8 @@ class OrderItem(models.Model):
     
     def get_available_stocks(self):
         """Calculates available stocks"""
-        return self.sum_number(self.get_stock_items()) - self.sum_number(self.get_similar_dispatches())
+        return self.sum_number(self.get_stock_items()) \
+                - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
@@ -725,11 +736,11 @@ class LoadingDetail(models.Model):
     
     number_of_units = models.IntegerField(_("Number of Units"))
     
-    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
-    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, default="1.0")
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3, default="1.0")
     
-    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=3)
-    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=3)
+    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=5, default="1.0")
+    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=5, default="1.0")
 
     #Number of delivered units
     number_units_good = models.DecimalField(_("number Units Good"), default=0, 

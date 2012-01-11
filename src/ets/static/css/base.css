@@ -180,7 +180,7 @@ table.summary {
   display: inline;
 }
 
-ul.messages li.info {
+ul.messages li.info, ul.messages li.success {
   color: green;
 }
 

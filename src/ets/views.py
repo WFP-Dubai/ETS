@@ -118,7 +118,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
         
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                        form=FormsetForm, formset=formset_class, 
-                       extra=5, max_num=5,
+                       extra=1, max_num=5,
                        can_order=False, can_delete=True)\
         (request.POST or None, request.FILES or None, prefix='item', instance=waybill)
     
@@ -127,6 +127,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
     
     form.fields['destination'].queryset = warehouses
+    form.fields['destination'].empty_label = None
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()

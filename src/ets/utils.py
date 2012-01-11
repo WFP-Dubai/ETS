@@ -228,6 +228,10 @@ def import_order(compas):
             }
             defaults = {
                 'number_of_units': lti.number_of_units,
+                'unit_weight_net': lti.unit_weight_net,
+                'unit_weight_gross': lti.unit_weight_gross,
+                'total_weight_net': lti.quantity_net,
+                'total_weight_gross': lti.quantity_gross,
             }
             
             rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
