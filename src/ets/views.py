@@ -365,14 +365,14 @@ def view_logs(request, template_name="logs.html"):
     sync_command = sync_compas.Command()
     try:
         with open(sync_command.get_log_name()) as f:
-            logs.append(('sync_compas', f.read(), sync_command.help))
+            logs.append(('sync_compas', f.read() or _("In progress"), sync_command.help))
     except IOError:
         pass
     
     submit_command = submit_waybills.Command()
     try:
         with open(submit_command.get_log_name()) as f:
-            logs.append(('submit_waybills', f.read(), submit_command.help))
+            logs.append(('submit_waybills', f.read() or _("In progress"), submit_command.help))
     except IOError:
         pass
     
