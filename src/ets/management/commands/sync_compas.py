@@ -4,6 +4,7 @@ from optparse import make_option
 import lockfile
 import os
 import logging
+from datetime import datetime
 
 from django.core.management.base import BaseCommand
 from django.db.utils import DatabaseError
@@ -50,6 +51,8 @@ class Command(LockedBaseCommandMixin, BaseCommand):
     def handle(self, compas='', *args, **options):
         
         with open(self.get_log_name(), 'w') as f:
+            f.write("\nDate: %s" % datetime.now())
+            
             stations = Compas.objects.all()
             if compas:
                 stations = stations.filter(pk=compas)
