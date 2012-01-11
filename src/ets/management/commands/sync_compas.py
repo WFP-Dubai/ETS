@@ -50,19 +50,24 @@ class Command(LockedBaseCommandMixin, BaseCommand):
     
     def handle(self, compas='', *args, **options):
         
-        with open(self.get_log_name(), 'w') as f:
-            f.write("\nDate: %s" % datetime.now())
+        logs = []
+        
+        logs.append("\nDate: %s" % datetime.now())
+        
+        stations = Compas.objects.all()
+        if compas:
+            stations = stations.filter(pk=compas)
             
-            stations = Compas.objects.all()
-            if compas:
-                stations = stations.filter(pk=compas)
-                
-            for compas in stations:
-                f.write("\nUpdating COMPAS: %s" % compas)
-                
-                try:
-                    self.synchronize(compas=compas.pk)
-                except Exception, err:
-                    f.write(unicode(err))
-                else:
-                    f.write("\nsuccess")
+        for compas in stations:
+            logs.append("\nUpdating COMPAS: %s" % compas)
+            
+            try:
+                self.synchronize(compas=compas.pk)
+            except Exception, err:
+                logs.append("\n%s" % unicode(err))
+            else:
+                logs.append("\nsuccess")
+    
+        with open(self.get_log_name(), 'w') as f:
+            f.writelines(logs)
+        
