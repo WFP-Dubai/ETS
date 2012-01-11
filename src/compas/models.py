@@ -139,7 +139,7 @@ class LtiOriginal( models.Model ):
     consegnee_name = models.CharField(_("Consignee Name"), max_length = 80, db_column = 'CONSEGNEE_NAME' )
     
     #Remarks
-    remarks = models.TextField(_("Remarks"), blank=True, db_column = 'REMARKS')
+    #remarks = models.TextField(_("Remarks"), blank=True, db_column = 'REMARKS')
     #remarks_b = models.TextField(_("RemarksBB"), blank=True, db_column = 'REMARKS_B')
     
     requested_dispatch_date = models.DateField(_("Requested Dispatch Date"), blank = True, null = True, db_column = 'REQUESTED_DISPATCH_DATE' )
