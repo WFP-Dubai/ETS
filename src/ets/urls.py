@@ -145,7 +145,7 @@ class PrefixedPatterns:
         ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
         
         ( r'^sync_compas/$', "sync_compas", {}, "sync_compas"),
-        ( r'^sync_compas/view_logs/$', "view_logs", {}, "view_logs"),
+        ( r'^admin/sync_logs/$', "view_logs", {}, "view_logs"),
         
         ( r'^export_data/$', ExportWaybillData.as_view(), {}, "export_file" ),
         ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),

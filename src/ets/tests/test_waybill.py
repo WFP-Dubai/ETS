@@ -490,4 +490,4 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         response = self.client.get(reverse('dispatch_validates'))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Failure")
+        self.assertContains(response, "Error-Error-Error")

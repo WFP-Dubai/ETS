@@ -355,7 +355,7 @@ def sync_compas(request):
     return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
 
 @permission_required("ets.sync_compas")
-def view_logs(request, template_name="logs.html"):
+def view_logs(request, template_name="admin/logs.html"):
     
     from .management.commands import sync_compas
     from .management.commands import submit_waybills
@@ -365,14 +365,14 @@ def view_logs(request, template_name="logs.html"):
     sync_command = sync_compas.Command()
     try:
         with open(sync_command.get_log_name()) as f:
-            logs.append(('sync_compas', f.read() or _("In progress"), sync_command.help))
+            logs.append(('sync_compas', f.read() or _("Empty"), sync_command.help))
     except IOError:
         pass
     
     submit_command = submit_waybills.Command()
     try:
         with open(submit_command.get_log_name()) as f:
-            logs.append(('submit_waybills', f.read() or _("In progress"), submit_command.help))
+            logs.append(('submit_waybills', f.read() or _("Empty"), submit_command.help))
     except IOError:
         pass
     
@@ -461,7 +461,7 @@ def export_compas_file(request):
         ets.models.Compas.objects.all(),
         ets.models.Location.objects.all(),
         ets.models.Person.objects.all(),
-        ets.models.Warehouse.objects.filter(start_date__gte=datetime.date.today, end_date__lt=datetime.date.today),
+        ets.models.Warehouse.objects.filter(Q(end_date__lt=datetime.date.today) | Q(end_date__isnull=True), start_date__gte=datetime.date.today),
         ets.models.LossDamageType.objects.all(),
         ets.models.Commodity.objects.all(),
         ets.models.CommodityCategory.objects.all(),

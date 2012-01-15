@@ -9,8 +9,8 @@
 
 <script charset="utf-8">
 $(document).ready(function() {
-  $('#sync_compas a.sync').click(function(){
-  	var container = $(this).parent();
+  $('#sync_compas a.sync').click(function() {
+	var container = $(this).parent();
   	container.loadIndicator()
   	$.ajax({
   		url: $(this).attr('href'),
