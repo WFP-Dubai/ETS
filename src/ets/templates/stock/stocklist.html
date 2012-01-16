@@ -48,7 +48,9 @@
 {{ block.super }}
 <script charset="utf-8">
   $(document).ready(function() {
-    $('.stocklist').dataTable();
+    $('.stocklist').dataTable({
+  	  "aaSorting": [[ 4, "desc" ]]
+  	});
   });
 </script>
 {% endblock script %}
