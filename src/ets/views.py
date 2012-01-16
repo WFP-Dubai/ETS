@@ -344,7 +344,7 @@ def get_stock_data(request, queryset):
         'unit_weight_net': stock_item.unit_weight_net,
         'unit_weight_gross': stock_item.unit_weight_gross,
         'number_of_units': stock_item.number_of_units,
-    }))
+    }), use_decimal=True)
 
 @permission_required("ets.sync_compas")
 def sync_compas(request):
