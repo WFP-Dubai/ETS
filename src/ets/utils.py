@@ -148,7 +148,6 @@ def import_stock(compas):
                 'commodity': commodity,
                 'package': package,
                 'number_of_units': number_of_units,
-                'quality': stock.qualitycode,
                 'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
                 'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
                 
@@ -160,7 +159,7 @@ def import_stock(compas):
                 'updated': now,
             }
             
-            rows = ets_models.StockItem.objects.filter(code=stock.pk).update(**defaults)
+            rows = ets_models.StockItem.objects.filter(external_ident=stock.wh_pk, quality=stock.qualitycode).update(**defaults)
             if not rows:
                 
                 #Clean virtual stocks
@@ -168,7 +167,7 @@ def import_stock(compas):
                                                     si_code=stock.si_code, commodity=commodity,
                                                     virtual=True).delete()
                 
-                ets_models.StockItem.objects.create(code=stock.pk, **defaults)
+                ets_models.StockItem.objects.create(external_ident=stock.wh_pk, quality=stock.qualitycode, **defaults)
         
         #Flush empty stocks
         ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse__compas__pk=compas, virtual=False)\

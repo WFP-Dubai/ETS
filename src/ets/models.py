@@ -236,7 +236,9 @@ class StockItem( models.Model ):
         ('U', u'Unavailable'),
     )
     
-    code = models.CharField(_("Code"), max_length=128, primary_key=True) 
+    code = AutoSlugField(populate_from="external_ident", slugify=capitalize_slug(slugify), 
+                         max_length=128, unique=True, sep='', 
+                         editable=True, primary_key=True) 
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
@@ -246,6 +248,7 @@ class StockItem( models.Model ):
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
     package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
     
+    external_ident = models.CharField(_("External Identifier"), max_length=128, default="111")
     quality = models.CharField(_("Quality"), max_length=1, choices=QUALITY_CHOICE) #qualitycode
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
@@ -269,6 +272,7 @@ class StockItem( models.Model ):
         order_with_respect_to = 'warehouse'
         verbose_name = _("Stock Item")
         verbose_name_plural = _("Stock Items")
+        unique_together = ('external_ident', 'quality')
 
     def  __unicode__( self ):
         name = "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
@@ -612,7 +616,7 @@ class Waybill( ld_models.Model ):
                                           si_code=item.stock_item.si_code, 
                                           commodity=item.stock_item.commodity,
                                           defaults={
-                                                'code': "%s%s" % (self.destination, item.stock_item.code),
+                                                'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
                                                 'quality': item.stock_item.quality,
                                                 'package': item.stock_item.package,
                                                 'number_of_units': item.stock_item.number_of_units,
