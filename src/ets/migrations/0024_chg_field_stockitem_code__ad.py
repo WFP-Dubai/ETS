@@ -206,7 +206,7 @@ class Migration(SchemaMigration):
             'warehouses': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'to': "orm['ets.Warehouse']"})
         },
         'ets.stockitem': {
-            'Meta': {'ordering': "('_order',)", 'unique_together': "(('external_ident', 'quality'),)", 'object_name': 'StockItem'},
+            'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'code': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '128', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),

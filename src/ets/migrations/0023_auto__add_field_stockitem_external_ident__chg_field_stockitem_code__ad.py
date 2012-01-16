@@ -16,13 +16,13 @@ class Migration(SchemaMigration):
             item.save()
         
         # Adding unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        db.create_unique('ets_stockitem', ['external_ident', 'quality'])
+        #db.create_unique('ets_stockitem', ['external_ident', 'quality'])
 
 
     def backwards(self, orm):
         
         # Removing unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        db.delete_unique('ets_stockitem', ['external_ident', 'quality'])
+        #db.delete_unique('ets_stockitem', ['external_ident', 'quality'])
 
         # Deleting field 'StockItem.external_ident'
         db.delete_column('ets_stockitem', 'external_ident')
@@ -210,7 +210,7 @@ class Migration(SchemaMigration):
             'warehouses': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'persons'", 'symmetrical': 'False', 'to': "orm['ets.Warehouse']"})
         },
         'ets.stockitem': {
-            'Meta': {'ordering': "('_order',)", 'unique_together': "(('external_ident', 'quality'),)", 'object_name': 'StockItem'},
+            'Meta': {'ordering': "('_order',)", 'object_name': 'StockItem'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'code': ('django.db.models.fields.CharField', [], {'max_length': '128', 'primary_key': 'True'}),
