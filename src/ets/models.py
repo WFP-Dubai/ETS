@@ -265,7 +265,7 @@ class StockItem( models.Model ):
     objects = StockManager()
 
     class Meta:
-        ordering = ('si_code', 'commodity__name')
+        ordering = ('-number_of_units', 'si_code', 'commodity__name')
         order_with_respect_to = 'warehouse'
         verbose_name = _("Stock Item")
         verbose_name_plural = _("Stock Items")
