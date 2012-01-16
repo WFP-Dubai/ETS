@@ -155,7 +155,7 @@ class OrderInline(admin.TabularInline):
     
 
 class StockAdmin(admin.ModelAdmin):
-    list_display = ('si_code', 'warehouse', 'project_number', 'commodity', 
+    list_display = ('si_code', 'warehouse', 'project_number', 'commodity', 'quality', 
                     'package', 'number_of_units')
     readonly_fields = ('updated',)
     raw_id_fields = ('warehouse',)
