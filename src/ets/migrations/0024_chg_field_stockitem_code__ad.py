@@ -8,25 +8,21 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding field 'StockItem.external_ident'
-        db.add_column('ets_stockitem', 'external_ident', self.gf('django.db.models.fields.CharField')(default='111', max_length=128), keep_default=False)
-        
-        for item in orm.StockItem.objects.all():
-            item.external_ident = item.code
-            item.save()
-        
-        # Adding unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        db.create_unique('ets_stockitem', ['external_ident', 'quality'])
+        # Changing field 'StockItem.code'
+        db.alter_column('ets_stockitem', 'code', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=128, primary_key=True, unique=True, populate_from=None))
+
+        # Adding index on 'StockItem', fields ['code']
+        db.create_index('ets_stockitem', ['code'])
+
 
 
     def backwards(self, orm):
         
-        # Removing unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        db.delete_unique('ets_stockitem', ['external_ident', 'quality'])
+        # Removing index on 'StockItem', fields ['code']
+        db.delete_index('ets_stockitem', ['code'])
 
-        # Deleting field 'StockItem.external_ident'
-        db.delete_column('ets_stockitem', 'external_ident')
-
+        # Changing field 'StockItem.code'
+        db.alter_column('ets_stockitem', 'code', self.gf('django.db.models.fields.CharField')(max_length=128, primary_key=True))
 
 
     models = {
@@ -213,7 +209,7 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "('_order',)", 'unique_together': "(('external_ident', 'quality'),)", 'object_name': 'StockItem'},
             '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'code': ('django.db.models.fields.CharField', [], {'max_length': '128', 'primary_key': 'True'}),
+            'code': ('autoslug.fields.AutoSlugField', [], {'unique_with': '()', 'max_length': '128', 'primary_key': 'True', 'unique': 'True', 'populate_from': 'None', 'db_index': 'True'}),
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Commodity']"}),
             'external_ident': ('django.db.models.fields.CharField', [], {'default': "'111'", 'max_length': '128'}),
             'is_bulk': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
