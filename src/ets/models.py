@@ -427,8 +427,9 @@ class OrderItem(models.Model):
         return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
                                             waybill__date_removed__isnull=True,
                                             stock_item__project_number=self.project_number,
-                                            stock_item__si_code = self.si_code, 
-                                            stock_item__commodity = self.commodity,
+                                            stock_item__si_code=self.si_code, 
+                                            stock_item__commodity=self.commodity,
+                                            waybill__order__warehouse=self.order.warehouse,
                                             ).order_by('-waybill__dispatch_date')
     
     def get_order_dispatches(self):

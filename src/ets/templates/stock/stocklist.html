@@ -24,7 +24,7 @@
   </thead>
   <tbody>
     {% for item in wh.stock_items.all %}
-    <tr style="{% if item.quality != item.GOOD_QUALITY %}color:red;{% endif %}{% if item.number_of_units == 0 %}background-color:red;{% endif %}" >
+    <tr style="{% if item.quality != item.GOOD_QUALITY %}color:red;{% endif %}{% if item.number_of_units <= 0 %}opacity:0.2;{% endif %}" >
       <td>{{ item.commodity }}</td>
       <td>{{ item.project_number }}</td>
       <td>{{ item.si_code }}</td>
