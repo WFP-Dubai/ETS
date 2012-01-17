@@ -47,9 +47,7 @@
   </div>
   <div class='footer'>
     {% block footer %}
-    {% cache 180 last_updated user.is_authenticated %}
     {% get_last_update request.user %}
-    {% endcache %}
     {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
     {% endblock %}
   </div>
