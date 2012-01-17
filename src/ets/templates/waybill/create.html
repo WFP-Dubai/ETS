@@ -105,7 +105,7 @@
 	  
 	  stockItem.change(function(){
 		  container.find('div.ctrlHolder').loadIndicator();
-		  $.getJSON('{% url get_stock_data %}',{stock_item: $(this).val()}, function(data){
+		  $.getJSON('{% url get_stock_data %}',{stock_item: $(this).val(), order: '{{ object.pk }}'}, function(data){
 			  
     		  unitWeight.val(data['unit_weight_net']);
     		  unitWeightGross.val(data['unit_weight_gross']);
@@ -116,20 +116,25 @@
 	  });
 	  
 	  function updateWeights(){
-		  weightTotal.val(parseInt(numberUnits.val()) * parseFloat(unitWeight.val()) / 1000);
-		  weightTotalGross.val(parseInt(numberUnits.val()) * parseFloat(unitWeightGross.val()) / 1000);
+		  var totalNet = parseInt(numberUnits.val()) * parseFloat(unitWeight.val()) / 1000;
+		  totalNet = totalNet.toFixed(3);
+		  weightTotal.val(totalNet);
+		  
+		  var totalGross = parseInt(numberUnits.val()) * parseFloat(unitWeightGross.val()) / 1000;
+		  totalGross = totalGross.toFixed(3);
+		  weightTotalGross.val(totalGross);
 	  }
 	  
 	  numberUnits.change(updateWeights);
 	  unitWeight.change(updateWeights);
 	  unitWeightGross.change(updateWeights);
 	  
-	  weightTotal.change(function(){
+	  /*weightTotal.change(function(){
 		  unitWeight.val(1000 * parseFloat($(this).val()) / parseInt(numberUnits.val()));
 	  });
 	  weightTotalGross.change(function(){
 		  unitWeightGross.val(1000 * parseFloat($(this).val()) / parseInt(numberUnits.val()));
-	  });
+	  });*/
 	  
   }
 })(jQuery);
