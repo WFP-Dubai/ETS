@@ -275,7 +275,7 @@ class StockItem( models.Model ):
         unique_together = ('external_ident', 'quality')
 
     def  __unicode__( self ):
-        name = "%s-%s-%s" % (self.coi_code(), self.commodity.name, self.number_of_units)
+        name = "%s-%s-%s" % (self.coi_code(), self.commodity.name, int(self.number_of_units))
         if self.quality != self.GOOD_QUALITY:
             return "%s (%s)" % (name, self.get_quality_display())
         return name
