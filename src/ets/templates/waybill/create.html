@@ -115,19 +115,24 @@
 		  }).complete(function(){ container.find('div.ctrlHolder').deleteIndicator(); });
 	  });
 	  
-	  function updateWeights(){
+	  function updateWeightsNet(){
 		  var totalNet = parseInt(numberUnits.val()) * parseFloat(unitWeight.val()) / 1000;
 		  totalNet = totalNet.toFixed(3);
 		  weightTotal.val(totalNet);
-		  
+	  }
+	  function updateWeightsGross(){
 		  var totalGross = parseInt(numberUnits.val()) * parseFloat(unitWeightGross.val()) / 1000;
 		  totalGross = totalGross.toFixed(3);
 		  weightTotalGross.val(totalGross);
 	  }
 	  
-	  numberUnits.change(updateWeights);
-	  unitWeight.change(updateWeights);
-	  unitWeightGross.change(updateWeights);
+	  numberUnits.change(function(){
+		  updateWeightsNet(); 
+		  updateWeightsGross();
+	  });
+	  
+	  unitWeight.change(updateWeightsNet);
+	  unitWeightGross.change(updateWeightsGross);
 	  
 	  /*weightTotal.change(function(){
 		  unitWeight.val(1000 * parseFloat($(this).val()) / parseInt(numberUnits.val()));
