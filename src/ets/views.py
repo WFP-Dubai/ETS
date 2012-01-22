@@ -34,7 +34,7 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, DateRangeForm, 
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from .utils import history_list, send_dispatched, send_received, _data_to_response
+from .utils import history_list, send_dispatched, send_received, _data_to_response, import_file
 from .compress import compress_json, decompress_json
 import simplejson
 
@@ -479,11 +479,8 @@ class ImportData(FormView):
     
     def form_valid(self, form):
         _file = form.cleaned_data['file']
-        #File is supposed to be small (< 4Mb)
-        data = decompress_json(_file.read())
-        for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-            print obj
-            obj.save()
+
+        import_file(_file)
         
         messages.add_message(self.request, messages.INFO, _('File has been imported successfully.'))
         

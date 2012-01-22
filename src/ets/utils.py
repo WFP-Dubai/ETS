@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, date
 from itertools import chain, izip
+import decimal
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -13,7 +14,7 @@ from django.utils.translation import ugettext as _
 from compas.utils import call_db_procedure
 import compas.models as compas_models
 import models as ets_models
-from .compress import compress_json
+from .compress import compress_json, decompress_json
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
@@ -406,3 +407,15 @@ def history_list(log_queryset, model, exclude=()):
     
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
+
+
+def import_file(f):
+    """Reads file, decompresses serialized data,deserializes it and saves objects"""
+    #File is supposed to be small (< 4Mb)
+    data = decompress_json(f.read())
+    total = 0
+    for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
+        obj.save()
+        total += 1
+    
+    return total
