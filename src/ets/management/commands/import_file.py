@@ -2,7 +2,7 @@
 
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from ets.utils import import_file
 
@@ -27,5 +27,5 @@ class Command(BaseCommand):
                     print "Totally saved objects --> ", total
                 
         except TypeError:
-            print "Wrong file argument. It must be proper file name instead of %s" % file_name
+            raise CommandError("Wrong file argument. It must be proper file name instead of %s" % file_name)
         

@@ -461,7 +461,7 @@ def export_compas_file(request):
         ets.models.Compas.objects.all(),
         ets.models.Location.objects.all(),
         ets.models.Person.objects.all(),
-        ets.models.Warehouse.objects.filter(Q(end_date__lt=datetime.date.today) | Q(end_date__isnull=True), start_date__gte=datetime.date.today),
+        ets.models.Warehouse.objects.filter(Q(end_date__gt=datetime.date.today) | Q(end_date__isnull=True), start_date__lte=datetime.date.today),
         ets.models.LossDamageType.objects.all(),
         ets.models.Commodity.objects.all(),
         ets.models.CommodityCategory.objects.all(),
@@ -480,8 +480,9 @@ class ImportData(FormView):
     def form_valid(self, form):
         _file = form.cleaned_data['file']
 
-        import_file(_file)
+        total = import_file(_file)
         
-        messages.add_message(self.request, messages.INFO, _('File has been imported successfully.'))
+        messages.add_message(self.request, messages.INFO, 
+                             _('File has been imported successfully. Totally saved objects --> %s' % total))
         
         return self.get(self.request)
