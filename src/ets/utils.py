@@ -5,6 +5,7 @@ import decimal
 from django.conf import settings
 from django.http import HttpResponse
 from django.db import connections, transaction, models
+from django.db.models import Q
 from django.db.utils import DatabaseError
 from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
@@ -18,14 +19,6 @@ from .compress import compress_json, decompress_json
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
-
-
-def _data_to_response(data, file_name):
-    data = compress_json( serializers.serialize('json', data, use_decimal=False) )
-        
-    response = HttpResponse(data, content_type='application/data')
-    response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
-    return response
 
 
 def update_compas(using):
@@ -409,13 +402,55 @@ def history_list(log_queryset, model, exclude=()):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
 
 
+def data_to_file_response(data, file_name):
+    response = HttpResponse(data, content_type='application/data')
+    response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
+    return response
+
+
 def import_file(f):
     """Reads file, decompresses serialized data,deserializes it and saves objects"""
     #File is supposed to be small (< 4Mb)
+    
     data = decompress_json(f.read())
     total = 0
+    
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
         obj.save()
         total += 1
     
     return total
+
+
+def get_compas_data(compas=None):
+    """Fetches all COMPAS-imported data, serializes and compresses them"""
+    
+    #COMPAS stations themself
+    compas_stations = ets_models.Compas.objects.all() 
+    if compas is not None:
+        compas_stations = ets_models.Compas.objects.filter(pk=compas)
+    
+    
+    warehouses = ets_models.Warehouse.objects.filter(Q(end_date__gt=date.today) | Q(end_date__isnull=True), 
+                                        start_date__lte=date.today, 
+                                        compas__in=compas_stations)
+    return chain(
+        ets_models.Organization.objects.all(),
+        ets_models.Location.objects.all(),
+        ets_models.LossDamageType.objects.all(),
+        ets_models.Commodity.objects.all(),
+        ets_models.CommodityCategory.objects.all(),
+        ets_models.Package.objects.all(),
+        
+        compas_stations,
+        warehouses,
+        ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True)),
+        ets_models.StockItem.objects.filter(warehouse__in=warehouses),
+        ets_models.Order.objects.filter(expiry__lte=date.today, warehouse__in=warehouses),
+        ets_models.OrderItem.objects.filter(order__expiry__lte=date.today, order__warehouse__in=warehouses),
+    )
+
+def compress_compas_data(compas=None):
+
+    data = get_compas_data(compas)
+    return compress_json( serializers.serialize('json', data, use_decimal=False) )

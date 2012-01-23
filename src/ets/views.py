@@ -34,7 +34,7 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, DateRangeForm, 
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from .utils import history_list, send_dispatched, send_received, _data_to_response, import_file
+from .utils import history_list, send_dispatched, send_received, import_file, get_compas_data, data_to_file_response
 from .compress import compress_json, decompress_json
 import simplejson
 
@@ -435,8 +435,10 @@ class ExportDataBase(FormView):
     def form_valid(self, form):
         start_date = form.cleaned_data['start_date'] 
         end_date = form.cleaned_data['end_date']
-            
-        return _data_to_response(self.construct_data(start_date, end_date), self.file_name % {
+        
+        data = compress_json( serializers.serialize('json', self.construct_data(start_date, end_date), use_decimal=False) )
+        
+        return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 
             'end_date': end_date,
         })
@@ -456,21 +458,9 @@ class ExportWaybillData(ExportDataBase):
 
 
 def export_compas_file(request):
-    return _data_to_response(chain(
-        ets.models.Organization.objects.all(),
-        ets.models.Compas.objects.all(),
-        ets.models.Location.objects.all(),
-        ets.models.Person.objects.all(),
-        ets.models.Warehouse.objects.filter(Q(end_date__gt=datetime.date.today) | Q(end_date__isnull=True), start_date__lte=datetime.date.today),
-        ets.models.LossDamageType.objects.all(),
-        ets.models.Commodity.objects.all(),
-        ets.models.CommodityCategory.objects.all(),
-        ets.models.Package.objects.all(),
-        ets.models.StockItem.objects.all(),
-        ets.models.Order.objects.filter(expiry__lte=datetime.date.today),
-        ets.models.OrderItem.objects.filter(order__expiry__lte=datetime.date.today),
-    ), 'ets_data-%s' % datetime.date.today())
-
+    """Returns a file with all COMPAS data in response""" 
+    return data_to_file_response(get_compas_data(), file_name='ets_data-%s' % datetime.date.today())
+    
 
 class ImportData(FormView):
     

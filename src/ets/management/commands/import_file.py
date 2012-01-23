@@ -13,7 +13,7 @@ class Command(BaseCommand):
     )
     help = 'Imports file with serialized and compressed data'
 
-    def handle(self, file_name, *args, **options):
+    def handle(self, file_name=None, *args, **options):
         
         verbosity = int(options.get('verbosity', 1))
         
