@@ -4,6 +4,7 @@ from optparse import make_option
 import lockfile
 import os
 import logging
+import time
 from datetime import datetime
 
 from django.core.management.base import BaseCommand
@@ -14,6 +15,7 @@ from ets.utils import update_compas
 from ets.models import Compas
 
 LOG_DIRECTORY = settings.LOG_DIRECTORY
+MINIMUM_AGE = 30
 
 class LockedBaseCommandMixin(object):
 
@@ -23,7 +25,16 @@ class LockedBaseCommandMixin(object):
         
         lock = lockfile.FileLock(os.path.join(settings.EGG_ROOT, self.lock_file_name))
         
-        lock.acquire(60)
+        try:
+            lock.acquire(timeout=30)    # wait up to 60 seconds
+        except lockfile.LockTimeout:
+            
+            lock_time = datetime.fromtimestamp(os.path.getctime(lock.path))
+            if lock_time + datetime.timedelta(minutes=MINIMUM_AGE) <= datetime.datetime.now():
+                lock.break_lock()
+                lock.acquire()
+            
+            raise
         
         try:
             super(LockedBaseCommandMixin, self).execute(*args, **options)
