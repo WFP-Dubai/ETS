@@ -182,6 +182,13 @@ def import_order(compas):
                                     #destination_location_code__in=places.values_list('geo_point_code', flat=True)
                                     ):
             
+            #Get or Create location
+            location = ets_models.Location.objects.get_or_create(pk=lti.destination_location_code, defaults={
+                            'name': lti.destination_loc_name, 
+                            'country': compas_models.Place.objects.using(compas)\
+                                            .filter(geo_point_code=lti.destination_location_code)[0].country_code
+            })[0]
+            
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -193,7 +200,7 @@ def import_order(compas):
                 'origin_type': lti.origin_type,
                 'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
                 'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
-                'location': ets_models.Location.objects.get(pk=lti.destination_location_code),
+                'location': location,
                 'updated': now,
                 #'remarks': lti.remarks,
                 #'remarks_b': lti.remarks_b,
