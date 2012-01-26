@@ -173,6 +173,8 @@ def import_order(compas):
     now = datetime.now()
     today = date.today()
     
+    errors = []
+    
     with transaction.commit_on_success(compas) as tr:
         places = _get_places(compas)
         for lti in compas_models.LtiOriginal.objects.using(compas)\
@@ -182,13 +184,22 @@ def import_order(compas):
                                     #destination_location_code__in=places.values_list('geo_point_code', flat=True)
                                     ):
             
+            #FAST HACK
+            country_code = compas_models.Place.objects.using(compas)\
+                            .filter(geo_point_code=lti.destination_location_code)
+            if country_code.count():
+                country_code = country_code[0].country_code
+            else:
+                errors.append("Couldn't find country code for location: %s | LTI code: %s" % (lti.destination_location_code, lti.code))
+                continue
+            
+            
             #Get or Create location
             location = ets_models.Location.objects.get_or_create(pk=lti.destination_location_code, defaults={
                             'name': lti.destination_loc_name, 
-                            'country': compas_models.Place.objects.using(compas)\
-                                            .filter(geo_point_code=lti.destination_location_code)[0].country_code
+                            'country': country_code
             })[0]
-            
+        
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -238,6 +249,8 @@ def import_order(compas):
             rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
             if not rows:
                 ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
+    
+    return errors
 
 
 def send_dispatched(waybill, compas=None):

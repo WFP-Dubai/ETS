@@ -54,31 +54,54 @@ class Command(LockedBaseCommandMixin, BaseCommand):
     log_name = 'sync_compas.log'
 
     def synchronize(self, compas):
-        update_compas(compas)
+        
+        from ets.utils import import_order, import_places, import_persons, import_stock, import_partners
+        from ets.models import LossDamageType
+        
+        #Import organizations
+        import_partners(compas)
+        
+        #Update places
+        import_places(compas)
+        
+        #Update persons
+        import_persons(compas)
+        
+        #Update loss, damage reasons
+        LossDamageType.update(compas)
+        
+        #Update stocks
+        import_stock(compas)
+    
+        #Update orders
+        errors = import_order(compas)
+        
+        self.logs.append("\nERRORS during LTI import:\n")
+        self.logs.extend(errors)
 
     def get_log_name(self):
         return os.path.join(LOG_DIRECTORY, self.log_name)
     
     def handle(self, compas='', *args, **options):
         
-        logs = []
+        self.logs = []
         
-        logs.append("\nDate: %s" % datetime.now())
+        self.logs.append("\nDate: %s" % datetime.now())
         
         stations = Compas.objects.all()
         if compas:
             stations = stations.filter(pk=compas)
             
         for compas in stations:
-            logs.append("\nUpdating COMPAS: %s" % compas)
+            self.logs.append("\nUpdating COMPAS: %s" % compas)
             
             try:
                 self.synchronize(compas=compas.pk)
             except Exception, err:
-                logs.append("\n%s" % unicode(err))
+                self.logs.append("\n%s" % unicode(err))
             else:
-                logs.append("\nsuccess")
+                self.logs.append("\nsuccess")
     
         with open(self.get_log_name(), 'w') as f:
-            f.writelines(logs)
+            f.writelines(self.logs)
         
