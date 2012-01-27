@@ -75,9 +75,9 @@ class Command(LockedBaseCommandMixin, BaseCommand):
     
         #Update orders
         errors = import_order(compas)
-        
-        self.logs.append("\nERRORS during LTI import:\n")
-        self.logs.extend(errors)
+        if (len(errors)):
+	        self.logs.append("\nERRORS during LTI import:\n")
+	        self.logs.extend(errors)
 
     def get_log_name(self):
         return os.path.join(LOG_DIRECTORY, self.log_name)
