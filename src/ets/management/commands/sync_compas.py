@@ -71,7 +71,7 @@ class Command(LockedBaseCommandMixin, BaseCommand):
             stations = stations.filter(pk=compas)
             
         for compas in stations:
-            self.logs.append("\nUpdating COMPAS: %s" % compas)
+            self.logs.append("\nCOMPAS: %s" % compas)
             
             try:
                 self.synchronize(compas=compas.pk)
@@ -80,6 +80,6 @@ class Command(LockedBaseCommandMixin, BaseCommand):
             else:
                 self.logs.append("\nsuccess")
     
-        with open(self.get_log_name(), 'w') as f:
+        with open(self.get_log_name(), 'a') as f:
             f.writelines(self.logs)
         

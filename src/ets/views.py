@@ -8,6 +8,7 @@ from itertools import chain
 
 from django import forms
 from django.db.models import Q
+from django.db.models.aggregates import Max
 #from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 #from django.core import serializers
@@ -347,12 +348,35 @@ def get_stock_data(request, queryset):
     }, use_decimal=True))
 
 @permission_required("ets.sync_compas")
-def sync_compas(request):
+def sync_compas(request, queryset, template_name="admin/sync_compas.html"):
+    
+    if not request.user.is_superuser:
+        queryset = queryset.filter(officers=request.user)
+    
+    queryset = queryset.annotate(last_updated=Max('warehouses__stock_items__updated'))
+    
+    return direct_to_template(request, template=template_name, extra_context={'stations': queryset})
+
+
+@permission_required("ets.sync_compas")
+@require_POST
+def handle_sync_compas(request, compas_pk, queryset):
+    
+    if not request.user.is_superuser:
+        queryset = queryset.filter(officers=request.user)
+        
+    station = get_object_or_404(queryset, pk=compas_pk)
     
     #Execute external command
-    Popen(['./bin/instance', 'sync_compas'], cwd=settings.EGG_ROOT) 
+    Popen(['./bin/instance', 'sync_compas', '--compas=%s' % station.pk], cwd=settings.EGG_ROOT)
     
-    return HttpResponse(format(ets.models.StockItem.get_last_update(), settings.DATETIME_FORMAT))
+    messages.add_message(request, messages.INFO, 
+                         _('Import process from %(station)s has been initiated. It might take several minutes.') % {
+        "station": station.pk
+    })
+    
+    return redirect('sync_compas')
+
 
 @permission_required("ets.sync_compas")
 def view_logs(request, template_name="admin/logs.html"):

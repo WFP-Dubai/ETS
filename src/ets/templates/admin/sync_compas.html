@@ -1,0 +1,33 @@
+{% extends "admin/base_site.html" %}
+
+{% load i18n %}
+
+{% block title %}{% trans "Import data from COMPAS stations" %}{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
+{% endblock %}
+
+{% block content %}
+<h1>{% trans "Import data from COMPAS stations" %}</h1> 
+<p>{% trans "You may synchronize each station one-by-one. It takes several minutes." %}</p>
+
+{% for station in stations %}
+<div class="station_{{ station.pk }}">
+  <h3>{{ station.pk }}</h3>
+  <p>{% trans "Last updated" %} (yyyy/mm/dd GMT+1): <strong>{{ station.last_updated|date:"DATETIME_FORMAT" }}</strong></p>
+  <form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
+    <p><button type="submit" name="import">{% trans "Import data" %}</button></p>
+  </form>
+  <h4>{% trans "Import Log" %}</h4>
+  <ul>
+  {% for item in station.import_logs.all|slice:":5" %}
+    <li style="color:{% if item.status %}red{% else %}green{% endif %};">
+      {% trans "Data" %}: {{ item.when_attempted }} | {{ item.get_status_display }} 
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+
+{% endblock %}

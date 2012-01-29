@@ -855,6 +855,30 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
+        
+class ImportLogger(models.Model):
+    
+    SUCCESS = 0
+    FAILURE = 1
+    
+    STATUSES = (
+        (SUCCESS, _("Success")),
+        (FAILURE, _("Failure"))
+    )
+    
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="import_logs")
+    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
+    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
+    message = models.TextField(_("error message"), blank=True)
+    
+    class Meta:
+        ordering = ('-when_attempted',)
+        verbose_name = _("COMPAS import logger")
+        verbose_name_plural = _("COMPAS import log")
+    
+    def __unicode__(self):
+        return "%s: %s" % (self.get_status_display(), self.message)
+
 
 class CompasLogger(models.Model):
     

@@ -23,23 +23,32 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 def update_compas(using):
     
-    #Import organizations
-    import_partners(using)
+    try:
+        #Import organizations
+        import_partners(using)
+        
+        #Update places
+        import_places(using)
+        
+        #Update persons
+        import_persons(using)
+        
+        #Update loss, damage reasons
+        ets_models.LossDamageType.update(using)
+        
+        #Update stocks
+        import_stock(using)
     
-    #Update places
-    import_places(using)
-    
-    #Update persons
-    import_persons(using)
-    
-    #Update loss, damage reasons
-    ets_models.LossDamageType.update(using)
-    
-    #Update stocks
-    import_stock(using)
-
-    #Update orders
-    import_order(using)
+        #Update orders
+        import_order(using)
+        
+        
+    except Exception, err:
+        ets_models.ImportLogger.objects.create(compas_id=using, 
+                                               status=ets_models.ImportLogger.FAILURE, 
+                                               message=err.messages[0])
+    else:
+        ets_models.ImportLogger.objects.create(compas_id=using)
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\

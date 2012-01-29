@@ -81,7 +81,7 @@
     <tr>
       <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
       <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
-      <td>{{ waybill.order..name }}</td>
+      <td>{{ waybill.order.warehouse.name }}</td>
       <td>{{ waybill.order.consignee.name }}</td>
       <td>{{ waybill.order.location.name }}</td>
       <td>
