@@ -23,7 +23,7 @@
   <ul>
   {% for item in station.import_logs.all|slice:":5" %}
     <li style="color:{% if item.status %}red{% else %}green{% endif %};">
-      {% trans "Data" %}: {{ item.when_attempted }} | {{ item.get_status_display }} 
+      {% trans "Data" %}: {{ item.when_attempted }} | {{ item.get_status_display }} {% if item.status %}: {{ item.message }}{% endif %}
     </li>
   {% endfor %}
   </ul>
