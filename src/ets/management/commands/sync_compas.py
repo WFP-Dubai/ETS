@@ -55,29 +55,7 @@ class Command(LockedBaseCommandMixin, BaseCommand):
 
     def synchronize(self, compas):
         
-        from ets.utils import import_order, import_places, import_persons, import_stock, import_partners
-        from ets.models import LossDamageType
-        
-        #Import organizations
-        import_partners(compas)
-        
-        #Update places
-        import_places(compas)
-        
-        #Update persons
-        import_persons(compas)
-        
-        #Update loss, damage reasons
-        LossDamageType.update(compas)
-        
-        #Update stocks
-        import_stock(compas)
-    
-        #Update orders
-        errors = import_order(compas)
-        if (len(errors)):
-	        self.logs.append("\nERRORS during LTI import:\n")
-	        self.logs.extend(errors)
+        update_compas(compas)
 
     def get_log_name(self):
         return os.path.join(LOG_DIRECTORY, self.log_name)

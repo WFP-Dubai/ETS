@@ -74,7 +74,7 @@ class Location(models.Model):
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
-    country = models.CharField( _("Country"), max_length=3, choices=COUNTRY_CHOICES)
+    country = models.CharField( _("Country"), max_length=3, choices=COUNTRY_CHOICES, blank=True, null=True)
     
     class Meta:
         ordering = ('code',)

@@ -56,10 +56,16 @@ def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
         #Create location
-        location = ets_models.Location.objects.get_or_create(code=place.geo_point_code, defaults={
+        location, created = ets_models.Location.objects.get_or_create(code=place.geo_point_code, defaults={
             'name': place.geo_name,
             'country': place.country_code,
-        })[0]
+        })
+        
+        
+        #Set country if it's null
+        if not created and location.country is None:
+            location.country = place.country_code
+            location.save()
         
         #Update warehouse
         defaults = {
@@ -168,12 +174,22 @@ def import_stock(compas):
                                     .exclude(updated=now).update(number_of_units=0)
 
 
+def _get_destination_location(compas, code, name):
+    """Gets of creates a location by code and name"""
+    places = compas_models.Place.objects.using(compas)\
+                            .filter(geo_point_code=code)
+    country_code = places.count() and places[0].country_code or None
+        
+    #Get or Create location
+    return ets_models.Location.objects.get_or_create(pk=code, defaults={
+                    'name': name, 
+                    'country': country_code
+                    })[0]
+
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
     today = date.today()
-    
-    errors = []
     
     with transaction.commit_on_success(compas) as tr:
         places = _get_places(compas)
@@ -184,22 +200,6 @@ def import_order(compas):
                                     #destination_location_code__in=places.values_list('geo_point_code', flat=True)
                                     ):
             
-            #FAST HACK
-            country_code = compas_models.Place.objects.using(compas)\
-                            .filter(geo_point_code=lti.destination_location_code)
-            if country_code.count():
-                country_code = country_code[0].country_code
-            else:
-                errors.append("Couldn't find country code for location: %s | LTI code: %s" % (lti.destination_location_code, lti.code))
-                continue
-            
-            
-            #Get or Create location
-            location = ets_models.Location.objects.get_or_create(pk=lti.destination_location_code, defaults={
-                            'name': lti.destination_loc_name, 
-                            'country': country_code
-            })[0]
-        
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -211,7 +211,7 @@ def import_order(compas):
                 'origin_type': lti.origin_type,
                 'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
                 'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
-                'location': location,
+                'location': _get_destination_location(compas, lti.destination_location_code, lti.destination_loc_name),
                 'updated': now,
                 #'remarks': lti.remarks,
                 #'remarks_b': lti.remarks_b,
@@ -250,8 +250,6 @@ def import_order(compas):
             if not rows:
                 ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
     
-    return errors
-
 
 def send_dispatched(waybill, compas=None):
     if not compas:

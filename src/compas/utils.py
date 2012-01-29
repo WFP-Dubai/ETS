@@ -2,6 +2,8 @@
 from django.db import connections
 from django.core.exceptions import ValidationError
 
+QUANTITY_EXCEEDS = "QUANTITY NET EXCEEDS THE STORED QUANTITY"
+
 try:
     import cx_Oracle
     
@@ -16,6 +18,10 @@ try:
         cursor.callproc( name, (Response_Message, Response_Code)+parameters)
         
         if Response_Code.getvalue() != 'S':
+            message = Response_Message.getvalue()
+            
+            if QUANTITY_EXCEEDS in message:
+                message = QUANTITY_EXCEEDS
             raise ValidationError(Response_Message.getvalue(), code=Response_Code.getvalue())
 
 except ImportError:
