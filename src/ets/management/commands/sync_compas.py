@@ -17,16 +17,34 @@ from ets.models import Compas
 LOG_DIRECTORY = settings.LOG_DIRECTORY
 MINIMUM_AGE = 30
 
-class LockedBaseCommandMixin(object):
 
-    lock_file_name = 'lock.lock'
+class Command(BaseCommand):
+
+    option_list = BaseCommand.option_list + ( 
+        make_option('--compas', dest='compas', default='',
+            help='Tells the system to synchronize only this one compas station'),
+    )
+
+    help = 'Import data from COMPAS stations'
+    lock_file_name = 'sync_compas'
+    log_name = 'sync_compas.log'
     
-    def execute(self, *args, **options):
+    def synchronize(self, compas):
         
-        lock = lockfile.FileLock(os.path.join(settings.EGG_ROOT, self.lock_file_name))
+        update_compas(compas)
+
+    def get_log_name(self):
+        return os.path.join(LOG_DIRECTORY, self.log_name)
+    
+    def get_lock_name(self, compas):
+        return os.path.join(settings.EGG_ROOT, "%s%s" % (self.lock_file_name, compas))
+    
+    def handle(self, compas='', *args, **options):
+        
+        lock = lockfile.FileLock(self.get_lock_name(compas))
         
         try:
-            lock.acquire(timeout=30)    # wait up to 60 seconds
+            lock.acquire(timeout=30)  # wait up to 60 seconds
         except lockfile.LockTimeout:
             
             lock_time = datetime.fromtimestamp(os.path.getctime(lock.path))
@@ -37,49 +55,25 @@ class LockedBaseCommandMixin(object):
             raise
         
         try:
-            super(LockedBaseCommandMixin, self).execute(*args, **options)
+            self.logs = []
+        
+            self.logs.append("\nDate: %s" % datetime.now())
+            
+            stations = Compas.objects.all()
+            if compas:
+                stations = stations.filter(pk=compas)
+                
+            for compas in stations:
+                self.logs.append("\nCOMPAS: %s" % compas)
+                
+                try:
+                    self.synchronize(compas=compas.pk)
+                except Exception, err:
+                    self.logs.append("\n%s" % unicode(err))
+                else:
+                    self.logs.append("\nsuccess")
+        
+            with open(self.get_log_name(), 'a') as f:
+                f.writelines(self.logs)
         finally:
             lock.release()
-
-
-class Command(LockedBaseCommandMixin, BaseCommand):
-
-    option_list = BaseCommand.option_list + ( 
-        make_option('--compas', dest='compas', default='',
-            help='Tells the system to synchronize only this one compas station'),
-    )
-
-    help = 'Import data from COMPAS stations'
-    lock_file_name = 'sync_compas.lock'
-    log_name = 'sync_compas.log'
-
-    def synchronize(self, compas):
-        
-        update_compas(compas)
-
-    def get_log_name(self):
-        return os.path.join(LOG_DIRECTORY, self.log_name)
-    
-    def handle(self, compas='', *args, **options):
-        
-        self.logs = []
-        
-        self.logs.append("\nDate: %s" % datetime.now())
-        
-        stations = Compas.objects.all()
-        if compas:
-            stations = stations.filter(pk=compas)
-            
-        for compas in stations:
-            self.logs.append("\nCOMPAS: %s" % compas)
-            
-            try:
-                self.synchronize(compas=compas.pk)
-            except Exception, err:
-                self.logs.append("\n%s" % unicode(err))
-            else:
-                self.logs.append("\nsuccess")
-    
-        with open(self.get_log_name(), 'a') as f:
-            f.writelines(self.logs)
-        

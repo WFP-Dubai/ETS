@@ -10,7 +10,7 @@ from ets.models import Waybill
 class Command(UpdateCompas):
 
     help = 'Submits waybills and updates stocks'
-    lock_file_name = 'submit_waybills.lock'
+    lock_file_name = 'submit_waybills'
     log_name = 'submit_waybills.log'
 
     def synchronize(self, compas):
