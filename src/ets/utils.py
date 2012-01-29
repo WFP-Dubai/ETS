@@ -46,7 +46,7 @@ def update_compas(using):
     except Exception, err:
         ets_models.ImportLogger.objects.create(compas_id=using, 
                                                status=ets_models.ImportLogger.FAILURE, 
-                                               message=err.messages[0])
+                                               message=str(err))
     else:
         ets_models.ImportLogger.objects.create(compas_id=using)
 
