@@ -11,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.forms import MediaDefiningClass
 
 import logicaldelete.admin
+from django_extensions.utils.text import truncate_letters
 
 import ets.models
 import ets.forms
@@ -156,13 +157,16 @@ class OrderInline(admin.TabularInline):
 
 class StockAdmin(admin.ModelAdmin):
     list_display = ('si_code', 'warehouse', 'project_number', 'commodity', 'quality', 
-                    'package', 'number_of_units')
+                    'get_package', 'number_of_units')
     readonly_fields = ('updated',)
     raw_id_fields = ('warehouse',)
     list_filter = ('warehouse__compas',)
     search_fields = ('code', 'warehouse__code', 'warehouse__name', 'project_number', 'si_code', 'commodity__name', 'package__name', 'si_record_id', 'origin_id')
     inlines = (LoadingDetailsInline,)
-
+    
+    def get_package(self, obj):
+        return truncate_letters(obj.package.name, 20)
+    
 admin.site.register( ets.models.StockItem, StockAdmin )
 
 class StockInline(admin.TabularInline):
