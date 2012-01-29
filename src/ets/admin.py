@@ -160,12 +160,15 @@ class StockAdmin(admin.ModelAdmin):
                     'get_package', 'number_of_units')
     readonly_fields = ('updated',)
     raw_id_fields = ('warehouse',)
-    list_filter = ('warehouse__compas',)
+    list_filter = ('warehouse__compas', 'package')
     search_fields = ('code', 'warehouse__code', 'warehouse__name', 'project_number', 'si_code', 'commodity__name', 'package__name', 'si_record_id', 'origin_id')
     inlines = (LoadingDetailsInline,)
     
     def get_package(self, obj):
-        return truncate_letters(obj.package.name, 20)
+        return '<span title="%s">%s</span>' % (obj.package.name, truncate_letters(obj.package.name, 20))
+    get_package.short_description = 'Package'
+    get_package.allow_tags = True
+    get_package.admin_order_field = 'package__name'
     
 admin.site.register( ets.models.StockItem, StockAdmin )
 
