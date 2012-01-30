@@ -58,5 +58,5 @@ receipt_compas = user_filtered(filter=lambda queryset, user: queryset.filter(
                          transport_dispach_signed_date__isnull=False, 
                          receipt_signed_date__isnull=False, 
                          receipt_sent_compas__isnull=True,
-                         sent_compas__isnull=False, 
+                         #sent_compas__isnull=False, 
                          destination__compas__officers=user))

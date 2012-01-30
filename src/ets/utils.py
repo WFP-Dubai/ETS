@@ -343,7 +343,7 @@ def send_dispatched(waybill, compas=None):
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
-                                               message=err.messages[0])
+                                               message=unicode(err.messages))
         waybill.validated = False
         waybill.save()
     else:
@@ -397,7 +397,7 @@ def send_received(waybill, compas=None):
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
-                                               message=err.messages[0])
+                                               message=unicode(err.messages))
         
         waybill.receipt_validated = False
     else:
