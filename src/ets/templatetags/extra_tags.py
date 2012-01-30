@@ -10,7 +10,7 @@ from django.db.models.aggregates import Max
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger
 from ets.utils import changed_fields
 
 register = template.Library()
@@ -97,7 +97,15 @@ def officer_only(context, nodelist, user):
 @register.inclusion_tag('last_updated.html')
 def get_last_update(user):
     """dummy function, just a wrapper"""
+    
+    failed = False
+    for c in Compas.objects.all():
+        last_attempt = c.import_logs.order_by('-when_attempted')[0]
+        if last_attempt.status == ImportLogger.FAILURE:
+            failed = True
+         
     return {
         'last_updated': StockItem.get_last_update(),
         'sync_compas': user.has_perm("ets.sync_compas"),
+        'failed': failed
     }
