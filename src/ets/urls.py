@@ -151,8 +151,6 @@ class PrefixedPatterns:
             'queryset': ets.models.Compas.objects.all(),
         }, "handle_sync_compas"),
                            
-        ( r'^admin/sync_logs/$', "view_logs", {}, "view_logs"),
-        
         ( r'^export_data/$', ExportWaybillData.as_view(), {}, "export_file" ),
         ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
         

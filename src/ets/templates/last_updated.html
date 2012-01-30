@@ -3,30 +3,5 @@
   {% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
   {% if sync_compas %}
     (<a class="sync" href="{% url sync_compas %}">{% trans "Sync" %}</a>)
-    (<a class="view-logs" href="{% url view_logs %}">{% trans "View logs" %}</a>)
   {% endif %}
 </span>
-
-{% comment %}
-<script charset="utf-8">
-$(document).ready(function() {
-  $('#sync_compas a.sync').click(function() {
-	var container = $(this).parent();
-  	container.loadIndicator()
-  	$.ajax({
-  		url: $(this).attr('href'),
-  		context: container,
-  		cache: false,
-  		timeout: 60000*15,
-      success: function (data) {
-      	$(this).find('strong').text(data);
-      	alert("{% trans 'Import process has been initiated. It might take several minutes.' %}");
-      	container.deleteIndicator();
-      }
-    });
-  	
-  	return false;
-  });
-});
-</script>
-{% endcomment %}

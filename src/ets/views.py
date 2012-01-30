@@ -379,30 +379,6 @@ def handle_sync_compas(request, compas_pk, queryset):
     
     return redirect('sync_compas')
 
-
-@permission_required("ets.sync_compas")
-def view_logs(request, template_name="admin/logs.html"):
-    
-    from .management.commands import sync_compas
-    from .management.commands import submit_waybills
-    
-    logs = []
-    
-    sync_command = sync_compas.Command()
-    try:
-        with open(sync_command.get_log_name()) as f:
-            logs.append(('sync_compas', f.read() or _("Empty"), sync_command.help))
-    except IOError:
-        pass
-    
-    submit_command = submit_waybills.Command()
-    try:
-        with open(submit_command.get_log_name()) as f:
-            logs.append(('submit_waybills', f.read() or _("Empty"), submit_command.help))
-    except IOError:
-        pass
-    
-    return direct_to_template(request, template=template_name, extra_context={'logs': logs})
     
 @officer_required
 @dispatch_compas
