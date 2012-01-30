@@ -47,7 +47,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
     waybill_log = waybill.audit_log.all()
 
     #Recepient should not see dispatcher's history
-    if not waybill.order.warehouse.persons.filter(pk=request.user.pk).count():
+    if not request.is_superuser and not waybill.order.warehouse.persons.filter(pk=request.user.pk).count():
         persons = waybill.order.warehouse.get_persons()
         waybill_log = waybill_log.exclude(action_user__in=persons)
         loading_log = loading_log.exclude(action_user__in=persons)
