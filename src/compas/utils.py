@@ -22,7 +22,8 @@ try:
             
             if QUANTITY_EXCEEDS in message:
                 message = QUANTITY_EXCEEDS
-            raise ValidationError(Response_Message.getvalue(), code=Response_Code.getvalue())
+            
+            raise ValidationError(message, code=Response_Code.getvalue())
 
 except ImportError:
     
