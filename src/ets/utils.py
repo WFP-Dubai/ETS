@@ -341,7 +341,7 @@ def send_dispatched(waybill, compas=None):
                 ), compas)
     
     except Exception, err:
-        message = unicode(u"\n".join(err.messages) if hasattr(err, 'messages') else unicode(err))
+        message = hasattr(err, 'messages') and u"\n".join(err.messages) or unicode(err)
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
@@ -396,7 +396,7 @@ def send_received(waybill, compas=None):
                 ), compas)
                 
     except Exception, err:
-        message = unicode(u"\n".join(err.messages) if hasattr(err, 'messages') else unicode(err))
+        message = hasattr(err, 'messages') and u"\n".join(err.messages) or unicode(err)
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
