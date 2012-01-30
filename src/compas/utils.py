@@ -3,7 +3,8 @@ from django.db import connections
 from django.core.exceptions import ValidationError
 from django.utils.encoding import force_unicode
 
-QUANTITY_EXCEEDS = "QUANTITY NET EXCEEDS THE STORED QUANTITY"
+QUANTITY_NET_EXCEEDS = "QUANTITY NET EXCEEDS THE STORED QUANTITY"
+QUANTITY_GROSS_EXCEEDS = "QUANTITY GROSS EXCEEDS THE STORED QUANTITY"
 
 try:
     import cx_Oracle
@@ -31,8 +32,10 @@ try:
                 
                 msg = force_unicode(msg)
                 #HACK to simplify error message
-                if QUANTITY_EXCEEDS in msg:
-                    msg = QUANTITY_EXCEEDS
+                if QUANTITY_NET_EXCEEDS in msg:
+                    msg = QUANTITY_NET_EXCEEDS
+                elif QUANTITY_GROSS_EXCEEDS in msg:
+                    msg = QUANTITY_GROSS_EXCEEDS
                 
                 errors.append(msg)
             
