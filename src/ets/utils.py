@@ -267,7 +267,7 @@ def send_dispatched(waybill, compas=None):
      
     try:
         with transaction.commit_on_success(using=compas) as tr:
-            CURR_CODE = waybill.pk
+            CURR_CODE = waybill.pk[len(compas):]
             
             CONTAINER_NUMBER = waybill.container_one_number
             
@@ -363,7 +363,7 @@ def send_received(waybill, compas=None):
     
     try:
         with transaction.commit_on_success(using=compas) as tr:
-            CURR_CODE = waybill.pk
+            CURR_CODE = waybill.pk[len(compas):]
 
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
