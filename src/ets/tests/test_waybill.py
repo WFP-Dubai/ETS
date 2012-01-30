@@ -143,7 +143,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 302)
         
         #check created waybill and loading details
-        waybill = ets.models.Waybill.objects.get(pk=u'ISBX00212A000001')
+        waybill = ets.models.Waybill.objects.get(pk=u'ISBX00212A000004')
         self.assertEqual(waybill.loading_details.count(), 1)
 
     
@@ -253,9 +253,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-slug': 'ISBX00311A1',
             'item-0-waybill': 'ISBX00311A',
             
-            'arrival_date': '2011-08-30',
-            'start_discharge_date': '2011-08-25',
-            'end_discharge_date': '2011-08-24',
+            'arrival_date': '2012-08-30',
+            'start_discharge_date': '2012-08-25',
+            'end_discharge_date': '2012-08-24',
             'container_one_remarks_reciept': '',
             'container_two_remarks_reciept': '',
             'distance': 5,
@@ -265,13 +265,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.post(path, data=data)
         self.assertContains(response, "Cargo Discharge started before Arrival?")
         data.update({
-            'arrival_date': '2011-08-23',
+            'arrival_date': '2012-08-23',
         })
         
         response = self.client.post(path, data=data)
         self.assertContains(response, "Cargo finished Discharge before Starting?")
         data.update({
-            'start_discharge_date': '2011-08-24',
+            'start_discharge_date': '2012-08-24',
         })
         
         response = self.client.post(path, data=data)
@@ -465,9 +465,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-slug': 'ISBX00311A1',
             'item-0-waybill': 'ISBX00311A',
             
-            'arrival_date': '2011-08-10',
-            'start_discharge_date': '2011-08-25',
-            'end_discharge_date': '2011-08-26',
+            'arrival_date': '2012-08-10',
+            'start_discharge_date': '2012-08-25',
+            'end_discharge_date': '2012-08-26',
             'container_one_remarks_reciept': '',
             'container_two_remarks_reciept': '',
             'distance': 5,

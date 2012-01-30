@@ -55,25 +55,12 @@ class Command(BaseCommand):
             raise
         
         try:
-            self.logs = []
-        
-            self.logs.append("\nDate: %s" % datetime.now())
-            
             stations = Compas.objects.all()
             if compas:
                 stations = stations.filter(pk=compas)
                 
             for compas in stations:
-                self.logs.append("\nCOMPAS: %s" % compas)
-                
-                try:
-                    self.synchronize(compas=compas.pk)
-                except Exception, err:
-                    self.logs.append("\n%s" % unicode(err))
-                else:
-                    self.logs.append("\nsuccess")
+                self.synchronize(compas=compas.pk)
         
-            with open(self.get_log_name(), 'a') as f:
-                f.writelines(self.logs)
         finally:
             lock.release()
