@@ -781,6 +781,7 @@ class LoadingDetail(models.Model):
     def get_shortage( self ):
         not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, 
                                                          waybill__validated=False, 
+                                                         waybill__transport_dispach_signed_date__isnull=False,
                                                          waybill__date_removed__isnull=True)\
                                 .aggregate(Sum('number_of_units'))['number_of_units__sum']
         return max(0, not_validated_sum - self.stock_item.number_of_units)
