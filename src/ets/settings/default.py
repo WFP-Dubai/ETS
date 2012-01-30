@@ -66,7 +66,7 @@ LANGUAGES = (
 USE_I18N = True
 USE_L10N = False
 
-TIME_ZONE = 'Europe/Rome'
+TIME_ZONE = 'Europe/London'
 
 STATIC_ROOT = os.path.join(EGG_ROOT, 'static')
 STATIC_URL = '/static/'

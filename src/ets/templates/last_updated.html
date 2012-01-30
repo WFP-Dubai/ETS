@@ -1,6 +1,6 @@
 {% load i18n %}   
 <span id="sync_compas">
-  {% trans "Last updated" %} (yyyy/mm/dd GMT+1): <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
+  {% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
   {% if sync_compas %}
     (<a class="sync" href="{% url sync_compas %}">{% trans "Sync" %}</a>)
     (<a class="view-logs" href="{% url view_logs %}">{% trans "View logs" %}</a>)
