@@ -56,7 +56,7 @@
           <tr class="logger">
             <td>{{ log.when_attempted }}</td>
             <td>{{ log.compas }}</td>
-            <td colspan="6">{{ log.message }}</td>
+            <td colspan="6">{{ log.message|linebreaks }}</td>
           </tr>
         {% endif %}
       {% endfor %}
