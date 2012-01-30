@@ -34,7 +34,7 @@ try:
                 
                 message = force_unicode(msg)
                 #HACK to simplify error message
-                for code, desc in COMPAS_ERRORS:
+                for code, desc in COMPAS_ERRORS.items():
                     if code in message:
                         message = desc
                         break
