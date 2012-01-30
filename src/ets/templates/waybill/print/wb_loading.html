@@ -23,7 +23,7 @@
             </tr>
             <tr>
                 <td><sup>{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination.name }}</td>
-                <td><sup>{% trans "Allocation Destination" %}:</sup><br>{{ object.destination.location.name }}</td>
+                <td><sup>{% trans "Allocation Destination" %}:</sup><br>{{ object.destination.location.get_country_display }}</td>
                 <td><sup>{% trans "Consignee" %}</sup><br>{{ object.order.consignee }}</td>
                 
             </tr>
