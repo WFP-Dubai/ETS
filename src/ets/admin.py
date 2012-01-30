@@ -315,6 +315,19 @@ class CompasLoggerAdmin(admin.ModelAdmin):
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
 
 
+#===============================================================================
+# class ImportLoggerAdmin(admin.ModelAdmin):
+#    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+#    
+#    list_display = ('pk', 'link_to_compas', 'when_attempted', 'status', 'message')
+#    search_fields = ('compas__pk', 'waybill__pk')
+#    date_hierarchy = 'when_attempted'
+#    raw_id_fields = ('waybill',)
+# 
+# admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
+#===============================================================================
+
+
 class PersonedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PersonInline,]
 
