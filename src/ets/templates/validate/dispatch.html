@@ -51,7 +51,7 @@
        </td>
        <td>{% block validate_link %}{% validate_dispatch waybill user %}{% endblock %}</td>
     </tr>
-      {% for log in waybill.compass_loggers.all %}
+      {% for log in waybill.compass_loggers.all|slice:"3" %}
         {% if log.action == logger_action %}
           <tr class="logger">
             <td>{{ log.when_attempted }}</td>
