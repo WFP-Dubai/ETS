@@ -46,7 +46,7 @@ def update_compas(using):
     except Exception, err:
         ets_models.ImportLogger.objects.create(compas_id=using, 
                                                status=ets_models.ImportLogger.FAILURE, 
-                                               message=str(err))
+                                               message=unicode(err))
     else:
         ets_models.ImportLogger.objects.create(compas_id=using)
 
@@ -339,11 +339,12 @@ def send_dispatched(waybill, compas=None):
                     '', #p_loannumber
                 ), compas)
     
-    except ValidationError, err:
+    except Exception, err:
+        message = unicode(u"\n".join(err.messages) if hasattr(err, 'messages') else unicode(err))
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
-                                               message=unicode(err.messages))
+                                               message=message)
         waybill.validated = False
         waybill.save()
     else:
@@ -393,11 +394,12 @@ def send_received(waybill, compas=None):
                     loading.stock_item.quality
                 ), compas)
                 
-    except ValidationError, err:
+    except Exception, err:
+        message = unicode(u"\n".join(err.messages) if hasattr(err, 'messages') else unicode(err))
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
-                                               message=unicode(err.messages))
+                                               message=message)
         
         waybill.receipt_validated = False
     else:

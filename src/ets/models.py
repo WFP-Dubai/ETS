@@ -46,7 +46,7 @@ def capitalize_slug(func):
     return wrapper
 
 
-class Compas(models.Model):
+class Compas(ld_models.Model):
     """ Compas station """
     
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)

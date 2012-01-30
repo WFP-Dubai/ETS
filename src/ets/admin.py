@@ -218,12 +218,17 @@ class LocationAdmin(admin.ModelAdmin):
 admin.site.register( ets.models.Location, LocationAdmin )
 
 
-class CompasAdmin(admin.ModelAdmin):
-    list_display = ('pk',)
+class CompasAdmin(logicaldelete.admin.ModelAdmin):
+    
+    list_display = ('pk', 'active')
     search_fields = list_display
     filter_horizontal = ('officers',)
-    #inlines = (WarehouseInline, PersonInline)
-    
+    fieldsets = (
+        (_('General'), {'fields': ('code', 'read_only', 'officers')}),
+        (_('Database'), {'fields': ('db_engine', 'db_name', 'db_user', 'db_password', 'db_host', 'db_port' )}),
+        (_('Dates'), {'fields': ('date_created', 'date_modified', 'date_removed',)}),
+    )
+    actions = None
 
 admin.site.register( ets.models.Compas, CompasAdmin )
 
@@ -311,6 +316,7 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     search_fields = ('compas__pk', 'waybill__pk')
     date_hierarchy = 'when_attempted'
     raw_id_fields = ('waybill',)
+    list_filter = ('when_attempted', 'status', 'compas')
 
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
 
@@ -321,7 +327,7 @@ class ImportLoggerAdmin(admin.ModelAdmin):
     list_display = ('pk', 'link_to_compas', 'when_attempted', 'status', 'message')
     search_fields = ('compas__pk', 'message')
     date_hierarchy = 'when_attempted'
-    list_filter = ('when_attempted', 'status',)
+    list_filter = ('when_attempted', 'status', 'compas')
 
 admin.site.register(ets.models.ImportLogger, ImportLoggerAdmin)
 
