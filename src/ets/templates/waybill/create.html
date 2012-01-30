@@ -145,8 +145,16 @@
 })(jQuery);
 
 $(document).ready(function() {
-  $('#{{ form.dispatch_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
-  $('#{{ form.loading_date.auto_id }}').datepicker({ minDate: 0, dateFormat: 'yy-mm-dd' });
+  $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
+	  minDate: '{{ object.created|date:"y-m-d" }}',
+	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
+	  dateFormat: 'yy-mm-dd'
+  });
+  $('#{{ form.loading_date.auto_id }}').datepicker({ 
+	  minDate: '{{ object.created|date:"y-m-d" }}',
+	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
+	  dateFormat: 'yy-mm-dd' 
+  });
   
   $("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
   

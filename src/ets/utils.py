@@ -256,11 +256,10 @@ def import_order(compas):
             'remarks_b': lti.remarks_b,
         }
         
-        order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
-        #===========================================================================================================
-        # if not created:
-        #    ets_models.Order.objects.filter(code=lti.code).update(**defaults)
-        #===========================================================================================================
+        order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
+        #Update order. IT's not supposed to happen. In this case system might break.
+        if not created:
+            ets_models.Order.objects.filter(code=lti.code).update(**defaults)
         
         #Commodity
         commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
