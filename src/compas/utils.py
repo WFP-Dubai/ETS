@@ -1,6 +1,7 @@
 
 from django.db import connections
 from django.core.exceptions import ValidationError
+from django.utils.encoding import force_unicode
 
 QUANTITY_EXCEEDS = "QUANTITY NET EXCEEDS THE STORED QUANTITY"
 
@@ -18,12 +19,17 @@ try:
         cursor.callproc( name, (Response_Message, Response_Code)+parameters)
         
         if Response_Code.getvalue() != 'S':
-            message = Response_Message.getvalue()
+            errors = []
             
-            if QUANTITY_EXCEEDS in message:
-                message = QUANTITY_EXCEEDS
+            for msg in Response_Message.getvalue():
+                
+                #HACK to simplify error message
+                if QUANTITY_EXCEEDS in msg:
+                    msg = QUANTITY_EXCEEDS
+                
+                errors.append(msg)
             
-            raise ValidationError(message, code=Response_Code.getvalue())
+            raise ValidationError(errors, code=Response_Code.getvalue())
 
 except ImportError:
     
