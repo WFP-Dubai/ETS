@@ -19,10 +19,17 @@ try:
         cursor.callproc( name, (Response_Message, Response_Code)+parameters)
         
         if Response_Code.getvalue() != 'S':
+            
+            error_messages = Response_Message.getvalue()
+            
             errors = []
             
-            for msg in Response_Message.getvalue():
+            if isinstance(error_messages, (str, unicode)):
+                error_messages = [error_messages]
                 
+            for msg in error_messages:
+                
+                msg = force_unicode(msg)
                 #HACK to simplify error message
                 if QUANTITY_EXCEEDS in msg:
                     msg = QUANTITY_EXCEEDS

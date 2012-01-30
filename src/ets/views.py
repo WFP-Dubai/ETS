@@ -248,6 +248,7 @@ def dispatch_validates(request, queryset, template):
     return direct_to_template(request, template, {
         'object_list': queryset.filter(validated=False),
         'validated_waybills': queryset.filter(validated=True),
+        'logger_action': ets.models.CompasLogger.DISPATCH,
     })
 
 @officer_required
@@ -256,6 +257,7 @@ def receipt_validates(request, queryset, template):
     return direct_to_template(request, template, {
         'object_list': queryset.filter(receipt_validated=False),
         'validated_waybills': queryset.filter(receipt_validated=True),
+        'logger_action': ets.models.CompasLogger.RECEIPT,
     })
 
 
