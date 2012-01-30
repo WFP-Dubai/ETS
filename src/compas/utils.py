@@ -32,13 +32,14 @@ try:
                 
             for msg in error_messages:
                 
-                msg = force_unicode(msg)
+                message = force_unicode(msg)
                 #HACK to simplify error message
                 for code, desc in COMPAS_ERRORS:
-                    if code in msg:
-                        msg = desc
+                    if code in message:
+                        message = desc
+                        break
                 
-                errors.append(msg)
+                errors.append(message)
             
             raise ValidationError(errors, code=Response_Code.getvalue())
 
