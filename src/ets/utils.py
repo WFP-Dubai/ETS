@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, date
 from itertools import chain, izip
 import decimal
+from functools import wraps
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -11,6 +12,7 @@ from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
 from django.core import serializers
 from django.utils.translation import ugettext as _
+from django.utils.decorators import available_attrs
 
 from compas.utils import call_db_procedure
 import compas.models as compas_models
@@ -21,34 +23,52 @@ TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 
+def compas_importer(func=None, log_success=False):
+    
+    def _decorator(f):
+        @wraps(f, assigned=available_attrs(func))
+        def _wrapped(using):
+            try: 
+                with transaction.commit_on_success(using) as tr:
+                    f(using)
+            except Exception, err:
+                ets_models.ImportLogger.objects.create(compas_id=using, 
+                                                       status=ets_models.ImportLogger.FAILURE, 
+                                                       message="%s: %s" % (f.__name__, unicode(err)))
+            else:
+                if log_success:
+                    ets_models.ImportLogger.objects.create(compas_id=using)
+        
+        return _wrapped
+    
+    if func:
+        return _decorator(func)
+    
+    return _decorator
+    
+    
+
+@compas_importer(log_success=True)
 def update_compas(using):
     
-    try:
-        #Import organizations
-        import_partners(using)
-        
-        #Update places
-        import_places(using)
-        
-        #Update persons
-        import_persons(using)
-        
-        #Update loss, damage reasons
-        ets_models.LossDamageType.update(using)
-        
-        #Update stocks
-        import_stock(using)
+    #Import organizations
+    import_partners(using)
     
-        #Update orders
-        import_order(using)
+    #Update places
+    import_places(using)
+    
+    #Update persons
+    import_persons(using)
+    
+    #Update loss, damage reasons
+    import_reasons(using)
+    
+    #Update stocks
+    import_stock(using)
+
+    #Update orders
+    import_order(using)
         
-        
-    except Exception, err:
-        ets_models.ImportLogger.objects.create(compas_id=using, 
-                                               status=ets_models.ImportLogger.FAILURE, 
-                                               message=unicode(err))
-    else:
-        ets_models.ImportLogger.objects.create(compas_id=using)
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
@@ -56,11 +76,12 @@ def _get_places(compas):
     
     return compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
 
-
+@compas_importer
 def import_partners(compas):
     for partner in compas_models.Partner.objects.using(compas).all():
         ets_models.Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
+@compas_importer
 def import_places(compas):
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
@@ -87,100 +108,107 @@ def import_places(compas):
         ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
 
 
+@compas_importer
 def import_persons(compas):
     
-    with transaction.commit_on_success(compas) as tr:
-        now = datetime.now()
-        places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
-    
-        for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
-                                location_code__in=places.values_list('geo_point_code', flat=True), 
-                                organization_id__in=places.values_list('organization_id', flat=True)):
-            try:
-                obj = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
-            except ets_models.Person.DoesNotExist:
-                obj = ets_models.Person(title=person.title,
-                                       code=person.code, compas_id=person.org_unit_code, 
-                                       organization_id=person.organization_id, 
-                                       location_id=person.location_code, username=person.person_pk, 
-                                       email=person.email,
-                                       first_name = person.first_name, last_name = person.last_name, 
-                                       is_staff=True, is_active=False, is_superuser=False)
-                obj.set_password(person.person_pk)
-                obj.save()
-                
-                for wh in ets_models.Warehouse.objects.filter(compas=obj.compas, 
-                                                   organization=obj.organization, 
-                                                   location=obj.location):
-                    obj.warehouses.add(wh)
-            
-            obj.updated = now
-            obj.save()
-        
-        #Disable deleted persons
-        ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
+    now = datetime.now()
+    places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
 
+    for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
+                            location_code__in=places.values_list('geo_point_code', flat=True), 
+                            organization_id__in=places.values_list('organization_id', flat=True)):
+        try:
+            obj = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
+        except ets_models.Person.DoesNotExist:
+            obj = ets_models.Person(title=person.title,
+                                   code=person.code, compas_id=person.org_unit_code, 
+                                   organization_id=person.organization_id, 
+                                   location_id=person.location_code, username=person.person_pk, 
+                                   email=person.email,
+                                   first_name = person.first_name, last_name = person.last_name, 
+                                   is_staff=True, is_active=False, is_superuser=False)
+            obj.set_password(person.person_pk)
+            obj.save()
+            
+            for wh in ets_models.Warehouse.objects.filter(compas=obj.compas, 
+                                               organization=obj.organization, 
+                                               location=obj.location):
+                obj.warehouses.add(wh)
+        
+        obj.updated = now
+        obj.save()
+    
+    #Disable deleted persons
+    ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
+
+
+@compas_importer
+def import_reasons(compas):
+    """Imports all possible reasons"""
+    return ets_models.LossDamageType.update(compas)
+
+
+@compas_importer
 def import_stock(compas):
     """Executes Imports of Stock"""
     
     now = datetime.now()
-    with transaction.commit_on_success(compas) as tr:
-        #places = _get_places(compas)
-        places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
+    #places = _get_places(compas)
+    places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
+    
+    for stock in compas_models.EpicStock.objects.using(compas)\
+                    .filter(wh_code__in=places.values_list('org_code', flat=True)):
         
-        for stock in compas_models.EpicStock.objects.using(compas)\
-                        .filter(wh_code__in=places.values_list('org_code', flat=True)):
-            
-            #Create commodity's category
-            category = ets_models.CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
-            
-            #Create commodity
-            commodity = ets_models.Commodity.objects.get_or_create(pk=stock.commodity_code, defaults={
-                'name': stock.cmmname,
-                'category': category, 
-            })[0]
-            
-            #Create package
-            package = ets_models.Package.objects.get_or_create(pk=stock.package_code, 
-                                                               defaults={'name': stock.packagename})[0]
-            
-            #Check package type. If 'BULK' then modify number and weight
-            number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
-                                            else (stock.number_of_units, stock.quantity_net)
-            
-            warehouse = ets_models.Warehouse.objects.get(pk=stock.wh_code)
-            
-            defaults = {
-                'warehouse': warehouse,
-                'project_number': stock.project_wbs_element,
-                'si_code': stock.si_code,
-                'commodity': commodity,
-                'package': package,
-                'number_of_units': number_of_units,
-                'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
-                'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
-                
-                'allocation_code': stock.allocation_code,
-                'si_record_id': stock.si_record_id,
-                'origin_id': stock.origin_id,
-                'is_bulk': stock.is_bulk(),
-                
-                'updated': now,
-            }
-            
-            rows = ets_models.StockItem.objects.filter(external_ident=stock.wh_pk, quality=stock.qualitycode).update(**defaults)
-            if not rows:
-                
-                #Clean virtual stocks
-                ets_models.StockItem.objects.filter(warehouse=warehouse, project_number=stock.project_wbs_element,
-                                                    si_code=stock.si_code, commodity=commodity,
-                                                    virtual=True).delete()
-                
-                ets_models.StockItem.objects.create(external_ident=stock.wh_pk, quality=stock.qualitycode, **defaults)
+        #Create commodity's category
+        category = ets_models.CommodityCategory.objects.get_or_create(pk=stock.comm_category_code)[0]
         
-        #Flush empty stocks
-        ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse__compas__pk=compas, virtual=False)\
-                                    .exclude(updated=now).update(number_of_units=0)
+        #Create commodity
+        commodity = ets_models.Commodity.objects.get_or_create(pk=stock.commodity_code, defaults={
+            'name': stock.cmmname,
+            'category': category, 
+        })[0]
+        
+        #Create package
+        package = ets_models.Package.objects.get_or_create(pk=stock.package_code, 
+                                                           defaults={'name': stock.packagename})[0]
+        
+        #Check package type. If 'BULK' then modify number and weight
+        number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
+                                        else (stock.number_of_units, stock.quantity_net)
+        
+        warehouse = ets_models.Warehouse.objects.get(pk=stock.wh_code)
+        
+        defaults = {
+            'warehouse': warehouse,
+            'project_number': stock.project_wbs_element,
+            'si_code': stock.si_code,
+            'commodity': commodity,
+            'package': package,
+            'number_of_units': number_of_units,
+            'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
+            'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
+            
+            'allocation_code': stock.allocation_code,
+            'si_record_id': stock.si_record_id,
+            'origin_id': stock.origin_id,
+            'is_bulk': stock.is_bulk(),
+            
+            'updated': now,
+        }
+        
+        rows = ets_models.StockItem.objects.filter(external_ident=stock.wh_pk, quality=stock.qualitycode).update(**defaults)
+        if not rows:
+            
+            #Clean virtual stocks
+            ets_models.StockItem.objects.filter(warehouse=warehouse, project_number=stock.project_wbs_element,
+                                                si_code=stock.si_code, commodity=commodity,
+                                                virtual=True).delete()
+            
+            ets_models.StockItem.objects.create(external_ident=stock.wh_pk, quality=stock.qualitycode, **defaults)
+    
+    #Flush empty stocks
+    ets_models.StockItem.objects.filter(number_of_units__gt=0, warehouse__compas__pk=compas, virtual=False)\
+                                .exclude(updated=now).update(number_of_units=0)
 
 
 def _get_destination_location(compas, code, name):
@@ -195,70 +223,71 @@ def _get_destination_location(compas, code, name):
                     'country': country_code
                     })[0]
 
+
+@compas_importer
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
     today = date.today()
     
-    with transaction.commit_on_success(compas) as tr:
-        places = _get_places(compas)
-        for lti in compas_models.LtiOriginal.objects.using(compas)\
-                            .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
-                                    lti_date__gte='2012-01-01',
-                                    #consegnee_code__in=places.values_list('organization_id', flat=True),
-                                    origin_wh_code__in=places.values_list('org_code', flat=True),
-                                    #destination_location_code__in=places.values_list('geo_point_code', flat=True)
-                                    ):
-            
-            #Create Order
-            defaults = {
-                'created': lti.lti_date,
-                'expiry': lti.expiry_date or lti.lti_date + timedelta(30*DEFAULT_ORDER_LIFE),
-                'dispatch_date': lti.requested_dispatch_date,
-                'transport_code': lti.transport_code,
-                'transport_ouc': lti.transport_ouc,
-                'transport_name': lti.transport_name,
-                'origin_type': lti.origin_type,
-                'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
-                'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
-                'location': _get_destination_location(compas, lti.destination_location_code, lti.destination_loc_name),
-                'updated': now,
-                #'remarks': lti.remarks,
-                #'remarks_b': lti.remarks_b,
-            }
-            
-            order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
-            #===========================================================================================================
-            # if not created:
-            #    ets_models.Order.objects.filter(code=lti.code).update(**defaults)
-            #===========================================================================================================
-            
-            #Commodity
-            commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
-                'name': lti.cmmname,
-                'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
-            })[0]
-            
-            #Create order item
-            key_data = {
-                'order': order,
-                'lti_pk': lti.lti_pk, 
-                'si_code': lti.si_code,
-                'commodity': commodity,
-                'lti_id': lti.lti_id,
-                'project_number': lti.project_wbs_element,
-            }
-            defaults = {
-                'number_of_units': lti.number_of_units,
-                'unit_weight_net': lti.unit_weight_net,
-                'unit_weight_gross': lti.unit_weight_gross,
-                'total_weight_net': lti.quantity_net,
-                'total_weight_gross': lti.quantity_gross,
-            }
-            
-            rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
-            if not rows:
-                ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
+    places = _get_places(compas)
+    for lti in compas_models.LtiOriginal.objects.using(compas)\
+                        .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
+                                lti_date__gte='2012-01-01',
+                                #consegnee_code__in=places.values_list('organization_id', flat=True),
+                                origin_wh_code__in=places.values_list('org_code', flat=True),
+                                #destination_location_code__in=places.values_list('geo_point_code', flat=True)
+                                ):
+        
+        #Create Order
+        defaults = {
+            'created': lti.lti_date,
+            'expiry': lti.expiry_date or lti.lti_date + timedelta(30*DEFAULT_ORDER_LIFE),
+            'dispatch_date': lti.requested_dispatch_date,
+            'transport_code': lti.transport_code,
+            'transport_ouc': lti.transport_ouc,
+            'transport_name': lti.transport_name,
+            'origin_type': lti.origin_type,
+            'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
+            'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
+            'location': _get_destination_location(compas, lti.destination_location_code, lti.destination_loc_name),
+            'updated': now,
+            #'remarks': lti.remarks,
+            #'remarks_b': lti.remarks_b,
+        }
+        
+        order = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)[0]
+        #===========================================================================================================
+        # if not created:
+        #    ets_models.Order.objects.filter(code=lti.code).update(**defaults)
+        #===========================================================================================================
+        
+        #Commodity
+        commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
+            'name': lti.cmmname,
+            'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
+        })[0]
+        
+        #Create order item
+        key_data = {
+            'order': order,
+            'lti_pk': lti.lti_pk, 
+            'si_code': lti.si_code,
+            'commodity': commodity,
+            'lti_id': lti.lti_id,
+            'project_number': lti.project_wbs_element,
+        }
+        defaults = {
+            'number_of_units': lti.number_of_units,
+            'unit_weight_net': lti.unit_weight_net,
+            'unit_weight_gross': lti.unit_weight_gross,
+            'total_weight_net': lti.quantity_net,
+            'total_weight_gross': lti.quantity_gross,
+        }
+        
+        rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
+        if not rows:
+            ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
     
 
 def send_dispatched(waybill, compas=None):

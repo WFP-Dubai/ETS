@@ -332,7 +332,7 @@ class ImportLoggerAdmin(admin.ModelAdmin):
 admin.site.register(ets.models.ImportLogger, ImportLoggerAdmin)
 
 
-class PersonedUserAdmin(UserAdmin):
+class LoggedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PersonInline,]
 
 #admin.site.unregister(User)
