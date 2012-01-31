@@ -90,6 +90,8 @@
        countFormsField.val(parseInt(count_forms) + 1);
        var holder = empty_form.removeClass(etalonClass).insertBefore(etalon);
        
+       $(holder).handleWeights();
+       
        if (success) success(holder);
        return false;
     });

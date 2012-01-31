@@ -347,7 +347,7 @@ def get_stock_data(request, order_pk, queryset):
     return HttpResponse(simplejson.dumps({
         'unit_weight_net': stock_item.unit_weight_net,
         'unit_weight_gross': stock_item.unit_weight_gross,
-        'number_of_units': stock_item.get_order_quantity(order_pk),
+        'number_of_units': min(stock_item.number_of_units, stock_item.get_order_quantity(order_pk)),
     }, use_decimal=True))
 
 @permission_required("ets.sync_compas")
