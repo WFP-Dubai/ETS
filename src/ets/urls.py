@@ -132,7 +132,7 @@ class PrefixedPatterns:
                                                 .filter(stock_count__gt=0).order_by('location', 'pk'),
             'template_name': 'stock/stocklist.html',
         }, "view_stock" ),
-        ( r'^get_stock_data/$', "get_stock_data", {
+        ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
             'queryset': ets.models.StockItem.objects.all().distinct(),
         }, "get_stock_data" ),
                  

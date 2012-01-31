@@ -335,7 +335,7 @@ def stock_items(request, template_name, queryset):
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
 
-def get_stock_data(request, queryset):
+def get_stock_data(request, order_pk, queryset):
     
     object_pk = request.GET.get('stock_item')
     
@@ -343,10 +343,11 @@ def get_stock_data(request, queryset):
         queryset = queryset.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
     
     stock_item = get_object_or_404(queryset, pk=object_pk)
+    
     return HttpResponse(simplejson.dumps({
         'unit_weight_net': stock_item.unit_weight_net,
         'unit_weight_gross': stock_item.unit_weight_gross,
-        'number_of_units': stock_item.number_of_units,
+        'number_of_units': stock_item.get_order_quantity(order_pk),
     }, use_decimal=True))
 
 @permission_required("ets.sync_compas")

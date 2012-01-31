@@ -293,6 +293,18 @@ class StockItem( models.Model ):
     def get_last_update(cls):
         return cls.objects.aggregate(max_date=Max('updated'))['max_date']
     
+    def get_order_item(self, order_pk):
+        """Retrieves stock items for current order item through warehouse"""
+        return OrderItem.objects.get(order__pk=order_pk,
+                                     project_number=self.project_number,
+                                     si_code=self.si_code, 
+                                     commodity=self.commodity,)
+    
+    def get_order_quantity(self, order_pk):
+        """Retrieves stock items for current order item through warehouse"""
+        return self.get_order_item(order_pk).items_left()
+
+    
 class LossDamageType(models.Model):
     
     LOSS = 'L'
@@ -788,10 +800,7 @@ class LoadingDetail(models.Model):
 
     def get_order_item(self):
         """Retrieves stock items for current order item through warehouse"""
-        return OrderItem.objects.get(order=self.waybill.order,
-                                     project_number=self.stock_item.project_number,
-                                     si_code = self.stock_item.si_code, 
-                                     commodity = self.stock_item.commodity,)
+        return self.stock_item.get_order_item(self.waybill.order.pk)
     
     def calculate_net_received_good( self ):
         return ( self.number_units_good * self.unit_weight_net ) / 1000
