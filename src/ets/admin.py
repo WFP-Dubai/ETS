@@ -98,7 +98,7 @@ class WaybillInline(admin.TabularInline):
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
-    raw_id_fields = ('waybill',)
+    raw_id_fields = ('waybill', 'stock_item')
     
 
 class WaybillAdmin(logicaldelete.admin.ModelAdmin):
