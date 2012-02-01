@@ -35,9 +35,7 @@ def compas_importer(func=None, log_success=False):
                 ets_models.ImportLogger.objects.create(compas_id=using, 
                                                        status=ets_models.ImportLogger.FAILURE, 
                                                        message="%s: %s" % (f.__name__, unicode(err)))
-            else:
-                if log_success:
-                    ets_models.ImportLogger.objects.create(compas_id=using)
+                raise
         
         return _wrapped
     
@@ -48,26 +46,32 @@ def compas_importer(func=None, log_success=False):
     
     
 
-@compas_importer(log_success=True)
 def update_compas(using):
     
-    #Import organizations
-    import_partners(using)
+    try:
+        #Import organizations
+        import_partners(using)
+        
+        #Update places
+        import_places(using)
+        
+        #Update persons
+        import_persons(using)
+        
+        #Update loss, damage reasons
+        import_reasons(using)
+        
+        #Update stocks
+        import_stock(using)
     
-    #Update places
-    import_places(using)
-    
-    #Update persons
-    import_persons(using)
-    
-    #Update loss, damage reasons
-    import_reasons(using)
-    
-    #Update stocks
-    import_stock(using)
-
-    #Update orders
-    import_order(using)
+        #Update orders
+        import_order(using)
+    except Exception:
+        #Since we already created log for this error simply pass here
+        pass
+    else:
+        #If all process did not fail create success log
+        ets_models.ImportLogger.objects.create(compas_id=using)
         
 
 def _get_places(compas):
