@@ -1,7 +1,6 @@
 {% load i18n %}   
 <span id="sync_compas">
-  {% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong>
-  {% if sync_compas %}
-    (<a class="sync" href="{% url sync_compas %}" {% if failed %}style="color:red;" title="Failed import"{% endif %}>{% trans "Sync" %}</a>)
-  {% endif %}
+  {% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ last_updated|date:"DATETIME_FORMAT" }}</strong> |
+  <a class="sync" href="{% url sync_compas %}">{% trans "Sync" %}</a> 
+  {% if failed %}(<span style="color:red;">{% trans "Failed import" %}</span>){% endif %}
 </span>

@@ -93,6 +93,12 @@ def person_only(context, nodelist, user):
 def officer_only(context, nodelist, user):
     return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
 
+@register.inclusion_tag('sync/sync_form.html')
+def sync_compas_form(compas, user):
+    return { 
+        'access_granted': user.is_superuser or Compas.objects.filter(pk=compas.pk, officers__pk=user.pk).exists(),
+        'station': compas,
+    }
 
 @register.inclusion_tag('last_updated.html')
 def get_last_update(user):
@@ -106,6 +112,5 @@ def get_last_update(user):
          
     return {
         'last_updated': StockItem.get_last_update(),
-        'sync_compas': user.has_perm("ets.sync_compas"),
-        'failed': failed
+        'failed': failed,
     }

@@ -350,18 +350,16 @@ def get_stock_data(request, order_pk, queryset):
         'number_of_units': min(stock_item.number_of_units, stock_item.get_order_quantity(order_pk)),
     }, use_decimal=True))
 
-@permission_required("ets.sync_compas")
-def sync_compas(request, queryset, template_name="admin/sync_compas.html"):
+def sync_compas(request, queryset, template_name="sync/sync_compas.html"):
     
     if not request.user.is_superuser:
-        queryset = queryset.filter(officers=request.user)
-    
+        queryset = queryset.filter(Q(warehouses__persons__pk=request.user.pk) | Q(officers=request.user))
+        
     queryset = queryset.annotate(last_updated=Max('warehouses__stock_items__updated'))
     
     return direct_to_template(request, template=template_name, extra_context={'stations': queryset})
 
 
-@permission_required("ets.sync_compas")
 @require_POST
 def handle_sync_compas(request, compas_pk, queryset):
     

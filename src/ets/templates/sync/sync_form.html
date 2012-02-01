@@ -1,0 +1,6 @@
+{% load i18n %}
+{% if access_granted %}
+<form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
+  <p><button type="submit" name="import">{% trans "Import data" %}</button></p>
+</form>
+{% endif %}

@@ -1,12 +1,8 @@
-{% extends "admin/base_site.html" %}
+{% extends "base_template.html" %}
 
-{% load i18n %}
+{% load i18n extra_tags %}
 
 {% block title %}{% trans "Import data from COMPAS stations" %}{% endblock %}
-
-{% block breadcrumbs %}
-<div class="breadcrumbs"><a href="{% url admin:index %}">{% trans 'Home' %}</a>{% if title %} &rsaquo; {{ title }}{% endif %}</div>
-{% endblock %}
 
 {% block content %}
 <h1>{% trans "Import data from COMPAS stations" %}</h1> 
@@ -16,9 +12,7 @@
 <div class="station_{{ station.pk }}">
   <h3>{{ station.pk }}</h3>
   <p>{% trans "Last updated" %} (yyyy/mm/dd GMT+1): <strong>{{ station.last_updated|date:"DATETIME_FORMAT" }}</strong></p>
-  <form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
-    <p><button type="submit" name="import">{% trans "Import data" %}</button></p>
-  </form>
+  {% sync_compas_form station request.user %}
   <h4>{% trans "Import Log" %}</h4>
   <ul>
   {% for item in station.import_logs.all|slice:":5" %}

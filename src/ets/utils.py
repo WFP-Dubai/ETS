@@ -351,7 +351,7 @@ def send_dispatched(waybill, compas=None):
                     
                     CONTAINER_NUMBER,
                     
-                    compas,
+                    waybill.destination.compas.pk,
                     
                     loading.stock_item.origin_id, 
                     loading.stock_item.commodity.category.pk, 
