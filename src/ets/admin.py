@@ -290,7 +290,7 @@ class PersonAdmin(UserAdmin):
         'link_to_organization', 'link_to_location', 'dispatch', 'receive', 'is_active'
     )
     list_editable = ('is_active', 'dispatch', 'receive')
-    list_filter = ('is_active',)
+    list_filter = ('is_active', 'compas')
     search_fields = (
         'code', 'title', 'username', 'first_name', 'last_name', 'email',
         'compas__code', 'organization__name', 'location__name'
