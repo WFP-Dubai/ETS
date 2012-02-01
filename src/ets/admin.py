@@ -185,7 +185,7 @@ class WarehouseAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date', 'end_date')
     list_editable = ('start_date',)
     list_filter = ('start_date', 'compas',)
-    raw_id_fields = ('location',)
+    raw_id_fields = ('location', 'organization')
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
     inlines = (StockInline,)
     

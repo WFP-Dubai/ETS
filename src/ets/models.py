@@ -91,7 +91,7 @@ class Organization(models.Model):
     name = models.CharField(_("Name"), max_length=100, blank=True)
     
     class Meta:
-        ordering = ('code',)
+        ordering = ('name',)
         verbose_name = _('organization')
         verbose_name_plural = _("organizations")
     
