@@ -42,12 +42,12 @@ class Command(BaseCommand):
     def handle(self, compas='', *args, **options):
         
         lock = lockfile.FileLock(self.get_lock_name(compas))
-        
+
         try:
-            lock.acquire(timeout=30)  # wait up to 60 seconds
+            lock.acquire(timeout=10)  # wait up to 30 seconds
         except lockfile.LockTimeout:
             
-            lock_time = datetime.fromtimestamp(os.path.getctime(lock.path))
+            lock_time = datetime.fromtimestamp(os.path.getctime(lock.lock_file))
             if lock_time + datetime.timedelta(minutes=MINIMUM_AGE) <= datetime.datetime.now():
                 lock.break_lock()
                 lock.acquire()
