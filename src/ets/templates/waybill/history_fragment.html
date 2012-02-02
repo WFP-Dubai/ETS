@@ -14,7 +14,7 @@
       <tr>
           <td>{% if action_user %}{{ action_user }}{% else %}{% trans "System" %}{% endif %}</td>
           <td>{{ action_type }}</td>
-          <td>{{ action_date|date|upper:"DATETIME_FORMAT" }}</td>
+          <td>{{ action_date|date:"DATETIME_FORMAT"|upper }}</td>
           <td>
             {% for key, field in changes %}
               {{ key }}: &quot;{{ field }}&quot;{% if not forloop.last %},{% endif %}

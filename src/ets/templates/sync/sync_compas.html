@@ -11,7 +11,7 @@
 {% for station in stations %}
 <div class="station_{{ station.pk }}">
   <h3>{{ station.pk }}</h3>
-  <p>{% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ station.last_updated|date|upper:"DATETIME_FORMAT" }}</strong></p>
+  <p>{% trans "Last updated" %} (yyyy/mm/dd GMT): <strong>{{ station.last_updated|date:"DATETIME_FORMAT"|upper }}</strong></p>
   {% sync_compas_form station request.user %}
   <h4>{% trans "Import Log" %}</h4>
   <ul>
