@@ -173,8 +173,8 @@ SERVER_EMAIL = 'no-reply@wfp.com'
 # debug toolbar
 INTERNAL_IPS = ('127.0.0.1', )
 
-DATE_FORMAT = "Y/m/d"
-DATETIME_FORMAT = "Y/m/d H:i"
+DATE_FORMAT = "d-b-Y"
+DATETIME_FORMAT = "d-b-Y H:i"
 
 def prefix_url(path, prefix):
     if path.startswith('/'):
