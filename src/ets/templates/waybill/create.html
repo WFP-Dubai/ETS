@@ -148,13 +148,13 @@
 
 $(document).ready(function() {
   $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-	  minDate: '{{ object.created|date:"y-m-d" }}',
-	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
+	  minDate: '{{ object.created|date|upper:"y-m-d" }}',
+	  maxDate: '{{ object.expiry|date|upper:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd'
   });
   $('#{{ form.loading_date.auto_id }}').datepicker({ 
-	  minDate: '{{ object.created|date:"y-m-d" }}',
-	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
+	  minDate: '{{ object.created|date|upper:"y-m-d" }}',
+	  maxDate: '{{ object.expiry|date|upper:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd' 
   });
   

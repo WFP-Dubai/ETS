@@ -25,9 +25,9 @@
     {% for order in object_list %}
     <tr>
       <td><a href='{{ order.get_absolute_url }}'>{{ order.code }}</a></td>
-      <td>{{ order.created|date }}</td>
-      <td>{{ order.dispatch_date|date }}</td>
-      <td>{{ order.expiry|date }}</td>
+      <td>{{ order.created|date|upper }}</td>
+      <td>{{ order.dispatch_date|date|upper }}</td>
+      <td>{{ order.expiry|date|upper }}</td>
       <td>{{ order.warehouse.name }}</td>
       <td>{{ order.location.name }}</td>
       <td>{{ order.consignee }}</td>

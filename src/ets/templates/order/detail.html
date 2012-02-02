@@ -85,10 +85,10 @@
       <tr>
         <td align="center">{% waybill_delete waybill user %}</td>
         <td align="center">
-          {{ waybill.transport_dispach_signed_date|date }}
+          {{ waybill.transport_dispach_signed_date|date|upper }}
         </td>
         <td align="center">
-          {{ waybill.receipt_signed_date|date }}
+          {{ waybill.receipt_signed_date|date|upper }}
         </td>
       </tr>
       <tr>

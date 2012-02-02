@@ -18,8 +18,8 @@
             
             </tr>
             <tr>
-                <td><sup>{% trans "Date of Loading" %}:</sup> {{ object.loading_date|date  }}</td>
-                <td colspan="2"><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date|date }}</td>
+                <td><sup>{% trans "Date of Loading" %}:</sup> {{ object.loading_date|date|upper  }}</td>
+                <td colspan="2"><sup>{% trans "Date of Dispatch" %}:</sup> {{ object.dispatch_date|date|upper }}</td>
             </tr>
             <tr>
                 <td><sup>{% trans "Destination(warehouse)" %}: </sup><br>{{ object.destination.name }}</td>
@@ -124,7 +124,7 @@
             <p class="x-small">
             {% if object.transport_dispach_signed_date %}
               {{ object.dispatcher_person.get_full_name }}<br>
-              {% trans "Date:" %} {{ object.transport_dispach_signed_date|date }}
+              {% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}
             {% endif %}
             </p>
           </td>
@@ -151,7 +151,7 @@
             <p class="small">
             {% if object.transport_dispach_signed_date %}
               {{ object.transport_driver_name|upper }}<br>
-              {% trans "Date:" %}{{object.transport_dispach_signed_date|date}}
+              {% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}
             {% endif %}
             </p>
           </td>

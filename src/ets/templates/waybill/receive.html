@@ -62,7 +62,7 @@
 <script charset="utf-8" type="text/javascript">
 $(document).ready(function() {
    $('#{{ form.arrival_date.auto_id }}, #{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ 
-	   minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+	   minDate: '{{ form.instance.dispatch_date|date|upper:"y-m-d" }}', 
 	   dateFormat: 'yy-mm-dd' 
 	 });
 });

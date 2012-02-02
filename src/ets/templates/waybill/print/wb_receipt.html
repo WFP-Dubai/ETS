@@ -7,15 +7,15 @@
       <tbody>
         <tr>
           <td><small>{% trans "Location:" %}</small> {{ object.destination.location.name }}</td>
-          <td><small>{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date }}</td>
+          <td><small>{% trans "Arrival Date:" %}</small> {{ object.arrival_date|date|upper }}</td>
         </tr>
         <tr>
           <td><small>{% trans "Consignee:" %}</small> {{ object.order.consignee }}</td>
-          <td><small>{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date }}</td>
+          <td><small>{% trans "Start Discharge Date:" %}</small> {{ object.start_discharge_date|date|upper }}</td>
         </tr>
         <tr>
           <td><small>{% trans "Name:" %}</small> {{ object.receipt_person.get_full_name }}</td>
-          <td><small>{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date }}</td>
+          <td><small>{% trans "End Discharge Date:" %}</small> {{ object.end_discharge_date|date|upper }}</td>
         </tr>
         <tr>
           <td><small>{% trans "Title:" %}</small> {{ object.receipt_person.title }}</td>
@@ -127,7 +127,7 @@
     	  <p class="x-small">{% trans "Name, signature and stamp:" %}</p>
     	  {% if object.receipt_signed_date %}
           <p class="small">{{ object.receipt_person.get_full_name }}</p>
-          <p>{% trans "Date:" %}{{ object.receipt_signed_date|date }}</p>
+          <p>{% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}</p>
         {% endif %}
         <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>
     	</td>
@@ -136,7 +136,7 @@
           <p class="x-small">{% trans "Name, signature and stamp" %}</p>
           {% if object.receipt_signed_date %}
             <p class="small">{{ object.transport_driver_name|upper}}</p>
-            <p>{% trans "Date:" %} {{ object.receipt_signed_date|date }}</p>
+            <p>{% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}</p>
           {% endif %}
     	  <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>
     	</td>

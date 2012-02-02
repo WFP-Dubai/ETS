@@ -37,14 +37,14 @@
        <td>{{ waybill.order.location.name }}</td>
        <td>
         {% if waybill.transport_dispach_signed_date %}
-          {{ waybill.transport_dispach_signed_date|date }}
+          {{ waybill.transport_dispach_signed_date|date|upper }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
        </td>
        <td>
         {% if waybill.receipt_signed_date %}
-          {{ waybill.receipt_signed_date|date }}
+          {{ waybill.receipt_signed_date|date|upper }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
@@ -86,14 +86,14 @@
       <td>{{ waybill.order.location.name }}</td>
       <td>
         {% if waybill.transport_dispach_signed_date %}
-          {{ waybill.transport_dispach_signed_date|date }}
+          {{ waybill.transport_dispach_signed_date|date|upper }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
       </td>
       <td>
         {% if waybill.receipt_signed_date %}
-          {{ waybill.receipt_signed_date|date }}
+          {{ waybill.receipt_signed_date|date|upper }}
         {% else %}
           {% trans "Pending" %}
         {% endif %}
