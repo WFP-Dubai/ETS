@@ -187,7 +187,7 @@ class WarehouseAdmin(admin.ModelAdmin):
     list_filter = ('start_date', 'compas',)
     raw_id_fields = ('location', 'organization')
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
-    inlines = (StockInline,)
+    #inlines = (StockInline,)
     
     def queryset(self, request):
         queryset = super(WarehouseAdmin, self).queryset(request)
