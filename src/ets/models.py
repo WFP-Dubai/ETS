@@ -299,7 +299,8 @@ class StockItem( models.Model ):
                                      project_number=self.project_number,
                                      si_code=self.si_code, 
                                      commodity=self.commodity,
-                                     unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),)
+                                     #unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
+                                     )
     
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
