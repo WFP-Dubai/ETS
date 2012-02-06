@@ -69,7 +69,7 @@ class CompasTestCase(TestCase):
         self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         
         #Update changed stock
-        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=700)
+        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=0.7)
         import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='KARX025KARX0010000944801MIXMIXHEBCG1558').number_of_units, 700)

@@ -162,9 +162,9 @@
       "project_wbs_element": "1", 
       "si_code": "123", 
       "si_record_id": "testme0124", 
-      "quantity_gross": "0.015", 
+      "quantity_gross": "1.001", 
       "qualitydescr": "Good", 
-      "quantity_net": "1000", 
+      "quantity_net": "1", 
       "wh_code": "ISBX002", 
       "package_code": "BG16",
       "packagename": "BULK", 
@@ -204,8 +204,8 @@
       "allocation_code": "586", 
       "wh_country": "PAKISTAN",
       "number_of_units": 50, 
-      "quantity_gross": "0.011", 
-      "quantity_net": "0.010" 
+      "quantity_gross": "1.001", 
+      "quantity_net": "1" 
     }
   },
   {
@@ -231,8 +231,8 @@
       "allocation_code": "586", 
       "wh_country": "PAKISTAN",
       "number_of_units": 50, 
-      "quantity_gross": "0.011", 
-      "quantity_net": "0.010" 
+      "quantity_gross": "1.011", 
+      "quantity_net": "1.010" 
     }
   },
   {
@@ -258,8 +258,8 @@
       "allocation_code": "586", 
       "wh_country": "PAKISTAN",
       "number_of_units": 50, 
-      "quantity_gross": "0.011", 
-      "quantity_net": "0.010" 
+      "quantity_gross": "1.011", 
+      "quantity_net": "1.010" 
     }
   },
   {
@@ -270,9 +270,9 @@
       "project_wbs_element": "1", 
       "si_code": "123", 
       "si_record_id": "anotherstock1234", 
-      "quantity_gross": "0.015", 
+      "quantity_gross": "1.015", 
       "qualitydescr": "Good", 
-      "quantity_net": "1000", 
+      "quantity_net": "1", 
       "wh_code": "ISBX003", 
       "package_code": "BG16",
       "packagename": "BULK", 
@@ -297,9 +297,9 @@
       "project_wbs_element": "1", 
       "si_code": "123", 
       "si_record_id": "anotherstock12345", 
-      "quantity_gross": "0.015", 
+      "quantity_gross": "1.015", 
       "qualitydescr": "Good", 
-      "quantity_net": "1000", 
+      "quantity_net": "1", 
       "wh_code": "ISBX003", 
       "package_code": "BG16",
       "packagename": "BULK", 
@@ -369,11 +369,11 @@
       "destination_loc_name": "ISLAMABAD_CAP", 
       "requested_dispatch_date": "2012-11-03", 
       "transport_name": "MUSLIM TRANSPORT", 
-      "unit_weight_net": "0.2",
+      "unit_weight_net": "1",
       "transport_ouc": "ISBX001", 
       "lti_id": "QANX001000000000000005218", 
       "number_of_units": "70", 
-      "unit_weight_gross": "0.22", 
+      "unit_weight_gross": "1", 
       "commodity_code": "wheet", 
       "comm_category_code": "MIX", 
       "cmmname": "WHEET", 
@@ -404,11 +404,11 @@
       "destination_loc_name": "ISLAMABAD_CAP", 
       "requested_dispatch_date": "2012-11-03", 
       "transport_name": "MUSLIM TRANSPORT", 
-      "unit_weight_net": "0.2",
+      "unit_weight_net": "1",
       "transport_ouc": "ISBX001", 
       "lti_id": "QANX001000000000000005218", 
       "number_of_units": "70", 
-      "unit_weight_gross": "50.330", 
+      "unit_weight_gross": "1", 
       "commodity_code": "wheet", 
       "comm_category_code": "MIX", 
       "cmmname": "WHEET", 

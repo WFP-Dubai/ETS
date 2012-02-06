@@ -107,7 +107,7 @@ class EpicStock( models.Model ):
         #managed = False
     
     def is_bulk(self):
-        return self.packagename == BULK_NAME and self.quantity_net
+        return self.packagename == BULK_NAME and not not self.quantity_net
     
  
 class LtiOriginal( models.Model ):

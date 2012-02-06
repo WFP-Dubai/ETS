@@ -435,12 +435,20 @@ class OrderItem(models.Model):
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
-        return StockItem.objects.filter(warehouse=self.order.warehouse,
-                                        project_number=self.project_number,
-                                        si_code=self.si_code, 
-                                        commodity=self.commodity,
-                                        unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
-                                        ).order_by('-number_of_units')
+        filters = dict(warehouse=self.order.warehouse,
+                        project_number=self.project_number,
+                        si_code=self.si_code, 
+                        commodity=self.commodity,)
+        
+        stocks = StockItem.objects.filter(
+                #unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
+                **filters
+                )
+        
+        if not stocks.exists():
+            stocks = StockItem.objects.filter(**filters)
+        
+        return stocks.order_by('-number_of_units')
     
     @staticmethod
     def sum_number( queryset ):

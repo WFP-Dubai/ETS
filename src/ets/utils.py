@@ -177,9 +177,9 @@ def import_stock(compas):
                                                            defaults={'name': stock.packagename})[0]
         
         #Check package type. If 'BULK' then modify number and weight
-        number_of_units, quantity_net = (stock.quantity_net, stock.number_of_units) if stock.is_bulk() \
-                                        else (stock.number_of_units, stock.quantity_net)
-        
+        number_of_units = stock.quantity_net*TOTAL_WEIGHT_METRIC if stock.is_bulk() \
+                                else stock.number_of_units
+         
         warehouse = ets_models.Warehouse.objects.get(pk=stock.wh_code)
         
         defaults = {
@@ -189,7 +189,7 @@ def import_stock(compas):
             'commodity': commodity,
             'package': package,
             'number_of_units': number_of_units,
-            'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*quantity_net/number_of_units,
+            'unit_weight_net': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_net/number_of_units,
             'unit_weight_gross': number_of_units and TOTAL_WEIGHT_METRIC*stock.quantity_gross/number_of_units,
             
             'allocation_code': stock.allocation_code,
