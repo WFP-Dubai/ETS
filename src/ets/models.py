@@ -441,7 +441,7 @@ class OrderItem(models.Model):
                         project_number=self.project_number,
                         si_code=self.si_code, 
                         commodity=self.commodity,
-                        unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
+                        #unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
                         ).order_by('-number_of_units')
         
     
