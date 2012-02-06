@@ -14,7 +14,7 @@ from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
 
-from compas.utils import call_db_procedure
+from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from .compress import compress_json, decompress_json
@@ -373,11 +373,13 @@ def send_dispatched(waybill, compas=None):
                 ), compas)
     
     except Exception, err:
+        
         message = hasattr(err, 'messages') and u"\n".join(err.messages) or unicode(err)
-        ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
-                                               compas_id=compas, waybill=waybill,
-                                               status=ets_models.CompasLogger.FAILURE, 
-                                               message=message)
+        for error_message in reduce_compas_errors(message):
+            ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
+                                                   compas_id=compas, waybill=waybill,
+                                                   status=ets_models.CompasLogger.FAILURE, 
+                                                   message=error_message)
         waybill.validated = False
         waybill.save()
     else:

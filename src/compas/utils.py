@@ -8,6 +8,25 @@ COMPAS_ERRORS = {
     "ORA-20105": "QUANTITY GROSS EXCEEDS THE STORED QUANTITY",
 }
 
+def reduce_compas_errors(error_messages):
+    errors = []
+            
+    if isinstance(error_messages, (str, unicode)):
+        error_messages = [error_messages]
+        
+    for msg in error_messages:
+        
+        message = force_unicode(msg)
+        #HACK to simplify error message
+        for code, desc in COMPAS_ERRORS.items():
+            if code in message:
+                message = desc
+                break
+        
+        errors.append(message)
+    
+    return errors
+
 try:
     import cx_Oracle
     
@@ -22,25 +41,8 @@ try:
         cursor.callproc( name, (Response_Message, Response_Code)+parameters)
         
         if Response_Code.getvalue() != 'S':
-            
-            error_messages = Response_Message.getvalue()
-            
-            errors = []
-            
-            if isinstance(error_messages, (str, unicode)):
-                error_messages = [error_messages]
-                
-            for msg in error_messages:
-                
-                message = force_unicode(msg)
-                #HACK to simplify error message
-                for code, desc in COMPAS_ERRORS.items():
-                    if code in message:
-                        message = desc
-                        break
-                
-                errors.append(message)
-            
+            errors = reduce_compas_errors(Response_Message.getvalue())
+
             raise ValidationError(errors, code=Response_Code.getvalue())
 
 except ImportError:
