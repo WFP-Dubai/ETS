@@ -27,8 +27,8 @@ from .country import COUNTRY_CHOICES
 
 #name = "1234"
 BULK_NAME = "BULK"
-
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
+ACCURACY = 1
 
 # like a normal ForeignKey.
 try:
@@ -298,7 +298,8 @@ class StockItem( models.Model ):
         return OrderItem.objects.get(order__pk=order_pk,
                                      project_number=self.project_number,
                                      si_code=self.si_code, 
-                                     commodity=self.commodity,)
+                                     commodity=self.commodity,
+                                     unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),)
     
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
@@ -377,11 +378,17 @@ class Order(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
-        return StockItem.objects.filter(warehouse__orders=self,
-                                        project_number=F('warehouse__orders__items__project_number'),
-                                        si_code=F('warehouse__orders__items__si_code'), 
-                                        commodity=F('warehouse__orders__items__commodity'),
-                                        ).order_by('-warehouse__orders__items__number_of_units')
+        
+        return StockItem.objects.filter(pk__in=chain(*(item.get_stock_items().values_list('pk', flat=True) for item in self.items.all())))
+        
+        #=======================================================================
+        # return StockItem.objects.filter(warehouse__orders=self,
+        #                                project_number=F('warehouse__orders__items__project_number'),
+        #                                si_code=F('warehouse__orders__items__si_code'), 
+        #                                commodity=F('warehouse__orders__items__commodity'),
+        #                                unit_weight_net=F('warehouse__orders__items__unit_weight_net'),
+        #                                ).order_by('-warehouse__orders__items__number_of_units')
+        #=======================================================================
     
     def get_percent_executed(self):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
@@ -428,11 +435,12 @@ class OrderItem(models.Model):
 
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
-        return StockItem.objects.filter(warehouse__orders__items=self,
+        return StockItem.objects.filter(warehouse=self.order.warehouse,
                                         project_number=self.project_number,
-                                        si_code = self.si_code, 
-                                        commodity = self.commodity,
-                                        ).order_by('-number_of_units')      
+                                        si_code=self.si_code, 
+                                        commodity=self.commodity,
+                                        unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
+                                        ).order_by('-number_of_units')
     
     @staticmethod
     def sum_number( queryset ):
@@ -442,10 +450,7 @@ class OrderItem(models.Model):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
                                             waybill__date_removed__isnull=True,
-                                            stock_item__project_number=self.project_number,
-                                            stock_item__si_code=self.si_code, 
-                                            stock_item__commodity=self.commodity,
-                                            waybill__order__warehouse=self.order.warehouse,
+                                            stock_item__in=self.get_stock_items(),
                                             ).order_by('-waybill__dispatch_date')
     
     def get_order_dispatches(self):
@@ -623,7 +628,8 @@ class Waybill( ld_models.Model ):
         
         #Create virtual stock item
         for item in self.loading_details.all():
-            StockItem.objects.get_or_create(warehouse=self.destination,
+            StockItem.objects.get_or_create(
+                                          warehouse=self.destination,
                                           project_number=item.stock_item.project_number,
                                           si_code=item.stock_item.si_code, 
                                           commodity=item.stock_item.commodity,
