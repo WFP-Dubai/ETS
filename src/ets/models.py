@@ -299,7 +299,6 @@ class StockItem( models.Model ):
                                      project_number=self.project_number,
                                      si_code=self.si_code, 
                                      commodity=self.commodity,
-                                     #unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
                                      )
     
     def get_order_quantity(self, order_pk):
@@ -434,15 +433,19 @@ class OrderItem(models.Model):
     def  __unicode__( self ):
         return u"%s -  %.0f " % ( self.commodity, self.items_left() )
 
-    def get_stock_items(self):
+
+    def stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
         return StockItem.objects.filter(
                         warehouse=self.order.warehouse,
                         project_number=self.project_number,
                         si_code=self.si_code, 
                         commodity=self.commodity,
-                        #unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY),
                         ).order_by('-number_of_units')
+    
+    def get_stock_items(self):
+        """Retrieves stock items for current order item through warehouse"""
+        return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
         
     
     @staticmethod
@@ -453,7 +456,7 @@ class OrderItem(models.Model):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
                                             waybill__date_removed__isnull=True,
-                                            stock_item__in=self.get_stock_items(),
+                                            stock_item__in=self.stock_items(),
                                             ).order_by('-waybill__dispatch_date')
     
     def get_order_dispatches(self):
@@ -463,7 +466,7 @@ class OrderItem(models.Model):
     
     def get_available_stocks(self):
         """Calculates available stocks"""
-        return self.sum_number(self.get_stock_items()) \
+        return self.sum_number(self.stock_items()) \
                 - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
         
     def get_percent_executed(self):
