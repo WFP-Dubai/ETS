@@ -185,6 +185,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     }, instance=waybill)
     
     form.fields['destination'].queryset = request.user.person.warehouses.all().exclude(pk=waybill.order.warehouse.pk)
+    form.fields['destination'].empty_label = None
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()

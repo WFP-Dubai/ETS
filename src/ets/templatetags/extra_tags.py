@@ -46,7 +46,9 @@ def sign_dispatch(waybill, user):
 
 @function
 def sign_reception(waybill, user):
-    return (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=waybill.pk).count()
+    return (not hasattr(user, 'person') or user.person.receive) \
+            and waybill.is_received() \
+            and Waybill.receptions(user).filter(pk=waybill.pk).count()
 
 
 @register.inclusion_tag('tags/form.html')

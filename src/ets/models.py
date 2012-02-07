@@ -629,32 +629,32 @@ class Waybill( ld_models.Model ):
     
     def receipt_sign(self):
         """Signs the receipt waybill as ready to be sent."""
-        self.receipt_signed_date = datetime.now()
-        self.save()
-        
-        #Create virtual stock item
-        for item in self.loading_details.all():
-            StockItem.objects.get_or_create(
-                                          warehouse=self.destination,
-                                          project_number=item.stock_item.project_number,
-                                          si_code=item.stock_item.si_code, 
-                                          commodity=item.stock_item.commodity,
-                                          defaults={
-                                                'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
-                                                'quality': item.stock_item.quality,
-                                                'package': item.stock_item.package,
-                                                'number_of_units': item.stock_item.number_of_units,
-                                                'unit_weight_net': item.stock_item.unit_weight_net, 
-                                                'unit_weight_gross': item.stock_item.unit_weight_gross, 
-                                                'is_bulk': item.stock_item.is_bulk,
-                                                'si_record_id': item.stock_item.si_record_id,
-                                                'origin_id': item.stock_item.origin_id,
-                                                'allocation_code': item.stock_item.allocation_code,
-                                                'virtual': True,
-                                          })
+        if self.is_received():
+            
+            self.receipt_signed_date = datetime.now()
+            self.save()
+            
+            #Create virtual stock item
+            for item in self.loading_details.all():
+                StockItem.objects.get_or_create(
+                                              warehouse=self.destination,
+                                              project_number=item.stock_item.project_number,
+                                              si_code=item.stock_item.si_code, 
+                                              commodity=item.stock_item.commodity,
+                                              defaults={
+                                                    'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
+                                                    'quality': item.stock_item.quality,
+                                                    'package': item.stock_item.package,
+                                                    'number_of_units': item.stock_item.number_of_units,
+                                                    'unit_weight_net': item.stock_item.unit_weight_net, 
+                                                    'unit_weight_gross': item.stock_item.unit_weight_gross, 
+                                                    'is_bulk': item.stock_item.is_bulk,
+                                                    'si_record_id': item.stock_item.si_record_id,
+                                                    'origin_id': item.stock_item.origin_id,
+                                                    'allocation_code': item.stock_item.allocation_code,
+                                                    'virtual': True,
+                                              })
                 
-    
-    
     def serialize(self):
         """
         This method serializes the Waybill with related LoadingDetails, LtiOriginals and EpicStocks.
@@ -754,6 +754,8 @@ class Waybill( ld_models.Model ):
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   
     
+    def is_received(self):
+        return all(d.is_received() for d in self.loading_details.all()) and self.receipt_person is not None
     
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
@@ -840,6 +842,10 @@ class LoadingDetail(models.Model):
     
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
+    
+    def is_received(self):
+        return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost
+    
     
     def clean(self):
         super(LoadingDetail, self).clean()
