@@ -415,11 +415,11 @@ def send_received(waybill, compas=None):
                     waybill.receipt_person.code, 
                     waybill.arrival_date.strftime("%Y%m%d"),
                     
-                    u'%.3f' % loading.number_units_good, 
+                    loading.number_units_good and u'%.3f' % loading.number_units_good or None,
                     loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
-                    u'%.3f' % loading.number_units_damaged, 
+                    loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
                     loading.units_lost_reason and loading.units_lost_reason.cause or None, 
-                    u'%.3f' % loading.number_units_lost, 
+                    loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
                     
                     loading.stock_item.origin_id, 
                     loading.stock_item.commodity.category.pk,
