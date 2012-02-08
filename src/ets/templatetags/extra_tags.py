@@ -112,7 +112,7 @@ def get_last_update(user):
             last_attempt = c.import_logs.order_by('-when_attempted')[0]
             if last_attempt.status == ImportLogger.FAILURE:
                 failed = True
-        except ImportLogger.DoesNotExist:
+        except (ImportLogger.DoesNotExist, IndexError):
             pass
          
     return {
