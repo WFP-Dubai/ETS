@@ -108,9 +108,12 @@ def get_last_update(user):
     
     failed = False
     for c in Compas.objects.all():
-        last_attempt = c.import_logs.order_by('-when_attempted')[0]
-        if last_attempt.status == ImportLogger.FAILURE:
-            failed = True
+        try:
+            last_attempt = c.import_logs.order_by('-when_attempted')[0]
+            if last_attempt.status == ImportLogger.FAILURE:
+                failed = True
+        except ImportLogger.DoesNotExist:
+            pass
          
     return {
         'last_updated': StockItem.get_last_update(),
