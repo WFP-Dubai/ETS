@@ -74,6 +74,7 @@ def waybill_view(request, waybill_pk, queryset, template):
 @require_POST
 @person_required
 @dispatch_view
+@transaction.commit_on_success
 def waybill_finalize_dispatch(request, waybill_pk, queryset):
     """
     called when user pushes Print Original on dispatch
@@ -147,6 +148,7 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
 
 @person_required
 @warehouse_related
+@transaction.commit_on_success
 def waybill_create(request, order_pk, queryset, **kwargs):
     """Creates a Waybill"""
     
@@ -158,6 +160,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
 
 @person_required
 @dispatch_view
+@transaction.commit_on_success
 def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
     """Updates not signed dispatching waybill"""
     
@@ -205,6 +208,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 @require_POST
 @person_required
 @receipt_view
+@transaction.commit_on_success
 def waybill_finalize_receipt(request, waybill_pk, queryset):
     """ Signs reception"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -228,6 +232,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 @require_POST
 @person_required
 @dispatch_view
+@transaction.commit_on_success
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.delete()
@@ -265,6 +270,7 @@ def receipt_validates(request, queryset, template):
 @require_POST
 @officer_required
 @dispatch_compas
+@transaction.commit_on_success
 def validate_dispatch(request, waybill_pk, queryset):
     """Sets 'validated' flag"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -282,6 +288,7 @@ def validate_dispatch(request, waybill_pk, queryset):
 @require_POST
 @officer_required
 @receipt_compas
+@transaction.commit_on_success
 def validate_receipt(request, waybill_pk, queryset):
     """Sets 'validated' flag"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -382,6 +389,7 @@ def handle_sync_compas(request, compas_pk, queryset):
     
 @officer_required
 @dispatch_compas
+@transaction.commit_on_success
 def send_dispatched_view(request, queryset):
     """Submits dispatch waybills to compas"""
     total = 0
@@ -406,6 +414,7 @@ def send_dispatched_view(request, queryset):
 
 @officer_required
 @receipt_compas
+@transaction.commit_on_success
 def send_received_view(request, queryset):
     """Submits received waybills to compas"""
     for waybill in queryset:
