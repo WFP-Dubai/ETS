@@ -71,3 +71,7 @@ sup {
 .x-small {
   font-size: x-small;
 }
+
+.signature {
+  height: 20mm;
+}

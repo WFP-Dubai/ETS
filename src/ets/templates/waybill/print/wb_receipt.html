@@ -122,7 +122,7 @@
   <td>
   	<table class="border">
       <tr>
-    	<td>
+    	<td class="signature" valign="top">
     	  <p class="x-small">{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
     	  <p class="x-small">{% trans "Name, signature and stamp:" %}</p>
     	  {% if object.receipt_signed_date %}
@@ -131,7 +131,7 @@
         {% endif %}
         <p class="x-small">{% trans "Endorse this section with an official stamp" %}</p>
     	</td>
-        <td>
+        <td class="signature" valign="top">
           <p class="x-small">{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
           <p class="x-small">{% trans "Name, signature and stamp" %}</p>
           {% if object.receipt_signed_date %}

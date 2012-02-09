@@ -62,6 +62,11 @@ img{position: relative; text-align: right;}
 
 }
 
+#original_lable, #copy_lable{
+	font-weight: bold;
+	font-size: x-large;
+}
+
 .shown{
 	display:inherit;
 	visibility: visible;
@@ -77,4 +82,8 @@ p {
 
 .x-small {
   font-size: x-small;
+}
+
+.signature {
+  height: 30mm;
 }
