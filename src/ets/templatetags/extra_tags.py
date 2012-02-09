@@ -61,6 +61,7 @@ def validate_dispatch(waybill, user, link_text=_("Validate dispatch")):
             'text': link_text,
             'url': reverse('validate_dispatch', kwargs={'waybill_pk': waybill.pk,}),
             'success': queryset.filter(pk=waybill.pk).count(),
+            'dialog_question': _("Are you sure you want to validate this waybill?"),
     }
 
 
@@ -72,17 +73,19 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
                               .filter(receipt_validated=False)
 
     return { 
-            'text': link_text,
-            'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
-            'success': queryset.filter(pk=waybill.pk).count(),
+        'text': link_text,
+        'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
+        'success': queryset.filter(pk=waybill.pk).count(),
+        'dialog_question': _("Are you sure you want to validate this waybill?"),
     }
 
 @register.inclusion_tag('tags/form.html')
 def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
     return { 
-            'text': text,
-            'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
-            'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+        'text': text,
+        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
+        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+        'dialog_question': _("Are you sure you want to delete this waybill?"),
     }
 
 

@@ -24,7 +24,9 @@
   {% sign_dispatch object user as may_sign_dispatch %}
   {% if may_sign_dispatch %}
   <form method="POST" action="{% url waybill_finalize_dispatch waybill_pk=object.pk %}">
-    <input class="print_original" type="submit" name="print_original" value="Sign dispatch" />
+    <input class="print_original" type="submit" name="print_original" 
+      value="Sign dispatch" onclick="return confirm('{% trans 'Are you sure you want to sign this waybill?' %}');"
+    />
     {% csrf_token %}
   </form>
   {% endif %}
@@ -32,7 +34,9 @@
   {% sign_reception object user as may_sign_reception %}
   {% if may_sign_reception %}
   <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}">
-    <input class="print_original" type="submit" name="print_original" value="Sign receipt" />
+    <input class="print_original" type="submit" name="print_original" 
+      value="Sign receipt" onclick="return confirm('{% trans 'Are you sure you want to sign this waybill?' %}');"
+    />
     {% csrf_token %}
   </form>
   {% endif %}
