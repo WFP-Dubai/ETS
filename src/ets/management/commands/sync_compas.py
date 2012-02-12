@@ -1,21 +1,17 @@
 ### -*- coding: utf-8 -*- ####################################################
 
 from optparse import make_option
-import lockfile
-import os
-import logging
-import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
 from django.db.utils import DatabaseError
 from django.conf import settings
 
 from ets.utils import update_compas
-from ets.models import Compas
+from ets.models import Compas, ImportLogger
 
 LOG_DIRECTORY = settings.LOG_DIRECTORY
-MINIMUM_AGE = 30
+MINIMUM_AGE = 5
 
 
 class Command(BaseCommand):
@@ -26,41 +22,22 @@ class Command(BaseCommand):
     )
 
     help = 'Import data from COMPAS stations'
-    lock_file_name = 'sync_compas'
-    log_name = 'sync_compas.log'
     
     def synchronize(self, compas):
-        
+        """Exact method to proceed synchronization"""
         update_compas(compas)
 
-    def get_log_name(self):
-        return os.path.join(LOG_DIRECTORY, self.log_name)
-    
-    def get_lock_name(self, compas):
-        return os.path.join(settings.EGG_ROOT, "%s%s" % (self.lock_file_name, compas))
-    
     def handle(self, compas='', *args, **options):
         
-        lock = lockfile.FileLock(self.get_lock_name(compas))
-
-        try:
-            lock.acquire(timeout=10)  # wait up to 30 seconds
-        except lockfile.LockTimeout:
+        stations = Compas.objects.all()
+        if compas:
+            stations = stations.filter(pk=compas)
             
-            lock_time = datetime.fromtimestamp(os.path.getctime(lock.lock_file))
-            if lock_time + datetime.timedelta(minutes=MINIMUM_AGE) <= datetime.datetime.now():
-                lock.break_lock()
-                lock.acquire()
+        for compas in stations:
+            try:
+                last_attempt = ImportLogger.objects.filter(compas=compas).order_by('-when_attempted')[0].when_attempted
+            except (ImportLogger.DoesNotExist, IndexError):
+                last_attempt = datetime(1900, 1, 1)
             
-            raise
-        
-        try:
-            stations = Compas.objects.all()
-            if compas:
-                stations = stations.filter(pk=compas)
-                
-            for compas in stations:
+            if last_attempt + timedelta(minutes=MINIMUM_AGE) <= datetime.now():
                 self.synchronize(compas=compas.pk)
-        
-        finally:
-            lock.release()
