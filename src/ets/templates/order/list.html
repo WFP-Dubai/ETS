@@ -44,19 +44,34 @@
 {% block script %}
 {{ block.super }}
 <script charset="utf-8" type="text/javascript">
+var dateFormat = "dd-NNN-yyyy";
+/* Define two custom functions (asc and desc) for date sorting */
+jQuery.fn.dataTableExt.oSort['date-case-asc']  = function(x,y) {
+	var xd = new Date(getDateFromFormat(x, dateFormat));
+	var yd = new Date(getDateFromFormat(y, dateFormat));
+    return ((xd < yd) ? -1 : ((xd > yd) ?  1 : 0));
+};
+ 
+jQuery.fn.dataTableExt.oSort['date-case-desc'] = function(x,y) {
+	var xd = new Date(getDateFromFormat(x, dateFormat));
+	var yd = new Date(getDateFromFormat(y, dateFormat));
+    return ((xd < yd) ?  1 : ((xd > yd) ? -1 : 0));
+};
+
 $(document).ready(function() {
     $('#listing').dataTable({
-    	  "aaSorting": [[ 3, "asc" ]],
+    	"aaSorting": [[ 3, "asc" ]],
         "aoColumns": [
           null,
+          { "sType": 'date-case' },
+          { "sType": 'date-case' },
+          { "sType": 'date-case' },
+          null,
+          null,
+          null,
+          null,
+          null,
           { "asSorting": [ ] },
-          { "asSorting": [ ] },
-          { "asSorting": [ ] },
-          null,
-          null,
-          null,
-          null,
-          null
         ]
     });
 });
