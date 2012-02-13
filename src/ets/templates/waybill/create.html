@@ -33,12 +33,12 @@
             <td>{% include "uni_form/uni_field.html" with field=form.stock_item %} {{ form.slug }}</td>
             <td>{% include "uni_form/uni_field.html" with field=form.number_of_units %}</td>
             
-            <td>{% include "uni_form/uni_field.html" with field=form.unit_weight_net %}</td>
-            <td>{% include "uni_form/uni_field.html" with field=form.unit_weight_gross %}</td>
-            <td>{% include "uni_form/uni_field.html" with field=form.total_weight_net %}</td>
-            <td>{% include "uni_form/uni_field.html" with field=form.total_weight_gross %}</td>
+            <td class="weight">{% include "uni_form/uni_field.html" with field=form.unit_weight_net %}</td>
+            <td class="weight">{% include "uni_form/uni_field.html" with field=form.unit_weight_gross %}</td>
+            <td class="weight">{% include "uni_form/uni_field.html" with field=form.total_weight_net %}</td>
+            <td class="weight">{% include "uni_form/uni_field.html" with field=form.total_weight_gross %}</td>
             
-            <td>{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
+            <td class="overloaded_units">{% include "uni_form/uni_field.html" with field=form.overloaded_units %}</td>
             {% if formset.can_delete %}<th>{{ form.DELETE }}</th>{% endif %}
           </tr>
         {% endfor %}
@@ -47,11 +47,11 @@
         <tr class="etalon">
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.stock_item %}</td>
           <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.number_of_units %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_net %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_gross %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_net %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_gross %}</td>
-          <td>{% include "uni_form/uni_field.html" with field=formset.empty_form.overloaded_units %}</td>
+          <td class="weight">{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_net %}</td>
+          <td class="weight">{% include "uni_form/uni_field.html" with field=formset.empty_form.unit_weight_gross %}</td>
+          <td class="weight">{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_net %}</td>
+          <td class="weight">{% include "uni_form/uni_field.html" with field=formset.empty_form.total_weight_gross %}</td>
+          <td class="overloaded_units">{% include "uni_form/uni_field.html" with field=formset.empty_form.overloaded_units %}</td>
           {% if formset.can_delete %}<th>{{ formset.empty_form.DELETE }}</th>{% endif %}
         </tr>
       
@@ -87,14 +87,25 @@
          if (el.attr('name')) 
         	 el.attr('name', el.attr('name').replace('__prefix__', count_forms));
        });
+       
        countFormsField.val(parseInt(count_forms) + 1);
        var holder = empty_form.removeClass(etalonClass).insertBefore(etalon);
        
        $(holder).handleWeights();
+       empty_form.handleRemarksRequired();
        
        if (success) success(holder);
        return false;
     });
+  };
+  $.fn.handleRemarksRequired = function() {
+	  $(this).find('td.overloaded_units input, td.weight input').change(function(){
+		var remarksField = $("#{{ form.dispatch_remarks.auto_id }}");
+        if (!remarksField.val()) {
+        	alert("{% trans 'You are mandatory to fill remarks.' %}");
+        	remarksField.focus();
+        }
+  	  });
   };
   $.fn.handleWeights = function() {
 	  var container = $(this);
@@ -160,8 +171,10 @@ $(document).ready(function() {
   
   $("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
   
-  $("#loadingdetails tbody tr.row").each(function() {$(this).handleWeights();});
-  
+  $("#loadingdetails tbody tr.row").each(function() {
+    $(this).handleWeights(); 
+    $(this).handleRemarksRequired();
+  });
 });
 $(document).keydown(omit_enter);
 </script>

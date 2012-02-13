@@ -867,6 +867,8 @@ class LoadingDetail(models.Model):
             order_item = self.get_order_item()
             if order_item.items_left() < self.number_of_units and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+            elif self.overloaded_units and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you set 'overloaded' flag 'Dispatch Remarks' field is required."))
     
         #overloaded units for reception
         total = self.number_units_good + self.number_units_damaged + self.number_units_lost

@@ -85,11 +85,11 @@ class DispatchWaybillForm( forms.ModelForm ):
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset(ugettext('Date'), Row('loading_date', 'dispatch_date')),
+        Fieldset('', 'dispatch_remarks'),
+        Fieldset(ugettext('Dates'), Row('loading_date', 'dispatch_date')),
         Fieldset(ugettext('General'),
                 'destination',
                 Row('transaction_type', 'transport_type'),
-                'dispatch_remarks',
                  ),
         Fieldset(ugettext('Transport'),
                  'transport_sub_contractor',
