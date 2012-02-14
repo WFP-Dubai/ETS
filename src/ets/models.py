@@ -862,13 +862,25 @@ class LoadingDetail(models.Model):
                     "offload" : self.number_units_good + self.number_units_damaged + self.number_units_lost 
             })
         
-        #overloaded units for dispatch
+        #Dispath: overloaded units and changed weights
         if self.stock_item_id and not self.waybill.transport_dispach_signed_date:
             order_item = self.get_order_item()
             if order_item.items_left() < self.number_of_units and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
-            elif self.overloaded_units and not self.waybill.dispatch_remarks:
-                raise ValidationError(_("Since you set 'overloaded' flag 'Dispatch Remarks' field is required."))
+            if self.overloaded_units and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you set 'overloaded' flag 'Dispatch Remarks' field becomes required."))
+            if self.unit_weight_net != self.stock_item.unit_weight_net and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you changed unit weight net 'Dispatch Remarks' field becomes required."))
+            if self.unit_weight_gross != self.stock_item.unit_weight_gross and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you changed unit weight gross 'Dispatch Remarks' field becomes required."))
+            
+            expected_total_net = (self.stock_item.unit_weight_net * self.number_of_units / 1000).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
+            if self.total_weight_net != expected_total_net and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you changed total weight net 'Dispatch Remarks' field becomes required."))
+            
+            expected_total_gros = (self.stock_item.unit_weight_gross * self.number_of_units / 1000).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
+            if self.total_weight_gross != expected_total_gros and not self.waybill.dispatch_remarks:
+                raise ValidationError(_("Since you changed total weight gross 'Dispatch Remarks' field becomes required."))
     
         #overloaded units for reception
         total = self.number_units_good + self.number_units_damaged + self.number_units_lost
