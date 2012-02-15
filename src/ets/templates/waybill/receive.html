@@ -30,6 +30,7 @@
         <th>Lost Reason</th>
         <th>Number Units Damaged</th>
         <th>Damaged Reason</th>
+        <th>Total Weight Net</th>
         <th>Over Offload Units</th>
       </tr>
     </thead>
@@ -43,6 +44,7 @@
         <td>{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_damaged %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.units_damaged_reason %}</td>
+        <td>{% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
     {% endfor %}

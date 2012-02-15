@@ -16,15 +16,6 @@ from ets import models as ets_models
 
 UNDEFINED_MESSAGE = "N/A"
 
-#=======================================================================================================================
-# class StrippedCharField(forms.CharField):
-#    """CharField that strips trailing and leading spaces."""
-#    def clean(self, value):
-#        if value is not None:
-#            value = value.strip()
-#        return super(StrippedCharField, self).clean(value) 
-#=======================================================================================================================
-
 class StrippedTextInput(forms.TextInput):
     
     def value_from_datadict(self, data, files, name):
@@ -199,6 +190,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_good', 
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
+            'total_weight_net_received',
             'over_offload_units',
         )
         widgets = {
