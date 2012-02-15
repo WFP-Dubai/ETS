@@ -102,7 +102,7 @@
 	  $(this).find('td.overloaded_units input, td.weight input').change(function(){
 		var remarksField = $("#{{ form.dispatch_remarks.auto_id }}");
         if (!remarksField.val()) {
-        	alert("{% trans 'You are mandatory to fill remarks.' %}");
+        	alert("{% trans 'Fill remarks please.' %}");
         	remarksField.focus();
         }
   	  });

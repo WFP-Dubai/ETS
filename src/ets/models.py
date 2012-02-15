@@ -903,6 +903,9 @@ class LoadingDetail(models.Model):
         if self.units_lost_reason and self.units_lost_reason.category != self.stock_item.commodity.category:
             raise ValidationError(_("You have chosen wrong loss reason for current commodity category"))
         
+        #Total received weight net
+        if self.total_weight_net_received != self.calculate_total_received_net() and not self.waybill.receipt_remarks:
+            raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required."))
         
 class ImportLogger(models.Model):
     

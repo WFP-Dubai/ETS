@@ -96,8 +96,8 @@
               {% endif %}
             </td>
             <td>&nbsp;
-              {% if lineitem.calculate_total_received_net %}
-                {{ lineitem.calculate_total_received_net|floatformat:3 }}
+              {% if lineitem.total_weight_net_received %}
+                {{ lineitem.total_weight_net_received|floatformat:3 }}
               {% endif %}
             </td>    
           </tr>

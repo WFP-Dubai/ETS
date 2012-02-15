@@ -39,13 +39,16 @@
       <tr colspan="7">{% include "uni_form/errors.html" %}</tr>
       <tr>
         <td>{{ form.instance.stock_item.coi_code }} ({{ form.instance.number_of_units }} items) {{ form.slug }} {{ form.waybill }}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.number_units_good %}</td>
+        <td class="received_units">{% include "uni_form/uni_field.html" with field=form.number_units_good %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_lost %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.number_units_damaged %}</td>
+        <td class="received_units">{% include "uni_form/uni_field.html" with field=form.number_units_damaged %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.units_damaged_reason %}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
+        <td class="weight">
+          <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
+          {% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}
+        </td>
+        <td class="overoffloaded">{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
     {% endfor %}
     </tbody>
@@ -62,11 +65,43 @@
 {% block script %}
 {{ block.super }}
 <script charset="utf-8" type="text/javascript">
+(function($) {
+	  $.fn.handleRemarksRequired = function() {
+		  $(this).find('td.overoffloaded input, td.weight input').change(function(){
+			var remarksField = $("#{{ form.receipt_remarks.auto_id }}");
+	        if (!remarksField.val()) {
+	        	alert("{% trans 'Fill remarks please.' %}");
+	        	remarksField.focus();
+	        }
+	  	  });
+		  return $(this)
+	  };
+	  $.fn.handleTotalWeight = function() {
+		  var container = $(this);
+		  var numberFields = container.find('td.received_units input');
+		  
+		  numberFields.change(function(){
+			var sum = 0;
+			numberFields.each(function() {
+				sum += Number($(this).val());
+			});
+			
+			var weight = sum*container.find("td.weight input.unit_weight_net").val();
+			container.find("td.weight .ctrlHolder input").val(weight.toFixed(3));
+	  	  });
+	  };
+})(jQuery);
+
 $(document).ready(function() {
-   $('#{{ form.arrival_date.auto_id }}, #{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ 
-	   minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	   dateFormat: 'yy-mm-dd' 
-	 });
+	$('#{{ form.arrival_date.auto_id }}, #{{ form.start_discharge_date.auto_id }}, #{{ form.end_discharge_date.auto_id }}').datepicker({ 
+		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+	 	dateFormat: 'yy-mm-dd' 
+    });
+	
+	$("form table tr").each(function(){
+		$(this).handleRemarksRequired().handleTotalWeight();
+	});
+	
 });
 $(document).keydown(omit_enter);
 </script>
