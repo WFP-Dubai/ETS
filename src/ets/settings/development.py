@@ -36,6 +36,10 @@ DEBUG_TOOLBAR_CONFIG = {
     'INTERCEPT_REDIRECTS': False,
 }
 
+SOUTH_DATABASE_ADAPTERS = {
+    'default': 'south.db.sqlite3',
+}
+
 # Local settings for development / production
 try:
     from local import *

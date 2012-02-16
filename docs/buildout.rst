@@ -22,8 +22,7 @@ This is a base configuration, which contains all dependencies from different rep
 
 Contents:
 
-  - :ref:`Git <base-git>`
-  - :ref:`Subversion <base-svn>`
+  - :ref:`Mr. Developer extension <mr-developer>`
   - :ref:`base-interpreter`
   - :ref:`Sphinx configuration <base-sphinx>`
   - :ref:`base-cmds`
@@ -31,33 +30,16 @@ Contents:
 
 Code from repository is not stable, so we use it on our own risk.
 
-.. _base-git:
+.. _mr-developer:
 
-Eggs from git repository
-~~~~~~~~~~~~~~~~~~~~~~~~
-  - django-app-media
-  - django-mailer
-
-Example of such parts::
-
-  [django-mailer]
-  recipe = zerokspot.recipe.git
-  repository = http://github.com/spookylukey/django-mailer.git
-  as_egg = true
-
-Where recipe determines buildout recipe, which fetches code from repository, then builds package, installs dependencies.
-
-.. _base-svn:
-
-Packages from Subversion
-~~~~~~~~~~~~~~~~~~~~~~~~
-  - tabs
-
-Code example:
+Mr. Developer extension
+~~~~~~~~~~~~~~~~~~~~~~~
 
 .. literalinclude:: ../base.cfg
-   :start-after: #svn part
-   :end-before: #svn part ends
+   :start-after: extensions = mr.developer
+   :end-before: base-eggs
+
+Where recipe determines buildout recipe, which fetches code from repository, then builds package, installs dependencies.
 
 
 .. _base-interpreter:
@@ -71,7 +53,7 @@ This part is used for collecting all dependencies and creating proper PYTHONPATH
    :start-after: #interpreter part
    :end-before: #interpreter part end
 
-.. _django-recipe
+.. _django-recipe:
 
 Django recipes
 ~~~~~~~~~~~~~~
@@ -84,8 +66,8 @@ There are two parts with different `settings`.
    :start-after: #instance part
    :end-before: #instance part ends
 
-This part downloads django 1.2.1, uses dependencies from :ref:`base-interpreter`, creates script `instance`, which acts like usual `manage`.
-If we'd change wsgi equal to `True`, it'd create script `instance.wsgi`.
+This part downloads django 1.3, uses dependencies from :ref:`base-interpreter`, creates script `instance`, which acts like usual `manage`.
+It creates a script `instance.wsgi`.
 
 .. _base-sphinx:
 
@@ -97,7 +79,7 @@ Sphinx
    :end-before: #sphinx part ends
 
 Use script `make-docs` to create or update documentation.
-Built docs will be stored in `build` folder.  
+Built docs will be stored in `docs/_build` folder.  
 
 .. _base-cmds:
 
@@ -114,17 +96,22 @@ Shell commands
 Development configuration
 -------------------------
 
-When user does not provide configuration file this will be used by default.
+This configuration file used in development.
 
-To inherit :ref:`base-configuration`:
+To inherit :ref:`default-configuration`:
 
 .. literalinclude:: ../buildout.cfg
    :lines: 1-2
 
+.. _pydev-configuration:
+
+PyDev configuration
+-------------------------
+
 If you use `Eclipse IDE <http://www.eclipse.org>`_, this configuration will be useful for you. It contains special recipe:
 
-.. literalinclude:: ../buildout.cfg
-   :lines: 7-
+.. literalinclude:: ../pydev.cfg
+   :lines: 4-
 
 This part registers all eggs and extra paths in eclipse project.
 
@@ -141,5 +128,5 @@ Couple of thing we do:
   - append egg psycopg2
   - do check new versions of eggs
   - do not unzip eggs
-  - install cmemcached
+  - install redis
   - create wsgi script

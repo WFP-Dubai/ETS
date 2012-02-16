@@ -38,7 +38,7 @@ If you user Pydev, change last command as follows::
 Test environment
 ----------------
 
-Go to http://localhost:8000/admin/
+Go to http://localhost:8000/ets/admin/
 
 - Default Admin account
 
@@ -53,14 +53,14 @@ Production server
 =================
 
 Production dependencies
-------------
+-----------------------
   
 Following names of package are called so in debian package system::
   
   sudo apt-get install libpq-dev libaio-dev
 
 Nginx
--------------
+-----
 
 /etc/nginx/sites-available/ETS::
 
@@ -148,6 +148,7 @@ Apache
 
 SSH KEY
 -------
+::
 
   sudo su
   cd ~/.ssh
@@ -155,8 +156,9 @@ SSH KEY
   cat ./id_rsa.pub and copy and paste this key to your github account
 
 Download project from GitHub
-----------------------------
-  
+----------------------------  
+::
+
   cd /opt/
   sudo git clone git@github.com:WFP-Dubai/ETS.git
 
@@ -210,22 +212,22 @@ Mac OS X
 
 1. Download following packages::
 
-  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-basic-10.2.0.4.0-macosx-x64.zip
-  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-jdbc-10.2.0.4.0-macosx-x64.zip
-  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sqlplus-10.2.0.4.0-macosx-x64.zip
-  http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sdk-10.2.0.4.0-macosx-x64.zip
+	http://download.oracle.com/otn/mac/instantclient/10204/instantclient-basic-10.2.0.4.0-macosx-x64.zip
+	http://download.oracle.com/otn/mac/instantclient/10204/instantclient-jdbc-10.2.0.4.0-macosx-x64.zip
+	http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sqlplus-10.2.0.4.0-macosx-x64.zip
+	http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sdk-10.2.0.4.0-macosx-x64.zip
     
 2. Unzip the packages into a single directory such as "instantclient".
 3. Set the library loading path in your environment to the directory in Step 2 ("instantclient").
 4. Create symlink for the library::
-  
-  cd <instantclient>
-  ln -s libclntsh.dylib.10.1 libclntsh.dylib
+
+	cd <instantclient>
+	ln -s libclntsh.dylib.10.1 libclntsh.dylib
    
 4. Set environment variables::
-  
-  echo "export PATH=<instantclient directory>:$PATH" >> ~/.profile
-  echo "export DYLD_LIBRARY_PATH=<instantclient directory>:$DYLD_LIBRARY_PATH" >> ~/.profile
+
+	echo "export PATH=<instantclient directory>:$PATH" >> ~/.profile
+	echo "export DYLD_LIBRARY_PATH=<instantclient directory>:$DYLD_LIBRARY_PATH" >> ~/.profile
    
 5. Restart terminal and start your application.
 
@@ -235,10 +237,10 @@ Build project
 
 Build project using buildout and run it::
 
-  sudo python bootstrap.py
-  sudo ./bin/buildout -c production.cfg
-  sudo chown -R www-dada:www-data /opt/ETS
-  sudo ./bin/instance createsuperuser
+	sudo python bootstrap.py
+	sudo ./bin/buildout -c production.cfg
+	sudo chown -R www-dada:www-data /opt/ETS
+	sudo ./bin/instance createsuperuser
 
 Offliner on Windows XP
 ======================
@@ -333,17 +335,20 @@ Compiling ETS-folder on Windows:
 - Check internet connection
 - Go to directory ETS 
 - Run this commands in console::
+
     git clone http://github.com/WFP-Dubai/ETS.git
     python bootstrap.py
     bin\buildout -c windows.cfg
 
 Copy sub-directory ETS to "pkgdir"
 You can clean this directory(without .pyo, .pyc, windows)::
+  
   rm -r ETS/windows
   find ETS/ -type f -name "*.pyo" -delete
   find ETS/ -type f -name "*.pyc" -delete
 
 Build exe for users::
+  
   makensis ets_users.nsi
 
 You can use result exe-file for installation on user's computers.
