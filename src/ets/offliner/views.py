@@ -1,16 +1,10 @@
 
 import datetime
-from itertools import chain
 
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
-from django.views.generic.simple import direct_to_template
-from django.views.decorators.http import require_POST, require_GET
-from django.http import HttpResponse
 from django.views.generic.edit import FormView
-from django.core import serializers
 
-from ets.compress import compress_json, decompress_json
 from ets.utils import data_to_file_response
 
 from .forms import DateRangeForm
