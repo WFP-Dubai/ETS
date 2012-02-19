@@ -3,8 +3,8 @@ from itertools import chain
 
 from django.core import serializers
 
-from ets.compress import compress_json, decompress_json
-from ets.models import Warehouse, Waybill, LoadingDetail
+from ets.compress import compress_json
+from ets.models import Waybill, LoadingDetail
 
 def compress_waybills(start_date, end_date):
     #Append log entry 

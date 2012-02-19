@@ -12,8 +12,8 @@ from django.core import serializers
 
 from ets.compress import compress_json, decompress_json
 from ets.utils import data_to_file_response
-from ets.forms import DateRangeForm
 
+from .forms import DateRangeForm
 from .models import UpdateLog
 from .utils import compress_waybills
 
