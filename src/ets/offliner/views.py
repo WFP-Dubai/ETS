@@ -10,12 +10,12 @@ from django.http import HttpResponse
 from django.views.generic.edit import FormView
 from django.core import serializers
 
-from ets.models import Warehouse, Waybill, LoadingDetail
 from ets.compress import compress_json, decompress_json
 from ets.utils import data_to_file_response
 from ets.forms import DateRangeForm
 
 from .models import UpdateLog
+from .utils import compress_waybills
 
 @login_required
 def request_update(request):
@@ -52,22 +52,13 @@ class ExportWaybillData(FormView):
         start_date = end_date - datetime.timedelta(days=7)
         return {'start_date': start_date, 'end_date': end_date}
     
-    def construct_data(self, start_date, end_date):
-        #Append log entry 
-        return chain(
-            Waybill.objects.filter(date_modified__range=(start_date, end_date+datetime.timedelta(1))),
-            LoadingDetail.objects.filter(waybill__date_modified__range=(start_date, end_date+datetime.timedelta(1)),
-                                                    waybill__date_removed__isnull=True)
-        )
-    
     def form_valid(self, form):
         start_date = form.cleaned_data['start_date'] 
         end_date = form.cleaned_data['end_date']
         
-        data = compress_json( serializers.serialize('json', self.construct_data(start_date, end_date), use_decimal=False) )
+        data = compress_waybills(start_date, end_date)
         
         return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 
             'end_date': end_date,
         })
-    
