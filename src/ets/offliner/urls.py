@@ -11,14 +11,11 @@ from django.utils.translation import ugettext as _
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
-from ets.forms import WaybillSearchForm, WaybillScanForm
-from ets.models import Waybill
-from ets.views import waybill_list, waybill_reception
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
-import ets.models
-
+from .views import ExportWaybillData
 
 urlpatterns = patterns("ets.offliner.views",
     #( r'^synchronization/$', "synchronization", {}, "synchronization"),
     ( r'^synchronize/$', "request_update", {}, "synchronize" ),
+    
+    ( r'^export/waybills/$', ExportWaybillData.as_view(), {}, "export_waybills" ),
 )

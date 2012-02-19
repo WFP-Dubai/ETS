@@ -19,7 +19,7 @@ Following names of package are called so in debian package system::
 
 .. _development-environment:  
 
-Development environment
+Local environment
 =======================
 
 Change directory to project's root.
@@ -70,12 +70,16 @@ Nginx
 
     access_log /var/log/ETS/nginx_access.log;
     error_log /var/log/ETS/nginx_error.log;
-
-    location / {
-      proxy_pass    http://127.0.0.1:80/;
-      include       /etc/nginx/proxy.conf;
+    
+    location /ets/doc/ {
+        alias /opt/ETS/docs/_build/html/;
+        index index.html;
+        expires 5d;
+        autoindex on;
+        auth_basic "Restricted Area";
+        auth_basic_user_file /etc/nginx/htpasswd;
     }
-
+    
     location /static/ {
       root /opt/ETS/;
       expires 5d;
@@ -85,8 +89,17 @@ Nginx
       root /opt/ETS/;
       expires 5d;
     }
+    
+    location / {
+      proxy_pass    http://127.0.0.1:80/;
+      include       /etc/nginx/proxy.conf;
+    }
+    
   }
 
+Create password file::
+	
+	sudo echo "<user> <password>" > /etc/nginx/htpasswd
 
 /etc/nginx/proxy.conf::
   
@@ -171,13 +184,15 @@ Setting of Database
 	'NAME': 'ets',
 	'ENGINE': 'django.db.backends.postgresql_psycopg2',
 	'HOST': '127.0.0.1',
-	'USER': 'ets',
-	'PASSWORD': 'ets',
+	'USER': '<database name>',
+	'PASSWORD': '<database password>',
   }
 
-  sudo su - postgres
-  createuser -dSRP ets
-  createdb ets -O ets
+Create database in Postgres::
+  
+	sudo su - postgres
+	createuser -dSRP ets
+	createdb ets -O ets
 
 Oracle client
 -------------

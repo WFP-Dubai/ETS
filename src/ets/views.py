@@ -11,7 +11,6 @@ from django.db.models import Q
 from django.db.models.aggregates import Max
 #from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-#from django.core import serializers
 from django.forms.models import inlineformset_factory
 from django.http import HttpResponse
 from django.shortcuts import redirect, get_object_or_404
@@ -27,11 +26,10 @@ from django.utils.translation import ugettext as _
 from django.core.management import call_command
 from django.contrib.auth.decorators import permission_required
 from django.views.generic.edit import FormView
-from django.core import serializers
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, DateRangeForm, ImportDataForm
+from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, ImportDataForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
@@ -423,51 +421,6 @@ def send_received_view(request, queryset):
         send_received(waybill)
     
     return redirect('receipt_validates')
-
-
-class ExportDataBase(FormView):
-    
-    template_name = 'sync/export_file.html'
-    form_class = DateRangeForm
-    file_name = 'data-%(start_date)s-%(end_date)s'
-    
-    #===========================================================================
-    # def get_context_data(self, **kwargs):
-    #    context = super(ExportDataBase, self).get_context_data(**kwargs)
-    #    context['']
-    #===========================================================================
-    
-    def get_initial(self):
-        end_date = datetime.date.today()
-        start_date = end_date - datetime.timedelta(days=7)
-        return {'start_date': start_date, 'end_date': end_date}
-    
-    def construct_data(self):
-        raise NotImplementedError()
-    
-    def form_valid(self, form):
-        start_date = form.cleaned_data['start_date'] 
-        end_date = form.cleaned_data['end_date']
-        
-        data = compress_json( serializers.serialize('json', self.construct_data(start_date, end_date), use_decimal=False) )
-        
-        return data_to_file_response(data, self.file_name % {
-            'start_date': start_date, 
-            'end_date': end_date,
-        })
-    
-
-class ExportWaybillData(ExportDataBase):
-    
-    file_name = 'waybills-%(start_date)s-%(end_date)s'
-    
-    def construct_data(self, start_date, end_date):
-        #Append log entry 
-        return chain(
-            ets.models.Waybill.objects.filter(date_modified__range=(start_date, end_date+datetime.timedelta(1))),
-            ets.models.LoadingDetail.objects.filter(waybill__date_modified__range=(start_date, end_date+datetime.timedelta(1)),
-                                                    waybill__date_removed__isnull=True)
-        )
 
 
 def export_compas_file(request):

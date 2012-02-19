@@ -13,7 +13,7 @@ admin.autodiscover()
 
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
-from ets.views import waybill_list, waybill_reception, ExportWaybillData, ImportData
+from ets.views import waybill_list, waybill_reception, ImportData
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
@@ -151,7 +151,6 @@ class PrefixedPatterns:
             'queryset': ets.models.Compas.objects.all(),
         }, "handle_sync_compas"),
                            
-        ( r'^export_data/$', ExportWaybillData.as_view(), {}, "export_file" ),
         ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
         
         ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
