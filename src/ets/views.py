@@ -37,6 +37,7 @@ from .utils import history_list, send_dispatched, send_received, import_file, ge
 from .compress import compress_json, decompress_json
 import simplejson
 
+WFP_ORGANIZATION = 'WFP'
 
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
@@ -126,10 +127,16 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     form = form_class(data=request.POST or None, files=request.FILES or None, instance=waybill)
     
+    #Filter choices
+    #Warehouse
     warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
     
     form.fields['destination'].queryset = warehouses
     form.fields['destination'].empty_label = None
+    
+    #Transaction type
+    if order.consignee.pk == WFP_ORGANIZATION:
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.INTERNAL_TRANSFER)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()

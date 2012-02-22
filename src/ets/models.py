@@ -484,8 +484,10 @@ class Waybill( ld_models.Model ):
     Base waybill abstract class
     """
     
+    INTERNAL_TRANSFER = u'WIT'
+    
     TRANSACTION_TYPES = ( 
-                        ( u'WIT', _(u'WFP Internal Transfer') ),
+                        ( INTERNAL_TRANSFER, _(u'WFP Internal Transfer') ),
                         ( u'DEL',_( u'Delivery' )),
                         #( u'SWA', _(u'Swap' )),
                         #( u'REP', _(u'Repayment' )),
