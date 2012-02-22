@@ -180,7 +180,7 @@ class ReadOrderItemsHandler(BaseHandler):
     allowed_methods = ('GET',)
     model = ets.models.OrderItem
     fields = (
-        'lti_pk', 'si_code', 'project_number',
+        'si_code', 'project_number',
         ('order', (
             'code', 'created', 'expiry', 'dispatch_date', 
             'transport_code', 'transport_ouc', 'transport_name', 

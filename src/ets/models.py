@@ -397,14 +397,9 @@ class Order(models.Model):
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
     
-    #===================================================================================================================
-    # slug = AutoSlugField(populate_from=lambda obj: "%s%s%s" % (obj.lti_pk, obj.si_code, obj.commodity), 
-    #                     unique=True, editable=True, primary_key=True)
-    #===================================================================================================================
-    
-    lti_pk = models.CharField(_("COMPAS LTI identifier"), max_length=50)
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
+    lti_id = models.CharField(_("LTI ID"), max_length=40)
     si_code = models.CharField( _("Shipping Order Code"), max_length=8)
     project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
@@ -421,14 +416,11 @@ class OrderItem(models.Model):
     total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=3,
                                              editable=False, blank=True, null=True)
     
-    lti_id = models.CharField(_("LTI ID"), max_length=40, editable=False, blank=True, null=True)
-    
     class Meta:
         ordering = ('si_code',)
         order_with_respect_to = 'order'
         verbose_name = _("order item")
         verbose_name_plural = _("order items")
-        #unique_together = ('lti_pk', 'si_code', 'commodity')
     
     def  __unicode__( self ):
         return u"%s -  %.0f " % ( self.commodity, self.items_left() )

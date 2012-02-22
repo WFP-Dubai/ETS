@@ -7,4 +7,4 @@ from test_api import ApiServerTestCase
 from test_tags import TagsTestCase
 from test_order import OrderTestCase
 #from test_update import UpdateTestCase
-from test_offline import OfflineSyncTestCase, ExportTestCase
+#from test_offline import OfflineSyncTestCase, ExportTestCase

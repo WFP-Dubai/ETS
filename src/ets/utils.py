@@ -273,7 +273,6 @@ def import_order(compas):
         #Create order item
         key_data = {
             'order': order,
-            'lti_pk': lti.lti_pk, 
             'si_code': lti.si_code,
             'commodity': commodity,
             'lti_id': lti.lti_id,
