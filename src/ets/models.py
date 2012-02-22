@@ -295,11 +295,11 @@ class StockItem( models.Model ):
     
     def get_order_item(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
-        return OrderItem.objects.get(order__pk=order_pk,
+        return OrderItem.objects.filter(order__pk=order_pk,
                                      project_number=self.project_number,
                                      si_code=self.si_code, 
                                      commodity=self.commodity,
-                                     )
+                                     )[0]
     
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
