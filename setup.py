@@ -36,7 +36,6 @@ install_requires = [
         'pygments',
         'google_analytics',
         'django-pagination',
-        'lockfile',
 ]
 
 #Extra dependencies for test purposes

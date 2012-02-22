@@ -119,8 +119,7 @@ def import_persons(compas):
     places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
 
     for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
-                            location_code__in=places.values_list('geo_point_code', flat=True), 
-                            organization_id__in=places.values_list('organization_id', flat=True)):
+                                        location_code__in=places.values_list('geo_point_code', flat=True)):
         try:
             obj = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
         except ets_models.Person.DoesNotExist:
