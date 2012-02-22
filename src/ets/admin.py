@@ -293,7 +293,7 @@ class PersonAdmin(UserAdmin):
     list_filter = ('is_active', 'compas')
     search_fields = (
         'code', 'title', 'username', 'first_name', 'last_name', 'email',
-        'compas__code', 'organization__name', 'location__name'
+        'compas__code', 'organization__name', 'organization__code', 'location__name'
     )
     readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location', 'code')
     raw_id_fields = ('organization', 'location')
