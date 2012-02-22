@@ -116,7 +116,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(tuple(form.fields['destination'].queryset.all()), 
                          (ets.models.Warehouse.objects.get(pk="ISBX003"),))
         
-        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data={
+        data = {
             'loading_date': self.order.dispatch_date,
             'dispatch_date': self.order.dispatch_date,
             'destination': 'ISBX003',
@@ -138,8 +138,16 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 0,
             'item-MAX_NUM_FORMS': 5,
+        }
+        
+        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
+        
+        self.assertContains(response, u'Overloaded for 10.250 tons')
+        data.update({
+            'item-0-overloaded_units': True,
         })
         
+        response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
         self.assertEqual(response.status_code, 302)
         
         #check created waybill and loading details
@@ -186,7 +194,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-MAX_NUM_FORMS': 5,
         }
         response = self.client.post(edit_url, data=data)
-        self.assertContains(response, "Overloaded for 2")
+        self.assertContains(response, "Overloaded ")
         
         data['item-0-number_of_units'] = 12
         #let's check validation. Provide wrong destination warehouse
@@ -196,6 +204,8 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         data['destination'] = 'ISBX003'
         data['item-0-number_of_units'] = '10'    
+        data['item-0-overloaded_units'] = True
+        
         #Valid data
         response = self.client.post(edit_url, data=data)
         self.assertEqual(response.status_code, 302)

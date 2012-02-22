@@ -864,10 +864,16 @@ class LoadingDetail(models.Model):
             order_item = self.get_order_item()
             if order_item.items_left() < self.number_of_units and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+            
+            if order_item.total_weight_net < self.total_weight_net and not self.overloaded_units:
+                raise ValidationError(_("Overloaded for %.3f tons") % (self.total_weight_net - order_item.total_weight_net))
+            
             if self.overloaded_units and not self.waybill.dispatch_remarks:
                 raise ValidationError(_("Since you set 'overloaded' flag 'Dispatch Remarks' field becomes required."))
+            
             if self.unit_weight_net != self.stock_item.unit_weight_net and not self.waybill.dispatch_remarks:
                 raise ValidationError(_("Since you changed unit weight net 'Dispatch Remarks' field becomes required."))
+            
             if self.unit_weight_gross != self.stock_item.unit_weight_gross and not self.waybill.dispatch_remarks:
                 raise ValidationError(_("Since you changed unit weight gross 'Dispatch Remarks' field becomes required."))
             
