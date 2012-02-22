@@ -86,7 +86,7 @@
 				sum += Number($(this).val());
 			});
 			
-			var weight = sum*container.find("td.weight input.unit_weight_net").val();
+			var weight = sum*container.find("td.weight input.unit_weight_net").val()/1000.0;
 			container.find("td.weight .ctrlHolder input").val(weight.toFixed(3));
 	  	  });
 	  };
