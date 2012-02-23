@@ -7,7 +7,10 @@ from django.core.management.base import BaseCommand, CommandError
 from ets.utils import import_file
 
 class Command(BaseCommand):
-    
+    """
+    Accepts a file as command-line argument. 
+    Deserializes all data and save them.
+    """
     option_list = BaseCommand.option_list + (
         make_option('-f', '--file', dest='file_name', type='string', help='Imported file name'),
     )

@@ -15,7 +15,13 @@ MINIMUM_AGE = 5
 
 
 class Command(BaseCommand):
-
+    """
+    Import data from COMPAS stations. 
+    Accepts following arguments:
+        
+        --compas -- COMPAS station identifier (i.e. ISBX002 for example)
+        
+    """
     option_list = BaseCommand.option_list + ( 
         make_option('--compas', dest='compas', default='',
             help='Tells the system to synchronize only this one compas station'),

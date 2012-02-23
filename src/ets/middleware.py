@@ -7,7 +7,7 @@ from django.contrib.auth.middleware import AuthenticationMiddleware
 from piston.authentication import NoAuthentication
 
 class RequiredAuthenticationMiddleware(object):
-    
+    """Middleware that forces every user to be authenticated. Otherwise returns login form."""
     def process_view(self, request, view_func, view_args, view_kwargs):
         
         #DIRTY HACK. CHANGE IT LATER.

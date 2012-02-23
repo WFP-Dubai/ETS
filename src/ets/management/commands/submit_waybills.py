@@ -8,7 +8,14 @@ from ets.utils import send_dispatched, send_received, import_stock
 from ets.models import Waybill
 
 class Command(UpdateCompas):
-
+    """
+    Submits waybills to COMPAS. Both dispatch and receipt. Afterwards imports stock items to update quantity. 
+    Accepts following arguments:
+        
+        --compas -- COMPAS station identifier (i.e. ISBX002 for example)
+        
+    """
+    
     help = 'Submits waybills and updates stocks'
 
     def synchronize(self, compas):
