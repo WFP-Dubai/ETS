@@ -73,3 +73,13 @@ Settings
 ========
 
 - **URL_PREFIX** -- site prefix,
+
+Reports
+=======
+
+Piston is used for handling reports. We have a bunch of different handlers. And special emitter to create CSV.
+
+.. automodule:: ets.api.handlers
+   :members:
+
+Every handler has at least one mapping line in urls.py.

@@ -24,7 +24,7 @@ DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
 
 def compas_importer(func=None, log_success=False):
-    
+    """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
     def _decorator(f):
         @wraps(f, assigned=available_attrs(func))
         def _wrapped(using):
@@ -47,7 +47,7 @@ def compas_importer(func=None, log_success=False):
     
 
 def update_compas(using):
-    
+    """ Utility to run whole import process. If no fails Success ImportLogger is created."""
     try:
         #Import organizations
         import_partners(using)
@@ -82,11 +82,13 @@ def _get_places(compas):
 
 @compas_importer
 def import_partners(compas):
+    """Imports organizations from COMPAS"""
     for partner in compas_models.Partner.objects.using(compas).all():
         ets_models.Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
 @compas_importer
 def import_places(compas):
+    """Imports warehouses with locations from COMPAS"""
     for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
             
         #Create location
@@ -114,6 +116,7 @@ def import_places(compas):
 
 @compas_importer
 def import_persons(compas):
+    """Imports persons from COMPAS"""
     
     now = datetime.now()
     places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
@@ -147,13 +150,13 @@ def import_persons(compas):
 
 @compas_importer
 def import_reasons(compas):
-    """Imports all possible reasons"""
+    """Imports all possible loss/damage reasons"""
     return ets_models.LossDamageType.update(compas)
 
 
 @compas_importer
 def import_stock(compas):
-    """Executes Imports of Stock"""
+    """Imports stock items or updates quantity"""
     
     now = datetime.now()
     #places = _get_places(compas)
@@ -290,6 +293,7 @@ def import_order(compas):
     
 
 def send_dispatched(waybill, compas=None):
+    """Submits dispatched and validated waybills to COMPAS"""
     if not compas:
         compas = waybill.order.warehouse.compas.pk
      
@@ -388,6 +392,7 @@ def send_dispatched(waybill, compas=None):
         
 
 def send_received(waybill, compas=None):
+    """Submits received and validated waybills to COMPAS"""
     if not compas:
         compas = waybill.destination.compas.pk
     
@@ -452,7 +457,7 @@ def changed_fields(model, next, previous, exclude=()):
     
     
 def history_list(log_queryset, model, exclude=()):
-    
+    """Utility to generate history of actions at some objects"""
     ACTIONS = {
         'I': _('Created'),
         'U': _('Changed'),
@@ -464,6 +469,7 @@ def history_list(log_queryset, model, exclude=()):
 
 
 def data_to_file_response(data, file_name):
+    """Creates response with provided data and inserts Content-Disposition header with file name."""
     response = HttpResponse(data, content_type='application/data')
     response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
     return response

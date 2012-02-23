@@ -1,10 +1,7 @@
 import datetime
 import pyqrcode
 import cStringIO
-import os
-import decimal
-from subprocess import call, Popen
-from itertools import chain
+from subprocess import Popen
 
 from django import forms
 from django.db.models import Q
@@ -21,10 +18,7 @@ from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
-from django.utils.dateformat import format
 from django.utils.translation import ugettext as _
-from django.core.management import call_command
-from django.contrib.auth.decorators import permission_required
 from django.views.generic.edit import FormView
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
@@ -34,7 +28,6 @@ from .decorators import person_required, officer_required, dispatch_view, receip
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from .utils import history_list, send_dispatched, send_received, import_file, get_compas_data, data_to_file_response
-from .compress import compress_json, decompress_json
 import simplejson
 
 WFP_ORGANIZATION = 'WFP'
@@ -66,6 +59,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
 
 @waybill_user_related
 def waybill_view(request, waybill_pk, queryset, template):
+    """Waybill details view"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     return waybill_detail(request, waybill, template)
     
@@ -99,7 +93,7 @@ def waybill_list(request, queryset, template='waybill/list.html', extra_context=
 def waybill_search( request, form_class=WaybillSearchForm, 
                     queryset=ets.models.Waybill.objects.all(), 
                     template='waybill/list.html'):
-#                    param_name='wbnumber', consegnee_code='W200000475' ):
+    """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
@@ -179,6 +173,7 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
                       formset_form = LoadingDetailRecieptForm,
                       template='waybill/receive.html'):
+    """Waybill reception view""" 
     waybill = get_object_or_404(queryset, pk=waybill_pk)
     waybill.receipt_person = request.user.person
     
@@ -230,6 +225,7 @@ def waybill_finalize_receipt(request, waybill_pk, queryset):
 
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
+    """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
     waybill = ets.models.Waybill.decompress(scanned_code)
     if not waybill:
         raise Http404
@@ -241,6 +237,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 @dispatch_view
 @transaction.commit_on_success
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
+    """Deletes specific waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.delete()
     redirect_to = redirect_to or request.GET.get('redirect_to', '')
@@ -258,6 +255,11 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
 @officer_required
 @dispatch_compas
 def dispatch_validates(request, queryset, template):
+    """
+    Listing of dispatch waybills. 
+    Firstly officer validates a waybill, then he can push it to COMPAS. 
+    Otherwise system does it every 2 minutes.
+    """
     return direct_to_template(request, template, {
         'object_list': queryset.filter(validated=False),
         'validated_waybills': queryset.filter(validated=True),
@@ -267,6 +269,11 @@ def dispatch_validates(request, queryset, template):
 @officer_required
 @receipt_compas
 def receipt_validates(request, queryset, template):
+    """
+    Listing of receipt waybills. 
+    Firstly officer validates a waybill, then he can push it to COMPAS. 
+    Otherwise system does it every 2 minutes.
+    """
     return direct_to_template(request, template, {
         'object_list': queryset.filter(receipt_validated=False),
         'validated_waybills': queryset.filter(receipt_validated=True),
@@ -279,7 +286,7 @@ def receipt_validates(request, queryset, template):
 @dispatch_compas
 @transaction.commit_on_success
 def validate_dispatch(request, waybill_pk, queryset):
-    """Sets 'validated' flag"""
+    """Sets dispatch 'validated' flag. It allows system to submit this waybill to COMPAS."""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.validated = True
     waybill.save()
@@ -297,7 +304,7 @@ def validate_dispatch(request, waybill_pk, queryset):
 @receipt_compas
 @transaction.commit_on_success
 def validate_receipt(request, waybill_pk, queryset):
-    """Sets 'validated' flag"""
+    """Sets receipt 'validated' flag. It allows system to submit this waybill to COMPAS."""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_validated = True
     waybill.save()
@@ -311,6 +318,10 @@ def validate_receipt(request, waybill_pk, queryset):
 
 
 def deserialize(request, form_class=WaybillScanForm):
+    """
+    View that accepts POST request with serialized and compress data. 
+    And, decompress it, finds a waybill and redirects to waybill details.
+    """
     form = form_class(request.GET or None)
     if form.is_valid():
         data = form.cleaned_data['data']
@@ -325,7 +336,7 @@ def deserialize(request, form_class=WaybillScanForm):
 
 
 def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() ):
-    
+    """Bar code generator. This view uses 'pyqrcode' for back-end. It returns image file in response."""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
     file_out = cStringIO.StringIO()
@@ -343,6 +354,7 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
 
 
 def stock_items(request, template_name, queryset):
+    """Listing of stock items splitted by warehouses."""
     
     if not request.user.has_perm("ets.stockitem_api_full_access"):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
@@ -351,6 +363,7 @@ def stock_items(request, template_name, queryset):
 
 
 def get_stock_data(request, order_pk, queryset):
+    """Utility ajax view that returns stock item information to fill dispatch form."""
     
     object_pk = request.GET.get('stock_item')
     
@@ -366,6 +379,7 @@ def get_stock_data(request, order_pk, queryset):
     }, use_decimal=True))
 
 def sync_compas(request, queryset, template_name="sync/sync_compas.html"):
+    """Landing page, that shows all COMPAS stations with possibility to import one-by-one."""
     
     if not request.user.is_superuser:
         queryset = queryset.filter(Q(warehouses__persons__pk=request.user.pk) | Q(officers=request.user))
@@ -377,6 +391,7 @@ def sync_compas(request, queryset, template_name="sync/sync_compas.html"):
 
 @require_POST
 def handle_sync_compas(request, compas_pk, queryset):
+    """Executes COMPAS import for specific station."""
     
     if not request.user.is_superuser:
         queryset = queryset.filter(officers=request.user)
@@ -398,7 +413,7 @@ def handle_sync_compas(request, compas_pk, queryset):
 @dispatch_compas
 @transaction.commit_on_success
 def send_dispatched_view(request, queryset):
-    """Submits dispatch waybills to compas"""
+    """Submits dispatch waybills to COMPAS"""
     total = 0
     for waybill in queryset:
         send_dispatched(waybill)
@@ -423,7 +438,7 @@ def send_dispatched_view(request, queryset):
 @receipt_compas
 @transaction.commit_on_success
 def send_received_view(request, queryset):
-    """Submits received waybills to compas"""
+    """Submits received waybills to COMPAS"""
     for waybill in queryset:
         send_received(waybill)
     
@@ -436,7 +451,7 @@ def export_compas_file(request):
     
 
 class ImportData(FormView):
-    
+    """Imports file with compressed data, i.e. all datas from compas or eveb waybills"""
     template_name = 'sync/import_file.html'
     form_class = ImportDataForm
     

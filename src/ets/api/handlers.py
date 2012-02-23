@@ -12,6 +12,7 @@ import ets.models
 
 
 def get_titles(model):
+    """Extracts titles from model fields"""
     fields_name = {}
     for field in model._meta.fields:
         if ForeignKey == type(field):
@@ -23,7 +24,7 @@ def get_titles(model):
 
 
 class ReadWaybillHandler(BaseHandler):
-
+    """ Waybill details without loading details """
     allowed_methods = ('GET',)
     model = ets.models.Waybill
     fields = (
@@ -74,7 +75,7 @@ class ReadWaybillHandler(BaseHandler):
         
         
 class ReadLoadingDetailHandler(BaseHandler):
-
+    """ Waybill details with loading details flattened """
     allowed_methods = ('GET',)
     model = ets.models.LoadingDetail
     
@@ -141,7 +142,7 @@ class ReadLoadingDetailHandler(BaseHandler):
 
 
 class ReadOrdersHandler(BaseHandler):
-
+    """ Order details without items """
     allowed_methods = ('GET',)
     model = ets.models.Order
     fields = (
@@ -176,7 +177,7 @@ class ReadOrdersHandler(BaseHandler):
             
 
 class ReadOrderItemsHandler(BaseHandler):
-
+    """ Order details with commodity items flattened """
     allowed_methods = ('GET',)
     model = ets.models.OrderItem
     fields = (
@@ -217,7 +218,7 @@ class ReadOrderItemsHandler(BaseHandler):
         
     
 class ReadStockItemsHandler(BaseHandler):
-
+    """Stock items"""
     allowed_methods = ('GET',)
     model = ets.models.StockItem
     
@@ -247,7 +248,7 @@ class ReadStockItemsHandler(BaseHandler):
 
 
 class ReadCSVWarehouseHandler(BaseHandler):
-
+    """Warehouse short information with code, name and location"""
     allowed_methods = ('GET',)
     model = ets.models.Warehouse
     fields = (
@@ -266,6 +267,7 @@ class ReadCSVWarehouseHandler(BaseHandler):
     
 
 def get_flattened_field_names(fields):
+    """Generator to convert intermodel relations waybill__order__pk to getitem waybill.order.pk""" 
     for field_name in fields:
         if isinstance(field_name, (str, unicode)):
             yield field_name
@@ -288,9 +290,7 @@ def get_flattened_dict(data):
 
 
 class CSVEmitter(Emitter):
-    """
-    Emitter that returns CSV.
-    """
+    """Emitter that returns CSV file"""
     def render(self, request):
         result = StringIO.StringIO()
         

@@ -17,7 +17,7 @@ from ets import models as ets_models
 UNDEFINED_MESSAGE = "N/A"
 
 class StrippedTextInput(forms.TextInput):
-    
+    """Special form input to strip spaces."""
     def value_from_datadict(self, data, files, name):
         """
         Given a dictionary of data and this widget's name, returns the value
@@ -31,17 +31,20 @@ class StrippedTextInput(forms.TextInput):
 
 
 class PersonChangeForm(UserChangeForm):
+    """Person model form"""
     class Meta:
         model = ets_models.Person
 
 class WaybillSearchForm( forms.Form ):
+    """Search form with only one field: query set"""
     q = forms.CharField(required=True, label=_('Waybill code'))
 
 class WaybillScanForm( forms.Form ):
+    """Waybill scan form with one input"""
     data = forms.CharField(required=True, label=_('Scan Waybill'))
 
 class DispatchWaybillForm( forms.ModelForm ):
-    
+    """Dispatch waybill form."""
     class Meta:
         model = ets_models.Waybill
         fields = (
@@ -98,7 +101,7 @@ class DispatchWaybillForm( forms.ModelForm ):
 
 
 class LoadingDetailDispatchForm( forms.ModelForm ):
-
+    """LoadingDetails model form to use in dispatch page."""
     class Meta:
         model = ets_models.LoadingDetail
         fields = (
@@ -115,8 +118,10 @@ class LoadingDetailDispatchForm( forms.ModelForm ):
         }
 
 class BaseLoadingDetailFormSet(BaseInlineFormSet):
+    """FormSet base model. We use this formset in dispatch page."""
     
     def clean(self):
+        """Validates number of waybill items. System requires at least one line."""
         super(BaseLoadingDetailFormSet, self).clean()
         count = 0
         for form in self.forms:
@@ -131,8 +136,10 @@ class BaseLoadingDetailFormSet(BaseInlineFormSet):
     
 
 class WaybillRecieptForm( forms.ModelForm ):
+    """Waybill receipt form."""
     
     def __init__(self, *args, **kwargs):
+        """ Makes date fields required """
         super(WaybillRecieptForm, self).__init__(*args, **kwargs)
         for field_name in ('arrival_date', 'start_discharge_date', 'end_discharge_date',):
             self.fields[field_name].required = True
@@ -168,14 +175,17 @@ class WaybillRecieptForm( forms.ModelForm ):
 
 
 class LoadingDetailRecieptForm( forms.ModelForm ):
+    """Model form for loading details on receipt page."""
     
     def __init__(self, *args, **kwargs):
+        """Filters loss and damage reason choice."""
         super(LoadingDetailRecieptForm, self).__init__(*args, **kwargs)
         
         for field_name in ('units_lost_reason', 'units_damaged_reason'):
             self.fields[field_name].queryset = self.fields[field_name].queryset.filter(category=self.instance.stock_item.commodity.category)
     
     def clean(self):
+        """Validates entered values, i.e. quantities"""
         super(LoadingDetailRecieptForm, self).clean()
         if hasattr(self, 'cleaned_data'):
             if not self.cleaned_data.get('number_units_good')\
@@ -201,10 +211,9 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
         
 
 class ImportDataForm( forms.Form ):
-    
+    """Form that accepts file to import datas."""
     file = forms.FileField(required=True, label=_('Import Data'))
 
     helper = FormHelper()
-    
     helper.add_input(Submit(_("Submit"), 'submit'))
     
