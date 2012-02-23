@@ -15,7 +15,8 @@ class Command(BaseCommand):
     Accept two arguments:
       
       --compas -- COMPAS station identifier
-      --compress -- boolean. To be compressed or not.
+      --compress -- boolean. To be compressed or not
+    
     """
     option_list = BaseCommand.option_list + (
         make_option('--compas', dest='compas',
