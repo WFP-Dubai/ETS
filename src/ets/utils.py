@@ -54,8 +54,11 @@ def fetch_resources(uri, rel):
     `rel` gives a relative path, but it's not used here.
 
     """
-    path = os.path.abspath(os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, "")))
-    print "uri --> %s | rel --> %s | path --> %s" % (uri, rel, path)
+    if uri.startswith(settings.STATIC_URL):
+        path = os.path.abspath(os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, "")))
+    else:
+        path = uri
+    
     return path
 
 
