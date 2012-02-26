@@ -36,6 +36,10 @@ install_requires = [
         'pygments',
         'google_analytics',
         'django-pagination',
+        'reportlab',
+        'html5lib',
+        'pypdf',
+        'pisa',
 ]
 
 #Extra dependencies for test purposes

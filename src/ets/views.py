@@ -27,7 +27,8 @@ from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, ImportDataForm
 from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from .decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from .utils import history_list, send_dispatched, send_received, import_file, get_compas_data, data_to_file_response
+from .utils import history_list, send_dispatched, send_received 
+from .utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
 import simplejson
 
 WFP_ORGANIZATION = 'WFP'
@@ -68,19 +69,23 @@ def waybill_view(request, waybill_pk, queryset, template):
 @person_required
 @dispatch_view
 @transaction.commit_on_success
-def waybill_finalize_dispatch(request, waybill_pk, queryset):
+def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     """
     called when user pushes Print Original on dispatch
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.dispatch_sign()
+    #waybill.dispatch_sign()
     
     messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
         "waybill": waybill.pk
     })
     
-    return waybill_detail(request, waybill, extra_context={'print_original': True})
+    return render_to_pdf(request, template_name, {
+                'print_original': True,
+                'object': waybill,
+                'items': waybill.loading_details.select_related(),
+    }, 'waybill-%s' % waybill.pk)
 
 
 @waybill_user_related

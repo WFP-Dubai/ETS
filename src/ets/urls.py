@@ -67,8 +67,9 @@ class PrefixedPatterns:
             'template': 'waybill/edit.html',
         }, "waybill_edit" ),
         
-        ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_dispatch/$', "waybill_finalize_dispatch", 
-          {}, "waybill_finalize_dispatch" ),
+        ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_dispatch/$', "waybill_finalize_dispatch", {
+            'template_name': 'waybill/print/detail.html',
+        }, "waybill_finalize_dispatch" ),
         
         #Reception pages
         
