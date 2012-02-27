@@ -1,0 +1,6 @@
+.waybill-details .header,
+.waybill-details .menu,
+.waybill-details .content .hidden_print, 
+.waybill-details .footer {
+  display: none;
+}

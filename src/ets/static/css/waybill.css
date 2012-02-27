@@ -98,7 +98,7 @@ table.border tbody tr th {
 }
 
 #loading_details tbody tr.item {
-  font-size:x-small;
+  font-size:9px;
 }
 
 #loading_details tbody tr.item td.number {
@@ -116,6 +116,6 @@ table.border tbody tr th {
   font-size: x-small;
 }
 
-#receipt tbody tr td, #certification_loaded tbody tr td {
+#receipt tbody tr td {
   min-width: 15%;
 }
