@@ -1,6 +1,6 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-{% load i18n compress extra_tags analytics cache %}   
 <html lang="en">
+{% load i18n compress extra_tags analytics cache %}
 <head>
   <title>{% block title %}{{ section.title }}{% endblock %} - {% trans "ETS" %}</title>
 
@@ -18,8 +18,7 @@
   <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.6.2.min.js"></script>
 
 </head>
-<body>
-{% spaceless %}
+<body class="{% block body_class %}{% endblock %}">
   <div class="header">
     <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill{% endblocktrans %}</span>
   </div>
@@ -51,7 +50,6 @@
     {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
     {% endblock %}
   </div>
-{% endspaceless %}
   
 {% block script %}
 {% compress js %}

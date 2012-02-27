@@ -68,6 +68,17 @@ def waybill_view(request, waybill_pk, queryset, template):
     return waybill_detail(request, waybill, template)
     
 
+def waybill_pdf(request, waybill_pk, queryset, template):
+    """Generates PDF version of waybill"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    return render_to_pdf(request, template, {
+                'print_original': True,
+                'object': waybill,
+                'items': waybill.loading_details.select_related(),
+                'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
+    }, 'waybill-%s' % waybill.pk)
+
+
 @require_POST
 @person_required
 @dispatch_view
@@ -80,16 +91,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     #waybill.dispatch_sign()
     
-#    messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
-#        "waybill": waybill.pk
-#    })
-    
-    return render_to_pdf(request, template_name, {
-                'print_original': True,
-                'object': waybill,
-                'items': waybill.loading_details.select_related(),
-                'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
-    }, 'waybill-%s' % waybill.pk)
+    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name)
 
 
 @waybill_user_related

@@ -63,6 +63,11 @@ class PrefixedPatterns:
             'queryset': ets.models.Waybill.objects.all(),
         }, "waybill_view" ),
         
+        ( r'^waybill/(?P<waybill_pk>[-\w]+).pdf$', 'waybill_pdf', {
+            "template": 'waybill/print/detail.html',
+            'queryset': ets.models.Waybill.objects.all(),
+        }, "waybill_pdf" ),
+        
         #Dispatch
         ( r'^order/(?P<order_pk>[-\w]+)/(?P<waybill_pk>[-\w]+)/$', "waybill_dispatch_edit", {
             'template': 'waybill/edit.html',

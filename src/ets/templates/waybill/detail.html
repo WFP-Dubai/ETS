@@ -4,12 +4,10 @@
 {% block title %}{{ object }}{% endblock %}
 
 {% block style %}
-{% comment %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="print"/>
-{% endcomment %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css"/>
 {% endblock %}
+
+{% block body_class %}waybill-details{% endblock %}
 
 {% block content %}
 
@@ -68,15 +66,10 @@
 {{ block.super }}
 <script charset="utf-8">
   $(window).load(function() {
-	{% if print_original %}
-      print();
-      window.location = '{{ object.get_absolute_url }}';
-    {% else %}
-      $('.print_copy').click(function(){
-      	print();
-      	return false;
-      });
-    {% endif %}
+    $('.print_copy').click(function(){
+  		window.location = '{% url waybill_pdf waybill_pk=object.pk %}';
+    	return false;
+    });
   });
 </script>
 {% endblock %}
