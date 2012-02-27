@@ -4,6 +4,7 @@
 {% block title %}{{ object }}{% endblock %}
 
 {% block style %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css"/>
 {% endblock %}
 
