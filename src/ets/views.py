@@ -19,6 +19,7 @@ from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
+from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
@@ -30,6 +31,7 @@ import ets.models
 from .utils import history_list, send_dispatched, send_received 
 from .utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
 import simplejson
+
 
 WFP_ORGANIZATION = 'WFP'
 
@@ -53,6 +55,7 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
         'items': waybill.loading_details.select_related(),
         'waybill_history': history_list(waybill_log, ets.models.Waybill, ('date_modified',)),
         'loading_detail_history': loading_details,
+        'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
     }
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
@@ -77,14 +80,15 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     #waybill.dispatch_sign()
     
-    messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
-        "waybill": waybill.pk
-    })
+#    messages.add_message(request, messages.INFO, _('Waybill %(waybill)s Dispatch Signed') % {
+#        "waybill": waybill.pk
+#    })
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
                 'object': waybill,
                 'items': waybill.loading_details.select_related(),
+                'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
     }, 'waybill-%s' % waybill.pk)
 
 
@@ -344,18 +348,11 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
     """Bar code generator. This view uses 'pyqrcode' for back-end. It returns image file in response."""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
-    file_out = cStringIO.StringIO()
-    
-    image = pyqrcode.MakeQRImage(waybill.compress(), minTypeNumber = 24, 
-                                 errorCorrectLevel = pyqrcode.QRErrorCorrectLevel.L)
-    image.save(file_out, 'JPEG')
-    file_out.reset()
-    
-    result = file_out.read()
-    
-    file_out.close()
-    
-    return HttpResponse(result, mimetype="image/jpeg")
+    barcode = waybill.barcode_qr()
+    print "name --> ", barcode.name
+    response = HttpResponse(barcode.read(), content_type="image/jpeg")
+    response['Content-Disposition'] = 'attachment; filename=%s' % barcode.name
+    return response
 
 
 def stock_items(request, template_name, queryset):

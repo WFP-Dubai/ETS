@@ -1,0 +1,138 @@
+{% load extra_tags %}
+{% load i18n %}
+<table id="receipt" class="border">
+  <thead><tr><th colspan="8">{% trans "Certification of Commodities Received" %}</th></tr></thead>
+  <tbody>
+    <tr>
+      <th>{% trans "Location" %}:</th>
+      <td>{{ object.destination.location.name }}</td>
+      <th>{% trans "Consignee" %}:</th>
+      <td>{{ object.order.consignee }}</td>
+      <th>{% trans "Name" %}:</th>
+      <td>{{ object.receipt_person.get_full_name }}</td>
+      <th>{% trans "Title" %}:</th>
+      <td>{{ object.receipt_person.title }}</td>
+    </tr>
+    <tr>
+      <th>{% trans "Arrival Date" %}:</th>
+      <td>{{ object.arrival_date|date|upper }}</td>
+      <th>{% trans "Start Discharge Date" %}:</th>
+      <td>{{ object.start_discharge_date|date|upper }}</td>
+      <th>{% trans "End Discharge Date" %}:</th>
+      <td>{{ object.end_discharge_date|date|upper }}</td>
+      <th>{% trans "Distance in KM" %}:</th>
+      <td>{{ object.distance|default:"" }}</td>
+    </tr>
+  </tbody>
+</table>
+<table class="border">
+  <thead><tr><th colspan="11">{% trans "Observations" %}</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><sup>{% trans "Condition" %}</sup></td>
+      <td colspan="2"><sup>{% trans "Good" %}</sup></td>
+      <td colspan="3"><sup>{% trans "Lost or Damaged cargo" %}</sup></td>
+      <td colspan="2"><sup>{% trans "Total received" %}</sup></td>
+    </tr>
+    <tr>
+      <td><sup>{% trans "SI No" %}</sup></td>    
+      <td><sup>{% trans "Units" %}</sup></td>    
+      <td><sup>{% trans "Net MT" %}</sup></td>    
+      <td><sup>{% trans "Units" %}</sup></td>    
+      <td><sup>{% trans "Net MT" %}</sup></td>    
+      <td><sup>{% trans "Reason" %}</sup></td>    
+      <td><sup>{% trans "Units" %}</sup></td>    
+      <td><sup>{% trans "Net MT" %}</sup></td>
+    </tr>
+    
+    {% for lineitem in items %}
+      <tr style="font-size:x-small; text-align:right;">
+        <td style="text-align:left;"><span>{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</span></td>
+        <td>&nbsp;
+          {% if lineitem.number_units_good %}
+            {{ lineitem.number_units_good|floatformat:3 }}
+          {% endif %}
+        </td>
+        <td>&nbsp;
+          {% if lineitem.number_units_good %}
+            {{ lineitem.calculate_net_received_good|floatformat:3}}
+          {% endif %}
+        </td>
+        <td style="text-align:center;">
+          {% if lineitem.number_units_lost %}
+            L:{{ lineitem.number_units_lost|floatformat:3 }}
+          {% endif %}
+          {% if lineitem.number_units_damaged %}
+            {% if lineitem.number_units_lost %}/{% endif %}
+            D:{{ lineitem.number_units_damaged|floatformat:3 }}
+          {% endif %}
+          &nbsp;
+        </td>
+
+        <td style="text-align:center;">&nbsp;
+          {% if lineitem.number_units_lost %}
+            L:{{ lineitem.calculate_net_received_lost|floatformat:3 }}
+          {% endif %}
+          {% if lineitem.number_units_damaged %}
+            {% if lineitem.number_units_lost %}/{% endif %}
+            D:{{ lineitem.calculate_net_received_damaged|floatformat:3 }}
+          {% endif %}
+        </td>
+
+        <td style="text-align:left;">&nbsp;<!--reason-->
+          {% if lineitem.number_units_lost %}
+            L:{{ lineitem.units_lost_reason.cause }} 
+          {% endif %} 
+          {% if lineitem.number_units_damaged %}
+            {% if lineitem.number_units_lost %}/{% endif %}
+            D:{{ lineitem.units_damaged_reason.cause }} 
+          {% endif %}
+        </td>
+        <td>&nbsp;
+          {% if lineitem.calculate_total_received_units %}
+            {{ lineitem.calculate_total_received_units|floatformat:3 }}
+          {% endif %}
+        </td>
+        <td>&nbsp;
+          {% if lineitem.total_weight_net_received %}
+            {{ lineitem.total_weight_net_received|floatformat:3 }}
+          {% endif %}
+        </td>    
+      </tr>
+    {% endfor %}
+                                    
+    <tr>
+      <td colspan="10">
+        <sup>{% trans "Reciptient Remarks" %}:</sup> {{ object.receipt_remarks }}
+        {% if object.container_one_remarks_reciept%}
+          <p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
+        {%endif%}
+        {% if object.container_two_remarks_reciept %}
+          <p>{% trans "Container 2 Remarks:" %}{{ object.container_two_remarks_reciept }}</p>
+        {%endif%}
+      </td>
+    </tr>
+  </tbody>
+</table>
+<table class="border">
+  <tr>
+	<td class="signature">
+	  <p>{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above. Name, signature and stamp" %}:</p>
+      <p>
+	  {% if object.receipt_signed_date %}
+      {{ object.receipt_person.get_full_name }}<br/>
+      {% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}
+      {% endif %}
+      </p>
+	</td>
+    <td class="signature">
+      <p>{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above. Name, signature and stamp" %}:</p>
+      <p>
+      {% if object.receipt_signed_date %}
+        {{ object.transport_driver_name|upper}}<br/>
+        {% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}
+      {% endif %}
+      </p>
+	</td>
+  </tr>
+</table>

@@ -1,5 +1,5 @@
 
-import zlib, base64, string, decimal
+import zlib, base64, string, decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
@@ -15,12 +15,14 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db.models import F
 from django.db import transaction
+from django.core.files.base import File, ContentFile
 from django.db.models.aggregates import Max
 
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
-import logicaldelete.models as ld_models 
+import logicaldelete.models as ld_models
+from sorl.thumbnail.shortcuts import get_thumbnail 
 
 from .compress import compress_json, decompress_json
 from .country import COUNTRY_CHOICES
@@ -733,7 +735,19 @@ class Waybill( ld_models.Model ):
             
             return waybill
                     
-
+    def barcode_qr(self):
+        """Bar code generator. This view uses 'pyqrcode' for back-end. It returns image file in response."""
+        
+        file_out = cStringIO.StringIO()
+        
+        image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=24, 
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L)
+        image.save(file_out, 'JPEG')
+        file_out.reset()
+        
+        return File(file_out, name="%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date))
+    
+    
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""

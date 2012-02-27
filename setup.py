@@ -40,6 +40,8 @@ install_requires = [
         'html5lib',
         'pypdf',
         'pisa',
+        'sorl-thumbnail', # thumbnail creation tool
+        'django-concurrent-server',
 ]
 
 #Extra dependencies for test purposes

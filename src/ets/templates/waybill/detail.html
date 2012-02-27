@@ -4,9 +4,11 @@
 {% block title %}{{ object }}{% endblock %}
 
 {% block style %}
+{% comment %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="screen"/>
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="print" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="print"/>
+{% endcomment %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="screen" />
 {% endblock %}
 
 {% block content %}
@@ -44,11 +46,10 @@
   {% waybill_delete object user _('Delete') object.order.get_absolute_url %}
 </div>
 
-<table id="details" cellpadding="0" cellspacing="0" border="0px" >
-  {% include 'waybill/print/wb_header.html' %}
-  {% include 'waybill/print/wb_loading.html' %}
-  {% include 'waybill/print/wb_receipt.html' %}
-</table>
+{% include 'waybill/print/header.html' %}
+{% include 'waybill/print/general.html' %}
+{% include 'waybill/print/loading.html' %}
+{% include 'waybill/print/receipt.html' %}
 
 <div id="sidebar" class="hidden_print">
   <h3>{% trans "Waybill history" %}</h3>

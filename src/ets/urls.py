@@ -7,6 +7,7 @@ from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.db.models.aggregates import Count
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -174,10 +175,7 @@ class PrefixedPatterns:
             'document_root': settings.MEDIA_ROOT,
         }),
     )
-    
-    if settings.SERVE_STATIC:
-        from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-        urlpatterns += staticfiles_urlpatterns()
+    urlpatterns += staticfiles_urlpatterns('static')
 
     
 urlpatterns = patterns('',

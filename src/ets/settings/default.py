@@ -143,6 +143,8 @@ INSTALLED_APPS = (
     'compressor',
     'google_analytics',
     'pagination',
+    'sorl.thumbnail',
+    'concurrent_server',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
@@ -219,6 +221,10 @@ DJANGO_BUILTIN_TAGS = (
 )
 NATIVE_TAGS = ()
 
+THUMBNAIL_UPSCALE = True
+THUMBNAIL_QUALITY = 95
+THUMBNAIL_DEBUG = True
+THUMBNAIL_FORMAT = 'JPEG'
 
 #Loading details settings
 LOADING_LINES = 5

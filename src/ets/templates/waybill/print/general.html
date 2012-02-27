@@ -1,0 +1,80 @@
+{% load extra_tags thumbnail %}
+{% load i18n %}
+<div id="general_waybill">
+<div class="barcode">
+  {% thumbnail 'test/test_barcode.jpeg' "200x200" as im %}
+  <img alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
+  {% endthumbnail %}
+</div>
+<div class="info">
+  <table class="border">
+    <thead>
+        <tr><th colspan="4">{% trans "Transaction Details" %}</th></tr>
+    </thead>
+    <tbody>
+    <tr>
+        <th>{% trans "Origin(location)" %}:</th>
+        <td>{{ object.order.warehouse.location.name }}</td>
+        <th>{% trans "Origin(warehouse)" %}:</th>
+        <td>{{ object.order.warehouse.name }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Destination(location)" %}:</th>
+        <td>{{ object.destination.location.name }}</td>
+        <th>{% trans "Consignee" %}:</th>
+        <td>{{ object.order.consignee }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Destination(warehouse)" %}:</th>
+        <td>{{ object.destination.name }}</td>
+        <th>{% trans "Allocation Destination" %}:</th>
+        <td>{{ object.destination.location.get_country_display }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Type of Transaction" %}:</th>
+        <td>{{ object.get_transaction_type_display }}</td>
+        <th>{% trans "Transport Type" %}:</th>
+        <td>{{ object.get_transport_type_display }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Date of Loading" %}:</th>
+        <td>{{ object.loading_date|date|upper }}</td>
+        <th>{% trans "Date of Dispatch" %}:</th>
+        <td>{{ object.dispatch_date|date|upper }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "LTI No." %}:</th>
+        <td>{{ object.order.pk }}</td>
+        <th>{% trans "Dispatch Remarks" %}:</th>
+        <td style="font-size:small;">{{ object.dispatch_remarks }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Transport Contractor" %}:</th>
+        <td>{{ object.order.transport_name }}</td>
+        <th>{% trans "Transport Subcontractor" %}:</th>
+        <td>{{ object.transport_sub_contractor }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Vehicle registration" %}:</th>
+        <td>{{ object.transport_vehicle_registration }}</td>
+        <th>{% trans "Trailer No." %}:</th>
+        <td>{{ object.transport_trailer_registration }}</td>
+    </tr>
+    <tr>
+        <th>{% trans "Container 1" %}:</th>
+        <td>
+          <small>{% trans "No." %}:</small> {{ object.container_one_number }}
+          <small>{% trans "Seal:" %}</small> {{ object.container_one_seal_number }}
+          <small>{% trans "Remarks" %}:</small> {{ object.container_one_remarks_dispatch }}
+        </td>
+        <th>{% trans "Container 2" %}:</th>
+        <td>
+          <small>{% trans "No." %}:</small> {{ object.container_two_number }}
+          <small>{% trans "Seal:" %}</small> {{ object.container_two_seal_number }}
+          <small>{% trans "Remarks" %}:</small> {{ object.container_two_remarks_dispatch }}
+        </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</div>

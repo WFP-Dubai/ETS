@@ -56,9 +56,10 @@ def fetch_resources(uri, rel):
     """
     if uri.startswith(settings.STATIC_URL):
         path = os.path.abspath(os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, "")))
+    elif uri.startswith(settings.MEDIA_URL):
+        path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, "")))
     else:
         path = uri
-    
     return path
 
 

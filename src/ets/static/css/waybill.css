@@ -75,3 +75,7 @@ sup {
 .signature {
   height: 20mm;
 }
+
+#general_waybill .barcode {
+  width: 203px;
+}

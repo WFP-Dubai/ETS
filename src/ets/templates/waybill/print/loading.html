@@ -1,0 +1,71 @@
+{%load extra_tags%}
+{% load i18n %}
+<table id="loading_details" class="border">
+    <thead>
+        <tr><th colspan="9">{% trans "Loading Details" %}</th></tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>{% trans "SI No" %}</td>
+        <td>{% trans "Project no." %}</td>
+        <td>{% trans "Commodity" %}</td>
+        <td>{% trans "Packing" %}</td>
+        <td>{% trans "Number of Units" %}</td>
+        <td>{% trans "Unit Weight (kg) Net" %}</td>
+        <td>{% trans "Unit Weight (kg) Gross" %}</td>
+        <td>{% trans "Tonnage Net" %}</td>
+        <td>{% trans "Tonnage Gross" %}</td>
+    </tr>
+    {% for lineitem in items %}
+    <tr class="item">
+        <td class="number">{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
+        <td class="number">{{ lineitem.stock_item.project_number }}</td>
+        <td>{{ lineitem.stock_item.commodity.name }}</td>
+        <td>{{ lineitem.stock_item.package.name }}</td>
+        <td class="number">{{ lineitem.number_of_units }}</td>
+        <td class="number">{{ lineitem.unit_weight_net|floatformat:3 }}</td>
+        <td class="number">{{ lineitem.unit_weight_gross|floatformat:3 }}</td>
+        <td class="number">{{ lineitem.total_weight_net|floatformat:3 }}</td>
+        <td class="number">{{ lineitem.total_weight_gross|floatformat:3 }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<table id="certification_loaded" class="border" >
+  <thead>
+    <tr><th colspan="8">{% trans "Certification of Commodities Loaded" %}</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>{% trans "Name" %}:</th>
+      <td>{{ object.dispatcher_person.get_full_name }}</td>
+      <th>{% trans "Title" %}:</th>
+      <td>{{ object.dispatcher_person.title }}</td>
+      <th>{% trans "Driver's Name" %}:</th>
+      <td>{{ object.transport_driver_name }}</td>
+      <th>{% trans "Driver's Licence/ID:" %}</th>
+      <td>{{ object.transport_driver_licence }}</td>
+    </tr>
+    <tr>
+      <td class="signature" colspan="4">
+        <p>{% trans "I hereby certify the loading of the commodities described above. Name, signature and stamp" %}:</p>
+        <p>
+        {% if object.transport_dispach_signed_date %}
+          {{ object.dispatcher_person.get_full_name }}<br/>
+          {% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}
+        {% endif %}
+        </p>
+      </td>
+      <td class="signature" colspan="4">
+        <p>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above. Name, signature and stamp" %}:</p>
+        <p>
+        {% if object.transport_dispach_signed_date %}
+          {{ object.transport_driver_name|upper }}<br/>
+          {% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}
+        {% endif %}
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
