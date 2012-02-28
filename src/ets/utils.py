@@ -277,61 +277,72 @@ def import_order(compas):
     today = date.today()
     
     places = _get_places(compas)
-    for lti in compas_models.LtiOriginal.objects.using(compas)\
+    
+    for lti_code in compas_models.LtiOriginal.objects.using(compas).distinct()\
                         .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                 lti_date__gte='2012-01-01',
                                 origin_wh_code__in=places.values_list('org_code', flat=True),
-                                ):
+                                )\
+                        .values_list('code', flat=True):
         
-        #Create Order
-        defaults = {
-            'created': lti.lti_date,
-            'expiry': lti.expiry_date or lti.lti_date + timedelta(30*DEFAULT_ORDER_LIFE),
-            'dispatch_date': lti.requested_dispatch_date,
-            'transport_code': lti.transport_code,
-            'transport_ouc': lti.transport_ouc,
-            'transport_name': lti.transport_name,
-            'origin_type': lti.origin_type,
-            'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
-            'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
-            'location': _get_destination_location(compas, lti.destination_location_code, lti.destination_loc_name),
-            'updated': now,
-            'remarks': lti.remarks,
-            'remarks_b': lti.remarks_b,
-        }
+        order_items = []
+        for lti in compas_models.LtiOriginal.objects.using(compas).filter(code=lti_code):
+            
+            #Create Order
+            defaults = {
+                'created': lti.lti_date,
+                'expiry': lti.expiry_date or lti.lti_date + timedelta(30*DEFAULT_ORDER_LIFE),
+                'dispatch_date': lti.requested_dispatch_date,
+                'transport_code': lti.transport_code,
+                'transport_ouc': lti.transport_ouc,
+                'transport_name': lti.transport_name,
+                'origin_type': lti.origin_type,
+                'warehouse': ets_models.Warehouse.objects.get(code=lti.origin_wh_code),
+                'consignee': ets_models.Organization.objects.get(pk=lti.consegnee_code),
+                'location': _get_destination_location(compas, lti.destination_location_code, lti.destination_loc_name),
+                'updated': now,
+                'remarks': lti.remarks,
+                'remarks_b': lti.remarks_b,
+            }
+            
+            order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
+            #Update order. IT's not supposed to happen. In this case system might break.
+            if not created:
+                ets_models.Order.objects.filter(code=lti.code).update(**defaults)
+            
+            #Commodity
+            commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
+                'name': lti.cmmname,
+                'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
+            })[0]
+            
+            #Create order item
+            key_data = {
+                'order': order,
+                'si_code': lti.si_code,
+                'commodity': commodity,
+                'lti_id': lti.lti_id,
+                'project_number': lti.project_wbs_element,
+            }
+            defaults = {
+                'number_of_units': lti.number_of_units,
+                'unit_weight_net': lti.unit_weight_net,
+                'unit_weight_gross': lti.unit_weight_gross,
+                'total_weight_net': lti.quantity_net,
+                'total_weight_gross': lti.quantity_gross,
+            }
+            
+            order_item, created = ets_models.OrderItem.objects.get_or_create(defaults=defaults, **key_data)
+            
+            if not created:
+                ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
+                
+            order_items.append(order_item.pk)
+            
+        #Emptying deleted order items
+        ets_models.OrderItem.objects.filter(pk=lti_code).exclude(pk__in=order_items).update(number_of_units=0, total_weight_net=0, total_weight_gross=0)
         
-        order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
-        #Update order. IT's not supposed to happen. In this case system might break.
-        if not created:
-            ets_models.Order.objects.filter(code=lti.code).update(**defaults)
         
-        #Commodity
-        commodity = ets_models.Commodity.objects.get_or_create(pk=lti.commodity_code, defaults={
-            'name': lti.cmmname,
-            'category': ets_models.CommodityCategory.objects.get_or_create(pk=lti.comm_category_code)[0],
-        })[0]
-        
-        #Create order item
-        key_data = {
-            'order': order,
-            'si_code': lti.si_code,
-            'commodity': commodity,
-            'lti_id': lti.lti_id,
-            'project_number': lti.project_wbs_element,
-        }
-        defaults = {
-            'number_of_units': lti.number_of_units,
-            'unit_weight_net': lti.unit_weight_net,
-            'unit_weight_gross': lti.unit_weight_gross,
-            'total_weight_net': lti.quantity_net,
-            'total_weight_gross': lti.quantity_gross,
-        }
-        
-        rows = ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
-        if not rows:
-            ets_models.OrderItem.objects.create(**dict(key_data.items() + defaults.items()))
-    
-
 def send_dispatched(waybill, compas=None):
     """Submits dispatched and validated waybills to COMPAS"""
     if not compas:
