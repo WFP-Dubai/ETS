@@ -1,0 +1,9 @@
+.selector-available, 
+.selector-chosen,
+.selector select {
+  width: 370px;
+}
+
+.selector {
+  width: 780px;
+}
