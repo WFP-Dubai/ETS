@@ -1,5 +1,5 @@
 # Django settings for ets project.
-from .default import *
+from ets.settings.default import *
 
 DEBUG = False
 COMPRESS_ENABLED = True

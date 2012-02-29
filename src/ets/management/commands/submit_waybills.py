@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from .sync_compas import Command as UpdateCompas
+from ets.management.commands.sync_compas import Command as UpdateCompas
 
 from ets.utils import send_dispatched, send_received, import_stock
 from ets.models import Waybill

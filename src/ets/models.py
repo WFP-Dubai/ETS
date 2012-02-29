@@ -24,8 +24,8 @@ from autoslug.settings import slugify
 import logicaldelete.models as ld_models
 from sorl.thumbnail.shortcuts import get_thumbnail 
 
-from .compress import compress_json, decompress_json
-from .country import COUNTRY_CHOICES
+from ets.compress import compress_json, decompress_json
+from ets.country import COUNTRY_CHOICES
 
 #name = "1234"
 BULK_NAME = "BULK"

@@ -1,5 +1,5 @@
 # Django settings for ets project.
-from .default import *
+from ets.settings.default import *
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
   

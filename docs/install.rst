@@ -14,7 +14,7 @@ Dependencies
   
 Following names of package are called so in debian package system::
   
-  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn
+  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn graphviz
   sudo easy_install -U zc.buildout
 
 .. _development-environment:  

@@ -11,7 +11,7 @@ from django.utils.translation import ugettext as _
 from django.contrib import admin #@Reimport
 admin.autodiscover()
 
-from .views import ExportWaybillData
+from ets.offliner.views import ExportWaybillData
 
 urlpatterns = patterns("ets.offliner.views",
     #( r'^synchronization/$', "synchronization", {}, "synchronization"),

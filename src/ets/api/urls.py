@@ -12,8 +12,8 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 from piston.authentication import HttpBasicAuthentication
 
-from .handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadCSVWarehouseHandler
-from .handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandler
+from ets.api.handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadCSVWarehouseHandler
+from ets.api.handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandler
 
 
 class ExpandedResource(Resource):
