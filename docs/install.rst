@@ -59,6 +59,19 @@ Following names of package are called so in debian package system::
   
   sudo apt-get install libpq-dev libaio-dev
 
+
+PostgreSQL
+----------
+
+  sudo apt-get install postgresql
+
+Create database in Postgres::
+  
+	sudo su - postgres
+	createuser -dSRP ets
+	createdb ets -O ets
+
+
 Nginx
 -----
 
@@ -178,7 +191,7 @@ Download project from GitHub
 Setting of Database
 ----------------------------
 
-/opt/ETS/src/ets/settings/local.py::
+/opt/ETS/src/ets/local_settings.py::
     
   DEFAULT_DATABASE = {
 	'NAME': 'ets',
@@ -187,12 +200,6 @@ Setting of Database
 	'USER': '<database name>',
 	'PASSWORD': '<database password>',
   }
-
-Create database in Postgres::
-  
-	sudo su - postgres
-	createuser -dSRP ets
-	createdb ets -O ets
 
 Oracle client
 -------------

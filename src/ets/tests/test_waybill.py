@@ -10,7 +10,7 @@ from django.utils.datastructures import MultiValueDictKeyError
 from django.contrib.auth.forms import AuthenticationForm
 
 import ets.models
-from .utils import TestCaseMixin
+from ets.tests.utils import TestCaseMixin
 
 
 class WaybillTestCase(TestCaseMixin, TestCase):
@@ -80,7 +80,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_waybill_search(self):
         """ets.views.waybill_search test"""
-        #from ..forms import WaybillSearchForm
+        #from ets.forms import WaybillSearchForm
         # Empty search query
         self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.post(reverse('waybill_search'))
@@ -103,7 +103,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
          
     def test_create_waybill(self):
         """ets.views.waybill_create test"""
-        from ..forms import DispatchWaybillForm
+        from ets.forms import DispatchWaybillForm
         
         self.client.login(username='dispatcher', password='dispatcher')        
         response = self.client.get(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}))
@@ -225,7 +225,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
-        from ..forms import WaybillRecieptForm
+        from ets.forms import WaybillRecieptForm
         
         self.client.login(username='dispatcher', password='dispatcher')
         

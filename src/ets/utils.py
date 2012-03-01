@@ -129,7 +129,7 @@ def import_partners(compas):
 @compas_importer
 def import_places(compas):
     """Imports warehouses with locations from COMPAS"""
-    for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
+    for place in compas_models.Place.objects.using(compas):
             
         #Create location
         location, created = ets_models.Location.objects.get_or_create(code=place.geo_point_code, defaults={
@@ -143,15 +143,24 @@ def import_places(compas):
             location.country = place.country_code
             location.save()
         
+        try:
+            compas = ets_models.Compas.objects.get(pk=place.reporting_code)
+        except ets_models.Compas.DoesNotExist:
+            compas = None
+        
         #Update warehouse
         defaults = {
             'name': place.name,
             'location': location,
             'organization': ets_models.Organization.objects.get(code=place.organization_id) if place.organization_id else None,
-            'compas': ets_models.Compas.objects.get(pk=place.reporting_code),
+            'compas': compas,
         }
         
-        ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
+        wh, created = ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
+        
+        if not created and not wh.compas and compas:
+            wh.compas = compas
+            wh.save()
 
 
 @compas_importer

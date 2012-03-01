@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 import ets.models
 import compas.models as compas_models
 from ets.utils import import_stock, send_dispatched, send_received
-from .utils import TestCaseMixin
+from ets.tests.utils import TestCaseMixin
 
 class CompasTestCase(TestCase):
     

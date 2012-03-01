@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 import ets.models
 from ets.templatetags.extra_tags import waybill_edit, waybill_reception, waybill_creation, waybill_delete
 
-from .utils import TestCaseMixin
+from ets.tests.utils import TestCaseMixin
 
 class TagsTestCase(TestCaseMixin, TestCase):
     

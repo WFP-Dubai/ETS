@@ -6,8 +6,8 @@
 import os.path
 from django.conf import global_settings
 
-PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../')
-EGG_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../')
+PROJECT_ROOT = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../') )
+EGG_ROOT = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../') )
 
 ugettext = lambda s: s
 
@@ -19,44 +19,6 @@ MANAGERS = (
 ADMINS = ( 
     # ('Your Name', 'your_email@domain.com'),
  )
-
-
-#=======================================================================================================================
-# ALL_DB = {
-#    'compas_test_pak': {
-#        'ENGINE': 'django.db.backends.oracle',
-#        'NAME': '10.11.70.50/ISBX002',
-#        'USER': 'TESTISBX002',
-#        'PASSWORD': 'TESTISBX002',
-#        'HOST': '10.11.70.50',
-#        'PORT': '',
-#    },
-#    'compas_test_pal': {
-#        'ENGINE': 'django.db.backends.oracle',
-#        'NAME': '10.11.216.4/JERX001',
-#        'USER': 'TESTJERX001',
-#        'PASSWORD': 'TESTJERX001',
-#        'HOST': '10.11.216.4',
-#        'PORT': '',
-#    },
-#    'compas_test_rome': {
-#        'ENGINE': 'django.db.backends.oracle',
-#        'NAME': '10.11.32.26/CMPS',
-#        'USER': 'bw_reader',
-#        'PASSWORD': 'readme',
-#        'HOST': '10.11.32.26',
-#        'PORT': '',
-#    },
-#    'compas_prod_pal': {
-#        'ENGINE': 'django.db.backends.oracle',
-#        'NAME': '10.11.216.4/JERX001',
-#        'USER': 'opt_epic',
-#        'PASSWORD': 'opt_epic',
-#        'HOST': '10.11.33.199',
-#        'PORT': '',
-#    },
-# }
-#=======================================================================================================================
 
 LANGUAGE_CODE = 'en'
 LANGUAGES = (
@@ -304,3 +266,16 @@ DEFAULT_DATABASE = {
 
 #Prevent migrations during testing
 SOUTH_TESTS_MIGRATE = False
+
+DEBUG = False
+COMPRESS_ENABLED = True
+
+# Local settings for development / production
+try:
+    from local_settings import *
+except ImportError:
+    pass
+
+TEMPLATE_DEBUG = DEBUG
+ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
+DATABASES = DatabasesFormDatabase(DEFAULT_DATABASE)

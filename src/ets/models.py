@@ -107,7 +107,7 @@ class Warehouse(models.Model):
     location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
-    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
     start_date = models.DateField(_("Start date"), blank=True, null=True)
     end_date = models.DateField(_("End date"), blank=True, null=True)
     

@@ -8,7 +8,7 @@ from django.conf import settings
 import StringIO
 
 import ets.models
-from .utils import TestCaseMixin
+from ets.tests.utils import TestCaseMixin
 from ets.utils import import_file
 
 class OfflineSyncTestCase(TestCase):

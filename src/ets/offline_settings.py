@@ -1,5 +1,5 @@
 # Django settings for ets project.
-from ets.settings.default import *
+from ets.settings import *
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG

@@ -1,5 +1,5 @@
 # Django settings for ets project.
-from ets.settings.default import *
+from ets.settings import *
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
   
@@ -42,7 +42,7 @@ SOUTH_DATABASE_ADAPTERS = {
 
 # Local settings for development / production
 try:
-    from local import *
+    from local_settings import *
 except ImportError:
     pass
 
