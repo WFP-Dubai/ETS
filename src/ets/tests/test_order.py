@@ -4,7 +4,7 @@ from django.core.management import call_command
 from django.core.urlresolvers import reverse
 
 import ets.models
-from .utils import TestCaseMixin
+from ets.tests.utils import TestCaseMixin
 
 class OrderTestCase(TestCaseMixin, TestCase):
     

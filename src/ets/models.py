@@ -24,8 +24,8 @@ from autoslug.settings import slugify
 import logicaldelete.models as ld_models
 from sorl.thumbnail.shortcuts import get_thumbnail 
 
-from .compress import compress_json, decompress_json
-from .country import COUNTRY_CHOICES
+from ets.compress import compress_json, decompress_json
+from ets.country import COUNTRY_CHOICES
 
 #name = "1234"
 BULK_NAME = "BULK"
@@ -107,7 +107,7 @@ class Warehouse(models.Model):
     location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
-    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses")
+    compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
     start_date = models.DateField(_("Start date"), blank=True, null=True)
     end_date = models.DateField(_("End date"), blank=True, null=True)
     

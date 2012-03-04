@@ -14,7 +14,7 @@ Dependencies
   
 Following names of package are called so in debian package system::
   
-  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn
+  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn graphviz libgraphviz-dev
   sudo easy_install -U zc.buildout
 
 .. _development-environment:  
@@ -59,8 +59,25 @@ Following names of package are called so in debian package system::
   
   sudo apt-get install libpq-dev libaio-dev
 
+
+PostgreSQL
+----------
+
+  sudo apt-get install postgresql
+
+Create database in Postgres::
+  
+	sudo su - postgres
+	createuser -dSRP ets
+	createdb ets -O ets
+
+
 Nginx
 -----
+
+Following names of package are called so in debian package system::
+  
+  sudo apt-get install nginx
 
 /etc/nginx/sites-available/ETS::
 
@@ -68,8 +85,8 @@ Nginx
     listen <REAL_IP>:80;
     server_name ubuntu;
 
-    access_log /var/log/ETS/nginx_access.log;
-    error_log /var/log/ETS/nginx_error.log;
+    access_log /var/log/nginx/ETS_access.log;
+    error_log /var/log/nginx/ETS_error.log;
     
     location /ets/doc/ {
         alias /opt/ETS/docs/_build/html/;
@@ -81,12 +98,12 @@ Nginx
     }
     
     location /static/ {
-      root /opt/ETS/;
+      alias /opt/ETS/static/;
       expires 5d;
     }
 
     location /media/ {
-      root /opt/ETS/;
+      alias /opt/ETS/media/;
       expires 5d;
     }
     
@@ -121,6 +138,10 @@ Create password file::
 Apache
 -------------
 
+Following names of package are called so in debian package system::
+  
+  sudo apt-get install libapache2-mod-wsgi
+
 /etc/apache2/ports.conf::
   
   NameVirtualHost 127.0.0.1:80
@@ -152,6 +173,7 @@ Apache
     WSGIScriptAlias / /opt/ETS/bin/instance.wsgi
     WSGIDaemonProcess main user=www-data group=www-data threads=25
     WSGIProcessGroup main
+    WSGIPassAuthorization on
   
     LogLevel debug
     ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -178,7 +200,7 @@ Download project from GitHub
 Setting of Database
 ----------------------------
 
-/opt/ETS/src/ets/settings/local.py::
+/opt/ETS/src/ets/local_settings.py::
     
   DEFAULT_DATABASE = {
 	'NAME': 'ets',
@@ -187,12 +209,6 @@ Setting of Database
 	'USER': '<database name>',
 	'PASSWORD': '<database password>',
   }
-
-Create database in Postgres::
-  
-	sudo su - postgres
-	createuser -dSRP ets
-	createdb ets -O ets
 
 Oracle client
 -------------
@@ -220,7 +236,13 @@ Add to /etc/bash.bashrc::
   export LD_LIBRARY_PATH=$ORACLE_HOME/lib
   export PATH=$ORACLE_HOME/bin:$PATH
   export PATH=$ORACLE_HOME/lib:$PATH
-  
+ 
+
+Ubuntu 32
+~~~~~~~~~
+
+Follow instructions: http://boyombo.blogspot.com/2011/07/setting-up-cxoracle-on-ubuntu-1104.html
+
 
 Mac OS X
 ~~~~~~~~

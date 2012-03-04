@@ -42,6 +42,7 @@ install_requires = [
         'pisa',
         'sorl-thumbnail', # thumbnail creation tool
         'django-concurrent-server',
+        #'pygraphviz',
 ]
 
 #Extra dependencies for test purposes

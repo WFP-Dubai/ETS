@@ -25,11 +25,11 @@ from django.views.generic.edit import FormView
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
 from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, ImportDataForm
-from .decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
-from .decorators import warehouse_related, dispatch_compas, receipt_compas
+from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
+from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from .utils import history_list, send_dispatched, send_received 
-from .utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
+from ets.utils import history_list, send_dispatched, send_received 
+from ets.utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
 import simplejson
 
 
@@ -89,8 +89,9 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     Redirects to order details
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    #waybill.dispatch_sign()
+    waybill.dispatch_sign()
     
+    #return waybill_detail(request, waybill, extra_context)
     return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name)
 
 
@@ -351,7 +352,6 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
     barcode = waybill.barcode_qr()
-    print "name --> ", barcode.name
     response = HttpResponse(barcode.read(), content_type="image/jpeg")
     response['Content-Disposition'] = 'attachment; filename=%s' % barcode.name
     return response

@@ -7,10 +7,10 @@ from django.test import TestCase
 from django.contrib.auth.models import User, Permission
 from django.conf import settings
 
-#from ..models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
+#from ets.models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
-#from ..models import Waybill, LtiOriginal, EpicStock, Warehouse,
-from .utils import TestCaseMixin
+#from ets.models import Waybill, LtiOriginal, EpicStock, Warehouse,
+from ets.tests.utils import TestCaseMixin
 
 
 class ApiServerTestCase(TestCaseMixin, TestCase):

@@ -7,7 +7,7 @@ from piston.resource import Resource
 from piston.authentication import HttpBasicAuthentication, OAuthAuthentication
 
 from ets.api.urls import expand_response
-from .handlers import JSONOfflineHandler
+from ets.offliner.api.handlers import JSONOfflineHandler
 
 auth = HttpBasicAuthentication(realm='My sample API')
 

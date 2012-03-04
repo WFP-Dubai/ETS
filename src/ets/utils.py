@@ -24,7 +24,7 @@ from django.template import RequestContext
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
-from .compress import compress_json, decompress_json
+from ets.compress import compress_json, decompress_json
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
@@ -129,7 +129,7 @@ def import_partners(compas):
 @compas_importer
 def import_places(compas):
     """Imports warehouses with locations from COMPAS"""
-    for place in compas_models.Place.objects.using(compas).filter(reporting_code=compas):
+    for place in compas_models.Place.objects.using(compas):
             
         #Create location
         location, created = ets_models.Location.objects.get_or_create(code=place.geo_point_code, defaults={
@@ -143,15 +143,24 @@ def import_places(compas):
             location.country = place.country_code
             location.save()
         
+        try:
+            compas = ets_models.Compas.objects.get(pk=place.reporting_code)
+        except ets_models.Compas.DoesNotExist:
+            compas = None
+        
         #Update warehouse
         defaults = {
             'name': place.name,
             'location': location,
             'organization': ets_models.Organization.objects.get(code=place.organization_id) if place.organization_id else None,
-            'compas': ets_models.Compas.objects.get(pk=place.reporting_code),
+            'compas': compas,
         }
         
-        ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
+        wh, created = ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
+        
+        if not created and not wh.compas and compas:
+            wh.compas = compas
+            wh.save()
 
 
 @compas_importer
@@ -199,8 +208,7 @@ def import_stock(compas):
     """Imports stock items or updates quantity"""
     
     now = datetime.now()
-    #places = _get_places(compas)
-    places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
+    places = _get_places(compas)
     
     for stock in compas_models.EpicStock.objects.using(compas)\
                     .filter(wh_code__in=places.values_list('org_code', flat=True)):
@@ -258,9 +266,8 @@ def import_stock(compas):
 
 
 def _get_destination_location(compas, code, name):
-    """Gets of creates a location by code and name"""
-    places = compas_models.Place.objects.using(compas)\
-                            .filter(geo_point_code=code)
+    """Finds or creates a location by code and name"""
+    places = compas_models.Place.objects.using(compas).filter(geo_point_code=code)
     country_code = places.count() and places[0].country_code or None
         
     #Get or Create location
@@ -278,12 +285,12 @@ def import_order(compas):
     
     places = _get_places(compas)
     
-    for lti_code in compas_models.LtiOriginal.objects.using(compas).distinct()\
+    for lti_code in tuple(compas_models.LtiOriginal.objects.using(compas).distinct()\
                         .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
-                                lti_date__gte='2012-01-01',
+                                lti_date__gte=date(year=2012, month=1, day=1),
                                 origin_wh_code__in=places.values_list('org_code', flat=True),
                                 )\
-                        .values_list('code', flat=True):
+                        .values_list('code', flat=True)):
         
         order_items = []
         for lti in compas_models.LtiOriginal.objects.using(compas).filter(code=lti_code):
@@ -338,9 +345,9 @@ def import_order(compas):
                 ets_models.OrderItem.objects.filter(**key_data).update(**defaults)
                 
             order_items.append(order_item.pk)
-            
+        
         #Emptying deleted order items
-        ets_models.OrderItem.objects.filter(pk=lti_code).exclude(pk__in=order_items).update(number_of_units=0, total_weight_net=0, total_weight_gross=0)
+        ets_models.OrderItem.objects.filter(order__code=lti_code).exclude(pk__in=order_items).update(number_of_units=0, total_weight_net=0, total_weight_gross=0)
         
         
 def send_dispatched(waybill, compas=None):

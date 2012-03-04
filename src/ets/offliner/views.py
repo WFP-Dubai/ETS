@@ -7,9 +7,9 @@ from django.views.generic.edit import FormView
 
 from ets.utils import data_to_file_response
 
-from .forms import DateRangeForm
-from .models import UpdateLog
-from .utils import compress_waybills
+from ets.offliner.forms import DateRangeForm
+from ets.offliner.models import UpdateLog
+from ets.offliner.utils import compress_waybills
 
 @login_required
 def request_update(request):

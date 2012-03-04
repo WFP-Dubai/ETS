@@ -161,86 +161,88 @@ class LtiOriginal( models.Model ):
         #managed = False
 
 
-# TODO: Importing of old waybills....
-class DispatchMaster( models.Model ):
-    code = models.CharField(_("Code"), max_length = 25, primary_key = True )
-    document_code = models.CharField(_("Document code"), max_length = 2 )
-    dispatch_date = models.DateField(_("Dispatch date"))
-    origin_type = models.CharField(_("Origin type"), max_length = 1 )
-    origin_location_code = models.CharField(_("Origin location code"), max_length = 13 )
-    intvyg_code = models.CharField(_("Intvyg code"), max_length = 25, blank = True )
-    intdlv_code = models.IntegerField(_("Intdlv code"), null = True, blank = True )
-    origin_code = models.CharField(_("Origin code"), max_length = 13, blank = True )
-    origin_descr = models.CharField(_("Origin description"), max_length = 50, blank = True )
-    destination_location_code = models.CharField(_("Destination location code"), max_length = 10 )
-    destination_code = models.CharField(_("Destination code"), max_length = 13, blank = True )
-    pro_activity_code = models.CharField(_("Pro activity code"), max_length = 6, blank = True )
-    activity_ouc = models.CharField(_("Activity ouc"), max_length = 13, blank = True )
-    lndarrm_code = models.CharField(_("Lndarrm code"), max_length = 25, blank = True )
-    lti_id = models.CharField(_("LTI id "), max_length = 25, blank = True )
-    loan_id = models.CharField(_("Loan id "), max_length = 25, blank = True )
-    loading_date = models.DateField(_("Loading date"))
-    organization_id = models.CharField(_("Organization id "), max_length = 12 )
-    tran_type_code = models.CharField(_("Tran type code"), max_length = 4 )
-    tran_type_descr = models.CharField(_("Tran type descr"), max_length = 50, blank = True )
-    modetrans_code = models.CharField(_("Modetrans code"), max_length = 2 )
-    comments = models.CharField(_("Comments"), max_length = 250, blank = True )
-    person_code = models.CharField(_("Person code"), max_length = 7 )
-    person_ouc = models.CharField(_("Person ouc"), max_length = 13 )
-    certifing_title = models.CharField(_("Certifing title"), max_length = 50, blank = True )
-    trans_contractor_code = models.CharField(_("Trans contractor code"), max_length = 4 )
-    supplier1_ouc = models.CharField(_("Supplier1 ouc"), max_length = 13 )
-    trans_subcontractor_code = models.CharField(_("Trans subcontractor code"), max_length = 4, blank = True )
-    supplier2_ouc = models.CharField(_("Supplier2 ouc "), max_length = 13, blank = True )
-    nmbplt_id = models.CharField(_("Nmbplt id"), max_length = 25, blank = True )
-    nmbtrl_id = models.CharField(_("Nmbtrl id "), max_length = 25, blank = True )
-    driver_name = models.CharField(_("Driver name"), max_length = 50, blank = True )
-    license = models.CharField(_("license"), max_length = 20, blank = True )
-    vehicle_registration = models.CharField(_("Vehicle registration"), max_length = 20, blank = True )
-    trailer_plate = models.CharField(_("Trailer plate"), max_length = 20, blank = True )
-    container_number = models.CharField(_("Container number"), max_length = 15, blank = True )
-    atl_li_code = models.CharField(_("Atl li code"), max_length = 8, blank = True )
-    notify_indicator = models.CharField(_("Notify indicator"), max_length = 1, blank = True )
-    customised = models.CharField(_("Customised"), max_length = 50, blank = True )
-    org_unit_code = models.CharField(_("Org unit code"), max_length = 13 )
-    printed_indicator = models.CharField(_("Printed indicator"), max_length = 1, blank = True )
-    notify_org_unit_code = models.CharField(_("Notify org unit code"), max_length = 13, blank = True )
-    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
-    send_pack = models.BigIntegerField( _("Send pack"), null = True, blank = True )
-    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
-    last_mod_user = models.CharField( _("Last mod user"), max_length = 30, blank = True )
-    last_mod_date = models.DateField( _("Last mod date"), null = True, blank = True )
-    
-    class Meta:
-        db_table = u'dispatch_masters'
-    
-    def  __unicode__( self ):
-        return self.code
-
-
-class DispatchDetail( models.Model ):
-    code = models.ForeignKey(DispatchMaster ,verbose_name=_("Code"))
-    document_code = models.CharField( _("Document code "), max_length = 2 )
-    si_record_id = models.CharField( _("SI record id"), max_length = 25, blank = True, null = True )
-    origin_id = models.CharField( _("Origin id"), max_length = 23, blank = True )
-    comm_category_code = models.CharField( _("Commodity category code"), max_length = 9 )
-    commodity_code = models.CharField( _("Commodity code"), max_length = 18 )
-    package_code = models.CharField( _("Package code"), max_length = 17 )
-    allocation_destination_code = models.CharField( _("Allocation destination code"), max_length = 10 )
-    quality = models.CharField( _("Quality"), max_length = 1 )
-    quantity_net = models.DecimalField( _("Quantity net"), max_digits = 11, decimal_places = 3 )
-    quantity_gross = models.DecimalField( _("Quantity gross"), max_digits = 11, decimal_places = 3 )
-    number_of_units = models.IntegerField( _("Number of units "))
-    unit_weight_net = models.DecimalField( _("Unit Weight net"), null = True, max_digits = 8, decimal_places = 3, blank = True )
-    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"), null = True, max_digits = 8, decimal_places = 3, blank = True )
-    lonmst_id = models.CharField( _("Lonmst id"), max_length = 25, blank = True )
-    londtl_id = models.IntegerField( _("Londtl id"), null = True, blank = True )
-    rpydtl_id = models.IntegerField( _("Rpydtl id"), null = True, blank = True )
-    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
-    send_pack = models.BigIntegerField( _("Send pack"),null = True, blank = True )
-    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
-    last_mod_user = models.CharField( _("Last mod user"),max_length = 30, blank = True )
-    last_mod_date = models.DateField( _("Last modified date"), null = True, blank = True )
-    
-    class Meta:
-        db_table = u'dispatch_details'
+#===============================================================================
+# # TODO: Importing of old waybills....
+# class DispatchMaster( models.Model ):
+#    code = models.CharField(_("Code"), max_length = 25, primary_key = True )
+#    document_code = models.CharField(_("Document code"), max_length = 2 )
+#    dispatch_date = models.DateField(_("Dispatch date"))
+#    origin_type = models.CharField(_("Origin type"), max_length = 1 )
+#    origin_location_code = models.CharField(_("Origin location code"), max_length = 13 )
+#    intvyg_code = models.CharField(_("Intvyg code"), max_length = 25, blank = True )
+#    intdlv_code = models.IntegerField(_("Intdlv code"), null = True, blank = True )
+#    origin_code = models.CharField(_("Origin code"), max_length = 13, blank = True )
+#    origin_descr = models.CharField(_("Origin description"), max_length = 50, blank = True )
+#    destination_location_code = models.CharField(_("Destination location code"), max_length = 10 )
+#    destination_code = models.CharField(_("Destination code"), max_length = 13, blank = True )
+#    pro_activity_code = models.CharField(_("Pro activity code"), max_length = 6, blank = True )
+#    activity_ouc = models.CharField(_("Activity ouc"), max_length = 13, blank = True )
+#    lndarrm_code = models.CharField(_("Lndarrm code"), max_length = 25, blank = True )
+#    lti_id = models.CharField(_("LTI id "), max_length = 25, blank = True )
+#    loan_id = models.CharField(_("Loan id "), max_length = 25, blank = True )
+#    loading_date = models.DateField(_("Loading date"))
+#    organization_id = models.CharField(_("Organization id "), max_length = 12 )
+#    tran_type_code = models.CharField(_("Tran type code"), max_length = 4 )
+#    tran_type_descr = models.CharField(_("Tran type descr"), max_length = 50, blank = True )
+#    modetrans_code = models.CharField(_("Modetrans code"), max_length = 2 )
+#    comments = models.CharField(_("Comments"), max_length = 250, blank = True )
+#    person_code = models.CharField(_("Person code"), max_length = 7 )
+#    person_ouc = models.CharField(_("Person ouc"), max_length = 13 )
+#    certifing_title = models.CharField(_("Certifing title"), max_length = 50, blank = True )
+#    trans_contractor_code = models.CharField(_("Trans contractor code"), max_length = 4 )
+#    supplier1_ouc = models.CharField(_("Supplier1 ouc"), max_length = 13 )
+#    trans_subcontractor_code = models.CharField(_("Trans subcontractor code"), max_length = 4, blank = True )
+#    supplier2_ouc = models.CharField(_("Supplier2 ouc "), max_length = 13, blank = True )
+#    nmbplt_id = models.CharField(_("Nmbplt id"), max_length = 25, blank = True )
+#    nmbtrl_id = models.CharField(_("Nmbtrl id "), max_length = 25, blank = True )
+#    driver_name = models.CharField(_("Driver name"), max_length = 50, blank = True )
+#    license = models.CharField(_("license"), max_length = 20, blank = True )
+#    vehicle_registration = models.CharField(_("Vehicle registration"), max_length = 20, blank = True )
+#    trailer_plate = models.CharField(_("Trailer plate"), max_length = 20, blank = True )
+#    container_number = models.CharField(_("Container number"), max_length = 15, blank = True )
+#    atl_li_code = models.CharField(_("Atl li code"), max_length = 8, blank = True )
+#    notify_indicator = models.CharField(_("Notify indicator"), max_length = 1, blank = True )
+#    customised = models.CharField(_("Customised"), max_length = 50, blank = True )
+#    org_unit_code = models.CharField(_("Org unit code"), max_length = 13 )
+#    printed_indicator = models.CharField(_("Printed indicator"), max_length = 1, blank = True )
+#    notify_org_unit_code = models.CharField(_("Notify org unit code"), max_length = 13, blank = True )
+#    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
+#    send_pack = models.BigIntegerField( _("Send pack"), null = True, blank = True )
+#    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
+#    last_mod_user = models.CharField( _("Last mod user"), max_length = 30, blank = True )
+#    last_mod_date = models.DateField( _("Last mod date"), null = True, blank = True )
+#    
+#    class Meta:
+#        db_table = u'dispatch_masters'
+#    
+#    def  __unicode__( self ):
+#        return self.code
+# 
+# 
+# class DispatchDetail( models.Model ):
+#    code = models.ForeignKey(DispatchMaster ,verbose_name=_("Code"))
+#    document_code = models.CharField( _("Document code "), max_length = 2 )
+#    si_record_id = models.CharField( _("SI record id"), max_length = 25, blank = True, null = True )
+#    origin_id = models.CharField( _("Origin id"), max_length = 23, blank = True )
+#    comm_category_code = models.CharField( _("Commodity category code"), max_length = 9 )
+#    commodity_code = models.CharField( _("Commodity code"), max_length = 18 )
+#    package_code = models.CharField( _("Package code"), max_length = 17 )
+#    allocation_destination_code = models.CharField( _("Allocation destination code"), max_length = 10 )
+#    quality = models.CharField( _("Quality"), max_length = 1 )
+#    quantity_net = models.DecimalField( _("Quantity net"), max_digits = 11, decimal_places = 3 )
+#    quantity_gross = models.DecimalField( _("Quantity gross"), max_digits = 11, decimal_places = 3 )
+#    number_of_units = models.IntegerField( _("Number of units "))
+#    unit_weight_net = models.DecimalField( _("Unit Weight net"), null = True, max_digits = 8, decimal_places = 3, blank = True )
+#    unit_weight_gross = models.DecimalField( _("Unit Weight Gross"), null = True, max_digits = 8, decimal_places = 3, blank = True )
+#    lonmst_id = models.CharField( _("Lonmst id"), max_length = 25, blank = True )
+#    londtl_id = models.IntegerField( _("Londtl id"), null = True, blank = True )
+#    rpydtl_id = models.IntegerField( _("Rpydtl id"), null = True, blank = True )
+#    offid = models.CharField( _("Offid"), max_length = 13, blank = True )
+#    send_pack = models.BigIntegerField( _("Send pack"),null = True, blank = True )
+#    recv_pack = models.BigIntegerField( _("Recv pack"), null = True, blank = True )
+#    last_mod_user = models.CharField( _("Last mod user"),max_length = 30, blank = True )
+#    last_mod_date = models.DateField( _("Last modified date"), null = True, blank = True )
+#    
+#    class Meta:
+#        db_table = u'dispatch_details'
+#===============================================================================
