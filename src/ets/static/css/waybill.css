@@ -1,22 +1,36 @@
-* {padding:0; margin:0;}
-body {text-overflow:ellipsis; background:#fff;}
-.content {font: 10pt/12pt "Times New Roman", Times, serif;}
-h1 {font: 18pt/22pt "Times New Roman", Times, serif;}
-#top_note, .x-small {font: 8pt/9pt "Times New Roman", Times, serif;}
-table {width:170mm; border-spacing:0;}
-td {border:1px solid #aaa; vertical-align:top; min-width:15%;}
+* {
+	padding:0;
+	margin:0;
+}
+body {
+	text-overflow:ellipsis;
+	background:#fff;
+}
+.content {
+	font: 10pt/12pt "Times New Roman", Times, serif;
+}
+h1 {
+	font: 18pt/22pt "Times New Roman", Times, serif;
+}
+.x-small {
+	font: 8pt/9pt "Times New Roman", Times, serif;
+}
 
+/* all tables */
+table {
+	width:170mm;
+	border-spacing:0;
+}
+td {
+	border:1px solid #aaa;
+	vertical-align:top;
+}
 tr.title td,
 td span {
-    font: 7pt/8pt Arial, sans-serif;
+	font:7pt/8pt Arial, sans-serif;
 }
 td span {
 	display:block;
-}
-table#loading_details tbody tr.title td span {
-	display:inline;
-	width:50%;
-	float:left;
 }
 thead th {
 	text-align:left;
@@ -24,18 +38,24 @@ thead th {
 	background:black;
 	padding:3px;
 }
-tbody th {
-  font: bold 7pt/9pt "Times New Roman",Times,serif;
+
+/* header table */
+#top_note {font: 8pt/9pt "Times New Roman", Times, serif;}
+
+table#loading_details tbody tr.title td span {
+	display:inline;
+	width:50%;
+	float:left;
 }
 
-table#general_waybill tbody th {
+table#general tbody th {
 	text-align:right;
 	width: 24mm !important;
 }
-table#general_waybill tbody td {
+table#general tbody td {
 	width: 36mm !important;
 }
-table#general_waybill td.barcode {
+table#general td.barcode {
 	width: 50mm !important;
 }
 /* === */
@@ -58,4 +78,31 @@ td.signature span{
 	float:left;
 	height:27mm;
 	width:100%;
+}
+
+
+/* [AD] not sure why this is here */
+.centric h1 {
+	font-weight:bold;
+	text-align:center;
+}
+.centric p {
+	font:10pt 12pt normal;
+	text-align:center;
+}
+
+.right {
+	position:absolute;
+	right:20px;
+	text-align:right;
+}
+.centric {
+	display:inline-block;
+	position: relative;
+	left:200px;
+	text-align:center;
+}
+.the_forms{
+	display:inline;
+	height:0px;
 }
