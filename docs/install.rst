@@ -14,7 +14,7 @@ Dependencies
   
 Following names of package are called so in debian package system::
   
-  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn graphviz
+  sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn graphviz libgraphviz-dev
   sudo easy_install -U zc.buildout
 
 .. _development-environment:  
@@ -75,14 +75,18 @@ Create database in Postgres::
 Nginx
 -----
 
+Following names of package are called so in debian package system::
+  
+  sudo apt-get install nginx
+
 /etc/nginx/sites-available/ETS::
 
   server {
     listen <REAL_IP>:80;
     server_name ubuntu;
 
-    access_log /var/log/ETS/nginx_access.log;
-    error_log /var/log/ETS/nginx_error.log;
+    access_log /var/log/nginx/ETS_access.log;
+    error_log /var/log/nginx/ETS_error.log;
     
     location /ets/doc/ {
         alias /opt/ETS/docs/_build/html/;
@@ -94,12 +98,12 @@ Nginx
     }
     
     location /static/ {
-      root /opt/ETS/;
+      alias /opt/ETS/static/;
       expires 5d;
     }
 
     location /media/ {
-      root /opt/ETS/;
+      alias /opt/ETS/media/;
       expires 5d;
     }
     
@@ -134,6 +138,10 @@ Create password file::
 Apache
 -------------
 
+Following names of package are called so in debian package system::
+  
+  sudo apt-get install libapache2-mod-wsgi
+
 /etc/apache2/ports.conf::
   
   NameVirtualHost 127.0.0.1:80
@@ -165,6 +173,7 @@ Apache
     WSGIScriptAlias / /opt/ETS/bin/instance.wsgi
     WSGIDaemonProcess main user=www-data group=www-data threads=25
     WSGIProcessGroup main
+    WSGIPassAuthorization on
   
     LogLevel debug
     ErrorLog ${APACHE_LOG_DIR}/error.log
@@ -227,7 +236,13 @@ Add to /etc/bash.bashrc::
   export LD_LIBRARY_PATH=$ORACLE_HOME/lib
   export PATH=$ORACLE_HOME/bin:$PATH
   export PATH=$ORACLE_HOME/lib:$PATH
-  
+ 
+
+Ubuntu 32
+~~~~~~~~~
+
+Follow instructions: http://boyombo.blogspot.com/2011/07/setting-up-cxoracle-on-ubuntu-1104.html
+
 
 Mac OS X
 ~~~~~~~~
