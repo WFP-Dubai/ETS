@@ -38,37 +38,8 @@ thead th {
 	background:black;
 	padding:3px;
 }
-
-/* header table */
-#top_note {font: 8pt/9pt "Times New Roman", Times, serif;}
-
-table#loading_details tbody tr.title td span {
-	display:inline;
-	width:50%;
-	float:left;
-}
-
-table#general tbody th {
-	text-align:right;
-	width: 24mm !important;
-}
-table#general tbody td {
-	width: 36mm !important;
-}
-table#general td.barcode {
-	width: 50mm !important;
-}
-/* === */
 td.number {
 	text-align:right;
-}
-/* === */
-table#loaded tbody td {
-	width:50%;
-}
-table#loaded tbody span ,
-table#receipt tbody span {
-	display:inline;
 }
 td.signature {
 	vertical-align: bottom;
@@ -80,29 +51,33 @@ td.signature span{
 	width:100%;
 }
 
+/* header table */
+#top_note {font: 8pt/9pt "Times New Roman", Times, serif;}
 
-/* [AD] not sure why this is here */
-.centric h1 {
-	font-weight:bold;
-	text-align:center;
-}
-.centric p {
-	font:10pt 12pt normal;
-	text-align:center;
-}
-
-.right {
-	position:absolute;
-	right:20px;
+/* general table */
+table#general tbody th {
 	text-align:right;
+	width: 24mm !important;
 }
-.centric {
-	display:inline-block;
-	position: relative;
-	left:200px;
-	text-align:center;
+table#general tbody td {
+	width: 36mm !important;
 }
-.the_forms{
+table#general td.barcode {
+	width: 50mm !important;
+}
+
+/* loading tables */
+table#loading_details tbody tr.title td span {
 	display:inline;
-	height:0px;
+	width:50%;
+	float:left;
 }
+table#loaded tbody td {
+	width:50%;
+}
+table#loaded tbody span ,
+table#receipt tbody span {
+	display:inline;
+}
+
+/* that's it */
