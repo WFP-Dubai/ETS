@@ -1,121 +1,61 @@
-body {
-	height: 100%;
-	border-width: 0;
-	padding: 0;
-	margin: 0;
-	text-overflow: ellipsis;
+* {padding:0; margin:0;}
+body {text-overflow:ellipsis; background:#fff;}
+.content {font: 10pt/12pt "Times New Roman", Times, serif;}
+h1 {font: 18pt/22pt "Times New Roman", Times, serif;}
+#top_note, .x-small {font: 8pt/9pt "Times New Roman", Times, serif;}
+table {width:170mm; border-spacing:0;}
+td {border:1px solid #aaa; vertical-align:top; min-width:15%;}
+
+tr.title td,
+td span {
+    font: 7pt/8pt Arial, sans-serif;
+}
+td span {
+	display:block;
+}
+table#loading_details tbody tr.title td span {
+	display:inline;
+	width:50%;
+	float:left;
+}
+thead th {
+	text-align:left;
+	color:white;
+	background:black;
+	padding:3px;
+}
+tbody th {
+  font: bold 7pt/9pt "Times New Roman",Times,serif;
 }
 
-.centric h1{ font-weight: bold; text-align: center;}
-.centric p{font-size: small; text-align: center;}
-
-.content {
-    border: none;
-    font-family: serif;
-    font-weight: normal;
-    padding: 0;
-    background-color: white;
+table#general_waybill tbody th {
+	text-align:right;
+	width: 24mm !important;
 }
-
-table {
-	margin: 0px;
-	padding: 0px;
-	max-width: 100%;
-	min-width: 100%;
-	width: 100%;
-	height: 100%;
-	font-size: 11px;
+table#general_waybill tbody td {
+	width: 36mm !important;
 }
-
-.border {
-	padding: 0px;
-	border-spacing: 0px;
-	border-width: 1px;
-	border-style: ridge;
-	border-color: black;
+table#general_waybill td.barcode {
+	width: 50mm !important;
 }
-
-.border td {
-	padding: 0px;
-	border-spacing: 0px;
-	border-width: 1px;
-	border-style: ridge;
-	border-color: black #B5B5B5 #B5B5B5 black;
+/* === */
+td.number {
+	text-align:right;
 }
-
-
-.border thead th {
-  color: white;
-  background: black;
-  font-size: small;
+/* === */
+table#loaded tbody td {
+	width:50%;
 }
-
-img{position: relative; text-align: right;}
-.right{ position: absolute; right: 20px; text-align: right;}
-.centric{display: inline-block; position: relative; left:200px; text-align: center; }
-
-#original_lable, #copy_lable{
-	font-weight: bold;
-	font-size: x-large;
+table#loaded tbody span ,
+table#receipt tbody span {
+	display:inline;
 }
-
-.shown{
-	display:inherit;
-	visibility: visible;
+td.signature {
+	vertical-align: bottom;
 }
-.the_forms{
-	display: inline;
-	height: 0px;
-}
-
-p {
-  margin: 0;
-}
-
-.x-small {
-  font-size: x-small;
-}
-
-/* New */
-
-table.border tbody tr th {
-  width: 50px;
-  text-align: right;
-  font-size: 9px;
-}
-
-.barcode {
-  width: 203px;
-  float: left;
-}
-
-#general_waybill .info {
-  padding-left: 204px;
-}
-
-#general_waybill td {
-  font-size: 11px;
-}
-
-#loading_details tbody tr.item {
-  font-size:9px;
-}
-
-#loading_details tbody tr.item td.number {
-  text-align:right;
-  width: 60px;
-}
-
-.signature {
-  vertical-align: top;
-  height: 27mm;
-  width: 50%;
-}
-
-.signature p {
-  font-size: x-small;
-}
-
-#receipt tbody tr td {
-  min-width: 15%;
+td.signature span{
+	display:block;
+	float:left;
+	height:27mm;
+	width:100%;
 }
