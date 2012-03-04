@@ -220,7 +220,7 @@ admin.site.register( ets.models.Location, LocationAdmin )
 
 class CompasAdmin(logicaldelete.admin.ModelAdmin):
     
-    list_display = ('pk', 'active')
+    list_display = ('pk', 'read_only', 'active')
     search_fields = list_display
     filter_horizontal = ('officers',)
     fieldsets = (
