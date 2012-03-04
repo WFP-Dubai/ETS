@@ -6,8 +6,7 @@
 import os.path
 from django.conf import global_settings
 
-PROJECT_ROOT = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../') )
-EGG_ROOT = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../') )
+EGG_ROOT = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../') )
 
 ugettext = lambda s: s
 
