@@ -39,7 +39,7 @@ def render_to_pdf(request, template_name, context, file_name):
     html = render_to_string(template_name, context_dict, RequestContext(request))
     result = StringIO.StringIO()
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), 
-                            result, debug=True, encoding='utf-8',
+                            result, debug=True, encoding='utf-8', show_error_as_pdf=True,
                             link_callback=fetch_resources)
     if not pdf.err:
         response = HttpResponse(result.getvalue(), content_type='application/pdf')
