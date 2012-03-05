@@ -178,7 +178,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'simple',
-            'filename': os.path.join(EGG_ROOT, 'log', 'access.log')  # log file
+            'filename': os.path.join(EGG_ROOT, 'access.log')  # log file
         },
     },
     'loggers': {
@@ -190,7 +190,6 @@ LOGGING = {
         'ho.pisa': {
             'handlers': ['console',],
             'level': 'INFO',
-            'filters': ['special']
         }
     }
 }
