@@ -161,11 +161,25 @@ DEFAULT_ORDER_LIFE = 3
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
         'mail_admins': {
             'level': 'ERROR',
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'simple',
+            'filename': os.path.join(EGG_ROOT, 'log', 'access.log')  # log file
+        },
     },
     'loggers': {
         'django.request':{
@@ -173,6 +187,11 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
+        'ho.pisa': {
+            'handlers': ['console',],
+            'level': 'INFO',
+            'filters': ['special']
+        }
     }
 }
 
