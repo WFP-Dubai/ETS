@@ -152,7 +152,7 @@ def import_places(compas):
         defaults = {
             'name': place.name,
             'location': location,
-            'organization': ets_models.Organization.objects.get(code=place.organization_id) if place.organization_id else None,
+            'organization': ets_models.Organization.objects.get_or_create(code=place.organization_id)[0] if place.organization_id else None,
             'compas': compas,
         }
         
