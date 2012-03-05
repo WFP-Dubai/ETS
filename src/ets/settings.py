@@ -189,7 +189,8 @@ LOGGING = {
         },
         'ho.pisa': {
             'handlers': ['console',],
-            'level': 'INFO',
+            'level': 'DEBUG',
+            'propagate': True,
         }
     }
 }
