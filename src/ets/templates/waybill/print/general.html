@@ -30,7 +30,7 @@
             {% thumbnail barcode_url "200x200" as im %}
 			<img alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
 			{% endthumbnail %}
-          {% cache %}
+          {% endcache %}
 		</td>
 	</tr>
 	<tr>
