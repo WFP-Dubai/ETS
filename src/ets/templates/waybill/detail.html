@@ -66,7 +66,7 @@
 
 {% block script %}
 {{ block.super }}
-<script charset="utf-8">
+<script type="text/javascript">
   $(window).load(function() {
     $('.print_copy').click(function(){
   		window.location = '{% url waybill_pdf waybill_pk=object.pk %}';
