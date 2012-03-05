@@ -57,7 +57,7 @@ Production dependencies
   
 Following names of package are called so in debian package system::
   
-  sudo apt-get install libpq-dev libaio-dev
+  sudo apt-get install libpq-dev libaio-dev redis-server
 
 
 PostgreSQL
