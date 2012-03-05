@@ -149,7 +149,7 @@ class PrefixedPatterns:
                             
         ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
     
-        ( r'^qrcode/(?P<waybill_pk>[-\w]+)/$', "barcode_qr", {}, "barcode_qr" ),
+        ( r'^qrcode/(?P<waybill_pk>[-\w]+).jpg$', "barcode_qr", {}, "barcode_qr" ),
         
         ( r'^sync_compas/$', "sync_compas", {
             'queryset': ets.models.Compas.objects.all(),

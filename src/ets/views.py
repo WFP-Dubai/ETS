@@ -353,8 +353,9 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
     
     barcode = waybill.barcode_qr()
     response = HttpResponse(barcode.read(), content_type="image/jpeg")
-    response['Content-Disposition'] = 'attachment; filename=%s' % barcode.name
+    #response['Content-Disposition'] = 'attachment; filename=%s' % barcode.name
     return response
+barcode_qr.authentication = False
 
 
 def stock_items(request, template_name, queryset):

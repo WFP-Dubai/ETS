@@ -11,7 +11,8 @@ class RequiredAuthenticationMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         
         #DIRTY HACK. CHANGE IT LATER.
-        if hasattr(view_func, 'authentication') and not isinstance(view_func.authentication, NoAuthentication):
+        if hasattr(view_func, 'authentication')\
+        and not (isinstance(view_func.authentication, NoAuthentication) and view_func.authentication):
             return
         
         if not request.user.is_authenticated():
