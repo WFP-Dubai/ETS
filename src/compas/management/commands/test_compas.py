@@ -38,6 +38,10 @@ class Command(BaseCommand):
             cursor = conn.cursor()
             cursor.execute("SELECT COUNT(*) FROM organizations;")
             cursor.execute("SELECT COUNT(*) FROM organizations;")
+            cursor.execute("SELECT COUNT(*) FROM epic_geo;")
+            cursor.execute("SELECT COUNT(*) FROM epic_geo;")
+            cursor.execute("SELECT COUNT(*) FROM epic_persons;")
+            cursor.execute("SELECT COUNT(*) FROM epic_persons;")
         except Exception, err:
             if verbosity >= 2:
                 print err
