@@ -10,6 +10,39 @@ TEMPLATE_LOADERS = (
   ),
 )
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'console':{
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'django.request':{
+            'handlers': ['console',],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+        'ho.pisa': {
+            'handlers': ['console',],
+            'level': 'DEBUG',
+            'propagate': True,
+        }
+    }
+}
+
+
 MIDDLEWARE_CLASSES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
 
 DEBUG = True
