@@ -1,0 +1,100 @@
+{%load extra_tags%}
+{% load i18n %}
+<table id="loaded">
+<thead>
+	<tr>
+		<th colspan="2">III. {% trans "Certification of Commodities Loaded" %} <span class="x-small">(please endorse this section with an official stamp)</span></th>
+	</tr>
+</thead>
+<tbody>
+	<tr>
+		<td class="w85">
+			<span>WAREHOUSE/DISPATCH POINT</span>
+			&nbsp;
+		</td>
+		<td class="w85">
+			<span>23. {% trans "Transport Contractor" %}: </span>
+			{{ object.order.transport_name }}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span>21. {% trans "Name" %}: </span>
+			{{ object.dispatcher_person.get_full_name }}
+		</td>
+		<td>
+			<span>24. {% trans "Transport Subcontractor" %}: </span>
+			{{ object.transport_sub_contractor }}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span>22. {% trans "Title" %}: </span>
+			{{ object.dispatcher_person.title }}
+		</td>
+		<td>
+			<span>25. {% trans "Driver's Name" %}: </span>
+			{{ object.transport_driver_name }}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span>{% trans "Container 1" %}:</span>
+{% if object.container_one_number %}
+			{% trans "No." %}: {{ object.container_one_number }}<br/>
+{% endif %}
+{% if object.container_one_seal_number %}
+			{% trans "Seal" %}: {{ object.container_one_seal_number }}<br/>
+{% endif %}
+{% if object.container_one_remarks_dispatch %}
+			{% trans "Remarks" %}: {{ object.container_one_remarks_dispatch }}
+{% endif %}
+		</td>
+		<td>
+			<span>26. {% trans "Driver's Licence/ID" %}: </span>
+			{{ object.transport_driver_licence }}
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<span>{% trans "Container 2" %}:</span>
+{% if object.container_two_number %}
+			{% trans "No." %}: {{ object.container_two_number }}<br/>
+{% endif %}
+{% if object.container_two_seal_number %}
+			{% trans "Seal" %}: {{ object.container_two_seal_number }}<br/>
+{% endif %}
+{% if object.container_two_remarks_dispatch %}
+			{% trans "Remarks" %}: {{ object.container_two_remarks_dispatch }}
+{% endif %}
+		</td>
+		<td>
+			<span>27. {% trans "Vehicle registration" %}: </span>
+			{{ object.transport_vehicle_registration }}
+{% if object.transport_trailer_registration %}
+			<br/>
+			<span> &nbsp; &nbsp; &nbsp; {% trans "Trailer No." %}: </span>
+			{{ object.transport_trailer_registration }}
+{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td class="signature">
+			<span>{% trans "I hereby certify the loading of the commodities described above." %}</span> 
+{% if object.transport_dispach_signed_date %}
+			{{ object.dispatcher_person.get_full_name }}<br/>
+			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}<br/>
+{% endif %}
+			{% trans "Name, signature and stamp" %}
+		</td>
+		<td class="signature">
+			<span>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</span>
+			{% if object.transport_dispach_signed_date %}
+				{{ object.transport_driver_name|upper }}<br/>
+				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}<br/>
+			{% endif %}
+			{% trans "Name, signature and stamp" %}
+		</td>
+	</tr>
+</tbody>
+</table>

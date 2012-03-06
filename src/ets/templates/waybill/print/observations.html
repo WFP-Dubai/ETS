@@ -1,31 +1,5 @@
 {% load extra_tags %}
 {% load i18n %}
-<table id="receipt">
-<thead>
-	<tr>
-		<th colspan="8">IV. {% trans "Certification of Commodities Received" %}</th>
-	</tr>
-</thead>
-<tbody>
-	<tr>
-		<td class="w85"><span>28. {% trans "Location" %}: </span> {{ object.destination.location.name }}</td>
-		<td class="w85"><span>32. {% trans "Arrival Date" %}: </span> {{ object.arrival_date|date|upper }}</td>
-	</tr>
-	<tr>
-		<td><span>29. {% trans "Consignee" %}: </span> {{ object.order.consignee }}</td>
-		<td><span>33. {% trans "Start Discharge Date" %}: </span> {{ object.start_discharge_date|date|upper }}</td>
-	</tr>
-	<tr>
-		<td><span>30. {% trans "Name" %}: </span> {{ object.receipt_person.get_full_name }}</td>
-		<td><span>34. {% trans "End Discharge Date" %}: </span> {{ object.end_discharge_date|date|upper }}</td>
-	</tr>
-	<tr>
-		<td><span>31. {% trans "Title" %}: </span> {{ object.receipt_person.title }}</td>
-		<td><span>35. {% trans "Distance in KM" %}: </span> {{ object.distance|default:"" }}</td>
-	</tr>
-</tbody>
-</table>
-
 <table id="observations">
 <thead>
 	<tr>

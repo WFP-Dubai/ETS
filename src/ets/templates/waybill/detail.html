@@ -47,9 +47,11 @@
 </div>
 
 {% include 'waybill/print/header.html' %}
-{% include 'waybill/print/general.html' %}
-{% include 'waybill/print/loading.html' %}
-{% include 'waybill/print/receipt.html' %}
+{% include 'waybill/print/transaction_details.html' %}
+{% include 'waybill/print/loading_details.html' %}
+{% include 'waybill/print/commodities_loaded.html' %}
+{% include 'waybill/print/commodities_received.html' %}
+{% include 'waybill/print/observations.html' %}
 
 <div id="sidebar" class="hidden_print">
   <h3>{% trans "Waybill history" %}</h3>
