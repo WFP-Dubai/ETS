@@ -89,3 +89,6 @@ table#receipt span {
 }
 
 /* that's it */
+hr.sep {
+	margin:20px;
+}
