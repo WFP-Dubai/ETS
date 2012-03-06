@@ -87,8 +87,9 @@ class PrefixedPatterns:
                                                           receipt_signed_date__isnull=True)
         }, "waybill_reception_scanned"),
         
-        ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", 
-          {}, "waybill_finalize_receipt" ),
+        ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", {
+            'template_name': 'waybill/print/detail.html',
+        }, "waybill_finalize_receipt" ),
         
         #Validation pages
         

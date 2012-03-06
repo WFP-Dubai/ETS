@@ -68,11 +68,11 @@ def waybill_view(request, waybill_pk, queryset, template):
     return waybill_detail(request, waybill, template)
     
 
-def waybill_pdf(request, waybill_pk, queryset, template):
+def waybill_pdf(request, waybill_pk, queryset, template, print_original=False):
     """Generates PDF version of waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     return render_to_pdf(request, template, {
-                'print_original': True,
+                'print_original': print_original,
                 'object': waybill,
                 'items': waybill.loading_details.select_related(),
                 'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
@@ -92,7 +92,21 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     waybill.dispatch_sign()
     
     #return waybill_detail(request, waybill, extra_context)
-    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name)
+    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name, print_original=True)
+
+
+@require_POST
+@person_required
+@receipt_view
+@transaction.commit_on_success
+def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
+    """ Signs reception"""
+    waybill = get_object_or_404(queryset, pk = waybill_pk)
+    waybill.receipt_sign()
+    
+    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name, print_original=True)
+#    return waybill_detail(request, waybill, extra_context={'print_original': True})
+
 
 
 @waybill_user_related
@@ -217,22 +231,6 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'formset': loading_formset,
         'waybill': waybill,
     })
-
-
-@require_POST
-@person_required
-@receipt_view
-@transaction.commit_on_success
-def waybill_finalize_receipt(request, waybill_pk, queryset):
-    """ Signs reception"""
-    waybill = get_object_or_404(queryset, pk = waybill_pk)
-    waybill.receipt_sign()
-    
-    messages.add_message( request, messages.INFO, _('Waybill %(waybill)s Receipt Signed') % { 
-        'waybill': waybill.pk,
-    })
-
-    return waybill_detail(request, waybill, extra_context={'print_original': True})
 
 
 @person_required

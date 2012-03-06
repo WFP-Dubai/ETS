@@ -2,13 +2,14 @@
 <html>
 <head>
     <title>{{ object }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/waybill.css" media="print" />
     <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/print.css" media="print" />
 </head>
 <body>
 {% load i18n extra_tags %}
-  {% include 'waybill/print/header.html' %}
-  {% include 'waybill/print/general.html' %}
-  {% include 'waybill/print/loading.html' %}
-  {% include 'waybill/print/receipt.html' %}
+{% include 'waybill/print/header.html' %}
+{% include 'waybill/print/general.html' %}
+{% include 'waybill/print/loading.html' %}
+{% include 'waybill/print/receipt.html' %}
 </body>
 </html>
