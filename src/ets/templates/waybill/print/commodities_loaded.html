@@ -1,50 +1,5 @@
 {%load extra_tags%}
 {% load i18n %}
-<table id="loading_details">
-<thead>
-	<tr>
-		<th colspan="9">II. {% trans "Loading Details" %}</th>
-	</tr>
-</thead>
-<tbody>
-	<tr class="title">
-		<td>13. {% trans "SI No" %}</td>
-		<td>7. {% trans "Project no." %}</td>
-		<td>14. {% trans "Commodity" %}</td>
-		<td>15. {% trans "Packing" %}</td>
-		<td>16. {% trans "Number of Units" %}</td>
-		<td colspan="2">{% trans "Unit Weight (kg)" %}<br/>
-			<span>17. {% trans "Net" %}</span>
-			<span>18. {% trans "Gross" %}</span>
-		</td>
-		<td colspan="2">{% trans "Tonnage (mt)" %}<br/>
-			<span>19. {% trans "Net" %}</span>
-			<span>20. {% trans "Gross" %}</span>
-		</td>
-	</tr>
-{% for lineitem in items %}
-    <tr>
-        <td class="number">{% trans "ID" %} {{ forloop.counter }}. {{ lineitem.stock_item.coi_code }}</td>
-        <td class="number">{{ lineitem.stock_item.project_number }}</td>
-        <td>{{ lineitem.stock_item.commodity.name }}</td>
-        <td>{{ lineitem.stock_item.package.name }}</td>
-        <td class="number">{{ lineitem.number_of_units }}</td>
-        <td class="number">{{ lineitem.unit_weight_net|floatformat:3 }}</td>
-        <td class="number">{{ lineitem.unit_weight_gross|floatformat:3 }}</td>
-        <td class="number">{{ lineitem.total_weight_net|floatformat:3 }}</td>
-        <td class="number">{{ lineitem.total_weight_gross|floatformat:3 }}</td>
-    </tr>
-{% endfor %}
-	<tr>
-		<td colspan="9">
-			<span>{% trans "Dispatch Remarks" %}:</span>
-			{{ object.dispatch_remarks }}
-		</td>
-	</tr>
-</tbody>
-</table>
-
-	
 <table id="loaded">
 <thead>
 	<tr>

@@ -216,12 +216,14 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         self.assertEqual(waybill.loading_details.get().number_of_units, 10)
         
         
-    def test_waybill_finalize_dispatch(self):
-        """ets.views.waybill_finalize_dispatch"""
-        self.client.login(username='dispatcher', password='dispatcher')
-        response = self.client.post(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['print_original'])
+    #===========================================================================
+    # def test_waybill_finalize_dispatch(self):
+    #    """ets.views.waybill_finalize_dispatch"""
+    #    self.client.login(username='dispatcher', password='dispatcher')
+    #    response = self.client.post(reverse('waybill_finalize_dispatch', kwargs={"waybill_pk": self.waybill.pk,}))
+    #    self.assertEqual(response.status_code, 200)
+    #    self.assertTrue(response.context['print_original'])
+    #===========================================================================
     
     def test_waybill_reception(self):
         """ets.views.waybill_reception test"""
