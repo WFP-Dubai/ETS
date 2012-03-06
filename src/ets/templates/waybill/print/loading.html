@@ -53,11 +53,11 @@
 </thead>
 <tbody>
 	<tr>
-		<td>
+		<td class="w85">
 			<span>WAREHOUSE/DISPATCH POINT</span>
 			&nbsp;
 		</td>
-		<td>
+		<td class="w85">
 			<span>23. {% trans "Transport Contractor" %}: </span>
 			{{ object.order.transport_name }}
 		</td>
@@ -128,7 +128,7 @@
 			<span>{% trans "I hereby certify the loading of the commodities described above." %}</span> 
 {% if object.transport_dispach_signed_date %}
 			{{ object.dispatcher_person.get_full_name }}<br/>
-			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}
+			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}<br/>
 {% endif %}
 			{% trans "Name, signature and stamp" %}
 		</td>
@@ -136,7 +136,7 @@
 			<span>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</span>
 			{% if object.transport_dispach_signed_date %}
 				{{ object.transport_driver_name|upper }}<br/>
-				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}
+				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}<br/>
 			{% endif %}
 			{% trans "Name, signature and stamp" %}
 		</td>

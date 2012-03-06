@@ -1,4 +1,4 @@
-{% load extra_tags thumbnail cache %}
+{% load extra_tags thumbnail %}
 {% load i18n %}
 
 <table id="general" cellspacing="0">
@@ -26,14 +26,9 @@
 			{{ object.destination.name }}
 		</td>
 		<td rowspan="4" class="barcode">
-          {% cache 100000 barcode object.pk object.transport_dispach_signed_date object.sent_compas object.receipt_sent_compas object.receipt_signed_date %}
-            <img alt="barcode" src="{{ barcode_url }}" width="200" height="200"/>
-            {% comment %}
-            {% thumbnail barcode_url "200x200" as im %}
+			{% thumbnail 'test/test_barcode.jpeg' "200x200" as im %}
 			<img alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
 			{% endthumbnail %}
-            {% endcomment %}
-          {% endcache %}
 		</td>
 	</tr>
 	<tr>

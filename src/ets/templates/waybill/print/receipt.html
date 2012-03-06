@@ -8,8 +8,8 @@
 </thead>
 <tbody>
 	<tr>
-		<td><span>28. {% trans "Location" %}: </span> {{ object.destination.location.name }}</td>
-		<td><span>32. {% trans "Arrival Date" %}: </span> {{ object.arrival_date|date|upper }}</td>
+		<td class="w85"><span>28. {% trans "Location" %}: </span> {{ object.destination.location.name }}</td>
+		<td class="w85"><span>32. {% trans "Arrival Date" %}: </span> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
 		<td><span>29. {% trans "Consignee" %}: </span> {{ object.order.consignee }}</td>
@@ -29,21 +29,25 @@
 <table id="observations">
 <thead>
 	<tr>
-		<th colspan="11">V. {% trans "Observations" %} <span class="x-small">(For Lost or Damaged Goods please indicate weight and cause)</span></th>
+		<th colspan="8">V. {% trans "Observations" %} <span class="x-small">(For Lost or Damaged Goods please indicate weight and cause)</span></th>
 	</tr>
 </thead>
 <tbody>
-	<tr>
+	<tr class="sans">
 		<td>{% trans "Receipt Condition" %}</td>
 		<td colspan="2">{% trans "Good" %}</td>
 		<td colspan="3">{% trans "Lost or Damaged cargo" %}</td>
 		<td colspan="2">{% trans "Total received" %}</td>
 	</tr>
-	<tr>
-		<td>{% trans "SI No" %}</td>
-		<td>{% trans "Units" %}</td><td>{% trans "Net MT" %}</td>
-		<td>{% trans "Units" %}</td><td>{% trans "Net MT" %}</td><td>{% trans "Reason" %}</td>
-		<td>{% trans "Units" %}</td><td>{% trans "Net MT" %}</td>
+	<tr class="sans">
+		<td class="w34">{% trans "SI No" %}</td>
+		<td class="w17">{% trans "Units" %}</td>
+		<td class="w17">{% trans "Net MT" %}</td>
+		<td class="w17">{% trans "Units" %}</td>
+		<td class="w17">{% trans "Net MT" %}</td>
+		<td class="w34">{% trans "Reason" %}</td>
+		<td class="w17">{% trans "Units" %}</td>
+		<td class="w17">{% trans "Net MT" %}</td>
 	</tr>
 {% for lineitem in items %}
 	<tr>
@@ -120,7 +124,7 @@
 			<span>{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</span>
 			{% if object.receipt_signed_date %}
 				{{ object.receipt_person.get_full_name }}<br/>
-				{% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}
+				{% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
 			{% trans "Name, signature and stamp" %}
 		</td>
@@ -128,7 +132,7 @@
 			<span>{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</span>
 			{% if object.receipt_signed_date %}
 				{{ object.transport_driver_name|upper}}<br/>
-				{% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}
+				{% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
 			{% trans "Name, signature and stamp" %}
 		</td>
