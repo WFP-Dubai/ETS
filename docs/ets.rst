@@ -6,6 +6,8 @@ ETS
 
 Central application in the system.
 
+.. _ets_models:
+
 Models
 ======
 
@@ -16,6 +18,8 @@ Inheritance diagrams
 --------------------
 
 .. inheritance-diagram:: ets.models
+
+.. _ets_views:
 
 Views
 =====
@@ -62,6 +66,8 @@ Middleware
 
 .. automodule:: ets.middleware
    :members:
+
+.. _ets_utils:
 
 Utils
 =====
