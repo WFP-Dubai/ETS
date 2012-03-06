@@ -58,7 +58,7 @@ install_requires.extend(extras_require['test'])
 #List of paths, where parser may find packages
 dependency_links = [
         'http://dist.plone.org/thirdparty/',
-        'http://pypi.pinaxproject.com/',
+        #'http://pypi.pinaxproject.com/',
         'http://dist.repoze.org',
         #'http://downloads.sourceforge.net/project/cx-oracle/5.1/cx_Oracle-5.1.tar.gz?r=http%3A%2F%2Fcx-oracle.sourceforge.net%2F&ts=1310462337&use_mirror=space',
 ]

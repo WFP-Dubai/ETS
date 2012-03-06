@@ -4,10 +4,8 @@ from ets.settings import *
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
   
 TEMPLATE_LOADERS = (
-  (
     'django.template.loaders.app_directories.Loader',
     'django.template.loaders.eggs.Loader',
-  ),
 )
 
 LOGGING = {

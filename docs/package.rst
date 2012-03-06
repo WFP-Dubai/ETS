@@ -21,6 +21,9 @@ Structure::
   |-docs                  Documentation
   |-src                   
     |---ets               :ref:`Configuration and common application <ets>`
+    	|---models.py     :ref:`Models <ets_models>`
+    	|---views.py      :ref:`Views <ets_views>`
+    	|---utils.py      :ref:`Utils <ets_utils>`
     |---compas            :ref:`COMPAS mapping models <compas>`
   ======================= =============================================================
 
