@@ -123,7 +123,8 @@
       
       "receipt_signed_date": null,
       
-      "_order": 0
+      "_order": 0,
+      "barcode": "test/test_barcode.jpeg"
     }
   }, 
   {
@@ -191,7 +192,8 @@
       
       "validated": false,
       
-      "_order": 0
+      "_order": 0,
+      "barcode": "test/test_barcode.jpeg"
     }
   }, 
   {
@@ -257,7 +259,8 @@
       "receipt_remarks": "",
       "receipt_validated": false,
       
-      "_order": 0
+      "_order": 0,
+      "barcode": "test/test_barcode.jpeg"
     }
   },
   {

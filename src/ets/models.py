@@ -18,6 +18,7 @@ from django.db import transaction
 from django.core.files.base import File, ContentFile
 from django.db.models.aggregates import Max
 
+from sorl.thumbnail.fields import ImageField
 from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
@@ -577,6 +578,10 @@ class Waybill( ld_models.Model ):
     receipt_validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
     receipt_sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
     
+    barcode = ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
+                       blank=True, null=True,
+                       max_length=255,)
+    
     audit_log = AuditLog(exclude=())
 
     objects = ld_models.managers.LogicalDeletedManager()
@@ -590,13 +595,23 @@ class Waybill( ld_models.Model ):
     def  __unicode__( self ):
         return self.slug
     
+    def default_update_to(self, file_name):
+        return 'uploads/waybills/%s/%s/%s' % (
+                    self.order.pk, self.slug, file_name
+        )
+    
     @models.permalink
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
     
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
-        return super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
+        if self.pk:
+            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr())
+        super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
+        if not self.barcode:
+            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr())
+            self.save()
 
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
@@ -745,7 +760,9 @@ class Waybill( ld_models.Model ):
         image.save(file_out, 'JPEG')
         file_out.reset()
         
-        return File(file_out, name="%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date))
+        #name = "%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date)
+        
+        return ContentFile(file_out.read())
     
     
     @classmethod
