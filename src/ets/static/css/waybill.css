@@ -8,7 +8,6 @@ body {
 }
 .content {
 	font: 10pt/12pt Times, Georgia, serif;
-	margin:0 20px;
 	background:#eee;
 }
 h1 {
@@ -22,6 +21,8 @@ h1 {
 table {
 	width:170mm;
 	border-spacing:0;
+	background:#fff;
+	margin:0 20px;
 }
 td {
 	border:1px solid #aaa;
@@ -88,3 +89,6 @@ table#receipt span {
 }
 
 /* that's it */
+hr.sep {
+	margin:20px;
+}
