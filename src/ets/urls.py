@@ -62,6 +62,10 @@ class PrefixedPatterns:
             "template": 'waybill/detail.html',
             'queryset': ets.models.Waybill.objects.all(),
         }, "waybill_view" ),
+        ( r'^waybill/(?P<waybill_pk>[-\w]+)/simple/$', 'waybill_view', {
+            "template": 'waybill/print/detail.html',
+            'queryset': ets.models.Waybill.objects.all(),
+        }, "waybill_view" ),
         
         ( r'^waybill/(?P<waybill_pk>[-\w]+).pdf$', 'waybill_pdf', {
             "template": 'waybill/print/detail.html',
