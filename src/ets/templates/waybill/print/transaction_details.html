@@ -1,28 +1,29 @@
 {% load extra_tags thumbnail cache i18n %}
+<div class="general">
+{% thumbnail object.barcode '200x200' as im %}
+<img class="barcode" alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
+{% endthumbnail %}
 <table id="general" cellspacing="0" cellpadding="0">
 <thead>
 	<tr>
-		<th colspan="5">I. {% trans "Transaction Details" %}</th>
+		<th colspan="4">
+		I. {% trans "Transaction Details" %}
+		</th>
 	</tr>
 </thead>
 <tbody>
 	<tr>
-		<td width="20%">
-			<p>1. {% trans "Origin(location)" %}: </p> {{ object.order.warehouse.location.name }}
-		</td>
-		<td width="20%">
-			<p>2. {% trans "Origin(warehouse)" %}: </p> {{ object.order.warehouse.name }}
-		</td>
-		<td width="20%">
-			<p>3. {% trans "Destination(location)" %}: </p> {{ object.destination.location.name }}
-		</td>
-		<td width="20%">
-			<p>4. {% trans "Destination(warehouse)" %}: </p> {{ object.destination.name }}
+		<td>
+			<p>1. {% trans "Origin (location)" %}: </p> {{ object.order.warehouse.location.name }}
 		</td>
 		<td>
-			{% thumbnail object.barcode '200x200' as im %}
-			<img class="barcode" alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
-			{% endthumbnail %}
+			<p>2. {% trans "Origin (warehouse)" %}: </p> {{ object.order.warehouse.name }}
+		</td>
+		<td>
+			<p>3. {% trans "Destination (location)" %}: </p> {{ object.destination.location.name }}
+		</td>
+		<td>
+			<p>4. {% trans "Destination (warehouse)" %}: </p> {{ object.destination.name }}
 		</td>
 	</tr>
 	<tr>
@@ -55,3 +56,4 @@
 	</tr>
 </tbody>
 </table>
+</div>

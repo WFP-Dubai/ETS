@@ -3,19 +3,28 @@
 	margin:0;
 }
 body {
-	text-overflow:ellipsis;
+	/* text-overflow:ellipsis; /* CSS 3 selector, not sure if removing it breaks anything */
 	background-color:#fff;
-	font: 10pt/12pt Times;
+	font-size:10pt;
+	line-height:12pt;
+	font-family:Times-Roman;
 }
 .content {
-	font: 10pt/12pt Times;
+	font-size:10pt;
+	line-height:12pt;
+	font-family:Times-Roman;
 	background-color:#eee;
 }
 h1 {
-	font: 18pt/22pt Times;
+	font-size:18pt;
+	line-height:22pt;
+	font-family:Times-Roman;
 }
+#top_note ,
 .x-small {
-	font: 8pt/9pt Times;
+	font-size:8pt;
+	line-height:9pt;
+	font-family:Times-Roman;
 }
 
 /* all tables */
@@ -26,14 +35,17 @@ table {
 	position:relative;
 }
 td {
-	border:1px solid #000;
+	border:1px solid #333;
 	vertical-align:top;
 	padding-top:1mm;
+	padding-left:1mm;
 }
 tr.sans td,
 tr.title td,
 td p {
-	font:7pt/8pt Arial;
+	font-size:7pt;
+	line-height:8pt;
+	font-family:Helvetica;
 }
 thead th {
 	text-align:left;
@@ -54,21 +66,33 @@ td.signature p.stamp {
 	font-style:italic;
 	text-align:center;
 }
-img.barcode {
-	position:absolute;
-	right:0;
-}
+
+td.w50 {width:50%;}
+td.w20 {width:20%;}
+td.w10 {width:10%;}
 
 /* header table */
-#top_note {font: 8pt/9pt Times;}
+table#header {
+	height:2cm;	
+}
 
 /* general table */
-table#general tbody th {
-	text-align:right;
-	width: 24mm !important;
+table#general {
+	width:118mm;
+	height:200px;
 }
-table#general td.barcode {
-	width: 50mm !important;
+table#general td {
+	height:60px;
+	width:25%;
+}
+div.general {
+	width:170mm;
+	position:relative;
+}
+img.barcode {
+	position:absolute;
+	top:0;
+	right:0;
 }
 
 /* loading tables */
