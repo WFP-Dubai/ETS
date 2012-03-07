@@ -173,6 +173,7 @@ class PrefixedPatterns:
         ( r'^accounts/', include('django.contrib.auth.urls') ),
         ( r'^databrowse/(.*)', databrowse.site.root ),
         ( r'^rosetta/', include('rosetta.urls') ),
+        (r'^ajax_select/', include('ajax_select.urls')),
         ( r'^admin/', include( admin.site.urls ) ),
         ( r'^api/offline/', include('ets.offliner.api.urls')),
         ( r'^api/', include('ets.api.urls')),

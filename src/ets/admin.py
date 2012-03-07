@@ -10,6 +10,7 @@ from django.utils.datastructures import SortedDict
 from django.http import HttpResponseRedirect
 from django.forms import MediaDefiningClass
 
+from ajax_select import make_ajax_form
 import logicaldelete.admin
 from django_extensions.utils.text import truncate_letters
 
@@ -300,8 +301,8 @@ class PersonAdmin(UserAdmin):
     )
     readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location', 'code')
     raw_id_fields = ('organization', 'location')
-    filter_horizontal = ('warehouses',)
-    form = ets.forms.PersonChangeForm
+    #filter_horizontal = ('warehouses',)
+    form = make_ajax_form(ets.models.Person, dict(warehouses='warehouses'), ets.forms.PersonChangeForm)
     
     def queryset(self, request):
         queryset = super(PersonAdmin, self).queryset(request)
