@@ -99,7 +99,7 @@
 				{{ object.receipt_person.get_full_name }}<br/>
 				{% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
-			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
+			<p class="stamp">{% trans "Name, signature and stamp" %}</p>
 		</td>
 		<td class="signature" colspan="4">
 			<p>{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
@@ -107,7 +107,7 @@
 				{{ object.transport_driver_name|upper}}<br/>
 				{% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
-			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
+			<p class="stamp">{% trans "Name, signature and stamp" %}</p>
 		</td>
 	</tr>
 </tbody>

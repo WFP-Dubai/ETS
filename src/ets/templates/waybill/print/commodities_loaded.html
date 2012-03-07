@@ -77,7 +77,7 @@
 			{{ object.dispatcher_person.get_full_name }}<br/>
 			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}<br/>
 {% endif %}
-			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
+			<p class="stamp">{% trans "Name, signature and stamp" %}</p>
 		</td>
 		<td class="signature">
 			<p>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</p>
@@ -85,7 +85,7 @@
 				{{ object.transport_driver_name|upper }}<br/>
 				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}<br/>
 			{% endif %}
-			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
+			<p class="stamp">{% trans "Name, signature and stamp" %}</p>
 		</td>
 	</tr>
 </tbody>

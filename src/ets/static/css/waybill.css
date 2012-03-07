@@ -47,11 +47,12 @@ td.number {
 td.signature {
 	height:25mm;
 }
-td.signature span.stamp {
+td.signature p.stamp {
 	position:absolute;
 	bottom:0;
 	color:#999;
 	font-style:italic;
+	text-align:center;
 }
 img.barcode {
 	position:absolute;
