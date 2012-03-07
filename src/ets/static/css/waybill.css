@@ -5,13 +5,10 @@
 body {
 	/* text-overflow:ellipsis; /* CSS 3 selector, not sure if removing it breaks anything */
 	background-color:#fff;
-	font-size:10pt;
-	line-height:12pt;
-	font-family:Times-Roman;
 }
 .content {
 	font-size:10pt;
-	line-height:12pt;
+	line-height:11pt;
 	font-family:Times-Roman;
 	background-color:#eee;
 }
@@ -39,6 +36,9 @@ td {
 	vertical-align:top;
 	padding-top:1mm;
 	padding-left:1mm;
+	font-size:10pt;
+	line-height:11pt;
+	font-family:Times-Roman;
 }
 tr.sans td,
 tr.title td,
@@ -49,15 +49,16 @@ td p {
 }
 thead th {
 	text-align:left;
-	color:white;
-	background:black;
-	padding:2px 4px;
+	color:#fff;
+	background:#000;
+	padding-top:1mm;
+	padding-left:2mm;
 }
 td.number {
 	text-align:right;
 }
 td.signature {
-	height:25mm;
+	height:27mm;
 }
 td.signature p.stamp {
 	position:absolute;
@@ -67,14 +68,11 @@ td.signature p.stamp {
 	text-align:center;
 }
 
-td.w50 {width:50%;}
+td.w50 {width:85mm;}
 td.w20 {width:20%;}
 td.w10 {width:10%;}
 
 /* header table */
-table#header {
-	height:2cm;	
-}
 
 /* general table */
 table#general {
@@ -82,12 +80,12 @@ table#general {
 	height:200px;
 }
 table#general td {
-	height:60px;
 	width:25%;
+	padding-top:1mm;
+	padding-left:1mm;
 }
-div.general {
-	width:170mm;
-	position:relative;
+#transaction_detail td {
+	padding:0;
 }
 img.barcode {
 	position:absolute;
