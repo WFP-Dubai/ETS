@@ -221,16 +221,6 @@ AJAX_SELECT_BOOTSTRAP = True
 LOG_DIRECTORY = os.path.join(EGG_ROOT, 'logs') 
 ALLOWED_INCLUDE_ROOTS = (LOG_DIRECTORY,)
 
-#List of possible content types to export
-#===============================================================================
-# EXPORT_CONTENT_TYPES = (
-#    'waybill', 'location', 'organization', 'oranization', 
-#    'warehouse', 'person', 'compas', 'Commodity Category', 
-#    'Commodity', 'Package', 'Stock Item', 'Loss/Damages Reason',
-#    'Order', 'OrderItem', 'LoadingDetail',
-# )
-#===============================================================================
-
 class DatabasesFormDatabase(object):
     
     default = 'default'
