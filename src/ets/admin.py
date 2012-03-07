@@ -90,6 +90,7 @@ class ModelAdminWithForeignKeyLinksMetaclass(MediaDefiningClass):
 class CompasLoggerInline(admin.TabularInline):
     model = ets.models.CompasLogger
     extra = 0
+    readonly_fields = ('action', 'compas', 'waybill', 'when_attempted', 'status', 'message')
 
 class WaybillInline(admin.TabularInline):
     model = ets.models.Waybill
