@@ -1,13 +1,13 @@
 {% load extra_tags i18n %}
-<table id="header" cellspacing="0">
+<table id="header" cellspacing="0" cellpadding="0">
 <tbody>
 	<tr>
-		<td align="center" class="w34">
+		<td align="center" width="20%">
 			<img width="62" height="75" src="{{ STATIC_URL }}images/logo_small.gif"/>
 		</td>
 		<td align="center">
 			<h1>{% trans "Waybill" %} {% trans "No:" %} {{ object.pk }}</h1>
-			<span id="top_note">{% trans "Conditions of carriage as indicated overleaf are applicable" %}</span>
+			<p id="top_note">{% trans "Conditions of carriage as indicated overleaf are applicable" %}</p>
 			{% if print_original %}
 			<h1 id="original_lable">{% trans "ORIGINAL" %}</h1>
 			{% else %}

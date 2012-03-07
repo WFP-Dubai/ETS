@@ -1,6 +1,5 @@
-{%load extra_tags%}
-{% load i18n %}
-<table id="loaded">
+{% load extra_tags i18n %}
+<table id="loaded" cellspacing="0" cellpadding="0">
 <thead>
 	<tr>
 		<th colspan="2">III. {% trans "Certification of Commodities Loaded" %} <span class="x-small">(please endorse this section with an official stamp)</span></th>
@@ -8,38 +7,32 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w85">
-			<span>WAREHOUSE/DISPATCH POINT</span>
-			&nbsp;
+		<td width="50%">
+			<p>WAREHOUSE/DISPATCH POINT</p> {{ object.destination.location.name }}
 		</td>
-		<td class="w85">
-			<span>23. {% trans "Transport Contractor" %}: </span>
-			{{ object.order.transport_name }}
+		<td width="50%">
+			<p>23. {% trans "Transport Contractor" %}: </p> {{ object.order.transport_name }}
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<span>21. {% trans "Name" %}: </span>
-			{{ object.dispatcher_person.get_full_name }}
+			<p>21. {% trans "Name" %}: </p> {{ object.dispatcher_person.get_full_name }}
 		</td>
 		<td>
-			<span>24. {% trans "Transport Subcontractor" %}: </span>
-			{{ object.transport_sub_contractor }}
+			<p>24. {% trans "Transport Subcontractor" %}: </p> {{ object.transport_sub_contractor }}
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<span>22. {% trans "Title" %}: </span>
-			{{ object.dispatcher_person.title }}
+			<p>22. {% trans "Title" %}: </p> {{ object.dispatcher_person.title }}
 		</td>
 		<td>
-			<span>25. {% trans "Driver's Name" %}: </span>
-			{{ object.transport_driver_name }}
+			<p>25. {% trans "Driver's Name" %}: </p> {{ object.transport_driver_name }}
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<span>{% trans "Container 1" %}:</span>
+			<p>{% trans "Container 1" %}: </p>
 {% if object.container_one_number %}
 			{% trans "No." %}: {{ object.container_one_number }}<br/>
 {% endif %}
@@ -51,13 +44,12 @@
 {% endif %}
 		</td>
 		<td>
-			<span>26. {% trans "Driver's Licence/ID" %}: </span>
-			{{ object.transport_driver_licence }}
+			<p>26. {% trans "Driver's Licence/ID" %}: </p> {{ object.transport_driver_licence }}
 		</td>
 	</tr>
 	<tr>
 		<td>
-			<span>{% trans "Container 2" %}:</span>
+			<p>{% trans "Container 2" %}:</p>
 {% if object.container_two_number %}
 			{% trans "No." %}: {{ object.container_two_number }}<br/>
 {% endif %}
@@ -69,31 +61,31 @@
 {% endif %}
 		</td>
 		<td>
-			<span>27. {% trans "Vehicle registration" %}: </span>
+			<p>27. {% trans "Vehicle registration" %}: </p>
 			{{ object.transport_vehicle_registration }}
 {% if object.transport_trailer_registration %}
 			<br/>
-			<span> &nbsp; &nbsp; &nbsp; {% trans "Trailer No." %}: </span>
+			<p> &nbsp; &nbsp; &nbsp; {% trans "Trailer No." %}: </p>
 			{{ object.transport_trailer_registration }}
 {% endif %}
 		</td>
 	</tr>
 	<tr>
 		<td class="signature">
-			<span>{% trans "I hereby certify the loading of the commodities described above." %}</span> 
+			<p>{% trans "I hereby certify the loading of the commodities described above." %}</p> 
 {% if object.transport_dispach_signed_date %}
 			{{ object.dispatcher_person.get_full_name }}<br/>
 			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}<br/>
 {% endif %}
-			{% trans "Name, signature and stamp" %}
+			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
 		</td>
 		<td class="signature">
-			<span>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</span>
+			<p>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</p>
 			{% if object.transport_dispach_signed_date %}
 				{{ object.transport_driver_name|upper }}<br/>
 				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}<br/>
 			{% endif %}
-			{% trans "Name, signature and stamp" %}
+			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
 		</td>
 	</tr>
 </tbody>

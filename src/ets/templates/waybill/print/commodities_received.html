@@ -1,6 +1,5 @@
-{% load extra_tags %}
-{% load i18n %}
-<table id="receipt">
+{% load extra_tags i18n %}
+<table id="receipt" cellspacing="0" cellpadding="0">
 <thead>
 	<tr>
 		<th colspan="8">IV. {% trans "Certification of Commodities Received" %}</th>
@@ -8,20 +7,20 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w85"><span>28. {% trans "Location" %}: </span> {{ object.destination.location.name }}</td>
-		<td class="w85"><span>32. {% trans "Arrival Date" %}: </span> {{ object.arrival_date|date|upper }}</td>
+		<td width="50%"><p>28. {% trans "Location" %}: </p> {{ object.destination.location.name }}</td>
+		<td width="50%"><p>32. {% trans "Arrival Date" %}: </p> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
-		<td><span>29. {% trans "Consignee" %}: </span> {{ object.order.consignee }}</td>
-		<td><span>33. {% trans "Start Discharge Date" %}: </span> {{ object.start_discharge_date|date|upper }}</td>
+		<td><p>29. {% trans "Consignee" %}: </p> {{ object.order.consignee }}</td>
+		<td><p>33. {% trans "Start Discharge Date" %}: </p> {{ object.start_discharge_date|date|upper }}</td>
 	</tr>
 	<tr>
-		<td><span>30. {% trans "Name" %}: </span> {{ object.receipt_person.get_full_name }}</td>
-		<td><span>34. {% trans "End Discharge Date" %}: </span> {{ object.end_discharge_date|date|upper }}</td>
+		<td><p>30. {% trans "Name" %}: </p> {{ object.receipt_person.get_full_name }}</td>
+		<td><p>34. {% trans "End Discharge Date" %}: </p> {{ object.end_discharge_date|date|upper }}</td>
 	</tr>
 	<tr>
-		<td><span>31. {% trans "Title" %}: </span> {{ object.receipt_person.title }}</td>
-		<td><span>35. {% trans "Distance in KM" %}: </span> {{ object.distance|default:"" }}</td>
+		<td><p>31. {% trans "Title" %}: </p> {{ object.receipt_person.title }}</td>
+		<td><p>35. {% trans "Distance in KM" %}: </p> {{ object.distance|default:"" }}</td>
 	</tr>
 </tbody>
 </table>

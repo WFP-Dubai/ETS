@@ -1,6 +1,5 @@
-{% load extra_tags %}
-{% load i18n %}
-<table id="observations">
+{% load extra_tags i18n %}
+<table id="observations" cellspacing="0" cellpadding="0">
 <thead>
 	<tr>
 		<th colspan="8">V. {% trans "Observations" %} <span class="x-small">(For Lost or Damaged Goods please indicate weight and cause)</span></th>
@@ -14,14 +13,14 @@
 		<td colspan="2">{% trans "Total received" %}</td>
 	</tr>
 	<tr class="sans">
-		<td class="w34">{% trans "SI No" %}</td>
-		<td class="w17">{% trans "Units" %}</td>
-		<td class="w17">{% trans "Net MT" %}</td>
-		<td class="w17">{% trans "Units" %}</td>
-		<td class="w17">{% trans "Net MT" %}</td>
-		<td class="w34">{% trans "Reason" %}</td>
-		<td class="w17">{% trans "Units" %}</td>
-		<td class="w17">{% trans "Net MT" %}</td>
+		<td width="20%">{% trans "SI No" %}</td>
+		<td width="10%">{% trans "Units" %}</td>
+		<td width="10%">{% trans "Net MT" %}</td>
+		<td width="10%">{% trans "Units" %}</td>
+		<td width="10%">{% trans "Net MT" %}</td>
+		<td width="20%">{% trans "Reason" %}</td>
+		<td width="10%">{% trans "Units" %}</td>
+		<td width="10%">{% trans "Net MT" %}</td>
 	</tr>
 {% for lineitem in items %}
 	<tr>
@@ -83,7 +82,7 @@
 {% endfor %}   
 	<tr>
 		<td colspan="8">
-			<span>{% trans "Reciptient Remarks" %}:</span>
+			<p>{% trans "Reciptient Remarks" %}:</p>
        		{{ object.receipt_remarks }}
 			{% if object.container_one_remarks_reciept%}
 				<p>{% trans "Container 1 Remarks:" %}{{ object.container_one_remarks_reciept }}</p>
@@ -95,20 +94,20 @@
 	</tr>
 	<tr>
 		<td class="signature" colspan="4">
-			<span>{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</span>
+			<p>{% trans "On behalf of the Consignee I hereby certify receipt of the commodities loaded, unless endorsed as above." %}</p>
 			{% if object.receipt_signed_date %}
 				{{ object.receipt_person.get_full_name }}<br/>
 				{% trans "Date:" %}{{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
-			{% trans "Name, signature and stamp" %}
+			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
 		</td>
 		<td class="signature" colspan="4">
-			<span>{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</span>
+			<p>{% trans "On behalf of the Transport Contractor I hereby certify delivery of the commodities loaded, unless endorsed as above." %}</p>
 			{% if object.receipt_signed_date %}
 				{{ object.transport_driver_name|upper}}<br/>
 				{% trans "Date:" %} {{ object.receipt_signed_date|date|upper }}<br/>
 			{% endif %}
-			{% trans "Name, signature and stamp" %}
+			<span class="stamp">{% trans "Name, signature and stamp" %}</span>
 		</td>
 	</tr>
 </tbody>

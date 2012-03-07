@@ -4,17 +4,18 @@
 }
 body {
 	text-overflow:ellipsis;
-	background:#fff;
+	background-color:#fff;
+	font: 10pt/12pt Times;
 }
 .content {
-	font: 10pt/12pt Times, Georgia, serif;
-	background:#eee;
+	font: 10pt/12pt Times;
+	background-color:#eee;
 }
 h1 {
-	font: 18pt/22pt Times, Georgia, serif;
+	font: 18pt/22pt Times;
 }
 .x-small {
-	font: 8pt/9pt Times, Georgia, serif;
+	font: 8pt/9pt Times;
 }
 
 /* all tables */
@@ -22,53 +23,48 @@ table {
 	width:170mm;
 	border-spacing:0;
 	background:#fff;
-	margin:0 20px;
+	position:relative;
 }
 td {
-	border:1px solid #aaa;
+	border:1px solid #000;
 	vertical-align:top;
+	padding-top:1mm;
 }
 tr.sans td,
 tr.title td,
-td span {
-	font:7pt/8pt Arial, Verdana, Geneva, sansserif, sans;
-}
-td span {
-	display:block;
+td p {
+	font:7pt/8pt Arial;
 }
 thead th {
 	text-align:left;
 	color:white;
 	background:black;
-	padding:3px;
+	padding:2px 4px;
 }
 td.number {
 	text-align:right;
 }
 td.signature {
-	vertical-align: bottom;
-}
-td.signature span{
-	display:block;
-	float:left;
 	height:25mm;
-	width:100%;
 }
-td.w17{	width:17mm;}
-td.w34{	width:34mm;}
-td.w51{	width:51mm;}
-td.w85{	width:85mm;}
+td.signature span.stamp {
+	position:absolute;
+	bottom:0;
+	color:#999;
+	font-style:italic;
+}
+img.barcode {
+	position:absolute;
+	right:0;
+}
 
 /* header table */
-#top_note {font: 8pt/9pt Times, Georgia, serif;}
+#top_note {font: 8pt/9pt Times;}
 
 /* general table */
 table#general tbody th {
 	text-align:right;
 	width: 24mm !important;
-}
-table#general tbody td {
-	width: 36mm !important;
 }
 table#general td.barcode {
 	width: 50mm !important;
@@ -89,6 +85,6 @@ table#receipt span {
 }
 
 /* that's it */
-hr.sep {
-	margin:20px;
+div.wb {
+	margin:0px 50px 30px 50px;
 }

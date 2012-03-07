@@ -46,12 +46,14 @@
   {% waybill_delete object user _('Delete') object.order.get_absolute_url %}
 </div>
 
+<div class="wb">
 {% include 'waybill/print/header.html' %}
 {% include 'waybill/print/transaction_details.html' %}
 {% include 'waybill/print/loading_details.html' %}
 {% include 'waybill/print/commodities_loaded.html' %}
 {% include 'waybill/print/commodities_received.html' %}
 {% include 'waybill/print/observations.html' %}
+</div>
 
 <div id="sidebar" class="hidden_print">
   <h3>{% trans "Waybill history" %}</h3>
