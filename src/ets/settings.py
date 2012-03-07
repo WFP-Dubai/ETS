@@ -100,6 +100,7 @@ INSTALLED_APPS = (
     'autoslug',
     'uni_form',
     'logicaldelete',
+    'ajax_select',
     'native_tags',
     'compressor',
     'google_analytics',
@@ -208,6 +209,14 @@ THUMBNAIL_FORMAT = 'JPEG'
 
 #Loading details settings
 LOADING_LINES = 5
+
+AJAX_LOOKUP_CHANNELS = {
+    #'warehouses': dict(model='ets.Warehouse', search_field='code'),
+    'warehouses': ('ets.lookup', 'WarehouseChannel'),
+}
+
+AJAX_SELECT_INLINES = 'inline'
+AJAX_SELECT_BOOTSTRAP = True
 
 LOG_DIRECTORY = os.path.join(EGG_ROOT, 'logs') 
 ALLOWED_INCLUDE_ROOTS = (LOG_DIRECTORY,)

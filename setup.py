@@ -43,6 +43,7 @@ install_requires = [
         'sorl-thumbnail', # thumbnail creation tool
         'django-concurrent-server',
         #'pygraphviz',
+        'django-ajax-selects', # jQuery-powered auto-complete fields for ForeignKey and ManyToMany fields
 ]
 
 #Extra dependencies for test purposes
