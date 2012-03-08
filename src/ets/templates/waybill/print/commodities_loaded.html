@@ -34,10 +34,10 @@
 		<td>
 			<p>{% trans "Container 1" %}: </p>
 {% if object.container_one_number %}
-			{% trans "No." %}: {{ object.container_one_number }}<br/>
+			{% trans "No." %}: {{ object.container_one_number }} ---
 {% endif %}
 {% if object.container_one_seal_number %}
-			{% trans "Seal" %}: {{ object.container_one_seal_number }}<br/>
+			{% trans "Seal" %}: {{ object.container_one_seal_number }} ---
 {% endif %}
 {% if object.container_one_remarks_dispatch %}
 			{% trans "Remarks" %}: {{ object.container_one_remarks_dispatch }}
@@ -51,10 +51,10 @@
 		<td>
 			<p>{% trans "Container 2" %}:</p>
 {% if object.container_two_number %}
-			{% trans "No." %}: {{ object.container_two_number }}<br/>
+			{% trans "No." %}: {{ object.container_two_number }} ---
 {% endif %}
 {% if object.container_two_seal_number %}
-			{% trans "Seal" %}: {{ object.container_two_seal_number }}<br/>
+			{% trans "Seal" %}: {{ object.container_two_seal_number }} ---
 {% endif %}
 {% if object.container_two_remarks_dispatch %}
 			{% trans "Remarks" %}: {{ object.container_two_remarks_dispatch }}
@@ -72,7 +72,7 @@
 	</tr>
 	<tr>
 		<td class="signature">
-			<p>{% trans "I hereby certify the loading of the commodities described above." %}</p> 
+			<p>{% trans "I hereby certify the loading of the commodities described above." %}</p><br/>
 {% if object.transport_dispach_signed_date %}
 			{{ object.dispatcher_person.get_full_name }}<br/>
 			{% trans "Date:" %} {{ object.transport_dispach_signed_date|date|upper }}<br/>
@@ -80,7 +80,7 @@
 			<p class="stamp">{% trans "Name, signature and stamp" %}</p>
 		</td>
 		<td class="signature">
-			<p>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</p>
+			<p>{% trans "On behalf of the Transporter I hereby certify the receipt of the commodities as described above in good condition, unless otherwise endorsed here above." %}</p><br/>
 			{% if object.transport_dispach_signed_date %}
 				{{ object.transport_driver_name|upper }}<br/>
 				{% trans "Date:" %}{{object.transport_dispach_signed_date|date|upper}}<br/>

@@ -3,30 +3,35 @@
 	margin:0;
 }
 body {
-	/* text-overflow:ellipsis; /* CSS 3 selector, not sure if removing it breaks anything */
 	background-color:#fff;
 }
 .content {
-	font-size:10pt;
-	line-height:11pt;
+	font-size:9pt;
+	line-height:9pt;
 	font-family:Times-Roman;
 	background-color:#eee;
 }
+div.wb {
+	margin:0px 50px 30px 50px;
+}
+
+/* font sizes */
 h1 {
-	font-size:18pt;
-	line-height:22pt;
+	font-size:16pt;
+	line-height:16pt;
 	font-family:Times-Roman;
+	display:inline-block;
 }
 #top_note ,
 .x-small {
-	font-size:8pt;
-	line-height:9pt;
+	font-size:7pt;
+	line-height:7pt;
 	font-family:Times-Roman;
 }
 
 /* all tables */
 table {
-	width:170mm;
+	width:190mm;
 	border-spacing:0;
 	background:#fff;
 	position:relative;
@@ -36,15 +41,15 @@ td {
 	vertical-align:top;
 	padding-top:1mm;
 	padding-left:1mm;
-	font-size:10pt;
-	line-height:11pt;
+	font-size:9pt;
+	line-height:9pt;
 	font-family:Times-Roman;
 }
 tr.sans td,
 tr.title td,
 td p {
 	font-size:7pt;
-	line-height:8pt;
+	line-height:7pt;
 	font-family:Helvetica;
 }
 thead th {
@@ -53,61 +58,77 @@ thead th {
 	background:#000;
 	padding-top:1mm;
 	padding-left:2mm;
+	font-size:10pt;
+	line-height:10pt;
+	font-family:Helvetica;
+}
+thead th span {
+	margin-left:25px;
 }
 td.number {
 	text-align:right;
+	padding-right:1px;
+}
+
+td.w50 {width:50%;}
+td.w20 {width:20%;}
+td.w10 {width:10%;}
+
+/* header table */
+
+/* I. Transaction Details */
+#general_wrapper td {
+	padding:0;
+	border-left:none;
+}
+table#general {
+	width:100%;
+	height:202px;
+}
+table#general td.thumb {
+	width:200px;
+}
+table#general td {
+	padding-top:1mm;
+	padding-left:1mm;
+}
+table#general td {
+	padding-top:1mm;
+	padding-left:1mm;
+	border:1px solid #333;
+}
+
+/* II. Loading Details */
+table#loading_details tbody tr.title td {
+	text-align:center;
+}
+table#loading_details tbody td {
+	font-size:7pt;
+}
+
+/* III. Certification of Commodities Loaded */
+table#loaded tbody td {
+	width:50%;
+}
+table#loaded p {
+	display:inline;
 }
 td.signature {
-	height:27mm;
+	height:27mm !important;
 }
 td.signature p.stamp {
 	position:absolute;
 	bottom:0;
 	color:#999;
 	font-style:italic;
-	text-align:center;
 }
 
-td.w50 {width:85mm;}
-td.w20 {width:20%;}
-td.w10 {width:10%;}
-
-/* header table */
-
-/* general table */
-table#general {
-	width:118mm;
-	height:200px;
-}
-table#general td {
-	width:25%;
-	padding-top:1mm;
-	padding-left:1mm;
-}
-#transaction_detail td {
-	padding:0;
-}
-img.barcode {
-	position:absolute;
-	top:0;
-	right:0;
-}
-
-/* loading tables */
-table#loading_details tbody tr.title td span {
-	display:inline;
-	width:50%;
-	float:left;
-}
-table#loaded tbody td {
+/*IV. Certification of Commodities Received */
+table#receipt tbody td {
 	width:50%;
 }
-table#loaded span ,
-table#receipt span {
+table#receipt p {
 	display:inline;
 }
 
 /* that's it */
-div.wb {
-	margin:0px 50px 30px 50px;
-}

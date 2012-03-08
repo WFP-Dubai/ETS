@@ -1,62 +1,62 @@
 {% load extra_tags thumbnail cache i18n %}
-<table id="transaction_detail">
+<table id="general_wrapper">
+	<thead>
+		<tr>
+			<th colspan="2">
+			I. {% trans "Transaction Details" %}
+			</th>
+		</tr>
+	</thead>
 	<tr>
 		<td>
 			<table id="general" cellspacing="0" cellpadding="0">
-			<thead>
-				<tr>
-					<th colspan="4">
-					I. {% trans "Transaction Details" %}
-					</th>
-				</tr>
-			</thead>
-			<tbody>
 				<tr>
 					<td>
 						<p>1. {% trans "Origin (location)" %}: </p> {{ object.order.warehouse.location.name }}
 					</td>
 					<td>
-						<p>2. {% trans "Origin (warehouse)" %}: </p> {{ object.order.warehouse.name }}
+						<p>5. {% trans "Allocation Destination" %}: </p> {{ object.destination.location.get_country_display }}
 					</td>
 					<td>
-						<p>3. {% trans "Destination (location)" %}: </p> {{ object.destination.location.name }}
-					</td>
-					<td>
-						<p>4. {% trans "Destination (warehouse)" %}: </p> {{ object.destination.name }}
+						<p>9. {% trans "Date of Loading" %}: </p> {{ object.loading_date|date|upper }}
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<p>5. {% trans "Allocation Destination" %}: </p> {{ object.destination.location.get_country_display }}
+						<p>2. {% trans "Origin (warehouse)" %}: </p> {{ object.order.warehouse.name }}
 					</td>
 					<td>
 						<p>6. {% trans "Consignee" %}: </p> {{ object.order.consignee }}
 					</td>
 					<td>
-						<p>7. {% trans "Requested Dispatch Date" %}: </p> {{ object.order.dispatch_date|date|upper }}
-					</td>
-					<td>
-						<p>8. {% trans "LTI No." %}: </p> {{ object.order.pk }}
+						<p>10. {% trans "Date of Dispatch" %}: </p> {{ object.dispatch_date|date|upper }}
 					</td>
 				</tr>
 				<tr>
 					<td>
-						<p>9. {% trans "Date of Loading" %}: </p> {{ object.loading_date|date|upper }}
+						<p>3. {% trans "Destination (location)" %}: </p> {{ object.destination.location.name }}
 					</td>
 					<td>
-						<p>10. {% trans "Date of Dispatch" %}: </p> {{ object.dispatch_date|date|upper }}
+						<p>7. {% trans "Requested Dispatch Date" %}: </p> {{ object.order.dispatch_date|date|upper }}
 					</td>
 					<td>
 						<p>11. {% trans "Type of Transaction" %}: </p> {{ object.get_transaction_type_display }}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<p>4. {% trans "Destination (warehouse)" %}: </p> {{ object.destination.name }}
+					</td>
+					<td>
+						<p>8. {% trans "LTI No." %}: </p> {{ object.order.pk }}
 					</td>
 					<td>
 						<p>12. {% trans "Transport Type" %}: </p> {{ object.get_transport_type_display }}
 					</td>
 				</tr>
-			</tbody>
 			</table>
 		</td>
-		<td>
+		<td class="thumb" style="width:200px;">
 			{% thumbnail object.barcode '200x200' as im %}
 			<img class="barcode" alt="barcode" src="{{ im.url }}" width="{{ im.width }}" height="{{ im.height }}"/>
 			{% endthumbnail %}
