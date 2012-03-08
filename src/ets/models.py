@@ -994,4 +994,23 @@ class CompasLogger(models.Model):
     
     def __unicode__(self):
         return "%s: %s" % (self.get_status_display(), self.message)
+
+
+class LastAttempt(models.Model):
     
+    SUCCESS = 0
+    FAILURE = 1
+    
+    STATUSES = (
+        (SUCCESS, _("Success")),
+        (FAILURE, _("Failure"))
+    )
+    
+    compas = models.OneToOneField(Compas, verbose_name=_("COMPAS station"), related_name="last_attempt")
+    attempt_date = models.DateTimeField(_("Date/time"), default=datetime.now)
+    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
+    
+    class Meta:
+        ordering = ('-attempt_date',)
+        verbose_name = _("Last import Attempt")
+        verbose_name_plural = _("import attempts")
