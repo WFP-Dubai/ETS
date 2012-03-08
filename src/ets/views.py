@@ -1,6 +1,7 @@
 import datetime
 import pyqrcode
 import cStringIO
+import logging
 from subprocess import Popen
 
 from django import forms
@@ -55,7 +56,6 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
         'items': waybill.loading_details.select_related(),
         'waybill_history': history_list(waybill_log, ets.models.Waybill, ('date_modified',)),
         'loading_detail_history': loading_details,
-        'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
     }
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
@@ -68,6 +68,7 @@ def waybill_view(request, waybill_pk, queryset, template):
     return waybill_detail(request, waybill, template)
     
 
+@waybill_user_related
 def waybill_pdf(request, waybill_pk, queryset, template, print_original=False):
     """Generates PDF version of waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
@@ -75,7 +76,6 @@ def waybill_pdf(request, waybill_pk, queryset, template, print_original=False):
                 'print_original': print_original,
                 'object': waybill,
                 'items': waybill.loading_details.select_related(),
-                'barcode_url': "http://%s%s" % (request.get_host(), reverse('barcode_qr', kwargs={'waybill_pk': waybill.pk})),
     }, 'waybill-%s' % waybill.pk)
 
 
@@ -91,9 +91,12 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.dispatch_sign()
     
-    #return waybill_detail(request, waybill, extra_context)
-    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name, print_original=True)
-
+    return render_to_pdf(request, template_name, {
+                'print_original': True,
+                'object': waybill,
+                'items': waybill.loading_details.select_related(),
+    }, 'waybill-%s' % waybill.pk)
+    
 
 @require_POST
 @person_required
@@ -104,8 +107,11 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_sign()
     
-    return waybill_pdf(request, waybill_pk=waybill_pk, queryset=queryset, template=template_name, print_original=True)
-#    return waybill_detail(request, waybill, extra_context={'print_original': True})
+    return render_to_pdf(request, template_name, {
+                'print_original': True,
+                'object': waybill,
+                'items': waybill.loading_details.select_related(),
+    }, 'waybill-%s' % waybill.pk)
 
 
 
