@@ -9,7 +9,7 @@ from django.db.models.aggregates import Max
 from ets.models import Waybill
 from ets.compress import decompress_json
 
-API_URL = 'http://10.11.208.242/ets/api/offline/%s/'
+API_URL = 'http://10.11.208.242/api/offline/%s/'
 WAREHOUSE = 'ISBX002'
 
 class UpdateLog( models.Model ):
