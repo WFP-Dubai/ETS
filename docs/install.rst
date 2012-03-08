@@ -38,7 +38,7 @@ If you user Pydev, change last command as follows::
 Test environment
 ----------------
 
-Go to http://localhost:8000/ets/admin/
+Go to http://localhost:8000/admin/
 
 - Default Admin account
 
@@ -88,7 +88,7 @@ Following names of package are called so in debian package system::
     access_log /var/log/nginx/ETS_access.log;
     error_log /var/log/nginx/ETS_error.log;
     
-    location /ets/doc/ {
+    location /doc/ {
         alias /opt/ETS/docs/_build/html/;
         index index.html;
         expires 5d;
