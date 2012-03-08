@@ -140,20 +140,6 @@ INTERNAL_IPS = ('127.0.0.1', )
 DATE_FORMAT = "d-b-Y"
 DATETIME_FORMAT = "d-b-Y H:i"
 
-def prefix_url(path, prefix):
-    if path.startswith('/'):
-        path = path[1:]
-    
-    return "/%s/%s" % (prefix, path)
-
-URL_PREFIX = "ets"
-
-MEDIA_URL = prefix_url(MEDIA_URL, URL_PREFIX)
-STATIC_URL = prefix_url(STATIC_URL, URL_PREFIX)
-LOGIN_URL = prefix_url(LOGIN_URL, URL_PREFIX)
-LOGOUT_URL = prefix_url(LOGOUT_URL, URL_PREFIX)
-LOGIN_REDIRECT_URL = prefix_url(LOGIN_REDIRECT_URL, URL_PREFIX)
-
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 
 #Default life time of order (months)
