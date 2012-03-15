@@ -90,16 +90,16 @@ def update_compas(using):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
     try:
         #Import organizations
-        import_partners(using)
+        #import_partners(using)
         
         #Update places
-        import_places(using)
+        #import_places(using)
         
         #Update persons
         import_persons(using)
         
         #Update loss, damage reasons
-        import_reasons(using)
+        #import_reasons(using)
         
         #Update stocks
         import_stock(using)
@@ -112,7 +112,26 @@ def update_compas(using):
     else:
         #If all process did not fail create success log
         ets_models.ImportLogger.objects.create(compas_id=using)
+
+def update_compas_info(using):
+    """ Utility to run special import process. If no fails Success ImportLogger is created."""
+    try:
+        #Import organizations
+        import_partners(using)
         
+        #Update places
+        import_places(using)
+                
+        #Update loss, damage reasons
+        import_reasons(using)
+        
+    except Exception:
+        #Since we already created log for this error simply pass here
+        pass
+    else:
+        #If all process did not fail create success log
+        ets_models.ImportLogger.objects.create(compas_id=using)
+       
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
