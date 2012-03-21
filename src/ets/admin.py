@@ -127,7 +127,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     
     list_display = ('pk', 'link_to_order', 'date_created', 'dispatch_date',
                     'destination', 'active')
-    readonly_fields = ('date_created', 'date_modified')
+    readonly_fields = ('order','date_created', 'date_modified')
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
     raw_id_fields = ('destination','dispatcher_person',)
