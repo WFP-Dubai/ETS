@@ -130,6 +130,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     readonly_fields = ('date_created', 'date_modified')
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
+    raw_id_fields = ('destination','dispatcher_person',)
     search_fields = ('slug', 'order__pk',)
     inlines = (LoadingDetailsInline, CompasLoggerInline)
     
