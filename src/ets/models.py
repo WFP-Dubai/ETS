@@ -488,18 +488,21 @@ class Waybill( ld_models.Model ):
     """
     
     INTERNAL_TRANSFER = u'WIT'
+    DELIVERY = u'DEL'
+    DISTIBRUTION= u'DIS'
+    SHUNTING= u'SHU'
     
     TRANSACTION_TYPES = ( 
                         ( INTERNAL_TRANSFER, _(u'WFP Internal Transfer') ),
-                        ( DELIVERY, u'DEL',_( u'Delivery' )),
+                        ( DELIVERY, _( u'Delivery' )),
                         #( u'SWA', _(u'Swap' )),
                         #( u'REP', _(u'Repayment' )),
                         #( u'SAL', _(u'Sale' )),
-                        (DISTIBRUTION, u'DIS', _(u'Distribution' )),
+                        (DISTIBRUTION, _(u'Distribution' )),
                         #( u'LON', _(u'Loan' )),
                         ( u'DSP', _(u'Disposal' )),
                         ( u'PUR', _(u'Purchase' )),
-                        (SHUNTING, u'SHU', _(u'Shunting' )),
+                        (SHUNTING, _(u'Shunting' )),
                 )
     TRANSPORT_TYPES = ( 
                         ( u'02', _(u'Road' )),
