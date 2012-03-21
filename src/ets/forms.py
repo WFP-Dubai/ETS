@@ -132,7 +132,7 @@ class BaseLoadingDetailFormSet(BaseInlineFormSet):
                 count += 1
             
         if count < 1:
-            raise forms.ValidationError( _('You must have at least one commodity') )
+            raise forms.ValidationError( _('You must have at least one loading detail with no issues') )
     
 
 class WaybillRecieptForm( forms.ModelForm ):
