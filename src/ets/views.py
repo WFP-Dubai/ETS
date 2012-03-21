@@ -35,7 +35,7 @@ import simplejson
 
 
 WFP_ORGANIZATION = 'WFP'
-
+WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
@@ -162,7 +162,12 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.INTERNAL_TRANSFER)
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
+    if order.consignee.pk == WFP_DISTRUIBUTION:
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DISTIBRUTION)
+    if not order.consignee.pk == WFP_DISTRUIBUTION:
+    	if not order.consignee.pk == WFP_ORGANIZATION:
+    		form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
