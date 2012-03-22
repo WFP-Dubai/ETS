@@ -106,6 +106,7 @@ def update_compas(using):
     
         #Update orders
         import_order(using)
+        
     except Exception:
         #Since we already created log for this error simply pass here
         pass
@@ -187,8 +188,9 @@ def import_persons(compas):
     """Imports persons from COMPAS"""
     
     now = datetime.now()
-    places = compas_models.Place.objects.using(compas).filter(reporting_code=compas)
-
+    places = compas_models.Place.objects.using(compas)#.filter(reporting_code=compas)
+#fix filtering #
+#expand it to do it lighter
     for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
                                         location_code__in=places.values_list('geo_point_code', flat=True)):
         try:
