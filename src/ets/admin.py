@@ -204,7 +204,7 @@ admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
 class WarehouseInline(admin.TabularInline):
     model = ets.models.Warehouse
-	raw_id_fields = ('location',)
+    raw_id_fields = ('location',)
     extra = 0
 
 class OrganizationAdmin(admin.ModelAdmin):
