@@ -30,7 +30,8 @@
         <th>Lost Reason</th>
         <th>Number Units Damaged</th>
         <th>Damaged Reason</th>
-        <th>Total Weight Net</th>
+        <th>{% trans "Net Qty" %}</th>
+        <th>{% trans "Gross Qty" %}</th>
         <th>Over Offload Units</th>
       </tr>
     </thead>
@@ -47,6 +48,10 @@
         <td class="weight">
           <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
           {% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}
+        </td>
+        <td class="weight">
+          <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
+          {% include "uni_form/uni_field.html" with field=form.total_weight_gross_received %}
         </td>
         <td class="overoffloaded">{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
