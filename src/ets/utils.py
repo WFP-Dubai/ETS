@@ -206,7 +206,7 @@ def import_persons(compas):
             obj.set_password(person.person_pk)
             obj.save()
             
-        for wh in ets_models.Warehouse.objects.filter(compas=obj.compas, 
+        for wh in ets_models.Warehouse.objects.filter(
                                                organization=obj.organization, 
                                                location=obj.location):
                 obj.warehouses.add(wh)
