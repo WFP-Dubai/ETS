@@ -911,9 +911,9 @@ class LoadingDetail(models.Model):
             if self.unit_weight_gross != self.stock_item.unit_weight_gross and not self.waybill.dispatch_remarks:
                 raise ValidationError(_("Since you changed unit weight gross 'Dispatch Remarks' field becomes required."))
             
-            expected_total_net = (self.stock_item.unit_weight_net * self.number_of_units / 1000).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
-            if self.total_weight_net != expected_total_net and not self.waybill.dispatch_remarks:
-                raise ValidationError(_("Since you changed total weight net 'Dispatch Remarks' field becomes required."))
+            #expected_total_net = (self.stock_item.unit_weight_net * self.number_of_units / 1000).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
+            #if self.total_weight_net != expected_total_net and not self.waybill.dispatch_remarks:
+            #    raise ValidationError(_("Since you changed total weight net 'Dispatch Remarks' field becomes required."))
             
             expected_total_gros = (self.stock_item.unit_weight_gross * self.number_of_units / 1000).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
             if self.total_weight_gross != expected_total_gros and not self.waybill.dispatch_remarks:
