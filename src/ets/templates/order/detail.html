@@ -22,7 +22,7 @@
     <td>{% trans "Destination Location" %}: {{ object.location.name }}</td>
   </tr>
   <tr>
-    <td>{% trans "Transporter" %}: {{ object.transport_name }}</td>
+    <td>{% trans "Transport Contractor" %}: {{ object.transport_name }}</td>
   </tr>
   
   <tr>
@@ -36,22 +36,23 @@
 <table class='bordered' >
   <thead>
     <tr>
+      <th>{% trans "Project Number" %}</th>
       <th>{% trans "SI" %}</th>
       <th>{% trans "Commodity" %}</th>
       <th>{% trans "Units" %}</th>
       <th>{% trans "Unit Weight (Net)" %}</th>
       <th>{% trans "Unit Weight (Gross)" %}</th>
       <th>{% trans "Net Qty" %}</th>
-      <th>{% trans "Net Qty Gross" %}</th>
-      <th>{% trans "Project Number" %}</th>
+      <th>{% trans "Gross Qty" %}</th>
       <th>{% trans "Stock In Warehouse" %}</th>
       <th>{% trans "To Be Dispatched" %}</th>
-      <th>{% trans "Percentage" %}</th>
+      <th>{% trans "% Completed" %}</th>
     </tr>
   </thead>
   <tbody>
   {% for item in object.items.all %}
     <tr>
+      <td align="right">{{ item.project_number }}&nbsp;</td>
       <td>&nbsp;{{ item.si_code }}&nbsp;</td><!-- fixme: for bulk show 3 decimals-->
       <td>{{ item.commodity }}&nbsp;</td>
       <td align="right">{{ item.number_of_units }}</td>
@@ -59,7 +60,6 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-      <td align="right">&nbsp;{{ item.project_number }}&nbsp;</td>
       <td align="right">{{ item.get_available_stocks }}</td>
       <td align="right">{{ item.items_left }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
