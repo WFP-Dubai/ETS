@@ -7,7 +7,7 @@
 <table class="summary">
   <tr>
     <td>{% trans "LTI Number" %}: <a href="{{ object.get_absolute_url }}" >{{ object.pk }}</a></td>
-    <td>{% trans "Creation Date" %}: {{ object.created }}</td>
+    <td>{% trans "Creation Date" %}: {{ object.created|upper }}</td>
   </tr>
   <tr>
     <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
@@ -60,7 +60,7 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-      <td align="right">{{ item.get_available_stocks }} / {{item.get_available_stocks_mt}} MT</td>
+      <td align="right">{{item.get_available_stocks_mt}} MT</td>
       <td align="right">{{ item.items_left }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
