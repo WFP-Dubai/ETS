@@ -545,11 +545,11 @@ class Waybill( ld_models.Model ):
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Receipt Warehouse"), related_name="receipt_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), related_name="receipt_waybills")
     
     #Dates
-    loading_date = models.DateField(_("Date of loading"), default=datetime.now) #dateOfLoading
-    dispatch_date = models.DateField( _("Date of dispatch"), default=datetime.now) #dateOfDispatch
+    loading_date = models.DateField(_("Loading Date"), default=datetime.now) #dateOfLoading
+    dispatch_date = models.DateField( _("Dispatch Date"), default=datetime.now) #dateOfDispatch
     
     transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
                                          choices=TRANSACTION_TYPES, default=TRANSACTION_TYPES[0][0]) #transactionType
@@ -568,19 +568,19 @@ class Waybill( ld_models.Model ):
     receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
     
     #Transporter
-    transport_sub_contractor = models.CharField(_("Transport Sub contractor"), max_length=40, blank=True) #transportSubContractor
-    transport_driver_name = models.CharField(_("Transport Driver Name"), max_length=40) #transportDriverName
-    transport_driver_licence = models.CharField(_("Transport Driver LicenceID "), max_length=40) #transportDriverLicenceID
-    transport_vehicle_registration = models.CharField(_("Transport Vehicle Registration "), max_length=40) #transportVehicleRegistration
-    transport_trailer_registration = models.CharField( _("Transport Trailer Registration"), max_length=40, blank=True) #transportTrailerRegistration
+    transport_sub_contractor = models.CharField(_("Transport Sub Contractor"), max_length=40, blank=True) #transportSubContractor
+    transport_driver_name = models.CharField(_("Driver Name"), max_length=40) #transportDriverName
+    transport_driver_licence = models.CharField(_("Driver License or National ID"), max_length=40) #transportDriverLicenceID
+    transport_vehicle_registration = models.CharField(_("Vehicle Registration"), max_length=40) #transportVehicleRegistration
+    transport_trailer_registration = models.CharField( _("Trailer Registration"), max_length=40, blank=True) #transportTrailerRegistration
 
     #Container        
     container_one_number = models.CharField(_("Container One Number"), max_length=40, blank=True) #containerOneNumber
     container_two_number = models.CharField( _("Container Two Number"), max_length=40, blank=True) #containerTwoNumber
     container_one_seal_number = models.CharField(_("Container One Seal Number"), max_length=40, blank=True) #containerOneSealNumber
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
-    container_one_remarks_dispatch = models.CharField( _("Container One Remarks Dispatch"), max_length=40, blank=True) #containerOneRemarksDispatch
-    container_two_remarks_dispatch = models.CharField( _("Container Two Remarks Dispatch"), max_length=40, blank=True) #containerTwoRemarksDispatch
+    container_one_remarks_dispatch = models.CharField( _("Container One Dispatch Remarks"), max_length=40, blank=True) #containerOneRemarksDispatch
+    container_two_remarks_dispatch = models.CharField( _("Container Two Dispatch Remarks"), max_length=40, blank=True) #containerTwoRemarksDispatch
     container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
     container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
 
