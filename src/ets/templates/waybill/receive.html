@@ -24,22 +24,22 @@
     {{ formset.management_form }}
     <thead class="bordered">
       <tr>
-        <th>Stock item</th>
-        <th>Number Units Good</th>
-        <th>Number Units Lost</th>
-        <th>Lost Reason</th>
-        <th>Number Units Damaged</th>
-        <th>Damaged Reason</th>
+        <th>{% trans "Dispatched Commodity"%}</th>
+        <th>{% trans "Number Units Good"%}</th>
+        <th>{% trans "Number Units Lost"%}</th>
+        <th>{% trans "Lost Reason"%}</th>
+        <th>{% trans "Number Units Damaged"%}</th>
+        <th>{% trans "Damaged Reason"%}</th>
         <th>{% trans "Net Qty" %}</th>
         <th>{% trans "Gross Qty" %}</th>
-        <th>Over Offload Units</th>
+        <th>{% trans "Over Offload Units"%}</th>
       </tr>
     </thead>
     <tbody>
     {% for form in formset %}
       <tr colspan="7">{% include "uni_form/errors.html" %}</tr>
       <tr>
-        <td>{{ form.instance.stock_item.coi_code }} ({{ form.instance.number_of_units }} items) {{ form.slug }} {{ form.waybill }}</td>
+        <td>{{ form.instance.stock_item.coi_code }} {{form.instance.stock_item.commodity.name}} ({{ form.instance.number_of_units }} items) {{ form.slug }} {{ form.waybill }}</td>
         <td class="received_units">{% include "uni_form/uni_field.html" with field=form.number_units_good %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_lost %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
