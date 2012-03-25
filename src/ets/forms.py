@@ -37,7 +37,7 @@ class PersonChangeForm(UserChangeForm):
 
 class WaybillSearchForm( forms.Form ):
     """Search form with only one field: query set"""
-    q = forms.CharField(required=True, label=_('Waybill code'))
+    q = forms.CharField(required=True, label=_('eWaybill Code'))
 
 class WaybillScanForm( forms.Form ):
     """Waybill scan form with one input"""
