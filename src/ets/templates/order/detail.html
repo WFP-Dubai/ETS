@@ -43,8 +43,6 @@
       <th>{% trans "Unit Weight (Net)" %}</th>
       <th>{% trans "Unit Weight (Gross)" %}</th>
       <th>{% trans "Net Qty" %}</th>
-      <th>{% trans "Net Qty Gross" %}</th>
-      <th>{% trans "Project Number" %}</th>
       <th>{% trans "Gross Qty" %}</th>
       <th>{% trans "Stock In Warehouse" %}</th>
       <th>{% trans "To Be Dispatched" %}</th>
@@ -63,8 +61,7 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-      <td align="right">&nbsp;{{ item.project_number }}&nbsp;</td>
-      <td align="right">{{ item.get_available_stocks }} / {{item.get_available_stocks_mt}}</td>
+      <td align="right">{{ item.get_available_stocks }} / {{item.get_available_stocks_mt}} MT</td>
       <td align="right">{{ item.items_left }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
