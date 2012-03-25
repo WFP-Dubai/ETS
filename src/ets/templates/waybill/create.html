@@ -16,13 +16,13 @@
       {{ formset.management_form }}
       <thead class="bordered">
         <tr>
-          <th>{% trans "Stock item" %}</th>
-          <th>{% trans "Number of Units" %}</th>
+          <th>{% trans "COI" %}</th>
+          <th>{% trans "Units" %}</th>
           <th>{% trans "Unit Weight (Net)" %}</th>
           <th>{% trans "Unit Weight (Gross)" %}</th>
           <th>{% trans "Net Qty" %}</th>
           <th>{% trans "Gross Qty" %}</th>
-          <th>{% trans "Overloaded Units" %}</th>
+          <th>{% trans "Overloaded Dispatch" %}</th>
           {% if formset.can_delete %}<th style="background-color: red;">{% trans "Delete" %}</th>{% endif %}
         </tr>
       </thead>
@@ -57,7 +57,7 @@
       
       </tbody>
     </table>
-    <a href="#" class="items-add-more" id="add-item-link">{% trans "Append more items" %}</a>
+    <a href="#" class="items-add-more" id="add-item-link">{% trans "Append More COI" %}</a>
     </fieldset>
     {% uni_form form form.helper %}
     <div class="buttonHolder">
