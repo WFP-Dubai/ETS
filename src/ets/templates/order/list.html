@@ -44,6 +44,7 @@
 {% block script %}
 {{ block.super }}
 <script charset="utf-8" type="text/javascript">
+//<![CDATA[
 var dateFormat = "dd-NNN-yyyy";
 /* Define two custom functions (asc and desc) for date sorting */
 
@@ -77,5 +78,6 @@ $(document).ready(function() {
         ]
     });
 });
+//]]>
 </script>
 {% endblock %}
