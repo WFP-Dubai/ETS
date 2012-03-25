@@ -446,6 +446,12 @@ class OrderItem(models.Model):
     @staticmethod
     def sum_number( queryset ):
         return queryset.aggregate(units_count=Sum('number_of_units'))['units_count'] or 0
+        
+
+    @staticmethod
+    def sum_number_mt( queryset ):
+        return queryset.aggregate(units_count=Sum('unit_weight_net'))['units_count'] or 0
+    
     
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
@@ -463,6 +469,14 @@ class OrderItem(models.Model):
         """Calculates available stocks"""
         return self.sum_number(self.stock_items()) \
                 - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+
+    def get_available_stocks_mt(self):
+        """Calculates available stocks"""
+        
+        return self.sum_number_mt(self.stock_items()) \
+                - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+
+
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
