@@ -51,6 +51,8 @@
   </thead>
   <tbody>
   {% for item in object.items.all %}
+  {% if number_of_units==0 and total_weight_net==0 and  total_weight_gross==0%}
+  {%else%}
     <tr>
       <td align="right">{{ item.project_number }}&nbsp;</td>
       <td>&nbsp;{{ item.si_code }}&nbsp;</td><!-- fixme: for bulk show 3 decimals-->
@@ -64,6 +66,7 @@
       <td align="right">{{ item.tonnes_left }} MT</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
+{%endif%}
   {% endfor %}
   </tbody>
 </table>
