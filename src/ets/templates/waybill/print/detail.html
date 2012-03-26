@@ -13,7 +13,7 @@
 {% include 'waybill/print/transaction_details.html' %}
 {% include 'waybill/print/loading_details.html' %}
 {% include 'waybill/print/commodities_loaded.html' %}
-{% if object.arrival_date %}
+{% if object.arrival_date %}{{object.arrival_date}}
 {% include 'waybill/print/commodities_received.html' %}
 {%else%}
 {% include 'waybill/print/commodities_received_empty.html' %}
