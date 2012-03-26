@@ -51,7 +51,7 @@
   </thead>
   <tbody>
   {% for item in object.items.all %}
-  {% if number_of_units==0 and total_weight_net==0 and  total_weight_gross==0%}
+  {% if item.number_of_units == 0%}
   {%else%}
     <tr>
       <td align="right">{{ item.project_number }}&nbsp;</td>
