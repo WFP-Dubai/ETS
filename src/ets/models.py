@@ -565,7 +565,7 @@ class Waybill( ld_models.Model ):
     receipt_person =  models.ForeignKey(Person, verbose_name=_("Recipient person"), 
                                         related_name="recipient_waybills", 
                                         blank=True, null=True) #recipientName
-    receipt_remarks = models.TextField(_("Recipient Remarks"), blank=True) #recipientRemarks
+    receipt_remarks = models.TextField(_("Receipt Remarks"), blank=True) #recipientRemarks
     
     #Transporter
     transport_sub_contractor = models.CharField(_("Transport Sub Contractor"), max_length=40, blank=True) #transportSubContractor
@@ -581,14 +581,14 @@ class Waybill( ld_models.Model ):
     container_two_seal_number = models.CharField(_("Container Two Seal Number"), max_length=40, blank=True ) #containerTwoSealNumber
     container_one_remarks_dispatch = models.CharField( _("Container One Dispatch Remarks"), max_length=40, blank=True) #containerOneRemarksDispatch
     container_two_remarks_dispatch = models.CharField( _("Container Two Dispatch Remarks"), max_length=40, blank=True) #containerTwoRemarksDispatch
-    container_one_remarks_reciept = models.CharField( _("Container One Remarks Reciept"), max_length=40, blank=True) #containerOneRemarksReciept
-    container_two_remarks_reciept = models.CharField(_("Container Two Remarks Reciept"), max_length=40, blank=True) #containerTwoRemarksReciept
+    container_one_remarks_reciept = models.CharField( _("Container One Receipt Remarks"), max_length=40, blank=True) #containerOneRemarksReciept
+    container_two_remarks_reciept = models.CharField(_("Container Two Receipt Remarks"), max_length=40, blank=True) #containerTwoRemarksReciept
 
-    arrival_date = models.DateField(_("Recipient Arrival Date"), blank=True, null=True) #recipientArrivalDate
-    start_discharge_date = models.DateField(_("Recipient Start Discharge Date"), blank=True, null=True) #recipientStartDischargeDate
-    end_discharge_date = models.DateField(_("Recipient End Discharge Date"), blank=True, null=True) #recipientEndDischargeDate
+    arrival_date = models.DateField(_("Arrival Date"), blank=True, null=True) #recipientArrivalDate
+    start_discharge_date = models.DateField(_("Start Unloading Date"), blank=True, null=True) #recipientStartDischargeDate
+    end_discharge_date = models.DateField(_("End Unloading Date"), blank=True, null=True) #recipientEndDischargeDate
 
-    distance = models.IntegerField(_("Recipient Distance (km)"), blank=True, null=True) #recipientDistance
+    distance = models.IntegerField(_("Distance Covered (km)"), blank=True, null=True) #recipientDistance
     
     transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
     receipt_signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
@@ -826,11 +826,11 @@ class LoadingDetail(models.Model):
                                                     max_digits=12, decimal_places=3, default=0)
     
     #Number of delivered units
-    number_units_good = models.DecimalField(_("number Units Good"), default=0, 
+    number_units_good = models.DecimalField(_("Units (Good)"), default=0, 
                                             max_digits=12, decimal_places=3) #numberUnitsGood
-    number_units_lost = models.DecimalField(_("number Units Lost"), default=0, 
+    number_units_lost = models.DecimalField(_("Units (Lost)"), default=0, 
                                             max_digits=12, decimal_places=3 ) #numberUnitsLost
-    number_units_damaged = models.DecimalField(_("number Units Damaged"), default=0, 
+    number_units_damaged = models.DecimalField(_("Units (Damaged)"), default=0, 
                                                max_digits=12, decimal_places=3 ) #numberUnitsDamaged
     
     #Reasons

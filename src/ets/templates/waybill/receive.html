@@ -6,13 +6,13 @@
 {% block content %}
 
 <div class="actions">
-  <a href="{{ waybill.get_absolute_url }}">{% trans "Back to waybill details" %}</a>
+  <a href="{{ waybill.get_absolute_url }}">{% trans "Back To eWaybill Details" %}</a>
 </div>
 
 <table cellpadding="0" cellspacing="0" border="0"><tbody>
-<tr><td>{% trans "Waybill Number:" %}</td><td> {{ waybill.pk }}</td></tr>
-<tr><td>{% trans "Dispatch Location" %}</td><td>{{ waybill.order.warehouse.location.name }}</td></tr>
-<tr><td>{% trans "Recipient Location:" %}</td><td> {{ waybill.destination.location.name }}</td></tr>
+<tr><td>{% trans "eWaybill Number:" %}</td><td> {{ waybill.pk }}</td></tr>
+<tr><td>{% trans "Origin Location" %}</td><td>{{ waybill.order.warehouse.location.name }}</td></tr>
+<tr><td>{% trans "Destination Location:" %}</td><td> {{ waybill.destination.location.name }}</td></tr>
 <tr><td>{% trans "Consignee:" %}</td><td>{{ waybill.order.consignee }}</td></tr>
 </tbody></table>
 
@@ -25,14 +25,14 @@
     <thead class="bordered">
       <tr>
         <th>{% trans "Dispatched Commodity"%}</th>
-        <th>{% trans "Number Units Good"%}</th>
-        <th>{% trans "Number Units Lost"%}</th>
+        <th>{% trans "Units (Good)"%}</th>
+        <th>{% trans "Units (Lost)"%}</th>
         <th>{% trans "Lost Reason"%}</th>
-        <th>{% trans "Number Units Damaged"%}</th>
+        <th>{% trans "Units (Damaged)"%}</th>
         <th>{% trans "Damaged Reason"%}</th>
         <th>{% trans "Net Qty" %}</th>
         <!--<th>{% trans "Gross Qty" %}</th>-->
-        <th>{% trans "Over Offload Units"%}</th>
+        <th>{% trans "Over Unloaded Receipt"%}</th>
       </tr>
     </thead>
     <tbody>

@@ -11,7 +11,7 @@
 <form method="POST" action="" class="uniForm">{% csrf_token %}
     {% include "uni_form/errors_formset.html" %}
     <fieldset>
-    <legend>{% trans "Loading details" %}</legend>    
+    <legend>{% trans "Unloading Details" %}</legend>    
     <table id="loadingdetails">
       {{ formset.management_form }}
       <thead class="bordered">

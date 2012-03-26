@@ -7,20 +7,20 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w50"><p>28. {% trans "Location" %}: </p> {{ object.destination.location.name }}</td>
+		<td class="w50"><p>28. {% trans "Destination Location" %}: </p> {{ object.destination.location.name }}</td>
 		<td class="w50"><p>32. {% trans "Arrival Date" %}: </p> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
 		<td><p>29. {% trans "Consignee" %}: </p> {{ object.order.consignee }}</td>
-		<td><p>33. {% trans "Start Discharge Date" %}: </p> {{ object.start_discharge_date|date|upper }}</td>
+		<td><p>33. {% trans "Start Unloading Date" %}: </p> {{ object.start_discharge_date|date|upper }}</td>
 	</tr>
 	<tr>
 		<td><p>30. {% trans "Name" %}: </p> {{ object.receipt_person.get_full_name }}</td>
-		<td><p>34. {% trans "End Discharge Date" %}: </p> {{ object.end_discharge_date|date|upper }}</td>
+		<td><p>34. {% trans "End Unloading Date" %}: </p> {{ object.end_discharge_date|date|upper }}</td>
 	</tr>
 	<tr>
 		<td><p>31. {% trans "Title" %}: </p> {{ object.receipt_person.title }}</td>
-		<td><p>35. {% trans "Distance in KM" %}: </p> {{ object.distance|default:"" }}</td>
+		<td><p>35. {% trans "Distance Covered (km)" %}: </p> {{ object.distance|default:"" }}</td>
 	</tr>
 </tbody>
 </table>
