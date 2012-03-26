@@ -201,6 +201,7 @@ class LoadingDetailRecieptForm( forms.ModelForm ):
             'number_units_lost', 'units_lost_reason',
             'number_units_damaged', 'units_damaged_reason',
             'total_weight_net_received',
+            'total_weight_gross_received',
             'over_offload_units',
         )
         widgets = {

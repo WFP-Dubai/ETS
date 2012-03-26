@@ -824,6 +824,9 @@ class LoadingDetail(models.Model):
     
     total_weight_net_received = models.DecimalField(_("Total weight net received"), 
                                                     max_digits=12, decimal_places=3, default=0)
+
+    total_weight_gross_received = models.DecimalField(_("Total Weight Gross Received"), 
+                                                    max_digits=12, decimal_places=3, default=0)
     
     #Number of delivered units
     number_units_good = models.DecimalField(_("Units (Good)"), default=0, 
