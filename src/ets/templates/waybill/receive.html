@@ -49,7 +49,9 @@
           <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
           {% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}
         </td>
-        <td>{% include "uni_form/uni_field.html" with field=form.total_weight_gross_received %}</td>
+        <td>
+          {% include "uni_form/uni_field.html" with field=form.total_weight_gross_received %}
+        </td>
         <td class="overoffloaded">{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
     {% endfor %}
