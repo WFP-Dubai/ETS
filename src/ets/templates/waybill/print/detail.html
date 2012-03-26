@@ -13,10 +13,10 @@
 {% include 'waybill/print/transaction_details.html' %}
 {% include 'waybill/print/loading_details.html' %}
 {% include 'waybill/print/commodities_loaded.html' %}
-{% if object.arrival_date|length > 0 %}
-{% include 'waybill/print/commodities_received.html' %}
-{%else%}
+{%if object.arrival_date|date|upper|length <= 0%}
 {% include 'waybill/print/commodities_received_empty.html' %}
+{%else%}
+{% include 'waybill/print/commodities_received.html' %}
 {%endif%}
 {% include 'waybill/print/observations.html' %}
 </body>
