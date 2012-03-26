@@ -7,7 +7,7 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w50"><p>28. {% trans "Destination Location" %}: </p> {%if object.arrival_date|date|upper|length >= 0%}{{ object.destination.location.name }}{%endif%}</td>
+		<td class="w50"><p>28. {% trans "Destination Location" %}: </p> {%if object.arrival_date|date|upper|length <= 0%}{{ object.destination.location.name }}{%endif%}</td>
 		<td class="w50"><p>32. {% trans "Arrival Date" %}: </p> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
