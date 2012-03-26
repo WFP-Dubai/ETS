@@ -7,11 +7,11 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w50"><p>28. {% trans "Destination Location" %}: </p> {%if object.arrival_date|date|upper|length <= 0%}{{ object.destination.location.name }}{%endif%}</td>
+		<td class="w50"><p>28. {% trans "Destination Location" %}: </p> {%if object.arrival_date|date|upper|length != 0%}{{ object.destination.location.name }}{%endif%}</td>
 		<td class="w50"><p>32. {% trans "Arrival Date" %}: </p> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
-		<td><p>29. {% trans "Consignee" %}: </p> {{ object.order.consignee }}</td>
+		<td><p>29. {% trans "Consignee" %}: </p>{%if object.arrival_date|date|upper|length != 0 %}{{ object.order.consignee }}{%endif%}</td></td>
 		<td><p>33. {% trans "Start Unloading Date" %}: </p> {{ object.start_discharge_date|date|upper }}</td>
 	</tr>
 	<tr>
