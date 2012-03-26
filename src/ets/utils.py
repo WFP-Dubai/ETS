@@ -210,7 +210,6 @@ def import_persons(compas):
                                                organization=obj.organization, 
                                                location=obj.location):
             obj.warehouses.add(wh)
-            print wh
         
         obj.updated = now
         obj.save()
