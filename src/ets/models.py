@@ -1,5 +1,5 @@
 
-import zlib, base64, string, decimal, cStringIO, pyqrcode
+import decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
@@ -10,12 +10,10 @@ from django.contrib.auth.models import User
 from django.db.models import Sum
 from django.core import serializers
 from django.conf import settings
-from django.utils import simplejson
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
-from django.db.models import F
 from django.db import transaction
-from django.core.files.base import File, ContentFile
+from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
 
 from sorl.thumbnail.fields import ImageField
@@ -23,7 +21,6 @@ from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models
-from sorl.thumbnail.shortcuts import get_thumbnail 
 
 from ets.compress import compress_json, decompress_json
 from ets.country import COUNTRY_CHOICES
