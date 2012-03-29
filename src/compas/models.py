@@ -33,6 +33,7 @@ class Place( models.Model ):
     country_code = models.CharField( _("Country code"), max_length = 3 )
     reporting_code = models.CharField(_("COMPAS station code"), max_length = 7 )
     organization_id = models.CharField( _("Organization id"), max_length = 20, blank=True )
+    compas_indicator =  models.CharField( _("Copas Ind"), max_length = 1 )
 
     class Meta:
         db_table = u'epic_geo'
