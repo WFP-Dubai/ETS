@@ -138,7 +138,7 @@ urlpatterns = patterns("ets.views",
     }, "compass_waybill" ),
     
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.objects.all().annotate(stock_count=Count('stock_items'))\
+        'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True).annotate(stock_count=Count('stock_items'))\
                                             .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, "view_stock" ),
