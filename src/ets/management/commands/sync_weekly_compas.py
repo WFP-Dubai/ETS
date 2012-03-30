@@ -34,5 +34,5 @@ class Command(BaseCommand):
         update_compas_info(compas)
 
     def handle(self, compas='', *args, **options):
-        compas = Compas.objects.get(pk='ISBX002')
+        compas = Compas.objects.get(pk='PSHX001')
         self.synchronize(compas=compas.pk)
