@@ -182,6 +182,10 @@ def import_places(compas):
         
         wh, created = ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
         
+        if valid_warehouse != wh.valid_warehouse:
+        	wh.valid_warehouse = valid_warehouse
+        	wh.save()
+        
         if not created and not wh.compas and compas:
             wh.compas = compas
             wh.save()
