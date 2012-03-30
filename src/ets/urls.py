@@ -138,7 +138,8 @@ urlpatterns = patterns("ets.views",
     }, "compass_waybill" ),
     
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True).annotate(stock_count=Count('stock_items'))\
+        'queryset': ets.models.Warehouse.objects.filter(.filter(valid_warehouse=True)).filter(start_date__lte=date.today)\
+                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True).annotate(stock_count=Count('stock_items'))\
                                             .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, "view_stock" ),
