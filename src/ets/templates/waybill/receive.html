@@ -92,7 +92,7 @@
 			});
 			
 			var weight = sum*container.find("td.weight input.unit_weight_net").val()/1000.0;
-			var weight_gross = sum*container.find("td.weight input.unit_weight_gross").val()/1000.0;
+			var weight_gross = sum*container.find("td.weight_gross input.unit_weight_gross").val()/1000.0;
 			container.find("td.weight .ctrlHolder input").val(weight.toFixed(3));
 			container.find("td.weight_gross .ctrlHolder input").val(weight_gross.toFixed(3));
 			
