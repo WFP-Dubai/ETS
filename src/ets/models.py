@@ -106,7 +106,7 @@ class Warehouse(models.Model):
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
-    is_warehouse = BooleanField(_("Is Warehouse"), default=True)
+    is_warehouse = models.BooleanField(_("Is Warehouse"), default=True)
     start_date = models.DateField(_("Start date"), blank=True, null=True)
     end_date = models.DateField(_("End date"), blank=True, null=True)
     
