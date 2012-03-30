@@ -918,8 +918,8 @@ class LoadingDetail(models.Model):
         #Dispath: overloaded units and changed weights
         if self.stock_item_id and not self.waybill.transport_dispach_signed_date:
             order_item = self.get_order_item()
-            if order_item.items_left() < self.number_of_units and not self.overloaded_units:
-                raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
+#            if order_item.items_left() < self.number_of_units and not self.overloaded_units:
+#                raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
             
             if order_item.total_weight_net < self.total_weight_net and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f tons") % (self.total_weight_net - order_item.total_weight_net))
@@ -966,6 +966,7 @@ class LoadingDetail(models.Model):
         #Total received weight gross
         if self.total_weight_gross_received != self.calculate_total_received_gross() and not self.waybill.receipt_remarks:
             raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required."))
+            
         
 class ImportLogger(models.Model):
     
