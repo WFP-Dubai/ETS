@@ -1,4 +1,4 @@
-
+from datetime import datetime, timedelta, date
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, handler404, handler500
 from django.contrib import databrowse
@@ -7,6 +7,7 @@ from django.views.generic.list_detail import object_detail, object_list
 from django.utils.translation import ugettext_lazy, ugettext as _
 from django.db.models.aggregates import Count
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.db import models
 
 from django.contrib import admin #@Reimport
 admin.autodiscover()
@@ -138,9 +139,12 @@ urlpatterns = patterns("ets.views",
     }, "compass_waybill" ),
     
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True)\
-                      					.annotate(stock_count=Count('stock_items')\
-                                    	.filter(stock_count__gt=0).order_by('location', 'pk'),
+        'queryset': ets.models.Warehouse.objects\
+        								.filter(valid_warehouse=True)\
+        								.filter(start_date__lte=date.today)\
+                      					.filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
+        								.annotate(stock_count=Count('stock_items'))\
+                                        .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, "view_stock" ),
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
