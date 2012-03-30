@@ -167,9 +167,9 @@ def import_places(compas):
             compas = ets_models.Compas.objects.get(pk=place.reporting_code)
         except ets_models.Compas.DoesNotExist:
             compas = None
-        is_warehouse = True
+        valid_warehouse = True
         if place.compas_indicator == 'T':
-        	is_warehouse = False
+        	valid_warehouse = False
         
         #Update warehouse
         defaults = {
@@ -177,7 +177,7 @@ def import_places(compas):
             'location': location,
             'organization': ets_models.Organization.objects.get_or_create(code=place.organization_id)[0] if place.organization_id else None,
             'compas': compas,
-            'is_warehouse': is_warehouse,
+            'valid_warehouse': valid_warehouse,
         }
         
         wh, created = ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
