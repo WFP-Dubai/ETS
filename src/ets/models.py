@@ -106,6 +106,7 @@ class Warehouse(models.Model):
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
+    compas_indicator = BooleanField(_("Is Warehouse"), default=True)
     start_date = models.DateField(_("Start date"), blank=True, null=True)
     end_date = models.DateField(_("End date"), blank=True, null=True)
     
@@ -120,7 +121,7 @@ class Warehouse(models.Model):
 
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        queryset = cls.objects.filter(location=location).filter(start_date__lte=date.today)\
+        queryset = cls.objects.filter(location=location).filter(compas_indicator==True).filter(start_date__lte=date.today)\
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
 
         #Check wh for specific organization
