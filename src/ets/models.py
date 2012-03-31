@@ -121,7 +121,7 @@ class Warehouse(models.Model):
 
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        queryset = cls.objects.filter(location=location).filter(valid_warehouse==True).filter(start_date__lte=date.today)\
+        queryset = cls.objects.filter(location=location).filter(start_date__lte=date.today)\
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
 
         #Check wh for specific organization
