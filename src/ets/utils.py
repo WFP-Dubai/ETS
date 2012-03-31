@@ -203,9 +203,10 @@ def import_persons(compas):
                                         location_code__in=places.values_list('geo_point_code', flat=True)):
         try:
             p = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
-            if p.organization_id != person.organization_id:
-            	p.organization_id = person.organization_id
-            	p.save()
+            if not p.organization_id:
+            	if p.organization_id != person.organization_id:
+	            	p.organization_id = person.organization_id
+	            	p.save()
         except ets_models.Person.DoesNotExist:
             p = ets_models.Person(title=person.title,
                                    code=person.code, compas_id=person.org_unit_code, 
