@@ -179,11 +179,12 @@ admin.site.register( ets.models.StockItem, StockAdmin )
 class StockInline(admin.TabularInline):
     model = ets.models.StockItem
     extra = 0
+    readonly_fields = ('warehouse','commodity','package')
 
 class PersonInline(admin.TabularInline):
     model = ets.models.Person
     extra = 0
-    readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location', 'code')
+    readonly_fields = ('last_login', 'date_joined', 'compas', 'organization', 'location', 'code','warehouses','user_permissions')
 
 class WarehouseAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'organization', 'location', 'compas', 'start_date', 'end_date')
@@ -191,7 +192,7 @@ class WarehouseAdmin(admin.ModelAdmin):
     list_filter = ('start_date', 'compas',)
     raw_id_fields = ('location', 'organization')
     search_fields = ('code', 'name', 'location__name', 'organization__name', 'compas__code')
-    #inlines = (StockInline,)
+    inlines = (StockInline,)
     
     def queryset(self, request):
         queryset = super(WarehouseAdmin, self).queryset(request)
@@ -204,13 +205,14 @@ admin.site.register( ets.models.Warehouse, WarehouseAdmin )
 
 class WarehouseInline(admin.TabularInline):
     model = ets.models.Warehouse
-    raw_id_fields = ('location',)
+    raw_id_fields = ('location', 'organization')
+    readonly_fields = ( 'name', 'organization', 'location', 'compas', 'start_date', 'end_date')
     extra = 0
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
     search_fields = ('name',)
-    inlines = (PersonInline,)# WarehouseInline)
+    inlines = (WarehouseInline,)# PersonInline)
 
 admin.site.register( ets.models.Organization, OrganizationAdmin )
 
