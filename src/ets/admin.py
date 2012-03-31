@@ -212,7 +212,7 @@ class WarehouseInline(admin.TabularInline):
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name',)
     search_fields = ('name',)
-    inlines = (WarehouseInline,)# PersonInline)
+    inlines = (WarehouseInline, PersonInline,)
 
 admin.site.register( ets.models.Organization, OrganizationAdmin )
 
