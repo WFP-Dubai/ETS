@@ -237,6 +237,7 @@ def import_stock(compas):
     """Imports stock items or updates quantity"""
     
     now = datetime.now()
+    ## Why places from compas and not from locations
     places = _get_places(compas)
     
     for stock in compas_models.EpicStock.objects.using(compas)\
