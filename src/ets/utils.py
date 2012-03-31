@@ -219,8 +219,8 @@ def import_persons(compas):
         
            
         for wh in ets_models.Warehouse.objects.filter(
-                                               organization=obj.organization, 
-                                               location=obj.location):
+                                               organization=p.organization, 
+                                               location=p.location):
             p.warehouses.add(wh)
         
         p.updated = now
