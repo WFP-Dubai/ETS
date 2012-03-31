@@ -197,30 +197,34 @@ def import_persons(compas):
     
     now = datetime.now()
     places = compas_models.Place.objects.using(compas)#.filter(reporting_code=compas)
-#fix filtering #
-#expand it to do it lighter
+	#fix filtering #
+	#expand it to do it lighter
     for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
                                         location_code__in=places.values_list('geo_point_code', flat=True)):
         try:
-            obj = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
+            p = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
+            if p.organization_id != person.organization_id:
+            	p.organization_id = person.organization_id
+            	p.save()
         except ets_models.Person.DoesNotExist:
-            obj = ets_models.Person(title=person.title,
+            p = ets_models.Person(title=person.title,
                                    code=person.code, compas_id=person.org_unit_code, 
                                    organization_id=person.organization_id, 
                                    location_id=person.location_code, username=person.person_pk, 
                                    email=person.email,
                                    first_name = person.first_name, last_name = person.last_name, 
                                    is_staff=True, is_active=False, is_superuser=False)
-            obj.set_password(person.person_pk)
-            obj.save()
-            
+            p.set_password(person.person_pk)
+            p.save()
+        
+           
         for wh in ets_models.Warehouse.objects.filter(
                                                organization=obj.organization, 
                                                location=obj.location):
-            obj.warehouses.add(wh)
+            p.warehouses.add(wh)
         
-        obj.updated = now
-        obj.save()
+        p.updated = now
+        p.save()
     
     #Disable deleted persons
     ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
