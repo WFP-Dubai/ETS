@@ -962,7 +962,7 @@ class LoadingDetail(models.Model):
         
         #Total received weight net
         if self.total_weight_net_received != self.calculate_total_received_net() and not self.waybill.receipt_remarks:
-            raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required."))
+            raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required. %d"%self.total_weight_net_received))
 
         #Total received weight gross
         if self.total_weight_gross_received != self.calculate_total_received_gross() and not self.waybill.receipt_remarks:
