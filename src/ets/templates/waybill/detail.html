@@ -14,14 +14,11 @@
 {% block content %}
 
 <div class="hidden_print actions">
-    
-  {% waybill_edit object user %}
-  {% waybill_reception object user %}
-
-  <button class="print_copy">Print Copy</button>
-  
-  {% validate_dispatch object user %}
-  {% validate_receipt object user %}
+	<span id="hideme">
+		{% waybill_edit object user %}
+		{% waybill_reception object user %}
+		{% validate_dispatch object user %}
+		{% validate_receipt object user %}
   
   {% sign_dispatch object user as may_sign_dispatch %}
   {% if may_sign_dispatch %}
@@ -34,7 +31,7 @@
   
   {% sign_reception object user as may_sign_reception %}
   {% if may_sign_reception %}
-  <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}" onsubmit="this.style.display='none'">
+  <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}" onsubmit="document.getElementById('hideme').style.display='none';">
     <input class="print_original" type="submit" name="print_original" 
       value="Sign receipt" onclick="return confirm('{% trans 'Are you sure you want to sign this waybill?' %}');"
     />
@@ -43,6 +40,8 @@
   {% endif %}
 
   {% waybill_delete object user _('Delete') object.order.get_absolute_url %}
+	</span>
+	<button class="print_copy">Print Copy</button>
 </div>
 
 <div class="wb">
