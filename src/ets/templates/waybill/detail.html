@@ -31,7 +31,7 @@
   
   {% sign_reception object user as may_sign_reception %}
   {% if may_sign_reception %}
-  <form method="POST" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}" onsubmit="document.getElementById('hideme').style.display='none';">
+  <form method="post" action="{% url waybill_finalize_receipt waybill_pk=object.pk %}" onsubmit="document.getElementById('hideme').style.display='none';">
     <input class="print_original" type="submit" name="print_original" 
       value="Sign receipt" onclick="return confirm('{% trans 'Are you sure you want to sign this waybill?' %}');"
     />
