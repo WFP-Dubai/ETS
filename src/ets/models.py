@@ -448,7 +448,7 @@ class OrderItem(models.Model):
 
     @staticmethod
     def sum_number_mt( queryset ):
-    	total_items = sum_number(queryset)
+    	total_items = self.sum_number(queryset)
     	units = queryset.aggregate(units_count_mt=Sum('unit_weight_net'))['units_count_mt'] or 0
         return total_items*units
     
