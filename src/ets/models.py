@@ -286,10 +286,13 @@ class StockItem( models.Model ):
     
     def calculate_total_net(self):    
         return (self.number_of_units * self.unit_weight_net)/1000
+	@property 
+	def total_weight_net(self):
+		return calculate_total_net(self)
     
     def calculate_total_gross(self):
         return (self.number_of_units * self.unit_weight_gross)/1000
-    
+
     @classmethod
     def get_last_update(cls):
         return cls.objects.aggregate(max_date=Max('updated'))['max_date']
