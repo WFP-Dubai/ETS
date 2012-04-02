@@ -471,10 +471,8 @@ class OrderItem(models.Model):
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
         
-        
-        return self.sum_number_mt(self.stock_items())
-        //return self.sum_number_mt(self.stock_items()) \
-        //        - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+        return self.sum_number_mt(self.stock_items()) \
+                - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
 
 
         
