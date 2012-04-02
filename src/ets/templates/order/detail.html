@@ -62,13 +62,8 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-<<<<<<< HEAD
-      <td align="right">{{item.get_available_stocks_mt}}</td>
+      <td align="right">{{item.get_available_stocks_mt|floatformat:3}}</td>
       <td align="right">{{ item.tonnes_left }}</td>
-=======
-      <td align="right">{{item.get_available_stocks_mt|floatformat:3}} MT</td>
-      <td align="right">{{ item.tonnes_left }} MT</td>
->>>>>>> 6e2077bc83f464b708a93605ed18864dc7392550
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
 {%endif%}
