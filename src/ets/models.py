@@ -286,9 +286,6 @@ class StockItem( models.Model ):
     
     def calculate_total_net(self):    
         return (self.number_of_units * self.unit_weight_net)/1000
-	@property 
-	def total_weight_net(self):
-		return calculate_total_net(self)
     
     def calculate_total_gross(self):
         return (self.number_of_units * self.unit_weight_gross)/1000
@@ -474,8 +471,13 @@ class OrderItem(models.Model):
 
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
+        current_total_stock = 0
+        mystockitems = self.stock_items()
+        for i in mystockitems:
+        	current_total_stock =+ i.calculate_total_net()
         
-        return self.sum_number_mt(self.stock_items()) \
+        
+        return current_total_stock \
                 - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
 
 
