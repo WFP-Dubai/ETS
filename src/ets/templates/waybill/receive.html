@@ -31,6 +31,7 @@
         <th>{% trans "Units (Damaged)"%}</th>
         <th>{% trans "Damaged Reason"%}</th>
         <th>{% trans "Net Qty" %}</th>
+        <th>{% trans "Gross Qty" %}</th>
         <th>{% trans "Over Unloaded Receipt"%}</th>
       </tr>
     </thead>
@@ -48,7 +49,10 @@
           <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
           {% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}
         </td>
-        
+        <td class="weight_gross">
+          <input class="unit_weight_gross" type="hidden" name="dummy" value="{{ form.instance.unit_weight_gross }}" />
+          {% include "uni_form/uni_field.html" with field=form.total_weight_gross_received %}
+        </td>
         <td class="overoffloaded">{% include "uni_form/uni_field.html" with field=form.over_offload_units %}</td>
       </tr>
     {% endfor %}
@@ -68,7 +72,7 @@
 <script charset="utf-8" type="text/javascript">
 (function($) {
 	  $.fn.handleRemarksRequired = function() {
-		  $(this).find('td.overoffloaded input, td.weight input').change(function(){
+		  $(this).find('td.overoffloaded input, td.weight input, td.weight_gross').change(function(){
 			var remarksField = $("#{{ form.receipt_remarks.auto_id }}");
 	        if (!remarksField.val()) {
 	        	alert("{% trans 'Fill remarks please.' %}");
@@ -88,7 +92,9 @@
 			});
 			
 			var weight = sum*container.find("td.weight input.unit_weight_net").val()/1000.0;
+			var weight_gross = sum*container.find("td.weight_gross input.unit_weight_gross").val()/1000.0;
 			container.find("td.weight .ctrlHolder input").val(weight.toFixed(3));
+			container.find("td.weight_gross .ctrlHolder input").val(weight_gross.toFixed(3));
 			
 	  	  });
 	  };

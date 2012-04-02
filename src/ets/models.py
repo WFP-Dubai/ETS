@@ -892,10 +892,10 @@ class LoadingDetail(models.Model):
 
 
     def calculate_total_received_net( self ):
-        return self.calculate_net_received_good() + self.calculate_net_received_damaged()
+        return ( self.calculate_net_received_good() + self.calculate_net_received_damaged()).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
 
     def calculate_total_received_gross( self ):
-        return self.calculate_gross_received_good() + self.calculate_gross_received_damaged()
+        return (self.calculate_gross_received_good() + self.calculate_gross_received_damaged()).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
     
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
@@ -962,7 +962,7 @@ class LoadingDetail(models.Model):
         
         #Total received weight net
         if self.total_weight_net_received != self.calculate_total_received_net() and not self.waybill.receipt_remarks:
-            raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required.X %d "%{self.total_weight_net_received}))
+            raise ValidationError(_("Since you changed total weight net 'Recipient Remarks' field becomes required."))
 
         #Total received weight gross
         if self.total_weight_gross_received != self.calculate_total_received_gross() and not self.waybill.receipt_remarks:
