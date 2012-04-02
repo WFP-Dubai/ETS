@@ -448,7 +448,7 @@ class OrderItem(models.Model):
 
     @staticmethod
     def sum_number_mt( queryset ):
-        return queryset.aggregate(units_count=Sum('unit_weight_net'))['units_count'] or 0
+        return queryset.aggregate(units_count=Sum('total_weight_net'))['units_count'] or 0
     
     
     def get_similar_dispatches(self):
@@ -465,8 +465,8 @@ class OrderItem(models.Model):
     
     def get_available_stocks(self):
         """Calculates available stocks"""
-        return self.sum_number(self.stock_items()) #\
-#                - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+        return self.sum_number(self.stock_items()) \
+                - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
 
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
