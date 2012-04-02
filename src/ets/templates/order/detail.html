@@ -40,12 +40,12 @@
       <th>{% trans "SI" %}</th>
       <th>{% trans "Commodity" %}</th>
       <th>{% trans "Units" %}</th>
-      <th>{% trans "Unit Weight (Net)" %}</th>
-      <th>{% trans "Unit Weight (Gross)" %}</th>
-      <th>{% trans "Net Qty" %}</th>
-      <th>{% trans "Gross Qty" %}</th>
-      <th>{% trans "Stock In Warehouse" %}</th>
-      <th>{% trans "To Be Dispatched" %}</th>
+      <th>{% trans "Unit Weight Net (kg)" %}</th>
+      <th>{% trans "Unit Weight Gross (kg)" %}</th>
+      <th>{% trans "Net Qty (MT)" %}</th>
+      <th>{% trans "Gross Qty (MT)" %}</th>
+      <th>{% trans "Stock In Warehouse (MT)" %}</th>
+      <th>{% trans "To Be Dispatched (MT)" %}</th>
       <th>{% trans "% Completed" %}</th>
     </tr>
   </thead>
@@ -62,8 +62,8 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-      <td align="right">{{item.get_available_stocks_mt}} MT</td>
-      <td align="right">{{ item.tonnes_left }} MT</td>
+      <td align="right">{{item.get_available_stocks_mt}}</td>
+      <td align="right">{{ item.tonnes_left }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
 {%endif%}
@@ -111,7 +111,7 @@
 {% endif %}
 
 <br/>
-{% waybill_creation object user _("Create New Waybill") %}<br/>
+{% waybill_creation object user _("Create New eWaybill") %}<br/>
 <br/>
 {% endblock %}
 {% endblock %}

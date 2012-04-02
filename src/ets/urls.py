@@ -51,7 +51,7 @@ urlpatterns = patterns("ets.views",
         'queryset': ets.models.Waybill.objects.all(),
     }, "waybill_search" ),
     ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
-        "extra_context": {"extra_title": _("Waybills waiting for Dispatch signature")}
+        "extra_context": {"extra_title": _("eWaybills Waiting For Dispatch Signature")}
     }, "waybill_dispatch_list" ),
     ( r'^receive/$', person_required(receipt_view(waybill_list)), {
         "extra_context": {"extra_title": _("Expected Consignments")}

@@ -41,7 +41,7 @@ class WaybillSearchForm( forms.Form ):
 
 class WaybillScanForm( forms.Form ):
     """Waybill scan form with one input"""
-    data = forms.CharField(required=True, label=_('Scan Waybill'))
+    data = forms.CharField(required=True, label=_('Scan eWaybill'))
 
 class DispatchWaybillForm( forms.ModelForm ):
     """Dispatch waybill form."""

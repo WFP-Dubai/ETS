@@ -19,7 +19,7 @@
 <form method="POST" action="" class="uniForm">{% csrf_token %}
   {% include "uni_form/errors_formset.html" %}
   <fieldset>
-  <legend>{% trans "Loading details" %}</legend>
+  <legend>{% trans "Unloading details" %}</legend>
   <table>
     {{ formset.management_form }}
     <thead class="bordered">
@@ -30,8 +30,8 @@
         <th>{% trans "Lost Reason"%}</th>
         <th>{% trans "Units (Damaged)"%}</th>
         <th>{% trans "Damaged Reason"%}</th>
-        <th>{% trans "Net Qty" %}</th>
-        <th>{% trans "Gross Qty" %}</th>
+        <th>{% trans "Net Qty (MT)" %}</th>
+        <th>{% trans "Gross Qty (MT)" %}</th>
         <th>{% trans "Over Unloaded Receipt"%}</th>
       </tr>
     </thead>

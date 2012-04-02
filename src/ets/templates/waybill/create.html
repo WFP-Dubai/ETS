@@ -11,17 +11,17 @@
 <form method="POST" action="" class="uniForm">{% csrf_token %}
     {% include "uni_form/errors_formset.html" %}
     <fieldset>
-    <legend>{% trans "Unloading Details" %}</legend>    
+    <legend>{% trans "Loading Details" %}</legend>    
     <table id="loadingdetails">
       {{ formset.management_form }}
       <thead class="bordered">
         <tr>
           <th>{% trans "COI" %}</th>
           <th>{% trans "Units" %}</th>
-          <th>{% trans "Unit Weight (Net)" %}</th>
-          <th>{% trans "Unit Weight (Gross)" %}</th>
-          <th>{% trans "Net Qty" %}</th>
-          <th>{% trans "Gross Qty" %}</th>
+          <th>{% trans "Unit Weight Net (kg)" %}</th>
+          <th>{% trans "Unit Weight Gross (kg)" %}</th>
+          <th>{% trans "Net Qty (MT)" %}</th>
+          <th>{% trans "Gross Qty (MT)" %}</th>
           <th>{% trans "Overloaded Dispatch" %}</th>
           {% if formset.can_delete %}<th style="background-color: red;">{% trans "Delete" %}</th>{% endif %}
         </tr>
