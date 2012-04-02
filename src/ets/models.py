@@ -448,7 +448,7 @@ class OrderItem(models.Model):
 
     @staticmethod
     def sum_number_mt( queryset ):
-        return queryset.aggregate(units_count=Sum('total_weight_net'))['units_count'] or 0
+        return queryset.aggregate(units_count=Sum('unit_weight_net'))['units_count_mt'] or 0
     
     
     def get_similar_dispatches(self):
