@@ -450,7 +450,7 @@ class OrderItem(models.Model):
     def sum_number_mt( queryset ):
     	total_items = OrderItem.sum_number(queryset)
     	units = queryset.aggregate(units_count_mt=Sum('unit_weight_net'))['units_count_mt'] or 0
-        return total_items*units
+        return total_items*units/1000
     
     
     def get_similar_dispatches(self):
