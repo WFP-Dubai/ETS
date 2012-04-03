@@ -10,7 +10,7 @@
     <tr>
       <th>{% trans "LTI Number" %}</th>
       <th>{% trans "eWaybill Number" %}</th>
-      <th>{% trans "Warehouse" %}</th>
+      <th>{% trans "Origin Warehouse" %}</th>
       <th>{% trans "Consignee" %}</th>
       <th>{% trans "Destination Location" %}</th>
       <th>{% trans "Transaction Type" %}</th>
@@ -35,7 +35,7 @@
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date|date|upper }}
           {% else %}
-            {% waybill_edit waybill user %}
+		  	<a href='{{ waybill.get_absolute_url }}'>Open</a>
           {% endif %}
         </td>
         <td>
