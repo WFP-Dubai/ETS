@@ -289,7 +289,7 @@ class StockItem( models.Model ):
     
     def calculate_total_gross(self):
         return (self.number_of_units * self.unit_weight_gross)/1000
-    
+
     @classmethod
     def get_last_update(cls):
         return cls.objects.aggregate(max_date=Max('updated'))['max_date']
@@ -448,9 +448,8 @@ class OrderItem(models.Model):
 
     @staticmethod
     def sum_number_mt( queryset ):
-    	total_items = OrderItem.sum_number(queryset)
-    	units = queryset.aggregate(units_count_mt=Sum('unit_weight_net'))['units_count_mt'] or 0
-        return total_items*units/1000
+    	units = queryset.aggregate(units_count_mt=Sum('total_weight_net'))['units_count_mt'] or 0
+        return units
     
     
     def get_similar_dispatches(self):
@@ -472,8 +471,14 @@ class OrderItem(models.Model):
 
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
+        current_total_stock = 0
+        mystockitems = self.stock_items()
+        for i in mystockitems:
+        	
+        	current_total_stock += i.calculate_total_net()
         
-        return self.sum_number_mt(self.stock_items()) \
+        
+        return current_total_stock \
                 - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
 
 
