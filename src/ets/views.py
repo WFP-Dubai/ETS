@@ -193,7 +193,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     order = get_object_or_404(queryset, pk=order_pk)
     waybill = ets.models.Waybill(order=order, dispatcher_person=request.user.person)
 
-    return _dispatching(request, waybill, success_message=_("Waybill has been created"), **kwargs)
+    return _dispatching(request, waybill, success_message=_("eWaybill has been created"), **kwargs)
 
 
 @person_required
@@ -203,7 +203,7 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
     """Updates not signed dispatching waybill"""
     
     waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
-    return _dispatching(request, waybill, success_message=_("Waybill has been updated"), **kwargs) 
+    return _dispatching(request, waybill, success_message=_("eWaybill has been updated"), **kwargs) 
 
 
 @transaction.commit_on_success
@@ -233,7 +233,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         waybill = form.save()
         loading_formset.save()
         
-        messages.add_message(request, messages.INFO, _('Waybill has been discharged'))
+        messages.add_message(request, messages.INFO, _('eWaybill has been discharged'))
         
         return redirect(waybill)
     
@@ -263,7 +263,7 @@ def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     waybill.delete()
     redirect_to = redirect_to or request.GET.get('redirect_to', '')
         
-    messages.info(request, _('Waybill %(number)s has now been Removed') % {"number": waybill.pk})
+    messages.info(request, _('eWaybill %(number)s has now been Removed') % {"number": waybill.pk})
 
     if redirect_to:
         return redirect(redirect_to)
@@ -313,7 +313,7 @@ def validate_dispatch(request, waybill_pk, queryset):
     waybill.save()
     
     messages.add_message(request, messages.INFO, 
-                        _('Waybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
+                        _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
                         })
 
@@ -331,7 +331,7 @@ def validate_receipt(request, waybill_pk, queryset):
     waybill.save()
     
     messages.add_message(request, messages.INFO, 
-                        _('Waybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
+                        _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
                         })
 

@@ -593,11 +593,11 @@ class Waybill( ld_models.Model ):
     transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
     receipt_signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
     
-    validated = models.BooleanField( _("Waybill Validated"), default=False) #waybillValidated
-    sent_compas = models.DateTimeField(_("Waybill Sent to Compas"), blank=True, null=True)
+    validated = models.BooleanField( _("eWaybill Validated"), default=False) #waybillValidated
+    sent_compas = models.DateTimeField(_("eWaybill Sent to Compas"), blank=True, null=True)
     
-    receipt_validated = models.BooleanField(_("Waybill Receipt Validated"), default=False) #waybillReceiptValidated
-    receipt_sent_compas = models.DateTimeField(_("Waybill Reciept Sent to Compas"), blank=True, null=True)
+    receipt_validated = models.BooleanField(_("eWaybill Receipt Validated"), default=False) #waybillReceiptValidated
+    receipt_sent_compas = models.DateTimeField(_("eWaybill Reciept Sent to Compas"), blank=True, null=True)
     
     barcode = ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
                        blank=True, null=True,
@@ -808,7 +808,7 @@ class Waybill( ld_models.Model ):
     
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
-    waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill Number"), related_name="loading_details")
+    waybill = models.ForeignKey(Waybill, verbose_name=_("eWaybill Number"), related_name="loading_details")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', editable=True, primary_key=True)
     
     #Stock data
@@ -1015,7 +1015,7 @@ class CompasLogger(models.Model):
     
     action = models.IntegerField(_("procedure name"), choices=ACTIONS)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="logs")
-    waybill = models.ForeignKey(Waybill, verbose_name=_("Waybill"), related_name="compass_loggers")
+    waybill = models.ForeignKey(Waybill, verbose_name=_("eWaybill"), related_name="compass_loggers")
     when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
     status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
     message = models.TextField(_("error message"))
