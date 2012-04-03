@@ -196,11 +196,11 @@ def import_persons(compas):
     """Imports persons from COMPAS"""
     
     now = datetime.now()
-    places = ets_models.Location.objects.all()#.filter(reporting_code=compas)
+    places = compas_models.Place.objects.using(compas)#.filter(reporting_code=compas)
 	#fix filtering #
 	#expand it to do it lighter
     for person in compas_models.CompasPerson.objects.using(compas).filter(org_unit_code=compas, 
-                                        location_code__in=places.values_list('code', flat=True)):
+                                        location_code__in=places.values_list('geo_point_code', flat=True)):
         try:
             p = ets_models.Person.objects.get(code=person.code, compas__pk=person.org_unit_code)
             if not p.organization_id:
