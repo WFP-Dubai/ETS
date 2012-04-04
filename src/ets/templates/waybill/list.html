@@ -13,9 +13,10 @@
       <th>{% trans "Origin Warehouse" %}</th>
       <th>{% trans "Consignee" %}</th>
       <th>{% trans "Destination Location" %}</th>
+      <th>{% trans "Destination Warehouse" %}</th>
       <th>{% trans "Transaction Type" %}</th>
       <th>{% trans "Dispatch" %}</th> 
-      <th>{% trans "Received" %}</th>
+      <th>{% trans "Receive" %}</th>
       <th>{% trans "Validated" %}</th>
       <th>{% trans "In COMPAS" %}</th>
       <th>{% trans "Delete" %}</th>
@@ -30,6 +31,7 @@
         <td>{{ waybill.order.warehouse.name }}</td>
         <td>{{ waybill.order.consignee }}</td>
         <td>{{ waybill.order.location.name }}</td>
+        <td>{{ waybill.order.destination.name }}</td>
         <td>{{ waybill.get_transaction_type_display }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
