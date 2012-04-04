@@ -31,7 +31,7 @@
         <td>{{ waybill.order.warehouse.name }}</td>
         <td>{{ waybill.order.consignee }}</td>
         <td>{{ waybill.order.location.name }}</td>
-        <td>{{ waybill.order.destination.name }}</td>
+        <td>{{ waybill.destination.name }}</td>
         <td>{{ waybill.get_transaction_type_display }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
