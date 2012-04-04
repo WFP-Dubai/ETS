@@ -174,19 +174,19 @@ class WaybillRecieptForm( forms.ModelForm ):
     helper.form_tag = False
 
 
-class LoadingDetailRecieptForm( forms.ModelForm ):
+class LoadingDetailReceiptForm( forms.ModelForm ):
     """Model form for loading details on receipt page."""
     
     def __init__(self, *args, **kwargs):
         """Filters loss and damage reason choice."""
-        super(LoadingDetailRecieptForm, self).__init__(*args, **kwargs)
+        super(LoadingDetailReceiptForm, self).__init__(*args, **kwargs)
         
         for field_name in ('units_lost_reason', 'units_damaged_reason'):
             self.fields[field_name].queryset = self.fields[field_name].queryset.filter(category=self.instance.stock_item.commodity.category)
     
     def clean(self):
         """Validates entered values, i.e. quantities"""
-        super(LoadingDetailRecieptForm, self).clean()
+        super(LoadingDetailReceiptForm, self).clean()
         if hasattr(self, 'cleaned_data'):
             if not self.cleaned_data.get('number_units_good')\
                 and not self.cleaned_data.get('number_units_damaged')\

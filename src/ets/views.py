@@ -25,7 +25,7 @@ from django.views.generic.edit import FormView
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
-from ets.forms import LoadingDetailRecieptForm, WaybillScanForm, ImportDataForm
+from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
@@ -208,7 +208,7 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
 
 @transaction.commit_on_success
 def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptForm, 
-                      formset_form = LoadingDetailRecieptForm,
+                      formset_form = LoadingDetailReceiptForm,
                       template='waybill/receive.html'):
     """Waybill reception view""" 
     waybill = get_object_or_404(queryset, pk=waybill_pk)
