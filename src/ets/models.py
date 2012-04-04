@@ -384,7 +384,7 @@ class Order(models.Model):
         """Retrieves stock items for current order through warehouse"""
         
         return StockItem.objects.filter(pk__in=chain(*(
-                                            item.get_stock_items().values_list('pk', flat=True) for item in self.items.filter((quantity_net!=0)|(number_of_units!=0)))))
+                                            item.get_stock_items().values_list('pk', flat=True) for item in self.items.all())))
         
         #=======================================================================
         # return StockItem.objects.filter(warehouse__orders=self,

@@ -142,7 +142,8 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     class FormsetForm(formset_form):
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), empty_label=_("Choose stock item"))
-        stock_item.choices = [(u"", stock_item.empty_label),]+[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) )) 
+        stock_item.choices = [(u"", stock_item.empty_label),]
+        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) )) 
                               for item in order.get_stock_items()]
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
