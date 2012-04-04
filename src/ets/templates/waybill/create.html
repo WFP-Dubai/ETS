@@ -156,14 +156,14 @@
 	  
   }
 })(jQuery);
-var ddmd;
+
 $(document).ready(function() {
 
   $('#{{ form.loading_date.auto_id }}').change(function(){
-		ddmd = $(this).datepicker('getDate');
+	
 
         $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-          minDate: ddmd,
+          minDate:$(this).datepicker('getDate'),
           maxDate: '{{ object.expiry|date:"y-m-d" }}',
           dateFormat: 'yy-mm-dd' 
         });
