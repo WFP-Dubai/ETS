@@ -79,11 +79,13 @@
   {% for waybill in object.waybills.all %}
       <tr>
         <th colspan="2" rowspan="2">
-          <a href='{{ waybill.get_absolute_url }}'>{% trans "Waybill:" %}{{ waybill.pk }}</a>
+          <a href='{{ waybill.get_absolute_url }}'>{{ waybill.pk }}</a>
         </th>
         <td align="center">{% waybill_edit waybill user %}</td>
-        <th>{% trans "Dispatched date" %}</th>
-        <th>{% trans "Received date" %}</th>
+        <th>{% trans "Dispatched Date" %}</th>
+        <th>{% trans "Received Date" %}</th>
+        <th>{% trans "Validation Status" %}</th>
+        <th>{% trans "In Compas" %}</th>
       </tr>
       <tr>
         <td align="center">{% waybill_delete waybill user %}</td>
@@ -93,17 +95,21 @@
         <td align="center">
           {{ waybill.receipt_signed_date|date|upper }}
         </td>
+        <td>{%if waybill.validated%}Validated{%else%}Not Validated{%endif%}</td>
+    	<td>{%if waybill.sent_compas%}{{sent_compas|date|upper}}{%else%}Not in COMPAS{%endif%}</td>
       </tr>
       <tr>
         <th>{% trans "Commodity" %}</th>
         <th>{% trans "SI" %}</th>
-        <th>{% trans "Number of units" %}</th>
+        <th>{% trans "Number of Units" %}</th>
+        <th>{% trans "Total Weight" %}</th>
       </tr>
       {% for loading in waybill.loading_details.all %}
       <tr>
         <td>&nbsp;{{ loading.stock_item.commodity }}&nbsp;</td>
         <td>&nbsp;{{ loading.stock_item.si_code }}&nbsp;</td>
         <td align="right">{{ loading.number_of_units }}</td>
+        <td align="right">{{ loading.total_weight_net|floatformat:3 }}MT</td>
       </tr>
       {% endfor %}
   {% endfor %}
