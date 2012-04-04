@@ -159,10 +159,10 @@
 
 $(document).ready(function() {
 
-  $('#{{ form.loading_date.auto_id }}').change(function)(
+  $('#{{ form.loading_date.auto_id }}').change(function(){
 		ddmd = $(this).datepicker('getDate');
 		dateFormat: 'yy-mm-dd'
-  );
+  });
 
   $('#{{ form.loading_date.auto_id }}').datepicker({ 
 	  minDate: '{{ object.created|date:"y-m-d" }}',
