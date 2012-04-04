@@ -82,8 +82,9 @@ class DispatchWaybillForm( forms.ModelForm ):
         Fieldset(ugettext('Dates'), Row('loading_date', 'dispatch_date')),
         Fieldset(ugettext('General'),
                 'destination',
-                'dispatch_remarks',
+
                 Row('transaction_type', 'transport_type'),
+                                Row('dispatch_remarks'),
                  ),
         Fieldset(ugettext('Transport'),
                  'transport_sub_contractor',
