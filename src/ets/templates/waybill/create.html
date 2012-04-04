@@ -158,12 +158,12 @@
 })(jQuery);
 
 $(document).ready(function() {
-  $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
+  $('#{{ form.loading_date.auto_id }}').datepicker({ 
 	  minDate: '{{ object.created|date:"y-m-d" }}',
 	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd'
   });
-  $('#{{ form.loading_date.auto_id }}').datepicker({ 
+  $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
 	  minDate: 'document.getElementById("id_loading_date").innerHTML',
 	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd' 
