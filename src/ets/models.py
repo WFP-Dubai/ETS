@@ -288,10 +288,10 @@ class StockItem( models.Model ):
         return self.origin_id[7:]
     
     def calculate_total_net(self):    
-        return (self.number_of_units * self.unit_weight_net)/1000
+        return quantity_net
     
     def calculate_total_gross(self):
-        return (self.number_of_units * self.unit_weight_gross)/1000
+        return quantity_gross
 
     @classmethod
     def get_last_update(cls):
