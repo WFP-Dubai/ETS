@@ -286,7 +286,7 @@ def import_stock(compas):
             'origin_id': stock.origin_id,
             'is_bulk': stock.is_bulk(),
             'quantity_net': quantity_net,
-            'quantity_gross': quantity_net,
+            'quantity_gross': quantity_gross,
             'updated': now,
         }
         
