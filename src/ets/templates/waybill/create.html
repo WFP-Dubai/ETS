@@ -161,7 +161,13 @@ $(document).ready(function() {
 
   $('#{{ form.loading_date.auto_id }}').change(function(){
 		ddmd = $(this).datepicker('getDate');
-		dateFormat: 'yy-mm-dd'
+
+        $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
+          minDate: ddmd,
+          maxDate: '{{ object.expiry|date:"y-m-d" }}',
+          dateFormat: 'yy-mm-dd' 
+        });
+
   });
 
   $('#{{ form.loading_date.auto_id }}').datepicker({ 
@@ -170,11 +176,6 @@ $(document).ready(function() {
 	  dateFormat: 'yy-mm-dd'
   });
   
-  $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-	  minDate: ddmd,
-	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
-	  dateFormat: 'yy-mm-dd' 
-  });
   
   $("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
   
