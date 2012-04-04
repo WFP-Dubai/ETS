@@ -84,8 +84,10 @@
         <td align="center">{% waybill_edit waybill user %}</td>
         <th>{% trans "Dispatched Date" %}</th>
         <th>{% trans "Received Date" %}</th>
-        <th>{% trans "Validation Status" %}</th>
-        <th>{% trans "In Compas" %}</th>
+        <th>{% trans "Dispatch Validation Status" %}</th>
+        <th>{% trans "Receipt Validation Status" %}</th>
+        <th>{% trans "Dispatch In Compas" %}</th>
+        <th>{% trans "Receipt In Compas" %}</th>
       </tr>
       <tr>
         <td align="center">{% waybill_delete waybill user %}</td>
@@ -95,8 +97,10 @@
         <td align="center">
           {{ waybill.receipt_signed_date|date|upper }}
         </td>
-        <td>{%if waybill.validated%}Validated{%else%}Not Validated{%endif%}</td>
-    	<td>{%if waybill.sent_compas%}{{sent_compas|date|upper}}{%else%}Not in COMPAS{%endif%}</td>
+        <td>Dispatch {%if waybill.validated%}Yes{%else%}No{%endif%}</td>
+        <td>Receipt {%if waybill.receipt_validated%}Yes{%else%}No{%endif%}</td>
+    	<td>{%if waybill.sent_compas%}{{waybill.sent_compas|date|upper}}{%else%}No{%endif%}</td>
+    	<td>{%if waybill.receipt_sent_compas%}{{waybill.receipt_sent_compas|date|upper}}{%else%}No{%endif%}</td>
       </tr>
       <tr>
         <th>{% trans "Commodity" %}</th>
@@ -112,6 +116,7 @@
         <td align="right">{{ loading.total_weight_net|floatformat:3 }}MT</td>
       </tr>
       {% endfor %}
+	<tr colspan="8" style="border:0px"><td>&nbsp;</td></tr>
   {% endfor %}
   </table>
 {% endif %}
