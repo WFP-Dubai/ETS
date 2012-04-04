@@ -430,7 +430,7 @@ class OrderItem(models.Model):
         verbose_name_plural = _("order items")
     
     def  __unicode__( self ):
-        return u"%s -  %.0f " % ( self.commodity, self.items_left() )
+        return u"%s -  %.0f " % ( self.commodity, self.tonnes_left() )
 
 
     def stock_items(self):

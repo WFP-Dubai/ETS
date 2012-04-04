@@ -63,7 +63,7 @@
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
       <td align="right">{{item.get_available_stocks_mt|floatformat:3}}</td>
-      <td align="right">{{ item.tonnes_left }}</td>
+      <td align="right">{{ item.tonnes_left|floatformat:3 }}</td>
       <td align="right">{{ item.get_percent_executed }}</td>
     </tr>
 {%endif%}
