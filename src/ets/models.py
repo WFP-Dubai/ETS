@@ -484,8 +484,14 @@ class OrderItem(models.Model):
         	current_total_stock += i.calculate_total_net()
         
         
-        return current_total_stock \
-                - self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+        return current_total_stock
+
+    def get_dispatched_not_yet_counted_of_stock(self):
+        """Calculates available stocks"""
+        mystockitems = self.stock_items()
+        un_stock =  self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+        
+        return un_stock
 
 
         
