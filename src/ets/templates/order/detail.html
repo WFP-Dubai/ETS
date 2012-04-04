@@ -7,11 +7,11 @@
 <table class="summary">
   <tr>
     <td>{% trans "LTI Number" %}: <a href="{{ object.get_absolute_url }}" >{{ object.pk }}</a></td>
-    <td>{% trans "Creation Date" %}: {{ object.created }}</td>
+    <td>{% trans "Creation Date" %}: {{ object.created|date|upper }}</td>
   </tr>
   <tr>
-    <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date }}</td>
-    <td>{% trans "Expiry Date" %}: {{ object.expiry }}</td>
+    <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date|date|upper }}</td>
+    <td>{% trans "Expiry Date" %}: {{ object.expiry|date|upper }}</td>
     <td>{% trans "% Completed" %}: {{ object.get_percent_executed }}</td>
   </tr>
   <tr>
