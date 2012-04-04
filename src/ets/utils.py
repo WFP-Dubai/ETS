@@ -435,7 +435,7 @@ def send_dispatched(waybill, compas=None):
                     
                     waybill.transaction_type, 
                     waybill.transport_vehicle_registration,
-                   #waybill.transport_trailer_registration,
+                    waybill.transport_trailer_registration,
                     waybill.transport_type,
                     waybill.dispatch_remarks, 
                     
