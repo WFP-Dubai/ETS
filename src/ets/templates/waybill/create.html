@@ -164,7 +164,7 @@ $(document).ready(function() {
 	  dateFormat: 'yy-mm-dd'
   });
   $('#{{ form.loading_date.auto_id }}').datepicker({ 
-	  minDate: 'document.getElementById('id_loading_date').innerHTML',
+	  minDate: 'document.getElementById("id_loading_date").innerHTML',
 	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd' 
   });
