@@ -78,7 +78,7 @@
   <table class='bordered'>
   {% for waybill in object.waybills.all %}
       <tr>
-        <th colspan="2" rowspan="2">
+        <th  rowspan="2">
           <a href='{{ waybill.get_absolute_url }}'>{{ waybill.pk }}</a>
         </th>
         <td align="center">{% waybill_edit waybill user %}</td>
