@@ -163,8 +163,12 @@ $(document).ready(function() {
 	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd'
   });
+  $('#{{ form.loading_date.auto_id }}').change(function)({ 
+		ddmd = $(this).datepicker('getDate');
+	  dateFormat: 'yy-mm-dd'
+  });
   $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-	  minDate: 'document.getElementById("id_loading_date").innerHTML',
+	  minDate: ddmd,
 	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
 	  dateFormat: 'yy-mm-dd' 
   });
