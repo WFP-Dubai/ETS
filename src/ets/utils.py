@@ -264,6 +264,10 @@ def import_stock(compas):
         #Check package type. If 'BULK' then modify number and weight
         number_of_units = stock.quantity_net*TOTAL_WEIGHT_METRIC if stock.is_bulk() \
                                 else stock.number_of_units
+                                
+        quantity_net =  stock.quantity_net
+        quantity_gross = stock.quantity_gross
+        
          
         warehouse = ets_models.Warehouse.objects.get(pk=stock.wh_code)
         
@@ -281,11 +285,13 @@ def import_stock(compas):
             'si_record_id': stock.si_record_id,
             'origin_id': stock.origin_id,
             'is_bulk': stock.is_bulk(),
-            
+            'quantity_net': quantity_net,
+            'quantity_gross': quantity_net,
             'updated': now,
         }
         
-        rows = ets_models.StockItem.objects.filter(external_ident=stock.wh_pk, quality=stock.qualitycode).update(**defaults)
+        rows = ets_models.StockItem.objects.filter(external_ident=stock.wh_pk, 
+                                                    quality=stock.qualitycode).update(**defaults)
         if not rows:
             
             #Clean virtual stocks

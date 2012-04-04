@@ -251,6 +251,8 @@ class StockItem( models.Model ):
     
     external_ident = models.CharField(_("External Identifier"), max_length=128, default="111")
     quality = models.CharField(_("Quality"), max_length=1, choices=QUALITY_CHOICE) #qualitycode
+    quantity_net =  models.DecimalField(_("Net MT"), max_digits=12, decimal_places=3)
+    quantity_gross =  models.DecimalField(_("Gross MT"), max_digits=12, decimal_places=3)
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
@@ -263,6 +265,7 @@ class StockItem( models.Model ):
     si_record_id = models.CharField(_("SI record id"), max_length=25, primary_key=False)
     origin_id = models.CharField(_("Origin identifier"), max_length=23)
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
+    
     
     virtual = models.BooleanField(_("Virtual stock"), default=False)
     
