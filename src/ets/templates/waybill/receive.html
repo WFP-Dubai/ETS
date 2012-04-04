@@ -27,9 +27,9 @@
         <th>{% trans "Dispatched Commodity"%}</th>
         <th>{% trans "Units (Good)"%}</th>
         <th>{% trans "Units (Lost)"%}</th>
-        <th style="width:250px;">{% trans "Lost Reason"%}</th>
+        <th>{% trans "Lost Reason"%}</th>
         <th>{% trans "Units (Damaged)"%}</th>
-        <th style="width:250px;">{% trans "Damaged Reason"%}</th>
+        <th>{% trans "Damaged Reason"%}</th>
         <th>{% trans "Net Qty (MT)" %}</th>
         <th>{% trans "Gross Qty (MT)" %}</th>
         <th>{% trans "Over Unloaded Receipt"%}</th>
@@ -42,9 +42,9 @@
         <td>{{ form.instance.stock_item.coi_code }} {{form.instance.stock_item.commodity.name}} ({{ form.instance.number_of_units }} items) {{ form.slug }} {{ form.waybill }}</td>
         <td class="received_units">{% include "uni_form/uni_field.html" with field=form.number_units_good %}</td>
         <td>{% include "uni_form/uni_field.html" with field=form.number_units_lost %}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
+        <td style="width:250px;">{% include "uni_form/uni_field.html" with field=form.units_lost_reason %}</td>
         <td class="received_units">{% include "uni_form/uni_field.html" with field=form.number_units_damaged %}</td>
-        <td>{% include "uni_form/uni_field.html" with field=form.units_damaged_reason %}</td>
+        <td style="width:250px;">{% include "uni_form/uni_field.html" with field=form.units_damaged_reason %}</td>
         <td class="weight">
           <input class="unit_weight_net" type="hidden" name="dummy" value="{{ form.instance.unit_weight_net }}" />
           {% include "uni_form/uni_field.html" with field=form.total_weight_net_received %}
