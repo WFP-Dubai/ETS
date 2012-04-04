@@ -298,7 +298,7 @@ class CSVEmitter(Emitter):
         field_names = list(get_flattened_field_names(self.fields))
         header = dict(zip(field_names, field_names))
         
-        dict_writer = unicodecsv.UnicodeDictWriter(result, field_names, dialect='excel')
+        dict_writer = unicodecsv.UnicodeDictWriter(result, field_names, dialect='excel_tab')
         dict_writer.writerow(header)
         dict_writer.writerows(get_flattened_data(self.construct()))
         
