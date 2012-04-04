@@ -3,13 +3,14 @@
 import csv
 import StringIO
 
+
 from django.db.models import Q, ForeignKey
 
 from piston.handler import BaseHandler
 from piston.emitters import Emitter
 
 import ets.models
-
+from ets.api import unicodecsv
 
 def get_titles(model):
     """Extracts titles from model fields"""
@@ -297,7 +298,7 @@ class CSVEmitter(Emitter):
         field_names = list(get_flattened_field_names(self.fields))
         header = dict(zip(field_names, field_names))
         
-        dict_writer = csv.DictWriter(result, field_names, dialect='excel', restval='', extrasaction='ignore')
+        dict_writer = unicodecsv.UnicodeDictWriter(result, field_names, dialect='excel', restval='', extrasaction='ignore')
         dict_writer.writerow(header)
         dict_writer.writerows(get_flattened_data(self.construct()))
         
