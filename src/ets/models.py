@@ -255,8 +255,8 @@ class StockItem( models.Model ):
     quantity_gross =  models.DecimalField(_("Gross MT"), max_digits=12, decimal_places=3)
     
     number_of_units = models.DecimalField(_("Number of units"), max_digits=12, decimal_places=3)
-    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
-    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3,default=0)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3,default=0)
     
     is_bulk = models.BooleanField(_("Bulk"), default=False)
     
