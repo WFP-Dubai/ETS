@@ -107,12 +107,12 @@ $(document).ready(function() {
 	 	dateFormat: 'dd-M-yy' 
     });
 	$('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	 	dateFormat: 'yy-mm-dd' 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
+	 	dateFormat: 'dd-M-yy' 
     });
     $('#{{ form.end_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	 	dateFormat: 'yy-mm-dd' 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
+	 	dateFormat: 'dd-M-yy'  
     });
 	
 	$("form table tr").each(function(){
