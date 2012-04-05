@@ -696,7 +696,7 @@ class Waybill( ld_models.Model ):
                         'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
                         'quality': item.stock_item.quality,
                         'package': item.stock_item.package,
-                        'number_of_units': item.stock_item.number_of_units,
+                        'number_of_units': item.number_of_units,
                         'unit_weight_net': item.stock_item.unit_weight_net, 
                         'unit_weight_gross': item.stock_item.unit_weight_gross, 
                         'is_bulk': item.stock_item.is_bulk,
@@ -704,6 +704,9 @@ class Waybill( ld_models.Model ):
                         'origin_id': item.stock_item.origin_id,
                         'allocation_code': item.stock_item.allocation_code,
                         'virtual': True,
+                        'quantity_net':item.total_weight_net_received,
+                        'quantity_gross':item.total_weight_gross_received
+                        
                     }) 
                     StockItem.objects.create(**filters)
                 
