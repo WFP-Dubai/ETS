@@ -158,8 +158,6 @@
 })(jQuery);
 
 $(document).ready(function() {
-	// initialize both datepickers
-	$("#{{ form.loading_date.auto_id }},#{{ form.dispatch_date.auto_id }}").datepicker();
 	// constrain loading date
 	$('#{{ form.loading_date.auto_id }}').datepicker({
 		minDate: '{{ object.created|date:"y-m-d" }}',
@@ -174,7 +172,6 @@ $(document).ready(function() {
 	});
 	// reconstrain dispatch date every time loading date is changed
 	$('#{{ form.loading_date.auto_id }}').change(function(){
-		
   		alert('Handler for .change() called.');
 //		$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
 //			minDate:$(this).datepicker('getDate'),
