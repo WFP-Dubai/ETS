@@ -230,3 +230,7 @@ div.loader div {
 .footer div.loader {
   display: inline;
 }
+
+.select{
+    width: 300px;
+}
