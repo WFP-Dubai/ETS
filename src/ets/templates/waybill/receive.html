@@ -103,16 +103,16 @@
 $(document).ready(function() {
 	
     $('#{{ form.arrival_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
-	 	dateFormat: 'dd-M-yy' 
+		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+	 	dateFormat: 'yy-mm-dd' 
     });
 	$('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
-	 	dateFormat: 'dd-M-yy' 
+		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+	 	dateFormat: 'yy-mm-dd' 
     });
     $('#{{ form.end_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
-	 	dateFormat: 'dd-M-yy'  
+		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+	 	dateFormat: 'yy-mm-dd' 
     });
 	
 	$("form table tr").each(function(){

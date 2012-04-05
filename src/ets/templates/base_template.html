@@ -29,7 +29,7 @@
   {% block menu %}
   <div class="menu">
     {% url index as index_url %}
-    {% if request.path != index_url %}<a href={{ index_url }}">{% trans "home" %}</a>{% endif %}
+    {% if request.path != index_url %}<a href="{{ index_url }}">{% trans "home" %}</a>{% endif %}
     {% if user.is_authenticated %}
       {% url django.contrib.auth.views.password_change as passwd_url %}
       {% if request.path != passwd_url %}<a href="{{ passwd_url }}">{% trans "Change password" %}</a>{% endif %}
