@@ -103,7 +103,7 @@
 $(document).ready(function() {
 	
     $('#{{ form.arrival_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"dd-M-yy" }}', 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
 	 	dateFormat: 'dd-M-yy' 
     });
 	$('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
