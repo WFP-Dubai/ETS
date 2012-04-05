@@ -103,15 +103,15 @@
 $(document).ready(function() {
 	
     $('#{{ form.arrival_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
 	 	dateFormat: 'dd-M-yy' 
     });
 	$('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
 	 	dateFormat: 'dd-M-yy' 
     });
     $('#{{ form.end_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y" }}', 
+		minDate: '{{ form.instance.dispatch_date|date:"d-M-Y"|upper }}', 
 	 	dateFormat: 'dd-M-yy'  
     });
 	
