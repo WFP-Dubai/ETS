@@ -180,8 +180,10 @@ $(document).ready(function() {
 //		});
 	});
 	// reconstrain dispatch date every time loading date is changed
-	$('#{{ form.dispatch_date.auto_id }}').onSelect(function(){
-  		alert('Selected dispatch date, change mindate to ' + $(this).datepicker('getDate') );
+	$('#{{ form.dispatch_date.auto_id }}').datepicker({
+		onSelect(function(){
+  			alert('Selected dispatch date, change mindate to ' + $(this).datepicker('getDate') );
+		}
 	});
 
 
