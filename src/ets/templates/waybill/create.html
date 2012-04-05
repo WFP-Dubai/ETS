@@ -162,13 +162,13 @@ $(document).ready(function() {
 	$('#{{ form.loading_date.auto_id }}').datepicker({
 		minDate: '{{ object.created|date:"y-m-d" }}',
 		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'dd-M-yy'
+		dateFormat: 'yy-mm-dd'
 	});
 	// constrain dispatch date
 	$('#{{ form.dispatch_date.auto_id }}').datepicker({
 		minDate: '{{ object.created|date:"y-m-d" }}',
 		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'dd-M-yy'
+		dateFormat: 'yy-mm-dd'
 	});
 	// reconstrain dispatch date every time loading date is changed
 	$('#{{ form.loading_date.auto_id }}').change(function(){
@@ -176,7 +176,7 @@ $(document).ready(function() {
 //		$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
 //			minDate:$(this).datepicker('getDate'),
 //			maxDate: '{{ object.expiry|date:"y-m-d" }}',
-//			dateFormat: 'dd-M-yy'
+//			dateFormat: 'yy-mm-dd' 
 //		});
 	});
 	// whatever
