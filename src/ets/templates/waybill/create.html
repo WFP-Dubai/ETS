@@ -158,30 +158,34 @@
 })(jQuery);
 
 $(document).ready(function() {
+	// initialize both datepickers
+	$("#{{ form.loading_date.auto_id }},#{{ form.dispatch_date.auto_id }}").datepicker();
+	// constrain loading date
+	$('#{{ form.loading_date.auto_id }}').datepicker({
+		minDate: '{{ object.created|date:"y-m-d" }}',
+		maxDate: '{{ object.expiry|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd'
+	});
+	// constrain dispatch date
+	$('#{{ form.dispatch_date.auto_id }}').datepicker({
+		minDate: '{{ object.created|date:"y-m-d" }}',
+		maxDate: '{{ object.expiry|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd'
+	});
+	// reconstrain dispatch date every time loading date is changed
 	$('#{{ form.loading_date.auto_id }}').change(function(){
+		alert("date has changed to ".(this).datepicker('getDate'));
 		$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
 			minDate:$(this).datepicker('getDate'),
 			maxDate: '{{ object.expiry|date:"y-m-d" }}',
 			dateFormat: 'yy-mm-dd' 
 		});
 	});
-	$('#{{ form.loading_date.auto_id }}').datepicker({
-		minDate: '{{ object.created|date:"y-m-d" }}',
-		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'yy-mm-dd'
-	});
+	// whatever
 	$("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
 	$("#loadingdetails tbody tr.row").each(function() {
 		$(this).handleWeights(); 
 		$(this).handleRemarksRequired();
-	});
-});
-$('#{{ form.loading_date.auto_id }}').change(function(){
-	alert('date has changed to '.(this).datepicker('getDate'));
-	$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-		minDate:$(this).datepicker('getDate'),
-		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'yy-mm-dd' 
 	});
 });
 $(document).keydown(omit_enter);
