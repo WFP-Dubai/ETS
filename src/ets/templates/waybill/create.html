@@ -166,11 +166,13 @@ $(document).ready(function() {
 	});
 	// constrain dispatch date
 	$('#{{ form.dispatch_date.auto_id }}').datepicker({
+		onSelect: function(dateText) {
+	  		alert('want to change dispatch min date to ') + $(this).datepicker('getDate');
+		}
 		minDate: '{{ object.created|date:"y-m-d" }}',
 		maxDate: '{{ object.expiry|date:"y-m-d" }}',
 		dateFormat: 'yy-mm-dd'
 	});
-
 	// reconstrain dispatch date every time loading date is changed
 	$('#{{ form.loading_date.auto_id }}').change(function(){
   		alert('Changed loading date to ')  + $(this).datepicker('getDate');
@@ -180,12 +182,6 @@ $(document).ready(function() {
 //			dateFormat: 'yy-mm-dd' 
 //		});
 	});
-	$('#{{ form.loading_date.auto_id }}').onSelect(function(){
-		alert('want to change dispatch min date to ') + $(this).datepicker('getDate');
-	});
-
-
-
 	// whatever
 	$("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
 	$("#loadingdetails tbody tr.row").each(function() {
