@@ -236,6 +236,4 @@ select.select {
 }
 select.select option {
     max-width: 300px;
-	/* IE Hack for max-width */
-	width: expression(this.width > 301 ? "300px": "auto");
 }
