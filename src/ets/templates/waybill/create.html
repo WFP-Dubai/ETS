@@ -171,23 +171,9 @@ $(document).ready(function() {
 		dateFormat: 'yy-mm-dd'
 	});
 	// reconstrain dispatch date every time loading date is changed
-	$('#{{ form.loading_date.auto_id }}').change(function(){
-  		alert('Changed loading date to ' + $(this).datepicker('getDate') );
-//		$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-//			minDate:$(this).datepicker('getDate'),
-//			maxDate: '{{ object.expiry|date:"y-m-d" }}',
-//			dateFormat: 'yy-mm-dd' 
-//		});
+	$('#id_loading_date').change(function(){
+			$('#id_dispatch_date').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
 	});
-	// reconstrain dispatch date every time loading date is changed
-	$('#{{ form.dispatch_date.auto_id }}').datepicker({
-		onSelect:(function(){
-  			alert('Selected dispatch date, change mindate to ' + $(this).datepicker('getDate') );
-		}
-	});
-
-
-
 	// whatever
 	$("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
 	$("#loadingdetails tbody tr.row").each(function() {
