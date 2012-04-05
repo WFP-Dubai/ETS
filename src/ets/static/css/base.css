@@ -231,6 +231,6 @@ div.loader div {
   display: inline;
 }
 
-.select{
-    width: 300px;
+select.select {
+    max-width: 300px;
 }
