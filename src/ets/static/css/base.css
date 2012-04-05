@@ -234,5 +234,5 @@ div.loader div {
 select.select {
     max-width: 300px;
 	/* IE Hack for max-width */
-	width: expression(this.width > 300 ? "300px": true);
+	width: expression(this.width > 301 ? "300px": "auto");
 }
