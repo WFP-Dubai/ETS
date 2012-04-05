@@ -158,31 +158,30 @@
 })(jQuery);
 
 $(document).ready(function() {
-
-  $('#{{ form.loading_date.auto_id }}').change(function(){
-	
-
-        $('#{{ form.dispatch_date.auto_id }}').datepicker({ 
-          minDate:$(this).datepicker('getDate'),
-          maxDate: '{{ object.expiry|date:"y-m-d" }}',
-          dateFormat: 'yy-mm-dd' 
-        });
-
-  });
-
-  $('#{{ form.loading_date.auto_id }}').datepicker({ 
-	  minDate: '{{ object.created|date:"y-m-d" }}',
-	  maxDate: '{{ object.expiry|date:"y-m-d" }}',
-	  dateFormat: 'yy-mm-dd'
-  });
-  
-  
-  $("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
-  
-  $("#loadingdetails tbody tr.row").each(function() {
-    $(this).handleWeights(); 
-    $(this).handleRemarksRequired();
-  });
+	$('#{{ form.loading_date.auto_id }}').change(function(){
+		$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
+			minDate:$(this).datepicker('getDate'),
+			maxDate: '{{ object.expiry|date:"y-m-d" }}',
+			dateFormat: 'yy-mm-dd' 
+		});
+	});
+	$('#{{ form.loading_date.auto_id }}').datepicker({
+		minDate: '{{ object.created|date:"y-m-d" }}',
+		maxDate: '{{ object.expiry|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd'
+	});
+	$("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
+	$("#loadingdetails tbody tr.row").each(function() {
+		$(this).handleWeights(); 
+		$(this).handleRemarksRequired();
+	});
+});
+$('#{{ form.loading_date.auto_id }}').change(function(){
+	$('#{{ form.dispatch_date.auto_id }}').datepicker({ 
+		minDate:$(this).datepicker('getDate'),
+		maxDate: '{{ object.expiry|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd' 
+	});
 });
 $(document).keydown(omit_enter);
 </script>
