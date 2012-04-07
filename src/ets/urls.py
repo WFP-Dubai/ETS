@@ -34,7 +34,7 @@ urlpatterns = patterns("ets.views",
     
     #Order detail
     ( r'^order/(?P<object_id>[-\w]+)/$', object_detail, {
-        'queryset': ets.models.Order.objects.select_related().all().order_by('-created'),
+        'queryset': ets.models.Order.objects.all().order_by('-created'),
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
@@ -151,6 +151,11 @@ urlpatterns = patterns("ets.views",
                                         .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, "view_stock" ),
+    
+)
+
+urlpatterns += patterns('',
+
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
         'queryset': ets.models.StockItem.objects.all().distinct(),
     }, "get_stock_data" ),
@@ -172,11 +177,6 @@ urlpatterns = patterns("ets.views",
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
     
-
-    
-)
-
-urlpatterns += patterns('',
     ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', databrowse.site.root ),
