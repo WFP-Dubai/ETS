@@ -28,7 +28,7 @@ urlpatterns = patterns("ets.views",
     
     #Order list
     ( r'^orders/$', person_required(warehouse_related(object_list)), {
-        'queryset': ets.models.Order.objects.select_related().all().order_by('-created'),
+        'queryset': ets.models.Order.objects.all().order_by('-created'),
         'template_name': 'order/list.html',
     }, "orders"),
     
