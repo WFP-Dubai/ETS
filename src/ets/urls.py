@@ -138,10 +138,6 @@ urlpatterns = patterns("ets.views",
         "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
     }, "compass_waybill" ),
     
-    (r'^cmps_list/$',
-    
-    ),
-    
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects\
         								.filter(valid_warehouse=True)\
@@ -172,7 +168,8 @@ urlpatterns = patterns("ets.views",
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
     
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),   
+    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
+    
 )
 
 urlpatterns += patterns('',
