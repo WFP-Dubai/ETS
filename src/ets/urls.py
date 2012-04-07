@@ -151,6 +151,11 @@ urlpatterns = patterns("ets.views",
                                         .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, "view_stock" ),
+    
+)
+
+urlpatterns += patterns('',
+
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
         'queryset': ets.models.StockItem.objects.all().distinct(),
     }, "get_stock_data" ),
@@ -172,10 +177,7 @@ urlpatterns = patterns("ets.views",
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
     
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),   
-)
-
-urlpatterns += patterns('',
+    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', databrowse.site.root ),
     ( r'^rosetta/', include('rosetta.urls') ),
