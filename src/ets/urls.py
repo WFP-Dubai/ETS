@@ -172,12 +172,11 @@ urlpatterns = patterns("ets.views",
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
     
-
+    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     
 )
 
 urlpatterns += patterns('',
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^databrowse/(.*)', databrowse.site.root ),
     ( r'^rosetta/', include('rosetta.urls') ),
