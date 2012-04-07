@@ -34,7 +34,7 @@ urlpatterns = patterns("ets.views",
     
     #Order detail
     ( r'^order/(?P<object_id>[-\w]+)/$', object_detail, {
-        'queryset': ets.models.Order.objects.all().order_by('-created'),
+        'queryset': ets.models.Order.objects.select_related().all().order_by('-created'),
         'template_name': 'order/detail.html',
     }, "order_detail" ),
     
@@ -137,6 +137,10 @@ urlpatterns = patterns("ets.views",
         "template_name": 'compas/list_waybills_compas_all.html',
         "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
     }, "compass_waybill" ),
+    
+    (r'^cmps_list/$',
+    
+    ),
     
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects\
