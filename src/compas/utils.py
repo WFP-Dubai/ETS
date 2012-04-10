@@ -26,6 +26,17 @@ def reduce_compas_errors(error_messages):
         errors.append(message)
     
     return errors
+try:
+    import cx_Oracle
+except ImportError:
+    pass
+def get_version(using):
+    cursor = connections[using].cursor()
+    ret = cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
+    cursor.close()
+    return ret
+
+
 
 try:
     import cx_Oracle
@@ -44,7 +55,7 @@ try:
             errors = reduce_compas_errors(Response_Message.getvalue())
 
             raise ValidationError(errors, code=Response_Code.getvalue())
-
+    
 except ImportError:
     
     def call_db_procedure(name, parameters, using):
