@@ -395,10 +395,29 @@ def send_dispatched(waybill, compas=None):
     """Submits dispatched and validated waybills to COMPAS"""
     if not compas:
         compas = waybill.order.warehouse.compas.pk
-     
     try:
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
+            
+            #test if LTI Exists:
+            #order_item.lti_id
+            IsValid = False
+            if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
+                IsValid = True
+            else:
+                IsValid = False
+            
+            if not IsValid:
+                message = "This LTI is not available in COMPAS"
+                ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
+                                                   compas_id=compas, waybill=waybill,
+                                                   status=ets_models.CompasLogger.FAILURE, 
+                                                   message=message)
+                
+                waybill.validated = False
+                waybill.save()
+                return 
+            
             
             CONTAINER_NUMBER = waybill.container_one_number
             
