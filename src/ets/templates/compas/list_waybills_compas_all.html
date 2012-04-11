@@ -27,13 +27,14 @@
   <tbody>
 </table>
 
-{% paginate %}
+
 {%if error_message %}
 <pre>
   <div>{{error_message}}</div>
 </pre>
 {%endif%}
 <br/>
+{% paginate %}
 {%endblock%}
 
 {%block script%}
