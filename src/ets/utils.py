@@ -381,7 +381,7 @@ def import_order(compas):
         ets_models.OrderItem.objects.filter(order__code=lti_code).exclude(pk__in=order_items).update(number_of_units=0, total_weight_net=0, total_weight_gross=0)
         #check missing
         #get all orders lti_ids filter by compas
-        order_items = ets_models.OrderItem.filter(order__warehouse__compas__pk = compas)
+        #order_items = ets_models.OrderItem.filter(order__warehouse__compas__pk = compas)
         
         
 def send_dispatched(waybill, compas=None):
@@ -392,28 +392,7 @@ def send_dispatched(waybill, compas=None):
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
             
-            #test if LTI Exists:
-            #order_item.lti_id
-            IsValid = False
-            if order_item.lti_id != 1:
-                if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
-                    IsValid = True
-                else:
-                    IsValid = False
-            else:
-                IsValid = False
-                
-            if not IsValid:
-                message = "This LTI is not available in COMPAS"
-                ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
-                                                   compas_id=compas, waybill=waybill,
-                                                   status=ets_models.CompasLogger.FAILURE, 
-                                                   message=message)
-                
-                waybill.validated = False
-                waybill.save()
-                return 
-
+ 
             
             CONTAINER_NUMBER = waybill.container_one_number
             
@@ -434,6 +413,24 @@ def send_dispatched(waybill, compas=None):
                     order_item = loading.get_order_item()
                 except ets_models.OrderItem.DoesNotExist:
                     raise ValidationError("System can not find order item. Check database.")
+                #test if LTI Exists:
+                #order_item.lti_id
+                IsValid = False
+                if order_item.lti_id != 1:
+                    if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
+                        IsValid = True
+                    else:
+                        IsValid = False
+                else:
+                    IsValid = False
+                    
+                if not IsValid:
+                    message = "This LTI is not available in COMPAS"
+                    raise ValidationError(message)
+                    waybill.validated = False
+                    waybill.save()
+                    return 
+
                 
                 call_db_procedure('write_waybill.dispatch', (
                     CURR_CODE, 
