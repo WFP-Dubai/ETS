@@ -89,17 +89,9 @@ def compas_importer(func=None, log_success=False):
 def update_compas(using):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
     try:
-        #Import organizations
-        #import_partners(using)
-        
-        #Update places
-        #import_places(using)
-        
+       
         #Update persons
         import_persons(using)
-        
-        #Update loss, damage reasons
-        #import_reasons(using)
         
         #Update stocks
         import_stock(using)
@@ -119,10 +111,8 @@ def update_compas_info(using):
     try:
         #Import organizations
         import_partners(using)
-        
-        #Update places
+        #Update places & warehouses
         import_places(using)
-                
         #Update loss, damage reasons
         import_reasons(using)
         
@@ -389,6 +379,9 @@ def import_order(compas):
         
         #Emptying deleted order items
         ets_models.OrderItem.objects.filter(order__code=lti_code).exclude(pk__in=order_items).update(number_of_units=0, total_weight_net=0, total_weight_gross=0)
+        #check missing
+        #get all orders lti_ids filter by compas
+        order_items = ets_models.OrderItem.filter(order__warehouse__compas__pk = compas)
         
         
 def send_dispatched(waybill, compas=None):
@@ -402,11 +395,14 @@ def send_dispatched(waybill, compas=None):
             #test if LTI Exists:
             #order_item.lti_id
             IsValid = False
-            if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
-                IsValid = True
+            if order_item.lti_id != 1:
+                if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
+                    IsValid = True
+                else:
+                    IsValid = False
             else:
                 IsValid = False
-            
+                
             if not IsValid:
                 message = "This LTI is not available in COMPAS"
                 ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
@@ -417,7 +413,7 @@ def send_dispatched(waybill, compas=None):
                 waybill.validated = False
                 waybill.save()
                 return 
-            
+
             
             CONTAINER_NUMBER = waybill.container_one_number
             
