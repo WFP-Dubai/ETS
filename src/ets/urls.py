@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, date
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, handler404, handler500
-from django.contrib import databrowse
 from django.views.generic.simple import direct_to_template
 from django.views.generic.list_detail import object_detail, object_list
 from django.utils.translation import ugettext_lazy, ugettext as _
@@ -136,7 +135,7 @@ urlpatterns = patterns("ets.views",
     ( r'^compass_waybill/$', officer_required(waybill_user_related(object_list)), {
         "template_name": 'compas/list_waybills_compas_all.html',
         "queryset": Waybill.objects.filter(sent_compas__isnull=False), 
-    }, "compass_waybill" ),
+    }, 'compass_waybill' ),
     
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects\
@@ -146,7 +145,7 @@ urlpatterns = patterns("ets.views",
         								.annotate(stock_count=Count('stock_items'))\
                                         .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
-    }, "view_stock" ),
+    }, 'view_stock' ),
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
         'queryset': ets.models.StockItem.objects.all().distinct(),
     }, "get_stock_data" ),
@@ -177,7 +176,6 @@ urlpatterns += patterns('',
     
     ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
-    ( r'^databrowse/(.*)', databrowse.site.root ),
     ( r'^rosetta/', include('rosetta.urls') ),
     (r'^ajax_select/', include('ajax_select.urls')),
     ( r'^admin/', include( admin.site.urls ) ),
