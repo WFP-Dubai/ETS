@@ -163,9 +163,9 @@ class LtiOriginal( models.Model ):
 
 
 #===============================================================================
-# # TODO: Importing of old waybills....
-# class DispatchMaster( models.Model ):
-#    code = models.CharField(_("Code"), max_length = 25, primary_key = True )
+# # TODO: Importing of old waybills.... No but use this to check if dispatched.
+class DispatchMaster( models.Model ):
+    code = models.CharField(_("Code"), max_length = 25, primary_key = True )
 #    document_code = models.CharField(_("Document code"), max_length = 2 )
 #    dispatch_date = models.DateField(_("Dispatch date"))
 #    origin_type = models.CharField(_("Origin type"), max_length = 1 )
@@ -213,12 +213,12 @@ class LtiOriginal( models.Model ):
 #    last_mod_user = models.CharField( _("Last mod user"), max_length = 30, blank = True )
 #    last_mod_date = models.DateField( _("Last mod date"), null = True, blank = True )
 #    
-#    class Meta:
-#        db_table = u'dispatch_masters'
-#    
-#    def  __unicode__( self ):
-#        return self.code
-# 
+    class Meta:
+        db_table = u'dispatch_masters'
+    
+    def  __unicode__( self ):
+        return self.code
+ 
 # 
 # class DispatchDetail( models.Model ):
 #    code = models.ForeignKey(DispatchMaster ,verbose_name=_("Code"))

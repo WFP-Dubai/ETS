@@ -55,3 +55,5 @@ logs/sync_compas.log
 logs/sync_compas.log
 
 access.log
+
+src/ets/settings/development.py
