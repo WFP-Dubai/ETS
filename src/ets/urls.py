@@ -158,14 +158,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
 
     ( r'^qrcode/(?P<waybill_pk>[-\w]+).jpg$', "barcode_qr", {}, "barcode_qr" ),
-    
-    
-)
-
-urlpatterns += patterns('',
-
-
-    ( r'^sync_compas/$', "sync_compas", {
+     ( r'^sync_compas/$', "sync_compas", {
         'queryset': ets.models.Compas.objects.all(),
     }, "sync_compas"),
     ( r'^sync_compas/(?P<compas_pk>[-\w]+)/$', "handle_sync_compas", {
@@ -173,6 +166,14 @@ urlpatterns += patterns('',
     }, "handle_sync_compas"),
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
+    
+    
+)
+
+urlpatterns += patterns('',
+
+
+   
     
     ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
