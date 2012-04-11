@@ -49,3 +49,10 @@ except ImportError:
     
     def call_db_procedure(name, parameters, using):
         pass
+
+
+    def get_version(using):
+        cursor = connections[using].cursor()
+        ret = cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
+        cursor.close()
+        return ret
