@@ -166,10 +166,10 @@ class LtiOriginal( models.Model ):
 # # TODO: Importing of old waybills.... No but use this to check if dispatched.
 class DispatchMaster( models.Model ):
     code = models.CharField(_("Code"), max_length = 25, primary_key = True )
-#    document_code = models.CharField(_("Document code"), max_length = 2 )
-#    dispatch_date = models.DateField(_("Dispatch date"))
-#    origin_type = models.CharField(_("Origin type"), max_length = 1 )
-#    origin_location_code = models.CharField(_("Origin location code"), max_length = 13 )
+    document_code = models.CharField(_("Document code"), max_length = 2 )
+    dispatch_date = models.DateField(_("Dispatch date"))
+    origin_type = models.CharField(_("Origin type"), max_length = 1 )
+    origin_location_code = models.CharField(_("Origin location code"), max_length = 13 )
 #    intvyg_code = models.CharField(_("Intvyg code"), max_length = 25, blank = True )
 #    intdlv_code = models.IntegerField(_("Intdlv code"), null = True, blank = True )
 #    origin_code = models.CharField(_("Origin code"), max_length = 13, blank = True )
