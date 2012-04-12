@@ -165,7 +165,7 @@ class WaybillRecieptForm( forms.ModelForm ):
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset(ugettext('Destination'), Row('destination', 'distance'), 'receipt_remarks'),
+        Fieldset('receipt_remarks',ugettext('Destination'), Row('destination', 'distance')),
         Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
         Fieldset(ugettext('Containers'), 
                  Row('container_one_remarks_reciept', 'container_two_remarks_reciept'),),
