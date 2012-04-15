@@ -18,7 +18,7 @@
     {% for waybill in object_list%}
     <tr>
       <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order__pk }}</a></td>
-      <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
+      <td><a href="/waybill/{{ waybill.pk }}">{{ waybill.pk }}</a></td>
       <td>{{ waybill.order__warehouse__location__name }}</td>
       <td>{{ waybill.order__consignee }}</td>
       <td>{{ waybill.order__location__name }}</td>
