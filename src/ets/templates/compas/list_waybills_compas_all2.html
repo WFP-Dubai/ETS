@@ -1,0 +1,54 @@
+{% extends "base_template.html"%}
+{% load i18n pagination_tags %}
+
+{%block content %}
+<h3>{{ extra_title }} {% trans "eWaybills Submitted to COMPAS" %}</h3>
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="example">
+  <thead>
+    <tr>
+      <th>{% trans "Order" %}</th>
+      <th>{% trans "eWaybill Number" %}</th>
+      <th>{% trans "Origin" %}</th>
+      <th>{% trans "Consignee" %}</th>
+      <th>{% trans "Destination Location" %}</th>
+    </tr>
+  </thead>
+  
+  <tbody>
+    {% for waybill in object_list%}
+    <tr>
+      <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order__pk }}</a></td>
+      <td><a href="{{ waybill.get_absolute_url }}">{{ waybill.pk }}</a></td>
+      <td>{{ waybill.order__warehouse__location__name }}</td>
+      <td>{{ waybill.order__consignee }}</td>
+      <td>{{ waybill.order__location__name }}</td>
+    </tr>
+    {% endfor%} 
+  <tbody>
+</table>
+
+
+{%if error_message %}
+<pre>
+  <div>{{error_message}}</div>
+</pre>
+{%endif%}
+<br/>
+{% paginate %}
+{%endblock%}
+
+{%block script%}
+<script type="text/javascript">
+$(document).ready(function() {
+	$('#example').dataTable( 
+		{"aoColumns": [ 
+            null,
+            null,
+            null,
+            null,
+            null,
+            { "bSearchable": false},
+        ] });
+} );
+</script>
+{%endblock script%}
