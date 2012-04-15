@@ -137,7 +137,16 @@ urlpatterns = patterns("ets.views",
         "queryset": Waybill.objects.filter(sent_compas__isnull=False),
         "paginate_by":50,
     }, 'compass_waybill' ),
-    
+    ( r'^compas_waybill/$', officer_required(waybill_user_related(object_list)), {
+        "template_name": 'compas/list_waybills_compas_all.html',
+        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('waybill__order__pk',
+        																	 'waybill__pk',
+        																	 'waybill__order__warehouse__location__name',
+        																	 'waybill__order__warehouse',
+        																	 'waybill__order__consignee',
+        																	 'waybill__order__location__name'),
+        "paginate_by":50,
+    }, 'compas_waybill' ),    
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects\
         								.filter(valid_warehouse=True)\
