@@ -139,7 +139,7 @@ urlpatterns = patterns("ets.views",
     }, 'compass_waybill' ),
     ( r'^compas_waybill/$', officer_required(waybill_user_related(object_list)), {
         "template_name": 'compas/list_waybills_compas_all2.html',
-        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('order__pk',
+        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('order','order__pk',
         																	 'pk',
         																	 'order__warehouse__location__name',
         																	 'order__warehouse',
