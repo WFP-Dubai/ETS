@@ -122,6 +122,25 @@ def waybill_list(request, queryset, template='waybill/list.html', extra_context=
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
+def dispatched_in_compas(request):
+    """
+
+    """
+    WBs = ets.models.Waybill.objects.select_related().filter(sent_compas__isnull=False)
+    person = request.user.person
+    #get return queryset.filter(Q(order__warehouse__persons__pk=user.pk)
+    #| Q(order__warehouse__compas__officers=user)
+    #| Q(destination__persons__pk=user.pk)
+    #| Q(destination__compas__officers=user)).distinct()
+    listWH = request.user.warehouses.all()
+
+
+
+    items =[]
+    for wb in WBs:
+        pass
+
+
 def waybill_search( request, form_class=WaybillSearchForm, 
                     queryset=ets.models.Waybill.objects.all(), 
                     template='waybill/list.html'):

@@ -433,7 +433,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         waybill.sent_compas = datetime.datetime.now()
         waybill.save()
         
-        response = self.client.get(reverse('compass_waybill'))
+        response = self.client.get(reverse('compas_waybill'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
         
@@ -443,7 +443,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         waybill_reciept.receipt_sent_compas = datetime.datetime.now()
         waybill_reciept.save()
         
-        response = self.client.get(reverse('compass_waybill_receipt'))
+        response = self.client.get(reverse('compas_waybill_receipt'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
     
