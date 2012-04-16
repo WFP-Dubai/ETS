@@ -1,5 +1,5 @@
 {% extends "base_template.html"%}
-{% load i18n pagination_tags %}
+
 
 {%block content %}
 <h3>{{ extra_title }} {% trans "eWaybills Submitted to COMPAS" %}</h3>
@@ -34,7 +34,7 @@
 </pre>
 {%endif%}
 <br/>
-{% paginate %}
+
 {%endblock%}
 
 {%block script%}
