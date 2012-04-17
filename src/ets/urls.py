@@ -55,7 +55,11 @@ urlpatterns = patterns("ets.views",
         													'order__consignee__name',
         													'order__location__name',
         													'transport_dispach_signed_date',
-        													'receipt_signed_date','validated','receipt_validated','sent_compas','receipt_sent_compas'
+        													'receipt_signed_date',
+        													'validated',
+        													'receipt_validated',
+        													'sent_compas',
+        													'receipt_sent_compas'
         ),
     }, "waybill_search" ),
     
