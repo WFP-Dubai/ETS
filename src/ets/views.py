@@ -116,7 +116,7 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
 
 
 @waybill_user_related
-def waybill_list(request, queryset, template='waybill/list.html', extra_context=None):
+def waybill_list(request, queryset, template='waybill/list2.html', extra_context=None):
     """Shows waybill listing"""
     context = {'object_list': queryset,}
     apply_extra_context(extra_context or {}, context)
