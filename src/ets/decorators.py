@@ -43,7 +43,7 @@ def waybill_user_related_filter(queryset, user):
     """
     #get Compas Station list for user
     CompasStations = user.compases.all().values_list('code')
-    WH = user.person.warehouses.all()
+
     
     return queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
                            | Q(order__warehouse__compas__in = CompasStations)
