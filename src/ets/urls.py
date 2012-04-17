@@ -159,7 +159,7 @@ urlpatterns = patterns("ets.views",
         																	 'order__warehouse',
         																	 'order__consignee__name',
         																	 'order__location__name'),
-        "paginate_by":50,
+        "paginate_by":50,#paging not solution
     }, 'compas_waybill' ),
     
         
