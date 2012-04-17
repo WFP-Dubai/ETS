@@ -41,10 +41,14 @@ def waybill_user_related_filter(queryset, user):
     it could be a dispatcher, a recepient, officer of both compases.
     Status of waybill does not matter.
     """
+    #get Compas Station list for user
+    CompasStations = user.compases.all().values_list('code')
+    WH = user.person.warehouses.all()
+    
     return queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
-                           | Q(order__warehouse__compas__officers=user)
+                           | Q(order__warehouse__compas__in = CompasStations)
                            | Q(destination__persons__pk=user.pk)
-                           | Q(destination__compas__officers=user)).distinct()
+                           | Q(destination____compas__in = CompasStations)).distinct()
                            
 waybill_user_related = user_filtered(filter=waybill_user_related_filter)
 
