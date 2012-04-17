@@ -47,7 +47,16 @@ urlpatterns = patterns("ets.views",
     
     #Listings
     ( r'^search/$', "waybill_search", {
-        'queryset': ets.models.Waybill.objects.select_related('order','order__warehouse','order__location','destination','order__consignee').all(),
+        'queryset': ets.models.Waybill.objects.all().values(
+        													'order','order__pk',
+        													'pk',
+        													'order__warehouse__location__name',
+        													'order__warehouse',
+        													'order__consignee__name',
+        													'order__location__name',
+        													'transport_dispach_signed_date',
+        													'receipt_signed_date','validated','receipt_validated','sent_compas','receipt_sent_compas'
+        ),
     }, "waybill_search" ),
     
     ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
