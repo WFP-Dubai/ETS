@@ -206,13 +206,8 @@ def import_persons(compas):
                                    first_name = person.first_name, last_name = person.last_name, 
                                    is_staff=True, is_active=False, is_superuser=False)
             p.set_password(person.person_pk)
+
             p.save()
-        
-           
-#        for wh in ets_models.Warehouse.objects.filter(
-#                                               organization=p.organization, 
-#                                               location=p.location):
-#            p.warehouses.add(wh)
         
         p.updated = now
         p.save()

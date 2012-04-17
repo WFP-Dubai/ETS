@@ -47,8 +47,9 @@ urlpatterns = patterns("ets.views",
     
     #Listings
     ( r'^search/$', "waybill_search", {
-        'queryset': ets.models.Waybill.objects.all(),
+        'queryset': ets.models.Waybill.objects.select_related().all(),
     }, "waybill_search" ),
+    
     ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
         "extra_context": {"extra_title": _("eWaybills Waiting For Dispatch Signature")}
     }, "waybill_dispatch_list" ),
