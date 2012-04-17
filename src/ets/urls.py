@@ -47,7 +47,7 @@ urlpatterns = patterns("ets.views",
     
     #Listings
     ( r'^search/$', "waybill_search", {
-        'queryset': ets.models.Waybill.objects.select_related().all(),
+        'queryset': ets.models.Waybill.objects.select_related('order','order__warehouse','order__location','destination','order__consignee').all(),
     }, "waybill_search" ),
     
     ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
