@@ -141,7 +141,9 @@ urlpatterns = patterns("ets.views",
         																	 'order__location__name'),
         "extra_context": {
             "extra_title": _("Received"),
-    }}, "compas_waybill_receipt" ),
+    }
+    "paginate_by":50,
+    }, "compas_waybill_receipt" ),
     
                         
     ( r'^compass_waybill/$', officer_required(waybill_user_related(object_list)), {
@@ -158,7 +160,7 @@ urlpatterns = patterns("ets.views",
         																	 'order__warehouse',
         																	 'order__consignee__name',
         																	 'order__location__name'),
-       # "paginate_by":50,
+       "paginate_by":50,
     }, 'compas_waybill' ),
     
         
