@@ -138,7 +138,12 @@ urlpatterns = patterns("ets.views",
         																	 'order__warehouse__location__name',
         																	 'order__warehouse',
         																	 'order__consignee',
-        																	 'order__location__name'),
+        																	 'order__location__name',
+        																	 'order__warehouse__persons__pk',
+        																	 'order__warehouse__compas__officers',
+        																	 'destination__persons__pk',
+        																	 'destination__compas__officers'),
+
         "extra_context": {
             "extra_title": _("Received"),
     }}, "compas_waybill_receipt" ),
