@@ -143,7 +143,7 @@ def dispatched_in_compas(request):
 
 def waybill_search( request, form_class=WaybillSearchForm, 
                     queryset=ets.models.Waybill.objects.all(), 
-                    template='waybill/list.html'):
+                    template='waybill/list2.html'):
     """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)

@@ -26,12 +26,12 @@
   <tbody>
     {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-        <td><a href="{{ waybill.order.get_absolute_url }}">{{ waybill.order.pk }}</a></td>
-        <td><a href='{{ waybill.get_absolute_url }}'>{{ waybill.pk }}</a></td>
-        <td>{{ waybill.order.warehouse.name }}</td>
-        <td>{{ waybill.order.consignee }}</td>
-        <td>{{ waybill.order.location.name }}</td>
-        <td>{{ waybill.destination.name }}</td>
+		<td><a href="/order/{{ waybill.order__pk }}">{{ waybill.order__pk }}</a></td>
+      	<td><a href="/waybill/{{ waybill.pk }}">{{ waybill.pk }}</a></td>
+        <td>{{ waybill.order__warehouse__name }}</td>
+        <td>{{ waybill.order__consignee__name }}</td>
+        <td>{{ waybill.order__location__name }}</td>
+        <td>{{ waybill.destination__name }}</td>
         <td>{{ waybill.get_transaction_type_display }}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
@@ -44,7 +44,7 @@
           {% if waybill.receipt_signed_date %}
             {{ waybill.receipt_signed_date|date|upper }}
           {% else %}
-            {% waybill_reception waybill user _("Receive this waybil") %}
+           x
           {% endif %}
         </td>
         <td>

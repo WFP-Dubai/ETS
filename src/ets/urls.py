@@ -48,7 +48,8 @@ urlpatterns = patterns("ets.views",
     #Listings
     ( r'^search/$', "waybill_search", {
         'queryset': ets.models.Waybill.objects.all().values(
-        													'order','order__pk',
+        													'order',
+        													'order__pk',
         													'pk',
         													'order__warehouse__location__name',
         													'order__warehouse',
