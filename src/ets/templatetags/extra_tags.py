@@ -83,8 +83,8 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
 def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
     return { 
         'text': text,
-        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
-        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': pk}), urlencode({'redirect_to': redirect_to})),
+        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=pk).count(),
         'dialog_question': _("Are you sure you want to delete this waybill?"),
     }
 
