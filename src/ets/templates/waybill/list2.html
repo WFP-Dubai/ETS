@@ -32,7 +32,7 @@
         <td>{{ waybill.order__consignee__name }}</td>
         <td>{{ waybill.order__location__name }}</td>
         <td>{{ waybill.destination__name }}</td>
-        <td>{{ waybill.transaction_type }}</td>
+        <td>{% waybill_delivery_method waybill.transaction_type %}</td>
         <td>
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date|date|upper }}
@@ -44,7 +44,7 @@
           {% if waybill.receipt_signed_date %}
             {{ waybill.receipt_signed_date|date|upper }}
           {% else %}
-                       {% waybill_reception waybill user _("Receive this waybil") %}
+            {% waybill_reception waybill user _("Receive this waybil") %}
           {% endif %}
         </td>
         <td>

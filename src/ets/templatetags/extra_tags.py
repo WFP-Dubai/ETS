@@ -38,7 +38,7 @@ def waybill_creation(order, user, text=_("Create")):
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
             'success': (not hasattr(user, 'person') or user.person.dispatch) and order.warehouse.persons.filter(pk=user.pk).count(),
     }
-    
+
 
 @function
 def sign_dispatch(waybill, user):
@@ -87,6 +87,15 @@ def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
         'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill['pk']).count(),
         'dialog_question': _("Are you sure you want to delete this waybill?"),
     }
+
+@register.simple_tag
+def waybill_delivery_method(transaction_type):
+    for o in Waybill.TRANSACTION_TYPES:
+        if o[0]==transaction_type:
+            return o[1].title()
+
+    return transaction_type
+
 
 
 
