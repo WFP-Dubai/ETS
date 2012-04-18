@@ -44,7 +44,7 @@
       <th>{% trans "Unit Weight Gross (kg)" %}</th>
       <th>{% trans "Net Qty (MT)" %}</th>
       <th>{% trans "Gross Qty (MT)" %}</th>
-      <th>{% trans "Stock In Warehouse (MT)" %}</th>
+      <th>{% trans "Stock In Warehouse/(Dispatch Not In Compas)" %}</th>
       <th>{% trans "To Be Dispatched (MT)" %}</th>
       <th>{% trans "% Completed" %}</th>
     </tr>
@@ -62,7 +62,7 @@
       <td align="right">{{ item.unit_weight_gross }}</td>
       <td align="right">{{ item.total_weight_net }}</td>
       <td align="right">{{ item.total_weight_gross }}</td>
-      <td align="right">{{item.get_available_stocks_mt|floatformat:3}} 
+      <td align="right">{{item.get_available_stocks_mt|floatformat:3}} MT
       {%if item.get_dispatched_not_yet_counted_of_stock != 0%}
       (-{{item.get_dispatched_not_yet_counted_of_stock|floatformat:3}} MT){%endif%}</td>
       <td align="right">{{ item.tonnes_left|floatformat:3 }}</td>
