@@ -118,7 +118,23 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
 @waybill_user_related
 def waybill_list(request, queryset, template='waybill/list2.html', extra_context=None):
     """Shows waybill listing"""
-    context = {'object_list': queryset,}
+    context = {'object_list': queryset.values(
+        'order',
+        'order__pk',
+        'pk',
+        'order__warehouse__location__name',
+        'order__warehouse__name',
+        'order__consignee__name',
+        'order__location__name',
+        'transport_dispach_signed_date',
+        'receipt_signed_date',
+        'validated',
+        'receipt_validated',
+        'sent_compas',
+        'receipt_sent_compas',
+        'destination__name',
+        'transaction_type'
+    ),}
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
