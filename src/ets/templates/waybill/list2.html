@@ -26,7 +26,7 @@
   <tbody>
     {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-		<td><a href="/order/{{ waybill.order__pk }}">{{ waybill.order__pk }}{{ waybill.order.pk }}</a></td>
+		<td><a href="/order/{{ waybill.order__pk }}">{{ waybill.order__pk }}</a></td>
       	<td><a href="/waybill/{{ waybill.pk }}">{{ waybill.pk }}</a></td>
         <td>{{ waybill.order__warehouse__name }}</td>
         <td>{{ waybill.order__consignee__name }}</td>
