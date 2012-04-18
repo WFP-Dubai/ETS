@@ -87,10 +87,15 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
 
 @register.inclusion_tag('tags/form.html')
 def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
+    waybillPk =0
+    try:
+        waybillPk = waybill['pk']
+    except :
+        waybillPk = waybill.pk
     return { 
         'text': text,
-        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill['pk']}), urlencode({'redirect_to': redirect_to})),
-        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill['pk']).count(),
+        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybillPk}), urlencode({'redirect_to': redirect_to})),
+        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybillPk).count(),
         'dialog_question': _("Are you sure you want to delete this waybill?"),
     }
 
