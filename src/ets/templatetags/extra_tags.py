@@ -10,7 +10,7 @@ from django.db.models.aggregates import Max
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, LastAttempt
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, LastAttempt, Order
 from ets.utils import changed_fields
 
 register = template.Library()
