@@ -25,11 +25,17 @@ def waybill_edit(waybill, user, text=_("Edit")):
 
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user, text=_("Receive")):
+    waybillPk =0
+    try:
+        waybillPk = waybill['pk']
+    except :
+        waybillPk = waybill.pk
     return { 
             'text': text,
-            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill['pk']}),
-            'success': (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=waybill['pk']).count(),
+            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybillPk}),
+            'success': (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=waybillPk).count(),
     }
+
 
 @register.inclusion_tag('tags/give_link.html')
 def waybill_creation(order, user, text=_("Create")):
