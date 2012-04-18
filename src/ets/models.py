@@ -807,19 +807,65 @@ class Waybill( ld_models.Model ):
     
     
     @classmethod
-    def dispatches(cls, user):
+    def dispatches_old(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
         #dispatch_person=user.person
         return cls.objects.filter(transport_dispach_signed_date__isnull=True,
                                   order__warehouse__persons__pk=user.pk)
-    
     @classmethod
-    def receptions(cls, user):
+    def dispatches(cls, user):
+        """Returns all loaded but not signed waybills, and related to user"""
+        #dispatch_person=user.person
+        return cls.objects.filter(transport_dispach_signed_date__isnull=True,
+            order__warehouse__persons__pk=user.pk).values(
+            'order',
+            'order__pk',
+            'pk',
+            'order__warehouse__location__name',
+            'order__warehouse__name',
+            'order__consignee__name',
+            'order__location__name',
+            'transport_dispach_signed_date',
+            'receipt_signed_date',
+            'validated',
+            'receipt_validated',
+            'sent_compas',
+            'receipt_sent_compas',
+            'destination__name',
+            'transaction_type'
+        ),
+
+    @classmethod
+    def receptions_old(cls, user):
         """Returns all waybills, that can be received, and related to user"""
         return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
                                   receipt_signed_date__isnull=True,
                                   destination__persons__pk=user.pk)
-    
+
+    @classmethod
+    def receptions(cls, user):
+        """Returns all waybills, that can be received, and related to user"""
+        return cls.objects.filter(transport_dispach_signed_date__isnull=False,
+            receipt_signed_date__isnull=True,
+            destination__persons__pk=user.pk).values(
+            'order',
+            'order__pk',
+            'pk',
+            'order__warehouse__location__name',
+            'order__warehouse__name',
+            'order__consignee__name',
+            'order__location__name',
+            'transport_dispach_signed_date',
+            'receipt_signed_date',
+            'validated',
+            'receipt_validated',
+            'sent_compas',
+            'receipt_sent_compas',
+            'destination__name',
+            'transaction_type'
+        ),
+
+
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   
     
