@@ -1,7 +1,7 @@
 {% extends "base_template.html" %}
 {% load i18n extra_tags %}
 
-{% block title %}{% trans "List of waybills" %}{% endblock %}
+{% block title %}{% if extra_title %}{{ extra_title }}{% else %}{% trans "List of waybills" %}{% endif %}{% endblock %}
 
 {% block content %}
 <h3>{% if extra_title %}{{ extra_title }}{% else %}{% trans "List of waybills" %}{% endif %}</h3>
@@ -26,8 +26,8 @@
   <tbody>
     {% for waybill in object_list %}
       <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-		<td><a href="/order/{{ waybill.order__pk }}">{{ waybill.order__pk }}</a></td>
-      	<td><a href="/waybill/{{ waybill.pk }}">{{ waybill.pk }}</a></td>
+		<td><a href="{% order_url waybill.order__pk %}">{{ waybill.order__pk }}</a></td>
+      	<td><a href="{% waybill_url waybill.pk %}">{{ waybill.pk }}</a></td>
         <td>{{ waybill.order__warehouse__name }}</td>
         <td>{{ waybill.order__consignee__name }}</td>
         <td>{{ waybill.order__location__name }}</td>
@@ -37,7 +37,7 @@
           {% if waybill.transport_dispach_signed_date %}
             {{ waybill.transport_dispach_signed_date|date|upper }}
           {% else %}
-		  	<a href='{{ waybill.get_absolute_url }}'>Open</a>
+		  	<a href="{% waybill_url waybill.pk %}">Open</a>
           {% endif %}
         </td>
         <td>

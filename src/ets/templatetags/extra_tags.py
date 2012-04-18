@@ -108,6 +108,17 @@ def waybill_delivery_method(transaction_type):
     return transaction_type
 
 
+@register.simple_tag
+def waybill_url(waybill):
+    wb = Waybill.objects.get(pk=waybill)
+
+    return wb.get_absolute_url()
+
+@register.simple_tag
+def order_url(order):
+    order = Order.objects.get(pk=order)
+
+    return order.get_absolute_url()
 
 
 @block
