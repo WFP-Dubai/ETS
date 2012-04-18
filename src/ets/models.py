@@ -797,8 +797,8 @@ class Waybill( ld_models.Model ):
         file_out = cStringIO.StringIO()
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=24, 
-                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L)
-        image.save(file_out, 'JPEG')
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.H)
+        image.save(file_out, 'PNG')
         file_out.reset()
         
         #name = "%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date)
