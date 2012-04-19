@@ -152,11 +152,15 @@ def import_places(compas):
         if not created and location.country is None:
             location.country = place.country_code
             location.save()
-        
+
+        compas_text = place.reporting_code
+
         try:
             compas = ets_models.Compas.objects.get(pk=place.reporting_code)
         except ets_models.Compas.DoesNotExist:
             compas = None
+
+
         valid_warehouse = True
         if place.compas_indicator == 'T':
         	valid_warehouse = False
@@ -168,6 +172,7 @@ def import_places(compas):
             'organization': ets_models.Organization.objects.get_or_create(code=place.organization_id)[0] if place.organization_id else None,
             'compas': compas,
             'valid_warehouse': valid_warehouse,
+            'compas_text':compas_text,
         }
         
         wh, created = ets_models.Warehouse.objects.get_or_create(code=place.org_code, defaults=defaults)
@@ -411,13 +416,8 @@ def send_dispatched(waybill, compas=None):
                 try:
                     DestCompas = waybill.destination.compas.pk
                 except:
-                    message = "The COMPAS Station for Warehouse %s (%s)  is not known."%( waybill.destination.name, waybill.destination.pk)
+                    DestCompas = waybill.destination.compas_text
 
-                    raise ValidationError(message)
-                    waybill.validated = False
-                    waybill.save()
-                    return
-                #test if LTI Exists:
                 IsValid = False
                 if order_item.lti_id != 1:
                     if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
@@ -434,7 +434,6 @@ def send_dispatched(waybill, compas=None):
                     waybill.save()
                     return 
 
-                
                 call_db_procedure('write_waybill.dispatch', (
                     CURR_CODE, 
                     waybill.dispatch_date.strftime("%Y%m%d"), 
@@ -465,8 +464,8 @@ def send_dispatched(waybill, compas=None):
                     waybill.transport_driver_licence,
                     
                     CONTAINER_NUMBER,
-                    
-                    waybill.destination.compas.pk,
+
+                    DestCompas,
                     
                     loading.stock_item.origin_id, 
                     loading.stock_item.commodity.category.pk, 
