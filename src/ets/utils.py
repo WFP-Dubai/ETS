@@ -411,7 +411,7 @@ def send_dispatched(waybill, compas=None):
                 try:
                     DestCompas = waybill.destination.compas.pk
                 except:
-                    message = "The COMPAS Station for Warehouse %s (%s)  is not known"%( waybill.destination.name, waybill.destination.pk)
+                    message = "The COMPAS Station for Warehouse %s (%s)  is not known."%( waybill.destination.name, waybill.destination.pk)
 
                     raise ValidationError(message)
                     waybill.validated = False
