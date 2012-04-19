@@ -180,6 +180,9 @@ def import_places(compas):
         if valid_warehouse != wh.valid_warehouse:
         	wh.valid_warehouse = valid_warehouse
         	wh.save()
+        if wh.compas_text != compas_text:
+            wh.compas_text = compas_text
+            wh.save()
         
         if not created and not wh.compas and compas:
             wh.compas = compas
