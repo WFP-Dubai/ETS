@@ -408,8 +408,16 @@ def send_dispatched(waybill, compas=None):
                     order_item = loading.get_order_item()
                 except ets_models.OrderItem.DoesNotExist:
                     raise ValidationError("System can not find order item. Check database.")
+                try:
+                    DestCompas = waybill.destination.compas.pk
+                except:
+                    message = "The COMPAS Station for Warehouse %s (%s)  is not known"%( waybill.destination.name, waybill.destination.pk)
+
+                    raise ValidationError(message)
+                    waybill.validated = False
+                    waybill.save()
+                    return
                 #test if LTI Exists:
-                #order_item.lti_id
                 IsValid = False
                 if order_item.lti_id != 1:
                     if bool(compas_models.LtiOriginal.objects.using(compas).filter(lti_id = order_item.lti_id)):
