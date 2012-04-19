@@ -51,6 +51,7 @@ class Compas(ld_models.Model):
     
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
+    description = models.CharField(_("Description"), max_length=20,blank=True)
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
@@ -60,6 +61,7 @@ class Compas(ld_models.Model):
     db_password = models.CharField(_("Database password"), max_length=100, blank=True)
     db_host = models.CharField(_("Database host"), max_length=100, default='localhost')
     db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
+
     
     class Meta:
         ordering = ('code',)
@@ -106,6 +108,7 @@ class Warehouse(models.Model):
     organization = models.ForeignKey(Organization, verbose_name=_("Organization"), related_name="warehouses", 
                                      blank=True, null=True)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
+    compas_text = models.CharField(_("COMPAS Station (Text)"), max_length = 13, blank=True, null=True) #COMPAS station for not managed WH
     valid_warehouse = models.BooleanField(_("Is Warehouse"), default=True)
     start_date = models.DateField(_("Start date"), blank=True, null=True)
     end_date = models.DateField(_("End date"), blank=True, null=True)
