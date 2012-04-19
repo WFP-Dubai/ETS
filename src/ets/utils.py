@@ -432,9 +432,9 @@ def send_dispatched(waybill, compas=None):
 
                 if not IsValid:
                     message = "The LTI %s is not available in the COMPAS Station %s"%( waybill.order.code, compas)
-                    raise ValidationError(message)
                     waybill.validated = False
                     waybill.save()
+                    raise ValidationError(message)
                     return 
 
                 call_db_procedure('write_waybill.dispatch', (
