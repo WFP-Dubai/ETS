@@ -519,7 +519,7 @@ def send_received(waybill, compas=None):
 
 
             ## Check if dispatch_master is there...
-            if bool(compas_models.DispatchMaster.objects.filter(code=CURR_CODE).using(compas)):
+            if bool(compas_models.DispatchMaster.objects.filter(code__contains=CURR_CODE).using(compas)):
                 IsValid = True
             else:
                 message = "The Dispatch %s is not available in the COMPAS Station %s"%( waybill.pk, compas)
