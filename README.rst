@@ -1,2 +1,2 @@
 Docs in Docs folder
-.. _Index: docs/index.rst
+.. __Index: ./docs/index.rst
