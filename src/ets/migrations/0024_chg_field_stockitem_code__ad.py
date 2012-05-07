@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
         db.alter_column('ets_stockitem', 'code', self.gf('autoslug.fields.AutoSlugField')(unique_with=(), max_length=128, primary_key=True, unique=True, populate_from=None))
 
         # Adding index on 'StockItem', fields ['code']
-        #db.create_index('ets_stockitem', ['code'])
+        db.create_index('ets_stockitem', ['code'])
 
 
 
