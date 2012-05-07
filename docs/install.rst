@@ -276,7 +276,7 @@ Build project using buildout and run it::
 
 	sudo python bootstrap.py
 	sudo ./bin/buildout -c production.cfg
-	sudo chown -R www-dada:www-data /opt/ETS
+	sudo chown -R www-data:www-data /opt/ETS
 	sudo ./bin/instance createsuperuser
 
 Offliner on Windows XP
