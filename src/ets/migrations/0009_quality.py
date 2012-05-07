@@ -13,7 +13,7 @@ class Migration(SchemaMigration):
             stock_item.save()
 
     def backwards(self, orm):
-
+        pass
 
     models = {
         'auth.group': {
