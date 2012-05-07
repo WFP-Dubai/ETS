@@ -1,34 +1,19 @@
 # encoding: utf-8
 import datetime
 from south.db import db
-from south.v2 import SchemaMigration
+from south.v2 import DataMigration
 from django.db import models
 
-class Migration(SchemaMigration):
+class Migration(DataMigration):
 
     def forwards(self, orm):
         
-        # Adding field 'StockItem.external_ident'
-        db.add_column('ets_stockitem', 'external_ident', self.gf('django.db.models.fields.CharField')(default='111', max_length=128), keep_default=False)
+        for item in orm.StockItem.objects.all():
+            item.external_ident = item.code
+            item.save()
         
-        #=======================================================================
-        # for item in orm.StockItem.objects.all():
-        #    item.external_ident = item.code
-        #    item.save()
-        #=======================================================================
-        
-        # Adding unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        #db.create_unique('ets_stockitem', ['external_ident', 'quality'])
-
-
     def backwards(self, orm):
-        
-        # Removing unique constraint on 'StockItem', fields ['external_ident', 'quality']
-        #db.delete_unique('ets_stockitem', ['external_ident', 'quality'])
-
-        # Deleting field 'StockItem.external_ident'
-        db.delete_column('ets_stockitem', 'external_ident')
-
+        pass
 
 
     models = {
