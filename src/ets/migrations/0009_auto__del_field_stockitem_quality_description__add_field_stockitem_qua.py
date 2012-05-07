@@ -14,9 +14,9 @@ class Migration(SchemaMigration):
         # Adding field 'StockItem.quality'
         db.add_column('ets_stockitem', 'quality', self.gf('django.db.models.fields.CharField')(default='G', max_length=1), keep_default=False)
         
-        for stock_item in orm.StockItem.objects.all():
-            stock_item.quality = stock_item.quality_code
-            stock_item.save()
+        #for stock_item in orm.StockItem.objects.all():
+        #    stock_item.quality = stock_item.quality_code
+        #    stock_item.save()
 
     def backwards(self, orm):
         
