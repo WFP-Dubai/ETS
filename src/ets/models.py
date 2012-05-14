@@ -385,9 +385,11 @@ class Order(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
-        
-        return StockItem.objects.filter(pk__in=chain(*(
-                                            item.get_stock_items().values_list('pk', flat=True) for item in self.items.all())))
+        try:
+            stockItem = chain(*(item.get_stock_items().values_list('pk', flat=True) for item in self.items.all()))
+        except:
+            return StockItem.objects.filter(pk = 0)
+        return StockItem.objects.filter(pk__in=stockItem)
         
         
     
@@ -447,7 +449,10 @@ class OrderItem(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
-        return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
+        if self.unit_weight_net:
+            return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
+        else:
+            return []
         
     
     @staticmethod
