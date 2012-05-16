@@ -120,7 +120,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'loading_date': self.order.dispatch_date,
             'dispatch_date': self.order.dispatch_date,
             'destination': 'ISBX003',
-            'transaction_type': u'WIT',
+            'transaction_type': u'DEL',
             'transport_type': u'02',
             'dispatch_remarks': 'You are funny guys!',
             'transport_sub_contractor': 'Arpaso',
@@ -172,7 +172,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'loading_date': today,
             'dispatch_date': today,
             'destination': 'ISBX0034',
-            'transaction_type': u'WIT',
+            'transaction_type': u'DEL',
             'transport_type': u'02',
             'dispatch_remarks': 'You are funny guys!',
             'transport_sub_contractor': 'Arpaso',
@@ -333,14 +333,15 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         
         response = self.client.post(path, data=data)
         
-        self.assertEqual(str(response.context['formset'].errors), "[{'total_weight_net_received': [u'This field is required.']}]")
+        self.assertEqual(str(response.context['formset'].errors), "[{'total_weight_net_received': [u'This field is required.'], 'total_weight_gross_received': [u'This field is required.']}]")
         
         #Provide total weight net
         data.update({
+            'item-0-total_weight_gross_received': '4.0',
             'item-0-total_weight_net_received': '3.5',
         })
-        
         response = self.client.post(path, data=data)
+
         # Now everything should be all right
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
@@ -483,6 +484,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'item-0-number_units_damaged': 0,
             'item-0-units_damaged_reason': '',
             'item-0-total_weight_net_received': '3.5',
+            'item-0-total_weight_gross_received': '4.0',
             
             'item-0-slug': 'ISBX00311A1',
             'item-0-waybill': 'ISBX00311A',

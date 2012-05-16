@@ -6,7 +6,7 @@ from functools import wraps
 from django.conf import settings
 from django.core.management import call_command
 
-from ets.utils import update_compas
+from ets.utils import update_compas, update_compas_info
 from ets.models import LossDamageType
 
 def change_settings(func, **kwargs):
@@ -36,5 +36,6 @@ class TestCaseMixin(object):
         "Hook method for setting up the test fixture before exercising it."
         
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
+        update_compas_info(self.compas)
         update_compas(self.compas)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')

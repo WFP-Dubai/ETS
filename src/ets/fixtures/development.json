@@ -57,7 +57,10 @@
       "title": "LOGISTICS OFFICER",
       "dispatch": true,
       "location": "ISBX",
-      "organization": "WFP"
+      "organization": "WFP",
+      "warehouses": [
+          "ISBX002"
+      ]
     }
   },
   {
@@ -70,7 +73,10 @@
       "title": "REGIONAL LOGISTICS COORDINATOR",
       "dispatch": false,
       "location": "ISBX",
-      "organization": "DOEAF"
+      "organization": "DOEAF",
+      "warehouses": [
+          "ISBX003"
+      ]
     }
   },
   {
@@ -83,7 +89,10 @@
       "title": "REGIONAL LOGISTICS COORDINATOR",
       "dispatch": false,
       "location": "OE7X",
-      "organization": "DOEAF"
+      "organization": "DOEAF",
+      "warehouses": [
+          "OE7X001"
+      ]
     }
   },
   {

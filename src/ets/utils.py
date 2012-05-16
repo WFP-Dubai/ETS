@@ -216,6 +216,11 @@ def import_persons(compas):
             p.set_password(person.person_pk)
 
             p.save()
+            
+            # for wh in ets_models.Warehouse.objects.filter(compas=p.compas,
+            #                                    organization=p.organization,
+            #                                    location=p.location):
+            #     p.warehouses.add(wh)
 
         p.updated = now
         p.save()
@@ -316,19 +321,16 @@ def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
     today = date.today()
-
     places = _get_places(compas)
-
+    
     for lti_code in tuple(compas_models.LtiOriginal.objects.using(compas).distinct()\
                         .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                 lti_date__gte=date(year=2012, month=1, day=1),
                                 origin_wh_code__in=places.values_list('org_code', flat=True),
                                 )\
                         .values_list('code', flat=True)):
-
         order_items = []
         for lti in compas_models.LtiOriginal.objects.using(compas).filter(code=lti_code):
-
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -347,6 +349,7 @@ def import_order(compas):
             }
 
             order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
+
             #Update order. IT's not supposed to happen. In this case system might break.
             if not created:
                 ets_models.Order.objects.filter(code=lti.code).update(**defaults)

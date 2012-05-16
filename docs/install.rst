@@ -340,7 +340,7 @@ Installation links:
 (it's require registration)
 
 http://www.collab.net/downloads/subversion/
-
+ 
 
 Building EXE
 ------------
@@ -354,10 +354,10 @@ Run command::
 Go to directory ETS/installation
 
 AccessControl.dll, AccessControlW.dll - for access rights on files
-copy to nsis folder - Plugins (/usr/share/nsis/Include/)
+copy to nsis folder - Plugins (/usr/share/nsis/Plugins/)
 
 WriteEnvStr.nsh - additional function for writing variables to system PATH
-copy to nsis folder - Include (/usr/share/nsis/Plugins/)
+copy to nsis folder - Include (/usr/share/nsis/Include/)
 
 Open ets_admin.nsi or ets_users.nsi and check variable "pkgdir" (path for exe-files and ETS):
 /home/werty/django_apps/ETS/windows/
@@ -374,6 +374,7 @@ Compiling ETS-folder on Windows:
 - Run this commands in console::
 
     git clone http://github.com/WFP-Dubai/ETS.git
+    cd ETS
     python bootstrap.py
     bin\buildout -c windows.cfg
 
