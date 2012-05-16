@@ -69,7 +69,7 @@ class CompasTestCase(TestCase):
         self.assertTupleEqual((stock_item.number_of_units, stock_item.unit_weight_net), (1000, 1))
         
         #Update changed stock
-        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net=0.7)
+        compas_models.EpicStock.objects.using(self.compas).filter(origin_id='testme0124').update(quantity_net="0.7")
         import_stock(self.compas)
         
         self.assertEqual(ets.models.StockItem.objects.get(pk='KARX025KARX0010000944801MIXMIXHEBCG1558').number_of_units, 700)
@@ -178,10 +178,9 @@ class SendCompasTestCase(TestCaseMixin, TestCase):
         
         ets.models.Waybill.objects.filter(pk="ISBX00312A").update(receipt_validated=True, 
                                                                   receipt_signed_date=datetime.now())
-        
+
         #Send all validated waybills to compas
         send_received(ets.models.Waybill.objects.get(pk="ISBX00312A"), self.compas)
-        
         self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_sent_compas)
         self.assertFalse(ets.models.Waybill.objects.get(pk="ISBX00312A").receipt_validated)
         
