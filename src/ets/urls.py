@@ -150,12 +150,11 @@ urlpatterns = patterns("ets.views",
     }}, "compass_waybill_receipt" ),
     ( r'^compas_waybill_receipt/$', officer_required(waybill_user_related(object_list)), {
         "template_name": 'compas/list_waybills_compas_all2.html',
-        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False).values('order','order__pk',
-        																	 'pk',
-        																	 'order__warehouse__location__name',
-        																	 'order__warehouse',
-        																	 'order__consignee__name',
-        																	 'order__location__name'),
+        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False).values('order','order__pk', 'pk',
+                                                                                     'order__warehouse__location__name',
+                                                                                     'order__warehouse',
+                                                                                     'order__consignee__name',
+                                                                                     'order__location__name'),
         "paginate_by":50,
         "extra_context": {
             "extra_title": _("Received"),
@@ -175,23 +174,21 @@ urlpatterns = patterns("ets.views",
     
     ( r'^compas_waybill/$', officer_required(waybill_user_related(object_list)), {
         "template_name": 'compas/list_waybills_compas_all2.html',
-        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('order','order__pk',
-        																	 'pk',
-        																	 'order__warehouse__location__name',
-        																	 'order__warehouse',
-        																	 'order__consignee__name',
-        																	 'order__location__name'),
+        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('order','order__pk', 'pk',
+                                                                             'order__warehouse__location__name',
+                                                                             'order__warehouse',
+                                                                             'order__consignee__name',
+                                                                             'order__location__name'),
         "paginate_by":50,#paging not solution
     }, 'compas_waybill' ),
     
         
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.objects\
-        								.filter(valid_warehouse=True)\
-        								.filter(start_date__lte=date.today)\
-                      					.filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
-        								.annotate(stock_count=Count('stock_items'))\
-                                        .filter(stock_count__gt=0).order_by('location', 'pk'),
+        'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True)\
+                                                .filter(start_date__lte=date.today)\
+                                                .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
+                                                .annotate(stock_count=Count('stock_items'))\
+                                                .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, 'view_stock' ),
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
@@ -218,10 +215,6 @@ urlpatterns = patterns("ets.views",
 )
 
 urlpatterns += patterns('',
-
-
-   
-    
     ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^rosetta/', include('rosetta.urls') ),

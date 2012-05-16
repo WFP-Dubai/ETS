@@ -283,6 +283,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 def waybill_reception_scanned(request, scanned_code, queryset):
     """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
     waybill = ets.models.Waybill.decompress(scanned_code)
+
     if not waybill:
         raise Http404
     return waybill_reception(request, waybill.pk, queryset)
@@ -402,10 +403,8 @@ barcode_qr.authentication = False
 
 def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
-    
     if not request.user.has_perm("ets.stockitem_api_full_access"):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
 

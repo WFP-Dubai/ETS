@@ -420,5 +420,15 @@
       "origin_type": "2", 
       "si_code": "123"
     }
+  },
+  {
+    "pk": "ISBX00312A",
+    "model": "compas.dispatchmaster",
+    "fields": {
+      "document_code": "AB",
+      "dispatch_date": "2000-11-03",
+      "origin_type": "B",
+      "origin_location_code": "ukraine"
+    }
   }
 ]
