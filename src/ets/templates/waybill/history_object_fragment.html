@@ -8,3 +8,13 @@
 {% block history_first_col %}
   <td>{{ first_col }}</td>
 {% endblock %}
+
+
+{% block history_changes %}
+  {% if action_type == "Dispatch" or action_type == "Receipt" %}
+    {{ changes }}
+  {% else %}
+    {{ block.super }}
+  {% endif %}
+{% endblock %}
+

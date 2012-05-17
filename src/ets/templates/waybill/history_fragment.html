@@ -16,9 +16,11 @@
           <td>{{ action_type }}</td>
           <td>{{ action_date|date:"DATETIME_FORMAT"|upper }}</td>
           <td>
+          {% block history_changes %}
             {% for key, field in changes %}
               {{ key }}: &quot;{{ field }}&quot;{% if not forloop.last %},{% endif %}
             {% endfor %}
+          {% endblock %}
           </td>
       </tr>
     {% endfor %}

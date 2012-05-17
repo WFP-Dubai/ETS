@@ -672,8 +672,9 @@ def item_history_list(log_queryset, model, exclude=()):
 
 def get_user_compaslogger(log_queryset):
     for item in log_queryset:
-        #changes = "%s: %s" % (item.get_status_display, item.message)
-        yield named_object(ets_models.Waybill, item.waybill), item.get_action_display, item.when_attempted
+        changes = "%s: %s" % (item.get_status_display(), item.message)
+        print changes
+        yield named_object(ets_models.Waybill, item.waybill), item.get_action_display, item.when_attempted, changes
 
 def get_user_actions(user):
     waybill_log = ets_models.Waybill.audit_log.filter(action_user=user)
