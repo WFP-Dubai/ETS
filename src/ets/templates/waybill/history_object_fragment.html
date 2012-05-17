@@ -1,0 +1,10 @@
+{% extends "waybill/history_fragment.html" %}
+{% load i18n %}
+
+{% block history_heading_first %}
+  <th>{% trans "Object" %}</th>
+{% endblock %}
+
+{% block history_first_col %}
+  <td>{{ first_col }}</td>
+{% endblock %}

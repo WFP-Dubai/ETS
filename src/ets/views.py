@@ -50,7 +50,8 @@ def waybill_detail(request, waybill, template="waybill/detail.html", extra_conte
         
     loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), ets.models.LoadingDetail))
                         for loading in waybill.loading_details.all())
-    
+    print loading_details
+    print history_list(waybill_log, ets.models.Waybill, ('date_modified',))
     context = {
         'object': waybill,
         'items': waybill.loading_details.select_related(),
@@ -462,7 +463,7 @@ def send_dispatched_view(request, queryset):
     """Submits dispatch waybills to COMPAS"""
     total = 0
     for waybill in queryset:
-        send_dispatched(waybill)
+        send_dispatched(waybill, user=request.user)
         if waybill.sent_compas:
             total += 1
     
@@ -486,7 +487,7 @@ def send_dispatched_view(request, queryset):
 def send_received_view(request, queryset):
     """Submits received waybills to COMPAS"""
     for waybill in queryset:
-        send_received(waybill)
+        send_received(waybill, user=request.user)
     
     return redirect('receipt_validates')
 
