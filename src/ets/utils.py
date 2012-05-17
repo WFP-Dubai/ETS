@@ -6,6 +6,7 @@ import cStringIO as StringIO
 import ho.pisa as pisa
 from cgi import escape
 import os.path
+from operator import itemgetter
 
 from django.template.loader import get_template, render_to_string
 from django.template import Context
@@ -29,6 +30,11 @@ from ets.compress import compress_json, decompress_json
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
+ACTIONS = {
+    'I': _('Created'),
+    'U': _('Changed'),
+    'D': _('Deleted'),
+}
 
 def render_to_pdf(request, template_name, context, file_name):
     """Renders template with context to HTML, than to PDF"""
@@ -216,7 +222,7 @@ def import_persons(compas):
             p.set_password(person.person_pk)
 
             p.save()
-
+            
         p.updated = now
         p.save()
 
@@ -316,19 +322,16 @@ def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
     today = date.today()
-
     places = _get_places(compas)
-
+    
     for lti_code in tuple(compas_models.LtiOriginal.objects.using(compas).distinct()\
                         .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                 lti_date__gte=date(year=2012, month=1, day=1),
                                 origin_wh_code__in=places.values_list('org_code', flat=True),
                                 )\
                         .values_list('code', flat=True)):
-
         order_items = []
         for lti in compas_models.LtiOriginal.objects.using(compas).filter(code=lti_code):
-
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -347,6 +350,7 @@ def import_order(compas):
             }
 
             order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
+
             #Update order. IT's not supposed to happen. In this case system might break.
             if not created:
                 ets_models.Order.objects.filter(code=lti.code).update(**defaults)
@@ -387,7 +391,7 @@ def import_order(compas):
         #order_items = ets_models.OrderItem.filter(order__warehouse__compas__pk = compas)
 
 
-def send_dispatched(waybill, compas=None):
+def send_dispatched(waybill, compas=None, user=None):
     """Submits dispatched and validated waybills to COMPAS"""
     if not compas:
         compas = waybill.order.warehouse.compas.pk
@@ -496,19 +500,20 @@ def send_dispatched(waybill, compas=None):
             ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                    compas_id=compas, waybill=waybill,
                                                    status=ets_models.CompasLogger.FAILURE, 
-                                                   message=error_message)
+                                                   message=error_message, user=user)
         waybill.validated = False
         waybill.save()
     else:
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                compas_id=compas, waybill=waybill,
-                                               status=ets_models.CompasLogger.SUCCESS)
+                                               status=ets_models.CompasLogger.SUCCESS,
+                                               user=user)
 
         waybill.sent_compas = datetime.now()
         waybill.save()
 
 
-def send_received(waybill, compas=None):
+def send_received(waybill, compas=None, user=None):
     """Submits received and validated waybills to COMPAS"""
     if not compas:
         compas = waybill.destination.compas.pk
@@ -563,13 +568,14 @@ def send_received(waybill, compas=None):
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.FAILURE, 
-                                               message=message)
+                                               message=message, user=user)
 
         waybill.receipt_validated = False
     else:
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.RECEIPT, 
                                                compas_id=compas, waybill=waybill,
-                                               status=ets_models.CompasLogger.SUCCESS)
+                                               status=ets_models.CompasLogger.SUCCESS,
+                                               user=user)
 
         waybill.receipt_sent_compas = datetime.now()
 
@@ -586,11 +592,6 @@ def changed_fields(model, next, previous, exclude=()):
 
 def history_list(log_queryset, model, exclude=()):
     """Utility to generate history of actions at some objects"""
-    ACTIONS = {
-        'I': _('Created'),
-        'U': _('Changed'),
-        'D': _('Deleted'),
-    }
 
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
@@ -649,3 +650,37 @@ def compress_compas_data(compas=None):
 
     data = get_compas_data(compas)
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
+
+
+def named_object(model, item):
+    title = ""
+    if model._meta.object_name == "Waybill":
+        title = "Waybill: %s" % item.slug
+    elif model._meta.object_name == "LoadingDetail":
+        title = "Waybill: %s, Commodity: %s" % (item.waybill, item.stock_item)
+    return title
+
+
+def item_history_list(log_queryset, model, exclude=()):
+    """Utility to generate history of actions at some objects"""
+
+    for item in log_queryset:
+        previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
+        prev = previous[0] if previous.exists else None
+        yield named_object(model, item), ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
+
+
+def get_user_compaslogger(log_queryset):
+    for item in log_queryset:
+        #changes = "%s: %s" % (item.get_status_display, item.message)
+        yield named_object(ets_models.Waybill, item.waybill), item.get_action_display, item.when_attempted
+
+def get_user_actions(user):
+    waybill_log = ets_models.Waybill.audit_log.filter(action_user=user)
+    loading_detail_log = ets_models.LoadingDetail.audit_log.filter(action_user=user)
+    history = sorted(chain(item_history_list(waybill_log, ets_models.Waybill, ('date_modified',)),
+                           item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',)),
+                           get_user_compaslogger(ets_models.CompasLogger.objects.filter(user=user))
+                           ),
+                     key=itemgetter(2), reverse=True)
+    return history

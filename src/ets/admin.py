@@ -16,6 +16,7 @@ from django_extensions.utils.text import truncate_letters
 
 import ets.models
 import ets.forms
+from ets.utils import get_user_actions
 
 
 class ButtonableModelAdmin(admin.ModelAdmin):
@@ -313,6 +314,13 @@ class PersonAdmin(UserAdmin):
         if not request.user.is_superuser:
             queryset = queryset.filter(compas__officers=request.user)
         return queryset
+
+    def change_view(self, request, object_id, extra_context=None):
+        obj = self.get_object(request, admin.util.unquote(object_id))
+        extra = { 'history':  get_user_actions(obj) }
+        extra.update(extra_context or {})
+
+        return super(PersonAdmin, self).change_view(request, object_id, extra_context=extra)
     
 admin.site.register(ets.models.Person, PersonAdmin)
 

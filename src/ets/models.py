@@ -1048,6 +1048,7 @@ class CompasLogger(models.Model):
     when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
     status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
     message = models.TextField(_("error message"))
+    user = models.ForeignKey(User, verbose_name=_("Officer"), related_name="compas_loggers", null=True, blank=True)
     
     class Meta:
         ordering = ('-when_attempted',)

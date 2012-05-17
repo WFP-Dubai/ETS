@@ -25,12 +25,12 @@ class Command(UpdateCompas):
                                               order__warehouse__compas__pk=compas,
                                               order__warehouse__compas__read_only=False):
         
-            send_dispatched(waybill, compas)
+            send_dispatched(waybill, compas=compas)
         
         for waybill in Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
                                               receipt_validated=True, receipt_sent_compas__isnull=True,
                                               destination__compas__pk=compas,
                                               destination__compas__read_only=False):
-            send_received(waybill, compas)
+            send_received(waybill, compas=compas)
             
         import_stock(compas)
