@@ -1,10 +1,26 @@
-{% extends "waybill/history_fragment.html" %}
-{% load i18n %}
+{% load i18n extra_tags adminmedia %}
 
-{% block history_heading_first %}
-  <th>{% trans "Object" %}</th>
-{% endblock %}
-
-{% block history_first_col %}
-  <td>{{ first_col }}</td>
-{% endblock %}
+<table cellpadding="0" cellspacing="0" border="0" class="display history_log">
+  <thead>
+    <tr>
+      <th>{% trans "Object" %}</th>
+      <th>{% trans "Action" %}</th>
+      <th>{% trans "Time" %}</th>
+      <th>{% trans "Changes" %}</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for slug, object_name, action_type, action_date, changes in history_list %}
+      <tr>
+          {% named_object slug object_name %}
+          <td>{{ action_type }}</td>
+          <td>{{ action_date|date:"DATETIME_FORMAT"|upper }}</td>
+          <td>
+            {% for key, field in changes %}
+              {{ key }}: &quot;{{ field }}&quot;{% if not forloop.last %},{% endif %}
+            {% endfor %}
+          </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

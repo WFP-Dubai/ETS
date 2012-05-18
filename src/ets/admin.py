@@ -9,6 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import SortedDict
 from django.http import HttpResponseRedirect
 from django.forms import MediaDefiningClass
+from django.template.response import TemplateResponse
+from django.utils.translation import ugettext
+from django.conf import settings
 
 from ajax_select import make_ajax_form
 import logicaldelete.admin
@@ -308,6 +311,16 @@ class PersonAdmin(UserAdmin):
     raw_id_fields = ('organization', 'location')
     #filter_horizontal = ('warehouses',)
     form = make_ajax_form(ets.models.Person, dict(warehouses='warehouses'), ets.forms.PersonChangeForm)
+
+    def get_urls(self):
+        from django.conf.urls.defaults import patterns, url
+
+        urls = super(PersonAdmin, self).get_urls()
+        urls = patterns('',
+                    url(r'^waybill-history/(?P<object_id>\d+)/$', self.admin_site.admin_view(self.waybill_history_view),
+                        name="waybill_history")
+                ) + urls
+        return urls
     
     def queryset(self, request):
         queryset = super(PersonAdmin, self).queryset(request)
@@ -321,6 +334,18 @@ class PersonAdmin(UserAdmin):
         extra.update(extra_context or {})
 
         return super(PersonAdmin, self).change_view(request, object_id, extra_context=extra)
+
+    def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
+        obj = self.get_object(request, admin.util.unquote(object_id))
+        context = {
+            'history_list':  get_user_actions(obj),
+            'opts': self.opts,
+            'title': 'Waybill history for user %s' % obj,
+            'person': obj,
+            'paginate_by': getattr(settings, "WAYBILL_HISTORY_PAGINATE", 40)
+        }
+        return TemplateResponse(request, template, context)
+        #return object_list(request, get_user_actions(obj), paginate_by=40, template_name=template_name)
     
 admin.site.register(ets.models.Person, PersonAdmin)
 

@@ -154,3 +154,16 @@ def get_last_update(user):
         'last_updated': StockItem.get_last_update(),
         'failed': failed,
     }
+
+@register.simple_tag
+def named_object(slug, object_name, title=""):
+    if object_name == "Waybill":
+        item = Waybill.objects.get(slug=slug)
+        title = "Waybill: %s" % slug
+    elif object_name == "LoadingDetail":
+        item = LoadingDetail.objects.get(slug=slug)
+        title = "Waybill: %s, Commodity: %s" % (item.waybill, item.stock_item)
+    else:
+        return
+    url_name = "admin:ets_%s_change" % object_name.lower()
+    return "<th><a href='%s'>%s</a></th>" % (reverse(url_name, args=[item.pk]), title)

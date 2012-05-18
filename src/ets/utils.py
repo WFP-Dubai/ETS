@@ -650,22 +650,13 @@ def compress_compas_data(compas=None):
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
 
 
-def named_object(model, item):
-    title = ""
-    if model._meta.object_name == "Waybill":
-        title = "Waybill: %s" % item.slug
-    elif model._meta.object_name == "LoadingDetail":
-        title = "Waybill: %s, Commodity: %s" % (item.waybill, item.stock_item)
-    return title
-
-
 def item_history_list(log_queryset, model, exclude=()):
     """Utility to generate history of actions at some objects"""
 
     for item in log_queryset:
         previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
         prev = previous[0] if previous.exists else None
-        yield named_object(model, item), ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
+        yield item.slug, model._meta.object_name, ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
 
 
 def get_user_actions(user):
