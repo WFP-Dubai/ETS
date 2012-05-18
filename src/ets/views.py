@@ -462,7 +462,7 @@ def send_dispatched_view(request, queryset):
     """Submits dispatch waybills to COMPAS"""
     total = 0
     for waybill in queryset:
-        send_dispatched(waybill, user=request.user)
+        send_dispatched(waybill)
         if waybill.sent_compas:
             total += 1
     
@@ -486,7 +486,7 @@ def send_dispatched_view(request, queryset):
 def send_received_view(request, queryset):
     """Submits received waybills to COMPAS"""
     for waybill in queryset:
-        send_received(waybill, user=request.user)
+        send_received(waybill)
     
     return redirect('receipt_validates')
 

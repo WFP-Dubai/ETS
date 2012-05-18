@@ -345,7 +345,6 @@ class PersonAdmin(UserAdmin):
             'paginate_by': getattr(settings, "WAYBILL_HISTORY_PAGINATE", 40)
         }
         return TemplateResponse(request, template, context)
-        #return object_list(request, get_user_actions(obj), paginate_by=40, template_name=template_name)
     
 admin.site.register(ets.models.Person, PersonAdmin)
 
