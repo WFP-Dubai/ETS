@@ -156,7 +156,7 @@ Section "Main" MainProgram
   nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
   FileOpen $8 $INSTDIR\ETS\export_waybills.bat w 
-  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" export_waybills --compress --verbosity=2 > $\"$DESKTOP\waybills.data$\"$\r$\n"
+  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" export_waybills --compress --verbosity=2 > $INSTDIR\waybills.data$\r$\n"
   FileClose $8
   CreateShortCut "$DESKTOP\Export.lnk" "$INSTDIR\ETS\export_waybills.bat" 
 SectionEnd
