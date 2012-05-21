@@ -139,6 +139,9 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     inlines = (LoadingDetailsInline, CompasLoggerInline)
     
     actions = None
+
+    def has_delete_permission(self, request, obj=None):
+        return False
     
 admin.site.register( ets.models.Waybill, WaybillAdmin )
 
