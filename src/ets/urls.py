@@ -210,12 +210,11 @@ urlpatterns = patterns("ets.views",
     }, "handle_sync_compas"),
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
-    
+    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     
 )
 
 urlpatterns += patterns('',
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^accounts/', include('django.contrib.auth.urls') ),
     ( r'^rosetta/', include('rosetta.urls') ),
     (r'^ajax_select/', include('ajax_select.urls')),

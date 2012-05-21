@@ -22,6 +22,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
+from django.core import serializers
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -32,6 +33,7 @@ import ets.models
 from ets.utils import history_list, send_dispatched, send_received 
 from ets.utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
 import simplejson
+from ets.compress import compress_json
 
 
 WFP_ORGANIZATION = 'WFP'
@@ -492,8 +494,10 @@ def send_received_view(request, queryset):
 
 
 def export_compas_file(request):
-    """Returns a file with all COMPAS data in response""" 
-    return data_to_file_response(get_compas_data(), file_name='ets_data-%s' % datetime.date.today())
+    """Returns a file with all COMPAS data in response"""
+    data = serializers.serialize('json', get_compas_data(), use_decimal=False)
+    data = compress_json(data)
+    return data_to_file_response(data, file_name='ets_data-%s' % datetime.date.today())
     
 
 class ImportData(FormView):

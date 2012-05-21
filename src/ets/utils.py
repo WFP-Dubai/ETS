@@ -640,8 +640,8 @@ def get_compas_data(compas=None):
         warehouses,
         ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True)),
         ets_models.StockItem.objects.filter(warehouse__in=warehouses),
-        ets_models.Order.objects.filter(expiry__lte=date.today, warehouse__in=warehouses),
-        ets_models.OrderItem.objects.filter(order__expiry__lte=date.today, order__warehouse__in=warehouses),
+        ets_models.Order.objects.filter(expiry__gte=date.today, warehouse__in=warehouses),
+        ets_models.OrderItem.objects.filter(order__expiry__gte=date.today, order__warehouse__in=warehouses),
     )
 
 def compress_compas_data(compas=None):
@@ -666,3 +666,38 @@ def get_user_actions(user):
                            item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',))),
                      key=itemgetter(3), reverse=True)
     return history
+
+def get_date_from_string(some_date, date_templates=None, default=None, message="Failed: date must be in one of such formats"):
+    DATE_FORMATS = (
+        "%Y-%m-%d",
+    )
+    
+    def extract_date_by_template(some_date, date_template):
+        try:
+            return datetime.strptime(some_date, date_template), True 
+        except:
+            return None, False
+
+    def get_results(result, flag, iterable=False):
+        if flag:
+            pass
+        elif default:
+            result = default
+        else:
+            templates = "; ".join([item.replace('%', "") for item in date_templates]) if iterable else date_templates.replace('%', "")
+            result = " ".join([message, templates])
+        return result, flag
+    
+    if date_templates is None:
+        date_templates = DATE_FORMATS
+    elif isinstance(some_date, str):
+        return get_results(extract_date_by_template(some_date, date_templates))
+    elif getattr(date_templates, '__iter__', False):
+        return "date_templates must be a string or list of strings", False
+
+    for template in date_templates:
+        result, flag = extract_date_by_template(some_date, template)
+        if flag:
+            return get_results(result, flag)
+    return get_results(None, False, iterable=True)
+
