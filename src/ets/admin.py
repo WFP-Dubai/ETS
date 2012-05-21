@@ -328,13 +328,6 @@ class PersonAdmin(UserAdmin):
             queryset = queryset.filter(compas__officers=request.user)
         return queryset
 
-    def change_view(self, request, object_id, extra_context=None):
-        obj = self.get_object(request, admin.util.unquote(object_id))
-        extra = { 'history':  get_user_actions(obj) }
-        extra.update(extra_context or {})
-
-        return super(PersonAdmin, self).change_view(request, object_id, extra_context=extra)
-
     def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
         obj = self.get_object(request, admin.util.unquote(object_id))
         context = {
