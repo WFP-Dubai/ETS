@@ -655,7 +655,7 @@ def item_history_list(log_queryset, model, exclude=()):
 
     for item in log_queryset:
         previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
-        prev = previous[0] if previous.exists else None
+        prev = previous[0] if previous.exists() else None
         yield item.slug, model._meta.object_name, ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
 
 
@@ -664,5 +664,5 @@ def get_user_actions(user):
     loading_detail_log = ets_models.LoadingDetail.audit_log.filter(action_user=user)
     history = sorted(chain(item_history_list(waybill_log, ets_models.Waybill, ('date_modified',)),
                            item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',))),
-                     key=itemgetter(2), reverse=True)
+                     key=itemgetter(3), reverse=True)
     return history

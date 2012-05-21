@@ -158,12 +158,12 @@ def get_last_update(user):
 @register.simple_tag
 def named_object(slug, object_name, title=""):
     if object_name == "Waybill":
-        item = Waybill.objects.get(slug=slug)
+        waybill = Waybill.objects.get(slug=slug)
         title = "Waybill: %s" % slug
     elif object_name == "LoadingDetail":
-        item = LoadingDetail.objects.get(slug=slug)
-        title = "Waybill: %s, Commodity: %s" % (item.waybill, item.stock_item)
+        item = LoadingDetail.audit_log.filter(slug=slug)[0]
+        waybill = item.waybill
+        title = "Waybill: %s, Commodity: %s" % (waybill, item.stock_item)
     else:
         return
-    url_name = "admin:ets_%s_change" % object_name.lower()
-    return "<th><a href='%s'>%s</a></th>" % (reverse(url_name, args=[item.pk]), title)
+    return "<th><a href='%s'>%s</a></th>" % (reverse("admin:ets_waybill_change", args=[waybill.pk]), title)
