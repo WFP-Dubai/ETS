@@ -1,6 +1,6 @@
 !define PRODUCT_NAME "ETS"
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
-!define PRODUCT_VERSION "0.0.2"
+!define PRODUCT_VERSION "0.0.3"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
 Var SYSTEMDRIVE
 

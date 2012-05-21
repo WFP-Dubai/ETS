@@ -53,5 +53,18 @@ class ExportTestCase(TestCaseMixin, TestCase):
         total = import_file(output)
         
         self.assertEqual(total, 14)
+
+    def test_export_waybills_command(self):
+        """Tests ets.offliner.management.commands.export_waybills.Command"""
+        
+        output = StringIO.StringIO()
+        
+        #Try with not existed COMPAS station argument
+        call_command('export_waybills', compress=True, stdout=output)
+        output.seek(0)
+        
+        total = import_file(output)
+        
+        self.assertEqual(total, 12)
         
         
