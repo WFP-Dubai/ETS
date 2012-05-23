@@ -1,6 +1,6 @@
 !define PRODUCT_NAME "ETS"
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
-!define PRODUCT_VERSION "0.0.2"
+!define PRODUCT_VERSION "0.0.3"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
 Var SYSTEMDRIVE
 
@@ -155,4 +155,8 @@ Section "Main" MainProgram
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
   nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
+  FileOpen $8 $INSTDIR\ETS\export_waybills.bat w 
+  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" export_waybills --compress --verbosity=2 > $INSTDIR\waybills.data$\r$\n"
+  FileClose $8
+  CreateShortCut "$DESKTOP\Export.lnk" "$INSTDIR\ETS\export_waybills.bat" 
 SectionEnd

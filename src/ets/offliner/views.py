@@ -50,7 +50,7 @@ class ExportWaybillData(FormView):
         start_date = form.cleaned_data['start_date'] 
         end_date = form.cleaned_data['end_date']
         
-        data = compress_waybills(start_date, end_date)
+        data = compress_waybills(self.request.user, start_date, end_date)
         
         return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 

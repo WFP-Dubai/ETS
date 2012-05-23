@@ -24,6 +24,7 @@ import logicaldelete.models as ld_models
 
 from ets.compress import compress_json, decompress_json
 from ets.country import COUNTRY_CHOICES
+from ets.utils import is_imported
 
 #name = "1234"
 BULK_NAME = "BULK"
@@ -519,6 +520,10 @@ def waybill_slug_populate(waybill):
     return "%s%s%s%06d" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
                            LETTER_CODE, count+1)
 
+class ImportAuditLog(AuditLog):
+
+    def post_save(self, instance, created, **kwargs):
+        self.create_log_entry(instance, is_imported(instance) and 'M' or created and 'I' or 'U')
 
 class Waybill( ld_models.Model ):
     """
@@ -623,7 +628,7 @@ class Waybill( ld_models.Model ):
                        blank=True, null=True,
                        max_length=255,)
     
-    audit_log = AuditLog(exclude=())
+    audit_log = ImportAuditLog(exclude=())
 
     objects = ld_models.managers.LogicalDeletedManager()
     
@@ -873,7 +878,7 @@ class LoadingDetail(models.Model):
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
-    audit_log = AuditLog(exclude=('date_modified',))
+    audit_log = ImportAuditLog(exclude=('date_modified',))
 
     class Meta:
         ordering = ('slug',)

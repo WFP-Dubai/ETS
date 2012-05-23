@@ -217,4 +217,4 @@ class ImportDataForm( forms.Form ):
 
     helper = FormHelper()
     helper.add_input(Submit(_("Submit"), 'submit'))
-    
+
