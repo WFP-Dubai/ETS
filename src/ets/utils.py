@@ -34,6 +34,7 @@ ACTIONS = {
     'I': _('Created'),
     'U': _('Changed'),
     'D': _('Deleted'),
+    'M': _('Imported'),
 }
 
 def render_to_pdf(request, template_name, context, file_name):
@@ -610,7 +611,12 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        obj.save()
+        if "AuditLogEntry" in obj.object._meta.object_name:
+            if not obj.object._base_manager.filter(action_date=obj.object.action_date).exists():
+                obj.object.pk = None
+                models.Model.save_base(obj.object, raw=True, force_insert=True)
+        else:    
+            obj.save()
         total += 1
 
     return total
@@ -701,3 +707,16 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
             return get_results(result, flag)
     return get_results(None, False, iterable=True)
 
+
+def is_imported(obj):
+    if obj._meta.object_name in ("Waybill", "WaybillAuditLogEntry"):
+        waybill = obj
+    elif obj._meta.object_name in ("LoadingDetail", "LoadingDetailAuditLogEntry"):
+        waybill = obj.waybill
+    else:
+        return False
+    print "date modified: %s" % waybill.date_modified.isoformat(" ")
+    print "now - 20 sec: %s" % datetime.now().isoformat(" ")
+    if waybill.date_modified < datetime.now() - timedelta(seconds=20):
+        return True
+    return False
