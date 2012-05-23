@@ -612,6 +612,7 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
+        print obj.object
         if "AuditLogEntry" in obj.object._meta.object_name:
             if not obj.object._base_manager.filter(action_date=obj.object.action_date).exists():
                 obj.object.pk = None
@@ -623,7 +624,7 @@ def import_file(f):
     return total
 
 
-def get_compas_data(compas=None):
+def get_compas_data(compas=None, warehouse=None):
     """Fetches all COMPAS-imported data, serializes and compresses them"""
 
     #COMPAS stations themself
@@ -635,6 +636,10 @@ def get_compas_data(compas=None):
     warehouses = ets_models.Warehouse.objects.filter(Q(end_date__gt=date.today) | Q(end_date__isnull=True), 
                                         start_date__lte=date.today, 
                                         compas__in=compas_stations)
+    if warehouse:
+        warehouses.filter(pk=warehouse.pk)
+        compas_stations.filter(pk=warehouse.compas.pk)
+        
     return chain(
         ets_models.Organization.objects.all(),
         ets_models.Location.objects.all(),

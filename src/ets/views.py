@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
 from django.core import serializers
+from django.views.generic import ListView
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -493,11 +494,19 @@ def send_received_view(request, queryset):
     return redirect('receipt_validates')
 
 
-def export_compas_file(request):
+def export_compas_file(request, compas=None, warehouse=None):
     """Returns a file with all COMPAS data in response"""
-    data = serializers.serialize('json', get_compas_data(), use_decimal=False)
+    template = 'ets_data-%s'
+    if compas:
+        compas = get_object_or_404(ets.models.Compas, pk=compas)
+        template = "-".join([template % compas.pk, "%s"])
+    if warehouse:
+        warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse)
+        template = "-".join([template % warehouse.pk, "%s"])
+    data = serializers.serialize('json', get_compas_data(compas=compas, warehouse=warehouse), use_decimal=False)
     data = compress_json(data)
-    return data_to_file_response(data, file_name='ets_data-%s' % datetime.date.today())
+
+    return data_to_file_response(data, file_name=template % datetime.date.today())
     
 
 class ImportData(FormView):
@@ -514,3 +523,13 @@ class ImportData(FormView):
                              _('File has been imported successfully. Totally saved objects --> %s' % total))
         
         return self.get(self.request)
+
+
+def installation_data(request, queryset=ets.models.Warehouse.objects.all(), template_name="stock/warehouse_list.html"):
+    user = request.user
+    compas_stations = user.compases.all().values_list('code')
+    if not user.is_superuser:
+        queryset.filter( Q(persons__pk=request.user.pk) | Q(compas__in=compas_stations))
+    queryset.order_by("compas", "name")
+    
+    return object_list(request, queryset, template_name=template_name)

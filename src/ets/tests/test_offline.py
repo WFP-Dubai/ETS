@@ -1,5 +1,6 @@
 ### -*- coding: utf-8 -*- ####################################################
 import os.path
+import datetime
 
 from django.test import TestCase
 from django.core.management import call_command
@@ -54,17 +55,43 @@ class ExportTestCase(TestCaseMixin, TestCase):
         
         self.assertEqual(total, 14)
 
-    # def test_export_waybills_command(self):
-    #     """Tests ets.offliner.management.commands.export_waybills.Command"""
+    def test_export_waybills_command(self):
+        """Tests ets.offliner.management.commands.export_waybills.Command"""
         
-    #     output = StringIO.StringIO()
+        output = StringIO.StringIO()
+
+        call_command('export_waybills', user="dispatcher", passwd="dispatcher", stdout=output)
+        output.seek(0)
         
-    #     #Try with not existed COMPAS station argument
-    #     call_command('export_waybills', compress=True, stdout=output)
-    #     output.seek(0)
+        total = import_file(output)
         
-    #     total = import_file(output)
+        self.assertEqual(total, 4)
+
+    def test_export_waybills_dispach_sign(self):
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
+        waybill.transport_dispach_signed_date = datetime.datetime.now()
+        waybill.save()
+
+        output = StringIO.StringIO()
         
-    #     self.assertEqual(total, 12)
+        #Try with not existed COMPAS station argument
+        call_command('export_waybills', user="dispatcher", passwd="dispatcher", stdout=output)
+        output.seek(0)
         
+        total = import_file(output)
         
+        self.assertEqual(total, 9)
+
+    def test_export_waybills_receipt_sign(self):
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00311A")
+        waybill.receipt_signed_date = datetime.datetime.now()
+        waybill.save()
+
+        output = StringIO.StringIO()
+
+        call_command('export_waybills', user="recepient", passwd="recepient", stdout=output)
+        output.seek(0)
+        
+        total = import_file(output)
+        
+        self.assertEqual(total, 5)

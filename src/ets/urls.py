@@ -210,7 +210,10 @@ urlpatterns = patterns("ets.views",
     }, "handle_sync_compas"),
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/(?P<compas>[-\w]+)/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/warehouse/(?P<warehouse>[-\w]+)/$', 'export_compas_file', {}, 'export_warehouse_file' ),
+    ( r'^installation_data/$', 'installation_data', {}, 'installation_data' ),
     
 )
 

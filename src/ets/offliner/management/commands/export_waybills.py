@@ -1,15 +1,16 @@
 ### -*- coding: utf-8 -*- ####################################################
 from optparse import make_option
 import datetime
-from itertools import chain
 
 from django.core.management.base import BaseCommand
-from django.core import serializers
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
-from ets.compress import compress_json
-from ets.models import Waybill, LoadingDetail
 from ets.utils import get_date_from_string
 from ets.offliner.utils import compress_waybills
+from ets.decorators import waybill_user_related_filter
+from ets.models import Waybill
+
 
 class Command(BaseCommand):
 
@@ -18,13 +19,20 @@ class Command(BaseCommand):
     option_list = BaseCommand.option_list + (
         make_option('-s', '--start_date', dest='start_date', type='string', help='Start date'),
         make_option('-e', '--end_date', dest='end_date', type='string', help='End date'),
+        make_option('-u', '--user', dest='user', type='string', help='Username'),
+        make_option('-P', '--passwd', dest='passwd', type='string', help='Password'),
     )
 
     def handle(self, *args, **options):
-        verbosity = int(options.get('verbosity', 1))        
         start_date, res = get_date_from_string(options.get('start_date', None), default=datetime.date(1900, 1, 1))
         end_date, res = get_date_from_string(options.get('end_date', None), default=datetime.datetime.now())
+        username = options.get('user', '')
+        passwd = options.get('passwd', '')
         data = ""
-        #data = compress_waybills(start_date, end_date)
-        
+        try:
+            user = authenticate(username=username, password=passwd)
+            queryset = waybill_user_related_filter(Waybill.objects.all(), user)
+            data = compress_waybills(queryset, start_date, end_date)
+        except User.DoesNotExist:
+            print "Wrong password or username '%s'" % username
         return data

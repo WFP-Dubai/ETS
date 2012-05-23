@@ -8,8 +8,9 @@ from django.views.generic.edit import FormView
 from ets.utils import data_to_file_response
 
 from ets.offliner.forms import DateRangeForm
-from ets.offliner.models import UpdateLog
+from ets.offliner.models import UpdateLog, Waybill
 from ets.offliner.utils import compress_waybills
+from ets.decorators import waybill_user_related_filter
 
 @login_required
 def request_update(request):
@@ -49,8 +50,9 @@ class ExportWaybillData(FormView):
     def form_valid(self, form):
         start_date = form.cleaned_data['start_date'] 
         end_date = form.cleaned_data['end_date']
-        
-        data = compress_waybills(self.request.user, start_date, end_date)
+
+        queryset = waybill_user_related_filter(Waybill.objects.all(), self.request.user)
+        data = compress_waybills(queryset, start_date, end_date)
         
         return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 
