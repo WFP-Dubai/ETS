@@ -10,7 +10,7 @@ from django.db.models.aggregates import Max
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, LastAttempt, Order
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, Order
 from ets.utils import changed_fields
 
 register = template.Library()
@@ -143,7 +143,6 @@ def get_last_update(user):
     failed = False
     for c in Compas.objects.all():
         try:
-            #last_attempt = = LastAttempt.objects.get(compas=c)
             last_attempt = c.import_logs.order_by('-when_attempted')[0]
             if last_attempt.status == ImportLogger.FAILURE:
                 failed = True

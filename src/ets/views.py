@@ -31,7 +31,8 @@ from ets.decorators import person_required, officer_required, dispatch_view, rec
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from ets.utils import history_list, send_dispatched, send_received 
-from ets.utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
+from ets.utils import import_file, get_compas_data, data_to_file_response
+from ets.pdf import render_to_pdf
 import simplejson
 from ets.compress import compress_json
 

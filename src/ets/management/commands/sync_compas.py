@@ -4,10 +4,11 @@ from optparse import make_option
 from datetime import datetime, timedelta
 
 from django.core.management.base import BaseCommand
-from django.db.utils import DatabaseError
 from django.conf import settings
 
-from ets.utils import update_compas, update_compas_info
+from ets.utils import (update_compas, 
+                       import_persons, import_stock, import_order,
+                       import_partners, import_places, import_reasons) 
 from ets.models import Compas, ImportLogger
 
 LOG_DIRECTORY = settings.LOG_DIRECTORY
@@ -31,8 +32,7 @@ class Command(BaseCommand):
     
     def synchronize(self, compas):
         """Exact method to proceed synchronization"""
-        update_compas_info(compas)
-        update_compas(compas)
+        update_compas(compas, import_partners, import_places, import_reasons, import_persons, import_stock, import_order)
 
     def handle(self, compas='', *args, **options):
         
