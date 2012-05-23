@@ -24,7 +24,7 @@ import logicaldelete.models as ld_models
 
 from ets.compress import compress_json, decompress_json
 from ets.country import COUNTRY_CHOICES
-from ets.utils import is_imported
+from ets.check import is_imported
 
 #name = "1234"
 BULK_NAME = "BULK"

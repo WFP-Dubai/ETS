@@ -32,5 +32,5 @@ class ImportUserLoggingMiddleware(UserLoggingMiddleware):
         if sender in registry:
             for field in registry.get_fields(sender):
                 print instance
-                if not is_imported(instance) or instance.action_type == 'M':
+                if not is_imported(instance) or (instance.action_type == 'M' and not instance.action_user):
                     setattr(instance, field.name, user)
