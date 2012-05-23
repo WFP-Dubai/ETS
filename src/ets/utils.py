@@ -26,6 +26,7 @@ from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json
+from ets.check import is_imported
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
@@ -708,15 +709,3 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
     return get_results(None, False, iterable=True)
 
 
-def is_imported(obj):
-    if obj._meta.object_name in ("Waybill", "WaybillAuditLogEntry"):
-        waybill = obj
-    elif obj._meta.object_name in ("LoadingDetail", "LoadingDetailAuditLogEntry"):
-        waybill = obj.waybill
-    else:
-        return False
-    print "date modified: %s" % waybill.date_modified.isoformat(" ")
-    print "now - 20 sec: %s" % datetime.now().isoformat(" ")
-    if waybill.date_modified < datetime.now() - timedelta(seconds=20):
-        return True
-    return False
