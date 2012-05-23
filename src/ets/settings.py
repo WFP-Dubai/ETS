@@ -39,6 +39,8 @@ SERVE_STATIC = True
 
 SERVE_STATIC = True
 
+DEFAULT_FILE_STORAGE = 'ets.storage.RewriteFileSystemStorage'
+
 STATICFILES_FINDERS = (
   "django.contrib.staticfiles.finders.FileSystemFinder",
   "django.contrib.staticfiles.finders.AppDirectoriesFinder",
@@ -68,7 +70,7 @@ MIDDLEWARE_CLASSES = (
     'ets.middleware.RequiredAuthenticationMiddleware',
     
     'django.contrib.messages.middleware.MessageMiddleware',
-    
+    'pagination.middleware.PaginationMiddleware',
     'audit_log.middleware.UserLoggingMiddleware',
 )
 
@@ -126,6 +128,8 @@ SESSION_COOKIE_NAME = 'ets'
 SESSION_COOKIE_AGE = 15 * 60 # 30 minutes age of cookie
 
 WAYBILL_LETTER = 'A'
+
+WAYBILL_HISTORY_PAGINATE = 40
 
 SITE_NAME = ugettext('ETS')
 DEFAULT_FROM_EMAIL = 'no-reply@wfp.com'

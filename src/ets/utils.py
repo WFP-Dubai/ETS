@@ -6,6 +6,7 @@ import cStringIO as StringIO
 import ho.pisa as pisa
 from cgi import escape
 import os.path
+from operator import itemgetter
 
 from django.template.loader import get_template, render_to_string
 from django.template import Context
@@ -29,6 +30,11 @@ from ets.compress import compress_json, decompress_json
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
+ACTIONS = {
+    'I': _('Created'),
+    'U': _('Changed'),
+    'D': _('Deleted'),
+}
 
 def render_to_pdf(request, template_name, context, file_name):
     """Renders template with context to HTML, than to PDF"""
@@ -584,11 +590,6 @@ def changed_fields(model, next, previous, exclude=()):
 
 def history_list(log_queryset, model, exclude=()):
     """Utility to generate history of actions at some objects"""
-    ACTIONS = {
-        'I': _('Created'),
-        'U': _('Changed'),
-        'D': _('Deleted'),
-    }
 
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
@@ -647,3 +648,21 @@ def compress_compas_data(compas=None):
 
     data = get_compas_data(compas)
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
+
+
+def item_history_list(log_queryset, model, exclude=()):
+    """Utility to generate history of actions at some objects"""
+
+    for item in log_queryset:
+        previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
+        prev = previous[0] if previous.exists() else None
+        yield item.slug, model._meta.object_name, ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
+
+
+def get_user_actions(user):
+    waybill_log = ets_models.Waybill.audit_log.filter(action_user=user)
+    loading_detail_log = ets_models.LoadingDetail.audit_log.filter(action_user=user)
+    history = sorted(chain(item_history_list(waybill_log, ets_models.Waybill, ('date_modified',)),
+                           item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',))),
+                     key=itemgetter(3), reverse=True)
+    return history
