@@ -153,7 +153,7 @@ Section "Main" MainProgram
   FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
-  nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
+;  nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
   FileOpen $9 $INSTDIR\ETS\import.bat w 
   FileWrite $9 "python $\"$INSTDIR\ETS\import_data.py$\" $\"$EXEDIR\$\r$\n"
   FileClose $9
