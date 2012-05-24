@@ -8,3 +8,8 @@ COMPRESS_ENABLED = False
 DATABASES = {
     'default': DEFAULT_DATABASE,
 }
+
+TEMPLATE_LOADERS = (
+    'django.template.loaders.app_directories.Loader',
+    'django.template.loaders.eggs.Loader',
+)
