@@ -11,11 +11,7 @@ from ets.models import LoadingDetail
 
 def compress_waybills(queryset, start_date, end_date):
     #Append log entry
-    for way in queryset.filter(Q( date_modified__range=(start_date, end_date+timedelta(1)),
-                                              date_removed__isnull=True ),
-                                           Q( Q(transport_dispach_signed_date__isnull=False) |
-                                              Q(receipt_signed_date__isnull=False) )):
-        print way
+    
     data = chain.from_iterable(
         [
             chain.from_iterable([
