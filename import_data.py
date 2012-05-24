@@ -32,7 +32,7 @@ if __name__ == '__main__':
     options = {
         'initialdir': installator_dir,
         'title': "Please choose file with initial data",
-        'filetypes': [('json data files', '.json'), ('compressed data files', '.data')],
+        'filetypes': [('compressed data files', '.data'), ('json data files', '.json')],
     }
     
     try:
