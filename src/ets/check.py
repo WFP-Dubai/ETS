@@ -7,8 +7,8 @@ def is_imported(obj):
         waybill = obj.waybill
     else:
         return False
-    print "date modified: %s" % waybill.date_modified.isoformat(" ")
-    print "now - 20 sec: %s" % datetime.now().isoformat(" ")
+    # print "date modified: %s" % waybill.date_modified.isoformat(" ")
+    # print "now - 20 sec: %s" % datetime.now().isoformat(" ")x
     if waybill.date_modified < datetime.now() - timedelta(seconds=20):
         return True
     return False

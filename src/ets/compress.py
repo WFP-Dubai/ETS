@@ -114,5 +114,5 @@ def decompress_json(data):
         #Extend field names
         for full_field, cut_field in COMPRESS_MAPPING:
             data = data.replace(cut_field, full_field)
-    
+
     return data 

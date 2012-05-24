@@ -1,0 +1,14 @@
+{% extends "base_template.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Download files for installation" %}{% endblock %}
+
+{% block content %}
+  <h2>{% trans "Available warehouses" %}</h2>
+  <dl>
+    {% for wh in object_list %}
+      {% ifchanged wh.compas %}<dt><h4>{{ wh.compas }}</h4></dt>{% endifchanged %}
+      <dd><a href='{% url export_warehouse_file "data" wh.pk %}'>{{ wh }}</a></dd>
+    {% endfor %}
+  </dl>
+{% endblock %}

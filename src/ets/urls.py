@@ -47,23 +47,7 @@ urlpatterns = patterns("ets.views",
     
     #Listings
     ( r'^search/$', "waybill_search", {
-        'queryset': ets.models.Waybill.objects.all().values(
-        													'order',
-        													'order__pk',
-        													'pk',
-        													'order__warehouse__location__name',
-        													'order__warehouse__name',
-        													'order__consignee__name',
-        													'order__location__name',
-        													'transport_dispach_signed_date',
-        													'receipt_signed_date',
-        													'validated',
-        													'receipt_validated',
-        													'sent_compas',
-        													'receipt_sent_compas',
-        													'destination__name',
-        													'transaction_type'
-        ),
+        'queryset': ets.models.Waybill.objects.all(),
     }, "waybill_search" ),
     
     ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
@@ -210,7 +194,13 @@ urlpatterns = patterns("ets.views",
     }, "handle_sync_compas"),
                        
     ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
-    ( r'^export_compas_file/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/(?P<data_type>data)/(?P<compas>[-\w]+)/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/(?P<data_type>data)/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/(?P<compas>[-\w]+)/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/compas/$', 'export_compas_file', {}, 'export_compas_file' ),
+    ( r'^export/warehouse/(?P<data_type>data)/(?P<warehouse>[-\w]+)/$', 'export_compas_file', {}, 'export_warehouse_file' ),
+    ( r'^export/warehouse/(?P<warehouse>[-\w]+)/$', 'export_compas_file', {}, 'export_warehouse_file' ),
+    ( r'^installation_data/$', 'installation_data', {}, 'installation_data' ),
     
 )
 

@@ -19,6 +19,7 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from django.core import serializers
+from django.views.generic import ListView
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -137,28 +138,8 @@ def waybill_list(request, queryset, template='waybill/list2.html', extra_context
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
-def dispatched_in_compas(request):
-    """
 
-    """
-    WBs = ets.models.Waybill.objects.select_related().filter(sent_compas__isnull=False)
-    person = request.user.person
-    #get return queryset.filter(Q(order__warehouse__persons__pk=user.pk)
-    #| Q(order__warehouse__compas__officers=user)
-    #| Q(destination__persons__pk=user.pk)
-    #| Q(destination__compas__officers=user)).distinct()
-    listWH = request.user.warehouses.all()
-
-
-
-    items =[]
-    for wb in WBs:
-        pass
-
-
-def waybill_search( request, form_class=WaybillSearchForm, 
-                    queryset=ets.models.Waybill.objects.all(), 
-                    template='waybill/list2.html'):
+def waybill_search( request, queryset, form_class=WaybillSearchForm, template='waybill/list2.html'):
     """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)
@@ -495,11 +476,23 @@ def send_received_view(request, queryset):
     return redirect('receipt_validates')
 
 
-def export_compas_file(request):
+def export_compas_file(request, compas=None, warehouse=None, data_type="json"):
     """Returns a file with all COMPAS data in response"""
-    data = serializers.serialize('json', get_compas_data(), use_decimal=False)
-    data = compress_json(data)
-    return data_to_file_response(data, file_name='ets_data-%s' % datetime.date.today())
+    template = 'ets_data-%s' % "compress" if data_type else "json"
+    if compas:
+        compas = get_object_or_404(ets.models.Compas, pk=compas)
+        template = "-".join([template, compas.pk])
+    if warehouse:
+        warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse)
+        template = "-".join([template, warehouse.pk])
+    data = serializers.serialize('json', get_compas_data(compas=compas, warehouse=warehouse), use_decimal=False)
+    template = "-".join([template, "%s"])
+
+    if data_type == "data":
+        data = compress_json(data)
+        
+    return data_to_file_response(data, file_name=template % datetime.date.today(), type=data_type)
+
     
 
 class ImportData(FormView):
@@ -516,3 +509,13 @@ class ImportData(FormView):
                              _('File has been imported successfully. Totally saved objects --> %s' % total))
         
         return self.get(self.request)
+
+
+def installation_data(request, queryset=ets.models.Warehouse.objects.all(), template_name="stock/warehouse_list.html"):
+    user = request.user
+    compas_stations = user.compases.all().values_list('code')
+    if not user.is_superuser:
+        queryset.filter( Q(persons__pk=request.user.pk) | Q(compas__in=compas_stations))
+    queryset.order_by("compas", "name")
+    
+    return object_list(request, queryset, template_name=template_name)
