@@ -2,25 +2,16 @@ from datetime import datetime, timedelta, date
 from itertools import chain, izip
 import decimal
 from functools import wraps
-import cStringIO as StringIO
-import ho.pisa as pisa
-from cgi import escape
-import os.path
 from operator import itemgetter
 
-from django.template.loader import get_template, render_to_string
-from django.template import Context
 from django.conf import settings
 from django.http import HttpResponse
-from django.db import connections, transaction, models
+from django.db import transaction, models
 from django.db.models import Q
-from django.db.utils import DatabaseError
-from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
 from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
-from django.template import RequestContext
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
@@ -38,40 +29,7 @@ ACTIONS = {
     'M': _('Imported'),
 }
 
-def render_to_pdf(request, template_name, context, file_name):
-    """Renders template with context to HTML, than to PDF"""
-
-    context_dict = {"STATIC_URL": settings.STATIC_URL}
-    context_dict.update(context)
-
-    html = render_to_string(template_name, context_dict, RequestContext(request))
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), 
-                            result, debug=True, encoding='utf-8', show_error_as_pdf=True,
-                            link_callback=fetch_resources, xhtml=False)
-    if not pdf.err:
-        response = HttpResponse(result.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename=%s.pdf' % file_name
-        return response
-    return HttpResponse('We had some errors<pre>%s</pre>' % escape(html))
-
-def fetch_resources(uri, rel):
-    """
-    Callback to allow pisa/reportlab to retrieve Images,Stylesheets, etc.
-    `uri` is the href attribute from the html link element.
-    `rel` gives a relative path, but it's not used here.
-
-    """
-    if uri.startswith(settings.STATIC_URL):
-        path = os.path.abspath(os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, "")))
-    elif uri.startswith(settings.MEDIA_URL):
-        path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, "")))
-    else:
-        path = uri
-    return path
-
-
-def compas_importer(func=None, log_success=False):
+def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
     def _decorator(f):
         @wraps(f, assigned=available_attrs(func))
@@ -80,56 +38,28 @@ def compas_importer(func=None, log_success=False):
                 with transaction.commit_on_success(using) as tr:
                     f(using)
             except Exception, err:
-                ets_models.ImportLogger.objects.create(compas_id=using, 
-                                                       status=ets_models.ImportLogger.FAILURE, 
-                                                       message="%s: %s" % (f.__name__, unicode(err)))
+                import_logger.status=ets_models.ImportLogger.FAILURE
+                import_logger.message="%s: %s" % (f.__name__, unicode(err))
+                import_logger.save()
                 raise
 
         return _wrapped
-
+    
     if func:
         return _decorator(func)
-
+    
     return _decorator
 
 
-
-def update_compas(using):
+def update_compas(using, *args):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
+    import_logger = ets_models.ImportLogger.objects.create(compas_id=using)
     try:
-
-        #Update persons
-        import_persons(using)
-
-        #Update stocks
-        import_stock(using)
-
-        #Update orders
-        import_order(using)
-
+        for func in args:
+            compas_importer(import_logger, func)(using)
     except Exception:
         #Since we already created log for this error simply pass here
         pass
-    else:
-        #If all process did not fail create success log
-        ets_models.ImportLogger.objects.create(compas_id=using)
-
-def update_compas_info(using):
-    """ Utility to run special import process. If no fails Success ImportLogger is created."""
-    try:
-        #Import organizations
-        import_partners(using)
-        #Update places & warehouses
-        import_places(using)
-        #Update loss, damage reasons
-        import_reasons(using)
-
-    except Exception:
-        #Since we already created log for this error simply pass here
-        pass
-    else:
-        #If all process did not fail create success log
-        ets_models.ImportLogger.objects.create(compas_id=using)
 
 
 def _get_places(compas):
@@ -138,13 +68,11 @@ def _get_places(compas):
 
     return compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
 
-@compas_importer
 def import_partners(compas):
     """Imports organizations from COMPAS"""
     for partner in compas_models.Partner.objects.using(compas).all():
         ets_models.Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
-@compas_importer
 def import_places(compas):
     """Imports warehouses with locations from COMPAS"""
     for place in compas_models.Place.objects.using(compas):
@@ -197,7 +125,6 @@ def import_places(compas):
             wh.save()
 
 
-@compas_importer
 def import_persons(compas):
     """Imports persons from COMPAS"""
 
@@ -232,13 +159,11 @@ def import_persons(compas):
     ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
 
 
-@compas_importer
 def import_reasons(compas):
     """Imports all possible loss/damage reasons"""
     return ets_models.LossDamageType.update(compas)
 
 
-@compas_importer
 def import_stock(compas):
     """Imports stock items or updates quantity"""
 
@@ -319,7 +244,6 @@ def _get_destination_location(compas, code, name):
                     })[0]
 
 
-@compas_importer
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
@@ -711,5 +635,3 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
         if flag:
             return get_results(result, flag)
     return get_results(None, False, iterable=True)
-
-

@@ -1,7 +1,4 @@
 import datetime
-import pyqrcode
-import cStringIO
-import logging
 from subprocess import Popen
 
 from django import forms
@@ -20,7 +17,6 @@ from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
 from django.core import serializers
 from django.views.generic import ListView
@@ -32,7 +28,8 @@ from ets.decorators import person_required, officer_required, dispatch_view, rec
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from ets.utils import history_list, send_dispatched, send_received 
-from ets.utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
+from ets.utils import import_file, get_compas_data, data_to_file_response
+from ets.pdf import render_to_pdf
 import simplejson
 from ets.compress import compress_json
 
@@ -141,28 +138,8 @@ def waybill_list(request, queryset, template='waybill/list2.html', extra_context
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
-def dispatched_in_compas(request):
-    """
 
-    """
-    WBs = ets.models.Waybill.objects.select_related().filter(sent_compas__isnull=False)
-    person = request.user.person
-    #get return queryset.filter(Q(order__warehouse__persons__pk=user.pk)
-    #| Q(order__warehouse__compas__officers=user)
-    #| Q(destination__persons__pk=user.pk)
-    #| Q(destination__compas__officers=user)).distinct()
-    listWH = request.user.warehouses.all()
-
-
-
-    items =[]
-    for wb in WBs:
-        pass
-
-
-def waybill_search( request, form_class=WaybillSearchForm, 
-                    queryset=ets.models.Waybill.objects.all(), 
-                    template='waybill/list2.html'):
+def waybill_search( request, queryset, form_class=WaybillSearchForm, template='waybill/list2.html'):
     """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)
@@ -179,9 +156,11 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     order = waybill.order
     
     class FormsetForm(formset_form):
-        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), empty_label=_("Choose stock item"))
+        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), 
+                                            empty_label=_("Choose stock item"))
         stock_item.choices = [(u"", stock_item.empty_label),]
-        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) ))  for item in order.get_stock_items().exclude(quantity_net=0)]
+        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) ))  
+                             for item in order.get_stock_items().exclude(quantity_net=0)]
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                        form=FormsetForm, formset=formset_class, 
@@ -200,12 +179,15 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
     if order.consignee.pk == WFP_DISTRUIBUTION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DISTIBRUTION)
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                                   if k ==ets.models.Waybill.DISTIBRUTION)
     if not order.consignee.pk == WFP_DISTRUIBUTION:
-    	if not order.consignee.pk == WFP_ORGANIZATION:
-    		form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DELIVERY)
+        if not order.consignee.pk == WFP_ORGANIZATION:
+            form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                                       if k ==ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
