@@ -1,13 +1,11 @@
 ### -*- coding: utf-8 -*- ####################################################
 
-import os
 from functools import wraps
 
 from django.conf import settings
 from django.core.management import call_command
 
-from ets.utils import update_compas
-from ets.models import LossDamageType
+from ets import utils
 
 def change_settings(func, **kwargs):
     @wraps(func)
@@ -36,5 +34,6 @@ class TestCaseMixin(object):
         "Hook method for setting up the test fixture before exercising it."
         
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
-        update_compas(self.compas)
+        utils.update_compas(self.compas, utils.import_partners, utils.import_places, utils.import_reasons, 
+                      utils.import_persons, utils.import_stock, utils.import_order)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')

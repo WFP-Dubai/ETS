@@ -21,6 +21,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
 
         self.client.login(username="dispatcher", password="dispatcher")
         self.user = User.objects.get(username="dispatcher")
+ 
     
     def get_waybill(self):
         return ets.models.Waybill.objects.get(pk="ISBX00211A")
@@ -36,7 +37,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['slug'], self.get_waybill().slug)
         # Waybills with destination and warehouse
@@ -58,7 +59,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['waybill.order.code'], self.get_waybill().order.pk)
         # Loading details for some destination and some warehouse
@@ -72,7 +73,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse("api_loading_details"))
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 7)
         
         #Test user with special permissions
@@ -84,7 +85,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         
         response = self.client.get(reverse("api_loading_details"))
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 7)
         
         
@@ -100,7 +101,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'OURLITORDER', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['code'], order.code)
         # Orders with destination and warehouse
@@ -123,7 +124,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'OURLITORDER', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['order.code'], order.code)
         # Order items for some destination and some warehouse
@@ -145,7 +146,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, warehouse.code, status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['warehouse.code'], warehouse.code)
         
@@ -153,7 +154,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.client.login(username="admin", password="admin")
         response = self.client.get(reverse("api_stock_items"))
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 7)
         
         #Test user with special permissions
@@ -165,7 +166,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         
         response = self.client.get(reverse("api_stock_items"))
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 7)
     
     def test_warehouses(self):
@@ -176,7 +177,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response["Content-Type"], "application/csv")
         # Stock items for one warehouse
         result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['code'], "ISBX002")
         
