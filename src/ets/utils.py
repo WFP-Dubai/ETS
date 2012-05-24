@@ -612,7 +612,6 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        print obj.object
         if "AuditLogEntry" in obj.object._meta.object_name:
             if not obj.object._base_manager.filter(action_date=obj.object.action_date).exists():
                 obj.object.pk = None
