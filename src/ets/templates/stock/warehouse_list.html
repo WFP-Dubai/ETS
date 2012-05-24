@@ -8,7 +8,7 @@
   <dl>
     {% for wh in object_list %}
       {% ifchanged wh.compas %}<dt><h4>{{ wh.compas }}</h4></dt>{% endifchanged %}
-      <dd><a href='{% url export_warehouse_file wh.pk %}'>{{ wh }}</a></dd>
+      <dd><a href='{% url export_warehouse_file "data" wh.pk %}'>{{ wh }}</a></dd>
     {% endfor %}
   </dl>
 {% endblock %}

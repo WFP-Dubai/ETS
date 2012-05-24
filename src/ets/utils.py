@@ -597,10 +597,10 @@ def history_list(log_queryset, model, exclude=()):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
 
 
-def data_to_file_response(data, file_name):
+def data_to_file_response(data, file_name, type):
     """Creates response with provided data and inserts Content-Disposition header with file name."""
-    response = HttpResponse(data, content_type='application/data')
-    response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
+    response = HttpResponse(data, content_type='application/%s' % type)
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (file_name, type)
     return response
 
 
@@ -656,9 +656,9 @@ def get_compas_data(compas=None, warehouse=None):
         ets_models.OrderItem.objects.filter(order__expiry__gte=date.today, order__warehouse__in=warehouses),
     )
 
-def compress_compas_data(compas=None):
+def compress_compas_data(compas=None, warehouse=None):
 
-    data = get_compas_data(compas)
+    data = get_compas_data(compas, warehouse)
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
 
 

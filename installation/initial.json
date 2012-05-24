@@ -14,15 +14,5 @@
         "password": "sha1$1fcb3$8df119b3ac1f36c936a6ee3d99b50908a516f276",
         "email": "admin@example.com"
     }
-  },
-  {
-    "pk": "ISBX002",
-    "model": "ets.compas",
-    "fields": {
-      "officers": [1],
-      
-      "db_engine": "django.db.backends.sqlite3",
-      "db_name": "compas"
-    }
   }
 ]

@@ -494,19 +494,23 @@ def send_received_view(request, queryset):
     return redirect('receipt_validates')
 
 
-def export_compas_file(request, compas=None, warehouse=None):
+def export_compas_file(request, compas=None, warehouse=None, data_type="json"):
     """Returns a file with all COMPAS data in response"""
-    template = 'ets_data-%s'
+    template = 'ets_data-%s' % "compress" if data_type else "json"
     if compas:
         compas = get_object_or_404(ets.models.Compas, pk=compas)
-        template = "-".join([template % compas.pk, "%s"])
+        template = "-".join([template, compas.pk])
     if warehouse:
         warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse)
-        template = "-".join([template % warehouse.pk, "%s"])
+        template = "-".join([template, warehouse.pk])
     data = serializers.serialize('json', get_compas_data(compas=compas, warehouse=warehouse), use_decimal=False)
-    data = compress_json(data)
+    template = "-".join([template, "%s"])
 
-    return data_to_file_response(data, file_name=template % datetime.date.today())
+    if data_type == "data":
+        data = compress_json(data)
+        
+    return data_to_file_response(data, file_name=template % datetime.date.today(), type=data_type)
+
     
 
 class ImportData(FormView):

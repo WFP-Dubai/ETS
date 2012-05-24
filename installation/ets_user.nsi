@@ -154,5 +154,10 @@ Section "Main" MainProgram
   FileClose $8
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
   nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
-  CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
+  FileOpen $9 $INSTDIR\ETS\import.bat w 
+  FileWrite $9 "python $\"$INSTDIR\ETS\import_data.py$\" $\"$EXEDIR\$\r$\n"
+  FileClose $9
+  CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat"
+  CreateShortCut "$DESKTOP\import ETS data.lnk" "$INSTDIR\ETS\import.bat"  
+  ExecWait "$INSTDIR\ETS\import.bat" 
 SectionEnd
