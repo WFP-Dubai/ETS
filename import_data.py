@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os.path, subprocess, sys, tempfile
+import os.path, subprocess, sys, tempfile, platform
 from tkFileDialog import askopenfilename
 from tkMessageBox import showinfo, showerror
 from Tkinter import Tk
@@ -40,14 +40,16 @@ if __name__ == '__main__':
     }
     
     try:
-        initialfile = (i for i in os.listdir(installator_dir) if i.endswith(".json") or i.endswith(".data")).next()
+        initialfile = (i for i in os.listdir(installator_dir) if i.endswith(".data")).next()
         initialfile = os.path.join(installator_dir, initialfile)
         if os.path.isfile(initialfile):
             options['initialfile'] = initialfile
-            ext = os.path.splitext(initialfile)[1]
-            index = (n for n, i in enumerate(FILETYPES) if i[1] == ext).next()
-            if index:
-                options['filetypes'] = FILETYPES.reverse()
+            # ext = os.path.splitext(initialfile)[1]
+            # index = (n for n, i in enumerate(FILETYPES) if i[1] == ext).next()
+            # if index:
+            #     item = FILETYPES.pop(index)
+            #     FILETYPES.insert(0, item)
+            #     options['filetypes'] = FILETYPES
     except StopIteration:
         pass
 
@@ -73,7 +75,11 @@ if __name__ == '__main__':
                 file_decompressed.close()
                 data_file = file_decompressed.name
 
-        loaddata = subprocess.Popen([command, "loaddata", data_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        addition = {}
+        if platform.system() == "Windows":
+            addition['shell'] = True 
+
+        loaddata = subprocess.Popen([command, "loaddata", data_file], stdout=subprocess.PIPE, stderr=subprocess.PIPE, **addition)
         result, error = loaddata.communicate()
         if ext == ".data":
             os.remove(file_decompressed.name)

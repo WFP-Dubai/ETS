@@ -478,13 +478,14 @@ def send_received_view(request, queryset):
 
 def export_compas_file(request, compas=None, warehouse=None, data_type="json"):
     """Returns a file with all COMPAS data in response"""
-    template = 'ets_data-%s' % "compress" if data_type else "json"
+    template = 'ets_data-%s' % ("compress" if data_type=="data" else data_type,)
     if compas:
         compas = get_object_or_404(ets.models.Compas, pk=compas)
         template = "-".join([template, compas.pk])
     if warehouse:
         warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse)
         template = "-".join([template, warehouse.pk])
+
     data = serializers.serialize('json', get_compas_data(compas=compas, warehouse=warehouse), use_decimal=False)
     template = "-".join([template, "%s"])
 
@@ -510,12 +511,14 @@ class ImportData(FormView):
         
         return self.get(self.request)
 
-
-def installation_data(request, queryset=ets.models.Warehouse.objects.all(), template_name="stock/warehouse_list.html"):
+@officer_required
+def installation_data(request, template_name="stock/warehouse_list.html",
+                      queryset=ets.models.Warehouse.objects.all().order_by("compas__code", "code")):
+    
     user = request.user
     compas_stations = user.compases.all().values_list('code')
     if not user.is_superuser:
-        queryset.filter( Q(persons__pk=request.user.pk) | Q(compas__in=compas_stations))
+        queryset.filter(compas__in=compas_stations)
     queryset.order_by("compas", "name")
     
     return object_list(request, queryset, template_name=template_name)

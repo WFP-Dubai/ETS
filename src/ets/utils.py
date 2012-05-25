@@ -12,6 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
+from django.contrib.auth.models import User
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
@@ -555,14 +556,18 @@ def get_compas_data(compas=None, warehouse=None):
     if compas is not None:
         compas_stations = ets_models.Compas.objects.filter(pk=compas)
 
+    if warehouse:
+        compas_stations = compas_stations.filter(pk=warehouse.compas.pk)
 
     warehouses = ets_models.Warehouse.objects.filter(Q(end_date__gt=date.today) | Q(end_date__isnull=True), 
                                         start_date__lte=date.today, 
                                         compas__in=compas_stations)
+
     if warehouse:
-        warehouses.filter(pk=warehouse.pk)
-        compas_stations.filter(pk=warehouse.compas.pk)
-        
+        warehouses = warehouses.filter(pk=warehouse.pk)
+
+    persons = ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True))
+
     return chain(
         ets_models.Organization.objects.all(),
         ets_models.Location.objects.all(),
@@ -573,7 +578,8 @@ def get_compas_data(compas=None, warehouse=None):
 
         compas_stations,
         warehouses,
-        ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True)),
+        persons,
+        User.objects.filter(pk__in=persons.values_list('pk', flat=True)),
         ets_models.StockItem.objects.filter(warehouse__in=warehouses),
         ets_models.Order.objects.filter(expiry__gte=date.today, warehouse__in=warehouses),
         ets_models.OrderItem.objects.filter(order__expiry__gte=date.today, order__warehouse__in=warehouses),
