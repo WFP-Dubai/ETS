@@ -93,20 +93,20 @@ class Command(BaseCommand):
                     file_decompressed.close()
                     data_file = file_decompressed.name
 
-        # addition = {}
-        # if platform.system() == "Windows":
-        #     addition['shell'] = True
-        output = StringIO.StringIO()
-        errors = StringIO.StringIO()
+            # addition = {}
+            # if platform.system() == "Windows":
+            #     addition['shell'] = True
+            output = StringIO.StringIO()
+            errors = StringIO.StringIO()
         
-        call_command('loaddata', data_file, stdout=output, stderr=errors)
-                    
-        if errors.getvalue():
-            showerror(" ".join([TITLE, "error"]), errors.getvalue())
-
-        if output.getvalue():
-            showinfo(TITLE, output.getvalue())
+            call_command('loaddata', data_file, stdout=output, stderr=errors)
             
-        output.close()
-        errors.close()
+            if errors.getvalue():
+                showerror(" ".join([TITLE, "error"]), errors.getvalue())
+
+            if output.getvalue():
+                showinfo(TITLE, output.getvalue())
+            
+            output.close()
+            errors.close()
 
