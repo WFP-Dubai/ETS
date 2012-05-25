@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import shutil, os.path, subprocess, sys, tempfile
+import os.path, subprocess, sys, tempfile
 from tkFileDialog import askopenfilename
 from tkMessageBox import showinfo, showerror
 from Tkinter import Tk
@@ -9,6 +9,10 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 FIXTURES_DIR = "src/ets/fixtures"
 INSTANCE_COMMANDS = ("instance", "instance-script.py", "instance.exe")
 TITLE = "Importing file"
+FILETYPES = [
+    ('compressed data files', '.data'),
+    ('json data files', '.json')
+]
 
 def get_command():
     for command in INSTANCE_COMMANDS:
@@ -32,7 +36,7 @@ if __name__ == '__main__':
     options = {
         'initialdir': installator_dir,
         'title': "Please choose file with initial data",
-        'filetypes': [('compressed data files', '.data'), ('json data files', '.json')],
+        'filetypes': FILETYPES,
     }
     
     try:
@@ -40,6 +44,10 @@ if __name__ == '__main__':
         initialfile = os.path.join(installator_dir, initialfile)
         if os.path.isfile(initialfile):
             options['initialfile'] = initialfile
+            ext = os.path.splitext(initialfile)[1]
+            index = (n for n, i in enumerate(FILETYPES) if i[1] == ext).next()
+            if index:
+                options['filetypes'] = FILETYPES.reverse()
     except StopIteration:
         pass
 
