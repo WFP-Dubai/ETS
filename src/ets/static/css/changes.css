@@ -57,3 +57,11 @@
     float: left;
     width: 250px;
 }
+
+dl.warehouse-list dt { 
+  font-weight: bold;   
+}
+
+dl.warehouse-list dd { 
+  margin-top: 10px;
+}
