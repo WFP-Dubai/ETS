@@ -65,3 +65,7 @@ dl.warehouse-list dt {
 dl.warehouse-list dd { 
   margin-top: 10px;
 }
+
+.active_import{ 
+  color: red;
+}
