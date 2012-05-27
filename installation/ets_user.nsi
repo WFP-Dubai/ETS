@@ -1,6 +1,6 @@
 !define PRODUCT_NAME "ETS"
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
-!define PRODUCT_VERSION "0.0.3"
+!define PRODUCT_VERSION "0.0.2"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
 Var SYSTEMDRIVE
 
@@ -163,5 +163,5 @@ Section "Main" MainProgram
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat"
   CreateShortCut "$DESKTOP\import ETS data.lnk" "$INSTDIR\ETS\import.bat"  
   Delete "$INSTDIR\ETS\import_first.bat"
-  nsExec::Exec "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure"
+;  nsExec::Exec "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure"
 SectionEnd
