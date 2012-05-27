@@ -159,8 +159,8 @@ Section "Main" MainProgram
   FileOpen $7 $INSTDIR\ETS\import_first.bat w 
   FileWrite $7 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" import_file -d $\"$EXEDIR\$\r$\n"
   FileClose $7
-  ExecWait "$INSTDIR\ETS\import_first.bat"
   CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat"
+  ExecWait "$INSTDIR\ETS\import_first.bat"
   CreateShortCut "$DESKTOP\import ETS data.lnk" "$INSTDIR\ETS\import.bat"  
   Delete "$INSTDIR\ETS\import_first.bat"
 ;  nsExec::Exec "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure"
