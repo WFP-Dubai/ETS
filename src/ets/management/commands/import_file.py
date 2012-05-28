@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 from ets.utils import import_file
 from ets.compress import decompress_json
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+BASE_DIR = os.path.abspath( os.path.join(os.path.abspath(os.path.dirname(__file__)), '../../../../../') )
 TITLE = "Importing file"
 FILETYPES = [
     ('compressed data files', '.data'),
@@ -50,13 +50,10 @@ class Command(BaseCommand):
         root = Tk()
         root.withdraw()
 
-        if dir_name:
-            if not os.path.exists(dir_name):
-                showerror(TITLE, "Wrong path to dir with installator: %s" % dir_name)
-                exit()
+        if dir_name and os.path.exists(dir_name):
+            dir_name = os.path.abspath(dir_name)
         else:
             dir_name = BASE_DIR
-        dir_name = os.path.abspath(dir_name)
     
         options = {
             'initialdir': dir_name,
