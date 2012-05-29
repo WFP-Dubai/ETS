@@ -57,4 +57,4 @@ class ExportWaybillData(FormView):
         return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 
             'end_date': end_date,
-        })
+        }, type="data")
