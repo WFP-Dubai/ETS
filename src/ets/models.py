@@ -3,7 +3,7 @@ import decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -30,6 +30,7 @@ from ets.check import is_imported
 BULK_NAME = "BULK"
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 ACCURACY = 1
+MINIMUM_AGE = 5
 
 # like a normal ForeignKey.
 try:
@@ -71,6 +72,16 @@ class Compas(ld_models.Model):
         
     def __unicode__(self):
         return self.pk
+
+    def sync_last_attempt(self):
+        try:
+            last_attempt = ImportLogger.objects.filter(compas=self).order_by('-when_attempted')[0].when_attempted
+        except (ImportLogger.DoesNotExist, IndexError):
+            last_attempt = datetime(1900, 1, 1)
+        return last_attempt
+
+    def is_sync_active(self):
+        return True if self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) > datetime.now() else False
     
 class Location(models.Model):
     """Location model. City or region"""
