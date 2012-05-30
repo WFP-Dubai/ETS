@@ -13,6 +13,10 @@ from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
 from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_unicode
+from django.utils.text import get_text_list
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
@@ -537,8 +541,12 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        if "AuditLogEntry" in obj.object._meta.object_name:
-            if not obj.object._base_manager.filter(action_date=obj.object.action_date).exists():
+        print obj.object._meta.object_name
+        if "LogEntry" in obj.object._meta.object_name:
+            if not obj.object._base_manager.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
+                                                   action_time=obj.object.action_time,
+                                                   user=obj.object.user,
+                                                   object_id=obj.object.object_id).exists():
                 obj.object.pk = None
                 models.Model.save_base(obj.object, raw=True, force_insert=True)
         else:    
@@ -641,3 +649,41 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
         if flag:
             return get_results(result, flag)
     return get_results(None, False, iterable=True)
+
+
+def create_logentry(request, obj, flag, message=""):
+    ets_models.ETSLogEntry.objects.log_action(
+        user_id = request.user.pk,
+        content_type_id = ContentType.objects.get_for_model(obj).pk,
+        object_id = obj.pk,
+        object_repr = force_unicode(obj),
+        action_flag = flag,
+        change_message = message
+    )
+
+
+def construct_change_message(request, form, formsets):
+    """
+    Construct a change message from a changed object.
+    """
+    change_message = []
+    if form.changed_data:
+        change_message.append(_('Changed %s.') % ", ".join(['"%s": %s' % (field, form.cleaned_data[field]) for field in form.changed_data]))
+
+    if formsets:
+        for formset in formsets:
+            for added_object in formset.new_objects:
+                change_message.append(_('Added %(name)s "%(object)s".')
+                                      % {'name': force_unicode(added_object._meta.verbose_name),
+                                         'object': force_unicode(added_object)})
+            for changed_object, changed_fields in formset.changed_objects:
+                change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
+                                      % {'list': ", ".join(['"%s": %s' % (field, getattr(changed_object, field)) for field in changed_fields]),
+                                         'name': force_unicode(changed_object._meta.verbose_name),
+                                         'object': force_unicode(changed_object)})
+            for deleted_object in formset.deleted_objects:
+                change_message.append(_('Deleted %(name)s "%(object)s".')
+                                      % {'name': force_unicode(deleted_object._meta.verbose_name),
+                                         'object': force_unicode(deleted_object)})
+    change_message = ' '.join(change_message)
+    return change_message or _('No fields changed.')

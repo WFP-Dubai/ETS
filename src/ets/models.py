@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
+from django.contrib.admin import models as log_models
 
 from sorl.thumbnail.fields import ImageField
 from audit_log.models.managers import AuditLog
@@ -1067,3 +1068,18 @@ class CompasLogger(models.Model):
     
     def __unicode__(self):
         return "%s: %s" % (self.get_status_display(), self.message)
+
+
+class ETSLogEntry(log_models.LogEntry):
+
+    ACTION_TYPE = (
+        (log_models.ADDITION, _("Create")),
+        (log_models.CHANGE, _("Change")),
+        (log_models.DELETION, _("Delete")),
+    )
+    
+    class Meta:
+        proxy = True
+
+    def get_action_flag_display(self):
+        return (action[1] for action in self.ACTION_TYPE if action[0] == self.action_flag).next()

@@ -3,10 +3,10 @@ from itertools import chain
 
 from django.core import serializers
 from django.db.models import Q
+from django.contrib.contenttypes.models import ContentType
 
 from ets.compress import compress_json
-from ets.models import LoadingDetail
-
+from ets.models import Waybill, ETSLogEntry
 
 
 def compress_waybills(queryset, start_date, end_date):
@@ -16,8 +16,8 @@ def compress_waybills(queryset, start_date, end_date):
         [
             chain.from_iterable([
                 [ waybill ], waybill.loading_details.all(),
-                waybill.audit_log.filter(action_date__range=(start_date, end_date+timedelta(1))),
-                LoadingDetail.audit_log.filter(waybill=waybill, action_date__range=(start_date, end_date+timedelta(1)))
+                ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(Waybill).pk,
+                                           action_time__range=(start_date, end_date+timedelta(1)))
             ]) \
             for waybill in queryset.filter(Q( date_modified__range=(start_date, end_date+timedelta(1)),
                                               date_removed__isnull=True ),

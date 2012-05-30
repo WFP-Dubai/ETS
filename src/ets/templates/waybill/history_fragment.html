@@ -3,23 +3,19 @@
 <table cellpadding="0" cellspacing="0" border="0" class="display history_log">
   <thead>
     <tr>
-      <th>{% trans "User" %}</th>
+      <th>{% block first_history_head_col %}{% trans "User" %}{% endblock %}</th>
       <th>{% trans "Action" %}</th>
       <th>{% trans "Time" %}</th>
       <th>{% trans "Changes" %}</th>
     </tr>
   </thead>
   <tbody>
-    {% for action_user, action_type, action_date, changes in history_list %}
+    {% for history_object in history_list %}
       <tr>
-          <td>{% if action_user %}{{ action_user }}{% else %}{% trans "System" %}{% endif %}</td>
-          <td>{{ action_type }}</td>
-          <td>{{ action_date|date:"DATETIME_FORMAT"|upper }}</td>
-          <td>
-            {% for key, field in changes %}
-              {{ key }}: &quot;{{ field }}&quot;{% if not forloop.last %},{% endif %}
-            {% endfor %}
-          </td>
+          <td>{% block first_history_col %}{{ history_object.user.username }} ({{ history_object.user.get_full_name }}){% endblock %}</td>
+          <td>{{ history_object.get_action_flag_display }}</td>
+          <td>{{ history_object.action_time|date:"DATETIME_FORMAT"|upper }}</td>
+          <td>{{ history_object.change_message }}</td>
       </tr>
     {% endfor %}
   </tbody>
