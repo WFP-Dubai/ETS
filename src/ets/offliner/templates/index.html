@@ -1,0 +1,10 @@
+{% extends "index_base.html" %}
+
+{% load i18n %}
+
+{% block content %}
+{{ block.super }}
+<ul>
+  <li><a href="{% url export_waybills %}">{% trans "Export Waybills" %}</a></li>
+</ul>
+{% endblock %}

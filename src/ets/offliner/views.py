@@ -38,7 +38,7 @@ def request_update(request):
 
 class ExportWaybillData(FormView):
     
-    template_name = 'offliner/export_waybills.html'
+    template_name = 'export_waybills.html'
     form_class = DateRangeForm
     file_name = 'waybills-%(start_date)s-%(end_date)s'
     
@@ -57,4 +57,4 @@ class ExportWaybillData(FormView):
         return data_to_file_response(data, self.file_name % {
             'start_date': start_date, 
             'end_date': end_date,
-        })
+        }, type="data")
