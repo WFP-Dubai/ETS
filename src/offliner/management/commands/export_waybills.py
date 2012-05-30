@@ -7,9 +7,9 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 from ets.utils import get_date_from_string
-from ets.offliner.utils import compress_waybills
 from ets.decorators import waybill_user_related_filter
 from ets.models import Waybill
+from offliner.utils import compress_waybills
 
 
 class Command(BaseCommand):

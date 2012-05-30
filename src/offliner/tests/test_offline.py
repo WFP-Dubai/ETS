@@ -98,7 +98,7 @@ class ExportTestCase(TestCaseMixin, TestCase):
         self.assertEqual(total, 14)
 
     def test_export_waybills_command(self):
-        """Tests ets.offliner.management.commands.export_waybills.Command"""
+        """Tests offliner.management.commands.export_waybills.Command"""
         
         output = StringIO.StringIO()
 
