@@ -46,6 +46,7 @@ class Command(BaseCommand):
                 
             except TypeError:
                 raise CommandError("Wrong file argument. It must be proper file name instead of %s" % file_name)
+            exit()
 
         root = Tk()
         root.withdraw()
@@ -106,4 +107,6 @@ class Command(BaseCommand):
             
             output.close()
             errors.close()
+
+        raise SystemExit
 

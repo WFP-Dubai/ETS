@@ -12,6 +12,7 @@ from django.forms import MediaDefiningClass
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
 from ajax_select import make_ajax_form
 import logicaldelete.admin
@@ -334,7 +335,7 @@ class PersonAdmin(UserAdmin):
     def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
         obj = self.get_object(request, admin.util.unquote(object_id))
         context = {
-            'history_list':  get_user_actions(obj),
+            'history_list': ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj),
             'opts': self.opts,
             'title': 'Waybill history for user %s' % obj,
             'person': obj,

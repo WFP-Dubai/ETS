@@ -19,7 +19,8 @@ from django.db import transaction
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from django.core import serializers
-from django.views.generic import ListView
+from django.contrib.admin import models as log_models
+from django.contrib.contenttypes.models import ContentType
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -27,7 +28,7 @@ from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list, send_dispatched, send_received 
+from ets.utils import history_list, send_dispatched, send_received, create_logentry, construct_change_message
 from ets.utils import import_file, get_compas_data, data_to_file_response
 from ets.pdf import render_to_pdf
 import simplejson
@@ -39,23 +40,12 @@ WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
-    loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
-    waybill_log = waybill.audit_log.all()
-
-    #Recepient should not see dispatcher's history
-    if not request.user.is_superuser and not waybill.order.warehouse.persons.filter(pk=request.user.pk).count():
-        persons = waybill.order.warehouse.get_persons()
-        waybill_log = waybill_log.exclude(action_user__in=persons)
-        loading_log = loading_log.exclude(action_user__in=persons)
-        
-    loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), ets.models.LoadingDetail))
-                        for loading in waybill.loading_details.all())
+    waybill_log = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, object_id=waybill.pk)
 
     context = {
         'object': waybill,
         'items': waybill.loading_details.select_related(),
-        'waybill_history': history_list(waybill_log, ets.models.Waybill, ('date_modified',)),
-        'loading_detail_history': loading_details,
+        'waybill_history': waybill_log,
     }
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
@@ -90,6 +80,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.dispatch_sign()
+    create_logentry(request, waybill, log_models.CHANGE, "Signed dispatch waybill")
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -106,6 +97,7 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
     """ Signs reception"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_sign()
+    create_logentry(request, waybill, log_models.CHANGE, "Signed receive waybill")
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -150,7 +142,7 @@ def waybill_search( request, queryset, form_class=WaybillSearchForm, template='w
 
 
 @transaction.commit_on_success
-def _dispatching(request, waybill, template, success_message, form_class=DispatchWaybillForm, 
+def _dispatching(request, waybill, template, success_message, created=False, form_class=DispatchWaybillForm, 
                 formset_form=LoadingDetailDispatchForm, formset_class=BaseLoadingDetailFormSet):
     """Private function with common functionality for creating and editing dispatching waybill"""
     order = waybill.order
@@ -193,6 +185,11 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
         waybill = form.save()
         loading_formset.save()
         
+        if created:
+            create_logentry(request, waybill, log_models.ADDITION, "Created dispatch waybill")
+        else:
+            create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited dispatch waybill", construct_change_message(request, form, [loading_formset])]))
+        
         messages.success(request, success_message)
         return redirect(waybill)
         
@@ -213,7 +210,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     order = get_object_or_404(queryset, pk=order_pk)
     waybill = ets.models.Waybill(order=order, dispatcher_person=request.user.person)
 
-    return _dispatching(request, waybill, success_message=_("eWaybill has been created"), **kwargs)
+    return _dispatching(request, waybill, success_message=_("eWaybill has been created"), created=True,  **kwargs)
 
 
 @person_required
@@ -223,6 +220,7 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
     """Updates not signed dispatching waybill"""
     
     waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
+
     return _dispatching(request, waybill, success_message=_("eWaybill has been updated"), **kwargs) 
 
 
@@ -252,6 +250,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
+        create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited receive waybill", construct_change_message(request, form, [loading_formset])]))
         
         messages.add_message(request, messages.INFO, _('eWaybill has been discharged'))
         
@@ -281,6 +280,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     """Deletes specific waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    create_logentry(request, waybill, log_models.DELETION)
     waybill.delete()
     redirect_to = redirect_to or request.GET.get('redirect_to', '')
         

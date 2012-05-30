@@ -107,7 +107,7 @@ class ExportTestCase(TestCaseMixin, TestCase):
         
         total = import_file(output)
         
-        self.assertEqual(total, 4)
+        self.assertEqual(total, 2)
 
     def test_export_waybills_dispach_sign(self):
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
@@ -122,7 +122,7 @@ class ExportTestCase(TestCaseMixin, TestCase):
         
         total = import_file(output)
         
-        self.assertEqual(total, 9)
+        self.assertEqual(total, 4)
 
     def test_export_waybills_receipt_sign(self):
         waybill = ets.models.Waybill.objects.get(pk="ISBX00311A")
@@ -136,4 +136,4 @@ class ExportTestCase(TestCaseMixin, TestCase):
         
         total = import_file(output)
         
-        self.assertEqual(total, 5)
+        self.assertEqual(total, 2)
