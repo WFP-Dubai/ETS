@@ -651,7 +651,6 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
-    print request.user
     ets_models.ETSLogEntry.objects.log_action(
         user_id = request.user.pk,
         content_type_id = ContentType.objects.get_for_model(obj).pk,
