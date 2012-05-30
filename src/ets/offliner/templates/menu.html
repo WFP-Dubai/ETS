@@ -1,0 +1,2 @@
+{% url index as index_url %}
+{% if request.path != index_url %}<a href="{{ index_url }}">{% trans "home" %}</a>{% endif %}
