@@ -3,7 +3,7 @@ import decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
+from django.contrib.admin import models as log_models
 
 from sorl.thumbnail.fields import ImageField
 from audit_log.models.managers import AuditLog
@@ -24,11 +25,13 @@ import logicaldelete.models as ld_models
 
 from ets.compress import compress_json, decompress_json
 from ets.country import COUNTRY_CHOICES
+from ets.check import is_imported
 
 #name = "1234"
 BULK_NAME = "BULK"
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 ACCURACY = 1
+MINIMUM_AGE = 5
 
 # like a normal ForeignKey.
 try:
@@ -70,6 +73,16 @@ class Compas(ld_models.Model):
         
     def __unicode__(self):
         return self.pk
+
+    def sync_last_attempt(self):
+        try:
+            last_attempt = ImportLogger.objects.filter(compas=self).order_by('-when_attempted')[0].when_attempted
+        except (ImportLogger.DoesNotExist, IndexError):
+            last_attempt = datetime(1900, 1, 1)
+        return last_attempt
+
+    def is_sync_active(self):
+        return True if self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) > datetime.now() else False
     
 class Location(models.Model):
     """Location model. City or region"""
@@ -524,6 +537,10 @@ def waybill_slug_populate(waybill):
     return "%s%s%s%06d" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
                            LETTER_CODE, count+1)
 
+class ImportAuditLog(AuditLog):
+
+    def post_save(self, instance, created, **kwargs):
+        self.create_log_entry(instance, is_imported(instance) and 'M' or created and 'I' or 'U')
 
 class Waybill( ld_models.Model ):
     """
@@ -628,7 +645,7 @@ class Waybill( ld_models.Model ):
                        blank=True, null=True,
                        max_length=255,)
     
-    audit_log = AuditLog(exclude=())
+    audit_log = ImportAuditLog(exclude=())
 
     objects = ld_models.managers.LogicalDeletedManager()
     
@@ -878,7 +895,7 @@ class LoadingDetail(models.Model):
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
 
-    audit_log = AuditLog(exclude=('date_modified',))
+    audit_log = ImportAuditLog(exclude=('date_modified',))
 
     class Meta:
         ordering = ('slug',)
@@ -1058,21 +1075,16 @@ class CompasLogger(models.Model):
         return "%s: %s" % (self.get_status_display(), self.message)
 
 
-class LastAttempt(models.Model):
-    
-    SUCCESS = 0
-    FAILURE = 1
-    
-    STATUSES = (
-        (SUCCESS, _("Success")),
-        (FAILURE, _("Failure"))
+class ETSLogEntry(log_models.LogEntry):
+
+    ACTION_TYPE = (
+        (log_models.ADDITION, _("Create")),
+        (log_models.CHANGE, _("Change")),
+        (log_models.DELETION, _("Delete")),
     )
     
-    compas = models.OneToOneField(Compas, verbose_name=_("COMPAS station"), related_name="last_attempt")
-    attempt_date = models.DateTimeField(_("Date/time"), default=datetime.now)
-    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
-    
     class Meta:
-        ordering = ('-attempt_date',)
-        verbose_name = _("Last import Attempt")
-        verbose_name_plural = _("import attempts")
+        proxy = True
+
+    def get_action_flag_display(self):
+        return (action[1] for action in self.ACTION_TYPE if action[0] == self.action_flag).next()

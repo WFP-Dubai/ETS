@@ -10,7 +10,7 @@ from django.db.models.aggregates import Max
 from native_tags.decorators import function, block
 
 #from ets import settings
-from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, LastAttempt, Order
+from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, Order
 from ets.utils import changed_fields
 
 register = template.Library()
@@ -143,7 +143,6 @@ def get_last_update(user):
     failed = False
     for c in Compas.objects.all():
         try:
-            #last_attempt = = LastAttempt.objects.get(compas=c)
             last_attempt = c.import_logs.order_by('-when_attempted')[0]
             if last_attempt.status == ImportLogger.FAILURE:
                 failed = True
@@ -154,3 +153,16 @@ def get_last_update(user):
         'last_updated': StockItem.get_last_update(),
         'failed': failed,
     }
+
+@register.simple_tag
+def named_object(slug, object_name, title=""):
+    if object_name == "Waybill":
+        waybill = Waybill.objects.get(slug=slug)
+        title = "Waybill: %s" % slug
+    elif object_name == "LoadingDetail":
+        item = LoadingDetail.audit_log.filter(slug=slug)[0]
+        waybill = item.waybill
+        title = "Waybill: %s, Commodity: %s" % (waybill, item.stock_item)
+    else:
+        return
+    return "<th><a href='%s'>%s</a></th>" % (reverse("admin:ets_waybill_change", args=[waybill.pk]), title)

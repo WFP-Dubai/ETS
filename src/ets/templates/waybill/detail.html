@@ -53,13 +53,6 @@
 <div id="sidebar" class="hidden_print">
   <h3>{% trans "Waybill history" %}</h3>
   {% include "waybill/history_fragment.html" with history_list=waybill_history %}
-  
-  <h3>{% trans "Loading details history" %}</h3>
-  
-  {% for loading, history in loading_detail_history %}
-  <h4>{{ loading.stock_item.coi_code }} - {{ loading.stock_item.commodity }}</h4>
-  {% include "waybill/history_fragment.html" with history_list=history %}
-  {% endfor %}
 </div>
 {% endblock %}
 

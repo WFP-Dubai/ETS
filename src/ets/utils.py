@@ -2,68 +2,39 @@ from datetime import datetime, timedelta, date
 from itertools import chain, izip
 import decimal
 from functools import wraps
-import cStringIO as StringIO
-import ho.pisa as pisa
-from cgi import escape
-import os.path
+from operator import itemgetter
 
-from django.template.loader import get_template, render_to_string
-from django.template import Context
 from django.conf import settings
 from django.http import HttpResponse
-from django.db import connections, transaction, models
+from django.db import transaction, models
 from django.db.models import Q
-from django.db.utils import DatabaseError
-from django.contrib.auth.models import User, UNUSABLE_PASSWORD
 from django.core.exceptions import ValidationError
 from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
-from django.template import RequestContext
+from django.contrib.auth.models import User
+from django.contrib.admin.models import LogEntry
+from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_unicode
+from django.utils.text import get_text_list
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json
+from ets.check import is_imported
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
+ACTIONS = {
+    'I': _('Created'),
+    'U': _('Changed'),
+    'D': _('Deleted'),
+    'M': _('Imported'),
+}
 
-def render_to_pdf(request, template_name, context, file_name):
-    """Renders template with context to HTML, than to PDF"""
-
-    context_dict = {"STATIC_URL": settings.STATIC_URL}
-    context_dict.update(context)
-
-    html = render_to_string(template_name, context_dict, RequestContext(request))
-    result = StringIO.StringIO()
-    pdf = pisa.pisaDocument(StringIO.StringIO(html.encode('utf-8')), 
-                            result, debug=True, encoding='utf-8', show_error_as_pdf=True,
-                            link_callback=fetch_resources, xhtml=False)
-    if not pdf.err:
-        response = HttpResponse(result.getvalue(), content_type='application/pdf')
-        response['Content-Disposition'] = 'attachment; filename=%s.pdf' % file_name
-        return response
-    return HttpResponse('We had some errors<pre>%s</pre>' % escape(html))
-
-def fetch_resources(uri, rel):
-    """
-    Callback to allow pisa/reportlab to retrieve Images,Stylesheets, etc.
-    `uri` is the href attribute from the html link element.
-    `rel` gives a relative path, but it's not used here.
-
-    """
-    if uri.startswith(settings.STATIC_URL):
-        path = os.path.abspath(os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, "")))
-    elif uri.startswith(settings.MEDIA_URL):
-        path = os.path.abspath(os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, "")))
-    else:
-        path = uri
-    return path
-
-
-def compas_importer(func=None, log_success=False):
+def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
     def _decorator(f):
         @wraps(f, assigned=available_attrs(func))
@@ -72,56 +43,28 @@ def compas_importer(func=None, log_success=False):
                 with transaction.commit_on_success(using) as tr:
                     f(using)
             except Exception, err:
-                ets_models.ImportLogger.objects.create(compas_id=using, 
-                                                       status=ets_models.ImportLogger.FAILURE, 
-                                                       message="%s: %s" % (f.__name__, unicode(err)))
+                import_logger.status=ets_models.ImportLogger.FAILURE
+                import_logger.message="%s: %s" % (f.__name__, unicode(err))
+                import_logger.save()
                 raise
 
         return _wrapped
-
+    
     if func:
         return _decorator(func)
-
+    
     return _decorator
 
 
-
-def update_compas(using):
+def update_compas(using, *args):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
+    import_logger = ets_models.ImportLogger.objects.create(compas_id=using)
     try:
-
-        #Update persons
-        import_persons(using)
-
-        #Update stocks
-        import_stock(using)
-
-        #Update orders
-        import_order(using)
-
+        for func in args:
+            compas_importer(import_logger, func)(using)
     except Exception:
         #Since we already created log for this error simply pass here
         pass
-    else:
-        #If all process did not fail create success log
-        ets_models.ImportLogger.objects.create(compas_id=using)
-
-def update_compas_info(using):
-    """ Utility to run special import process. If no fails Success ImportLogger is created."""
-    try:
-        #Import organizations
-        import_partners(using)
-        #Update places & warehouses
-        import_places(using)
-        #Update loss, damage reasons
-        import_reasons(using)
-
-    except Exception:
-        #Since we already created log for this error simply pass here
-        pass
-    else:
-        #If all process did not fail create success log
-        ets_models.ImportLogger.objects.create(compas_id=using)
 
 
 def _get_places(compas):
@@ -130,13 +73,11 @@ def _get_places(compas):
 
     return compas_models.Place.objects.using(compas).filter(reporting_code=compas, org_code__in=warehouses)
 
-@compas_importer
 def import_partners(compas):
     """Imports organizations from COMPAS"""
     for partner in compas_models.Partner.objects.using(compas).all():
         ets_models.Organization.objects.get_or_create(code=partner.id, defaults={'name': partner.name})
 
-@compas_importer
 def import_places(compas):
     """Imports warehouses with locations from COMPAS"""
     for place in compas_models.Place.objects.using(compas):
@@ -189,7 +130,6 @@ def import_places(compas):
             wh.save()
 
 
-@compas_importer
 def import_persons(compas):
     """Imports persons from COMPAS"""
 
@@ -216,7 +156,7 @@ def import_persons(compas):
             p.set_password(person.person_pk)
 
             p.save()
-
+            
         p.updated = now
         p.save()
 
@@ -224,13 +164,11 @@ def import_persons(compas):
     ets_models.Person.objects.filter(compas__pk=compas).exclude(updated=now).update(is_active=False)
 
 
-@compas_importer
 def import_reasons(compas):
     """Imports all possible loss/damage reasons"""
     return ets_models.LossDamageType.update(compas)
 
 
-@compas_importer
 def import_stock(compas):
     """Imports stock items or updates quantity"""
 
@@ -311,24 +249,20 @@ def _get_destination_location(compas, code, name):
                     })[0]
 
 
-@compas_importer
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
     now = datetime.now()
     today = date.today()
-
     places = _get_places(compas)
-
+    
     for lti_code in tuple(compas_models.LtiOriginal.objects.using(compas).distinct()\
                         .filter(models.Q(expiry_date__gte=today) | models.Q(expiry_date__isnull=True),
                                 lti_date__gte=date(year=2012, month=1, day=1),
                                 origin_wh_code__in=places.values_list('org_code', flat=True),
                                 )\
                         .values_list('code', flat=True)):
-
         order_items = []
         for lti in compas_models.LtiOriginal.objects.using(compas).filter(code=lti_code):
-
             #Create Order
             defaults = {
                 'created': lti.lti_date,
@@ -347,6 +281,7 @@ def import_order(compas):
             }
 
             order, created = ets_models.Order.objects.get_or_create(code=lti.code, defaults=defaults)
+
             #Update order. IT's not supposed to happen. In this case system might break.
             if not created:
                 ets_models.Order.objects.filter(code=lti.code).update(**defaults)
@@ -586,20 +521,15 @@ def changed_fields(model, next, previous, exclude=()):
 
 def history_list(log_queryset, model, exclude=()):
     """Utility to generate history of actions at some objects"""
-    ACTIONS = {
-        'I': _('Created'),
-        'U': _('Changed'),
-        'D': _('Deleted'),
-    }
 
     for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
         yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
 
 
-def data_to_file_response(data, file_name):
+def data_to_file_response(data, file_name, type):
     """Creates response with provided data and inserts Content-Disposition header with file name."""
-    response = HttpResponse(data, content_type='application/data')
-    response['Content-Disposition'] = 'attachment; filename=%s.data' % file_name
+    response = HttpResponse(data, content_type='application/%s' % type)
+    response['Content-Disposition'] = 'attachment; filename=%s.%s' % (file_name, type)
     return response
 
 
@@ -611,13 +541,22 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        obj.save()
+        print obj.object._meta.object_name
+        if "LogEntry" in obj.object._meta.object_name:
+            if not obj.object._base_manager.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
+                                                   action_time=obj.object.action_time,
+                                                   user=obj.object.user,
+                                                   object_id=obj.object.object_id).exists():
+                obj.object.pk = None
+                models.Model.save_base(obj.object, raw=True, force_insert=True)
+        else:    
+            obj.save()
         total += 1
 
     return total
 
 
-def get_compas_data(compas=None):
+def get_compas_data(compas=None, warehouse=None):
     """Fetches all COMPAS-imported data, serializes and compresses them"""
 
     #COMPAS stations themself
@@ -625,10 +564,18 @@ def get_compas_data(compas=None):
     if compas is not None:
         compas_stations = ets_models.Compas.objects.filter(pk=compas)
 
+    if warehouse:
+        compas_stations = compas_stations.filter(pk=warehouse.compas.pk)
 
     warehouses = ets_models.Warehouse.objects.filter(Q(end_date__gt=date.today) | Q(end_date__isnull=True), 
                                         start_date__lte=date.today, 
                                         compas__in=compas_stations)
+
+    if warehouse:
+        warehouses = warehouses.filter(pk=warehouse.pk)
+
+    persons = ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True))
+
     return chain(
         ets_models.Organization.objects.all(),
         ets_models.Location.objects.all(),
@@ -639,13 +586,104 @@ def get_compas_data(compas=None):
 
         compas_stations,
         warehouses,
-        ets_models.Person.objects.filter(warehouses__pk=warehouses.values_list('pk', flat=True)),
+        persons,
+        User.objects.filter(pk__in=persons.values_list('pk', flat=True)),
         ets_models.StockItem.objects.filter(warehouse__in=warehouses),
-        ets_models.Order.objects.filter(expiry__lte=date.today, warehouse__in=warehouses),
-        ets_models.OrderItem.objects.filter(order__expiry__lte=date.today, order__warehouse__in=warehouses),
+        ets_models.Order.objects.filter(expiry__gte=date.today, warehouse__in=warehouses),
+        ets_models.OrderItem.objects.filter(order__expiry__gte=date.today, order__warehouse__in=warehouses),
     )
 
-def compress_compas_data(compas=None):
+def compress_compas_data(compas=None, warehouse=None):
 
-    data = get_compas_data(compas)
+    data = get_compas_data(compas, warehouse)
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
+
+
+def item_history_list(log_queryset, model, exclude=()):
+    """Utility to generate history of actions at some objects"""
+
+    for item in log_queryset:
+        previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
+        prev = previous[0] if previous.exists() else None
+        yield item.slug, model._meta.object_name, ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
+
+
+def get_user_actions(user):
+    waybill_log = ets_models.Waybill.audit_log.filter(action_user=user)
+    loading_detail_log = ets_models.LoadingDetail.audit_log.filter(action_user=user)
+    history = sorted(chain(item_history_list(waybill_log, ets_models.Waybill, ('date_modified',)),
+                           item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',))),
+                     key=itemgetter(3), reverse=True)
+    return history
+
+def get_date_from_string(some_date, date_templates=None, default=None, message="Failed: date must be in one of such formats"):
+    DATE_FORMATS = (
+        "%Y-%m-%d",
+    )
+    
+    def extract_date_by_template(some_date, date_template):
+        try:
+            return datetime.strptime(some_date, date_template), True 
+        except:
+            return None, False
+
+    def get_results(result, flag, iterable=False):
+        if flag:
+            pass
+        elif default:
+            result = default
+        else:
+            templates = "; ".join([item.replace('%', "") for item in date_templates]) if iterable else date_templates.replace('%', "")
+            result = " ".join([message, templates])
+        return result, flag
+    
+    if date_templates is None:
+        date_templates = DATE_FORMATS
+    elif isinstance(some_date, str):
+        return get_results(extract_date_by_template(some_date, date_templates))
+    elif getattr(date_templates, '__iter__', False):
+        return "date_templates must be a string or list of strings", False
+
+    for template in date_templates:
+        result, flag = extract_date_by_template(some_date, template)
+        if flag:
+            return get_results(result, flag)
+    return get_results(None, False, iterable=True)
+
+
+def create_logentry(request, obj, flag, message=""):
+    ets_models.ETSLogEntry.objects.log_action(
+        user_id = request.user.pk,
+        content_type_id = ContentType.objects.get_for_model(obj).pk,
+        object_id = obj.pk,
+        object_repr = force_unicode(obj),
+        action_flag = flag,
+        change_message = message
+    )
+
+
+def construct_change_message(request, form, formsets):
+    """
+    Construct a change message from a changed object.
+    """
+    change_message = []
+    if form.changed_data:
+        change_message.append(_('Changed %s.') % ", ".join(['"%s": %s' % (field, form.cleaned_data[field]) for field in form.changed_data]))
+
+    if formsets:
+        for formset in formsets:
+            for added_object in formset.new_objects:
+                change_message.append(_('Added %(name)s "%(object)s".')
+                                      % {'name': force_unicode(added_object._meta.verbose_name),
+                                         'object': force_unicode(added_object)})
+            for changed_object, changed_fields in formset.changed_objects:
+                change_message.append(_('Changed %(list)s for %(name)s "%(object)s".')
+                                      % {'list': ", ".join(['"%s": %s' % (field, getattr(changed_object, field)) for field in changed_fields]),
+                                         'name': force_unicode(changed_object._meta.verbose_name),
+                                         'object': force_unicode(changed_object)})
+            for deleted_object in formset.deleted_objects:
+                change_message.append(_('Deleted %(name)s "%(object)s".')
+                                      % {'name': force_unicode(deleted_object._meta.verbose_name),
+                                         'object': force_unicode(deleted_object)})
+    change_message = ' '.join(change_message)
+    return change_message or _('No fields changed.')

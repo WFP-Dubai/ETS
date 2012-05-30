@@ -1,0 +1,15 @@
+{% extends "base_template.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Download files for installation" %}{% endblock %}
+
+{% block content %}
+  <h3><a href="http://github.com/downloads/Arpaso/ETS/ETS-0.0.2.exe">{% trans "Download ETS installer" %}</a></h3>
+  <h2>{% trans "Initial data for available warehouses" %}</h2>
+  <dl class="warehouse-list">
+    {% for wh in object_list %}
+      {% ifchanged wh.compas %}<dt>{{ wh.compas }}</dt>{% endifchanged %}
+      <dd><a href='{% url export_warehouse_file "data" wh.pk %}'>{{ wh }}</a></dd>
+    {% endfor %}
+  </dl>
+{% endblock %}
