@@ -18,4 +18,4 @@ class DateRangeForm(forms.Form):
         Fieldset(_('Select date range'), Row('start_date', 'end_date')),
     ))
     
-    helper.add_input(Submit(_("Download"), 'download'))
+    helper.add_input(Submit(_("Export"), 'Export'))

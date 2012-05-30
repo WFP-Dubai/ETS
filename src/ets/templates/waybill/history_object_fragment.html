@@ -1,0 +1,6 @@
+{% extends "waybill/history_fragment.html" %}
+{% load i18n %}
+
+{% block first_history_head_col %}{% trans "Waybill" %}{% endblock %}
+
+{% block first_history_col %}{{ history_object.object_repr }}{% endblock %}

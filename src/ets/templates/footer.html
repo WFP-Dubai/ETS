@@ -1,0 +1,3 @@
+{% load i18n extra_tags %}
+{% get_last_update request.user %}
+{% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}

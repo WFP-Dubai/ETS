@@ -34,7 +34,7 @@ class Command(BaseCommand):
         data = get_compas_data(compas)
         
         data = serializers.serialize('json', data, use_decimal=False)
-        
+
         if compress:
             data = compress_json(data)
         

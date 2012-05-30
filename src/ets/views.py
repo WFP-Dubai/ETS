@@ -1,7 +1,4 @@
 import datetime
-import pyqrcode
-import cStringIO
-import logging
 from subprocess import Popen
 
 from django import forms
@@ -20,8 +17,10 @@ from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
 from django.utils.translation import ugettext as _
-from django.core.urlresolvers import reverse
 from django.views.generic.edit import FormView
+from django.core import serializers
+from django.contrib.admin import models as log_models
+from django.contrib.contenttypes.models import ContentType
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -29,9 +28,11 @@ from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list, send_dispatched, send_received 
-from ets.utils import render_to_pdf, import_file, get_compas_data, data_to_file_response
+from ets.utils import history_list, send_dispatched, send_received, create_logentry, construct_change_message
+from ets.utils import import_file, get_compas_data, data_to_file_response
+from ets.pdf import render_to_pdf
 import simplejson
+from ets.compress import compress_json
 
 
 WFP_ORGANIZATION = 'WFP'
@@ -39,23 +40,12 @@ WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
-    loading_log = ets.models.LoadingDetail.audit_log.filter(waybill=waybill)
-    waybill_log = waybill.audit_log.all()
+    waybill_log = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, object_id=waybill.pk)
 
-    #Recepient should not see dispatcher's history
-    if not request.user.is_superuser and not waybill.order.warehouse.persons.filter(pk=request.user.pk).count():
-        persons = waybill.order.warehouse.get_persons()
-        waybill_log = waybill_log.exclude(action_user__in=persons)
-        loading_log = loading_log.exclude(action_user__in=persons)
-        
-    loading_details = ((loading, history_list(loading_log.filter(stock_item=loading.stock_item), ets.models.LoadingDetail))
-                        for loading in waybill.loading_details.all())
-    
     context = {
         'object': waybill,
         'items': waybill.loading_details.select_related(),
-        'waybill_history': history_list(waybill_log, ets.models.Waybill, ('date_modified',)),
-        'loading_detail_history': loading_details,
+        'waybill_history': waybill_log,
     }
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
@@ -90,6 +80,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     """
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.dispatch_sign()
+    create_logentry(request, waybill, log_models.CHANGE, "Signed dispatch waybill")
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -106,6 +97,7 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
     """ Signs reception"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_sign()
+    create_logentry(request, waybill, log_models.CHANGE, "Signed receive waybill")
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -138,28 +130,8 @@ def waybill_list(request, queryset, template='waybill/list2.html', extra_context
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
-def dispatched_in_compas(request):
-    """
 
-    """
-    WBs = ets.models.Waybill.objects.select_related().filter(sent_compas__isnull=False)
-    person = request.user.person
-    #get return queryset.filter(Q(order__warehouse__persons__pk=user.pk)
-    #| Q(order__warehouse__compas__officers=user)
-    #| Q(destination__persons__pk=user.pk)
-    #| Q(destination__compas__officers=user)).distinct()
-    listWH = request.user.warehouses.all()
-
-
-
-    items =[]
-    for wb in WBs:
-        pass
-
-
-def waybill_search( request, form_class=WaybillSearchForm, 
-                    queryset=ets.models.Waybill.objects.all(), 
-                    template='waybill/list2.html'):
+def waybill_search( request, queryset, form_class=WaybillSearchForm, template='waybill/list2.html'):
     """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)
@@ -170,15 +142,17 @@ def waybill_search( request, form_class=WaybillSearchForm,
 
 
 @transaction.commit_on_success
-def _dispatching(request, waybill, template, success_message, form_class=DispatchWaybillForm, 
+def _dispatching(request, waybill, template, success_message, created=False, form_class=DispatchWaybillForm, 
                 formset_form=LoadingDetailDispatchForm, formset_class=BaseLoadingDetailFormSet):
     """Private function with common functionality for creating and editing dispatching waybill"""
     order = waybill.order
     
     class FormsetForm(formset_form):
-        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), empty_label=_("Choose stock item"))
+        stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), 
+                                            empty_label=_("Choose stock item"))
         stock_item.choices = [(u"", stock_item.empty_label),]
-        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) ))  for item in order.get_stock_items().exclude(quantity_net=0)]
+        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) ))  
+                             for item in order.get_stock_items().exclude(quantity_net=0)]
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
                        form=FormsetForm, formset=formset_class, 
@@ -197,16 +171,24 @@ def _dispatching(request, waybill, template, success_message, form_class=Dispatc
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
     if order.consignee.pk == WFP_DISTRUIBUTION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DISTIBRUTION)
+        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                                   if k ==ets.models.Waybill.DISTIBRUTION)
     if not order.consignee.pk == WFP_DISTRUIBUTION:
-    	if not order.consignee.pk == WFP_ORGANIZATION:
-    		form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices if k ==ets.models.Waybill.DELIVERY)
+        if not order.consignee.pk == WFP_ORGANIZATION:
+            form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
+                                                       if k ==ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
+        
+        if created:
+            create_logentry(request, waybill, log_models.ADDITION, "Created dispatch waybill")
+        else:
+            create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited dispatch waybill", construct_change_message(request, form, [loading_formset])]))
         
         messages.success(request, success_message)
         return redirect(waybill)
@@ -228,7 +210,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     order = get_object_or_404(queryset, pk=order_pk)
     waybill = ets.models.Waybill(order=order, dispatcher_person=request.user.person)
 
-    return _dispatching(request, waybill, success_message=_("eWaybill has been created"), **kwargs)
+    return _dispatching(request, waybill, success_message=_("eWaybill has been created"), created=True,  **kwargs)
 
 
 @person_required
@@ -238,6 +220,7 @@ def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
     """Updates not signed dispatching waybill"""
     
     waybill = get_object_or_404(queryset, pk=waybill_pk, order__pk=order_pk)
+
     return _dispatching(request, waybill, success_message=_("eWaybill has been updated"), **kwargs) 
 
 
@@ -267,6 +250,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
+        create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited receive waybill", construct_change_message(request, form, [loading_formset])]))
         
         messages.add_message(request, messages.INFO, _('eWaybill has been discharged'))
         
@@ -283,6 +267,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 def waybill_reception_scanned(request, scanned_code, queryset):
     """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
     waybill = ets.models.Waybill.decompress(scanned_code)
+
     if not waybill:
         raise Http404
     return waybill_reception(request, waybill.pk, queryset)
@@ -295,6 +280,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     """Deletes specific waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
+    create_logentry(request, waybill, log_models.DELETION)
     waybill.delete()
     redirect_to = redirect_to or request.GET.get('redirect_to', '')
         
@@ -402,10 +388,8 @@ barcode_qr.authentication = False
 
 def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
-    
     if not request.user.has_perm("ets.stockitem_api_full_access"):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
 
@@ -492,9 +476,24 @@ def send_received_view(request, queryset):
     return redirect('receipt_validates')
 
 
-def export_compas_file(request):
-    """Returns a file with all COMPAS data in response""" 
-    return data_to_file_response(get_compas_data(), file_name='ets_data-%s' % datetime.date.today())
+def export_compas_file(request, compas=None, warehouse=None, data_type="json"):
+    """Returns a file with all COMPAS data in response"""
+    template = 'ets_data-%s' % ("compress" if data_type=="data" else data_type,)
+    if compas:
+        compas = get_object_or_404(ets.models.Compas, pk=compas)
+        template = "-".join([template, compas.pk])
+    if warehouse:
+        warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse)
+        template = "-".join([template, warehouse.pk])
+
+    data = serializers.serialize('json', get_compas_data(compas=compas, warehouse=warehouse), use_decimal=False)
+    template = "-".join([template, "%s"])
+
+    if data_type == "data":
+        data = compress_json(data)
+        
+    return data_to_file_response(data, file_name=template % datetime.date.today(), type=data_type)
+
     
 
 class ImportData(FormView):
@@ -511,3 +510,15 @@ class ImportData(FormView):
                              _('File has been imported successfully. Totally saved objects --> %s' % total))
         
         return self.get(self.request)
+
+@officer_required
+def installation_data(request, template_name="stock/warehouse_list.html",
+                      queryset=ets.models.Warehouse.objects.all().order_by("compas__code", "code")):
+    
+    user = request.user
+    compas_stations = user.compases.all().values_list('code')
+    if not user.is_superuser:
+        queryset.filter(compas__in=compas_stations)
+    queryset.order_by("compas", "name")
+    
+    return object_list(request, queryset, template_name=template_name)

@@ -1,6 +1,6 @@
 !define PRODUCT_NAME "ETS"
 !define PRODUCT_DESCRIPTION "Electronic Tracking System"
-!define PRODUCT_VERSION "0.0.1"
+!define PRODUCT_VERSION "0.0.2"
 !define pkgdir "/home/werty/django_apps/ETS/windows/"
 Var SYSTEMDRIVE
 
@@ -149,10 +149,19 @@ Section "Main" MainProgram
   SetOutPath "$INSTDIR\ETS"
   File /r "${pkgdir}\ETS\*"
   FileOpen $8 $INSTDIR\ETS\runserver.bat w 
-  FileWrite $8 "explorer http://127.0.0.1:8000/ets$\r$\n"
+  FileWrite $8 "explorer http://127.0.0.1:8000/$\r$\n"
   FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
-  nsExec::Exec "$\"$INSTDIR\Python27\python.exe$\" $\"$INSTDIR\ETS\bin\instance-script.py$\" loaddata $\"$EXEDIR\initial.json$\""
-  CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat" 
+  FileOpen $9 $INSTDIR\ETS\import.bat w 
+  FileWrite $9 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" import_file -d $\"$DESKTOP\$\r$\n"
+  FileClose $9
+  FileOpen $7 $INSTDIR\ETS\import_first.bat w 
+  FileWrite $7 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" import_file -d $\"$EXEDIR\$\r$\n"
+  FileClose $7
+  CreateShortCut "$DESKTOP\ETS.lnk" "$INSTDIR\ETS\runserver.bat"
+  ExecWait "$INSTDIR\ETS\import_first.bat"
+  CreateShortCut "$DESKTOP\import ETS data.lnk" "$INSTDIR\ETS\import.bat"  
+  Delete "$INSTDIR\ETS\import_first.bat"
+;  nsExec::Exec "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure"
 SectionEnd
