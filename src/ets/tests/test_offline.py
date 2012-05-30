@@ -6,6 +6,7 @@ from django.test import TestCase
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.contrib.auth.models import User
 import StringIO
 
 import ets.models
@@ -29,7 +30,7 @@ class OfflineSyncTestCase(TestCase):
         """Tests ets.management.commands.import_file.Command"""
         
         #Try without file argument
-        self.assertRaises(SystemExit, lambda: call_command('import_file'))
+        #self.assertRaises(SystemExit, lambda: call_command('import_file'))
         
         #Ensure we don't have objects in database. for example warehouses
         self.assertEqual(ets.models.Warehouse.objects.count(), 0)
@@ -69,29 +70,36 @@ class ExportTestCase(TestCaseMixin, TestCase):
 
     def test_export_waybills_dispach_sign(self):
         waybill = ets.models.Waybill.objects.get(pk="ISBX00211A")
-        waybill.transport_dispach_signed_date = datetime.datetime.now()
-        waybill.save()
+
+        self.client.login(username='dispatcher', password='dispatcher')
+        response = self.client.post(reverse('waybill_finalize_dispatch', kwargs={'waybill_pk': waybill.pk,}))
+        self.assertEqual(response.status_code, 200)
 
         output = StringIO.StringIO()
         
-        #Try with not existed COMPAS station argument
         call_command('export_waybills', user="dispatcher", passwd="dispatcher", stdout=output)
         output.seek(0)
         
         total = import_file(output)
         
-        self.assertEqual(total, 4)
+        self.assertEqual(total, 5)
 
     def test_export_waybills_receipt_sign(self):
-        waybill = ets.models.Waybill.objects.get(pk="ISBX00311A")
-        waybill.receipt_signed_date = datetime.datetime.now()
-        waybill.save()
+        waybill = ets.models.Waybill.objects.get(pk="ISBX00312A")
+
+        dispatcher = User.objects.get(username="dispatcher")
+        dispatcher.person.receive = True
+        dispatcher.person.save()
+        
+        self.client.login(username='dispatcher', password='dispatcher')
+        response = self.client.post(reverse('waybill_finalize_receipt', kwargs={'waybill_pk': waybill.pk,}))
+        self.assertEqual(response.status_code, 200)
 
         output = StringIO.StringIO()
 
-        call_command('export_waybills', user="recepient", passwd="recepient", stdout=output)
+        call_command('export_waybills', user="dispatcher", passwd="dispatcher", stdout=output)
         output.seek(0)
         
         total = import_file(output)
         
-        self.assertEqual(total, 2)
+        self.assertEqual(total, 9)

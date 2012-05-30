@@ -108,5 +108,3 @@ class Command(BaseCommand):
             output.close()
             errors.close()
 
-        raise SystemExit
-

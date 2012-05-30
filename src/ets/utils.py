@@ -541,9 +541,8 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        print obj.object._meta.object_name
-        if "LogEntry" in obj.object._meta.object_name:
-            if not obj.object._base_manager.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
+        if "LogEntry" == obj.object._meta.object_name:
+            if not LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
                                                    action_time=obj.object.action_time,
                                                    user=obj.object.user,
                                                    object_id=obj.object.object_id).exists():
@@ -652,6 +651,7 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
+    print request.user
     ets_models.ETSLogEntry.objects.log_action(
         user_id = request.user.pk,
         content_type_id = ContentType.objects.get_for_model(obj).pk,
