@@ -26,17 +26,12 @@
   <div class="header">
     <span style="font-weight:bold">{% blocktrans %} WFP Electronic Tracking System - eWaybill{% endblocktrans %}</span>
   </div>
-  {% block menu %}
+  
   <div class="menu">
-    {% url index as index_url %}
-    {% if request.path != index_url %}<a href="{{ index_url }}">{% trans "home" %}</a>{% endif %}
-    {% if user.is_authenticated %}
-      {% url django.contrib.auth.views.password_change as passwd_url %}
-      {% if request.path != passwd_url %}<a href="{{ passwd_url }}">{% trans "Change password" %}</a>{% endif %}
-      <a href="{% url django.contrib.auth.views.logout %}?next={% url index %}">{% trans "Logout" %}</a>
-    {% endif %}
-  </div>
+  {% block menu %}
+    {% include "menu.html" %}
   {% endblock %}
+  </div>
   {% if messages %}
     <ul class="messages">
       {% for message in messages %}
@@ -50,8 +45,7 @@
   </div>
   <div class="footer">
     {% block footer %}
-    {% get_last_update request.user %}
-    {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
+    {% include "footer.html" %}
     {% endblock %}
   </div>
   
