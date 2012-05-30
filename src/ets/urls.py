@@ -7,9 +7,11 @@ from django.utils.translation import ugettext_lazy, ugettext as _
 from django.db.models.aggregates import Count
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.db import models
-
+from django.views.static import serve
 from django.contrib import admin #@Reimport
 admin.autodiscover()
+
+serve.authentication = False
 
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
@@ -209,15 +211,19 @@ urlpatterns += patterns('',
     ( r'^rosetta/', include('rosetta.urls') ),
     (r'^ajax_select/', include('ajax_select.urls')),
     ( r'^admin/', include( admin.site.urls ) ),
-    ( r'^api/offline/', include('ets.offliner.api.urls')),
     ( r'^api/', include('ets.api.urls')),
-    ( r'^offliner/', include('ets.offliner.urls')),                        
 )
 
 #Serve media fields
 urlpatterns += patterns('',
-    (r'^media/(?P<path>.*)$', 'django.views.static.serve', {
+    (r'^media/(?P<path>.*)$', serve, {
         'document_root': settings.MEDIA_ROOT,
     }),
 )
-urlpatterns += staticfiles_urlpatterns('static')
+urlpatterns += patterns('',
+    (r'^static/(?P<path>.*)$', serve, {
+        'document_root': settings.STATIC_ROOT,
+    }),
+)
+
+#urlpatterns += staticfiles_urlpatterns('static')
