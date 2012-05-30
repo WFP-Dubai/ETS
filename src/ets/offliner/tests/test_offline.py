@@ -124,6 +124,7 @@ class ExportTestCase(TestCaseMixin, TestCase):
         total = import_file(output)
         
         self.assertEqual(total, 5)
+        #self.assertEqual(ets.models.LogEntry.objects.all().order_by("action_time")[0].change_message, "")
 
     def test_export_waybills_receipt_sign(self):
         waybill = ets.models.Waybill.objects.get(pk="ISBX00312A")
@@ -144,3 +145,4 @@ class ExportTestCase(TestCaseMixin, TestCase):
         total = import_file(output)
         
         self.assertEqual(total, 9)
+        #self.assertEqual(ets.models.LogEntry.objects.all().order_by("action_time")[0].change_message, "")
