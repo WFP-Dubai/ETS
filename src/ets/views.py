@@ -78,6 +78,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     called when user pushes Print Original on dispatch
     Redirects to order details
     """
+
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.dispatch_sign()
     create_logentry(request, waybill, log_models.CHANGE, "Signed dispatch waybill")
