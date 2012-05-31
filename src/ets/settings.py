@@ -108,6 +108,7 @@ INSTALLED_APPS = (
     'pagination',
     'sorl.thumbnail',
     'concurrent_server',
+    'clear_cache'
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
