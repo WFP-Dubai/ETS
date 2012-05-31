@@ -541,9 +541,8 @@ def import_file(f):
     total = 0
 
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
-        print obj.object._meta.object_name
-        if "LogEntry" in obj.object._meta.object_name:
-            if not obj.object._base_manager.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
+        if "LogEntry" == obj.object._meta.object_name:
+            if not LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
                                                    action_time=obj.object.action_time,
                                                    user=obj.object.user,
                                                    object_id=obj.object.object_id).exists():

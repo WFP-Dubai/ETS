@@ -4,16 +4,14 @@
   <thead>
     <tr>
       <th>{% block first_history_head_col %}{% trans "User" %}{% endblock %}</th>
-      <th>{% trans "Action" %}</th>
       <th>{% trans "Time" %}</th>
-      <th>{% trans "Changes" %}</th>
+      <th>{% trans "Action" %}</th>
     </tr>
   </thead>
   <tbody>
     {% for history_object in history_list %}
       <tr>
           <td>{% block first_history_col %}{{ history_object.user.username }} ({{ history_object.user.get_full_name }}){% endblock %}</td>
-          <td>{{ history_object.get_action_flag_display }}</td>
           <td>{{ history_object.action_time|date:"DATETIME_FORMAT"|upper }}</td>
           <td>{{ history_object.change_message }}</td>
       </tr>
