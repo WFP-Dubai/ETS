@@ -11,7 +11,7 @@ class Migration(DataMigration):
         for item in orm.StockItem.objects.all():
             item.external_ident = item.code
             item.save()
-        
+    
     def backwards(self, orm):
         pass
 
