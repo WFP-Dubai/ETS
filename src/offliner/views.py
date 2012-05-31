@@ -7,9 +7,9 @@ from django.views.generic.edit import FormView
 
 from ets.utils import data_to_file_response
 
-from ets.offliner.forms import DateRangeForm
-from ets.offliner.models import UpdateLog, Waybill
-from ets.offliner.utils import compress_waybills
+from offliner.forms import DateRangeForm
+from offliner.models import UpdateLog, Waybill
+from offliner.utils import compress_waybills
 from ets.decorators import waybill_user_related_filter
 
 @login_required
