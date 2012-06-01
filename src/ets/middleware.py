@@ -2,14 +2,7 @@
 from django.contrib.auth.views import login
 from django.utils.translation import ugettext
 
-from django.contrib.auth.middleware import AuthenticationMiddleware
-
 from piston.authentication import NoAuthentication
-from audit_log.middleware import UserLoggingMiddleware
-from audit_log import registration
-from audit_log.models import fields
-
-from ets.utils import is_imported
 
 class RequiredAuthenticationMiddleware(object):
     """Middleware that forces every user to be authenticated. Otherwise returns login form."""
@@ -24,12 +17,3 @@ class RequiredAuthenticationMiddleware(object):
             return login(request, extra_context={"extra_error": ugettext("The system requires you to be authenticated.")})
         elif not request.user.is_active:
             return login(request, extra_context={"extra_error": ugettext("Your account is not active.")})
-
-class ImportUserLoggingMiddleware(UserLoggingMiddleware):
-
-    def update_users(self, user, sender, instance, **kwargs):
-        registry = registration.FieldRegistry(fields.LastUserField)
-        if sender in registry:
-            for field in registry.get_fields(sender):
-                if not is_imported(instance) or (instance.action_type == 'M' and not instance.action_user):
-                    setattr(instance, field.name, user)
