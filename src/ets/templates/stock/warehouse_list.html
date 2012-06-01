@@ -9,7 +9,7 @@
   <dl class="warehouse-list">
     {% for wh in object_list %}
       {% ifchanged wh.compas %}<dt>{{ wh.compas }}</dt>{% endifchanged %}
-      <dd><a href='{% url export_warehouse_file "data" wh.pk %}'>{{ wh }}</a></dd>
+      <dd><a href='{% url export_warehouse_file data_type="data" warehouse=wh.pk %}'>{{ wh }}</a></dd>
     {% endfor %}
   </dl>
 {% endblock %}
