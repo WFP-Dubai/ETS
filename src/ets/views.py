@@ -522,4 +522,4 @@ def installation_data(request, template_name="stock/warehouse_list.html",
         queryset.filter(compas__in=compas_stations)
     queryset.order_by("compas", "name")
     
-    return object_list(request, queryset, paginate_by=20, template_name=template_name)
+    return object_list(request, queryset, paginate_by=settings.PAGINATION_DEFAULT_PAGINATION, template_name=template_name)
