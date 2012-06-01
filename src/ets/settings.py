@@ -146,6 +146,8 @@ DATETIME_FORMAT = "d-b-Y H:i"
 
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 
+PAGINATION_DEFAULT_PAGINATION = 20
+
 #Default life time of order (months)
 DEFAULT_ORDER_LIFE = 3
 
