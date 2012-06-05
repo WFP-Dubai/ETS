@@ -34,6 +34,23 @@ ACTIONS = {
     'M': _('Imported'),
 }
 
+LOGENTRY_CREATE_WAYBILL = 1
+LOGENTRY_EDIT_DISPATCH = 21
+LOGENTRY_EDIT_RECEIVE = 22
+LOGENTRY_SIGN_DISPATCH = 4
+LOGENTRY_SIGN_RECEIVE = 5
+LOGENTRY_DELETE_WAYBILL = 3
+
+LOGENTRY_WAYBILL_ACTIONS = {
+    LOGENTRY_CREATE_WAYBILL: _("Created dispatch waybill"),
+    LOGENTRY_EDIT_DISPATCH: _("Edited dispatch waybill"),
+    LOGENTRY_EDIT_RECEIVE: _("Edited receive waybill"),
+    LOGENTRY_SIGN_DISPATCH: _("Signed dispatch waybill"),
+    LOGENTRY_SIGN_RECEIVE: _("Signed receive waybill"),
+    LOGENTRY_DELETE_WAYBILL: _("Deleted dispatch waybill"),
+}
+
+
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
     def _decorator(f):
@@ -651,6 +668,11 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
+    if not message and str(flag)[0] != "2":
+        message = LOGENTRY_WAYBILL_ACTIONS[flag]
+    elif len(str(flag)) == 2:
+        message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
+        
     ets_models.ETSLogEntry.objects.log_action(
         user_id = request.user.pk,
         content_type_id = ContentType.objects.get_for_model(obj).pk,

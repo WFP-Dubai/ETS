@@ -1,4 +1,5 @@
 ### -*- coding: utf-8 -*- ####################################################
+from itertools import chain
 
 from django.forms.models import BaseModelFormSet, BaseInlineFormSet
 #from django.forms.formsets import formset_factory, BaseFormSet
@@ -13,6 +14,7 @@ from uni_form.helper import FormHelper
 from uni_form.layout import Layout, Fieldset, Row, Submit
 
 from ets import models as ets_models
+from ets.utils import LOGENTRY_WAYBILL_ACTIONS
 
 UNDEFINED_MESSAGE = "N/A"
 
@@ -217,4 +219,8 @@ class ImportDataForm( forms.Form ):
 
     helper = FormHelper()
     helper.add_input(Submit(_("Submit"), 'submit'))
+
+class WaybillActionForm( forms.Form ):
+    WAYBILL_ACTIONS = chain(((0, " - - - - - -"),), (item for item in LOGENTRY_WAYBILL_ACTIONS.items()))
+    action_type = forms.ChoiceField(choices=WAYBILL_ACTIONS, required=False)
 

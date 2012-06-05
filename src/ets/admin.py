@@ -334,10 +334,17 @@ class PersonAdmin(UserAdmin):
 
     def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
         obj = self.get_object(request, admin.util.unquote(object_id))
+        history_list = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj)
+
+        form = ets.forms.WaybillActionForm(request.POST or None)
+        if form.is_valid() and int(form.cleaned_data['action_type']):
+            history_list = history_list.filter(action_flag=form.cleaned_data['action_type'])
+            
         context = {
-            'history_list': ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj),
+            'history_list': history_list,
             'opts': self.opts,
             'title': 'Waybill history for user %s' % obj,
+            'form': form,
             'person': obj,
             'paginate_by': getattr(settings, "WAYBILL_HISTORY_PAGINATE", 40)
         }
