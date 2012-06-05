@@ -32,6 +32,7 @@
         <form id="changelist-search" action="." method="post">
           {% csrf_token %}
           <div>
+            &nbsp;
             {% for field in form %}
               {{ field.errors }}
               {{ field.label_tag }}: {{ field }}
