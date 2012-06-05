@@ -222,5 +222,5 @@ class ImportDataForm( forms.Form ):
 
 class WaybillActionForm( forms.Form ):
     WAYBILL_ACTIONS = chain(((0, " - - - - - -"),), (item for item in LOGENTRY_WAYBILL_ACTIONS.items()))
-    action_type = forms.ChoiceField(choices=WAYBILL_ACTIONS, required=False)
+    action_type = forms.TypedChoiceField(choices=WAYBILL_ACTIONS, coerce=lambda val: int(val), required=True)
 

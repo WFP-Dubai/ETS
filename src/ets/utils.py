@@ -668,10 +668,10 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
-    if not message and str(flag)[0] != "2":
-        message = LOGENTRY_WAYBILL_ACTIONS[flag]
-    elif len(str(flag)) == 2:
+    if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE):
         message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
+    elif not message:
+        message = LOGENTRY_WAYBILL_ACTIONS[flag]
         
     ets_models.ETSLogEntry.objects.log_action(
         user_id = request.user.pk,

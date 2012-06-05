@@ -337,7 +337,7 @@ class PersonAdmin(UserAdmin):
         history_list = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj)
 
         form = ets.forms.WaybillActionForm(request.POST or None)
-        if form.is_valid() and int(form.cleaned_data['action_type']):
+        if form.is_valid() and form.cleaned_data['action_type']:
             history_list = history_list.filter(action_flag=form.cleaned_data['action_type'])
             
         context = {
