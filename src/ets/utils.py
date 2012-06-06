@@ -23,7 +23,6 @@ from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json
-from ets.check import is_imported
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
