@@ -295,7 +295,7 @@ class StockItem( models.Model ):
         unique_together = ('external_ident', 'quality')
 
     def  __unicode__( self ):
-        name = "%s-%s" % (self.coi_code(), self.commodity.name)
+        name = "%s-%s" % (self.origin_id, self.commodity.name)
         if self.quality != self.GOOD_QUALITY:
             return "%s (%s)" % (name, self.get_quality_display())
         return name
@@ -465,7 +465,7 @@ class OrderItem(models.Model):
         if self.unit_weight_net:
             return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
         else:
-            return []
+            return self.stock_items().all()
         
     
     @staticmethod

@@ -19,7 +19,7 @@ from ets.views import waybill_list, waybill_reception, ImportData
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
-
+dated =  datetime.now() - timedelta( days = 10 )
 urlpatterns = patterns("ets.views",
 
     ( r'^$', direct_to_template, {
@@ -29,7 +29,7 @@ urlpatterns = patterns("ets.views",
     
     #Order list
     ( r'^orders/$', person_required(warehouse_related(object_list)), {
-        'queryset': ets.models.Order.objects.all().order_by('-created'),
+        'queryset': ets.models.Order.objects.filter(expiry__gt = (datetime.now() - timedelta( days = settings.ORDER_SHOW_AFTER_EXP_DAYS ))).order_by('-created'),
         'template_name': 'order/list.html',
     }, "orders"),
     
