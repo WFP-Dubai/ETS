@@ -41,15 +41,16 @@ LOGENTRY_SIGN_DISPATCH = 4
 LOGENTRY_SIGN_RECEIVE = 5
 LOGENTRY_DELETE_WAYBILL = 3
 
-LOGENTRY_WAYBILL_ACTIONS = {
-    LOGENTRY_CREATE_WAYBILL: _("Created dispatch waybill"),
-    LOGENTRY_EDIT_DISPATCH: _("Edited dispatch waybill"),
-    LOGENTRY_EDIT_RECEIVE: _("Edited receive waybill"),
-    LOGENTRY_SIGN_DISPATCH: _("Signed dispatch waybill"),
-    LOGENTRY_SIGN_RECEIVE: _("Signed receive waybill"),
-    LOGENTRY_DELETE_WAYBILL: _("Deleted dispatch waybill"),
-}
+ACTION_TYPES = (
+    (LOGENTRY_CREATE_WAYBILL, _("Created dispatch waybill")),
+    (LOGENTRY_EDIT_DISPATCH, _("Edited dispatch waybill")),
+    (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
+    (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
+    (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
+    (LOGENTRY_DELETE_WAYBILL, _("Deleted dispatch waybill")),
+)
 
+LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
