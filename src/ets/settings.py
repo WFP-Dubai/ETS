@@ -71,7 +71,6 @@ MIDDLEWARE_CLASSES = (
     
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    'ets.middleware.ImportUserLoggingMiddleware',
 )
 
 ROOT_URLCONF = 'ets.urls'

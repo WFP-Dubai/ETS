@@ -15,10 +15,8 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
-from django.contrib.admin.models import LogEntry as ETSLogEntry
 
 from sorl.thumbnail.fields import ImageField
-from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models
@@ -32,13 +30,6 @@ BULK_NAME = "BULK"
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 ACCURACY = 1
 MINIMUM_AGE = 5
-
-# like a normal ForeignKey.
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ['^audit_log\.models\.fields\.LastUserField'])
-except ImportError:
-    pass
 
 def capitalize_slug(func):
     @wraps(func)
@@ -640,8 +631,6 @@ class Waybill( ld_models.Model ):
                        blank=True, null=True,
                        max_length=255,)
     
-    audit_log = ImportAuditLog(exclude=())
-
     objects = ld_models.managers.LogicalDeletedManager()
     
     class Meta:
@@ -889,8 +878,6 @@ class LoadingDetail(models.Model):
     
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
-
-    audit_log = ImportAuditLog(exclude=('date_modified',))
 
     class Meta:
         ordering = ('slug',)
