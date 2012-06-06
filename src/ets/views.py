@@ -21,6 +21,7 @@ from django.views.generic.edit import FormView
 from django.core import serializers
 from django.contrib.admin import models as log_models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import LogEntry
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -28,7 +29,7 @@ from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list, send_dispatched, send_received, create_logentry, construct_change_message
+from ets.utils import send_dispatched, send_received, create_logentry, construct_change_message
 from ets.utils import import_file, get_compas_data, data_to_file_response
 from ets.utils import (LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
@@ -45,7 +46,8 @@ WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
-    waybill_log = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, object_id=waybill.pk)
+    waybill_log = LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, 
+                                          object_id=waybill.pk)
 
     context = {
         'object': waybill,
