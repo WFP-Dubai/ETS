@@ -21,7 +21,6 @@ install_requires = [
         'django-extensions', #'python-keyczar', 'pyasn1',
         'django-debug-toolbar',
         #'hashlib',
-        'django-audit-log',
         #'cx_Oracle==5.1',
         'simplejson >= 2.1.0',
         'django-piston',
