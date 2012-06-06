@@ -30,8 +30,9 @@ from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
 from ets.utils import history_list, send_dispatched, send_received, create_logentry, construct_change_message
 from ets.utils import import_file, get_compas_data, data_to_file_response
-from ets.utils import LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE
-from ets.utils import LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL
+from ets.utils import (LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
+                       LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
+                       LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
 from ets.pdf import render_to_pdf
 import simplejson
 from ets.compress import compress_json
@@ -338,6 +339,8 @@ def validate_dispatch(request, waybill_pk, queryset):
     waybill.validated = True
     waybill.save()
     
+    create_logentry(request, waybill, LOGENTRY_VALIDATE_DISPATCH)
+    
     messages.add_message(request, messages.INFO, 
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
@@ -355,6 +358,8 @@ def validate_receipt(request, waybill_pk, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_validated = True
     waybill.save()
+    
+    create_logentry(request, waybill, LOGENTRY_VALIDATE_RECEIVE)
     
     messages.add_message(request, messages.INFO, 
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 

@@ -40,6 +40,8 @@ LOGENTRY_EDIT_RECEIVE = 22
 LOGENTRY_SIGN_DISPATCH = 4
 LOGENTRY_SIGN_RECEIVE = 5
 LOGENTRY_DELETE_WAYBILL = 3
+LOGENTRY_VALIDATE_DISPATCH = 6
+LOGENTRY_VALIDATE_RECEIVE = 7
 
 ACTION_TYPES = (
     (LOGENTRY_CREATE_WAYBILL, _("Created dispatch waybill")),
@@ -48,6 +50,8 @@ ACTION_TYPES = (
     (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
     (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
     (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
+    (LOGENTRY_VALIDATE_DISPATCH, _("Validated dispatch waybill")),
+    (LOGENTRY_VALIDATE_RECEIVE, _("Validated receive waybill")),
 )
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
@@ -669,7 +673,8 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
-    if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE):
+    if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE, 
+                LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE):
         message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
     elif not message:
         message = LOGENTRY_WAYBILL_ACTIONS[flag]
