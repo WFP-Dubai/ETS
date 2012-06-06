@@ -14,7 +14,7 @@ from uni_form.helper import FormHelper
 from uni_form.layout import Layout, Fieldset, Row, Submit
 
 from ets import models as ets_models
-from ets.utils import LOGENTRY_WAYBILL_ACTIONS, ACTION_TYPES
+from ets.utils import ACTION_TYPES
 
 UNDEFINED_MESSAGE = "N/A"
 

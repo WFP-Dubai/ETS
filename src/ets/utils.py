@@ -27,13 +27,6 @@ from ets.compress import compress_json, decompress_json
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
-ACTIONS = {
-    'I': _('Created'),
-    'U': _('Changed'),
-    'D': _('Deleted'),
-    'M': _('Imported'),
-}
-
 LOGENTRY_CREATE_WAYBILL = 1
 LOGENTRY_EDIT_DISPATCH = 21
 LOGENTRY_EDIT_RECEIVE = 22
