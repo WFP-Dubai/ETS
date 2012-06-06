@@ -35,6 +35,28 @@ ACTIONS = {
     'M': _('Imported'),
 }
 
+LOGENTRY_CREATE_WAYBILL = 1
+LOGENTRY_EDIT_DISPATCH = 21
+LOGENTRY_EDIT_RECEIVE = 22
+LOGENTRY_SIGN_DISPATCH = 4
+LOGENTRY_SIGN_RECEIVE = 5
+LOGENTRY_DELETE_WAYBILL = 3
+LOGENTRY_VALIDATE_DISPATCH = 6
+LOGENTRY_VALIDATE_RECEIVE = 7
+
+ACTION_TYPES = (
+    (LOGENTRY_CREATE_WAYBILL, _("Created dispatch waybill")),
+    (LOGENTRY_EDIT_DISPATCH, _("Edited dispatch waybill")),
+    (LOGENTRY_DELETE_WAYBILL, _("Deleted dispatch waybill")),
+    (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
+    (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
+    (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
+    (LOGENTRY_VALIDATE_DISPATCH, _("Validated dispatch waybill")),
+    (LOGENTRY_VALIDATE_RECEIVE, _("Validated receive waybill")),
+)
+
+LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
+
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
     def _decorator(f):
@@ -628,6 +650,12 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
+    if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE, 
+                LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE):
+        message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
+    elif not message:
+        message = LOGENTRY_WAYBILL_ACTIONS[flag]
+        
     LogEntry.objects.log_action(
         user_id = request.user.pk,
         content_type_id = ContentType.objects.get_for_model(obj).pk,
