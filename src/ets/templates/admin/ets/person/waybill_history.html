@@ -31,15 +31,12 @@
       <div id="toolbar">
         <form id="changelist-search" action="." method="post">
           {% csrf_token %}
-          <div>
-            &nbsp;
-            {% for field in form %}
-              {{ field.errors }}
-              {{ field.label_tag }}: {{ field }}
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            {% endfor %}
-            <input type="submit" value='{% trans "Search" %}'>
-          </div>
+          <fieldset>
+            <div style="float:left;">
+            {{ form.as_p }}
+            </div>
+            <div><input type="submit" value='{% trans "Search" %}'></div>
+          </fieldset>
         </form>
       </div>
 

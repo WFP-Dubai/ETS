@@ -44,10 +44,10 @@ LOGENTRY_DELETE_WAYBILL = 3
 ACTION_TYPES = (
     (LOGENTRY_CREATE_WAYBILL, _("Created dispatch waybill")),
     (LOGENTRY_EDIT_DISPATCH, _("Edited dispatch waybill")),
-    (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
-    (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
-    (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
     (LOGENTRY_DELETE_WAYBILL, _("Deleted dispatch waybill")),
+    (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
+    (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
+    (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
 )
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
