@@ -118,11 +118,11 @@
 	  
 	  stockItem.change(function(){
 		  container.find('div.ctrlHolder').loadIndicator();
-		  $.getJSON('{% url get_stock_data order_pk=object.pk %}',{stock_item: $(this).val(), order: '{{ object.pk }}'}, function(data){
+		  $.getJSON('{% url get_stock_data_li order_pk=object.pk %}',{stock_item: $(this).val(), order: '{{ object.pk }}'}, function(data){
 			  
     		  unitWeight.val(data['unit_weight_net']);
     		  unitWeightGross.val(data['unit_weight_gross']);
-			  numberUnits.val(data['number_of_units']);
+			  numberUnits.val(data['number_of_units_left']);
 	    		  
     		  numberUnits.change();
 		  }).complete(function(){ container.find('div.ctrlHolder').deleteIndicator(); });

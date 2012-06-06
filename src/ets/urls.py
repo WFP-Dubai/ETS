@@ -177,6 +177,12 @@ urlpatterns = patterns("ets.views",
                                                 .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, 'view_stock' ),
+
+    ( r'^get_stock_data_li/(?P<order_pk>[-\w]+)/$', "get_stock_data_li", {
+        'queryset': ets.models.StockItem.objects.all().distinct(),
+    }, "get_stock_data_li" ),
+             
+
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
         'queryset': ets.models.StockItem.objects.all().distinct(),
     }, "get_stock_data" ),
