@@ -332,7 +332,7 @@ class PersonAdmin(UserAdmin):
 
     def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
         obj = self.get_object(request, admin.util.unquote(object_id))
-        history_list = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj)
+        history_list = LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj)
 
         form = ets.forms.WaybillActionForm(request.POST or None)
         if form.is_valid() and form.cleaned_data['action_type']:
