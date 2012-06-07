@@ -23,7 +23,6 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
     keys.sort()
     colitems = [columnIndexNameMap[key] for key in keys]
     sColumns = ",".join(map(str,colitems))
-    print sColumns
 
     # Ordering data
     iSortingCols =  int(request.GET.get('iSortingCols',0))
@@ -73,7 +72,6 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
     else:
         aaData = []
         a = querySet.values()
-        print a
         for row in a:
             rowkeys = row.keys()
             rowvalues = row.values()
@@ -87,7 +85,7 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
         response_dict.update({'aaData':aaData})
         response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
         response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
-    print aaData
+
     #prevent from caching datatables result
     add_never_cache_headers(response)
     return response
