@@ -17,22 +17,37 @@ from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 from django.utils.text import get_text_list
+from django.contrib.admin.models import LogEntry
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json
-from ets.check import is_imported
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
 
-ACTIONS = {
-    'I': _('Created'),
-    'U': _('Changed'),
-    'D': _('Deleted'),
-    'M': _('Imported'),
-}
+LOGENTRY_CREATE_WAYBILL = 1
+LOGENTRY_EDIT_DISPATCH = 21
+LOGENTRY_EDIT_RECEIVE = 22
+LOGENTRY_SIGN_DISPATCH = 4
+LOGENTRY_SIGN_RECEIVE = 5
+LOGENTRY_DELETE_WAYBILL = 3
+LOGENTRY_VALIDATE_DISPATCH = 6
+LOGENTRY_VALIDATE_RECEIVE = 7
+
+ACTION_TYPES = (
+    (LOGENTRY_CREATE_WAYBILL, _("Created dispatch waybill")),
+    (LOGENTRY_EDIT_DISPATCH, _("Edited dispatch waybill")),
+    (LOGENTRY_DELETE_WAYBILL, _("Deleted dispatch waybill")),
+    (LOGENTRY_SIGN_DISPATCH, _("Signed dispatch waybill")),
+    (LOGENTRY_EDIT_RECEIVE, _("Edited receive waybill")),
+    (LOGENTRY_SIGN_RECEIVE, _("Signed receive waybill")),
+    (LOGENTRY_VALIDATE_DISPATCH, _("Validated dispatch waybill")),
+    (LOGENTRY_VALIDATE_RECEIVE, _("Validated receive waybill")),
+)
+
+LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
@@ -519,13 +534,6 @@ def changed_fields(model, next, previous, exclude=()):
             yield field.verbose_name, getattr(next, field.name)
 
 
-def history_list(log_queryset, model, exclude=()):
-    """Utility to generate history of actions at some objects"""
-
-    for next, prev in izip(log_queryset, chain(log_queryset[1:], (None,))):
-        yield next.action_user, ACTIONS[next.action_type], next.action_date, changed_fields(model, next, prev, exclude)
-
-
 def data_to_file_response(data, file_name, type):
     """Creates response with provided data and inserts Content-Disposition header with file name."""
     response = HttpResponse(data, content_type='application/%s' % type)
@@ -598,23 +606,6 @@ def compress_compas_data(compas=None, warehouse=None):
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
 
 
-def item_history_list(log_queryset, model, exclude=()):
-    """Utility to generate history of actions at some objects"""
-
-    for item in log_queryset:
-        previous = model.audit_log.filter(slug=item.slug, action_date__lt=item.action_date).order_by("-action_date")
-        prev = previous[0] if previous.exists() else None
-        yield item.slug, model._meta.object_name, ACTIONS[item.action_type], item.action_date, changed_fields(model, item, prev, exclude)
-
-
-def get_user_actions(user):
-    waybill_log = ets_models.Waybill.audit_log.filter(action_user=user)
-    loading_detail_log = ets_models.LoadingDetail.audit_log.filter(action_user=user)
-    history = sorted(chain(item_history_list(waybill_log, ets_models.Waybill, ('date_modified',)),
-                           item_history_list(loading_detail_log, ets_models.LoadingDetail, ('date_modified',))),
-                     key=itemgetter(3), reverse=True)
-    return history
-
 def get_date_from_string(some_date, date_templates=None, default=None, message="Failed: date must be in one of such formats"):
     DATE_FORMATS = (
         "%Y-%m-%d",
@@ -651,7 +642,13 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
-    ets_models.ETSLogEntry.objects.log_action(
+    if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE, 
+                LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE):
+        message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
+    elif not message:
+        message = LOGENTRY_WAYBILL_ACTIONS[flag]
+        
+    LogEntry.objects.log_action(
         user_id = request.user.pk,
         content_type_id = ContentType.objects.get_for_model(obj).pk,
         object_id = obj.pk,

@@ -1,8 +1,6 @@
-import datetime
 from functools import partial
 
 from django.contrib import admin
-from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 #from django.utils.functional import curry
 from django.utils.translation import ugettext_lazy as _
@@ -13,6 +11,7 @@ from django.template.response import TemplateResponse
 from django.utils.translation import ugettext
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import LogEntry
 
 from ajax_select import make_ajax_form
 import logicaldelete.admin
@@ -20,7 +19,6 @@ from django_extensions.utils.text import truncate_letters
 
 import ets.models
 import ets.forms
-from ets.utils import get_user_actions
 
 
 class ButtonableModelAdmin(admin.ModelAdmin):
@@ -334,10 +332,17 @@ class PersonAdmin(UserAdmin):
 
     def waybill_history_view(self, request, object_id, template='admin/ets/person/waybill_history.html'):
         obj = self.get_object(request, admin.util.unquote(object_id))
+        history_list = LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj)
+
+        form = ets.forms.WaybillActionForm(request.POST or None)
+        if form.is_valid() and form.cleaned_data['action_type']:
+            history_list = history_list.filter(action_flag=form.cleaned_data['action_type'])
+            
         context = {
-            'history_list': ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, user=obj),
+            'history_list': history_list,
             'opts': self.opts,
             'title': 'Waybill history for user %s' % obj,
+            'form': form,
             'person': obj,
             'paginate_by': getattr(settings, "WAYBILL_HISTORY_PAGINATE", 40)
         }
