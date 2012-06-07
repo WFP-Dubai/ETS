@@ -71,7 +71,6 @@ MIDDLEWARE_CLASSES = (
     
     'django.contrib.messages.middleware.MessageMiddleware',
     'pagination.middleware.PaginationMiddleware',
-    'ets.middleware.ImportUserLoggingMiddleware',
 )
 
 ROOT_URLCONF = 'ets.urls'
@@ -146,7 +145,7 @@ DATETIME_FORMAT = "d-b-Y H:i"
 
 ADMIN_MEDIA_PREFIX = STATIC_URL+'admin/'
 
-PAGINATION_DEFAULT_PAGINATION = 20
+PAGINATION_DEFAULT_PAGINATION = 40
 
 #Default life time of order (months)
 DEFAULT_ORDER_LIFE = 3

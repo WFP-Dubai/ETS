@@ -21,6 +21,7 @@ from django.views.generic.edit import FormView
 from django.core import serializers
 from django.contrib.admin import models as log_models
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.admin.models import LogEntry
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -28,8 +29,11 @@ from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
 import ets.models
-from ets.utils import history_list, send_dispatched, send_received, create_logentry, construct_change_message
+from ets.utils import send_dispatched, send_received, create_logentry, construct_change_message
 from ets.utils import import_file, get_compas_data, data_to_file_response
+from ets.utils import (LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
+                       LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
+                       LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
 from ets.pdf import render_to_pdf
 import simplejson
 from ets.compress import compress_json
@@ -37,10 +41,13 @@ from ets.compress import compress_json
 
 WFP_ORGANIZATION = 'WFP'
 WFP_DISTRUIBUTION = 'WFP_DISTRIB'
+
+
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
     
-    waybill_log = ets.models.ETSLogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, object_id=waybill.pk)
+    waybill_log = LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets.models.Waybill).pk, 
+                                          object_id=waybill.pk)
 
     context = {
         'object': waybill,
@@ -81,7 +88,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
 
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.dispatch_sign()
-    create_logentry(request, waybill, log_models.CHANGE, "Signed dispatch waybill")
+    create_logentry(request, waybill, LOGENTRY_SIGN_DISPATCH)
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -98,7 +105,7 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
     """ Signs reception"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_sign()
-    create_logentry(request, waybill, log_models.CHANGE, "Signed receive waybill")
+    create_logentry(request, waybill, LOGENTRY_SIGN_RECEIVE)
     
     return render_to_pdf(request, template_name, {
                 'print_original': True,
@@ -187,9 +194,9 @@ def _dispatching(request, waybill, template, success_message, created=False, for
         loading_formset.save()
         
         if created:
-            create_logentry(request, waybill, log_models.ADDITION, "Created dispatch waybill")
+            create_logentry(request, waybill, LOGENTRY_CREATE_WAYBILL)
         else:
-            create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited dispatch waybill", construct_change_message(request, form, [loading_formset])]))
+            create_logentry(request, waybill, LOGENTRY_EDIT_DISPATCH, construct_change_message(request, form, [loading_formset]))
         
         messages.success(request, success_message)
         return redirect(waybill)
@@ -251,7 +258,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
         loading_formset.save()
-        create_logentry(request, waybill, log_models.CHANGE, ": ".join(["Edited receive waybill", construct_change_message(request, form, [loading_formset])]))
+        create_logentry(request, waybill, LOGENTRY_EDIT_RECEIVE, construct_change_message(request, form, [loading_formset]))
         
         messages.add_message(request, messages.INFO, _('eWaybill has been discharged'))
         
@@ -281,7 +288,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
     """Deletes specific waybill"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
-    create_logentry(request, waybill, log_models.DELETION)
+    create_logentry(request, waybill, LOGENTRY_DELETE_WAYBILL)
     waybill.delete()
     redirect_to = redirect_to or request.GET.get('redirect_to', '')
         
@@ -334,6 +341,8 @@ def validate_dispatch(request, waybill_pk, queryset):
     waybill.validated = True
     waybill.save()
     
+    create_logentry(request, waybill, LOGENTRY_VALIDATE_DISPATCH)
+    
     messages.add_message(request, messages.INFO, 
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
@@ -351,6 +360,8 @@ def validate_receipt(request, waybill_pk, queryset):
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_validated = True
     waybill.save()
+    
+    create_logentry(request, waybill, LOGENTRY_VALIDATE_RECEIVE)
     
     messages.add_message(request, messages.INFO, 
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
@@ -533,11 +544,13 @@ class ImportData(FormView):
         return self.get(self.request)
 
 @officer_required
-def installation_data(request, template_name="stock/warehouse_list.html",
-                      queryset=ets.models.Warehouse.objects.all().order_by("compas__code", "code")):
+def installation_data(request, template_name="stock/warehouse_list.html"):
     
     user = request.user
     compas_stations = user.compases.all().values_list('code')
+    
+    queryset = ets.models.Warehouse.get_active_warehouses().order_by("compas__code", "code")
+    
     if not user.is_superuser:
         queryset.filter(compas__in=compas_stations)
     queryset.order_by("compas", "name")

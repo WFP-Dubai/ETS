@@ -15,30 +15,20 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
-from django.contrib.admin.models import LogEntry as ETSLogEntry
 
 from sorl.thumbnail.fields import ImageField
-from audit_log.models.managers import AuditLog
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models
 
 from ets.compress import compress_json, decompress_json
 from ets.country import COUNTRY_CHOICES
-from ets.check import is_imported
 
 #name = "1234"
 BULK_NAME = "BULK"
 LETTER_CODE = getattr(settings, 'WAYBILL_LETTER', 'A')
 ACCURACY = 1
 MINIMUM_AGE = 5
-
-# like a normal ForeignKey.
-try:
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ['^audit_log\.models\.fields\.LastUserField'])
-except ImportError:
-    pass
 
 def capitalize_slug(func):
     @wraps(func)
@@ -135,10 +125,15 @@ class Warehouse(models.Model):
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.code, self.location.name, self.name)
 
+    
+    @classmethod
+    def get_active_warehouses(cls):
+        return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
+                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+    
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        queryset = cls.objects.filter(location=location).filter(start_date__lte=date.today).filter(valid_warehouse=True)\
-                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+        queryset = cls.get_active_warehouses().filter(location=location)
 
         #Check wh for specific organization
         if organization and queryset.filter(organization=organization).count():
@@ -537,11 +532,6 @@ def waybill_slug_populate(waybill):
     return "%s%s%s%06d" % (waybill.order.warehouse.compas.pk, waybill.date_created.strftime('%y'), 
                            LETTER_CODE, count+1)
 
-class ImportAuditLog(AuditLog):
-
-    def post_save(self, instance, created, **kwargs):
-        self.create_log_entry(instance, is_imported(instance) and 'M' or created and 'I' or 'U')
-
 class Waybill( ld_models.Model ):
     """
     Base waybill abstract class
@@ -645,8 +635,6 @@ class Waybill( ld_models.Model ):
                        blank=True, null=True,
                        max_length=255,)
     
-    audit_log = ImportAuditLog(exclude=())
-
     objects = ld_models.managers.LogicalDeletedManager()
     
     class Meta:
@@ -894,8 +882,6 @@ class LoadingDetail(models.Model):
     
     overloaded_units = models.BooleanField(_("overloaded Units"), default=False) #overloadedUnits
     over_offload_units = models.BooleanField(_("over offloaded Units"), default=False) #overOffloadUnits
-
-    audit_log = ImportAuditLog(exclude=('date_modified',))
 
     class Meta:
         ordering = ('slug',)

@@ -28,12 +28,23 @@
 {% block content %}
   <div id="content-main">
     <div class="module" id="changelist">
+      <div id="toolbar">
+        <form id="changelist-search" action="." method="post">
+          {% csrf_token %}
+          <fieldset>
+            <div style="float:left;">
+            {{ form.as_p }}
+            </div>
+            <div><input type="submit" value='{% trans "Search" %}'></div>
+          </fieldset>
+        </form>
+      </div>
 
-    <form id="changelist-form">
-      {% autopaginate history_list paginate_by %}
-      {% include "waybill/history_object_fragment.html" %}
+      <form id="changelist-form">
+        {% autopaginate history_list paginate_by %}
+        {% include "waybill/history_object_fragment.html" %}
       
-    </form>
+      </form>
     </div>
     {% paginate %}
   </div>

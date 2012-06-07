@@ -69,3 +69,7 @@ dl.warehouse-list dd {
 .active_import{ 
   color: red;
 }
+
+.paging_two_button a:hover { 
+  cursor: pointer;
+}
