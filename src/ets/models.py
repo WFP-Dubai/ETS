@@ -125,10 +125,15 @@ class Warehouse(models.Model):
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.code, self.location.name, self.name)
 
+    
+    @classmethod
+    def get_active_warehouses(cls):
+        return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
+                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+    
     @classmethod
     def get_warehouses(cls, location, organization=None):
-        queryset = cls.objects.filter(location=location).filter(start_date__lte=date.today).filter(valid_warehouse=True)\
-                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+        queryset = cls.get_active_warehouses().filter(location=location)
 
         #Check wh for specific organization
         if organization and queryset.filter(organization=organization).count():

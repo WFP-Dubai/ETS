@@ -524,11 +524,13 @@ class ImportData(FormView):
         return self.get(self.request)
 
 @officer_required
-def installation_data(request, template_name="stock/warehouse_list.html",
-                      queryset=ets.models.Warehouse.objects.all().order_by("compas__code", "code")):
+def installation_data(request, template_name="stock/warehouse_list.html"):
     
     user = request.user
     compas_stations = user.compases.all().values_list('code')
+    
+    queryset = ets.models.Warehouse.get_active_warehouses().order_by("compas__code", "code")
+    
     if not user.is_superuser:
         queryset.filter(compas__in=compas_stations)
     queryset.order_by("compas", "name")
