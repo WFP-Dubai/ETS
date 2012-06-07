@@ -37,6 +37,7 @@ from ets.utils import (LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY
 from ets.pdf import render_to_pdf
 import simplejson
 from ets.compress import compress_json
+from ets.datatables import get_datatables_records
 
 
 WFP_ORGANIZATION = 'WFP'
@@ -404,6 +405,22 @@ def stock_items(request, template_name, queryset):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
     return object_list(request, queryset, paginate_by=5, template_name=template_name)
 
+def table_stock_items(request, param_name):
+    warehouse_pk = request.GET.get(param_name)
+    warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)
+    column_index_map = {
+        0: 'commodity_id',
+        1: 'project_number',
+        2: 'si_code',
+        3: 'quality',
+        4: 'number_of_units',
+        5: 'unit_weight_net',
+        6: 'unit_weight_gross',
+        7: 'quantity_net',
+        8: 'quantity_gross'
+    }
+
+    return get_datatables_records(request, warehouse.stock_items.all(), column_index_map)
 
 def get_stock_data(request, order_pk, queryset):
     """Utility ajax view that returns stock item information to fill dispatch form."""

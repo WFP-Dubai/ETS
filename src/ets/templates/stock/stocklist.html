@@ -7,7 +7,7 @@
 <h3>{% trans "Stock List" %}</h3>
 {% for wh in object_list %}
 <p>{% trans "Location" %}: <strong>{{ wh.location.name }}</strong>, {% trans "Warehouse" %}: <strong>{{ wh.name }} ({{ wh.pk }})</strong></p>
-<table cellpadding="0" cellspacing="0" border="0" class="stocklist display">
+<table cellpadding="0" cellspacing="0" border="0" class="stocklist display" id='{{ wh.pk }}' rel='{% url table_stock_items wh.pk %}'>
   <thead>
     <tr>
       <th>{% trans "Commodity" %}</th>
@@ -19,38 +19,30 @@
       <th>{% trans "Unit Gross Weight (kg)"%}</th>
       <th>{% trans "Net Tonnage"%}</th>
       <th>{% trans "Gross Tonnage"%}</th>
-      
     </tr>
   </thead>
+
   <tbody>
-    {% for item in wh.stock_items.all %}
-    <tr style="{% if item.quality != item.GOOD_QUALITY %}color:red;{% endif %}{% if item.number_of_units <= 0 %}opacity:0.2;{% endif %}" >
-      <td>{{ item.commodity }}</td>
-      <td>{{ item.project_number }}</td>
-      <td>{{ item.si_code }}</td>
-      <td>{{ item.get_quality_display }}</td>
-      <td>{{ item.number_of_units|floatformat:0 }}</td>
-      <td>{{ item.unit_weight_net }}</td>
-      <td>{{ item.unit_weight_gross }}</td>
-      <td>{{ item.quantity_net }}</td>      
-      <td>{{ item.quantity_gross }}</td>
-    </tr>
-    {% endfor %}
   </tbody>
 </table>
 {% if not forloop.last %}<div class="sep"></div>{% endif %}
 {% endfor %}
 
-{#{% paginate %}#}
+{% paginate %}
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
   $(document).ready(function() {
-    $('.stocklist').dataTable({
-  	  "aaSorting": [[ 4, "desc" ]],
-  	});
+    $('.stocklist').each(function() { 
+      $(this).dataTable({
+        "aaSorting": [[ 4, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "{% url table_stock_items param_name='wh_id' %}?wh_id="+$(this).attr("id")
+      });
+    });
   });
 </script>
 {% endblock script %}

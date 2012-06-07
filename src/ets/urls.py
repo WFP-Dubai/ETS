@@ -168,7 +168,8 @@ urlpatterns = patterns("ets.views",
         "paginate_by":50,#paging not solution
     }, 'compas_waybill' ),
     
-        
+
+    ( r'^stock/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True)\
                                                 .filter(start_date__lte=date.today)\
