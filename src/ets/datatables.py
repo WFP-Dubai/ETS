@@ -1,3 +1,13 @@
+"""
+Pretty important file since it contains code for preparing data for datatable (server-side mode).
+Actually get_datatables_records is the function that does most of work.
+DataTables' server-side processing for Django:
+    http://www.datatables.net/development/server-side/django
+Link for file:
+    http://www.assembla.com/code/datatables_demo/subversion/nodes/trunk/1_6_2/datatables_demo/demo/utils.py?rev=5
+"""
+
+
 from django.db.models import Q
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -12,7 +22,6 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
         jsonTemplatePath: optional template file to generate custom json from.  If not provided it will generate the data directly from the model.
 
     """
-
     cols = int(request.GET.get('iColumns',0)) # Get the number of columns
     iDisplayLength =  min(int(request.GET.get('iDisplayLength',10)),100)     #Safety measure. If someone messes with iDisplayLength manually, we clip it to the max value of 100.
     startRecord = int(request.GET.get('iDisplayStart',0)) # Where the data starts from (page)
@@ -72,6 +81,7 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
     else:
         aaData = []
         a = querySet.values()
+        print a
         for row in a:
             rowkeys = row.keys()
             rowvalues = row.values()

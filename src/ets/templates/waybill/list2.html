@@ -24,42 +24,6 @@
   </thead>
   
   <tbody>
-    {% for waybill in object_list %}
-      <tr {% if waybill.hasError %}style='color:red;'{% endif %}>
-		<td><a href="{% order_url waybill.order__pk %}">{{ waybill.order__pk }}</a></td>
-      	<td><a href="{% waybill_url waybill.pk %}">{{ waybill.pk }}</a></td>
-        <td>{{ waybill.order__warehouse__name }}</td>
-        <td>{{ waybill.order__consignee__name }}</td>
-        <td>{{ waybill.order__location__name }}</td>
-        <td>{{ waybill.destination__name }}</td>
-        <td>{% waybill_delivery_method waybill.transaction_type %}</td>
-        <td>
-          {% if waybill.transport_dispach_signed_date %}
-            {{ waybill.transport_dispach_signed_date|date|upper }}
-          {% else %}
-		  	<a href="{% waybill_url waybill.pk %}">Open</a>
-          {% endif %}
-        </td>
-        <td>
-          {% if waybill.receipt_signed_date %}
-            {{ waybill.receipt_signed_date|date|upper }}
-          {% else %}
-            {% waybill_reception waybill user _("Receive this waybil") %}
-          {% endif %}
-        </td>
-        <td>
-          {% if waybill.validated %}{% trans "D" %}{% else %}-{% endif %}/
-          {% if waybill.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}
-        </td>
-        <td>
-          {% if waybill.sent_compas %}D: {{ waybill.sent_compas }}{% else %}-{% endif %}/
-          {% if waybill.receipt_sent_compas %}R: {{ waybill.receipt_sent_compas }}{% else %}-{% endif %}
-        </td>
-        <td>
-          {% waybill_delete waybill user %}
-        </td>
-      </tr>
-    {% endfor %}
   </tbody>
 </table>
 
@@ -69,7 +33,11 @@
 {{ block.super }}
 <script type="text/javascript">
   $(document).ready(function() {
-  	$('#example').dataTable();
+    $('#example').dataTable({
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "{{ ajax_source_url }}{% if search_string %}?search_string={{ search_string }}{% endif %}",
+    })
   } );
 </script>
 {% endblock script %}

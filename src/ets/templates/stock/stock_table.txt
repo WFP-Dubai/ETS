@@ -1,0 +1,13 @@
+{% extends "table.txt" %}
+
+{% block table_items %}
+    "{{ item.commodity }}",
+    "{{ item.project_number }}",
+    "{{ item.si_code }}",
+    "{{ item.get_quality_display }}",
+    "{{ item.number_of_units|floatformat:0 }}",
+    "{{ item.unit_weight_net }}",
+    "{{ item.unit_weight_gross }}",
+    "{{ item.quantity_net }}",
+    "{{ item.quantity_gross }}"
+{% endblock %}

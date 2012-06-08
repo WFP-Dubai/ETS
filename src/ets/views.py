@@ -22,6 +22,7 @@ from django.core import serializers
 from django.contrib.admin import models as log_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
+from django.core.urlresolvers import reverse
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
 from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
@@ -117,7 +118,7 @@ def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
 
 
 @waybill_user_related
-def waybill_list(request, queryset, template='waybill/list2.html', extra_context=None):
+def waybill_list(request, queryset, template='waybill/list2.html', extra_context=None): 
     """Shows waybill listing"""
     context = {'object_list': queryset.values(
         'order',
@@ -140,15 +141,58 @@ def waybill_list(request, queryset, template='waybill/list2.html', extra_context
     return direct_to_template(request, template, context)
 
 
-def waybill_search( request, queryset, form_class=WaybillSearchForm, template='waybill/list2.html'):
+def waybill_search( request, template='waybill/list2.html', form_class=WaybillSearchForm, extra_context=None):
     """Waybill search view. Simply a wrapper on waybill_list"""
     
     form = form_class(request.GET or None)
     search_string = form.cleaned_data['q'] if form.is_valid() else ''
-    queryset = queryset.filter(pk__icontains=search_string)
-    
-    return waybill_list(request, queryset=queryset)
 
+    context = {
+        "search_string": search_string,
+        "ajax_source_url": reverse("table_waybills"),
+    }
+    
+    apply_extra_context(extra_context or {}, context)
+    return direct_to_template(request, template, context)
+
+
+@waybill_user_related
+def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
+
+    search_string = request.GET.get("search_string", "")
+    if search_string:
+        queryset = queryset.filter(pk__icontains=search_string)
+
+    column_index_map = {
+        0: 'order__pk',
+        1: 'pk',
+        2: 'order__warehouse__name',
+        3: 'order__consignee__name',
+        4: 'order__location__name',
+        5: 'destination__name',
+        6: 'transaction_type',
+        7: 'transport_dispach_signed_date',
+        8: 'receipt_signed_date',
+        9: 'pk',
+        10: 'pk',
+        11: 'pk',
+    }
+
+    return get_datatables_records(request, queryset, column_index_map, "waybill/waybill_table.txt")
+
+@waybill_user_related
+def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
+    print queryset
+
+    column_index_map = {
+        0: 'order__pk',
+        1: 'pk',
+        2: 'order__warehouse__location__name',
+        3: 'order__consignee__name',
+        4: 'order__location__name',
+    }
+
+    return get_datatables_records(request, queryset, column_index_map, "compas/compas_waybills_table.txt")
 
 @transaction.commit_on_success
 def _dispatching(request, waybill, template, success_message, created=False, form_class=DispatchWaybillForm, 
@@ -409,7 +453,7 @@ def table_stock_items(request, param_name):
     warehouse_pk = request.GET.get(param_name)
     warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)
     column_index_map = {
-        0: 'commodity_id',
+        0: 'commodity__name',
         1: 'project_number',
         2: 'si_code',
         3: 'quality',
@@ -417,10 +461,29 @@ def table_stock_items(request, param_name):
         5: 'unit_weight_net',
         6: 'unit_weight_gross',
         7: 'quantity_net',
-        8: 'quantity_gross'
+        8: 'quantity_gross' 
     }
 
-    return get_datatables_records(request, warehouse.stock_items.all(), column_index_map)
+    return get_datatables_records(request, warehouse.stock_items.all(), column_index_map, "stock/stock_table.txt")
+
+@person_required
+@warehouse_related
+def table_orders(request, queryset):
+
+    column_index_map = {
+        0: 'code',
+        1: 'created',
+        2: 'dispatch_date',
+        3: 'expiry',
+        4: 'warehouse__name',
+        5: 'location__name',
+        6: 'consignee',
+        7: 'transport_name',
+        8: 'created',
+        9: 'created',
+    }
+
+    return get_datatables_records(request, queryset, column_index_map, "order/order_table.txt")
 
 def get_stock_data(request, order_pk, queryset):
     """Utility ajax view that returns stock item information to fill dispatch form."""
