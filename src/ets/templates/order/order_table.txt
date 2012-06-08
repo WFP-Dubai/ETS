@@ -1,0 +1,15 @@
+{% extends "table.txt" %}
+{% load extra_tags %}
+
+{% block table_items %}
+    "<a href='{{ item.get_absolute_url }}'>{{ item.code }}</a>",
+    "{{ item.created|date|upper }}",
+    "{{ item.dispatch_date|date|upper }}",
+    "{{ item.expiry|date|upper }}",
+    "{{ item.warehouse.name }}",
+    "{{ item.location.name }}",
+    "{{ item.consignee }}",
+    "{{ item.transport_name }}",
+    "{{ item.get_percent_executed }}",
+    "{% waybill_creation item request.user %}"
+{% endblock %}
