@@ -53,9 +53,9 @@ urlpatterns = patterns("ets.views",
     
     #Waybill pages
 
-    ( r'^datatables/waybills_dispatch/$', person_required(dispatch_view(table_waybills)), {}, "table_waybill_dispatch" ),
-    ( r'^datatables/waybills_recieve/$', person_required(receipt_view(table_waybills)), {}, "table_waybill_reception" ),
-    ( r'^datatables/waybills/$', person_required(table_waybills), {
+    ( r'^datatables/waybills_dispatch/$', dispatch_view(table_waybills), {}, "table_waybill_dispatch" ),
+    ( r'^datatables/waybills_recieve/$', receipt_view(table_waybills), {}, "table_waybill_reception" ),
+    ( r'^datatables/waybills/$', table_waybills, {
         'queryset': ets.models.Waybill.objects.all(),
     }, "table_waybills" ),
                        
