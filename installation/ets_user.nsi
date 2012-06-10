@@ -149,8 +149,9 @@ Section "Main" MainProgram
   SetOutPath "$INSTDIR\ETS"
   File /r "${pkgdir}\ETS\*"
   FileOpen $8 $INSTDIR\ETS\runserver.bat w 
+  FileWrite $8 "start python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
+  FileWrite $8 "ping 127.0.0.1 -n 4 -w 100000 > nul$\r$\n"
   FileWrite $8 "explorer http://127.0.0.1:8000/$\r$\n"
-  FileWrite $8 "python $\"$INSTDIR\ETS\bin\instance-script.py$\" runserver --insecure$\r$\n"
   FileClose $8
   AccessControl::GrantOnFile "$INSTDIR\ETS\db" "(BU)" "FullAccess + GenericRead + GenericWrite"
   FileOpen $9 $INSTDIR\ETS\import.bat w 

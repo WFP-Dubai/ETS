@@ -2,8 +2,8 @@
 {% load i18n extra_tags %}
 
 {% block table_items %}
-  "<a href='{% order_url item.order.pk %}'>{{ item.order.pk }}</a>",
-  "<a href='{% waybill_url item.pk %}'>{{ item.pk }}</a>",
+  "<a href='{{ item.order.get_absolute_url }}'>{{ item.order.pk }}</a>",
+  "<a href='{{ item.get_absolute_url }}'>{{ item.pk }}</a>",
   "{{ item.order.warehouse.name }}",
   "{{ item.order.consignee.name }}",
   "{{ item.order.location.name }}",
@@ -12,7 +12,7 @@
   "{% if waybill.transport_dispach_signed_date %}
      {{ waybill.transport_dispach_signed_date|date|upper }}
    {% else %}
-     <a href='{% waybill_url item.pk %}'>Open</a>
+     <a href='{{ item.get_absolute_url }}'>Open</a>
    {% endif %}",
   "{% if item.receipt_signed_date %}
      {{ item.receipt_signed_date|date|upper }}
