@@ -12,6 +12,7 @@ from django.conf import settings
 
 from uni_form.helper import FormHelper
 from uni_form.layout import Layout, Fieldset, Row, Submit
+from ajax_select.fields import AutoCompleteSelectField
 
 from ets import models as ets_models
 from ets.utils import ACTION_TYPES
@@ -223,3 +224,11 @@ class ImportDataForm( forms.Form ):
 class WaybillActionForm( forms.Form ):
     WAYBILL_ACTIONS = chain(((0, " - - - - - -"),), ACTION_TYPES)
     action_type = forms.TypedChoiceField(choices=WAYBILL_ACTIONS, coerce=lambda val: int(val), required=True)
+
+class WarehouseSearchForm( forms.ModelForm ):
+    """Waybill scan form with one input"""
+    q = AutoCompleteSelectField('warehouses', required=False, help_text=None)
+
+    class Meta:
+        model = ets_models.Warehouse
+
