@@ -40,7 +40,16 @@
         "aaSorting": [[ 4, "desc" ]],
         "bProcessing": true,
         "bServerSide": true,
-        "sAjaxSource": "{% url table_stock_items param_name='wh_id' %}?wh_id="+$(this).attr("id")
+        "sAjaxSource": "{% url table_stock_items param_name='wh_id' %}?wh_id="+$(this).attr("id"),
+        "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+          if ( aData[3] != "{{ good_quality }}" ) {
+            nRow.className +=' red';
+          };
+          if ( aData[4] <= 0 ) {
+            nRow.className +=' row-negative-units';
+          }
+          return nRow;
+        },
       });
     });
   });

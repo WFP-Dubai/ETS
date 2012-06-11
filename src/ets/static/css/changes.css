@@ -73,3 +73,11 @@ dl.warehouse-list dd {
 .paging_two_button a:hover { 
   cursor: pointer;
 }
+
+.red { 
+  color: red;
+}
+
+.row-negative-units { 
+  opacity: 0.2;
+}

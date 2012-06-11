@@ -447,7 +447,8 @@ def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
     if not request.user.has_perm("ets.stockitem_api_full_access"):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    return object_list(request, queryset, paginate_by=5, template_name=template_name)
+    return object_list(request, queryset, paginate_by=5, template_name=template_name,
+                       extra_context={ "good_quality": "Good" })
 
 def table_stock_items(request, param_name):
     warehouse_pk = request.GET.get(param_name)
