@@ -17,9 +17,9 @@
   "{% if item.receipt_signed_date %}
      {{ item.receipt_signed_date|date|upper }}
    {% else %}
-     {% waybill_reception item request.user _("Receive this waybil") %}
+     {% waybill_reception item request.user _('Receive this waybill') %}
    {% endif %}",
-  "{% if item.validated %}{% trans "D" %}{% else %}-{% endif %}/{% if item.receipt_validated %}{% trans "R" %}{% else %}-{% endif %}",
+  "{% if item.validated %}{% trans 'D' %}{% else %}-{% endif %}/{% if item.receipt_validated %}{% trans 'R' %}{% else %}-{% endif %}",
   "{% if item.sent_compas %}D: {{ item.sent_compas }}{% else %}-{% endif %}/{% if item.receipt_sent_compas %}R: {{ item.receipt_sent_compas }}{% else %}-{% endif %}",
-  "waybill_delete"
+  "{% waybill_delete item request.user %}"
 {% endblock %}
