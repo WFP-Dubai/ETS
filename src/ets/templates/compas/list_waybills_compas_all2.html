@@ -1,5 +1,5 @@
 {% extends "base_template.html"%}
-{% load i18n pagination_tags %}
+{% load i18n %}
 
 {%block content %}
 <h3>{{ extra_title }} {% trans "eWaybills Submitted to COMPAS" %}</h3>
@@ -15,40 +15,27 @@
   </thead>
   
   <tbody>
-    {% for waybill in object_list%}
-    <tr>
-      <td><a href="/order/{{ waybill.order__pk }}">{{ waybill.order__pk }}</a></td>
-      <td><a href="/waybill/{{ waybill.pk }}">{{ waybill.pk }}</a></td>
-      <td>{{ waybill.order__warehouse__location__name }}</td>
-      <td>{{ waybill.order__consignee__name }}</td>
-      <td>{{ waybill.order__location__name }}</td>
-    </tr>
-    {% endfor%} 
-  <tbody>
+  </tbody>
 </table>
 
 
-{%if error_message %}
+{% if error_message %}
 <pre>
-  <div>{{error_message}}</div>
+  <div>{{ error_message }}</div>
 </pre>
-{%endif%}
+{% endif %}
 <br/>
-{% paginate %}
-{%endblock%}
+{% endblock %}
 
-{%block script%}
+{% block script %}
+{{ block.super }}
 <script type="text/javascript">
 $(document).ready(function() {
-	$('#example').dataTable( 
-		{"aoColumns": [ 
-            null,
-            null,
-            null,
-            null,
-            null,
-            { "bSearchable": false},
-        ] });
+	$('#example').dataTable( { 
+            "bProcessing": true,
+            "bServerSide": true,
+            "sAjaxSource": "{{ ajax_source_url }}",
+        } );
 } );
 </script>
-{%endblock script%}
+{% endblock script %}

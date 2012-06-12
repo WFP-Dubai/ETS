@@ -22,6 +22,7 @@
     </tr>
   </thead>
   <tbody>
+    {% comment %}
     {% for order in object_list %}
     <tr>
       <td><a href="{{ order.get_absolute_url }}">{{ order.code }}</a></td>
@@ -36,6 +37,7 @@
       <td>{% waybill_creation order user %}</td>
     </tr>
     {% endfor %}
+    {% endcomment %}
   </tbody>
 </table>
 
@@ -63,7 +65,10 @@ jQuery.fn.dataTableExt.oSort['date-case-desc'] = function(x,y) {
 $(document).ready(function() {
 //$('#listing').dataTable();
     $('#listing').dataTable({
-    	"aaSorting": [[ 3, "desc" ]],
+    	"aaSorting": [[ 3, "asc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "{% url table_orders %}",
         "aoColumns": [
           null,
           { "sType": 'date-case' },

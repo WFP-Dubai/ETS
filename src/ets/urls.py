@@ -15,7 +15,7 @@ serve.authentication = False
 
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
-from ets.views import waybill_list, waybill_reception, ImportData
+from ets.views import waybill_list, waybill_reception, ImportData, table_waybills, table_compas_waybills
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
@@ -28,10 +28,12 @@ urlpatterns = patterns("ets.views",
     }, "index"),
     
     #Order list
-    ( r'^orders/$', person_required(warehouse_related(object_list)), {
-        'queryset': ets.models.Order.objects.filter(expiry__gt = (datetime.now() - timedelta( days = settings.ORDER_SHOW_AFTER_EXP_DAYS ))).order_by('-created'),
-        'template_name': 'order/list.html',
+    ( r'^orders/$', person_required(direct_to_template), {
+        'template': 'order/list.html',
     }, "orders"),
+    ( r'^datatables/orders/$', "table_orders", {
+        'queryset': ets.models.Order.objects.all().order_by('-created')
+    }, "table_orders"),
     
     #Order detail
     ( r'^order/(?P<object_id>[-\w]+)/$', object_detail, {
@@ -46,17 +48,29 @@ urlpatterns = patterns("ets.views",
     }, "waybill_create" ),
     
     #Waybill pages
-    
-    #Listings
-    ( r'^search/$', "waybill_search", {
+
+    ( r'^datatables/waybills_dispatch/$', dispatch_view(table_waybills), {}, "table_waybill_dispatch" ),
+    ( r'^datatables/waybills_recieve/$', receipt_view(table_waybills), {}, "table_waybill_reception" ),
+    ( r'^datatables/waybills/$', table_waybills, {
         'queryset': ets.models.Waybill.objects.all(),
-    }, "waybill_search" ),
+    }, "table_waybills" ),
+                       
+    #Listings
+    ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
-    ( r'^dispatch/$', person_required(dispatch_view(waybill_list)), {
-        "extra_context": {"extra_title": _("eWaybills Waiting For Dispatch Signature")}
+    ( r'^dispatch/$', person_required(direct_to_template), {
+        "template": 'waybill/list2.html',
+        "extra_context": {
+            "extra_title": _("eWaybills Waiting For Dispatch Signature"),
+            "ajax_source_url": "/datatables/waybills_dispatch/"
+        }
     }, "waybill_dispatch_list" ),
-    ( r'^receive/$', person_required(receipt_view(waybill_list)), {
-        "extra_context": {"extra_title": _("Expected Consignments")}
+    ( r'^receive/$', person_required(direct_to_template), {
+        "template": 'waybill/list2.html',
+        "extra_context": {
+            "extra_title": _("Expected Consignments"),
+            "ajax_source_url": "/datatables/waybills_recieve/"
+        }
     }, "waybill_reception_list" ),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
@@ -127,48 +141,27 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/(?P<redirect_to>[-\w]+)/$', 
       "waybill_delete", {}, "waybill_delete" ),
     ( r'^waybill/delete/(?P<waybill_pk>[-\w]+)/$', "waybill_delete", {}, "waybill_delete" ),
-    
-    ( r'^compass_waybill_receipt/$', officer_required(waybill_user_related(object_list)), {
-        "template_name": 'compas/list_waybills_compas_all.html',
-        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False),
+ 
+    ( r'^compas_waybill_receipt/$', officer_required(direct_to_template), {
+        "template": 'compas/list_waybills_compas_all2.html',
         "extra_context": {
             "extra_title": _("Received"),
-    }}, "compass_waybill_receipt" ),
-    ( r'^compas_waybill_receipt/$', officer_required(waybill_user_related(object_list)), {
-        "template_name": 'compas/list_waybills_compas_all2.html',
-        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False).values('order','order__pk', 'pk',
-                                                                                     'order__warehouse__location__name',
-                                                                                     'order__warehouse',
-                                                                                     'order__consignee__name',
-                                                                                     'order__location__name'),
-        "paginate_by":50,
-        "extra_context": {
-            "extra_title": _("Received"),
+            "ajax_source_url": "/datatables/compas_waybill_receipt/"
     }}, "compas_waybill_receipt" ),
+    ( r'^datatables/compas_waybill_receipt/$', officer_required(table_compas_waybills), {
+        "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False)
+    }, "table_compass_waybill_receipt" ),
+
+    ( r'^datatables/compas_waybill/$', officer_required(table_compas_waybills), {
+        "queryset": Waybill.objects.filter(sent_compas__isnull=False),
+    }, 'table_compass_waybill' ),
+    ( r'^compas_waybill/$', officer_required(direct_to_template), {
+        "template": 'compas/list_waybills_compas_all2.html',
+        "extra_context": {
+            "ajax_source_url": "/datatables/compas_waybill/"
+    }}, 'compas_waybill' ),
     
-                        
-    ( r'^compass_waybill/$', officer_required(waybill_user_related(object_list)), {
-        "template_name": 'compas/list_waybills_compas_all.html',
-        "queryset": Waybill.objects.select_related('order','order__warehouse','order__warehouse__location','order__consignee','order__location','order','order__pk',
-            'pk',
-            'order__warehouse__location__name',
-            'order__warehouse',
-            'order__consignee__name',
-            'order__location__name').filter(sent_compas__isnull=False),
-        "paginate_by":50,
-    }, 'compass_waybill' ),
-    
-    ( r'^compas_waybill/$', officer_required(waybill_user_related(object_list)), {
-        "template_name": 'compas/list_waybills_compas_all2.html',
-        "queryset": Waybill.objects.filter(sent_compas__isnull=False).values('order','order__pk', 'pk',
-                                                                             'order__warehouse__location__name',
-                                                                             'order__warehouse',
-                                                                             'order__consignee__name',
-                                                                             'order__location__name'),
-        "paginate_by":50,#paging not solution
-    }, 'compas_waybill' ),
-    
-        
+    ( r'^datatables/stock/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
     ( r'^stock/$', 'stock_items', {
         'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True)\
                                                 .filter(start_date__lte=date.today)\
