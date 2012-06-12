@@ -25,7 +25,7 @@ from django.contrib.admin.models import LogEntry
 from django.core.urlresolvers import reverse
 
 from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
-from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm #, WaybillValidationFormset 
+from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm, WarehouseSearchForm
 from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
 from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
 from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
@@ -607,13 +607,19 @@ class ImportData(FormView):
         return self.get(self.request)
 
 @officer_required
-def installation_data(request, template_name="stock/warehouse_list.html",
-                      queryset=ets.models.Warehouse.objects.all().order_by("compas__code", "code")):
+def installation_data(request, template_name="stock/warehouse_list.html", form_class=WaybillSearchForm):
+
+    form = form_class(request.GET or None)
+    compas_stations = request.user.compases.all().values_list('code')
     
-    user = request.user
-    compas_stations = user.compases.all().values_list('code')
-    if not user.is_superuser:
+    queryset = ets.models.Warehouse.get_active_warehouses().order_by("compas__code", "code")
+    
+    if not request.user.is_superuser:
         queryset.filter(compas__in=compas_stations)
-    queryset.order_by("compas", "name")
+
+    if form.is_valid():
+        search_string = form.cleaned_data['q']
+        queryset = queryset.filter(Q(pk__icontains=search_string) | Q(name__icontains=search_string) | Q(location__name__icontains=search_string))
     
-    return object_list(request, queryset, paginate_by=settings.PAGINATION_DEFAULT_PAGINATION, template_name=template_name)
+    return object_list(request, queryset.order_by("compas", "name"), extra_context = { "form" : form },
+                       paginate_by=settings.PAGINATION_DEFAULT_PAGINATION, template_name=template_name)
