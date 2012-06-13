@@ -580,8 +580,8 @@ class Waybill( ld_models.Model ):
     destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), related_name="receipt_waybills")
     
     #Dates
-    loading_date = models.DateField(_("Loading Date"), default=datetime.now) #dateOfLoading
-    dispatch_date = models.DateField( _("Dispatch Date"), default=datetime.now) #dateOfDispatch
+    loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
+    dispatch_date = models.DateField( _("Dispatch Date"), default=datetime.now, db_index=True) #dateOfDispatch
     
     transaction_type = models.CharField(_("Transaction Type"), max_length=10, 
                                          choices=TRANSACTION_TYPES, default=TRANSACTION_TYPES[0][0]) #transactionType
@@ -622,14 +622,14 @@ class Waybill( ld_models.Model ):
 
     distance = models.IntegerField(_("Distance Covered (km)"), blank=True, null=True) #recipientDistance
     
-    transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True) #transportDispachSignedTimestamp
-    receipt_signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True) #recipientSignedTimestamp
+    transport_dispach_signed_date = models.DateTimeField( _("Transport Dispach Signed Date"), null=True, blank=True, db_index=True) #transportDispachSignedTimestamp
+    receipt_signed_date = models.DateTimeField(_("Recipient Signed Date"), blank=True, null=True, db_index=True) #recipientSignedTimestamp
     
-    validated = models.BooleanField( _("eWaybill Validated"), default=False) #waybillValidated
-    sent_compas = models.DateTimeField(_("eWaybill Sent to Compas"), blank=True, null=True)
+    validated = models.BooleanField( _("eWaybill Validated"), default=False, db_index=True) #waybillValidated
+    sent_compas = models.DateTimeField(_("eWaybill Sent to Compas"), blank=True, null=True, db_index=True)
     
-    receipt_validated = models.BooleanField(_("eWaybill Receipt Validated"), default=False) #waybillReceiptValidated
-    receipt_sent_compas = models.DateTimeField(_("eWaybill Reciept Sent to Compas"), blank=True, null=True)
+    receipt_validated = models.BooleanField(_("eWaybill Receipt Validated"), default=False, db_index=True) #waybillReceiptValidated
+    receipt_sent_compas = models.DateTimeField(_("eWaybill Reciept Sent to Compas"), blank=True, null=True, db_index=True)
     
     barcode = ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
                        blank=True, null=True,
