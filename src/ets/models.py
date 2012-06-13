@@ -43,8 +43,8 @@ class Compas(ld_models.Model):
     """ Compas station """
     
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
-    officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases")
-    description = models.CharField(_("Description"), max_length=20,blank=True)
+    officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases", db_index=True)
+    description = models.CharField(_("Description"), max_length=20, blank=True)
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
     
     #Database settings
@@ -113,8 +113,8 @@ class Warehouse(models.Model):
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS station"), related_name="warehouses", blank=True, null=True)
     compas_text = models.CharField(_("COMPAS Station (Text)"), max_length = 13, blank=True, null=True) #COMPAS station for not managed WH
     valid_warehouse = models.BooleanField(_("Is Warehouse"), default=True)
-    start_date = models.DateField(_("Start date"), blank=True, null=True)
-    end_date = models.DateField(_("End date"), blank=True, null=True)
+    start_date = models.DateField(_("Start date"), blank=True, null=True, db_index=True)
+    end_date = models.DateField(_("End date"), blank=True, null=True, db_index=True)
     
     class Meta:
         ordering = ('name',)
@@ -164,10 +164,10 @@ class Person(User):
     organization = models.ForeignKey('ets.Organization', verbose_name=_("organization"), related_name="persons")
     location = models.ForeignKey('ets.Location', verbose_name=_("location"), related_name="persons")
     
-    warehouses = models.ManyToManyField('ets.Warehouse', verbose_name=_("Warehouses"), related_name="persons")
+    warehouses = models.ManyToManyField('ets.Warehouse', verbose_name=_("Warehouses"), related_name="persons", db_index=True)
     
-    dispatch = models.BooleanField(_("Can dispatch"), default=False)
-    receive = models.BooleanField(_("Can receive"), default=False)
+    dispatch = models.BooleanField(_("Can dispatch"), default=False, db_index=True)
+    receive = models.BooleanField(_("Can receive"), default=False, db_index=True)
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
     
@@ -249,12 +249,12 @@ class StockItem( models.Model ):
     
     code = AutoSlugField(populate_from="external_ident", slugify=capitalize_slug(slugify), 
                          max_length=128, unique=True, sep='', 
-                         editable=True, primary_key=True) 
+                         editable=True, primary_key=True)
     
     warehouse = models.ForeignKey(Warehouse, verbose_name=_("Warehouse"), related_name="stock_items")
     
-    project_number = models.CharField(_("Project Number"), max_length=24, blank=True) #project_wbs_element
-    si_code = models.CharField(_("shipping instruction code"), max_length=8)
+    project_number = models.CharField(_("Project Number"), max_length=24, blank=True, db_index=True) #project_wbs_element
+    si_code = models.CharField(_("shipping instruction code"), max_length=8, db_index=True)
     
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="stocks")
     package = models.ForeignKey(Package, verbose_name=_("Package"), related_name="stocks")
@@ -275,7 +275,6 @@ class StockItem( models.Model ):
     si_record_id = models.CharField(_("SI record id"), max_length=25, primary_key=False)
     origin_id = models.CharField(_("Origin identifier"), max_length=23)
     allocation_code = models.CharField(_("Allocation code"), max_length=10, editable=False)
-    
     
     virtual = models.BooleanField(_("Virtual stock"), default=False)
     
@@ -358,9 +357,9 @@ class Order(models.Model):
     
     code = models.CharField(_("Code"), max_length=40, primary_key=True)
     
-    created = models.DateField(_("Created date"), default=date.today) #lti_date
-    expiry = models.DateField(_("expire date"), default=date.today) #expiry_date
-    dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True)
+    created = models.DateField(_("Created date"), default=date.today, db_index=True) #lti_date
+    expiry = models.DateField(_("expire date"), default=date.today, db_index=True) #expiry_date
+    dispatch_date = models.DateField(_("Requested Dispatch Date"), blank=True, null=True, db_index=True)
     
     transport_code = models.CharField(_("Transport Code"), max_length = 4, editable=False)
     transport_ouc = models.CharField(_("Transport ouc"), max_length = 13, editable=False)
@@ -420,12 +419,12 @@ class OrderItem(models.Model):
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
-    lti_id = models.CharField(_("LTI ID"), max_length=40)
-    si_code = models.CharField( _("Shipping Order Code"), max_length=8)
-    project_number = models.CharField(_("Project Number"), max_length = 24, blank = True) #project_wbs_element
+    lti_id = models.CharField(_("LTI ID"), max_length=40, db_index=True)
+    si_code = models.CharField( _("Shipping Order Code"), max_length=8, db_index=True)
+    project_number = models.CharField(_("Project Number"), max_length = 24, blank=True, db_index=True) #project_wbs_element
     commodity = models.ForeignKey(Commodity, verbose_name=_("Commodity"), related_name="order_items")
     
-    number_of_units = models.IntegerField(_("Number of Units"))
+    number_of_units = models.IntegerField(_("Number of Units"), db_index=True)
     
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, 
                                           editable=False, blank=True, null=True)
@@ -854,7 +853,7 @@ class LoadingDetail(models.Model):
     #Stock data
     stock_item = models.ForeignKey(StockItem, verbose_name=_("Stock item"), related_name="dispatches")
     
-    number_of_units = models.IntegerField(_("Number of Units"))
+    number_of_units = models.IntegerField(_("Number of Units"), db_index=True)
     
     unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
     unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
@@ -1019,8 +1018,8 @@ class ImportLogger(models.Model):
     )
     
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="import_logs")
-    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
-    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
+    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now, db_index=True)
+    status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS, db_index=True)
     message = models.TextField(_("error message"), blank=True)
     
     class Meta:
@@ -1053,7 +1052,7 @@ class CompasLogger(models.Model):
     action = models.IntegerField(_("procedure name"), choices=ACTIONS)
     compas = models.ForeignKey(Compas, verbose_name=_("COMPAS"), related_name="logs")
     waybill = models.ForeignKey(Waybill, verbose_name=_("eWaybill"), related_name="compass_loggers")
-    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now)
+    when_attempted = models.DateTimeField(_("when attempted"), default=datetime.now, db_index=True)
     status = models.IntegerField(_("status"), choices=STATUSES, default=SUCCESS)
     message = models.TextField(_("error message"))
     
