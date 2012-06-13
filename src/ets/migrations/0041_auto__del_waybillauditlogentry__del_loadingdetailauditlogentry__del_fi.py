@@ -8,12 +8,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'WaybillAuditLogEntry'
-        db.delete_table('ets_waybillauditlogentry')
-
-        # Deleting model 'LoadingDetailAuditLogEntry'
-        db.delete_table('ets_loadingdetailauditlogentry')
-
+        
         # Deleting field 'Warehouse._order'
         db.delete_column('ets_warehouse', '_order')
 
