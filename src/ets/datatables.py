@@ -9,12 +9,11 @@ Link for file:
 
 
 from django.db.models import Q
-from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.utils.cache import add_never_cache_headers
 from django.utils import simplejson
 
-def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePath = None, *args):
+def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, *args):
     """
     Usage: 
         querySet: query set to draw data from.
@@ -74,14 +73,11 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
     iTotalRecords = iTotalDisplayRecords = querySet.count() #count how many records match the final criteria
     querySet = querySet[startRecord:endRecord] #get the slice
     sEcho = int(request.GET.get('sEcho',0)) # required echo response
-
-    if jsonTemplatePath:
-        jstonString = render_to_string(jsonTemplatePath, locals()) #prepare the JSON with the response, consider using : from django.template.defaultfilters import escapejs
-        response = HttpResponse(jstonString, mimetype="application/javascript")
-    else:
-        aaData = []
+    
+    aaData = []
+    if not aa_data:
+    
         a = querySet.values()
-        print a
         for row in a:
             rowkeys = row.keys()
             rowvalues = row.values()
@@ -91,10 +87,20 @@ def get_datatables_records(request, querySet, columnIndexNameMap, jsonTemplatePa
                     if val == colitems[col]:
                         rowlist.append(str(rowvalues[idx]))
             aaData.append(rowlist)
-        response_dict = {}
-        response_dict.update({'aaData':aaData})
-        response_dict.update({'sEcho': sEcho, 'iTotalRecords': iTotalRecords, 'iTotalDisplayRecords':iTotalDisplayRecords, 'sColumns':sColumns})
-        response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+    else:
+        for item in querySet:
+            aaData.append(aa_data(item))
+        
+    response_dict = {
+        'aaData': aaData,
+        'sEcho': sEcho, 
+        'iTotalRecords': iTotalRecords, 
+        'iTotalDisplayRecords':iTotalDisplayRecords, 
+        'sColumns':sColumns
+    }
+    
+    print "response_dict --> ", response_dict
+    response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
 
     #prevent from caching datatables result
     add_never_cache_headers(response)

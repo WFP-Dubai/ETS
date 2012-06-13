@@ -6,6 +6,10 @@
 {% block content %}
 <h3><a href="http://github.com/downloads/Arpaso/ETS/ETS-0.0.2.exe">{% trans "Download ETS installer" %}</a></h3>
 <h2>{% trans "Initial data for available warehouses" %}</h2>
+<form method="GET" action="{% url installation_data %}">
+  {{ form.q }}
+  <input type="submit" value="{% trans "Search for Warehouse" %}">
+</form>
 <dl class="warehouse-list">
   {% for wh in object_list %}
     {% ifchanged wh.compas %}<dt>{{ wh.compas }}</dt>{% endifchanged %}
