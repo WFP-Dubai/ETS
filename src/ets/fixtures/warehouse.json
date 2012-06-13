@@ -3,7 +3,6 @@
     "pk": "OE7X001",
     "model": "ets.warehouse",
     "fields": {
-      "_order": 0,
       "name": "EDO OFFICE MEHTI",
       "compas": "ISBX002",
       "location": "OE7X",
@@ -15,7 +14,6 @@
     "pk": "ISBX003",
     "model": "ets.warehouse",
     "fields": {
-      "_order": 0,
       "name": "ISLAMABAD CITY OFFICE",
       "compas": "ISBX002",
       "location": "ISBX",
@@ -27,7 +25,6 @@
     "pk": "ISBX002",
     "model": "ets.warehouse",
     "fields": {
-      "_order": 1,
       "name": "PAKISTAN COUNTRY OFFICE",
       "compas": "ISBX002",
       "location": "ISBX",

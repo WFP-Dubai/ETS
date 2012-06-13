@@ -5,11 +5,6 @@ from optparse import make_option
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-from ets.utils import (update_compas, 
-                       import_persons, import_stock, import_order,
-                       import_partners, import_places, import_reasons) 
-from ets.models import Compas
-
 LOG_DIRECTORY = settings.LOG_DIRECTORY
 
 
@@ -31,9 +26,12 @@ class Command(BaseCommand):
     
     def synchronize(self, compas):
         """Exact method to proceed synchronization"""
-        update_compas(compas, import_partners, import_places, import_reasons, import_persons, import_stock, import_order)
+        from ets import utils
+        utils.update_compas(compas, utils.import_partners, utils.import_places, utils.import_reasons, 
+                            utils.import_persons, utils.import_stock, utils.import_order)
 
     def handle(self, compas='', *args, **options):
+        from ets.models import Compas
         
         stations = Compas.objects.all()
         if compas:

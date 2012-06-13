@@ -99,7 +99,6 @@ def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, 
         'sColumns':sColumns
     }
     
-    print "response_dict --> ", response_dict
     response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
 
     #prevent from caching datatables result

@@ -132,7 +132,6 @@
       
       "receipt_signed_date": null,
       
-      "_order": 0,
       "barcode": "test/test_barcode.jpeg"
     }
   }, 
@@ -161,9 +160,7 @@
       "units_damaged_reason": null,
       
       "overloaded_units": false,
-      "over_offload_units": false,
-      
-      "_order": 0
+      "over_offload_units": false
     }
   },
   {
@@ -201,7 +198,6 @@
       
       "validated": false,
       
-      "_order": 0,
       "barcode": "test/test_barcode.jpeg"
     }
   }, 
@@ -223,8 +219,7 @@
       "units_lost_reason": null,
       "units_damaged_reason": null,
       "overloaded_units": false,
-      "over_offload_units": false,
-      "_order": 0
+      "over_offload_units": false
     }
   },
   {
@@ -268,7 +263,6 @@
       "receipt_remarks": "",
       "receipt_validated": false,
       
-      "_order": 0,
       "barcode": "test/test_barcode.jpeg"
     }
   },
@@ -276,7 +270,6 @@
     "pk": "ISBX00311A12",
     "model": "ets.loadingdetail",
     "fields": {
-      "_order": 0,
       "number_units_good": "0",
       "unit_weight_net": "1",
       "unit_weight_gross": "1",
@@ -297,7 +290,6 @@
     "pk": "ISBX00311A13",
     "model": "ets.loadingdetail",
     "fields": {
-      "_order": 1,
       "number_units_good": "0",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
@@ -318,7 +310,6 @@
     "pk": "ISBX00311A14",
     "model": "ets.loadingdetail",
     "fields": {
-      "_order": 1,
       "number_units_good": "3",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
@@ -338,7 +329,6 @@
     "pk": "ISBX00311A15",
     "model": "ets.loadingdetail",
     "fields": {
-      "_order": 2,
       "number_units_good": "5",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
@@ -358,7 +348,6 @@
     "pk": "ISBX00311A16",
     "model": "ets.loadingdetail",
     "fields": {
-      "_order": 3,
       "number_units_good": "15",
       "over_offload_units": false,
       "waybill": "ISBX00312A",
