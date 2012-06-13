@@ -234,7 +234,7 @@ def _dispatching(request, waybill, template, success_message, created=False, for
         stock_item = forms.ModelChoiceField(queryset=order.get_stock_items(), label=_('Stock Item'), 
                                             empty_label=_("Choose stock item"))
         stock_item.choices = [(u"", stock_item.empty_label),]
-        stock_item.choices+=[(item.pk, u"%s-%s" % (unicode(item), item.get_order_quantity(order.pk) ))  
+        stock_item.choices+=[(item.pk, u"%s  - %s(kg)" % (unicode(item), item.unit_weight_net ))  
                              for item in order.get_stock_items().exclude(quantity_net=0)]
     
     loading_formset = inlineformset_factory(ets.models.Waybill, ets.models.LoadingDetail, 
@@ -525,6 +525,8 @@ def table_orders(request, queryset):
         8: 'created',
         9: 'created',
     }
+
+    queryset = queryset.filter(expiry__gt = (datetime.datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)))
     
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),
@@ -557,6 +559,26 @@ def get_stock_data(request, order_pk, queryset):
         'unit_weight_gross': stock_item.unit_weight_gross,
         'number_of_units': min(stock_item.number_of_units, stock_item.get_order_quantity(order_pk)),
     }, use_decimal=True))
+    
+def get_stock_data_li(request, order_pk, queryset):
+    """Utility ajax view that returns stock item information to fill dispatch form. (give restant instead of in stock"""
+    
+    object_pk = request.GET.get('stock_item')
+    
+    
+    if not request.user.has_perm("ets.stockitem_api_full_access"):
+        queryset = queryset.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
+    
+    stock_item = get_object_or_404(queryset, pk=object_pk)
+    order_item_left= stock_item.get_order_item(order_pk).items_left()
+    
+    return HttpResponse(simplejson.dumps({
+        'unit_weight_net': stock_item.unit_weight_net,
+        'unit_weight_gross': stock_item.unit_weight_gross,
+        'number_of_units': min(stock_item.number_of_units, stock_item.get_order_quantity(order_pk)),
+        'number_of_units_left':order_item_left,
+    }, use_decimal=True))
+
 
 def sync_compas(request, queryset, template_name="sync/sync_compas.html"):
     """Landing page, that shows all COMPAS stations with possibility to import one-by-one."""

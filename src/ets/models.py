@@ -288,7 +288,7 @@ class StockItem( models.Model ):
         unique_together = ('external_ident', 'quality')
 
     def  __unicode__( self ):
-        name = "%s-%s" % (self.coi_code(), self.commodity.name)
+        name = "%s-%s" % (self.origin_id, self.commodity.name)
         if self.quality != self.GOOD_QUALITY:
             return "%s (%s)" % (name, self.get_quality_display())
         return name
@@ -391,9 +391,11 @@ class Order(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
-        
-        return StockItem.objects.filter(pk__in=chain(*(
-                                            item.get_stock_items().values_list('pk', flat=True) for item in self.items.all())))
+        try:
+            stockItem = chain(*(item.get_stock_items().values_list('pk', flat=True) for item in self.items.all()))
+        except:
+            return StockItem.objects.filter(pk = 0)
+        return StockItem.objects.filter(pk__in=stockItem)
         
         
     
@@ -455,7 +457,10 @@ class OrderItem(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
-        return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
+        if self.unit_weight_net:
+            return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
+        else:
+            return self.stock_items().all()
         
     
     @staticmethod
@@ -804,7 +809,7 @@ class Waybill( ld_models.Model ):
         file_out = cStringIO.StringIO()
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
-                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.M)
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L)
         image.save(file_out, 'PNG')
         file_out.reset()
         

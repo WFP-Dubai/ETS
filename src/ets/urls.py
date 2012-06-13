@@ -19,7 +19,7 @@ from ets.views import waybill_list, waybill_reception, ImportData, table_waybill
 from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
 import ets.models
 
-
+dated =  datetime.now() - timedelta( days = 10 )
 urlpatterns = patterns("ets.views",
 
     ( r'^$', direct_to_template, {
@@ -28,10 +28,6 @@ urlpatterns = patterns("ets.views",
     }, "index"),
     
     #Order list
-    # ( r'^orders/$', person_required(warehouse_related(object_list)), {
-    #     'queryset': ets.models.Order.objects.all().order_by('-created'),
-    #     'template_name': 'order/list.html',
-    # }, "orders"),
     ( r'^orders/$', person_required(direct_to_template), {
         'template': 'order/list.html',
     }, "orders"),
@@ -174,6 +170,12 @@ urlpatterns = patterns("ets.views",
                                                 .filter(stock_count__gt=0).order_by('location', 'pk'),
         'template_name': 'stock/stocklist.html',
     }, 'view_stock' ),
+
+    ( r'^get_stock_data_li/(?P<order_pk>[-\w]+)/$', "get_stock_data_li", {
+        'queryset': ets.models.StockItem.objects.all().distinct(),
+    }, "get_stock_data_li" ),
+             
+
     ( r'^get_stock_data/(?P<order_pk>[-\w]+)/$', "get_stock_data", {
         'queryset': ets.models.StockItem.objects.all().distinct(),
     }, "get_stock_data" ),

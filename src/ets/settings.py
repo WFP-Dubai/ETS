@@ -149,7 +149,7 @@ PAGINATION_DEFAULT_PAGINATION = 40
 
 #Default life time of order (months)
 DEFAULT_ORDER_LIFE = 3
-
+ORDER_SHOW_AFTER_EXP_DAYS=30
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
