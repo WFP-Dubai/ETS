@@ -8,36 +8,21 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Deleting model 'WaybillAuditLogEntry'
-        db.delete_table('ets_waybillauditlogentry')
+        # Deleting field 'OrderItem._order'
+        db.delete_column('ets_orderitem', '_order')
 
-        # Deleting model 'LoadingDetailAuditLogEntry'
-        db.delete_table('ets_loadingdetailauditlogentry')
-
-        # Deleting field 'Warehouse._order'
-        db.delete_column('ets_warehouse', '_order')
-
-        # Deleting field 'LoadingDetail._order'
-        db.delete_column('ets_loadingdetail', '_order')
-
-        # Deleting field 'Waybill._order'
-        db.delete_column('ets_waybill', '_order')
+        # Deleting field 'StockItem._order'
+        db.delete_column('ets_stockitem', '_order')
 
 
     def backwards(self, orm):
-
-        # Adding field 'Warehouse._order'
-        db.add_column('ets_warehouse', '_order',
+        # Adding field 'OrderItem._order'
+        db.add_column('ets_orderitem', '_order',
                       self.gf('django.db.models.fields.IntegerField')(default=0),
                       keep_default=False)
 
-        # Adding field 'LoadingDetail._order'
-        db.add_column('ets_loadingdetail', '_order',
-                      self.gf('django.db.models.fields.IntegerField')(default=0),
-                      keep_default=False)
-
-        # Adding field 'Waybill._order'
-        db.add_column('ets_waybill', '_order',
+        # Adding field 'StockItem._order'
+        db.add_column('ets_stockitem', '_order',
                       self.gf('django.db.models.fields.IntegerField')(default=0),
                       keep_default=False)
 
@@ -175,7 +160,6 @@ class Migration(SchemaMigration):
         },
         'ets.orderitem': {
             'Meta': {'ordering': "('si_code',)", 'object_name': 'OrderItem'},
-            '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'order_items'", 'to': "orm['ets.Commodity']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'lti_id': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -213,7 +197,6 @@ class Migration(SchemaMigration):
         },
         'ets.stockitem': {
             'Meta': {'ordering': "('si_code', 'commodity__name')", 'unique_together': "(('external_ident', 'quality'),)", 'object_name': 'StockItem'},
-            '_order': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'allocation_code': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
             'code': ('autoslug.fields.AutoSlugField', [], {'unique': 'True', 'max_length': '128', 'populate_from': 'None', 'primary_key': 'True', 'unique_with': '()'}),
             'commodity': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stocks'", 'to': "orm['ets.Commodity']"}),
