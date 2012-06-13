@@ -23,6 +23,7 @@ from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
 from django.core.urlresolvers import reverse
+from django.views.decorators.cache import cache_page
 from django.template.defaultfilters import date as date_filter
 
 from ets.forms import (WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm,
