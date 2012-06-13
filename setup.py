@@ -40,10 +40,10 @@ install_requires = [
         'pypdf',
         'pisa',
         'sorl-thumbnail', # thumbnail creation tool
-        'django-concurrent-server',
         #'pygraphviz',
         'django-ajax-selects', # jQuery-powered auto-complete fields for ForeignKey and ManyToMany fields
-        'django-clear-cache'
+        'django-clear-cache',
+        'django-audit-log',
 ]
 
 #Extra dependencies for test purposes

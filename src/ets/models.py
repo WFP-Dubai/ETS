@@ -118,7 +118,6 @@ class Warehouse(models.Model):
     
     class Meta:
         ordering = ('name',)
-        order_with_respect_to = 'location'
         verbose_name = _('warehouse')
         verbose_name_plural = _("warehouses")
         
@@ -284,7 +283,6 @@ class StockItem( models.Model ):
 
     class Meta:
         ordering = ('si_code', 'commodity__name')
-        order_with_respect_to = 'warehouse'
         verbose_name = _("Stock Item")
         verbose_name_plural = _("Stock Items")
         unique_together = ('external_ident', 'quality')
@@ -441,7 +439,6 @@ class OrderItem(models.Model):
     
     class Meta:
         ordering = ('si_code',)
-        order_with_respect_to = 'order'
         verbose_name = _("order item")
         verbose_name_plural = _("order items")
     
@@ -642,7 +639,6 @@ class Waybill( ld_models.Model ):
     
     class Meta:
         ordering = ('slug',)
-        order_with_respect_to = 'order'
         verbose_name = _("waybill")
         verbose_name_plural = _("waybills")
     
@@ -895,7 +891,6 @@ class LoadingDetail(models.Model):
 
     class Meta:
         ordering = ('slug',)
-        order_with_respect_to = 'waybill'
         verbose_name = _("loading detail")
         verbose_name_plural = _("waybill items")
         unique_together = ('waybill', 'stock_item')

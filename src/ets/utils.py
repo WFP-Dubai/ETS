@@ -1,8 +1,7 @@
 from datetime import datetime, timedelta, date
-from itertools import chain, izip
+from itertools import chain
 import decimal
 from functools import wraps
-from operator import itemgetter
 
 from django.conf import settings
 from django.http import HttpResponse
@@ -13,10 +12,8 @@ from django.core import serializers
 from django.utils.translation import ugettext as _
 from django.utils.decorators import available_attrs
 from django.contrib.auth.models import User
-from django.contrib.admin.models import LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
-from django.utils.text import get_text_list
 from django.contrib.admin.models import LogEntry
 
 from compas.utils import call_db_procedure, reduce_compas_errors
