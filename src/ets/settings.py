@@ -106,7 +106,6 @@ INSTALLED_APPS = (
     'google_analytics',
     'pagination',
     'sorl.thumbnail',
-    'concurrent_server',
     'clear_cache'
 )
 
