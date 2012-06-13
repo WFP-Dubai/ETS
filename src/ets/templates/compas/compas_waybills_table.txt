@@ -1,9 +1,0 @@
-{% extends "table.txt" %}
-
-{% block table_items %}
-  "<a href='{{ item.order.get_absolute_url }}'>{{ item.order.pk }}</a>",
-  "<a href='{{ item.get_absolute_url }}'>{{ item.pk }}</a>",
-  "{{ item.order.warehouse.location.name }}",
-  "{{ item.order.consignee.name }}",
-  "{{ item.order.location.name }}"
-{% endblock %}

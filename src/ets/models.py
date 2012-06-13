@@ -411,6 +411,9 @@ class Order(models.Model):
     def get_percent_executed(self):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
+    def has_waybill_creation_permission(self, user):
+        return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).count()
+
 
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
@@ -835,6 +838,13 @@ class Waybill( ld_models.Model ):
     def is_received(self):
         return all(d.is_received() for d in self.loading_details.all()) and self.receipt_person is not None
     
+    def has_receive_permission(self, user):
+        return (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=self.pk).count()
+    
+    def has_dispatch_permission(self, user):
+        return (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=self.pk).count()
+    
+
 class LoadingDetail(models.Model):
     """Loading details related to dispatch waybill"""
     waybill = models.ForeignKey(Waybill, verbose_name=_("eWaybill Number"), related_name="loading_details")

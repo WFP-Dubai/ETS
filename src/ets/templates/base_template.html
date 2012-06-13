@@ -64,7 +64,11 @@
 $(window).load(function() {
 	$(".dataTables_filter input:first").change();
 	$(".dataTables_filter input:first").focus();
-        $(".paging_two_button a").text("");
+    $(".paging_two_button a").text("");
+    
+    $(".delete_waybill").live('click', function(){
+    	return confirm("{% trans 'Are you sure you want to delete this waybill?' %}");
+    });
 });
 //]]>
 </script>

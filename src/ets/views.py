@@ -16,27 +16,27 @@ from django.views.generic.list_detail import object_list
 from django.views.generic.create_update import apply_extra_context
 from django.contrib import messages
 from django.db import transaction
+from django.utils import simplejson
 from django.utils.translation import ugettext as _
 from django.views.generic.edit import FormView
 from django.core import serializers
-from django.contrib.admin import models as log_models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
 from django.core.urlresolvers import reverse
+from django.template.defaultfilters import date as date_filter
 
-from ets.forms import WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm
-from ets.forms import WaybillSearchForm, LoadingDetailDispatchForm, WarehouseSearchForm
-from ets.forms import LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm
-from ets.decorators import person_required, officer_required, dispatch_view, receipt_view, waybill_user_related 
-from ets.decorators import warehouse_related, dispatch_compas, receipt_compas
+from ets.forms import (WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm,
+                       WaybillSearchForm, LoadingDetailDispatchForm,
+                       LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm)
+from ets.decorators import (person_required, officer_required, dispatch_view, receipt_view, waybill_user_related, 
+                            warehouse_related, dispatch_compas, receipt_compas)
 import ets.models
-from ets.utils import send_dispatched, send_received, create_logentry, construct_change_message
-from ets.utils import import_file, get_compas_data, data_to_file_response
-from ets.utils import (LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
+from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
+                       import_file, get_compas_data, data_to_file_response,
+                       LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
 from ets.pdf import render_to_pdf
-import simplejson
 from ets.compress import compress_json
 from ets.datatables import get_datatables_records
 
@@ -44,6 +44,9 @@ from ets.datatables import get_datatables_records
 WFP_ORGANIZATION = 'WFP'
 WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 
+def fill_link(url, text, klass=''):
+    return '<a href="%s" class="%s">%s</a>' % (url, klass, text)
+    
 
 def waybill_detail(request, waybill, template="waybill/detail.html", extra_context=None):
     """utility that shows waybill's details"""    
@@ -178,11 +181,31 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
         11: 'pk',
     }
 
-    return get_datatables_records(request, queryset, column_index_map, "waybill/waybill_table.txt")
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(item.get_absolute_url(), item.order.pk),
+        fill_link(item.get_absolute_url(), item.pk),
+        item.order.warehouse.name,
+        item.order.consignee.name,
+        item.order.location.name,
+        item.destination.name,
+        item.get_transaction_type_display(),
+        item.transport_dispach_signed_date and date_filter(item.transport_dispach_signed_date).upper() \
+                        or fill_link(item.get_absolute_url(), _("Open")),
+        item.receipt_signed_date and date_filter(item.receipt_signed_date).upper() \
+                        or fill_link(reverse('waybill_reception', kwargs={'waybill_pk': item.pk})
+                            if item.has_receive_permission(request.user) else '', _("Receive")),
+                        
+        "%s/%s" % (item.validated and "D" or "-", item.receipt_validated and "R" or "-", ),
+        "%s/%s" % (item.sent_compas and "D" or "-", item.receipt_sent_compas and "R" or "-", ),        
+        
+        fill_link(reverse('waybill_delete', kwargs={'waybill_pk': item.pk}) \
+                  if item.has_dispatch_permission(request.user) else '', 
+                  _("Delete"), "delete_waybill"),
+    ])
+    
 
 @waybill_user_related
 def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
-    print queryset
 
     column_index_map = {
         0: 'order__pk',
@@ -192,7 +215,14 @@ def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
         4: 'order__location__name',
     }
 
-    return get_datatables_records(request, queryset, column_index_map, "compas/compas_waybills_table.txt")
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(item.order.get_absolute_url(), item.order.pk),
+        fill_link(item.get_absolute_url(), item.pk),
+        item.order.warehouse.location.name,
+        item.order.consignee.name,
+        item.order.location.name,
+    ])
+
 
 @transaction.commit_on_success
 def _dispatching(request, waybill, template, success_message, created=False, form_class=DispatchWaybillForm, 
@@ -326,7 +356,6 @@ def waybill_reception_scanned(request, scanned_code, queryset):
     return waybill_reception(request, waybill.pk, queryset)
 
 
-@require_POST
 @person_required
 @dispatch_view
 @transaction.commit_on_success
@@ -447,7 +476,10 @@ def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
     if not request.user.has_perm("ets.stockitem_api_full_access"):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    return object_list(request, queryset, paginate_by=5, template_name=template_name)
+    good_quality = ( value for key, value in ets.models.StockItem.QUALITY_CHOICE if key == ets.models.StockItem.GOOD_QUALITY ).next()
+    
+    return object_list(request, queryset, paginate_by=5, template_name=template_name,
+                       extra_context={ "good_quality": good_quality })
 
 def table_stock_items(request, param_name):
     warehouse_pk = request.GET.get(param_name)
@@ -464,7 +496,18 @@ def table_stock_items(request, param_name):
         8: 'quantity_gross' 
     }
 
-    return get_datatables_records(request, warehouse.stock_items.all(), column_index_map, "stock/stock_table.txt")
+    return get_datatables_records(request, warehouse.stock_items.all(), column_index_map, lambda item: [
+        unicode(item.commodity),
+        item.project_number,
+        item.si_code,
+        item.get_quality_display(),
+        int(item.number_of_units),
+        item.unit_weight_net,
+        item.unit_weight_gross,
+        item.quantity_net,
+        item.quantity_gross,
+    ])
+
 
 @person_required
 @warehouse_related
@@ -482,8 +525,22 @@ def table_orders(request, queryset):
         8: 'created',
         9: 'created',
     }
-
-    return get_datatables_records(request, queryset, column_index_map, "order/order_table.txt")
+    
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(item.get_absolute_url(), item.code),
+        date_filter(item.created).upper(),
+        date_filter(item.dispatch_date).upper(),
+        date_filter(item.expiry).upper(),
+        item.warehouse.name,
+        item.location.name,
+        unicode(item.consignee),
+        item.transport_name,
+        item.get_percent_executed(),
+        fill_link(reverse('waybill_create', kwargs={'order_pk': item.pk}) \
+                  if item.has_waybill_creation_permission(request.user) else '', 
+                  _("Create"))
+    ])
+    
 
 def get_stock_data(request, order_pk, queryset):
     """Utility ajax view that returns stock item information to fill dispatch form."""
