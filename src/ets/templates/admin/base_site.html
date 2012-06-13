@@ -12,7 +12,7 @@
 {% block branding %}
 <h1 id="site-name"><img src='{{ STATIC_URL }}images/epic_logo_small.png' alt="logo"/><br/>{% trans 'ETS administration' %}</h1>
 <a href='{% url index %}'>{% trans 'Back to ETS' %}</a>
-{% get_last_update request.user %}
+{% get_last_update %}
 
 {% endblock %}
 

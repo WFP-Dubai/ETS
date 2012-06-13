@@ -1,3 +1,5 @@
-{% load i18n extra_tags %}
-{% get_last_update request.user %}
+{% load i18n extra_tags cache %}
+{% cache 160 last_update %}
+{% get_last_update %}
+{% endcache %}
 {% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}

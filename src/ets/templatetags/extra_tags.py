@@ -20,20 +20,15 @@ def waybill_edit(waybill, user, text=_("Edit")):
     return { 
             'text': text,
             'url': reverse('waybill_edit', kwargs={'waybill_pk': waybill.pk, 'order_pk':waybill.order.pk }),
-            'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill.pk).count(),
+            'success': waybill.has_dispatch_permission(user),
     }
 
 @register.inclusion_tag('tags/give_link.html')
 def waybill_reception(waybill, user, text=_("Receive")):
-    waybillPk =0
-    try:
-        waybillPk = waybill['pk']
-    except :
-        waybillPk = waybill.pk
     return { 
             'text': text,
-            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybillPk}),
-            'success': (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=waybillPk).count(),
+            'url': reverse('waybill_reception', kwargs={'waybill_pk': waybill.pk}),
+            'success': waybill.has_receive_permission(user),
     }
 
 
@@ -42,7 +37,7 @@ def waybill_creation(order, user, text=_("Create")):
     return { 
             'text': text,
             'url': reverse('waybill_create', kwargs={'order_pk': order.pk}),
-            'success': (not hasattr(user, 'person') or user.person.dispatch) and order.warehouse.persons.filter(pk=user.pk).count(),
+            'success': order.has_waybill_creation_permission(user),
     }
 
 
@@ -87,25 +82,12 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
 
 @register.inclusion_tag('tags/form.html')
 def waybill_delete(waybill, user, text=_("Delete"), redirect_to=''):
-    waybillPk =0
-    try:
-        waybillPk = waybill['pk']
-    except :
-        waybillPk = waybill.pk
     return { 
         'text': text,
-        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybillPk}), urlencode({'redirect_to': redirect_to})),
-        'success': (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybillPk).count(),
+        'url': "%s?%s" % (reverse('waybill_delete', kwargs={'waybill_pk': waybill.pk}), urlencode({'redirect_to': redirect_to})),
+        'success': waybill.has_dispatch_permission(user),
         'dialog_question': _("Are you sure you want to delete this waybill?"),
     }
-
-@register.simple_tag
-def waybill_delivery_method(transaction_type):
-    for o in Waybill.TRANSACTION_TYPES:
-        if o[0]==transaction_type:
-            return o[1].title()
-
-    return transaction_type
 
 @block
 def person_only(context, nodelist, user):
@@ -123,7 +105,7 @@ def sync_compas_form(compas, user):
     }
 
 @register.inclusion_tag('last_updated.html')
-def get_last_update(user):
+def get_last_update():
     """dummy function, just a wrapper"""
     
     failed = False
