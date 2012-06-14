@@ -74,9 +74,6 @@ def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, 
     querySet = querySet[startRecord:endRecord] #get the slice
     sEcho = int(request.GET.get('sEcho',0)) # required echo response
     
-    from django.db import connection
-    print "query --> ", querySet._as_sql(connection)
-    
     aaData = []
     if not aa_data:
     
