@@ -58,14 +58,14 @@ urlpatterns = patterns("ets.views",
     #Listings
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
-    ( r'^dispatch/$', person_required(direct_to_template), {
+    ( r'^dispatch/$', person_required(dispatch_view(direct_to_template)), {
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("eWaybills Waiting For Dispatch Signature"),
             "ajax_source_url": "/datatables/waybills_dispatch/"
         }
     }, "waybill_dispatch_list" ),
-    ( r'^receive/$', person_required(direct_to_template), {
+    ( r'^receive/$', person_required(receipt_view(direct_to_template)), {
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("Expected Consignments"),
