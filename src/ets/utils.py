@@ -7,6 +7,7 @@ from django.conf import settings
 from django.http import HttpResponse
 from django.db import transaction, models
 from django.db.models import Q
+from django.db.models.aggregates import Max
 from django.core.exceptions import ValidationError
 from django.core import serializers
 from django.utils.translation import ugettext as _
@@ -529,6 +530,14 @@ def changed_fields(model, next, previous, exclude=()):
         and getattr(next, field.name) != getattr(previous, field.name) \
         and field.name not in exclude:
             yield field.verbose_name, getattr(next, field.name)
+
+
+def get_compases(user):
+    queryset = ets_models.Compas.objects.all()
+    if not user.is_superuser:
+        queryset = queryset.filter(Q(warehouses__persons__pk=user.pk) | Q(officers=user))
+        
+    return queryset
 
 
 def data_to_file_response(data, file_name, type):
