@@ -187,9 +187,7 @@ urlpatterns = patterns("ets.views",
     ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
 
     ( r'^qrcode/(?P<waybill_pk>[-\w]+).jpg$', "barcode_qr", {}, "barcode_qr" ),
-     ( r'^sync_compas/$', "sync_compas", {
-        'queryset': ets.models.Compas.objects.all(),
-    }, "sync_compas"),
+     ( r'^sync_compas/$', "sync_compas", {}, "sync_compas"),
     ( r'^sync_compas/(?P<compas_pk>[-\w]+)/$', "handle_sync_compas", {
         'queryset': ets.models.Compas.objects.all(),
     }, "handle_sync_compas"),

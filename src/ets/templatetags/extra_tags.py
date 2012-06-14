@@ -11,7 +11,7 @@ from native_tags.decorators import function, block
 
 #from ets import settings
 from ets.models import Warehouse, Waybill, Person, Compas, LoadingDetail, StockItem, ImportLogger, Order
-from ets.utils import changed_fields
+from ets.utils import changed_fields, get_compases
 
 register = template.Library()
 
@@ -104,20 +104,25 @@ def sync_compas_form(compas, user):
         'station': compas,
     }
 
+def user_compases(user):
+    return get_compases(user).values_list('pk', flat=True)
+user_compases = function(user_compases, cache=3600)
+
+
 @register.inclusion_tag('last_updated.html')
-def get_last_update():
+def get_last_update(user):
     """dummy function, just a wrapper"""
     
     failed = False
-    for c in Compas.objects.all():
+    compases = get_compases(user)
+    for c in compases:
         try:
-            last_attempt = c.import_logs.order_by('-when_attempted')[0]
-            if last_attempt.status == ImportLogger.FAILURE:
+            if c.get_last_attempt().status == ImportLogger.FAILURE:
                 failed = True
         except (ImportLogger.DoesNotExist, IndexError):
             pass
          
     return {
-        'last_updated': StockItem.get_last_update(),
+        'last_updated': compases.aggregate(last_updated=Max('warehouses__stock_items__updated'))['last_updated'],
         'failed': failed,
     }

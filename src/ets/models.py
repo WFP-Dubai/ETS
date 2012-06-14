@@ -72,7 +72,10 @@ class Compas(ld_models.Model):
         return last_attempt
 
     def is_sync_active(self):
-        return True if self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) > datetime.now() else False
+        return True if self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) >= datetime.now() else False
+        
+    def get_last_attempt(self):
+        return self.import_logs.order_by('-when_attempted')[0]
     
 class Location(models.Model):
     """Location model. City or region"""
@@ -301,10 +304,6 @@ class StockItem( models.Model ):
     def calculate_total_gross(self):
         return self.quantity_gross
 
-    @classmethod
-    def get_last_update(cls):
-        return cls.objects.aggregate(max_date=Max('updated'))['max_date']
-    
     def get_order_item(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
         return OrderItem.objects.filter(order__pk=order_pk,
