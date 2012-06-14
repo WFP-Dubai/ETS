@@ -527,7 +527,7 @@ def table_orders(request, queryset):
         9: 'created',
     }
 
-    queryset = queryset.filter(expiry__gt = (datetime.datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)))
+    queryset = queryset.filter(expiry__gt = (datetime.datetime.now() - datetime.timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)))
     
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),
