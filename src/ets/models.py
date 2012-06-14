@@ -495,8 +495,7 @@ class OrderItem(models.Model):
         current_total_stock = 0
         mystockitems = self.stock_items()
         for i in mystockitems:
-        	
-        	current_total_stock += i.calculate_total_net()
+            current_total_stock += i.calculate_total_net()
         
         
         return current_total_stock
