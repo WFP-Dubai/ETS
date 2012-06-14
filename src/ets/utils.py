@@ -252,7 +252,7 @@ def import_stock(compas):
 def _get_destination_location(compas, code, name):
     """Finds or creates a location by code and name"""
     places = compas_models.Place.objects.using(compas).filter(geo_point_code=code)
-    country_code = places.count() and places[0].country_code or None
+    country_code = places.exists() and places[0].country_code or None
 
     #Get or Create location
     return ets_models.Location.objects.get_or_create(pk=code, defaults={

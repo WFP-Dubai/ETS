@@ -135,7 +135,7 @@ class Warehouse(models.Model):
         queryset = cls.get_active_warehouses().filter(location=location)
 
         #Check wh for specific organization
-        if organization and queryset.filter(organization=organization).count():
+        if organization and queryset.filter(organization=organization).exists():
             return queryset.filter(organization=organization)
         
         return queryset
@@ -411,7 +411,7 @@ class Order(models.Model):
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
     def has_waybill_creation_permission(self, user):
-        return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).count()
+        return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
 
 
 class OrderItem(models.Model):
@@ -702,7 +702,7 @@ class Waybill( ld_models.Model ):
                     'si_code': item.stock_item.si_code, 
                     'commodity': item.stock_item.commodity,
                 }
-                if not StockItem.objects.filter(**filters).count():
+                if not StockItem.objects.filter(**filters).exists():
                     filters.update({
                         'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
                         'quality': item.stock_item.quality,
@@ -793,7 +793,7 @@ class Waybill( ld_models.Model ):
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):
                 #Save object if it does not exist
-                if obj.object.__class__.objects.filter(pk=obj.object.pk).count() == 0:
+                if not obj.object.__class__.objects.filter(pk=obj.object.pk).exists():
                     obj.save()
                         
                 #Remember waybill instance to return from the method
@@ -839,10 +839,10 @@ class Waybill( ld_models.Model ):
         return all(d.is_received() for d in self.loading_details.all()) and self.receipt_person is not None
     
     def has_receive_permission(self, user):
-        return (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=self.pk).count()
+        return (not hasattr(user, 'person') or user.person.receive) and Waybill.receptions(user).filter(pk=self.pk).exists()
     
     def has_dispatch_permission(self, user):
-        return (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=self.pk).count()
+        return (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=self.pk).exists()
     
 
 class LoadingDetail(models.Model):

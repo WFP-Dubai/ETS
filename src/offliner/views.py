@@ -16,7 +16,7 @@ from ets.decorators import waybill_user_related_filter
 def request_update(request):
     """requests data at server and import them localy"""
     last = None
-    if UpdateLog.objects.count():
+    if UpdateLog.objects.exists():
         last = UpdateLog.objects.latest("date")
     UpdateLog.request_data(last)
 
