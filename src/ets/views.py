@@ -215,7 +215,7 @@ def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
         3: 'order__consignee__name',
         4: 'order__location__name',
     }
-
+    
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.order.get_absolute_url(), item.order.pk),
         fill_link(item.get_absolute_url(), item.pk),
