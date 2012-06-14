@@ -43,13 +43,13 @@ def waybill_creation(order, user, text=_("Create")):
 
 @function
 def sign_dispatch(waybill, user):
-    return (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=waybill.pk).count()
+    return waybill.has_dispatch_permission(user)
 
 @function
 def sign_reception(waybill, user):
     return (not hasattr(user, 'person') or user.person.receive) \
             and waybill.is_received() \
-            and Waybill.receptions(user).filter(pk=waybill.pk).count()
+            and Waybill.receptions(user).filter(pk=waybill.pk).exists()
 
 
 @register.inclusion_tag('tags/form.html')
@@ -61,7 +61,7 @@ def validate_dispatch(waybill, user, link_text=_("Validate dispatch")):
     return { 
             'text': link_text,
             'url': reverse('validate_dispatch', kwargs={'waybill_pk': waybill.pk,}),
-            'success': queryset.filter(pk=waybill.pk).count(),
+            'success': queryset.filter(pk=waybill.pk).exists(),
             'dialog_question': _("Are you sure you want to validate this waybill?"),
     }
 
@@ -76,7 +76,7 @@ def validate_receipt(waybill, user, link_text=_("Validate receipt")):
     return { 
         'text': link_text,
         'url': reverse('validate_receipt', kwargs={'waybill_pk': waybill.pk,}),
-        'success': queryset.filter(pk=waybill.pk).count(),
+        'success': queryset.filter(pk=waybill.pk).exists(),
         'dialog_question': _("Are you sure you want to validate this waybill?"),
     }
 
@@ -95,7 +95,7 @@ def person_only(context, nodelist, user):
 
 @block
 def officer_only(context, nodelist, user):
-    return Compas.objects.filter(officers=user).count() and nodelist.render(context) or ''
+    return Compas.objects.filter(officers=user).exists() and nodelist.render(context) or ''
 
 @register.inclusion_tag('sync/sync_form.html')
 def sync_compas_form(compas, user):

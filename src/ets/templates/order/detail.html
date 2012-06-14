@@ -75,7 +75,7 @@
 
 {% block extra_content %}
 <br/>
-{% if object.waybills.count %}
+{% if object.waybills.exists %}
   {% trans "Current eWaybills:" %}<br/>
   <table class='bordered'>
   {% for waybill in object.waybills.all %}

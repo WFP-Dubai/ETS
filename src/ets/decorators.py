@@ -9,7 +9,7 @@ import ets.models
 
 #Authentication decorators. If condition fails user is redirected to login form
 person_required = user_passes_test(lambda u: hasattr(u, 'person'))
-officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).count())
+officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).exists())
 
 def user_filtered(function=None, filter=lambda queryset, user: (), user_test=lambda u: True):
     """Decorates view function and inserts queryset filtered by user"""
