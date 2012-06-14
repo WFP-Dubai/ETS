@@ -33,7 +33,7 @@ from ets.decorators import (person_required, officer_required, dispatch_view, re
                             warehouse_related, dispatch_compas, receipt_compas)
 import ets.models
 from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
-                       import_file, get_compas_data, data_to_file_response,
+                       import_file, get_compas_data, data_to_file_response, get_compases,
                        LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
@@ -581,12 +581,10 @@ def get_stock_data_li(request, order_pk, queryset):
     }, use_decimal=True))
 
 
-def sync_compas(request, queryset, template_name="sync/sync_compas.html"):
+def sync_compas(request, template_name="sync/sync_compas.html"):
     """Landing page, that shows all COMPAS stations with possibility to import one-by-one."""
     
-    if not request.user.is_superuser:
-        queryset = queryset.filter(Q(warehouses__persons__pk=request.user.pk) | Q(officers=request.user))
-        
+    queryset = get_compases(request.user)
     queryset = queryset.annotate(last_updated=Max('warehouses__stock_items__updated'))
     
     return direct_to_template(request, template=template_name, extra_context={'stations': queryset})
