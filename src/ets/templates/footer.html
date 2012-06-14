@@ -1,6 +1,6 @@
 {% load i18n extra_tags cache %}
+{% if user.is_authenticated %}
 {% user_compases user as compases %}
-{% cache 160 last_update compases %}
-{% get_last_update user %}
-{% endcache %}
-{% if user.is_authenticated %} | {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.{% endif %}
+{% cache 160 last_update compases %}{% get_last_update user %}{% endcache %}
+| {% trans  "Logged in as:" %}<strong class="highlight">{{ user.username }}</strong>.
+{% endif %}
