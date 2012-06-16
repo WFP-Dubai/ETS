@@ -48,3 +48,14 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/javascript")
         self.assertEqual(result["iTotalRecords"], ets.models.Waybill.dispatches(self.user).count())
+
+    def test_table_reception_waybills(self):
+        # All reception waybills
+        person = ets.models.Person.objects.get(username=self.user.username)
+        person.receive = True
+        person.save()
+        response = self.client.get(reverse("table_waybill_reception"))
+        result = json.loads(response.content)
+        self.assertContains(response, 'ISBX00311A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(result["iTotalRecords"], ets.models.Waybill.receptions(self.user).count())
