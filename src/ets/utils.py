@@ -339,7 +339,7 @@ def import_order(compas):
 
 def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
     """Submits dispatched and validated waybills to COMPAS"""
-    cache_key = cache_prefix % waybill.pk
+    cache_key = "%s_%s" % (cache_prefix, waybill.pk)
     sending = cache.get(cache_key, False)
     if sending:
         return
@@ -471,7 +471,7 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
 
 def send_received(waybill, compas=None, cache_prefix='send_received'):
     """Submits received and validated waybills to COMPAS"""
-    cache_key = cache_prefix % waybill.pk
+    cache_key = "%s_%s" % (cache_prefix, waybill.pk)
     sending = cache.get(cache_key, False)
     if sending:
         return
