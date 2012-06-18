@@ -72,7 +72,7 @@ class Compas(ld_models.Model):
         return last_attempt
 
     def is_sync_active(self):
-        return True if self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) >= datetime.now() else False
+        return self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) >= datetime.now()
         
     def get_last_attempt(self):
         return self.import_logs.order_by('-when_attempted')[0]
