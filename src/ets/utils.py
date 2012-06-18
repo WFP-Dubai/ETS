@@ -465,16 +465,23 @@ def send_received(waybill, compas=None):
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
 
+            def check_dispatch_master(_waybill, _compas):
+                return bool(compas_models.DispatchMaster.objects.filter(code__contains=_waybill.pk).using(_compas))
 
             ## Check if dispatch_master is there...
-            if bool(compas_models.DispatchMaster.objects.filter(code__contains=waybill.pk).using(compas)):
+            if check_dispatch_master(waybill, compas):
                 IsValid = True
             else:
-                message = "The Dispatch %s is not available in the COMPAS Station %s"%( waybill.pk, compas)
-                raise ValidationError(message)
-                waybill.receipt_validated = False
-                waybill.save()
-                return 
+                send_dispatched(waybill, compas)
+                send_dispatched(waybill, waybill.destination.compas)
+                if check_dispatch_master(waybill, compas):
+                    IsValid = True
+                else:
+                    message = "The Dispatch %s is not available in the COMPAS Station %s"%( waybill.pk, compas)
+                    raise ValidationError(message)
+                    waybill.receipt_validated = False
+                    waybill.save()
+                    return 
 
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
