@@ -54,6 +54,37 @@ def waybill_user_related_filter(queryset, user):
 
 waybill_user_related = user_filtered(felter=waybill_user_related_filter)
 
+def waybill_officer_related_filter(queryset, user):
+    """
+    Returns a queryset with filter by user in widest range: 
+    it could be a dispatcher, a recepient, officer of both compases.
+    Status of waybill does not matter.
+    """
+    if not user.is_superuser:
+        #get Compas Station list for user
+        compas_stations = user.compases.all().values_list('code')
+    
+        queryset =  queryset.filter(Q(order__warehouse__compas__in = compas_stations)
+                               | Q(destination__compas__in = compas_stations)).distinct()
+    return queryset
+
+waybill_officer_related = user_filtered(felter=waybill_officer_related_filter)
+
+def waybill_person_related_filter(queryset, user):
+    """
+    Returns a queryset with filter by user in widest range: 
+    it could be a dispatcher, a recepient, officer of both compases.
+    Status of waybill does not matter.
+    """
+    if not user.is_superuser:
+    
+        #possible further optimization with persons
+        queryset =  queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
+                               | Q(destination__persons__pk=user.pk)).distinct()
+    return queryset
+
+waybill_person_related = user_filtered(felter=waybill_person_related_filter)
+
 #Validation
 dispatch_compas = user_filtered(felter=lambda queryset, user: queryset.filter(
                         transport_dispach_signed_date__isnull=False, 

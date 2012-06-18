@@ -160,7 +160,6 @@ def waybill_search( request, template='waybill/list2.html', form_class=WaybillSe
     return direct_to_template(request, template, context)
 
 
-@waybill_user_related
 def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
 
     search_string = request.GET.get("search_string", "")
@@ -205,7 +204,6 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
     ])
     
 
-@waybill_user_related
 def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
 
     column_index_map = {
