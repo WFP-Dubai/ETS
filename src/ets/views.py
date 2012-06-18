@@ -616,8 +616,7 @@ def send_dispatched_view(request, queryset):
     """Submits dispatch waybills to COMPAS"""
     total = 0
     for waybill in queryset:
-        send_dispatched(waybill)
-        if waybill.sent_compas:
+        if send_dispatched(waybill):
             total += 1
     
     messages.add_message(request, messages.INFO, 
