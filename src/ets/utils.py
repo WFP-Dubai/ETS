@@ -71,7 +71,8 @@ def compas_importer(import_logger, func=None):
 
 def update_compas(using, *args):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
-    import_logger = ets_models.ImportLogger.objects.create(compas_id=using)
+    import_logger = ets_models.ImportLogger(compas_id=using)
+    import_logger.save(force_insert=True)
     try:
         for func in args:
             compas_importer(import_logger, func)(using)
