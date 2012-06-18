@@ -30,7 +30,8 @@ from ets.forms import (WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWay
                        WaybillSearchForm, LoadingDetailDispatchForm,
                        LoadingDetailReceiptForm, WaybillScanForm, ImportDataForm)
 from ets.decorators import (person_required, officer_required, dispatch_view, receipt_view, waybill_user_related, 
-                            warehouse_related, dispatch_compas, receipt_compas)
+                            warehouse_related, dispatch_compas, receipt_compas, dispatcher_required,
+                            recipient_required, waybill_officer_related)
 import ets.models
 from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
                        import_file, get_compas_data, data_to_file_response, get_compases,
@@ -83,7 +84,7 @@ def waybill_pdf(request, waybill_pk, queryset, template, print_original=False):
 
 
 @require_POST
-@person_required
+@dispatcher_required
 @dispatch_view
 @transaction.commit_on_success
 def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
@@ -104,7 +105,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
     
 
 @require_POST
-@person_required
+@recipient_required
 @receipt_view
 @transaction.commit_on_success
 def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
@@ -160,7 +161,6 @@ def waybill_search( request, template='waybill/list2.html', form_class=WaybillSe
     return direct_to_template(request, template, context)
 
 
-@waybill_user_related
 def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
 
     search_string = request.GET.get("search_string", "")
@@ -204,8 +204,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
                   _("Delete"), "delete_waybill"),
     ])
     
-
-@waybill_user_related
+@waybill_officer_related
 def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
 
     column_index_map = {
@@ -297,7 +296,7 @@ def waybill_create(request, order_pk, queryset, **kwargs):
     return _dispatching(request, waybill, success_message=_("eWaybill has been created"), created=True,  **kwargs)
 
 
-@person_required
+@dispatcher_required
 @dispatch_view
 @transaction.commit_on_success
 def waybill_dispatch_edit(request, order_pk, waybill_pk, queryset, **kwargs):
@@ -357,7 +356,7 @@ def waybill_reception_scanned(request, scanned_code, queryset):
     return waybill_reception(request, waybill.pk, queryset)
 
 
-@person_required
+@dispatcher_required
 @dispatch_view
 @transaction.commit_on_success
 def waybill_delete(request, waybill_pk, queryset, redirect_to=''):
