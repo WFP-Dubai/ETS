@@ -81,3 +81,11 @@ dl.warehouse-list dd {
 .row-negative-units { 
   opacity: 0.2;
 }
+
+.warehouse-selector select { 
+  max-width: 600px;
+}
+
+.warehouse-selector select option { 
+  max-width: 600px;
+}

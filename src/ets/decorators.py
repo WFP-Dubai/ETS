@@ -10,12 +10,13 @@ import ets.models
 #Authentication decorators. If condition fails user is redirected to login form
 person_required = user_passes_test(lambda u: hasattr(u, 'person'))
 officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).exists())
+dispatcher_required = user_passes_test(lambda u: (hasattr(u, 'person') and u.person.dispatch))
+recipient_required = user_passes_test(lambda u: (hasattr(u, 'person') and u.person.receive))
 
-def user_filtered(function=None, felter=lambda queryset, user: (), user_test=lambda u: True):
+def user_filtered(function=None, felter=lambda queryset, user: ()):
     """Decorates view function and inserts queryset filtered by user"""
     
     def _decorator(view_func):
-        @user_passes_test(user_test)
         @wraps(view_func, assigned=available_attrs(view_func))
         def _wrapped_view(request, queryset=None, *args, **kwargs):
             return view_func(request, queryset=felter(queryset, request.user), *args, **kwargs)
@@ -27,11 +28,9 @@ def user_filtered(function=None, felter=lambda queryset, user: (), user_test=lam
     return _decorator
 
 #Decorators or views.
-dispatch_view = user_filtered(felter=lambda queryset, user: ets.models.Waybill.dispatches(user), 
-                              user_test=lambda u: (not hasattr(u, 'person') or u.person.dispatch))
+dispatch_view = user_filtered(felter=lambda queryset, user: ets.models.Waybill.dispatches(user))
 
-receipt_view = user_filtered(felter=lambda queryset, user: ets.models.Waybill.receptions(user),
-                             user_test=lambda u: (not hasattr(u, 'person') or u.person.receive))
+receipt_view = user_filtered(felter=lambda queryset, user: ets.models.Waybill.receptions(user))
 
 warehouse_related = user_filtered(felter=lambda queryset, user: queryset.filter(warehouse__persons__pk=user.pk))
 
@@ -42,17 +41,29 @@ def waybill_user_related_filter(queryset, user):
     Status of waybill does not matter.
     """
     if not user.is_superuser:
-        #get Compas Station list for user
-        compas_stations = user.compases.all().values_list('code')
     
         #possible further optimization with persons
-        queryset =  queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
-                               | Q(order__warehouse__compas__in = compas_stations)
+        queryset = queryset.filter(Q(order__warehouse__persons__pk=user.pk) 
+                               | Q(order__warehouse__compas__officers__pk = user.pk)
                                | Q(destination__persons__pk=user.pk)
-                               | Q(destination__compas__in = compas_stations)).distinct()
+                               | Q(destination__compas__officers__pk = user.pk)).distinct()
     return queryset
 
 waybill_user_related = user_filtered(felter=waybill_user_related_filter)
+
+def waybill_officer_related_filter(queryset, user):
+    """
+    Returns a queryset with filter by user in widest range: 
+    it could be a dispatcher, a recepient, officer of both compases.
+    Status of waybill does not matter.
+    """
+    if not user.is_superuser:
+    
+        queryset = queryset.filter(Q(order__warehouse__compas__officers__pk = user.pk)
+                               | Q(destination__compas__officers__pk = user.pk)).distinct()
+    return queryset
+
+waybill_officer_related = user_filtered(felter=waybill_officer_related_filter)
 
 #Validation
 dispatch_compas = user_filtered(felter=lambda queryset, user: queryset.filter(
