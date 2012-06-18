@@ -76,6 +76,7 @@ class DispatchWaybillForm( forms.ModelForm ):
             'transport_driver_name': StrippedTextInput(),
             'transport_driver_licence': StrippedTextInput(),
             'transport_vehicle_registration': StrippedTextInput(),
+            'destination': forms.Select(attrs={'class': 'warehouse-selector'})
         }
     
     helper = FormHelper()
