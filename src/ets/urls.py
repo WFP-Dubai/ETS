@@ -16,7 +16,8 @@ serve.authentication = False
 from ets.forms import WaybillSearchForm, WaybillScanForm
 from ets.models import Waybill
 from ets.views import waybill_list, waybill_reception, ImportData, table_waybills, table_compas_waybills
-from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required, waybill_user_related
+from ets.decorators import receipt_view, dispatch_view, person_required, warehouse_related, receipt_compas, officer_required
+from ets.decorators import officer_required, waybill_user_related, waybill_officer_related, dispatcher_required, recipient_required
 import ets.models
 
 dated =  datetime.now() - timedelta( days = 10 )
@@ -51,21 +52,21 @@ urlpatterns = patterns("ets.views",
 
     ( r'^datatables/waybills_dispatch/$', dispatch_view(table_waybills), {}, "table_waybill_dispatch" ),
     ( r'^datatables/waybills_recieve/$', receipt_view(table_waybills), {}, "table_waybill_reception" ),
-    ( r'^datatables/waybills/$', table_waybills, {
+    ( r'^datatables/waybills/$', waybill_user_related(table_waybills), {
         'queryset': ets.models.Waybill.objects.all(),
     }, "table_waybills" ),
                        
     #Listings
     ( r'^search/$', "waybill_search", {}, "waybill_search" ),
     
-    ( r'^dispatch/$', person_required(dispatch_view(direct_to_template)), {
+    ( r'^dispatch/$', dispatcher_required(direct_to_template), {
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("eWaybills Waiting For Dispatch Signature"),
             "ajax_source_url": "/datatables/waybills_dispatch/"
         }
     }, "waybill_dispatch_list" ),
-    ( r'^receive/$', person_required(receipt_view(direct_to_template)), {
+    ( r'^receive/$', recipient_required(direct_to_template), {
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("Expected Consignments"),
@@ -98,7 +99,7 @@ urlpatterns = patterns("ets.views",
     
     #Reception pages
     
-    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', person_required(receipt_view(waybill_reception)), 
+    ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', recipient_required(receipt_view(waybill_reception)), 
       {}, "waybill_reception"),
                         
     ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
@@ -148,11 +149,11 @@ urlpatterns = patterns("ets.views",
             "extra_title": _("Received"),
             "ajax_source_url": "/datatables/compas_waybill_receipt/"
     }}, "compas_waybill_receipt" ),
-    ( r'^datatables/compas_waybill_receipt/$', officer_required(table_compas_waybills), {
+    ( r'^datatables/compas_waybill_receipt/$', 'table_compas_waybills', {
         "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False)
     }, "table_compass_waybill_receipt" ),
 
-    ( r'^datatables/compas_waybill/$', officer_required(table_compas_waybills), {
+    ( r'^datatables/compas_waybill/$', 'table_compas_waybills', {
         "queryset": Waybill.objects.filter(sent_compas__isnull=False),
     }, 'table_compass_waybill' ),
     ( r'^compas_waybill/$', officer_required(direct_to_template), {

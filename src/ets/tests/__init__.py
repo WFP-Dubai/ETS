@@ -6,4 +6,5 @@ from test_warehouse import WarehouseTestCase
 from test_api import ApiServerTestCase
 from test_tags import TagsTestCase
 from test_order import OrderTestCase
+from test_datatables import DatatablesTestCase
 #from test_update import UpdateTestCase
