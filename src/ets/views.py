@@ -521,7 +521,11 @@ def table_orders(request, queryset):
         3: 'expiry',
         4: 'warehouse__name',
         5: 'location__name',
+<<<<<<< HEAD
         6: 'consignee__name',
+=======
+        6: 'consignee__code',
+>>>>>>> master
         7: 'transport_name',
         8: 'code',
         9: 'code',

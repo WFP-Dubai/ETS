@@ -492,9 +492,14 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
             CURR_CODE = waybill.pk[len(compas):]
 
             ## Check if dispatch_master is there...
-            if not compas_models.DispatchMaster.objects.filter(code__contains=waybill.pk).using(compas).exists():
-                raise ValidationError(_("The Dispatch %s is not available in the COMPAS Station %s") % ( waybill.pk, compas))
-
+            if not compas_models.DispatchMaster.objects.using(compas) \
+                                .filter(code__contains=waybill.pk, destination_code=waybill.destination.pk) \
+                                .exists():  
+                #Push dispatched waybill to COMPAS station 
+                if not send_dispatched(waybill, compas) and not send_dispatched(waybill, waybill.destination.compas):
+                    raise ValidationError(_("The Dispatch %s is not available in the COMPAS Station %s") % ( waybill.pk, compas))
+                
+                
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
             code_letter = u'A'
@@ -557,7 +562,7 @@ def changed_fields(model, next, previous, exclude=()):
 def get_compases(user):
     queryset = ets_models.Compas.objects.all()
     if not user.is_superuser:
-        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers=user))
+        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id))
         
     return queryset
 
