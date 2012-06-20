@@ -520,7 +520,7 @@ def table_orders(request, queryset):
         3: 'expiry',
         4: 'warehouse__name',
         5: 'location__name',
-        6: 'consignee',
+        6: 'consignee__code',
         7: 'transport_name',
         8: 'created',
         9: 'created',
