@@ -455,10 +455,12 @@ class OrderItem(models.Model):
     
     def get_stock_items(self):
         """Retrieves stock items for current order item through warehouse"""
-        if self.unit_weight_net:
-            return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
-        else:
-            return self.stock_items().all()
+        #=======================================================================
+        # if self.unit_weight_net:
+        #    return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
+        # else:
+        #=======================================================================
+        return self.stock_items().all()
         
     
     @staticmethod
