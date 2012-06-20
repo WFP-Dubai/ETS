@@ -89,3 +89,8 @@ dl.warehouse-list dd {
 .warehouse-selector select option { 
   max-width: 600px;
 }
+
+.csv_export {
+  float: right;
+  padding-right: 20px;
+}
