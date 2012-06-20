@@ -13,6 +13,40 @@ from django.http import HttpResponse
 from django.utils.cache import add_never_cache_headers
 from django.utils import simplejson
 
+def get_sorted_columns(request, columnIndexNameMap):
+    """Get ordered fields"""
+    iSortingCols =  int(request.GET.get('iSortingCols',0))
+    asortingCols = []
+
+    if iSortingCols:
+        for sortedColIndex in range(0, iSortingCols):
+            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
+            if request.GET.get('bSortable_{0}'.format(sortedColID), 'false')  == 'true':  # make sure the column is sortable first
+                sortedColName = columnIndexNameMap[sortedColID]
+                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
+                if sortingDirection == 'desc':
+                    sortedColName = '-'+sortedColName
+                asortingCols.append(sortedColName)
+    return asortingCols
+
+def get_searchable_columns(request, columnIndexNameMap, cols):
+    """Returns searchable columns"""
+    searchableColumns = []
+    for col in range(0,cols):
+        if request.GET.get('bSearchable_{0}'.format(col), False) == 'true': searchableColumns.append(columnIndexNameMap[col])
+    return searchableColumns
+
+def get_search_filter(request, searchableColumns):
+    """Apply filtering by value sent by user"""
+    customSearch = request.GET.get('sSearch', '').encode('utf-8')
+    outputQ = None
+    if customSearch != '':
+        for searchableColumn in searchableColumns:
+            kwargz = {searchableColumn+"__icontains" : customSearch}
+            outputQ = outputQ | Q(**kwargz) if outputQ else Q(**kwargz)
+    return outputQ
+
+
 def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, *args):
     """
     Usage: 
@@ -33,33 +67,16 @@ def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, 
     sColumns = ",".join(map(str,colitems))
 
     # Ordering data
-    iSortingCols =  int(request.GET.get('iSortingCols',0))
-    asortingCols = []
-
-    if iSortingCols:
-        for sortedColIndex in range(0, iSortingCols):
-            sortedColID = int(request.GET.get('iSortCol_'+str(sortedColIndex),0))
-            if request.GET.get('bSortable_{0}'.format(sortedColID), 'false')  == 'true':  # make sure the column is sortable first
-                sortedColName = columnIndexNameMap[sortedColID]
-                sortingDirection = request.GET.get('sSortDir_'+str(sortedColIndex), 'asc')
-                if sortingDirection == 'desc':
-                    sortedColName = '-'+sortedColName
-                asortingCols.append(sortedColName) 
+    asortingCols = get_sorted_columns(request, columnIndexNameMap)
+    if asortingCols:
         querySet = querySet.order_by(*asortingCols)
-
+        
     # Determine which columns are searchable
-    searchableColumns = []
-    for col in range(0,cols):
-        if request.GET.get('bSearchable_{0}'.format(col), False) == 'true': searchableColumns.append(columnIndexNameMap[col])
+    searchableColumns = get_searchable_columns(request, columnIndexNameMap, cols)
 
     # Apply filtering by value sent by user
-    customSearch = request.GET.get('sSearch', '').encode('utf-8');
-    if customSearch != '':
-        outputQ = None
-        first = True
-        for searchableColumn in searchableColumns:
-            kwargz = {searchableColumn+"__icontains" : customSearch}
-            outputQ = outputQ | Q(**kwargz) if outputQ else Q(**kwargz)             
+    outputQ = get_search_filter(request, searchableColumns)
+    if outputQ:
         querySet = querySet.filter(outputQ)
 
     # Individual column search 
