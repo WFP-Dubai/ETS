@@ -717,20 +717,23 @@ def construct_change_message(request, form, formsets):
     change_message = ' '.join(change_message)
     return change_message or _('No fields changed.')
 
-def get_api_url(request, url_name, column_index_map):
+def get_api_url(request, column_index_map, url_name, url_params=None, request_params={}):
     data_format = request.GET.get('data_format', '')
     if data_format:
         params = QueryDict('', mutable=True)
         searchable_columns = get_searchable_columns(request, column_index_map, len(column_index_map))
         sortable_columns = get_sorted_columns(request, column_index_map)
+        params.update(request_params)
         params.update({ 'sSearch': request.GET.get('sSearch', '').encode('utf-8') })
         params.setlist('sortable', list(set(sortable_columns)))
         params.setlist('searchable', list(set(searchable_columns)))
-        redirect_url = "?".join([reverse("api_orders"), params.urlencode()])
-        print redirect_url
+        redirect_url = "?".join([reverse(url_name, kwargs=url_params), params.urlencode()])
         return redirect_url
 
 def get_datatables_filtering(request, queryset):
+    search_string = request.GET.get("search_string", "")
+    if search_string:
+        queryset = queryset.filter(pk__icontains=search_string)
     sortable_columns = request.GET.getlist('sortable')
     if sortable_columns:
         queryset = queryset.order_by(*sortable_columns)

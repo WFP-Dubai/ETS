@@ -155,17 +155,19 @@ def waybill_search( request, template='waybill/list2.html', form_class=WaybillSe
 
     context = {
         "search_string": search_string,
-        "ajax_source_url": reverse("table_waybills"),
+        "ajax_source_url": reverse("table_waybills", kwargs={ 'filtering': 'user_related'}),
     }
     
     apply_extra_context(extra_context or {}, context)
     return direct_to_template(request, template, context)
 
 
-def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
+def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
 
     search_string = request.GET.get("search_string", "")
+    request_params = {}
     if search_string:
+        request_params["search_string"] = search_string
         queryset = queryset.filter(pk__icontains=search_string)
 
     column_index_map = {
@@ -182,6 +184,11 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
         10: 'pk',
         11: 'pk',
     }
+
+    params = { 'filtering': filtering } if filtering else None
+    redirect_url = get_api_url(request, column_index_map, "api_waybills", params, request_params )
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.order.pk),
@@ -206,7 +213,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all()):
     ])
     
 @waybill_officer_related
-def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
+def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
 
     column_index_map = {
         0: 'order__pk',
@@ -215,6 +222,11 @@ def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all()):
         3: 'order__consignee__name',
         4: 'order__location__name',
     }
+
+    params = { 'filtering': filtering } if filtering else None
+    redirect_url = get_api_url(request, column_index_map, "api_waybills", params)
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
     
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.order.get_absolute_url(), item.order.pk),
@@ -497,6 +509,10 @@ def table_stock_items(request, param_name):
         8: 'quantity_gross' 
     }
 
+    redirect_url = get_api_url(request, column_index_map, "api_stock_items", { 'warehouse': warehouse.pk })
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+
     return get_datatables_records(request, warehouse.stock_items.all(), column_index_map, lambda item: [
         unicode(item.commodity),
         item.project_number,
@@ -529,7 +545,7 @@ def table_orders(request, queryset):
     
     queryset = queryset.filter(**filter_not_expired_orders())
 
-    redirect_url = get_api_url(request, "api_orders", column_index_map)
+    redirect_url = get_api_url(request, column_index_map, "api_orders")
     if redirect_url:
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
     
