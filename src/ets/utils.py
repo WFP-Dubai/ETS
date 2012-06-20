@@ -551,7 +551,7 @@ def changed_fields(model, next, previous, exclude=()):
 def get_compases(user):
     queryset = ets_models.Compas.objects.all()
     if not user.is_superuser:
-        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers=user))
+        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id))
         
     return queryset
 
