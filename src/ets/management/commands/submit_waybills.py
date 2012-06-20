@@ -20,17 +20,22 @@ class Command(UpdateCompas):
 
     def synchronize(self, compas):
         
+        total = 0
         for waybill in Waybill.objects.filter(transport_dispach_signed_date__lte=datetime.now(), 
                                               validated=True, sent_compas__isnull=True,
                                               order__warehouse__compas__pk=compas,
                                               order__warehouse__compas__read_only=False):
         
-            send_dispatched(waybill, compas)
+            if send_dispatched(waybill, compas):
+                total += 1
         
         for waybill in Waybill.objects.filter(receipt_signed_date__lte=datetime.now(), 
                                               receipt_validated=True, receipt_sent_compas__isnull=True,
                                               destination__compas__pk=compas,
                                               destination__compas__read_only=False):
-            send_received(waybill, compas)
             
-        import_stock(compas)
+            if send_received(waybill, compas):
+                total += 1
+        
+        if total:
+            import_stock(compas)

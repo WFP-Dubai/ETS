@@ -15,6 +15,7 @@ from django.utils.decorators import available_attrs
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
+from django.core.cache import cache
 from django.contrib.admin.models import LogEntry
 
 from compas.utils import call_db_procedure, reduce_compas_errors
@@ -71,7 +72,8 @@ def compas_importer(import_logger, func=None):
 
 def update_compas(using, *args):
     """ Utility to run whole import process. If no fails Success ImportLogger is created."""
-    import_logger = ets_models.ImportLogger.objects.create(compas_id=using)
+    import_logger = ets_models.ImportLogger(compas_id=using)
+    import_logger.save(force_insert=True)
     try:
         for func in args:
             compas_importer(import_logger, func)(using)
@@ -335,10 +337,18 @@ def import_order(compas):
         #order_items = ets_models.OrderItem.filter(order__warehouse__compas__pk = compas)
 
 
-def send_dispatched(waybill, compas=None):
+def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
     """Submits dispatched and validated waybills to COMPAS"""
+    cache_key = "%s_%s" % (cache_prefix, waybill.pk)
+    sending = cache.get(cache_key, False)
+    if sending:
+        return
+    
+    cache.set(cache_key, True)
+    
     if not compas:
         compas = waybill.order.warehouse.compas.pk
+    
     try:
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
@@ -446,18 +456,28 @@ def send_dispatched(waybill, compas=None):
                                                    status=ets_models.CompasLogger.FAILURE, 
                                                    message=error_message)
         waybill.validated = False
-        waybill.save()
     else:
         ets_models.CompasLogger.objects.create(action=ets_models.CompasLogger.DISPATCH, 
                                                compas_id=compas, waybill=waybill,
                                                status=ets_models.CompasLogger.SUCCESS)
 
         waybill.sent_compas = datetime.now()
+        
+        return True
+    
+    finally:
         waybill.save()
+        cache.set(cache_key, False)
 
-
-def send_received(waybill, compas=None):
+def send_received(waybill, compas=None, cache_prefix='send_received'):
     """Submits received and validated waybills to COMPAS"""
+    cache_key = "%s_%s" % (cache_prefix, waybill.pk)
+    sending = cache.get(cache_key, False)
+    if sending:
+        return
+    
+    cache.set(cache_key, True)
+    
     if not compas:
         compas = waybill.destination.compas.pk
 
@@ -465,24 +485,15 @@ def send_received(waybill, compas=None):
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
 
-            def check_dispatch_master(_waybill, _compas):
-                return bool(compas_models.DispatchMaster.objects.filter(code__contains=_waybill.pk).using(_compas))
-
             ## Check if dispatch_master is there...
-            if check_dispatch_master(waybill, compas):
-                IsValid = True
-            else:
-                send_dispatched(waybill, compas)
-                send_dispatched(waybill, waybill.destination.compas)
-                if check_dispatch_master(waybill, compas):
-                    IsValid = True
-                else:
-                    message = "The Dispatch %s is not available in the COMPAS Station %s"%( waybill.pk, compas)
-                    raise ValidationError(message)
-                    waybill.receipt_validated = False
-                    waybill.save()
-                    return 
-
+            if not compas_models.DispatchMaster.objects.using(compas) \
+                                .filter(code__contains=waybill.pk, destination_code=waybill.destination.pk) \
+                                .exists():  
+                #Push dispatched waybill to COMPAS station 
+                if not send_dispatched(waybill, compas) and not send_dispatched(waybill, waybill.destination.compas):
+                    raise ValidationError(_("The Dispatch %s is not available in the COMPAS Station %s") % ( waybill.pk, compas))
+                
+                
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
             code_letter = u'A'
@@ -527,8 +538,11 @@ def send_received(waybill, compas=None):
                                                status=ets_models.CompasLogger.SUCCESS)
 
         waybill.receipt_sent_compas = datetime.now()
-
-    waybill.save()
+        
+        return True
+    finally:
+        waybill.save()
+        cache.set(cache_key, False)
 
 
 def changed_fields(model, next, previous, exclude=()):
@@ -542,7 +556,7 @@ def changed_fields(model, next, previous, exclude=()):
 def get_compases(user):
     queryset = ets_models.Compas.objects.all()
     if not user.is_superuser:
-        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers=user))
+        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id))
         
     return queryset
 
