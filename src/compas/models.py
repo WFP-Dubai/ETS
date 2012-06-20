@@ -175,7 +175,7 @@ class DispatchMaster( models.Model ):
 #    origin_code = models.CharField(_("Origin code"), max_length = 13, blank = True )
 #    origin_descr = models.CharField(_("Origin description"), max_length = 50, blank = True )
 #    destination_location_code = models.CharField(_("Destination location code"), max_length = 10 )
-#    destination_code = models.CharField(_("Destination code"), max_length = 13, blank = True )
+    destination_code = models.CharField(_("Destination code"), max_length = 13, blank = True )
 #    pro_activity_code = models.CharField(_("Pro activity code"), max_length = 6, blank = True )
 #    activity_ouc = models.CharField(_("Activity ouc"), max_length = 13, blank = True )
 #    lndarrm_code = models.CharField(_("Lndarrm code"), max_length = 25, blank = True )
