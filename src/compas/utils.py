@@ -31,7 +31,6 @@ try:
     import cx_Oracle
     
     def call_db_procedure(name, parameters, using):
-        print "call_db_procedure oracle"
         cursor = connections[using].cursor()
         
         cursor.execute("Set role epic_all identified by writeon;")
@@ -48,7 +47,6 @@ try:
 except ImportError:
     
     def call_db_procedure(name, parameters, using):
-        print "call_db_procedure pass"
         pass
 
 
