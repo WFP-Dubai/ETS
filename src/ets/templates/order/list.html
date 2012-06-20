@@ -21,25 +21,11 @@
       <th>{% trans "New eWaybill" %}</th>
     </tr>
   </thead>
+
   <tbody>
-    {% comment %}
-    {% for order in object_list %}
-    <tr>
-      <td><a href="{{ order.get_absolute_url }}">{{ order.code }}</a></td>
-      <td>{{ order.created|date|upper }}</td>
-      <td>{{ order.dispatch_date|date|upper }}</td>
-      <td>{{ order.expiry|date|upper }}</td>
-      <td>{{ order.warehouse.name }}</td>
-      <td>{{ order.location.name }}</td>
-      <td>{{ order.consignee }}</td>
-      <td>{{ order.transport_name }}</td>
-      <td>{{ order.get_percent_executed }}</td>
-      <td>{% waybill_creation order user %}</td>
-    </tr>
-    {% endfor %}
-    {% endcomment %}
   </tbody>
 </table>
+<a class="csv_export" href='{% url table_orders %}'>{% trans "Export as CSV" %}</a>
 
 {% endblock %}
 
@@ -62,24 +48,38 @@ jQuery.fn.dataTableExt.oSort['date-case-desc'] = function(x,y) {
     return ((xd < yd) ?  1 : ((xd > yd) ? -1 : 0));
 };
 
+jQuery.fn.getDataFromTable = function ( oTable, format ) {
+    var oSettings = oTable.fnSettings();
+    aoData = oTable._fnAjaxParameters( oSettings );
+    aoData.push( { "name": "data_format", "value": format } );
+    oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aoData, function(json) {
+        window.location = json.redirect_url;
+        return false;
+    }, oSettings );
+};
+
 $(document).ready(function() {
-    $('#listing').dataTable({
+    var oTable = $('#listing').dataTable({
     	"aaSorting": [[ 3, "desc" ]],
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "{% url table_orders %}",
         "aoColumns": [
           null,
-          { "sType": 'date-case' },
-          { "sType": 'date-case' },
-          { "sType": 'date-case' },
+          { "sType": 'date-case', "bSearchable": false },
+          { "sType": 'date-case', "bSearchable": false },
+          { "sType": 'date-case', "bSearchable": false },
           null,
           null,
           null,
           null,
-          null,
-          { "asSorting": [ ] }
+          { "bSortable": false, "bSearchable": false },
+          { "bSortable": false, "bSearchable": false }
         ]
+    });
+    $(".csv_export").click( function(){
+       jQuery.fn.getDataFromTable(oTable, "csv");
+       return false;
     });
 });
 //]]>
