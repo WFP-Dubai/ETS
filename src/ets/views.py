@@ -35,6 +35,7 @@ from ets.decorators import (person_required, officer_required, dispatch_view, re
 import ets.models
 from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
                        import_file, get_compas_data, data_to_file_response, get_compases,
+                       filter_not_expired_orders, get_api_url,
                        LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
@@ -520,13 +521,17 @@ def table_orders(request, queryset):
         3: 'expiry',
         4: 'warehouse__name',
         5: 'location__name',
-        6: 'consignee',
+        6: 'consignee__name',
         7: 'transport_name',
-        8: 'created',
-        9: 'created',
+        8: 'code',
+        9: 'code',
     }
+    
+    queryset = queryset.filter(**filter_not_expired_orders())
 
-    queryset = queryset.filter(expiry__gt = (datetime.datetime.now() - datetime.timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)))
+    redirect_url = get_api_url(request, "api_orders", column_index_map)
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
     
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),
@@ -541,7 +546,8 @@ def table_orders(request, queryset):
         fill_link(reverse('waybill_create', kwargs={'order_pk': item.pk}) \
                   if item.has_waybill_creation_permission(request.user) else '', 
                   _("Create"))
-    ])
+        ])
+    
     
 
 def get_stock_data(request, order_pk, queryset):

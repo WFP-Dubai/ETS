@@ -10,6 +10,7 @@ from piston.handler import BaseHandler
 from piston.emitters import Emitter
 
 import ets.models
+from ets.utils import filter_not_expired_orders, get_datatables_filtering
 from ets.api import unicodecsv
 
 def get_titles(model):
@@ -158,9 +159,13 @@ class ReadOrdersHandler(BaseHandler):
     def read(self, request, code="", warehouse="", destination="", consignee=""):
         """Return orders in CSV"""
         orders = self.model.objects.all()
+        orders = orders.filter(**filter_not_expired_orders())
      
         if not request.user.has_perm("ets.order_api_full_access"):
             orders = orders.filter(warehouse__persons__pk=request.user.pk)
+
+        if request.GET.has_key('sSearch'):
+            orders = get_datatables_filtering(request, orders)
         
         filter_arg = {}
         if warehouse: 
