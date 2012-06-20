@@ -31,7 +31,6 @@ try:
     import cx_Oracle
     
     def call_db_procedure(name, parameters, using):
-    
         cursor = connections[using].cursor()
         
         cursor.execute("Set role epic_all identified by writeon;")

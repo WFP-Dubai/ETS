@@ -428,7 +428,8 @@
       "document_code": "AB",
       "dispatch_date": "2000-11-03",
       "origin_type": "B",
-      "origin_location_code": "ukraine"
+      "origin_location_code": "ukraine",
+      "destination_code": "ISBX002"
     }
   }
 ]

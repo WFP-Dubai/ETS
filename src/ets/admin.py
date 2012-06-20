@@ -236,7 +236,7 @@ class CompasAdmin(logicaldelete.admin.ModelAdmin):
     list_display = ('pk', 'read_only', 'active')
     search_fields = list_display
     list_filter = ('read_only',)
-    readonly_fields = ('created_date', 'modified_date')
+    readonly_fields = ('date_created', 'date_modified')
     filter_horizontal = ('officers',)
     fieldsets = (
         (_('General'), {'fields': ('code', 'read_only', 'officers')}),

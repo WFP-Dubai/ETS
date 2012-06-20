@@ -17,11 +17,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_unicode
 from django.core.cache import cache
 from django.contrib.admin.models import LogEntry
+from django.http import QueryDict
+from django.core.urlresolvers import reverse
 
 from compas.utils import call_db_procedure, reduce_compas_errors
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json
+from ets.datatables import get_sorted_columns, get_searchable_columns, get_search_filter
 
 TOTAL_WEIGHT_METRIC = 1000
 DEFAULT_ORDER_LIFE = getattr(settings, 'DEFAULT_ORDER_LIFE', 3)
@@ -47,6 +50,9 @@ ACTION_TYPES = (
 )
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
+
+def filter_not_expired_orders():
+    return {"expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS))}
 
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
@@ -710,3 +716,26 @@ def construct_change_message(request, form, formsets):
                                          'object': force_unicode(deleted_object)})
     change_message = ' '.join(change_message)
     return change_message or _('No fields changed.')
+
+def get_api_url(request, url_name, column_index_map):
+    data_format = request.GET.get('data_format', '')
+    if data_format:
+        params = QueryDict('', mutable=True)
+        searchable_columns = get_searchable_columns(request, column_index_map, len(column_index_map))
+        sortable_columns = get_sorted_columns(request, column_index_map)
+        params.update({ 'sSearch': request.GET.get('sSearch', '').encode('utf-8') })
+        params.setlist('sortable', list(set(sortable_columns)))
+        params.setlist('searchable', list(set(searchable_columns)))
+        redirect_url = "?".join([reverse("api_orders"), params.urlencode()])
+        print redirect_url
+        return redirect_url
+
+def get_datatables_filtering(request, queryset):
+    sortable_columns = request.GET.getlist('sortable')
+    if sortable_columns:
+        queryset = queryset.order_by(*sortable_columns)
+    sortable_columns = request.GET.getlist('searchable')
+    filtering = get_search_filter(request, sortable_columns)
+    if filtering:
+        queryset = queryset.filter(filtering)
+    return queryset
