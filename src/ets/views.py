@@ -35,7 +35,7 @@ from ets.decorators import (person_required, officer_required, dispatch_view, re
 import ets.models
 from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
                        import_file, get_compas_data, data_to_file_response, get_compases,
-                       filter_not_expired_orders, get_api_url,
+                       filter_for_orders, get_api_url,
                        LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
@@ -541,14 +541,15 @@ def table_orders(request, queryset):
         7: 'transport_name',
         8: 'code',
         9: 'code',
+        10: 'code',
     }
     
-    queryset = queryset.filter(**filter_not_expired_orders())
+    queryset = queryset.filter(**filter_for_orders())
 
     redirect_url = get_api_url(request, column_index_map, "api_orders")
     if redirect_url:
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
-    
+
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),
         date_filter(item.created).upper(),
@@ -561,7 +562,8 @@ def table_orders(request, queryset):
         item.get_percent_executed(),
         fill_link(reverse('waybill_create', kwargs={'order_pk': item.pk}) \
                   if item.has_waybill_creation_permission(request.user) else '', 
-                  _("Create"))
+                  _("Create")),
+        item.is_expired(),
         ])
     
     

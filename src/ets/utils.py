@@ -51,8 +51,11 @@ ACTION_TYPES = (
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
-def filter_not_expired_orders():
-    return {"expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS))}
+def filter_for_orders():
+    return {
+        "expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)),
+        "percentage__gte": 100,
+    }
 
 def compas_importer(import_logger, func=None):
     """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
