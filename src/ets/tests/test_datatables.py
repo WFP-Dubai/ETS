@@ -35,7 +35,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
 
     def test_table_waybills(self):
         # All waybills
-        response = self.client.get(reverse("table_waybills"))
+        response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'user_related'}))
         result = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/javascript")
@@ -43,7 +43,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
 
     def test_table_dispatch_waybills(self):
         # All dispatch waybills
-        response = self.client.get(reverse("table_waybill_dispatch"))
+        response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'dispatches'}))
         result = json.loads(response.content)
         self.assertContains(response, 'ISBX00211A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/javascript")
@@ -54,7 +54,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         person = ets.models.Person.objects.get(username=self.user.username)
         person.receive = True
         person.save()
-        response = self.client.get(reverse("table_waybill_reception"))
+        response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'receptions'}))
         result = json.loads(response.content)
         self.assertContains(response, 'ISBX00311A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/javascript")

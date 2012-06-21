@@ -50,9 +50,9 @@ urlpatterns = patterns("ets.views",
     
     #Waybill pages
 
-    ( r'^datatables/waybills_dispatch/$', dispatch_view(table_waybills), {}, "table_waybill_dispatch" ),
-    ( r'^datatables/waybills_recieve/$', receipt_view(table_waybills), {}, "table_waybill_reception" ),
-    ( r'^datatables/waybills/$', waybill_user_related(table_waybills), {
+    ( r'^datatables/waybills/(?P<filtering>dispatches)/$', dispatch_view(table_waybills), {}, "table_waybills" ),
+    ( r'^datatables/waybills/(?P<filtering>receptions)/$', receipt_view(table_waybills), {}, "table_waybills" ),
+    ( r'^datatables/waybills/(?P<filtering>user_related)/$', waybill_user_related(table_waybills), {
         'queryset': ets.models.Waybill.objects.all(),
     }, "table_waybills" ),
                        
@@ -63,14 +63,14 @@ urlpatterns = patterns("ets.views",
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("eWaybills Waiting For Dispatch Signature"),
-            "ajax_source_url": "/datatables/waybills_dispatch/"
+            "ajax_source_url": "/datatables/waybills/dispatches/"
         }
     }, "waybill_dispatch_list" ),
     ( r'^receive/$', recipient_required(direct_to_template), {
         "template": 'waybill/list2.html',
         "extra_context": {
             "extra_title": _("Expected Consignments"),
-            "ajax_source_url": "/datatables/waybills_recieve/"
+            "ajax_source_url": "/datatables/waybills/receptions/"
         }
     }, "waybill_reception_list" ),
     
@@ -147,19 +147,19 @@ urlpatterns = patterns("ets.views",
         "template": 'compas/list_waybills_compas_all2.html',
         "extra_context": {
             "extra_title": _("Received"),
-            "ajax_source_url": "/datatables/compas_waybill_receipt/"
+            "ajax_source_url": "/datatables/waybills/compas_receipt/"
     }}, "compas_waybill_receipt" ),
-    ( r'^datatables/compas_waybill_receipt/$', 'table_compas_waybills', {
+    ( r'^datatables/waybills/(?P<filtering>compas_receipt)/$', 'table_compas_waybills', {
         "queryset": Waybill.objects.filter(receipt_sent_compas__isnull=False)
-    }, "table_compass_waybill_receipt" ),
+    }, "table_compass_waybill" ),
 
-    ( r'^datatables/compas_waybill/$', 'table_compas_waybills', {
+    ( r'^datatables/waybills/(?P<filtering>compas_dispatch)/$', 'table_compas_waybills', {
         "queryset": Waybill.objects.filter(sent_compas__isnull=False),
     }, 'table_compass_waybill' ),
     ( r'^compas_waybill/$', officer_required(direct_to_template), {
         "template": 'compas/list_waybills_compas_all2.html',
         "extra_context": {
-            "ajax_source_url": "/datatables/compas_waybill/"
+            "ajax_source_url": "/datatables/waybills/compas_dispatch/"
     }}, 'compas_waybill' ),
     
     ( r'^datatables/stock/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
