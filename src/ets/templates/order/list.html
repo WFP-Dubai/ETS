@@ -48,16 +48,6 @@ jQuery.fn.dataTableExt.oSort['date-case-desc'] = function(x,y) {
     return ((xd < yd) ?  1 : ((xd > yd) ? -1 : 0));
 };
 
-jQuery.fn.getDataFromTable = function ( oTable, format ) {
-    var oSettings = oTable.fnSettings();
-    aoData = oTable._fnAjaxParameters( oSettings );
-    aoData.push( { "name": "data_format", "value": format } );
-    oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aoData, function(json) {
-        window.location = json.redirect_url;
-        return false;
-    }, oSettings );
-};
-
 $(document).ready(function() {
     var oTable = $('#listing').dataTable({
     	"aaSorting": [[ 3, "desc" ]],
@@ -78,7 +68,7 @@ $(document).ready(function() {
         ]
     });
     $(".csv_export").click( function(){
-       jQuery.fn.getDataFromTable(oTable, "csv");
+       getDataFromTable(oTable, "csv");
        return false;
     });
 });

@@ -12,6 +12,7 @@ from piston.emitters import Emitter
 import ets.models
 from ets.utils import filter_not_expired_orders, get_datatables_filtering
 from ets.api import unicodecsv
+from ets.decorators import waybill_officer_related_filter, waybill_user_related_filter
 
 def get_titles(model):
     """Extracts titles from model fields"""
@@ -56,12 +57,26 @@ class ReadWaybillHandler(BaseHandler):
         'receipt_validated', 'receipt_sent_compas',
     )
 
-    def read(self, request, slug="", warehouse="", destination=""):
+    def read(self, request, slug="", warehouse="", destination="", filtering=None):
         """Return waybills in CSV"""
         waybills = self.model.objects.all()
-        
-        if not request.user.has_perm("ets.waybill_api_full_access"):
+
+        if filtering:
+            if filtering == 'dispatches':
+                waybills = self.model.dispatches(request.user)
+            elif filtering == 'receptions':
+                waybills = self.model.receptions(request.user)
+            elif filtering == 'user_related':
+                waybills = waybill_user_related_filter(waybills, request.user)
+            elif filtering == 'compas_receipt':
+                waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
+            elif filtering == 'compas_dispatch':
+                waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
+        elif not request.user.has_perm("ets.waybill_api_full_access"):
             waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
+
+        if request.GET.has_key('sSearch'):
+            waybills = get_datatables_filtering(request, waybills)
         
         filter_arg = {}
         if warehouse: 
@@ -241,15 +256,17 @@ class ReadStockItemsHandler(BaseHandler):
         
     def read(self, request, warehouse=""):
         """Finds all sent waybills to provided destination"""
-        
+
         stock_items = self.model.objects.all()
-            
-        if not request.user.has_perm("ets.stockitem_api_full_access"):
+
+        if request.GET.has_key('sSearch'):
+            stock_items = get_datatables_filtering(request, stock_items)
+        elif not request.user.has_perm("ets.stockitem_api_full_access"):
             stock_items = stock_items.filter(warehouse__persons__pk=request.user.pk)
-        
+
         if warehouse: 
-            stock_items = stock_items.filter(warehouse=warehouse)
-            
+            stock_items = stock_items.filter(warehouse__pk=warehouse)
+
         return stock_items
 
 

@@ -21,3 +21,14 @@ function omit_enter(eventObject){
   };
   
 })(jQuery);
+
+
+function getDataFromTable( oTable, format ) {
+    var oSettings = oTable.fnSettings();
+    aoData = oTable._fnAjaxParameters( oSettings );
+    aoData.push( { "name": "data_format", "value": format } );
+    oSettings.fnServerData.call( oSettings.oInstance, oSettings.sAjaxSource, aoData, function(json) {
+        window.location = json.redirect_url;
+        return false;
+    }, oSettings );
+};

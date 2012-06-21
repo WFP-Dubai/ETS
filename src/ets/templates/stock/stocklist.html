@@ -25,6 +25,7 @@
   <tbody>
   </tbody>
 </table>
+<a class="csv_export" href='{% url table_stock_items param_name=wh.pk %}'>{% trans "Export as CSV" %}</a>
 {% if not forloop.last %}<div class="sep"></div>{% endif %}
 {% endfor %}
 
@@ -36,11 +37,14 @@
 <script type="text/javascript">
   $(document).ready(function() {
     $('.stocklist').each(function() { 
-      $(this).dataTable({
+      var oTable = $(this).dataTable({
         "aaSorting": [[ 4, "desc" ]],
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "{% url table_stock_items param_name='wh_id' %}?wh_id="+$(this).attr("id"),
+        "aoColumnDefs": [
+          { "bSearchable": false, "aTargets": [ 1, 2, 3, 4, 5, 6, 7, 8 ] },
+        ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
           if ( aData[3] != "{{ good_quality }}" ) {
             nRow.className +=' red';
@@ -50,6 +54,10 @@
           }
           return nRow;
         },
+      });
+      $(this).parent().next(".csv_export").click( function(){
+         getDataFromTable(oTable, "csv");
+         return false;
       });
     });
   });
