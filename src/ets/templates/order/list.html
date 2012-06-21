@@ -68,7 +68,6 @@ $(document).ready(function() {
           { "bSortable": false, "bSearchable": false, "bVisible": false },
         ],
         "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
-          console.log(aData[10]);
           if ( aData[10] == true) {
             nRow.className +=' red';
           };
