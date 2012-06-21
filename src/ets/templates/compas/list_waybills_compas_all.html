@@ -26,7 +26,7 @@
     {% endfor%} 
   <tbody>
 </table>
-
+<a class="csv_export" href='{% url table_orders %}'>{% trans "Export as CSV" %}</a>
 
 {%if error_message %}
 <pre>

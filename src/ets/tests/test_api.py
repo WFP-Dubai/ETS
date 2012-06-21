@@ -5,7 +5,7 @@ import StringIO
 from django.core.urlresolvers import reverse
 from django.test import TestCase
 from django.contrib.auth.models import User, Permission
-from django.conf import settings
+from django.http import QueryDict
 
 #from ets.models import Waybill, LoadingDetail, LtiOriginal, EpicStock, DispatchPoint, LtiWithStock, urllib2
 import ets.models
@@ -181,3 +181,61 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         item = dict_reader.next()
         self.assertEqual(item['code'], "ISBX002")
         
+    def test_table_stock_items(self):
+        # All stock items
+        warehouse = ets.models.Warehouse.objects.get(pk="ISBX003")
+        params = QueryDict('', mutable=True)
+        _params = {
+            'sSearch': "",
+            'sortable': "quantity_gross"
+        }
+        params.update(_params)
+        response = self.client.get("?".join([reverse("api_stock_items", kwargs={"warehouse": warehouse.pk}), params.urlencode()]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        item = dict_reader.next()
+        self.assertEqual(item['origin_id'], "testme01231")
+        self.assertEqual(len(list(dict_reader)), warehouse.stock_items.count()-1)
+
+    def test_table_orders(self):
+        # Orders related to user
+        response = self.client.get("?".join([reverse("api_orders"), "sSearch="]))
+        self.assertContains(response, 'OURLITORDER', status_code=200)        
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), 1)
+
+    def test_table_waybills(self):
+        # All waybills
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'user_related'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), ets.models.Waybill.objects.count())
+
+    def test_table_dispatch_waybills(self):
+        # All dispatch waybills
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'dispatches'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), ets.models.Waybill.dispatches(self.user).count())
+
+    def test_table_reception_waybills(self):
+        # All reception waybills
+        person = ets.models.Person.objects.get(username=self.user.username)
+        person.receive = True
+        person.save()
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'receptions'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ISBX00311A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), ets.models.Waybill.receptions(self.user).count())

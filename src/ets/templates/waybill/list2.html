@@ -26,6 +26,7 @@
   <tbody>
   </tbody>
 </table>
+<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
 
 {% endblock %}
 
@@ -33,11 +34,19 @@
 {{ block.super }}
 <script type="text/javascript">
   $(document).ready(function() {
-    $('#example').dataTable({
+    var oTable = $('#example').dataTable({
       "bProcessing": true,
       "bServerSide": true,
       "sAjaxSource": "{{ ajax_source_url }}{% if search_string %}?search_string={{ search_string }}{% endif %}",
-    })
+      "aoColumnDefs": [
+          { "bSearchable": false, "aTargets": [ 7, 8, 9, 10, 11 ] },
+          { "bSortable": false, "aTargets": [ 9, 10, 11 ] },
+      ],
+    });
+    $(".csv_export").click( function(){
+      getDataFromTable(oTable, "csv");
+      return false;
+    });
   } );
 </script>
 {% endblock script %}
