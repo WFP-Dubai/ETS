@@ -114,7 +114,7 @@ $(document).ready(function() {
         minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
         dateFormat: 'yy-mm-dd' 
     });
-    // reconstrain dispatch date every time loading date is changed
+    // reconstrain date when it is changed
     $('#{{ form.arrival_date.auto_id }}').change(function(){
         $('#{{ form.start_discharge_date.auto_id }}').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
         $('#{{ form.start_discharge_date.auto_id }}').change();
