@@ -216,7 +216,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering
 def waybill_errors(request, waybill_pk, logger_action, queryset=ets.models.Waybill.objects.all(),
                    template="waybill/error-list.html", extra_context=None):
     """utility that shows waybill's errors"""
-    print "waybill_errors"
+
     waybill = get_object_or_404(queryset, pk=waybill_pk)
 
     context = {
@@ -238,7 +238,6 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
         logger_action = ets.models.CompasLogger.RECEIPT
         queryset = queryset.filter(**get_receipt_compas_filters(request.user))
         
-    print queryset
     column_index_map = {
         0: 'order__pk',
         1: 'pk',
