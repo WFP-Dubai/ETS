@@ -1,0 +1,19 @@
+{% load i18n %}
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="toplist">
+  <thead>
+    <th>{% trans "Date" %}</th>
+    <th>{% trans "Compas" %}</th>
+    <th>{% trans "Error message" %}</th>
+  </thead>
+  <tbody>
+    {% for log in object.compass_loggers.all|slice:"3" %}
+      {% if log.action == logger_action %}
+        <tr class="logger">
+          <td>{{ log.when_attempted }}</td>
+          <td>{{ log.compas }}</td>
+          <td colspan="6">{{ log.message|linebreaks }}</td>
+        </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>

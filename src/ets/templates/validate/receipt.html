@@ -8,9 +8,7 @@
 {% block validate_link %}{% validate_receipt waybill user %}{% endblock %}
 
 {% block submit_form %}
-{% if validated_waybills %}
-<form method="post" action="{% url send_received %}">{% csrf_token %}
+<form method="post" action="{% url send_received %}" class="submit-form">{% csrf_token %}
 	<input name="submit" value="{% trans 'Submit to COMPAS' %}" type="submit" />
 </form>
-{% endif %}
 {% endblock %}

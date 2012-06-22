@@ -820,17 +820,16 @@ class Waybill( ld_models.Model ):
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
-        #dispatch_person=user.person
-        return cls.objects.filter(transport_dispach_signed_date__isnull=True,
-                                  order__warehouse__persons__pk=user.pk)
+        return cls.objects.filter(transport_dispach_signed_date__isnull = True,
+                                  order__warehouse__persons__pk = user.pk)
 
 
     @classmethod
     def receptions(cls, user):
         """Returns all waybills, that can be received, and related to user"""
-        return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                  receipt_signed_date__isnull=True,
-                                  destination__persons__pk=user.pk)
+        return cls.objects.filter(transport_dispach_signed_date__isnull = False, 
+                                  receipt_signed_date__isnull = True,
+                                  destination__persons__pk = user.pk)
 
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   
