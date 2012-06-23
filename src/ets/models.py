@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
+from django.core.cache import cache
 
 from sorl.thumbnail.fields import ImageField
 from autoslug.fields import AutoSlugField
@@ -56,6 +57,8 @@ class Compas(ld_models.Model):
     db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
 
     
+    cache_prefix = "sync_compas"
+    
     class Meta:
         ordering = ('code',)
         verbose_name = _('Compas station')
@@ -70,12 +73,47 @@ class Compas(ld_models.Model):
         except (ImportLogger.DoesNotExist, IndexError):
             last_attempt = datetime(1900, 1, 1)
         return last_attempt
-
-    def is_sync_active(self):
-        return self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) >= datetime.now()
+    
+    def get_cache_key(self, methods):
+        return "%s_%s_%s" % (self.cache_prefix, "".join([m.__name__ for m in methods]), self.pk)
+    
+    def lock_import(self, methods):
+        cache.set(self.get_cache_key(methods), True, MINIMUM_AGE*60)
+    
+    def unlock_import(self, methods):
+        cache.delete(self.get_cache_key(methods))
+    
+    def is_locked(self, methods):
+        return cache.get(self.get_cache_key(methods), False)
         
     def get_last_attempt(self):
         return self.import_logs.order_by('-when_attempted')[0]
+    
+    def update(self, *args):
+        """ Utility to run whole import process. If no fails Success ImportLogger is created."""
+        
+        if self.is_locked(args):
+            return
+        
+        self.lock_import(args)
+        try:
+            for func in args:
+                
+                try: 
+                    with transaction.commit_on_success(self.pk) as tr:
+                        func(self.pk)
+                except Exception, err:
+                    self.import_logs.create(status=ImportLogger.FAILURE,
+                                            message="%s: %s" % (func.__name__, unicode(err)))
+                    raise
+        except Exception:
+            #Since we already created log for this error simply pass here
+            pass
+        else:
+            self.import_logs.create()
+        finally:
+            self.unlock_import(args)
+
     
 class Location(models.Model):
     """Location model. City or region"""
