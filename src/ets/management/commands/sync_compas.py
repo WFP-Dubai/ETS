@@ -8,7 +8,6 @@ from django.conf import settings
 LOG_DIRECTORY = settings.LOG_DIRECTORY
 
 
-
 class Command(BaseCommand):
     """
     Import data from COMPAS stations. 
@@ -22,13 +21,13 @@ class Command(BaseCommand):
             help='Tells the system to synchronize only this one compas station'),
     )
 
-    help = 'Import data from COMPAS stations'
+    help = 'Import orders plus stocks from COMPAS stations'
     
     def synchronize(self, compas):
         """Exact method to proceed synchronization"""
         from ets import utils
-        utils.update_compas(compas, utils.import_partners, utils.import_places, utils.import_reasons, 
-                            utils.import_persons, utils.import_stock, utils.import_order)
+        
+        compas.update(utils.import_stock, utils.import_order)
 
     def handle(self, compas='', *args, **options):
         from ets.models import Compas
@@ -38,5 +37,4 @@ class Command(BaseCommand):
             stations = stations.filter(pk=compas)
             
         for compas in stations:
-            if not compas.is_sync_active():
-                self.synchronize(compas=compas.pk)
+            self.synchronize(compas=compas)

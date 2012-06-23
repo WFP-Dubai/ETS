@@ -21,8 +21,6 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
     
     def test_get_warehouses(self):
         """Check method get_warehouses for model Warehouse"""
-        # Synchronizes data with compas database
-        call_command('sync_compas', nodelete=True)
         # Get warehouses without organization, only location 
         location = ets.models.Location.objects.get(pk="OE7X")
         warehouses = ets.models.Warehouse.get_warehouses(location=location)

@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if access_granted %}
 <form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
-  <p><button type="submit" name="import" {% if station.is_sync_active %}disabled{% endif %}>{% trans "Import data" %}</button>
-  {% if station.is_sync_active %}<span class="active_import">{% trans "Import is being executed!" %}</span>{% endif %}</p>
+  <p><button type="submit" name="import" {% if station.is_locked %}disabled{% endif %}>{% trans "Import data" %}</button>
+  {% if station.is_locked %}<span class="active_import">{% trans "Import is being executed!" %}</span>{% endif %}</p>
 </form>
 {% endif %}

@@ -5,8 +5,6 @@ from datetime import datetime
 from django.test import TestCase
 from django.core.management import call_command
 from django.core.exceptions import ValidationError
-from django.http import Http404
-from django.shortcuts import get_object_or_404
 
 
 import ets.models
@@ -33,6 +31,7 @@ class CompasTestCase(TestCase):
         self.assertEqual(ets.models.Warehouse.objects.count(), 3)
         self.assertEqual(ets.models.Organization.objects.count(), 0)
         
+        call_command('import_compas_full')
         call_command('sync_compas')
         
         """Test place's update method"""
