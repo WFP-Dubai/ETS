@@ -249,6 +249,12 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
         8: 'pk',
     }
 
+    params = { 'filtering': filtering } if filtering else None
+    redirect_url = get_api_url(request, column_index_map, "api_waybills", params)
+    if redirect_url:
+        print redirect_url
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.order.pk),
         fill_link(item.get_absolute_url(), item.pk),
@@ -449,8 +455,6 @@ def dispatch_validates(request, queryset, template):
     return direct_to_template(request, template, {
         'top_table_url': 'validate_dispatch',
         'bottom_table_url': 'dispatch_validated',
-        #'object_list': queryset.filter(validated=False),
-        #'validated_waybills': queryset.filter(validated=True),
         'logger_action': ets.models.CompasLogger.DISPATCH,
     })
 
@@ -465,8 +469,6 @@ def receipt_validates(request, queryset, template):
     return direct_to_template(request, template, {
         'top_table_url': 'validate_receipt',
         'bottom_table_url': 'receipt_validated',
-        # 'object_list': queryset.filter(receipt_validated=False),
-        # 'validated_waybills': queryset.filter(receipt_validated=True),
         'logger_action': ets.models.CompasLogger.RECEIPT,
     })
 
