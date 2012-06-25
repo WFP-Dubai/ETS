@@ -127,8 +127,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         data = {
             'loading_date': self.order.dispatch_date,
             'dispatch_date': self.order.dispatch_date,
-            'destination': 'ISBX003',
-            'transaction_type': u'DEL',
+            'transaction_type': u'WIT',
             'transport_type': u'02',
             'dispatch_remarks': 'You are funny guys!',
             'transport_sub_contractor': 'Arpaso',
@@ -149,10 +148,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         }
         
         response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
-        
+        self.assertContains(response, u'Chose Destination Warehouse or another Transaction Type')
         self.assertContains(response, u'Overloaded for 10.250 tons')
+
         data.update({
             'item-0-overloaded_units': True,
+            'transaction_type': u'DEL',
         })
         
         response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
