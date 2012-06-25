@@ -15,6 +15,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
+from django.core.cache import cache
 
 from sorl.thumbnail.fields import ImageField
 from autoslug.fields import AutoSlugField
@@ -56,6 +57,8 @@ class Compas(ld_models.Model):
     db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
 
     
+    cache_prefix = "sync_compas"
+    
     class Meta:
         ordering = ('code',)
         verbose_name = _('Compas station')
@@ -70,12 +73,47 @@ class Compas(ld_models.Model):
         except (ImportLogger.DoesNotExist, IndexError):
             last_attempt = datetime(1900, 1, 1)
         return last_attempt
-
-    def is_sync_active(self):
-        return self.sync_last_attempt() + timedelta(minutes=MINIMUM_AGE) >= datetime.now()
+    
+    def get_cache_key(self, methods):
+        return "%s_%s_%s" % (self.cache_prefix, "".join([m.__name__ for m in methods]), self.pk)
+    
+    def lock_import(self, methods):
+        cache.set(self.get_cache_key(methods), True, MINIMUM_AGE*60)
+    
+    def unlock_import(self, methods):
+        cache.delete(self.get_cache_key(methods))
+    
+    def is_locked(self, methods):
+        return cache.get(self.get_cache_key(methods), False)
         
     def get_last_attempt(self):
         return self.import_logs.order_by('-when_attempted')[0]
+    
+    def update(self, *args):
+        """ Utility to run whole import process. If no fails Success ImportLogger is created."""
+        
+        if self.is_locked(args):
+            return
+        
+        self.lock_import(args)
+        try:
+            for func in args:
+                
+                try: 
+                    with transaction.commit_on_success(self.pk) as tr:
+                        func(self.pk)
+                except Exception, err:
+                    self.import_logs.create(status=ImportLogger.FAILURE,
+                                            message="%s: %s" % (func.__name__, unicode(err)))
+                    raise
+        except Exception:
+            #Since we already created log for this error simply pass here
+            pass
+        else:
+            self.import_logs.create()
+        finally:
+            self.unlock_import(args)
+
     
 class Location(models.Model):
     """Location model. City or region"""
@@ -374,6 +412,8 @@ class Order(models.Model):
     remarks_b = models.TextField(_("More Remarks"), blank=True)
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+
+    percentage = models.IntegerField(_("Percentage of Executing"), default=0, db_index=True)
     
     class Meta:
         verbose_name = _("order")
@@ -412,6 +452,11 @@ class Order(models.Model):
     def has_waybill_creation_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
 
+    def is_expired(self):
+        return self.expiry < date.today()
+
+    def is_executed(self):
+        return self.percentage == 100
 
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
@@ -576,7 +621,7 @@ class Waybill( ld_models.Model ):
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), related_name="receipt_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), blank=True, null=True, related_name="receipt_waybills")
     
     #Dates
     loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
@@ -681,6 +726,9 @@ class Waybill( ld_models.Model ):
         if self.start_discharge_date and self.end_discharge_date \
         and self.end_discharge_date < self.start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+        if self.transaction_type not in [self.DELIVERY, self.DISTIBRUTION] and not self.destination:
+            raise ValidationError(_("Chose Destination Warehouse or another Transaction Type"))
     
     def dispatch_sign(self):
         """Signs the waybill as ready to be sent."""

@@ -51,9 +51,6 @@ ACTION_TYPES = (
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
-def filter_not_expired_orders():
-    return {"expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS))}
-
 def get_dispatch_compas_filters(user):
     return {
         "transport_dispach_signed_date__isnull": False, 
@@ -70,39 +67,12 @@ def get_receipt_compas_filters(user):
         "destination__compas__officers__pk": user.pk
     }
 
-def compas_importer(import_logger, func=None):
-    """ Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created. """
-    def _decorator(f):
-        @wraps(f, assigned=available_attrs(func))
-        def _wrapped(using):
-            try: 
-                with transaction.commit_on_success(using) as tr:
-                    f(using)
-            except Exception, err:
-                import_logger.status=ets_models.ImportLogger.FAILURE
-                import_logger.message="%s: %s" % (f.__name__, unicode(err))
-                import_logger.save()
-                raise
 
-        return _wrapped
-    
-    if func:
-        return _decorator(func)
-    
-    return _decorator
-
-
-def update_compas(using, *args):
-    """ Utility to run whole import process. If no fails Success ImportLogger is created."""
-    import_logger = ets_models.ImportLogger(compas_id=using)
-    import_logger.save(force_insert=True)
-    try:
-        for func in args:
-            compas_importer(import_logger, func)(using)
-    except Exception:
-        #Since we already created log for this error simply pass here
-        pass
-
+def filter_for_orders():
+    return {
+        "expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)),
+        "percentage__lt": 100,
+    }
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\
