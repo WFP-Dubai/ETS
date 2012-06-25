@@ -614,7 +614,7 @@ class Waybill( ld_models.Model ):
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), related_name="receipt_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), blank=True, null=True, related_name="receipt_waybills")
     
     #Dates
     loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
@@ -719,6 +719,9 @@ class Waybill( ld_models.Model ):
         if self.start_discharge_date and self.end_discharge_date \
         and self.end_discharge_date < self.start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+        if self.transaction_type not in [self.DELIVERY, self.DISTIBRUTION] and not self.destination:
+            raise ValidationError(_("Chose Destination Warehouse or another Transaction Type"))
     
     def dispatch_sign(self):
         """Signs the waybill as ready to be sent."""

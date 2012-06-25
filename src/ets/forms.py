@@ -48,6 +48,7 @@ class WaybillScanForm( forms.Form ):
 
 class DispatchWaybillForm( forms.ModelForm ):
     """Dispatch waybill form."""
+    
     class Meta:
         model = ets_models.Waybill
         fields = (

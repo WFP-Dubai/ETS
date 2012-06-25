@@ -196,7 +196,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering
         item.order.warehouse.name,
         item.order.consignee.name,
         item.order.location.name,
-        item.destination.name,
+        item.destination.name if item.destination else "",
         item.get_transaction_type_display(),
         item.transport_dispach_signed_date and date_filter(item.transport_dispach_signed_date).upper() \
                         or fill_link(item.get_absolute_url(), _("Open")),
@@ -263,19 +263,19 @@ def _dispatching(request, waybill, template, success_message, created=False, for
     warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
     
     form.fields['destination'].queryset = warehouses
-    form.fields['destination'].empty_label = None
+
+    def get_transaction_type_choice(*args):
+        return ((k, v) for k, v in form.fields['transaction_type'].choices if k in args)
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
-    if order.consignee.pk == WFP_DISTRUIBUTION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                                   if k ==ets.models.Waybill.DISTIBRUTION)
-    if not order.consignee.pk == WFP_DISTRUIBUTION:
-        if not order.consignee.pk == WFP_ORGANIZATION:
-            form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                                       if k ==ets.models.Waybill.DELIVERY)
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.INTERNAL_TRANSFER, 
+                                                                              ets.models.Waybill.SHUNTING)
+        form.fields['destination'].empty_label = None
+    elif order.consignee.pk == WFP_DISTRUIBUTION:
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DISTIBRUTION)
+    else:
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
