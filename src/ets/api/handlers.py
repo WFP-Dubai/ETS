@@ -10,7 +10,7 @@ from piston.handler import BaseHandler
 from piston.emitters import Emitter
 
 import ets.models
-from ets.utils import filter_not_expired_orders, get_datatables_filtering
+from ets.utils import filter_for_orders, get_datatables_filtering
 from ets.api import unicodecsv
 from ets.decorators import waybill_officer_related_filter, waybill_user_related_filter
 
@@ -174,7 +174,7 @@ class ReadOrdersHandler(BaseHandler):
     def read(self, request, code="", warehouse="", destination="", consignee=""):
         """Return orders in CSV"""
         orders = self.model.objects.all()
-        orders = orders.filter(**filter_not_expired_orders())
+        orders = orders.filter(**filter_for_orders())
      
         if not request.user.has_perm("ets.order_api_full_access"):
             orders = orders.filter(warehouse__persons__pk=request.user.pk)

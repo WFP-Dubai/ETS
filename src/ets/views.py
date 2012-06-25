@@ -23,7 +23,6 @@ from django.core import serializers
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
 from django.core.urlresolvers import reverse
-from django.views.decorators.cache import cache_page
 from django.template.defaultfilters import date as date_filter
 
 from ets.forms import (WaybillRecieptForm, BaseLoadingDetailFormSet, DispatchWaybillForm,
@@ -35,7 +34,8 @@ from ets.decorators import (person_required, officer_required, dispatch_view, re
 import ets.models
 from ets.utils import (send_dispatched, send_received, create_logentry, construct_change_message,
                        import_file, get_compas_data, data_to_file_response, get_compases,
-                       filter_not_expired_orders, get_api_url,
+                       get_dispatch_compas_filters, get_receipt_compas_filters,
+                       filter_for_orders, get_api_url,
                        LOGENTRY_CREATE_WAYBILL, LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE,
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
@@ -196,7 +196,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering
         item.order.warehouse.name,
         item.order.consignee.name,
         item.order.location.name,
-        item.destination.name,
+        item.destination.name if item.destination else "",
         item.get_transaction_type_display(),
         item.transport_dispach_signed_date and date_filter(item.transport_dispach_signed_date).upper() \
                         or fill_link(item.get_absolute_url(), _("Open")),
@@ -210,6 +210,55 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering
         fill_link(reverse('waybill_delete', kwargs={'waybill_pk': item.pk}) \
                   if item.has_dispatch_permission(request.user) else '', 
                   _("Delete"), "delete_waybill"),
+    ])
+
+def waybill_errors(request, waybill_pk, logger_action, queryset=ets.models.Waybill.objects.all(),
+                   template="waybill/error-list.html", extra_context=None):
+    """utility that shows waybill's errors"""
+
+    waybill = get_object_or_404(queryset, pk=waybill_pk)
+
+    context = {
+        'object': waybill,
+        'logger_action': int(logger_action),
+    }
+    apply_extra_context(extra_context or {}, context)
+    return direct_to_template(request, template, context)
+    
+
+def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
+
+    if filtering in ["dispatch_validated", "validate_dispatch"]:
+        url = "validate_dispatch"
+        logger_action = ets.models.CompasLogger.DISPATCH
+        queryset = queryset.filter(**get_dispatch_compas_filters(request.user))
+    elif filtering in ["receipt_validated", "validate_receipt"]:
+        url = "validate_receipt"
+        logger_action = ets.models.CompasLogger.RECEIPT
+        queryset = queryset.filter(**get_receipt_compas_filters(request.user))
+        
+    column_index_map = {
+        0: 'order__pk',
+        1: 'pk',
+        2: 'order__warehouse__name',
+        3: 'order__consignee__name',
+        4: 'order__location__name',
+        5: 'transport_dispach_signed_date',
+        6: 'receipt_signed_date',
+        7: 'pk',
+        8: 'pk',
+    }
+
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(item.get_absolute_url(), item.order.pk),
+        fill_link(item.get_absolute_url(), item.pk),
+        item.order.warehouse.name,
+        item.order.consignee.name,
+        item.order.location.name,
+        item.transport_dispach_signed_date and date_filter(item.transport_dispach_signed_date).upper() or _("Pending"),
+        item.receipt_signed_date and date_filter(item.receipt_signed_date).upper() or _("Pending"),
+        fill_link(reverse(url, kwargs={'waybill_pk': item.pk}), _("Validate"), "validate-link"),
+        fill_link(reverse("waybill_errors", kwargs={'waybill_pk': item.pk, "logger_action": logger_action}), _("Show errors"), "error-link") if item.compass_loggers.exists() else "",
     ])
     
 @waybill_officer_related
@@ -263,19 +312,19 @@ def _dispatching(request, waybill, template, success_message, created=False, for
     warehouses = ets.models.Warehouse.get_warehouses(order.location, order.consignee).exclude(pk=order.warehouse.pk)
     
     form.fields['destination'].queryset = warehouses
-    form.fields['destination'].empty_label = None
+
+    def get_transaction_type_choice(*args):
+        return ((k, v) for k, v in form.fields['transaction_type'].choices if k in args)
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                if (k ==ets.models.Waybill.INTERNAL_TRANSFER) or (k ==ets.models.Waybill.SHUNTING))
-    if order.consignee.pk == WFP_DISTRUIBUTION:
-        form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                                   if k ==ets.models.Waybill.DISTIBRUTION)
-    if not order.consignee.pk == WFP_DISTRUIBUTION:
-        if not order.consignee.pk == WFP_ORGANIZATION:
-            form.fields['transaction_type'].choices = ((k, v) for k, v in form.fields['transaction_type'].choices 
-                                                       if k ==ets.models.Waybill.DELIVERY)
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.INTERNAL_TRANSFER, 
+                                                                              ets.models.Waybill.SHUNTING)
+        form.fields['destination'].empty_label = None
+    elif order.consignee.pk == WFP_DISTRUIBUTION:
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DISTIBRUTION)
+    else:
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
@@ -398,8 +447,10 @@ def dispatch_validates(request, queryset, template):
     Otherwise system does it every 2 minutes.
     """
     return direct_to_template(request, template, {
-        'object_list': queryset.filter(validated=False),
-        'validated_waybills': queryset.filter(validated=True),
+        'top_table_url': 'validate_dispatch',
+        'bottom_table_url': 'dispatch_validated',
+        #'object_list': queryset.filter(validated=False),
+        #'validated_waybills': queryset.filter(validated=True),
         'logger_action': ets.models.CompasLogger.DISPATCH,
     })
 
@@ -412,8 +463,10 @@ def receipt_validates(request, queryset, template):
     Otherwise system does it every 2 minutes.
     """
     return direct_to_template(request, template, {
-        'object_list': queryset.filter(receipt_validated=False),
-        'validated_waybills': queryset.filter(receipt_validated=True),
+        'top_table_url': 'validate_receipt',
+        'bottom_table_url': 'receipt_validated',
+        # 'object_list': queryset.filter(receipt_validated=False),
+        # 'validated_waybills': queryset.filter(receipt_validated=True),
         'logger_action': ets.models.CompasLogger.RECEIPT,
     })
 
@@ -434,6 +487,8 @@ def validate_dispatch(request, waybill_pk, queryset):
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
                         })
+    if request.is_ajax():
+        return HttpResponse("")
 
     return redirect('dispatch_validates')
 
@@ -454,6 +509,8 @@ def validate_receipt(request, waybill_pk, queryset):
                         _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
                             'waybill': waybill.pk,
                         })
+    if request.is_ajax():
+        return HttpResponse("")
 
     return redirect('receipt_validates')
 
@@ -541,14 +598,15 @@ def table_orders(request, queryset):
         7: 'transport_name',
         8: 'code',
         9: 'code',
+        10: 'code',
     }
     
-    queryset = queryset.filter(**filter_not_expired_orders())
+    queryset = queryset.filter(**filter_for_orders())
 
     redirect_url = get_api_url(request, column_index_map, "api_orders")
     if redirect_url:
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
-    
+
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),
         date_filter(item.created).upper(),
@@ -561,7 +619,8 @@ def table_orders(request, queryset):
         item.get_percent_executed(),
         fill_link(reverse('waybill_create', kwargs={'order_pk': item.pk}) \
                   if item.has_waybill_creation_permission(request.user) else '', 
-                  _("Create"))
+                  _("Create")),
+        item.is_expired(),
         ])
     
     

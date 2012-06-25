@@ -129,6 +129,19 @@ urlpatterns = patterns("ets.views",
         'template': 'validate/receipt.html',
         'queryset': ets.models.Waybill.objects.all(),
     }, "receipt_validates" ),
+
+    ( r'^datatables/waybills/(?P<filtering>validate_dispatch)/$', 'table_validate_waybills', {
+        "queryset": ets.models.Waybill.objects.filter(validated=False)
+    }, "table_validate_waybill" ),
+    ( r'^datatables/waybills/(?P<filtering>validate_receipt)/$', 'table_validate_waybills', {
+        "queryset": ets.models.Waybill.objects.filter(receipt_validated=False),
+    }, 'table_validate_waybill' ),
+    ( r'^datatables/waybills/(?P<filtering>dispatch_validated)/$', 'table_validate_waybills', {
+        "queryset": ets.models.Waybill.objects.filter(validated=True)
+    }, "table_validate_waybill" ),
+    ( r'^datatables/waybills/(?P<filtering>receipt_validated)/$', 'table_validate_waybills', {
+        "queryset": ets.models.Waybill.objects.filter(receipt_validated=True),
+    }, 'table_validate_waybill' ),
     
     #Submit waybills to compas
     ( r'^send_dispatched/$', 'send_dispatched_view', {
@@ -186,6 +199,8 @@ urlpatterns = patterns("ets.views",
     }, "select_report" ),
                         
     ( r'^waybill_deserialize/$', "deserialize", {}, "deserialize" ),
+
+    ( r'^waybill_errors/(?P<waybill_pk>[-\w]+)/(?P<logger_action>[-\w]+)/$', "waybill_errors", {}, "waybill_errors"),
 
     ( r'^qrcode/(?P<waybill_pk>[-\w]+).jpg$', "barcode_qr", {}, "barcode_qr" ),
      ( r'^sync_compas/$', "sync_compas", {}, "sync_compas"),

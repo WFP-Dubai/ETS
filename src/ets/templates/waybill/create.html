@@ -160,19 +160,17 @@
 $(document).ready(function() {
 	// constrain loading date
 	$('#{{ form.loading_date.auto_id }}').datepicker({
-		minDate: '{{ object.created|date:"y-m-d" }}',
-		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'yy-mm-dd'
+		minDate: '{{ object.order.dispatch_date|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd',
 	});
 	// constrain dispatch date
 	$('#{{ form.dispatch_date.auto_id }}').datepicker({
-		minDate: '{{ object.created|date:"y-m-d" }}',
-		maxDate: '{{ object.expiry|date:"y-m-d" }}',
-		dateFormat: 'yy-mm-dd'
+		minDate: '{{ object.order.dispatch_date|date:"y-m-d" }}',
+		dateFormat: 'yy-mm-dd',
 	});
 	// reconstrain dispatch date every time loading date is changed
-	$('#id_loading_date').change(function(){
-			$('#id_dispatch_date').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
+	$('#{{ form.loading_date.auto_id }}').change(function(){
+			$('#{{ form.dispatch_date.auto_id }}').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
 	});
 	// whatever
 	$("#loadingdetails").formset($("#add-item-link"), 'etalon', $('#{{ formset.management_form.TOTAL_FORMS.auto_id }}'));
