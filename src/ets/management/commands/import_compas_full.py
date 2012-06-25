@@ -7,5 +7,4 @@ class Command(UpdateCompas):
     help = 'Import organizations, places, warehouses, reasons, persons from COMPAS stations'
 
     def synchronize(self, compas):
-        from ets import utils
-        compas.update(utils.import_partners, utils.import_places, utils.import_reasons, utils.import_persons)
+        compas.update(base=True)
