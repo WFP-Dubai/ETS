@@ -8,7 +8,7 @@ class Command(BaseCommand):
     
     help = 'Count percentage of order executing'
 
-    def count_order_percentage(self, compas):
+    def handle(self, compas='', *args, **options):
         for order in Order.objects.filter(percentage__lt=100):
             order.percentage = round(order.get_percent_executed())
             order.save()
