@@ -616,7 +616,7 @@ def table_orders(request, queryset):
         item.location.name,
         unicode(item.consignee),
         item.transport_name,
-        item.get_percent_executed(),
+        item.percentage,
         fill_link(reverse('waybill_create', kwargs={'order_pk': item.pk}) \
                   if item.has_waybill_creation_permission(request.user) else '', 
                   _("Create")),

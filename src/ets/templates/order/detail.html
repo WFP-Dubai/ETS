@@ -12,7 +12,7 @@
   <tr>
     <td>{% trans "Requested Dispatch Date" %}: {{ object.dispatch_date|date|upper }}</td>
     <td>{% trans "Expiry Date" %}: {{ object.expiry|date|upper }}</td>
-    <td>{% trans "% Completed" %}: {{ object.get_percent_executed }}</td>
+    <td>{% trans "% Completed" %}: {{ object.percentage }}</td>
   </tr>
   <tr>
     <td>{% trans "Origin Warehouse" %}: {{ object.warehouse.name }}</td>
@@ -66,7 +66,7 @@
       {%if item.get_dispatched_not_yet_counted_of_stock != 0%}
       (-{{item.get_dispatched_not_yet_counted_of_stock|floatformat:3}} MT){%endif%}</td>
       <td align="right">{{ item.tonnes_left|floatformat:3 }}</td>
-      <td align="right">{{ item.get_percent_executed }}</td>
+      <td align="right">{{ item.percentage }}</td>
     </tr>
 {%endif%}
   {% endfor %}
