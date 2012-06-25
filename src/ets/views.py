@@ -252,20 +252,18 @@ def _dispatching(request, waybill, template, success_message, created=False, for
     
     form.fields['destination'].queryset = warehouses
 
-    def get_transaction_type_choice(choices, *args):
-        return ((k, v) for k, v in choices if k in args)
+    def get_transaction_type_choice(*args):
+        return ((k, v) for k, v in form.fields['transaction_type'].choices if k in args)
     
     #Transaction type
     if order.consignee.pk == WFP_ORGANIZATION:
-        form.fields['transaction_type'].choices = get_transaction_type_choice(form.fields['transaction_type'].choices,
-                                                      ets.models.Waybill.INTERNAL_TRANSFER, ets.models.Waybill.SHUNTING)
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.INTERNAL_TRANSFER, 
+                                                                              ets.models.Waybill.SHUNTING)
         form.fields['destination'].empty_label = None
     elif order.consignee.pk == WFP_DISTRUIBUTION:
-        form.fields['transaction_type'].choices = get_transaction_type_choice(form.fields['transaction_type'].choices,
-                                                                              ets.models.Waybill.DISTIBRUTION)
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DISTIBRUTION)
     else:
-        form.fields['transaction_type'].choices = get_transaction_type_choice(form.fields['transaction_type'].choices,
-                                                                              ets.models.Waybill.DELIVERY)
+        form.fields['transaction_type'].choices = get_transaction_type_choice(ets.models.Waybill.DELIVERY)
     
     if form.is_valid() and loading_formset.is_valid():
         waybill = form.save()
