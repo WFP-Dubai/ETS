@@ -412,6 +412,8 @@ class Order(models.Model):
     remarks_b = models.TextField(_("More Remarks"), blank=True)
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+
+    percentage = models.IntegerField(_("Percentage of Executing"), default=0, db_index=True)
     
     class Meta:
         verbose_name = _("order")
@@ -450,6 +452,11 @@ class Order(models.Model):
     def has_waybill_creation_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
 
+    def is_expired(self):
+        return self.expiry < date.today()
+
+    def is_executed(self):
+        return self.percentage == 100
 
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
@@ -614,7 +621,7 @@ class Waybill( ld_models.Model ):
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
-    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), related_name="receipt_waybills")
+    destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), blank=True, null=True, related_name="receipt_waybills")
     
     #Dates
     loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
@@ -704,6 +711,9 @@ class Waybill( ld_models.Model ):
         """Validates Waybill instance. Checks different dates"""
         if self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
+
+        if self.order.dispatch_date and self.loading_date < self.order.dispatch_date:
+            raise ValidationError(_("Cargo loaded before being Requested"))
         
         #If second container exists, first must exist also
         if self.container_two_number and not self.container_one_number:
@@ -719,6 +729,9 @@ class Waybill( ld_models.Model ):
         if self.start_discharge_date and self.end_discharge_date \
         and self.end_discharge_date < self.start_discharge_date:
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
+
+        if self.transaction_type not in [self.DELIVERY, self.DISTIBRUTION] and not self.destination:
+            raise ValidationError(_("Chose Destination Warehouse or another Transaction Type"))
     
     def dispatch_sign(self):
         """Signs the waybill as ready to be sent."""
@@ -858,17 +871,16 @@ class Waybill( ld_models.Model ):
     @classmethod
     def dispatches(cls, user):
         """Returns all loaded but not signed waybills, and related to user"""
-        #dispatch_person=user.person
-        return cls.objects.filter(transport_dispach_signed_date__isnull=True,
-                                  order__warehouse__persons__pk=user.pk)
+        return cls.objects.filter(transport_dispach_signed_date__isnull = True,
+                                  order__warehouse__persons__pk = user.pk)
 
 
     @classmethod
     def receptions(cls, user):
         """Returns all waybills, that can be received, and related to user"""
-        return cls.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                  receipt_signed_date__isnull=True,
-                                  destination__persons__pk=user.pk)
+        return cls.objects.filter(transport_dispach_signed_date__isnull = False, 
+                                  receipt_signed_date__isnull = True,
+                                  destination__persons__pk = user.pk)
 
     def get_shortage_loading_details(self):
         return [loading_detail for loading_detail in self.loading_details.all() if loading_detail.get_shortage()]   

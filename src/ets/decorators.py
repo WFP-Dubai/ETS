@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import user_passes_test
 from django.utils.decorators import available_attrs
 
 import ets.models
-
+from ets.utils import get_dispatch_compas_filters, get_receipt_compas_filters
 
 #Authentication decorators. If condition fails user is redirected to login form
 person_required = user_passes_test(lambda u: hasattr(u, 'person'))
@@ -66,14 +66,6 @@ def waybill_officer_related_filter(queryset, user):
 waybill_officer_related = user_filtered(felter=waybill_officer_related_filter)
 
 #Validation
-dispatch_compas = user_filtered(felter=lambda queryset, user: queryset.filter(
-                        transport_dispach_signed_date__isnull=False, 
-                        sent_compas__isnull=True, 
-                        order__warehouse__compas__officers=user))
+dispatch_compas = user_filtered(felter=lambda queryset, user: queryset.filter(**get_dispatch_compas_filters(user)))
+receipt_compas = user_filtered(felter=lambda queryset, user: queryset.filter(**get_receipt_compas_filters(user)))
 
-receipt_compas = user_filtered(felter=lambda queryset, user: queryset.filter(
-                         transport_dispach_signed_date__isnull=False, 
-                         receipt_signed_date__isnull=False, 
-                         receipt_sent_compas__isnull=True,
-                         #sent_compas__isnull=False, 
-                         destination__compas__officers=user))

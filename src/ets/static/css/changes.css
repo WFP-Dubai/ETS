@@ -94,3 +94,26 @@ dl.warehouse-list dd {
   float: right;
   padding-right: 20px;
 }
+
+/* the overlayed element */
+#error_list {
+
+  /* must be initially hidden */
+  display:none;
+
+  /* place overlay on top of other elements */
+  z-index:10007 !important;
+
+  width:600px;
+
+  border: 0 none;
+  margin: 0 0 8px;
+
+  /* CSS3 styling for latest browsers */
+  -moz-box-shadow:0 0 90px 5px #000;
+  -webkit-box-shadow: 0 0 90px #000;
+}
+
+.submit-form { 
+  display: none;
+}
