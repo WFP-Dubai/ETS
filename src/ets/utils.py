@@ -51,6 +51,23 @@ ACTION_TYPES = (
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
+def get_dispatch_compas_filters(user):
+    return {
+        "transport_dispach_signed_date__isnull": False, 
+        "sent_compas__isnull": True, 
+        "order__warehouse__compas__officers__pk": user.pk
+    }
+
+def get_receipt_compas_filters(user):
+    return {
+        "transport_dispach_signed_date__isnull": False, 
+        "receipt_signed_date__isnull": False, 
+        "receipt_sent_compas__isnull": True,
+        #"sent_compas__isnull": False, 
+        "destination__compas__officers__pk": user.pk
+    }
+
+
 def filter_for_orders():
     return {
         "expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)),

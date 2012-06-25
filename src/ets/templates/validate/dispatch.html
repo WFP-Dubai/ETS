@@ -17,8 +17,12 @@
         <th>{% trans "Dispatched" %}</th>
         <th>{% trans "Received" %}</th>
         <th>{% trans "Validate" %}</th>
+        <th>{% trans "Errors" %}</th>
         </tr>
     </thead>
+    <tbody>
+    </tbody>
+{% comment %}
     {% for waybill in object_list %}
     {% with waybill.get_shortage_loading_details as shortage %}
     {% if shortage %}
@@ -61,6 +65,7 @@
         {% endif %}
       {% endfor %}
     {% endfor %}
+{% endcomment %}
 </table>
 
 <br/>
@@ -77,6 +82,9 @@
         <th>{% trans "Received" %}</th>
       </tr>
     </thead>
+    <tbody>
+    </tbody>
+{% comment %}
     {% for waybill in validated_waybills %}
     <tr>
       <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
@@ -100,38 +108,72 @@
       </td>
     </tr>
     {% endfor %}
+{% endcomment %}
 </table>
 
 {% block submit_form %}
-{% if validated_waybills %}
-<form method="POST" action="{% url send_dispatched %}">{% csrf_token %}
+<form method="POST" action="{% url send_dispatched %}" class="submit-form">{% csrf_token %}
 	<input name="submit" value="{% trans 'Submit to COMPAS' %}" type="submit" />
 </form>
-{% endif %}
 {% endblock %}
 
+<div id="error_list"></div>
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
 $(document).ready(function() {
-	/*
-  $('#toplist').dataTable( {
-      "bPaginate": false,
-      "bLengthChange": false,
-      "bFilter": false,
-      "bSort": false,
-      "bInfo": false,
-      "bAutoWidth": false
-  });*/
-  $('#validated_waybills').dataTable( {
-      "bPaginate": false,
-      "bLengthChange": false,
-      "bFilter": false,
-      "bSort": false,
-      "bInfo": false,
-      "bAutoWidth": false 
+  var oTableBottom = $("#validated_waybills").dataTable({
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "{% url table_validate_waybill filtering=bottom_table_url %}",
+      "aoColumnDefs": [
+          { "bSearchable": false, "bSortable": false, "bVisible": false, "aTargets": [ 7, 8 ] },
+      ],
+      "fnDrawCallback": function( oSettings ) {
+          if (oSettings.aoData.length > 0) {
+              $(".submit-form").show();
+          } else {
+              $(".submit-form").hide();
+          };
+      }
+  });
+  var oTableTop = $("#toplist").dataTable({
+      "bProcessing": true,
+      "bServerSide": true,
+      "sAjaxSource": "{% url table_validate_waybill filtering=top_table_url %}",
+      "aoColumnDefs": [
+          { "bSearchable": false, "bSortable": false, "aTargets": [ 7, 8 ] },
+      ],
+      "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
+          if ( aData[8] != "" ) {
+              nRow.className +=' red';
+          };
+          return nRow;
+      },
+      "fnDrawCallback": function( oSettings ) {
+          $(".error-link").click(function(){
+              $("#error_list").empty();
+              $("#error_list").data("overlay").load();
+              $("#error_list").load($(this).attr("href"));
+              return false;
+          });
+          $('.validate-link').click(function(){
+              data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
+              $.post($(this).attr("href"), data);
+              oTableTop.fnDraw();
+              oTableBottom.fnDraw();
+              return false;
+          }); 
+      }
+  });
+  $("#error_list").overlay({
+      mask: {
+          color: '#e2e3ee',
+          loadSpeed: 200,
+          opacity: 0.9
+      },
   });
 });
 </script>
