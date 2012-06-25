@@ -711,6 +711,9 @@ class Waybill( ld_models.Model ):
         """Validates Waybill instance. Checks different dates"""
         if self.loading_date > self.dispatch_date:
             raise ValidationError(_("Cargo Dispatched before being Loaded"))
+
+        if self.order.dispatch_date and self.loading_date < self.order.dispatch_date:
+            raise ValidationError(_("Cargo loaded before being Requested"))
         
         #If second container exists, first must exist also
         if self.container_two_number and not self.container_one_number:

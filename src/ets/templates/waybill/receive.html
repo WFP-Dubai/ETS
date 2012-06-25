@@ -103,21 +103,29 @@
 $(document).ready(function() {
 	
     $('#{{ form.arrival_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	 	dateFormat: 'yy-mm-dd' 
+        minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+        dateFormat: 'yy-mm-dd' 
     });
-	$('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	 	dateFormat: 'yy-mm-dd' 
+    $('#{{ form.start_discharge_date.auto_id }}').datepicker({ 
+        minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+        dateFormat: 'yy-mm-dd' 
     });
     $('#{{ form.end_discharge_date.auto_id }}').datepicker({ 
-		minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
-	 	dateFormat: 'yy-mm-dd' 
+        minDate: '{{ form.instance.dispatch_date|date:"y-m-d" }}', 
+        dateFormat: 'yy-mm-dd' 
     });
-	
-	$("form table tr").each(function(){
-		$(this).handleRemarksRequired().handleTotalWeight();
-	});
+    // reconstrain date when it is changed
+    $('#{{ form.arrival_date.auto_id }}').change(function(){
+        $('#{{ form.start_discharge_date.auto_id }}').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
+        $('#{{ form.start_discharge_date.auto_id }}').change();
+    });
+    $('#{{ form.start_discharge_date.auto_id }}').change(function(){
+        $('#{{ form.end_discharge_date.auto_id }}').datepicker('option', 'minDate', $(this).datepicker('getDate')); 
+    });
+
+    $("form table tr").each(function(){
+        $(this).handleRemarksRequired().handleTotalWeight();
+    });
 	
 });
 $(document).keydown(omit_enter);

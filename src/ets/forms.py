@@ -73,6 +73,8 @@ class DispatchWaybillForm( forms.ModelForm ):
             'container_two_remarks_dispatch',
         )
         widgets = {
+            'loading_date': forms.DateInput(attrs={'readonly': "readonly"}),
+            'dispatch_date': forms.DateInput(attrs={'readonly': "readonly"}),
             'dispatch_remarks': forms.Textarea(attrs={'rows': "3"}),
             'transport_driver_name': StrippedTextInput(),
             'transport_driver_licence': StrippedTextInput(),
@@ -148,6 +150,8 @@ class WaybillRecieptForm( forms.ModelForm ):
         super(WaybillRecieptForm, self).__init__(*args, **kwargs)
         for field_name in ('arrival_date', 'start_discharge_date', 'end_discharge_date',):
             self.fields[field_name].required = True
+            self.fields[field_name].widget.attrs['readonly'] = 'readonly'
+
     
     class Meta:
         model = ets_models.Waybill
@@ -163,7 +167,8 @@ class WaybillRecieptForm( forms.ModelForm ):
         )
         widgets = {
             'receipt_remarks': forms.Textarea(attrs={'rows': "3"}),
-            'distance': forms.TextInput(attrs={'size': 5, 'class': 'number'}),           
+            'distance': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
+            'destination': forms.Select(attrs={'class': 'warehouse-selector'})
         }
     
     helper = FormHelper()
