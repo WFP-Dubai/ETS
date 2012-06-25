@@ -2,6 +2,7 @@
 from django.test import TestCase
 from django.core.management import call_command
 from django.core.urlresolvers import reverse
+from django.core.management import call_command
 
 import ets.models
 from ets.tests.utils import TestCaseMixin
@@ -30,13 +31,9 @@ class OrderTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_order_percentage(self):
-        response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
-        self.assertEqual(response.context['object'].get_percent_executed(), 100)
+        self.assertEqual(self.order.percentage, 0)
+        call_command('order_percentage')
+        self.order = ets.models.Order.objects.get(pk='THEIRORDER')
+        self.assertEqual(self.order.percentage, 100)
 
-    def test_order_percentage_null(self):
-        self.client.login(username='dispatcher', password='dispatcher')
-        
-        self.order = ets.models.Order.objects.get(pk='OURLITORDER')
-        response = self.client.get(reverse('order_detail', kwargs={'object_id': self.order.pk,}))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object'].get_percent_executed(), 0)       
+

@@ -117,7 +117,10 @@
 </form>
 {% endblock %}
 
-<div id="error_list"></div>
+<div id="error_list">
+  <a class="close" href="#"></a>
+  <div id="overlay_wrap"></div>
+</div>
 {% endblock %}
 
 {% block script %}
@@ -154,16 +157,24 @@ $(document).ready(function() {
       },
       "fnDrawCallback": function( oSettings ) {
           $(".error-link").click(function(){
-              $("#error_list").empty();
-              $("#error_list").data("overlay").load();
-              $("#error_list").load($(this).attr("href"));
+              var overlay = $("#error_list");
+              var wrap = overlay.find("#overlay_wrap");
+              wrap.empty();
+              overlay.data("overlay").load();
+              wrap.load($(this).attr("href"));
+              overlay.find(".close").click(function() {
+                  overlay.data("overlay").close();
+                  return false;
+              });
               return false;
           });
           $('.validate-link').click(function(){
-              data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
-              $.post($(this).attr("href"), data);
-              oTableTop.fnDraw();
-              oTableBottom.fnDraw();
+              if (confirm('{% trans "Confirm validation?" %}')) {
+                  data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
+                  $.post($(this).attr("href"), data);
+                  oTableTop.fnDraw();
+                  oTableBottom.fnDraw();
+              };
               return false;
           }); 
       }

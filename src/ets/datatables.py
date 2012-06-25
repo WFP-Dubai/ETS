@@ -32,8 +32,9 @@ def get_sorted_columns(request, columnIndexNameMap):
 def get_searchable_columns(request, columnIndexNameMap, cols):
     """Returns searchable columns"""
     searchableColumns = []
-    for col in range(0,cols):
-        if request.GET.get('bSearchable_{0}'.format(col), False) == 'true': searchableColumns.append(columnIndexNameMap[col])
+    for col in range(cols):
+        if request.GET.get('bSearchable_{0}'.format(col), False) == 'true': 
+            searchableColumns.append(columnIndexNameMap[col])
     return searchableColumns
 
 def get_search_filter(request, searchableColumns):
