@@ -43,6 +43,8 @@ def capitalize_slug(func):
 class Compas(ld_models.Model):
     """ Compas station """
     
+    cache_prefix = "sync_compas"
+    
     code = models.CharField(_("Station code"), max_length=20, primary_key=True)
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases", db_index=True)
     description = models.CharField(_("Description"), max_length=20, blank=True)
@@ -56,9 +58,6 @@ class Compas(ld_models.Model):
     db_host = models.CharField(_("Database host"), max_length=100, default='localhost')
     db_port = models.CharField(_("Database server port"), max_length=4, blank=True)
 
-    
-    cache_prefix = "sync_compas"
-    
     class Meta:
         ordering = ('code',)
         verbose_name = _('Compas station')
@@ -74,30 +73,37 @@ class Compas(ld_models.Model):
             last_attempt = datetime(1900, 1, 1)
         return last_attempt
     
-    def get_cache_key(self, methods):
-        return "%s_%s_%s" % (self.cache_prefix, "".join([m.__name__ for m in methods]), self.pk)
-    
-    def lock_import(self, methods):
-        cache.set(self.get_cache_key(methods), True, MINIMUM_AGE*60)
-    
-    def unlock_import(self, methods):
-        cache.delete(self.get_cache_key(methods))
-    
-    def is_locked(self, methods):
-        return cache.get(self.get_cache_key(methods), False)
-        
     def get_last_attempt(self):
         return self.import_logs.order_by('-when_attempted')[0]
     
-    def update(self, *args):
+    def get_cache_key(self, methods):
+        return "%s_%s_%s" % (self.cache_prefix, "".join([m.__name__ for m in methods]), self.pk)
+    
+    def get_update_methods(self, base=False):
+        """Returns methods depending on base import or update"""
+        from ets import utils
+        methods = {
+            True: (utils.import_partners, utils.import_places, utils.import_reasons, utils.import_persons),
+            False: (utils.import_stock, utils.import_order)
+        }
+        return methods[base]
+    
+    def is_locked(self, base=False):
+        return cache.get(self.get_cache_key(self.get_update_methods(base)), False)
+    
+    def update(self, base=False):
         """ Utility to run whole import process. If no fails Success ImportLogger is created."""
         
-        if self.is_locked(args):
+        methods = self.get_update_methods(base)
+        
+        cache_key = self.get_cache_key(methods)
+        
+        if cache.get(cache_key, False):
             return
         
-        self.lock_import(args)
+        cache.set(cache_key, True, MINIMUM_AGE*60)
         try:
-            for func in args:
+            for func in methods:
                 
                 try: 
                     with transaction.commit_on_success(self.pk) as tr:
@@ -112,8 +118,8 @@ class Compas(ld_models.Model):
         else:
             self.import_logs.create()
         finally:
-            self.unlock_import(args)
-
+            cache.delete(cache_key)
+    
     
 class Location(models.Model):
     """Location model. City or region"""

@@ -25,9 +25,7 @@ class Command(BaseCommand):
     
     def synchronize(self, compas):
         """Exact method to proceed synchronization"""
-        from ets import utils
-        
-        compas.update(utils.import_stock, utils.import_order)
+        compas.update(base=False)
 
     def handle(self, compas='', *args, **options):
         from ets.models import Compas

@@ -102,6 +102,8 @@ def sync_compas_form(compas, user):
     return { 
         'access_granted': user.is_superuser or Compas.objects.filter(pk=compas.pk, officers__pk=user.pk).exists(),
         'station': compas,
+        'base_locked': compas.is_locked(base=True),
+        'update_locked': compas.is_locked(base=False),
     }
 
 def user_compases(user):

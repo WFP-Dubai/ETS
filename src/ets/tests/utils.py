@@ -5,7 +5,6 @@ from functools import wraps
 from django.conf import settings
 from django.core.management import call_command
 
-from ets import utils
 from ets.models import Compas
 
 def change_settings(func, **kwargs):
@@ -37,6 +36,6 @@ class TestCaseMixin(object):
         call_command('loaddata', 'compas.json', verbosity=0, commit=False, database=self.compas)
         
         station = Compas.objects.get(pk=self.compas)
-        station.update(utils.import_partners, utils.import_places, utils.import_reasons, 
-                      utils.import_persons, utils.import_stock, utils.import_order)
+        station.update(base=True)
+        station.update(base=False)
         call_command('loaddata', 'development.json', verbosity=0, commit=False, database='default')

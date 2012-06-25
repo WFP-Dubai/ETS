@@ -680,7 +680,11 @@ def handle_sync_compas(request, compas_pk, queryset):
     station = get_object_or_404(queryset, pk=compas_pk)
     
     #Execute external command
-    Popen(['./bin/instance', 'sync_compas', '--compas=%s' % station.pk], cwd=settings.EGG_ROOT)
+    if 'full_update' in request.POST:
+        Popen(['./bin/instance', 'import_compas_full', '--compas=%s' % station.pk], cwd=settings.EGG_ROOT)
+    else:
+        #Execute external command
+        Popen(['./bin/instance', 'sync_compas', '--compas=%s' % station.pk], cwd=settings.EGG_ROOT)
     
     messages.add_message(request, messages.INFO, 
                          _('Import process from %(station)s has been initiated. It might take several minutes.') % {
