@@ -51,8 +51,11 @@ ACTION_TYPES = (
 
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
-def filter_not_expired_orders():
-    return {"expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS))}
+def filter_for_orders():
+    return {
+        "expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)),
+        "percentage__lt": 100,
+    }
 
 def _get_places(compas):
     warehouses = tuple(ets_models.Warehouse.objects.filter(compas__pk=compas, start_date__lte=date.today)\

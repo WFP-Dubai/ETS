@@ -412,6 +412,8 @@ class Order(models.Model):
     remarks_b = models.TextField(_("More Remarks"), blank=True)
     
     updated = models.DateTimeField(_("update date"), default=datetime.now, editable=False)
+
+    percentage = models.IntegerField(_("Percentage of Executing"), default=0, db_index=True)
     
     class Meta:
         verbose_name = _("order")
@@ -450,6 +452,11 @@ class Order(models.Model):
     def has_waybill_creation_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
 
+    def is_expired(self):
+        return self.expiry < date.today()
+
+    def is_executed(self):
+        return self.percentage == 100
 
 class OrderItem(models.Model):
     """Order item with commodity and counters"""
