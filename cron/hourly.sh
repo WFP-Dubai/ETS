@@ -14,5 +14,7 @@ if test -r $PIDFILE ; then
 fi
 echo $$ > $PIDFILE
 
+#Update orders and stock
+./bin/instance sync_compas 2>&1
 
 rm -f $PIDFILE

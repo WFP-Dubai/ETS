@@ -14,5 +14,7 @@ if test -r $PIDFILE ; then
 fi
 echo $$ > $PIDFILE
 
+#Submit waybills to COMPAS
+./bin/instance submit_waybills 2>&1
 
 rm -f $PIDFILE
