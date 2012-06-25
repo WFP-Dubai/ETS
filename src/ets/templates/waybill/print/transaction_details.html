@@ -15,7 +15,7 @@
 						<p>1. {% trans "Origin Location" %}: </p> {{ object.order.warehouse.location.name }}
 					</td>
 					<td>
-						<p>5. {% trans "Allocation Destination" %}: </p> {{ object.destination.location.get_country_display }}
+						<p>5. {% trans "Allocation Destination" %}: </p> {{ object.order.location.get_country_display }}
 					</td>
 					<td>
 						<p>9. {% trans "Loading Date" %}: </p> {{ object.loading_date|date|upper }}
@@ -34,7 +34,7 @@
 				</tr>
 				<tr>
 					<td>
-						<p>3. {% trans "Destination Location" %}: </p> {{ object.destination.location.name }}
+						<p>3. {% trans "Destination Location" %}: </p> {{ object.order.location.name }}
 					</td>
 					<td>
 						<p>7. {% trans "Requested Dispatch Date" %}: </p> {{ object.order.dispatch_date|date|upper }}
