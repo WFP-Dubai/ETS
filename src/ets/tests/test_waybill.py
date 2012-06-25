@@ -127,8 +127,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         data = {
             'loading_date': self.order.dispatch_date,
             'dispatch_date': self.order.dispatch_date,
-            'destination': 'ISBX003',
-            'transaction_type': u'DEL',
+            'transaction_type': u'WIT',
             'transport_type': u'02',
             'dispatch_remarks': 'You are funny guys!',
             'transport_sub_contractor': 'Arpaso',
@@ -149,10 +148,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         }
         
         response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
-        
+        self.assertContains(response, u'Chose Destination Warehouse or another Transaction Type')
         self.assertContains(response, u'Overloaded for 10.250 tons')
+
         data.update({
             'item-0-overloaded_units': True,
+            'transaction_type': u'DEL',
         })
         
         response = self.client.post(reverse('waybill_create', kwargs={'order_pk': self.order.pk,}), data=data)
@@ -517,9 +518,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
         self.assertEqual(response.status_code, 404)
     
-    def test_dispatch_validates(self):
-        """ets.views.dispatch_validates"""
+    def test_waybill_errors(self):
+        """ets.views.waybill_errors"""
         
-        response = self.client.get(reverse('dispatch_validates'))
+        response = self.client.get(reverse('waybill_errors', kwargs={'waybill_pk': self.reception_waybill.pk, 'logger_action': ets.models.CompasLogger.DISPATCH }))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Error-Error-Error")
