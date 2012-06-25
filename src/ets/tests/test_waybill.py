@@ -517,9 +517,9 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
         self.assertEqual(response.status_code, 404)
     
-    def test_dispatch_validates(self):
-        """ets.views.dispatch_validates"""
+    def test_waybill_errors(self):
+        """ets.views.waybill_errors"""
         
-        response = self.client.get(reverse('dispatch_validates'))
+        response = self.client.get(reverse('waybill_errors', kwargs={'waybill_pk': self.reception_waybill.pk, 'logger_action': ets.models.CompasLogger.DISPATCH }))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Error-Error-Error")

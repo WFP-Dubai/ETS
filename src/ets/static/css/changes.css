@@ -78,6 +78,10 @@ dl.warehouse-list dd {
   color: red;
 }
 
+.red a, a.visited {
+  color: red;
+}
+
 .row-negative-units { 
   opacity: 0.2;
 }
@@ -116,4 +120,15 @@ dl.warehouse-list dd {
 
 .submit-form { 
   display: none;
+}
+
+/* close button positioned on upper right corner */
+#error_list .close {
+  background-image:url(../images/overlay/close.png);
+  position:absolute;
+  right:-15px;
+  top:-15px;
+  cursor:pointer;
+  height:35px;
+  width:35px;
 }
