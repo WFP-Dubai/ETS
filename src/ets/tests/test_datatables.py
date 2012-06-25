@@ -1,3 +1,5 @@
+import datetime
+
 from django.utils import simplejson as json
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -59,3 +61,42 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX00311A', status_code=200)
         self.assertEqual(response["Content-Type"], "application/javascript")
         self.assertEqual(result["iTotalRecords"], ets.models.Waybill.receptions(self.user).count())
+
+    def test_table_validate_dispatch_waybills(self):
+        # All waybills
+        waybill_pk = 'ISBX00311A'
+        waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'validate_dispatch'}))
+        result = json.loads(response.content)
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(result["iTotalRecords"], 2)
+        waybill.validated=True
+        waybill.save()
+        response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'dispatch_validated'}))
+        result = json.loads(response.content)
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(result["iTotalRecords"], 1)
+        
+    def test_table_validate_receipt_waybills(self):
+        waybill_pk = 'ISBX00211A'
+        waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
+        self.client.login(username='admin', password='admin')
+        waybill.transport_dispach_signed_date = datetime.date.today()
+        waybill.receipt_signed_date = datetime.date.today()
+        waybill.save()
+        response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'validate_receipt'}))
+        result = json.loads(response.content)
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(result["iTotalRecords"], 1)
+        waybill.receipt_validated=True
+        waybill.save()
+        response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'receipt_validated'}))
+        result = json.loads(response.content)
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(result["iTotalRecords"], 1)
