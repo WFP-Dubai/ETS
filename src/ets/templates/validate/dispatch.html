@@ -67,6 +67,7 @@
     {% endfor %}
 {% endcomment %}
 </table>
+<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
 
 <br/>
 <h3>{% trans "Validated, but not yet sent to COMPAS" %}</h3>
@@ -110,6 +111,7 @@
     {% endfor %}
 {% endcomment %}
 </table>
+<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
 
 {% block submit_form %}
 <form method="POST" action="{% url send_dispatched %}" class="submit-form">{% csrf_token %}
@@ -186,6 +188,15 @@ $(document).ready(function() {
           opacity: 0.9
       },
   });
+  oTableBottom.parent().next(".csv_export").click( function(){
+      getDataFromTable(oTableBottom, "csv");
+      return false;
+  });
+  oTableTop.parent().next(".csv_export").click( function(){
+      getDataFromTable(oTableTop, "csv");
+      return false;
+  });
+
 });
 </script>
 {% endblock %}

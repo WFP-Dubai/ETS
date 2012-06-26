@@ -10,7 +10,8 @@ from piston.handler import BaseHandler
 from piston.emitters import Emitter
 
 import ets.models
-from ets.utils import filter_for_orders, get_datatables_filtering
+from ets.utils import (filter_for_orders, get_datatables_filtering,
+                       get_dispatch_compas_filters, get_receipt_compas_filters)
 from ets.api import unicodecsv
 from ets.decorators import waybill_officer_related_filter, waybill_user_related_filter
 
@@ -62,6 +63,7 @@ class ReadWaybillHandler(BaseHandler):
         waybills = self.model.objects.all()
 
         if filtering:
+            officer_required = ets.models.Compas.objects.filter(officers=request.user).exists()
             if filtering == 'dispatches':
                 waybills = self.model.dispatches(request.user)
             elif filtering == 'receptions':
@@ -72,12 +74,20 @@ class ReadWaybillHandler(BaseHandler):
                 waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
             elif filtering == 'compas_dispatch':
                 waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
+            elif filtering == 'validate_receipt' and officer_required:
+                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
+            elif filtering == 'validate_dispatch' and officer_required:
+                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
+            elif filtering == 'dispatch_validated' and officer_required:
+                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
+            elif filtering == 'receipt_validated' and officer_required:
+                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
         elif not request.user.has_perm("ets.waybill_api_full_access"):
             waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
 
         if request.GET.has_key('sSearch'):
             waybills = get_datatables_filtering(request, waybills)
-        
+
         filter_arg = {}
         if warehouse: 
             filter_arg['order__warehouse__pk'] = warehouse
@@ -87,7 +97,7 @@ class ReadWaybillHandler(BaseHandler):
             filter_arg['slug'] = slug
         if filter_arg:
             waybills = waybills.filter(**filter_arg)
-            
+
         return waybills
         
         
