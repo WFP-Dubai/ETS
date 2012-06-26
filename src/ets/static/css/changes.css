@@ -85,7 +85,7 @@ dl.warehouse-list dd {
 .row-negative-units { 
   -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
   filter: alpha(opacity=20);
-  opacity: 0.5;
+  opacity: 0.2;
 }
 
 .warehouse-selector select { 
