@@ -1,6 +1,7 @@
 ### -*- coding: utf-8 -*- ####################################################
 import csv
 import StringIO
+import datetime
 
 from django.core.urlresolvers import reverse
 from django.test import TestCase
@@ -239,3 +240,51 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), ets.models.Waybill.receptions(self.user).count())
+
+    def test_table_not_validated_dispatch_waybills(self):
+        # All not validated waybills
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'validate_dispatch'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), 2)
+
+    def test_table_validated_dispatch_waybills(self):
+        # All validated waybills
+        self.client.login(username='admin', password='admin')
+        waybill_pk = 'ISBX00311A'
+        waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
+        waybill.validated=True
+        waybill.save()
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'dispatch_validated'}))
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), 1)
+
+    def test_table_validate_receipt_waybills(self):
+        # All not validated waybills
+        waybill_pk = 'ISBX00211A'
+        waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
+        self.client.login(username='admin', password='admin')
+        waybill.transport_dispach_signed_date = datetime.date.today()
+        waybill.receipt_signed_date = datetime.date.today()
+        waybill.save()
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'validate_receipt'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), 1)
+        # All validated waybills
+        waybill.receipt_validated=True
+        waybill.save()
+        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'receipt_validated'}))
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        self.assertEqual(len(list(dict_reader)), 1)
