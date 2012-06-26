@@ -252,7 +252,6 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
     params = { 'filtering': filtering } if filtering else None
     redirect_url = get_api_url(request, column_index_map, "api_waybills", params)
     if redirect_url:
-        print redirect_url
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
