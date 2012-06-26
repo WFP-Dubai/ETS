@@ -134,7 +134,7 @@ $(document).ready(function() {
       "bServerSide": true,
       "sAjaxSource": "{% url table_validate_waybill filtering=bottom_table_url %}",
       "aoColumnDefs": [
-          { "bSearchable": false, "bSortable": false, "bVisible": false, "aTargets": [ 7, 8 ] },
+          { "bSearchable": false, "bSortable": false, "bVisible": false, "aTargets": [ 7, 8 ] }
       ],
       "fnDrawCallback": function( oSettings ) {
           if (oSettings.aoData.length > 0) {
@@ -149,7 +149,7 @@ $(document).ready(function() {
       "bServerSide": true,
       "sAjaxSource": "{% url table_validate_waybill filtering=top_table_url %}",
       "aoColumnDefs": [
-          { "bSearchable": false, "bSortable": false, "aTargets": [ 7, 8 ] },
+          { "bSearchable": false, "bSortable": false, "aTargets": [ 7, 8 ] }
       ],
       "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
           if ( aData[8] != "" ) {
