@@ -49,6 +49,8 @@ class Compas(ld_models.Model):
     officers = models.ManyToManyField(User, verbose_name=_("Officers"), related_name="compases", db_index=True)
     description = models.CharField(_("Description"), max_length=20, blank=True)
     read_only = models.BooleanField(_("Read-only compas station"), default=False)
+    is_base = models.BooleanField(_("Base station"), default=False, 
+                                  help_text=_("Import of administrative table is possible"))
     
     #Database settings
     db_engine = models.CharField(_("Database engine"), max_length=100, default="django.db.backends.oracle")
