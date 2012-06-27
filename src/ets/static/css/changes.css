@@ -83,7 +83,7 @@ dl.warehouse-list dd {
 }
 
 .row-negative-units { 
-  color: gray;
+  color: lightgray;
 }
 
 .warehouse-selector select { 
