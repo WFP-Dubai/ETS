@@ -1,7 +1,7 @@
 {% load i18n %}
 {% if access_granted %}
 <form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
-  {% compas.is_base %}
+  {% if station.is_base %}
   <p>
     <button type="submit" name="full_update" title="{% trans 'Import organizations, places, warehouses, persons data' %}"
       {% if base_locked %}disabled{% endif %}>{% trans "Import administrative tables from COMPAS" %}</button>
