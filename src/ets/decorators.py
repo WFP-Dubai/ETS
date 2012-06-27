@@ -8,6 +8,7 @@ import ets.models
 from ets.utils import get_dispatch_compas_filters, get_receipt_compas_filters
 
 #Authentication decorators. If condition fails user is redirected to login form
+superuser_required = user_passes_test(lambda u: u.is_superuser)
 person_required = user_passes_test(lambda u: hasattr(u, 'person'))
 officer_required = user_passes_test(lambda u: ets.models.Compas.objects.filter(officers=u).exists())
 dispatcher_required = user_passes_test(lambda u: (hasattr(u, 'person') and u.person.dispatch))
