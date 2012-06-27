@@ -20,7 +20,7 @@
     "model": "ets.compas",
     "fields": {
       "officers": [1],
-      
+      "is_base": true,
       "db_engine": "django.db.backends.sqlite3",
       "db_name": "compas"
     }
