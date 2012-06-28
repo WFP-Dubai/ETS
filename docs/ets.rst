@@ -34,13 +34,15 @@ Forms
 .. automodule:: ets.forms
    :members:
 
+.. _ets_commands:
+
 Commands
 ========
 
 .. _syncdb:
 
 Special Syncdb
-----------------
+--------------
 
 .. automodule:: ets.management.commands.syncdb
    :members:
@@ -48,7 +50,7 @@ Special Syncdb
 .. _sync_compas:
 
 Import data from COMPAS
--------------------------
+-----------------------
 
 .. automodule:: ets.management.commands.sync_compas
    :members:
@@ -59,6 +61,38 @@ Submit created waybills back to COMPAS
 --------------------------------------
 
 .. automodule:: ets.management.commands.submit_waybills
+   :members:
+
+.. _export_compas:
+
+Export data from COMPAS
+-----------------------
+
+.. automodule:: ets.management.commands.export_compas
+   :members:
+
+.. _import_file:
+
+Import file with serialized and compressed data
+-----------------------------------------------
+
+.. automodule:: ets.management.commands.import_file
+   :members:
+
+.. _import_compas_full:
+
+Import base data from compas
+----------------------------
+
+.. automodule:: ets.management.commands.import_compas_full
+   :members:
+
+.. _order_percentage:
+
+Percentage of order executing
+----------------------------
+
+.. automodule:: ets.management.commands.order_percentage
    :members:
 
 Middleware
@@ -79,6 +113,8 @@ Settings
 ========
 
 - **URL_PREFIX** -- site prefix,
+
+.. _ets_reports:
 
 Reports
 =======

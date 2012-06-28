@@ -41,7 +41,19 @@ def capitalize_slug(func):
 
 
 class Compas(ld_models.Model):
-    """ Compas station """
+    """
+    Compas station
+        - **code** -- station code
+        - **officers** -- officers related to compas
+        - **description** -- station description
+        - **read_only** -- access to compas station
+        - **db_engine** -- database engine
+        - **db_name** -- name for related database
+        - **db_user** -- database user
+        - **db_password** -- password of database user
+        - **db_host** -- database host
+        - **db_port** -- database server port 
+    """
     
     cache_prefix = "sync_compas"
     
@@ -67,6 +79,7 @@ class Compas(ld_models.Model):
         return self.pk
 
     def sync_last_attempt(self):
+        """Returns last attempt of updating or default value"""
         try:
             last_attempt = ImportLogger.objects.filter(compas=self).order_by('-when_attempted')[0].when_attempted
         except (ImportLogger.DoesNotExist, IndexError):
@@ -74,9 +87,11 @@ class Compas(ld_models.Model):
         return last_attempt
     
     def get_last_attempt(self):
+        """Returns last attempt of updating or raises exception"""
         return self.import_logs.order_by('-when_attempted')[0]
     
     def get_cache_key(self, methods):
+        """Returns cache key for update method"""
         return "%s_%s_%s" % (self.cache_prefix, "".join([m.__name__ for m in methods]), self.pk)
     
     def get_update_methods(self, base=False):
@@ -89,10 +104,11 @@ class Compas(ld_models.Model):
         return methods[base]
     
     def is_locked(self, base=False):
+        """Checks for executing update"""
         return cache.get(self.get_cache_key(self.get_update_methods(base)), False)
     
     def update(self, base=False):
-        """ Utility to run whole import process. If no fails Success ImportLogger is created."""
+        """Utility to run whole import process. If no fails Success ImportLogger is created."""
         
         methods = self.get_update_methods(base)
         
@@ -122,7 +138,12 @@ class Compas(ld_models.Model):
     
     
 class Location(models.Model):
-    """Location model. City or region"""
+    """
+    Location model. City or region
+        - **code** -- GEO point code of location
+        - **name** -- name of location
+        - **country**
+    """
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
     name = models.CharField(_("Name"), max_length=100)
@@ -137,7 +158,11 @@ class Location(models.Model):
         return "%s %s" % (self.country, self.name)
     
 class Organization(models.Model):
-    """ Organization model"""
+    """
+    Organization model
+        - **code** -- unique identifier in COMPAS
+        - **name** -- organization title
+    """
     
     code = models.CharField(_("code"), max_length=20, primary_key=True)
     name = models.CharField(_("Name"), max_length=100, blank=True)
@@ -151,7 +176,18 @@ class Organization(models.Model):
         return self.name or self.code
 
 class Warehouse(models.Model):
-    """ Warehouse. dispatch or recipient."""
+    """
+    Warehouse. dispatch or recipient.
+        - **code** -- unique identifier in COMPAS
+        - **name** -- origin name of warehouse
+        - **location**
+        - **organization**
+        - **compas** -- COMPAS station
+        - **compas_text** -- COMPAS station for not managed warehouses
+        - **valid_warehouse** -- validity of warehouse
+        - **start_date** -- start date of the warehouse
+        - **end_date** -- end date of the warehouse
+    """
     code = models.CharField(_("code"), max_length = 13, primary_key=True) #origin_wh_code
     name = models.CharField(_("name"),  max_length = 50, blank = True ) #origin_wh_name
     location = models.ForeignKey(Location, verbose_name=_("location"), related_name="warehouses") #origin_location_code
@@ -174,11 +210,13 @@ class Warehouse(models.Model):
     
     @classmethod
     def get_active_warehouses(cls):
+        """Returns active warehouses"""
         return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
     
     @classmethod
     def get_warehouses(cls, location, organization=None):
+        """Returns warehouses related to location or organization"""
         queryset = cls.get_active_warehouses().filter(location=location)
 
         #Check wh for specific organization
@@ -198,11 +236,23 @@ class Warehouse(models.Model):
     #===================================================================================================================
 
     def get_persons(self):
+        """Returns related persons"""
         return Person.objects.filter(compas=self.compas, organization=self.organization, location=self.location)
 
     
 class Person(User):
-    """Person model"""
+    """
+    Person model
+        - **code** -- identifier in COMPAS
+        - **title** -- title of person
+        - **compas**
+        - **organization**
+        - **location**
+        - **warehouses** -- many-to-many relation to warehouses
+        - **dispatch** -- can person to dispatch waybills
+        - **receive** -- can person to receive waybills
+        - **updated** -- update date
+    """
     
     code = models.CharField(_("code"), max_length=7)
     title = models.CharField(_("title"), max_length=50, blank=True)
@@ -236,7 +286,10 @@ class Person(User):
         
 
 class CommodityCategory(models.Model):
-    """Commodity category"""
+    """
+    Commodity category
+        - **code**
+    """
     code = models.CharField(_("Commodity Category Code"), max_length=9, primary_key=True)
     
     class Meta:
@@ -248,7 +301,12 @@ class CommodityCategory(models.Model):
         return self.pk
     
 class Commodity(models.Model):
-    """Commodity model"""
+    """
+    Commodity model
+        - **code** -- unique identifier
+        - **name** -- commodity title
+        - **category** -- related commodity category
+    """
     
     code = models.CharField(_("Commodity Code"), max_length=18, primary_key=True)
     name = models.CharField(_("Commodity Name"), max_length=100)
@@ -263,7 +321,11 @@ class Commodity(models.Model):
         return self.name
 
 class Package(models.Model):
-    """Packaging model"""
+    """
+    Packaging model
+        - **code** -- unique identifier
+        - **name** -- name of package
+    """
     
     code = models.CharField(_("code"), max_length=17, primary_key=True)
     name = models.CharField(_("name"), max_length=50)
@@ -283,7 +345,28 @@ class StockManager( models.Manager ):
         return super( StockManager, self ).get_query_set().filter( number_of_units__gt = 0 )
 
 class StockItem( models.Model ):
-    """Accessible stocks"""
+    """
+    Accessible stocks
+        - **code** -- simplified and encoded external ident
+        - **warehouse** -- title of person
+        - **project_number**
+        - **si_code** -- shipping instruction code
+        - **commodity** -- commodity of stock item
+        - **package** -- package
+        - **external_ident** -- external identifier
+        - **quality** -- Quality
+        - **quantity_net** -- Net MT
+        - **quantity_gross** -- Gross MT
+        - **number_of_units** -- Number of units
+        - **unit_weight_net** -- Unit weight net
+        - **unit_weight_gross** -- unit weight gross
+        - **is_bulk** -- commodity of stock item
+        - **updated** -- last update date
+        - **si_record_id** -- SI record id
+        - **origin_id** -- origin identifier
+        - **allocation_code** -- allocation code
+        - **virtual** -- virtual stock
+    """
     
     GOOD_QUALITY = 'G'
     
@@ -362,6 +445,13 @@ class StockItem( models.Model ):
 
     
 class LossDamageType(models.Model):
+    """
+    Type of loss/damage
+        - **slug** -- simplified and encoded title for proper URL
+        - **type** -- loss/damage type
+        - **category** -- commodity category
+        - **cause** -- description of reasons for difference
+    """
     
     LOSS = 'L'
     DAMAGE = 'D'
@@ -396,7 +486,24 @@ class LossDamageType(models.Model):
 
 
 class Order(models.Model):
-    """Delivery order"""
+    """
+    Delivery order
+        - **code** -- identifier in COMPAS
+        - **created** -- date of creating
+        - **expiry** -- expire date of order
+        - **dispatch_date** -- shipping instruction code
+        - **transport_code** -- transport identifier
+        - **transport_ouc** -- transport ouc
+        - **transport_name** -- transport name
+        - **origin_type** -- origin type
+        - **warehouse** -- dispatch warehouse
+        - **consignee** -- consignee
+        - **location** -- consignee's location
+        - **remarks** -- order remarks
+        - **remarks_b** -- more complete remarks
+        - **updated** -- last update date
+        - **percentage** -- percentage of executing 
+    """
     
     code = models.CharField(_("Code"), max_length=40, primary_key=True)
     
@@ -465,7 +572,19 @@ class Order(models.Model):
         return self.percentage == 100
 
 class OrderItem(models.Model):
-    """Order item with commodity and counters"""
+    """
+    Order item with commodity and counters
+        - **order** -- identifier in COMPAS
+        - **lti_id** -- LTI identifier
+        - **si_code** -- shipping order code
+        - **project_number** -- project number
+        - **commodity** -- commodity
+        - **number_of_units** -- number of units
+        - **unit_weight_net** -- unit weight net
+        - **unit_weight_gross** -- unit weight gross
+        - **total_weight_net** -- total weight net
+        - **total_weight_gross** -- total weight gross
+    """
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
     
@@ -585,6 +704,18 @@ def waybill_slug_populate(waybill):
 class Waybill( ld_models.Model ):
     """
     Base waybill abstract class
+        - **slug** -- identifier in COMPAS
+        - **order** -- LTI identifier
+        - **destination** -- shipping order code
+        - **loading_date** -- project number
+        - **dispatch_date** -- commodity
+        - **transaction_type** -- number of units
+        - **transport_type** -- unit weight net
+        - **dispatch_remarks** -- unit weight gross
+        - **dispatcher_person** -- total weight net
+        - **receipt_remarks** -- total weight gross
+        - **receipt_person** -- total weight net
+        - **total_weight_gross** -- total weight gross
     """
     
     INTERNAL_TRANSFER = u'WIT'
@@ -999,6 +1130,7 @@ class LoadingDetail(models.Model):
     
     
     def clean(self):
+        """Validates LoadingDetail instance."""
         super(LoadingDetail, self).clean()
 
         #clean number of items
@@ -1064,6 +1196,7 @@ class LoadingDetail(models.Model):
             
         
 class ImportLogger(models.Model):
+    """Logger for import operation"""
     
     SUCCESS = 0
     FAILURE = 1
@@ -1088,6 +1221,15 @@ class ImportLogger(models.Model):
 
 
 class CompasLogger(models.Model):
+    """
+    Logger for sending to compas
+        - **action** -- action's type
+        - **compas** -- COMPAS which received waybill
+        - **waybill** -- sended waybill
+        - **when_attempted** -- time of action
+        - **status** -- status of action in result
+        - **message** -- description of error
+    """
     
     DISPATCH = 1
     RECEIPT = 2

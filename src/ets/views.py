@@ -48,6 +48,7 @@ WFP_ORGANIZATION = 'WFP'
 WFP_DISTRUIBUTION = 'WFP_DISTRIB'
 
 def fill_link(url, text, klass=''):
+    """Return html link with class"""
     return '<a href="%s" class="%s">%s</a>' % (url, klass, text)
     
 
@@ -110,7 +111,7 @@ def waybill_finalize_dispatch(request, waybill_pk, template_name, queryset):
 @receipt_view
 @transaction.commit_on_success
 def waybill_finalize_receipt(request, waybill_pk, template_name, queryset):
-    """ Signs reception"""
+    """Signs reception"""
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     waybill.receipt_sign()
     create_logentry(request, waybill, LOGENTRY_SIGN_RECEIVE)
@@ -163,7 +164,8 @@ def waybill_search( request, template='waybill/list2.html', form_class=WaybillSe
 
 
 def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
-
+    """Ajax view that returns list of waybills for using in datatables"""
+    
     search_string = request.GET.get("search_string", "")
     request_params = {}
     if search_string:
@@ -227,7 +229,8 @@ def waybill_errors(request, waybill_pk, logger_action, queryset=ets.models.Waybi
     
 
 def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
-
+    """Ajax view that returns list of validated/not validated waybills for using in datatables"""
+    
     if filtering in ["dispatch_validated", "validate_dispatch"]:
         url = "validate_dispatch"
         logger_action = ets.models.CompasLogger.DISPATCH
@@ -268,7 +271,8 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
     
 @waybill_officer_related
 def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering=None):
-
+    """Ajax view that returns list of compas' waybills for using in datatables"""
+    
     column_index_map = {
         0: 'order__pk',
         1: 'pk',
@@ -553,6 +557,7 @@ def stock_items(request, template_name, queryset):
                        extra_context={ "good_quality": good_quality })
 
 def table_stock_items(request, param_name):
+    """Ajax view that returns list of stock items for using in datatables"""
     warehouse_pk = request.GET.get(param_name)
     warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)
     column_index_map = {
@@ -587,7 +592,7 @@ def table_stock_items(request, param_name):
 @person_required
 @warehouse_related
 def table_orders(request, queryset):
-
+    """Ajax view that returns list of orders for using in datatables"""
     column_index_map = {
         0: 'code',
         1: 'created',
@@ -643,7 +648,7 @@ def get_stock_data(request, order_pk, queryset):
     }, use_decimal=True))
     
 def get_stock_data_li(request, order_pk, queryset):
-    """Utility ajax view that returns stock item information to fill dispatch form. (give restant instead of in stock"""
+    """Utility ajax view that returns stock item information to fill dispatch form. (give restant instead of in stock)"""
     
     object_pk = request.GET.get('stock_item')
     
@@ -767,7 +772,7 @@ class ImportData(FormView):
 
 @officer_required
 def installation_data(request, template_name="stock/warehouse_list.html", form_class=WaybillSearchForm):
-
+    """Allows download installation file and initial COMPAS data"""
     form = form_class(request.GET or None)
     compas_stations = request.user.compases.all().values_list('code')
     

@@ -11,7 +11,7 @@ Notes about packaging this system.
 Map
 ---------
 
-Structure::
+Structure:
 
   ======================= =============================================================
   |-setup.py              :ref:`package-setup`
@@ -20,11 +20,14 @@ Structure::
   |-production.cfg        :ref:`Production buildout configuration <production-configuration>`
   |-docs                  Documentation
   |-src                   
-    |---ets               :ref:`Configuration and common application <ets>`
-    	|---models.py     :ref:`Models <ets_models>`
-    	|---views.py      :ref:`Views <ets_views>`
-    	|---utils.py      :ref:`Utils <ets_utils>`
-    |---compas            :ref:`COMPAS mapping models <compas>`
+  |-+---ets               :ref:`Configuration and common application <ets>`
+  |------+---api          :ref:`Reports <ets_reports>`
+  |------+---management   :ref:`Commands <ets_commands>`
+  |------+---models.py    :ref:`Models <ets_models>`
+  |------+---views.py     :ref:`Views <ets_views>`
+  |------+---utils.py     :ref:`Utils <ets_utils>`
+  |-+---compas            :ref:`COMPAS mapping models <compas>`
+  |-+---offliner          :ref:`Configuration for offline clients <offliner>`
   ======================= =============================================================
 
 

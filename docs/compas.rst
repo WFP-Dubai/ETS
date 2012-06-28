@@ -33,5 +33,5 @@ Test compas station connection
 Utils
 =====
 
-.. automodule:: ets.utils
+.. automodule:: compas.utils
    :members:
