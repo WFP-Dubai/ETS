@@ -25,7 +25,12 @@
   <tbody>
   </tbody>
 </table>
-<a class="csv_export" href='{% url table_stock_items param_name=wh.pk %}'>{% trans "Export as CSV" %}</a>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="csv" href="#">{% trans "CSV" %}</a>,
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
+
 {% if not forloop.last %}<div class="sep"></div>{% endif %}
 {% endfor %}
 
@@ -55,8 +60,8 @@
           return nRow;
         },
       });
-      $(this).parent().next(".csv_export").click( function(){
-         getDataFromTable(oTable, "csv");
+      $(this).parent().next(".export_links").find("a").click( function(){
+         getDataFromTable(oTable, $(this).attr("class"));
          return false;
       });
     });

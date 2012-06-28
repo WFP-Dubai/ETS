@@ -25,7 +25,11 @@
   <tbody>
   </tbody>
 </table>
-<a class="csv_export" href='{% url table_orders %}'>{% trans "Export as CSV" %}</a>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="csv" href="#">{% trans "CSV" %}</a>,
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
 
 {% endblock %}
 
@@ -74,8 +78,8 @@ $(document).ready(function() {
           return nRow;
         },
     });
-    $(".csv_export").click( function(){
-       getDataFromTable(oTable, "csv");
+    $(".export_links a").click( function(){
+       getDataFromTable(oTable, $(this).attr("class"));
        return false;
     });
   

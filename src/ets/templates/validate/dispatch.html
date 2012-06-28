@@ -22,52 +22,12 @@
     </thead>
     <tbody>
     </tbody>
-{% comment %}
-    {% for waybill in object_list %}
-    {% with waybill.get_shortage_loading_details as shortage %}
-    {% if shortage %}
-    <tr class="error"><td colspan="8">
-      {% for item in shortage %}
-        <p>{{ waybill.order.warehouse }} --> {{ item.stock_item.coi_code }} ({{ item.stock_item.commodity }}). Shortage: {{ item.get_shortage }}</p>
-      {% endfor %}
-    </td></tr>
-    {% endif %}
-    {% endwith %}
-    <tr>
-       <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
-       <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
-       <td>{{ waybill.order.warehouse.name }}</td>
-       <td>{{ waybill.order.consignee.name }}</td>
-       <td>{{ waybill.order.location.name }}</td>
-       <td>
-        {% if waybill.transport_dispach_signed_date %}
-          {{ waybill.transport_dispach_signed_date|date|upper }}
-        {% else %}
-          {% trans "Pending" %}
-        {% endif %}
-       </td>
-       <td>
-        {% if waybill.receipt_signed_date %}
-          {{ waybill.receipt_signed_date|date|upper }}
-        {% else %}
-          {% trans "Pending" %}
-        {% endif %}
-       </td>
-       <td>{% block validate_link %}{% validate_dispatch waybill user %}{% endblock %}</td>
-    </tr>
-      {% for log in waybill.compass_loggers.all|slice:"3" %}
-        {% if log.action == logger_action %}
-          <tr class="logger">
-            <td>{{ log.when_attempted }}</td>
-            <td>{{ log.compas }}</td>
-            <td colspan="6">{{ log.message|linebreaks }}</td>
-          </tr>
-        {% endif %}
-      {% endfor %}
-    {% endfor %}
-{% endcomment %}
 </table>
-<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="csv" href="#">{% trans "CSV" %}</a>,
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
 
 <br/>
 <h3>{% trans "Validated, but not yet sent to COMPAS" %}</h3>
@@ -85,33 +45,12 @@
     </thead>
     <tbody>
     </tbody>
-{% comment %}
-    {% for waybill in validated_waybills %}
-    <tr>
-      <td><a href="{{ waybill.order.get_absolute_url }}" title="View details">{{ waybill.order.pk }}</a></td>
-      <td><a href="{{ waybill.get_absolute_url }}" title="View details">{{ waybill.pk }}</a></td>
-      <td>{{ waybill.order.warehouse.name }}</td>
-      <td>{{ waybill.order.consignee.name }}</td>
-      <td>{{ waybill.order.location.name }}</td>
-      <td>
-        {% if waybill.transport_dispach_signed_date %}
-          {{ waybill.transport_dispach_signed_date|date|upper }}
-        {% else %}
-          {% trans "Pending" %}
-        {% endif %}
-      </td>
-      <td>
-        {% if waybill.receipt_signed_date %}
-          {{ waybill.receipt_signed_date|date|upper }}
-        {% else %}
-          {% trans "Pending" %}
-        {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-{% endcomment %}
 </table>
-<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="csv" href="#">{% trans "CSV" %}</a>,
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
 
 {% block submit_form %}
 <form method="POST" action="{% url send_dispatched %}" class="submit-form">{% csrf_token %}
@@ -188,12 +127,12 @@ $(document).ready(function() {
           opacity: 0.9
       },
   });
-  oTableBottom.parent().next(".csv_export").click( function(){
-      getDataFromTable(oTableBottom, "csv");
+  oTableBottom.parent().next(".export_links").find("a").click( function(){
+      getDataFromTable(oTableBottom, $(this).attr("class"));
       return false;
   });
-  oTableTop.parent().next(".csv_export").click( function(){
-      getDataFromTable(oTableTop, "csv");
+  oTableTop.parent().next(".export_links").find("a").click( function(){
+      getDataFromTable(oTableTop, $(this).attr("class"));
       return false;
   });
 

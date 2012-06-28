@@ -94,9 +94,14 @@ dl.warehouse-list dd {
   max-width: 600px;
 }
 
-.csv_export {
+.csv_export, .export_links{
   float: right;
   padding-right: 20px;
+}
+
+.export_links span{
+  font-weight: bold;
+  font-style: italic;
 }
 
 /* the overlayed element */

@@ -606,6 +606,7 @@ def table_orders(request, queryset):
 
     redirect_url = get_api_url(request, column_index_map, "api_orders")
     if redirect_url:
+        print redirect_url
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
