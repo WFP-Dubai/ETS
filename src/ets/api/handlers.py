@@ -341,6 +341,24 @@ class CSVEmitter(Emitter):
 
 Emitter.register('csv', CSVEmitter, 'application/csv')
 
+def write_val_to_sheet(sheet, val, row, col):
+    if isinstance(val, str):
+        try:
+            val = int(val)
+            sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0'))
+        except ValueError:
+            try:
+                val = float(val)
+                sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0.00000'))
+            except ValueError:
+                sheet.write(row, col, val)
+    elif isinstance(val, datetime.datetime):
+        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY h:mm'))
+    elif isinstance(val, datetime.date):
+        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY'))
+    else:
+        sheet.write(row, col, val)
+
 class ExcelEmitter(Emitter):
     """Emitter that returns Excel file"""
     def render(self, request):
@@ -357,22 +375,7 @@ class ExcelEmitter(Emitter):
         for row_index, row_contents in enumerate(get_flattened_data(self.construct())):
             for i in range(0, count):
                 val = row_contents.get(header[i], "")
-                if isinstance(val, str):
-                    try:
-                        val = int(val)
-                        sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='#,##0'))
-                    except ValueError:
-                        try:
-                            val = float(val)
-                            sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='#,##0.00000'))
-                        except ValueError:
-                            sheet.write(row_index + 1, i, val)
-                elif isinstance(val, datetime.datetime):
-                    sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='M/D/YY h:mm'))
-                elif isinstance(val, datetime.date):
-                    sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='M/D/YY'))
-                else:
-                    sheet.write(row_index + 1, i, val)
+                write_val_to_sheet(sheet, val, row_index + 1, i)
         book.save(result)
         
         return result.getvalue()
