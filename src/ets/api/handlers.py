@@ -362,7 +362,11 @@ class ExcelEmitter(Emitter):
                         val = int(val)
                         sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='#,##0'))
                     except ValueError:
-                        sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='#,##0.00000'))
+                        try:
+                            val = float(val)
+                            sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='#,##0.00000'))
+                        except ValueError:
+                            sheet.write(row_index + 1, i, val)
                 elif isinstance(val, datetime.datetime):
                     sheet.write(row_index + 1, i, val, xlwt.easyxf(num_format_str='M/D/YY h:mm'))
                 elif isinstance(val, datetime.date):

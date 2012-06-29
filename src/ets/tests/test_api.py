@@ -339,6 +339,6 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 1)
         # All validated waybills in excel
-        response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'receipt_validated'}))
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'receipt_validated'}))
         self.assertContains(response, waybill_pk, status_code=200)
         self.assertEqual(response["Content-Type"], "application/excel")
