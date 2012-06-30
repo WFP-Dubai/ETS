@@ -90,7 +90,7 @@ Import base data from compas
 .. _order_percentage:
 
 Percentage of order executing
-----------------------------
+-----------------------------
 
 .. automodule:: ets.management.commands.order_percentage
    :members:

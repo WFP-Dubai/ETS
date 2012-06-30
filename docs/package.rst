@@ -13,8 +13,8 @@ Map
 
 Structure:
 
-  ======================= =============================================================
-  |-setup.py              :ref:`package-setup`
+  ======================= ===================================================================
+  |-setup.py              :ref:`Package setup <package-setup>`
   |-base.cfg              :ref:`Base buildout configuration <base-configuration>`
   |-buildout.cfg          :ref:`Developement buildout configuration <default-configuration>`
   |-production.cfg        :ref:`Production buildout configuration <production-configuration>`
@@ -28,7 +28,7 @@ Structure:
   |------+---utils.py     :ref:`Utils <ets_utils>`
   |-+---compas            :ref:`COMPAS mapping models <compas>`
   |-+---offliner          :ref:`Configuration for offline clients <offliner>`
-  ======================= =============================================================
+  ======================= ===================================================================
 
 
 .. _package-setup:

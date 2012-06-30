@@ -142,7 +142,7 @@ class Location(models.Model):
     Location model. City or region
         - **code** -- GEO point code of location
         - **name** -- name of location
-        - **country**
+        - **country** -- name of related country
     """
     
     code = models.CharField(_("Geo point code"), max_length=4, primary_key=True)
@@ -180,10 +180,10 @@ class Warehouse(models.Model):
     Warehouse. dispatch or recipient.
         - **code** -- unique identifier in COMPAS
         - **name** -- origin name of warehouse
-        - **location**
-        - **organization**
-        - **compas** -- COMPAS station
-        - **compas_text** -- COMPAS station for not managed warehouses
+        - **location** -- foreign key to location of warehouse
+        - **organization** -- foreign key to related organization
+        - **compas** -- foreign key to COMPAS station
+        - **compas_text** -- text input for COMPAS station for not managed warehouses
         - **valid_warehouse** -- validity of warehouse
         - **start_date** -- start date of the warehouse
         - **end_date** -- end date of the warehouse
@@ -245,8 +245,8 @@ class Person(User):
     Person model
         - **code** -- identifier in COMPAS
         - **title** -- title of person
-        - **compas**
-        - **organization**
+        - **compas** -- foreign key to related Compas
+        - **organization** -- foreign key to related organization
         - **location**
         - **warehouses** -- many-to-many relation to warehouses
         - **dispatch** -- can person to dispatch waybills
@@ -360,7 +360,7 @@ class StockItem( models.Model ):
         - **number_of_units** -- Number of units
         - **unit_weight_net** -- Unit weight net
         - **unit_weight_gross** -- unit weight gross
-        - **is_bulk** -- commodity of stock item
+        - **is_bulk** -- stock is bulk or not
         - **updated** -- last update date
         - **si_record_id** -- SI record id
         - **origin_id** -- origin identifier
@@ -423,6 +423,7 @@ class StockItem( models.Model ):
         return name
         
     def coi_code(self):
+        """Returns coi code from origin identifier"""
         return self.origin_id[7:]
     
     def calculate_total_net(self):    
@@ -494,12 +495,12 @@ class Order(models.Model):
         - **dispatch_date** -- shipping instruction code
         - **transport_code** -- transport identifier
         - **transport_ouc** -- transport ouc
-        - **transport_name** -- transport name
+        - **transport_name** -- name of transport
         - **origin_type** -- origin type
         - **warehouse** -- dispatch warehouse
         - **consignee** -- consignee
         - **location** -- consignee's location
-        - **remarks** -- order remarks
+        - **remarks** -- some description of order
         - **remarks_b** -- more complete remarks
         - **updated** -- last update date
         - **percentage** -- percentage of executing 
@@ -560,15 +561,18 @@ class Order(models.Model):
         #=======================================================================
     
     def get_percent_executed(self):
+        """Returns percent of execution"""
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
     
     def has_waybill_creation_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
 
     def is_expired(self):
+        """Checks expiration of order"""
         return self.expiry < date.today()
 
     def is_executed(self):
+        """Checks completion of order"""
         return self.percentage == 100
 
 class OrderItem(models.Model):
@@ -578,12 +582,12 @@ class OrderItem(models.Model):
         - **lti_id** -- LTI identifier
         - **si_code** -- shipping order code
         - **project_number** -- project number
-        - **commodity** -- commodity
+        - **commodity** -- commodity of item
         - **number_of_units** -- number of units
-        - **unit_weight_net** -- unit weight net
-        - **unit_weight_gross** -- unit weight gross
-        - **total_weight_net** -- total weight net
-        - **total_weight_gross** -- total weight gross
+        - **unit_weight_net** -- weight net of one unit in kg
+        - **unit_weight_gross** -- weight gross of one unit in kg
+        - **total_weight_net** -- total weight net of item in ton
+        - **total_weight_gross** -- total weight gross of item in ton
     """
     
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="items")
@@ -704,18 +708,37 @@ def waybill_slug_populate(waybill):
 class Waybill( ld_models.Model ):
     """
     Base waybill abstract class
-        - **slug** -- identifier in COMPAS
+        - **slug** -- unique identifier for waybill
         - **order** -- LTI identifier
-        - **destination** -- shipping order code
-        - **loading_date** -- project number
-        - **dispatch_date** -- commodity
-        - **transaction_type** -- number of units
-        - **transport_type** -- unit weight net
-        - **dispatch_remarks** -- unit weight gross
-        - **dispatcher_person** -- total weight net
-        - **receipt_remarks** -- total weight gross
-        - **receipt_person** -- total weight net
-        - **total_weight_gross** -- total weight gross
+        - **destination** -- destination warehouse
+        - **loading_date** -- date of load
+        - **dispatch_date** -- date of dispatch
+        - **transaction_type** -- type of transaction
+        - **transport_type** -- type of transport
+        - **dispatch_remarks** -- some description for dispatch
+        - **dispatcher_person** -- foreign key to person which create dispatch
+        - **receipt_remarks** -- some description for receipt
+        - **receipt_person** -- foreign key to person which received
+        - **total_weight_gross** -- toatal weight graoss
+        - **container_one_number** -- number of first container
+        - **container_two_number** -- number of second container
+        - **container_one_seal_number** -- seal number of first container
+        - **container_two_seal_number** -- seal number of second container
+        - **container_one_remarks_dispatch** -- some description for dispatch of first container
+        - **container_two_remarks_dispatch** -- some description for dispatch of second container
+        - **container_one_remarks_reciept** -- some description for receipt of first container
+        - **container_two_remarks_reciept** -- some description for receipt of second container
+        - **arrival_date** -- date of arrival
+        - **start_discharge_date** -- date of discharging start
+        - **end_discharge_date** --date of discharging end
+        - **distance** -- distance covered in km
+        - **transport_dispach_signed_date** -- date of confirmation of dispatch
+        - **receipt_signed_date** -- date of confirmation of receipt
+        - **validated** -- validation of dispatch eWaybill
+        - **sent_compas** -- date of sending dispatch eWaybill to Compas
+        - **receipt_validated** -- validation of receipt eWaybill
+        - **receipt_sent_compas** -- date of sending receipt eWaybill to Compas
+        - **barcode** -- barcode
     """
     
     INTERNAL_TRANSFER = u'WIT'
@@ -1033,7 +1056,26 @@ class Waybill( ld_models.Model ):
     
 
 class LoadingDetail(models.Model):
-    """Loading details related to dispatch waybill"""
+    """
+    Loading details related to dispatch waybill
+        - **waybill** -- foreign key to parent waybill
+        - **slug** -- simplified and encoded title for proper URL
+        - **stock_item** -- foreign key to related stock item
+        - **number_of_units** -- number of units
+        - **unit_weight_net** -- weight net of one unit in kg
+        - **unit_weight_gross** -- weight gross of one unit in kg
+        - **total_weight_net** -- ordered total weight net of item in ton
+        - **total_weight_gross** -- ordered total weight gross of item in ton
+        - **total_weight_net_received** -- received total weight net in ton
+        - **total_weight_gross_received** -- received total weight gross in ton
+        - **number_units_good** -- number of good delivered units
+        - **number_units_lost** -- number of lost delivered units
+        - **number_units_damaged** -- number of damaged delivered units
+        - **units_lost_reason** -- cause of lost items
+        - **units_damaged_reason** -- cause of damaged items
+        - **overloaded_units** -- the existence of overloaded units
+        - **over_offload_units** -- the existence of over offloaded units
+    """
     waybill = models.ForeignKey(Waybill, verbose_name=_("eWaybill Number"), related_name="loading_details")
     slug = AutoSlugField(populate_from='waybill', unique=True, sep='', editable=True, primary_key=True)
     
@@ -1083,6 +1125,7 @@ class LoadingDetail(models.Model):
 
 
     def get_shortage( self ):
+        """Returns shortage for item"""
         not_validated_sum = LoadingDetail.objects.filter(stock_item=self.stock_item, 
                                                          waybill__validated=False, 
                                                          waybill__transport_dispach_signed_date__isnull=False,
@@ -1095,37 +1138,47 @@ class LoadingDetail(models.Model):
         return self.stock_item.get_order_item(self.waybill.order.pk)
     
     def calculate_net_received_good( self ):
+        """Returns weight net for good units"""
         return ( self.number_units_good * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_good( self ):
+        """Returns weight gross for good units"""
         return ( self.number_units_good * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_damaged( self ):
+        """Returns weight net for damaged units"""
         return ( self.number_units_damaged * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_damaged( self ):
+        """Returns weight gross for damaged units"""
         return ( self.number_units_damaged * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_lost( self ):
+        """Returns weight net for lost units"""
         return ( self.number_units_lost * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_lost( self ):
+        """Returns weight gross for good units"""
         return ( self.number_units_lost * self.unit_weight_gross ) / 1000
     
     def calculate_total_received_units( self ):
+        """Returns total count of received units"""
         return self.number_units_good + self.number_units_damaged
 
 
     def calculate_total_received_net( self ):
+        """Returns total weight net for received units"""
         return ( self.calculate_net_received_good() + self.calculate_net_received_damaged()).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
 
     def calculate_total_received_gross( self ):
+        """Returns total weight gross for received units"""
         return (self.calculate_gross_received_good() + self.calculate_gross_received_damaged()).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
     
     def  __unicode__( self ):
         return "%s - %s - %s" % (self.waybill, self.stock_item.si_code, self.number_of_units)
     
     def is_received(self):
+        """Checks for receipt completion of item"""
         return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost
     
     
@@ -1196,7 +1249,13 @@ class LoadingDetail(models.Model):
             
         
 class ImportLogger(models.Model):
-    """Logger for import operation"""
+    """
+    Logger for import operation
+        - **compas** -- foreign key to COMPAS which received data
+        - **when_attempted** -- time of action
+        - **status** -- status of action in result
+        - **message** -- description of error
+    """
     
     SUCCESS = 0
     FAILURE = 1
@@ -1223,9 +1282,9 @@ class ImportLogger(models.Model):
 class CompasLogger(models.Model):
     """
     Logger for sending to compas
-        - **action** -- action's type
-        - **compas** -- COMPAS which received waybill
-        - **waybill** -- sended waybill
+        - **action** -- action type
+        - **compas** -- foreign key to COMPAS which received waybill
+        - **waybill** -- foreign key to sended waybill
         - **when_attempted** -- time of action
         - **status** -- status of action in result
         - **message** -- description of error
