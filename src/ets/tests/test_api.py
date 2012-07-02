@@ -47,7 +47,10 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'ISBX003', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
-        
+
+        response = self.client.get(reverse("api_waybills", kwargs={'format': "excel"}))
+        self.assertEqual(response["Content-Type"], "application/excel")
+        self.assertContains(response, 'ISBX00211A', status_code=200)
         
     def test_get_loading_details(self):
 
@@ -111,6 +114,10 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertContains(response, 'ISBX002', status_code=200)
         self.assertContains(response, 'DOEAF', status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        # test excel format
+        response = self.client.get(reverse("api_orders", kwargs={'format': "excel"}))
+        self.assertContains(response, 'OURLITORDER', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
         
         
     def test_get_order_items(self):
@@ -142,6 +149,12 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("api_stock_items"))
         self.assertContains(response, warehouse.code, status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+
+        #Test returned excel file
+        response = self.client.get(reverse("api_stock_items", kwargs={"format": 'excel'}))
+        self.assertContains(response, warehouse.code, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+    
         # Stock items for one warehouse
         response = self.client.get(reverse("api_stock_items", kwargs={"warehouse": warehouse.code}))
         self.assertContains(response, warehouse.code, status_code=200)
@@ -200,8 +213,13 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         self.assertEqual(item['origin_id'], "testme01231")
         self.assertEqual(len(list(dict_reader)), warehouse.stock_items.count()-1)
 
+        # Stock items in excel
+        response = self.client.get("?".join([reverse("api_stock_items", kwargs={'format': 'excel', "warehouse": warehouse.pk}), params.urlencode()]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+
     def test_table_orders(self):
-        # Orders related to user
+        # Orders related to user in csv
         response = self.client.get("?".join([reverse("api_orders"), "sSearch="]))
         self.assertContains(response, 'OURLITORDER', status_code=200)        
         self.assertEqual(response["Content-Type"], "application/csv")
@@ -209,17 +227,27 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 1)
 
+        # Orders related to user in excel
+        response = self.client.get("?".join([reverse("api_orders", kwargs={'format': "excel"}), "sSearch="]))
+        self.assertContains(response, 'OURLITORDER', status_code=200)        
+        self.assertEqual(response["Content-Type"], "application/excel")
+
     def test_table_waybills(self):
-        # All waybills
+        # All waybills in csv
         response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'user_related'}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/csv")
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), ets.models.Waybill.objects.count())
+        
+        # All waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'user_related'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/excel")
 
     def test_table_dispatch_waybills(self):
-        # All dispatch waybills
+        # All dispatch waybills in csv
         response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'dispatches'}))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'ISBX00211A', status_code=200)
@@ -228,8 +256,14 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), ets.models.Waybill.dispatches(self.user).count())
 
+        # All dispatch waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'dispatches'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ISBX00211A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+
     def test_table_reception_waybills(self):
-        # All reception waybills
+        # All reception waybills in csv
         person = ets.models.Person.objects.get(username=self.user.username)
         person.receive = True
         person.save()
@@ -241,8 +275,14 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), ets.models.Waybill.receptions(self.user).count())
 
+        # All reception waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'receptions'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'ISBX00311A', status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+
     def test_table_not_validated_dispatch_waybills(self):
-        # All not validated waybills
+        # All not validated waybills in csv
         self.client.login(username='admin', password='admin')
         response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'validate_dispatch'}))
         self.assertEqual(response.status_code, 200)
@@ -251,8 +291,13 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 2)
 
+        # All not validated waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'validate_dispatch'}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+
     def test_table_validated_dispatch_waybills(self):
-        # All validated waybills
+        # All validated waybills in csv
         self.client.login(username='admin', password='admin')
         waybill_pk = 'ISBX00311A'
         waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
@@ -264,6 +309,11 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 1)
+
+        # All validated waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'dispatch_validated'}))
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
 
     def test_table_validate_receipt_waybills(self):
         # All not validated waybills
@@ -279,7 +329,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 1)
-        # All validated waybills
+        # All validated waybills in csv
         waybill.receipt_validated=True
         waybill.save()
         response = self.client.get(reverse("api_waybills", kwargs={ 'filtering': 'receipt_validated'}))
@@ -288,3 +338,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 1)
+        # All validated waybills in excel
+        response = self.client.get(reverse("api_waybills", kwargs={ 'format': 'excel', 'filtering': 'receipt_validated'}))
+        self.assertContains(response, waybill_pk, status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")

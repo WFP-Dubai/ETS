@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, date
 from itertools import chain
-import decimal
+import decimal, copy
 from functools import wraps
 
 from django.conf import settings
@@ -703,9 +703,10 @@ def construct_change_message(request, form, formsets):
     change_message = ' '.join(change_message)
     return change_message or _('No fields changed.')
 
-def get_api_url(request, column_index_map, url_name, url_params=None, request_params={}):
+def get_api_url(request, column_index_map, url_name, url_params={}, request_params={}):
     data_format = request.GET.get('data_format', '')
     if data_format:
+        _url_params = copy.copy(url_params)
         params = QueryDict('', mutable=True)
         searchable_columns = get_searchable_columns(request, column_index_map, len(column_index_map))
         sortable_columns = get_sorted_columns(request, column_index_map)
@@ -713,7 +714,9 @@ def get_api_url(request, column_index_map, url_name, url_params=None, request_pa
         params.update({ 'sSearch': request.GET.get('sSearch', '').encode('utf-8') })
         params.setlist('sortable', list(set(sortable_columns)))
         params.setlist('searchable', list(set(searchable_columns)))
-        redirect_url = "?".join([reverse(url_name, kwargs=url_params), params.urlencode()])
+        if data_format == 'excel':
+            _url_params.update({'format': data_format})
+        redirect_url = "?".join([reverse(url_name, kwargs=_url_params), params.urlencode()])
         return redirect_url
 
 def get_datatables_filtering(request, queryset):
