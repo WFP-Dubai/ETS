@@ -65,24 +65,41 @@ class ReadWaybillHandler(BaseHandler):
 
         if filtering:
             officer_required = ets.models.Compas.objects.filter(officers=request.user).exists()
-            if filtering == 'dispatches':
-                waybills = self.model.dispatches(request.user)
-            elif filtering == 'receptions':
-                waybills = self.model.receptions(request.user)
-            elif filtering == 'user_related':
-                waybills = waybill_user_related_filter(waybills, request.user)
-            elif filtering == 'compas_receipt':
-                waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
-            elif filtering == 'compas_dispatch':
-                waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
-            elif filtering == 'validate_receipt' and officer_required:
-                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
-            elif filtering == 'validate_dispatch' and officer_required:
-                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
-            elif filtering == 'dispatch_validated' and officer_required:
-                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
-            elif filtering == 'receipt_validated' and officer_required:
-                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
+
+            # 1 variant
+            filter_choice = {
+                'dispatches': lambda user: self.model.dispatches(user),
+                'receptions': lambda user: self.model.receptions(user),
+                'user_related': lambda user: waybill_user_related_filter(waybills, user),
+                'compas_receipt': lambda user: waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), user),
+                'compas_dispatch': lambda user: waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), user),
+                'validate_receipt': lambda user: officer_required and waybills.filter(**get_receipt_compas_filters(user)).filter(receipt_validated=False),
+                'validate_dispatch': lambda user: officer_required and waybills.filter(**get_dispatch_compas_filters(user)).filter(validated=False),
+                'dispatch_validated': lambda user: officer_required and waybills.filter(**get_dispatch_compas_filters(user)).filter(validated=True),
+                'receipt_validated': lambda user: officer_required and waybills.filter(**get_receipt_compas_filters(user)).filter(receipt_validated=True),
+            }
+            waybills = filter_choice[filtering](request.user)
+
+            # 2 variant
+            # if filtering == 'dispatches':
+            #     waybills = self.model.dispatches(request.user)
+            # elif filtering == 'receptions':
+            #     waybills = self.model.receptions(request.user)
+            # elif filtering == 'user_related':
+            #     waybills = waybill_user_related_filter(waybills, request.user)
+            # elif filtering == 'compas_receipt':
+            #     waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
+            # elif filtering == 'compas_dispatch':
+            #     waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
+            # elif filtering == 'validate_receipt' and officer_required:
+            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
+            # elif filtering == 'validate_dispatch' and officer_required:
+            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
+            # elif filtering == 'dispatch_validated' and officer_required:
+            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
+            # elif filtering == 'receipt_validated' and officer_required:
+            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
+                
         elif not request.user.has_perm("ets.waybill_api_full_access"):
             waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
 

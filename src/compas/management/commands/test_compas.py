@@ -7,7 +7,7 @@ from django.db.utils import load_backend
 
 
 class Command(BaseCommand):
-
+    """'Tests connection to COMPAS stations'"""
     option_list = BaseCommand.option_list + ( 
         make_option('--engine', dest='db_engine', default='django.db.backends.oracle', help='Database engine'),
         make_option('--name', dest='db_name', help='Database name'),

@@ -37,6 +37,7 @@ def request_update(request):
 #===============================================================================
 
 class ExportWaybillData(FormView):
+    """Exports offliner's waybills into file"""
     
     template_name = 'export_waybills.html'
     form_class = DateRangeForm
