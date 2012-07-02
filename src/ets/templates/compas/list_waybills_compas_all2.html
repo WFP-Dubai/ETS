@@ -17,7 +17,11 @@
   <tbody>
   </tbody>
 </table>
-<a class="csv_export" href="#">{% trans "Export as CSV" %}</a>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="csv" href="#">{% trans "CSV" %}</a>,
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
 
 {% if error_message %}
 <pre>
@@ -36,8 +40,8 @@ $(document).ready(function() {
             "bServerSide": true,
             "sAjaxSource": "{{ ajax_source_url }}",
         } );
-        $(".csv_export").click( function(){
-            getDataFromTable(oTable, "csv");
+        $(".export_links a").click( function(){
+            getDataFromTable(oTable, $(this).attr("class"));
             return false;
         });
 } );

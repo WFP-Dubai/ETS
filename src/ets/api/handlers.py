@@ -1,5 +1,5 @@
 ### -*- coding: utf-8 -*- ####################################################
-
+import datetime
 import csv
 import StringIO
 
@@ -8,6 +8,7 @@ from django.db.models import Q, ForeignKey
 
 from piston.handler import BaseHandler
 from piston.emitters import Emitter
+import xlwt
 
 import ets.models
 from ets.utils import (filter_for_orders, get_datatables_filtering,
@@ -58,30 +59,47 @@ class ReadWaybillHandler(BaseHandler):
         'receipt_validated', 'receipt_sent_compas',
     )
 
-    def read(self, request, slug="", warehouse="", destination="", filtering=None):
+    def read(self, request, slug="", warehouse="", destination="", filtering=None, format=""):
         """Return waybills in CSV"""
         waybills = self.model.objects.all()
 
         if filtering:
             officer_required = ets.models.Compas.objects.filter(officers=request.user).exists()
-            if filtering == 'dispatches':
-                waybills = self.model.dispatches(request.user)
-            elif filtering == 'receptions':
-                waybills = self.model.receptions(request.user)
-            elif filtering == 'user_related':
-                waybills = waybill_user_related_filter(waybills, request.user)
-            elif filtering == 'compas_receipt':
-                waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
-            elif filtering == 'compas_dispatch':
-                waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
-            elif filtering == 'validate_receipt' and officer_required:
-                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
-            elif filtering == 'validate_dispatch' and officer_required:
-                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
-            elif filtering == 'dispatch_validated' and officer_required:
-                waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
-            elif filtering == 'receipt_validated' and officer_required:
-                waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
+
+            # 1 variant
+            filter_choice = {
+                'dispatches': lambda user: self.model.dispatches(user),
+                'receptions': lambda user: self.model.receptions(user),
+                'user_related': lambda user: waybill_user_related_filter(waybills, user),
+                'compas_receipt': lambda user: waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), user),
+                'compas_dispatch': lambda user: waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), user),
+                'validate_receipt': lambda user: officer_required and waybills.filter(**get_receipt_compas_filters(user)).filter(receipt_validated=False),
+                'validate_dispatch': lambda user: officer_required and waybills.filter(**get_dispatch_compas_filters(user)).filter(validated=False),
+                'dispatch_validated': lambda user: officer_required and waybills.filter(**get_dispatch_compas_filters(user)).filter(validated=True),
+                'receipt_validated': lambda user: officer_required and waybills.filter(**get_receipt_compas_filters(user)).filter(receipt_validated=True),
+            }
+            waybills = filter_choice[filtering](request.user)
+
+            # 2 variant
+            # if filtering == 'dispatches':
+            #     waybills = self.model.dispatches(request.user)
+            # elif filtering == 'receptions':
+            #     waybills = self.model.receptions(request.user)
+            # elif filtering == 'user_related':
+            #     waybills = waybill_user_related_filter(waybills, request.user)
+            # elif filtering == 'compas_receipt':
+            #     waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
+            # elif filtering == 'compas_dispatch':
+            #     waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
+            # elif filtering == 'validate_receipt' and officer_required:
+            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
+            # elif filtering == 'validate_dispatch' and officer_required:
+            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
+            # elif filtering == 'dispatch_validated' and officer_required:
+            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
+            # elif filtering == 'receipt_validated' and officer_required:
+            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
+                
         elif not request.user.has_perm("ets.waybill_api_full_access"):
             waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
 
@@ -181,8 +199,9 @@ class ReadOrdersHandler(BaseHandler):
         ('location', ('code', 'name')),
     )
         
-    def read(self, request, code="", warehouse="", destination="", consignee=""):
+    def read(self, request, code="", warehouse="", destination="", consignee="", format=""):
         """Return orders in CSV"""
+
         orders = self.model.objects.all()
         orders = orders.filter(**filter_for_orders())
      
@@ -264,7 +283,7 @@ class ReadStockItemsHandler(BaseHandler):
       'is_bulk', 'si_record_id', 'origin_id', 'allocation_code',
     )
         
-    def read(self, request, warehouse=""):
+    def read(self, request, warehouse="", format=""):
         """Finds all sent waybills to provided destination"""
 
         stock_items = self.model.objects.all()
@@ -325,6 +344,7 @@ def get_flattened_dict(data):
 class CSVEmitter(Emitter):
     """Emitter that returns CSV file"""
     def render(self, request):
+
         result = StringIO.StringIO()
         
         field_names = list(get_flattened_field_names(self.fields))
@@ -337,5 +357,46 @@ class CSVEmitter(Emitter):
         return result.getvalue()
 
 Emitter.register('csv', CSVEmitter, 'application/csv')
+
+def write_val_to_sheet(sheet, val, row, col):
+    if isinstance(val, str):
+        try:
+            val = int(val)
+            sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0'))
+        except ValueError:
+            try:
+                val = float(val)
+                sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0.00000'))
+            except ValueError:
+                sheet.write(row, col, val)
+    elif isinstance(val, datetime.datetime):
+        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY h:mm'))
+    elif isinstance(val, datetime.date):
+        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY'))
+    else:
+        sheet.write(row, col, val)
+
+class ExcelEmitter(Emitter):
+    """Emitter that returns Excel file"""
+    def render(self, request):
+
+        result = StringIO.StringIO()
+        header = dict(enumerate(get_flattened_field_names(self.fields)))
+        count = len(header)
+        
+        book = xlwt.Workbook()
+        sheet = book.add_sheet('new')
+        sheet.auto_style_outline = True
+        for i in range(0, count):
+            sheet.write(0, i, header[i])
+        for row_index, row_contents in enumerate(get_flattened_data(self.construct())):
+            for i in range(0, count):
+                val = row_contents.get(header[i], "")
+                write_val_to_sheet(sheet, val, row_index + 1, i)
+        book.save(result)
+        
+        return result.getvalue()
+
+Emitter.register('excel', ExcelEmitter, 'application/excel')
 
 

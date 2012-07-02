@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, date
 from itertools import chain
-import decimal
+import decimal, copy
 from functools import wraps
 
 from django.conf import settings
@@ -52,6 +52,7 @@ ACTION_TYPES = (
 LOGENTRY_WAYBILL_ACTIONS = dict(ACTION_TYPES)
 
 def get_dispatch_compas_filters(user):
+    """filter for dispatch waybills prepared for sending to COMPAS"""
     return {
         "transport_dispach_signed_date__isnull": False, 
         "sent_compas__isnull": True, 
@@ -59,6 +60,7 @@ def get_dispatch_compas_filters(user):
     }
 
 def get_receipt_compas_filters(user):
+    """filter for receipt waybills prepared for sending to COMPAS"""
     return {
         "transport_dispach_signed_date__isnull": False, 
         "receipt_signed_date__isnull": False, 
@@ -69,6 +71,7 @@ def get_receipt_compas_filters(user):
 
 
 def filter_for_orders():
+    """filter for not expired and not executed orders"""
     return {
         "expiry__gt": (datetime.now() - timedelta(days=settings.ORDER_SHOW_AFTER_EXP_DAYS)),
         "percentage__lt": 100,
@@ -538,6 +541,7 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
 
 
 def changed_fields(model, next, previous, exclude=()):
+    """Detects changed fields"""
     for field in model._meta.fields:
         if previous is not None \
         and getattr(next, field.name) != getattr(previous, field.name) \
@@ -546,6 +550,7 @@ def changed_fields(model, next, previous, exclude=()):
 
 
 def get_compases(user):
+    """Returns user's related compases"""
     queryset = ets_models.Compas.objects.all()
     if not user.is_superuser:
         queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id))
@@ -583,7 +588,7 @@ def import_file(f):
 
 
 def get_compas_data(compas=None, warehouse=None):
-    """Fetches all COMPAS-imported data, serializes and compresses them"""
+    """Fetches all COMPAS-imported data"""
 
     #COMPAS stations themself
     compas_stations = ets_models.Compas.objects.all() 
@@ -620,12 +625,13 @@ def get_compas_data(compas=None, warehouse=None):
     )
 
 def compress_compas_data(compas=None, warehouse=None):
-
+    """Returns compressed and serialized data for compas, warehouse"""
     data = get_compas_data(compas, warehouse)
     return compress_json( serializers.serialize('json', data, use_decimal=False) )
 
 
 def get_date_from_string(some_date, date_templates=None, default=None, message="Failed: date must be in one of such formats"):
+    """Extracts date from string"""
     DATE_FORMATS = (
         "%Y-%m-%d",
     )
@@ -661,6 +667,7 @@ def get_date_from_string(some_date, date_templates=None, default=None, message="
 
 
 def create_logentry(request, obj, flag, message=""):
+    """Creates log entry"""
     if flag in (LOGENTRY_EDIT_DISPATCH, LOGENTRY_EDIT_RECEIVE, 
                 LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE):
         message = "%s: %s" % (LOGENTRY_WAYBILL_ACTIONS[flag], message)
@@ -703,20 +710,25 @@ def construct_change_message(request, form, formsets):
     change_message = ' '.join(change_message)
     return change_message or _('No fields changed.')
 
-def get_api_url(request, column_index_map, url_name, url_params=None, request_params={}):
+def get_api_url(request, column_index_map, url_name, url_params=None, request_params=None):
+    """Returns url with datatables filters"""
     data_format = request.GET.get('data_format', '')
     if data_format:
+        _url_params = url_params or {}
         params = QueryDict('', mutable=True)
         searchable_columns = get_searchable_columns(request, column_index_map, len(column_index_map))
         sortable_columns = get_sorted_columns(request, column_index_map)
-        params.update(request_params)
+        params.update(request_params or {})
         params.update({ 'sSearch': request.GET.get('sSearch', '').encode('utf-8') })
         params.setlist('sortable', list(set(sortable_columns)))
         params.setlist('searchable', list(set(searchable_columns)))
-        redirect_url = "?".join([reverse(url_name, kwargs=url_params), params.urlencode()])
+        if data_format == 'excel':
+            _url_params.update({'format': data_format})
+        redirect_url = "?".join([reverse(url_name, kwargs=_url_params), params.urlencode()])
         return redirect_url
 
 def get_datatables_filtering(request, queryset):
+    """Datatables filtering with searchable and sortable fields"""
     search_string = request.GET.get("search_string", "")
     if search_string:
         queryset = queryset.filter(pk__icontains=search_string)

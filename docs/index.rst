@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Afisha's documentation!
+Welcome to ETS's documentation!
 ======================================
 
 This documentation was written for development purposes and for developers.
@@ -19,6 +19,7 @@ Contents:
    package
    buildout
    compas
+   offliner
    ets   
 
 Indices and tables

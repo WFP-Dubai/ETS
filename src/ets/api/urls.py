@@ -45,7 +45,12 @@ CSV_ORDER_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=order-it
 CSV_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.csv' % datetime.date.today() }
 CSV_WH_HEADERS = {'Content-Disposition': 'attachment; filename=warehouses-%s.csv' % datetime.date.today() }
 
+EXCEL_WAYBILLS_HEADERS = {'Content-Disposition': 'attachment; filename=waybills-%s.xls' % datetime.date.today() }
+EXCEL_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.xls' % datetime.date.today() }
+EXCEL_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.xls' % datetime.date.today() }
+
 FORMAT_CSV = {'emitter_format': 'csv'}
+FORMAT_EXCEL = {'emitter_format': 'excel'}
 
 authentication = HttpBasicAuthentication(realm='ETS API HTTP')
 
@@ -69,7 +74,32 @@ stock_items_resource_basic = ExpandedResource(ReadStockItemsHandler,
 warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))
 
 
+waybills_resource_excel = login_required(expand_response(Resource(ReadWaybillHandler), EXCEL_WAYBILLS_HEADERS))
+orders_resource_excel = login_required(expand_response(Resource(ReadOrdersHandler), EXCEL_ORDERS_HEADERS))
+stock_items_resource_excel = login_required(expand_response(Resource(ReadStockItemsHandler), EXCEL_STOCK_ITEMS_HEADERS))
+
+
 urlpatterns = patterns('',
+
+    # For Waybills EXCEL API
+    (r'^waybills/(?P<format>excel)/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$',  
+        waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/warehouse/(?P<warehouse>[-\w]+)/$',  waybills_resource_excel, 
+        FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/destination/(?P<destination>[-\w]+)/$', waybills_resource_excel, 
+        FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>dispatches)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>receptions)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>user_related)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>compas_dispatch)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>compas_receipt)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>validate_receipt)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>validate_dispatch)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>dispatch_validated)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<filtering>receipt_validated)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
+    (r'^waybills/(?P<format>excel)/(?P<slug>[-\w]+)/$', waybills_resource_excel, FORMAT_EXCEL, 
+        "api_waybills"),
+    (r'^waybills/(?P<format>excel)/$', waybills_resource_excel, FORMAT_EXCEL, "api_waybills"),
                        
     # For Waybills CSV API
     (r'^waybills/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$',  
@@ -90,6 +120,7 @@ urlpatterns = patterns('',
     (r'^waybills/(?P<slug>[-\w]+)/$', waybills_resource, FORMAT_CSV, 
         "api_waybills"),
     (r'^waybills/$', waybills_resource, FORMAT_CSV, "api_waybills"),
+
     
     # For LoadingDetails CSV API
     (r'^loading_details/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', 
@@ -101,7 +132,18 @@ urlpatterns = patterns('',
     (r'^loading_details/$', loading_details_resource, FORMAT_CSV, "api_loading_details"),
     (r'^loading_details/basic/$', loading_details_resource_basic, FORMAT_CSV, "api_loading_details_basic_auth"),
     (r'^loading_details/(?P<waybill>[-\w]+)/$', loading_details_resource, FORMAT_CSV, "api_loading_details"),
-    
+
+    # For Order EXCEL API
+    (r'^orders/(?P<format>excel)/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', orders_resource_excel, 
+        FORMAT_EXCEL, "api_orders"),
+    (r'^orders/(?P<format>excel)/warehouse_consignee/(?P<warehouse>[-\w]+)/(?P<consignee>[-\w]+)/$', orders_resource_excel, 
+        FORMAT_EXCEL, "api_orders"),
+    (r'^orders/(?P<format>excel)/consignee/(?P<consignee>[-\w]+)/$', orders_resource_excel, FORMAT_EXCEL, "api_orders"), 
+    (r'^orders/(?P<format>excel)/warehouse/(?P<warehouse>[-\w]+)/$', orders_resource_excel, FORMAT_EXCEL, "api_orders"),
+    (r'^orders/(?P<format>excel)/destination/(?P<destination>[-\w]+)/$', orders_resource_excel, FORMAT_EXCEL, "api_orders"),                 
+    (r'^orders/(?P<format>excel)/(?P<code>[-\w]+)/$', orders_resource_excel, FORMAT_EXCEL, "api_orders"),
+    (r'^orders/(?P<format>excel)/$', orders_resource_excel, FORMAT_EXCEL, "api_orders"),
+
     # For Order CSV API
     (r'^orders/warehouse_destination/(?P<warehouse>[-\w]+)/(?P<destination>[-\w]+)/$', orders_resource, 
         FORMAT_CSV, "api_orders"),
@@ -112,7 +154,7 @@ urlpatterns = patterns('',
     (r'^orders/destination/(?P<destination>[-\w]+)/$', orders_resource, FORMAT_CSV, "api_orders"),                 
     (r'^orders/(?P<code>[-\w]+)/$', orders_resource, FORMAT_CSV, "api_orders"),
     (r'^orders/$', orders_resource, FORMAT_CSV, "api_orders"),
-    
+  
     # For OrderItem CSV API
     (r'^order_items/warehouse_consignee/(?P<warehouse>[-\w]+)/(?P<consignee>[-\w]+)/$', 
         order_items_resource, FORMAT_CSV, "api_order_items"),
@@ -123,11 +165,15 @@ urlpatterns = patterns('',
     (r'^order_items/consignee/(?P<consignee>[-\w]+)/$', order_items_resource, FORMAT_CSV, "api_order_items"),                     
     (r'^order_items/(?P<order>[-\w]+)/$', order_items_resource, FORMAT_CSV, "api_order_items"),
     (r'^order_items/$', order_items_resource, FORMAT_CSV, "api_order_items"),
+
+    # For StockItems EXCEL API
+    (r'^stock_items/(?P<format>excel)/(?P<warehouse>[-\w]+)/$', stock_items_resource_excel, FORMAT_EXCEL, "api_stock_items"),
+    (r'^stock_items/(?P<format>excel)/$', stock_items_resource_excel, FORMAT_EXCEL, "api_stock_items"),
     
     # For StockItems CSV API
+    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/basic/$', stock_items_resource_basic, FORMAT_CSV, "api_stock_items_basic_auth"),
-    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     
     #Warehouses
     (r'^warehouses/$', warehouses_resource, FORMAT_CSV, "api_warehouses"),
