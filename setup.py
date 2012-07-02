@@ -44,6 +44,7 @@ install_requires = [
         'django-ajax-selects', # jQuery-powered auto-complete fields for ForeignKey and ManyToMany fields
         'django-clear-cache',
         'django-audit-log',
+        'pylzma',
 ]
 
 #Extra dependencies for test purposes
