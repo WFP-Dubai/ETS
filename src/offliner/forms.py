@@ -7,7 +7,7 @@ from uni_form.layout import Layout, Fieldset, Row, Submit
 
 
 class DateRangeForm(forms.Form):
-    
+    """Form for select date range"""
     start_date = forms.DateField(label=_('Start date'))
     end_date = forms.DateField(label=_('End date'))
     

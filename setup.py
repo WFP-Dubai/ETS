@@ -45,6 +45,7 @@ install_requires = [
         'django-clear-cache',
         'django-audit-log',
         'pylzma',
+        'xlwt',
 ]
 
 #Extra dependencies for test purposes
