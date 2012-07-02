@@ -233,13 +233,13 @@ admin.site.register( ets.models.Location, LocationAdmin )
 
 class CompasAdmin(logicaldelete.admin.ModelAdmin):
     
-    list_display = ('pk', 'read_only', 'active')
+    list_display = ('pk', 'is_base', 'read_only', 'active')
     search_fields = list_display
-    list_filter = ('read_only',)
+    list_filter = ('is_base', 'read_only',)
     readonly_fields = ('date_created', 'date_modified')
     filter_horizontal = ('officers',)
     fieldsets = (
-        (_('General'), {'fields': ('code', 'read_only', 'officers')}),
+        (_('General'), {'fields': ('code', 'is_base', 'read_only', 'officers')}),
         (_('Database'), {'fields': ('db_engine', 'db_name', 'db_user', 'db_password', 'db_host', 'db_port' )}),
         (_('Dates'), {'fields': ('date_created', 'date_modified', 'date_removed',)}),
     )

@@ -1,15 +1,17 @@
 {% load i18n %}
 {% if access_granted %}
 <form action="{% url handle_sync_compas compas_pk=station.pk %}" method="POST">{% csrf_token %}
+  {% if station.is_base %}
   <p>
     <button type="submit" name="full_update" title="{% trans 'Import organizations, places, warehouses, persons data' %}"
-      {% if base_locked %}disabled{% endif %}>{% trans "Base import" %}</button>
+      {% if base_locked %}disabled{% endif %}>{% trans "Import administrative tables from COMPAS" %}</button>
     {% if base_locked %}<span class="active_import">{% trans "Import is being executed!" %}</span>{% endif %}
   </p>
+  {% endif %}
   <p>
     <button type="submit" name="import" {% if update_locked %}disabled{% endif %} 
       title="{% trans 'Update Orders and stocks' %}">
-      {% trans "Update" %}
+      {% trans "Import LTIs and Stocks from COMPAS" %}
     </button>
     {% if update_locked %}<span class="active_import">{% trans "Update is being executed!" %}</span>{% endif %}
   </p>

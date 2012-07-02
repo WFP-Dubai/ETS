@@ -83,9 +83,7 @@ dl.warehouse-list dd {
 }
 
 .row-negative-units { 
-  -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-  filter: alpha(opacity=20);
-  opacity: 0.2;
+  color: lightgray;
 }
 
 .warehouse-selector select { 
@@ -96,9 +94,14 @@ dl.warehouse-list dd {
   max-width: 600px;
 }
 
-.csv_export {
+.csv_export, .export_links{
   float: right;
   padding-right: 20px;
+}
+
+.export_links span{
+  font-weight: bold;
+  font-style: italic;
 }
 
 /* the overlayed element */
