@@ -229,6 +229,7 @@ class ImportDataForm( forms.Form ):
     helper.add_input(Submit(_("Submit"), 'submit'))
 
 class WaybillActionForm( forms.Form ):
+    """Form allows to filter waybills by actions"""
     WAYBILL_ACTIONS = chain(((0, " - - - - - -"),), ACTION_TYPES)
     action_type = forms.TypedChoiceField(choices=WAYBILL_ACTIONS, coerce=lambda val: int(val), required=True)
 

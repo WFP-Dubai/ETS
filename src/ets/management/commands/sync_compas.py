@@ -10,7 +10,7 @@ LOG_DIRECTORY = settings.LOG_DIRECTORY
 
 class Command(BaseCommand):
     """
-    Import data from COMPAS stations. 
+    Import stock items and orders from COMPAS stations. 
     Accepts following arguments:
         
         --compas -- COMPAS station identifier (i.e. ISBX002 for example)
