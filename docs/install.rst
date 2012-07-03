@@ -387,7 +387,8 @@ You can clean this directory(without .pyo, .pyc, windows)::
 
 Build exe for users::
   
-  makensis ets_users.nsi
+  cd ../installation/
+  makensis ets_user.nsi
 
 You can use result exe-file for installation on user's computers.
 You must put initial.json to directory with exe-file.
