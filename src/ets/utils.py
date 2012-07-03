@@ -343,7 +343,6 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
     
     if not compas:
         compas = waybill.order.warehouse.compas.pk
-    
     try:
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
@@ -372,7 +371,10 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
                 try:
                     DestCompas = waybill.destination.compas.pk
                 except:
-                    DestCompas = waybill.destination.compas_text
+                    try:
+                       DestCompas = waybill.destination.compas_text
+                     except:
+                        DestCompas = '';
 
                 IsValid = False
                 if order_item.lti_id != 1:
