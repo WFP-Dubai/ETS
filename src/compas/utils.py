@@ -46,9 +46,7 @@ try:
     
     def get_version(using):
         cursor = connections[using].cursor()
-        ret = cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
-        cursor.close()
-        return ret
+        return cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
     
 except ImportError:
     

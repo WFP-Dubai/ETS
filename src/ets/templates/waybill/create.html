@@ -160,12 +160,12 @@
 $(document).ready(function() {
 	// constrain loading date
 	$('#{{ form.loading_date.auto_id }}').datepicker({
-		minDate: '{{ object.order.dispatch_date|date:"y-m-d" }}',
+		minDate: '{{ object.dispatch_date|date:"y-m-d" }}',
 		dateFormat: 'yy-mm-dd',
 	});
 	// constrain dispatch date
 	$('#{{ form.dispatch_date.auto_id }}').datepicker({
-		minDate: '{{ object.order.dispatch_date|date:"y-m-d" }}',
+		minDate: '{{ object.dispatch_date|date:"y-m-d" }}',
 		dateFormat: 'yy-mm-dd',
 	});
 	// reconstrain dispatch date every time loading date is changed

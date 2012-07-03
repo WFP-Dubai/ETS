@@ -261,6 +261,7 @@ def _get_destination_location(compas, code, name):
 
 def import_order(compas):
     """Imports all LTIs from COMPAS"""
+    
     now = datetime.now()
     today = date.today()
     places = _get_places(compas)
@@ -484,6 +485,11 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
 
     try:
         with transaction.commit_on_success(using=compas) as tr:
+            
+            #Check COMPAS version. We support only old versions lower than 1.3
+            if get_version(using=compas) > '1.3':
+                raise ValidationError(_("Inappropriate version of COMPAS. Please, contact your administrator."))
+            
             CURR_CODE = waybill.pk[len(compas):]
 
             ## Check if dispatch_master is there...
