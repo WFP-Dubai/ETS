@@ -20,7 +20,7 @@ from django.contrib.admin.models import LogEntry
 from django.http import QueryDict
 from django.core.urlresolvers import reverse
 
-from compas.utils import call_db_procedure, reduce_compas_errors
+from compas.utils import call_db_procedure, reduce_compas_errors, get_version
 import compas.models as compas_models
 import models as ets_models
 from ets.compress import compress_json, decompress_json

@@ -43,7 +43,13 @@ try:
             errors = reduce_compas_errors(Response_Message.getvalue())
 
             raise ValidationError(errors, code=Response_Code.getvalue())
-
+    
+    def get_version(using):
+        cursor = connections[using].cursor()
+        ret = cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
+        cursor.close()
+        return ret
+    
 except ImportError:
     
     def call_db_procedure(name, parameters, using):
@@ -51,7 +57,4 @@ except ImportError:
 
 
     def get_version(using):
-        cursor = connections[using].cursor()
-        ret = cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
-        cursor.close()
-        return ret
+        return '1.3'
