@@ -372,8 +372,8 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
                     DestCompas = waybill.destination.compas.pk
                 except:
                     try:
-                       DestCompas = waybill.destination.compas_text
-                     except:
+                        DestCompas = waybill.destination.compas_text
+                    except:
                         DestCompas = ''
 
                 IsValid = False
