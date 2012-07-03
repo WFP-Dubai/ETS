@@ -46,6 +46,7 @@ install_requires = [
         'django-audit-log',
         'pylzma',
         'xlwt',
+        'django-native-datatables',
 ]
 
 #Extra dependencies for test purposes
