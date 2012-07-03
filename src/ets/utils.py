@@ -374,7 +374,7 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
                     try:
                        DestCompas = waybill.destination.compas_text
                      except:
-                        DestCompas = '';
+                        DestCompas = ''
 
                 IsValid = False
                 if order_item.lti_id != 1:
