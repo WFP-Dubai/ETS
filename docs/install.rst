@@ -376,7 +376,7 @@ Compiling ETS-folder on Windows:
     git clone http://github.com/WFP-Dubai/ETS.git
     cd ETS
     python bootstrap.py
-    bin\buildout -c windows.cfg
+    bin\buildout.exe -c windows.cfg
 
 Copy sub-directory ETS to "pkgdir"
 You can clean this directory(without .pyo, .pyc, windows)::
