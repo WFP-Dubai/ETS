@@ -1,6 +1,6 @@
 ### -*- coding: utf-8 -*- ####################################################
 
-import base64, zlib
+import base64, pylzma, py7zlib
 
 COMPRESS_MAPPING = (
     ('"_order":', '"_o":'),
@@ -93,22 +93,51 @@ COMPRESS_MAPPING = (
     ('"si_record_id":', '"sri":'),
     ('"fields":', '"f":'),
     ('"model":', '"m":'),
+    ('"total_weight_gross_received":', '"twgr":'),
+    ('"total_weight_net_received":', '"twnr":'),
+    ('"total_weight_gross":', '"twg":'),
+    ('"total_weight_net":', '"twn":'),
+    ('"receive":', '"re":'),
+    ('"dispatch":', '"ds":'),
+    ('"warehouses":', '"ws":'),
+    ('"valid_warehouse":', '"vw":'),
+    ('"compas_text":', '"ct":'),
+    ('"is_base":', '"ia":'),
+    ('"quantity_gross":', '"qg":'),
+    ('"quantity_net":', '"qn":'),
+    ('"external_ident":', '"ei":'),
+    ('"virtual":', '"vi":'),
+    ('"percentage":', '"pc":'),
+    ('"remarks":', '"rm":'),
+    ('"remarks_b":', '"rmb":'),
+    ('"cause":', '"cs":'),
+    ('"ets.stockitem"', '"e.s"'),
+    ('"ets.location"', '"e.l"'),
+    ('"ets.person"', '"e.p"'),
+    ('"ets.warehouse"', '"e.w"'),
+    ('"ets.order"', '"e.or"'),
+    ('"ets.commodity"', '"e.c"'),
+    ('"ets.organization"', '"e.o"'),
+    ('"ets.commoditycategory"', '"e.cc"'),
+    ('"ets.loadingdetail"', '"e.ld"'),
+    ('"ets.package"', '"e.pg"'),
+    ('"ets.lossdamagetype"', '"e.dt"'),
 )
 
 def compress_json(data):
     """Replaces all long field names with short ones, than compresses it with zlib and base64"""
     for full_field, cut_field in COMPRESS_MAPPING:
         data = data.replace(full_field, cut_field)
-
-    return base64.b64encode( zlib.compress( data ) )
+    
+    return base64.b64encode( pylzma.compress( data ) )
 
 
 def decompress_json(data):
     """Replaces all short abbreviations with real field names"""
     
     try:
-        data = zlib.decompress( base64.b64decode( data ) )
-    except (zlib.error, TypeError):
+        data = pylzma.decompress( base64.b64decode( data ) )
+    except (py7zlib.ArchiveError, TypeError):
         return
     else:
         #Extend field names
