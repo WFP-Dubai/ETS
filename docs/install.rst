@@ -376,7 +376,7 @@ Compiling ETS-folder on Windows:
     git clone http://github.com/WFP-Dubai/ETS.git
     cd ETS
     python bootstrap.py
-    bin\buildout -c windows.cfg
+    bin\buildout.exe -c windows.cfg
 
 Copy sub-directory ETS to "pkgdir"
 You can clean this directory(without .pyo, .pyc, windows)::
@@ -387,7 +387,8 @@ You can clean this directory(without .pyo, .pyc, windows)::
 
 Build exe for users::
   
-  makensis ets_users.nsi
+  cd ../installation/
+  makensis ets_user.nsi
 
 You can use result exe-file for installation on user's computers.
 You must put initial.json to directory with exe-file.

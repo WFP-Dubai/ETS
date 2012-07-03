@@ -358,23 +358,14 @@ class CSVEmitter(Emitter):
 
 Emitter.register('csv', CSVEmitter, 'application/csv')
 
-def write_val_to_sheet(sheet, val, row, col):
+def detect_style(val):
     if isinstance(val, str):
-        try:
-            val = int(val)
-            sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0'))
-        except ValueError:
+        for typ in [int, float]:
             try:
-                val = float(val)
-                sheet.write(row, col, val, xlwt.easyxf(num_format_str='#,##0.00000'))
+                val = typ(val)
+                return val, typ
             except ValueError:
-                sheet.write(row, col, val)
-    elif isinstance(val, datetime.datetime):
-        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY h:mm'))
-    elif isinstance(val, datetime.date):
-        sheet.write(row, col, val, xlwt.easyxf(num_format_str='M/D/YY'))
-    else:
-        sheet.write(row, col, val)
+                pass
 
 class ExcelEmitter(Emitter):
     """Emitter that returns Excel file"""
@@ -386,13 +377,22 @@ class ExcelEmitter(Emitter):
         
         book = xlwt.Workbook()
         sheet = book.add_sheet('new')
-        sheet.auto_style_outline = True
+        styles = {
+            datetime.date: xlwt.easyxf(num_format_str='M/D/YY'),
+            int: xlwt.easyxf(num_format_str='#,##0'),
+            float: xlwt.easyxf(num_format_str='#,##0.00000'),
+            datetime.datetime: xlwt.easyxf(num_format_str='M/D/YY h:mm'),
+            unicode: xlwt.easyxf(),
+        }
+        styles['default'] = styles[unicode]
+        
         for i in range(0, count):
             sheet.write(0, i, header[i])
         for row_index, row_contents in enumerate(get_flattened_data(self.construct())):
             for i in range(0, count):
                 val = row_contents.get(header[i], "")
-                write_val_to_sheet(sheet, val, row_index + 1, i)
+                val, key = (val, type(val)) if styles.has_key(type(val)) else detect_style(val) or (val, 'default')
+                sheet.write(row_index + 1, i, val, styles[key])
         book.save(result)
         
         return result.getvalue()
