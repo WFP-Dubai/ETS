@@ -375,6 +375,10 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
                         DestCompas = waybill.destination.compas_text
                     except:
                         DestCompas = ''
+                try:
+                    Destination = waybill.destination.pk
+                except:
+                    Destination = ''
 
                 IsValid = False
                 if order_item.lti_id != 1:
@@ -400,7 +404,7 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
                     waybill.order.warehouse.pk,
                     waybill.order.warehouse.name, 
                     waybill.order.location.pk,
-                    waybill.destination.pk,
+                    Destination,
                     order_item.lti_id, 
                     waybill.loading_date.strftime("%Y%m%d"),
                     waybill.order.consignee.pk, 
