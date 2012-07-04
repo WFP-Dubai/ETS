@@ -73,7 +73,12 @@ urlpatterns = patterns("ets.views",
             "ajax_source_url": "/datatables/waybills/receptions/"
         }
     }, "waybill_reception_list" ),
-    
+
+    ( r'^waybill/scanned_receive/$', "waybill_reception_scanned", {
+        'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
+                                                      receipt_signed_date__isnull=True)
+    }, "waybill_reception_scanned"),
+
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
         "template": 'waybill/detail.html',
         'queryset': ets.models.Waybill.objects.all(),
@@ -101,11 +106,6 @@ urlpatterns = patterns("ets.views",
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/receive/$', recipient_required(receipt_view(waybill_reception)), 
       {}, "waybill_reception"),
-                        
-    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
-        'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
-                                                      receipt_signed_date__isnull=True)
-    }, "waybill_reception_scanned"),
     
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/sign_receipt/$', "waybill_finalize_receipt", {
         'template_name': 'waybill/print/detail.html',
@@ -174,14 +174,22 @@ urlpatterns = patterns("ets.views",
         "extra_context": {
             "ajax_source_url": "/datatables/waybills/compas_dispatch/"
     }}, 'compas_waybill' ),
-    
-    ( r'^datatables/stock/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
+
+
+    ( r'^warehouses/$', direct_to_template, { "template": 'stock/warehouses.html' }, 'warehouses_list'),
+    ( r'^stocks/(?P<object_id>[-\w]+)/$', object_detail, {
+        "queryset": ets.models.Warehouse.get_active_warehouses(),
+        "template_name": 'stock/stock_list.html',
+        "extra_context": {
+            "good_quality": ets.models.StockItem.get_good_quality(),
+    }}, 'stock_list'),
+    ( r'^datatables/warehouses/$', 'table_warehouses', {
+        'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),
+    }, 'table_warehouses' ),
+    ( r'^datatables/stock/param/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
+    ( r'^datatables/stock/(?P<warehouse_pk>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.objects.filter(valid_warehouse=True)\
-                                                .filter(start_date__lte=date.today)\
-                                                .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))\
-                                                .annotate(stock_count=Count('stock_items'))\
-                                                .filter(stock_count__gt=0).order_by('location', 'pk'),
+        'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),
         'template_name': 'stock/stocklist.html',
     }, 'view_stock' ),
 

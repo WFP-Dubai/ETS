@@ -40,7 +40,7 @@ from ets.utils import (send_dispatched, send_received, create_logentry, construc
                        LOGENTRY_SIGN_DISPATCH, LOGENTRY_SIGN_RECEIVE, LOGENTRY_DELETE_WAYBILL,
                        LOGENTRY_VALIDATE_DISPATCH, LOGENTRY_VALIDATE_RECEIVE)
 from ets.pdf import render_to_pdf
-from ets.compress import compress_json
+from ets.compress import compress_json, decompress_json
 from ets.datatables import get_datatables_records
 
 
@@ -417,11 +417,11 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
     })
 
 
-@person_required
-def waybill_reception_scanned(request, scanned_code, queryset):
+#@person_required
+def waybill_reception_scanned(request, queryset):
     """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
+    scanned_code = request.GET.get('scanned_code', '')
     waybill = ets.models.Waybill.decompress(scanned_code)
-
     if not waybill:
         raise Http404
     return waybill_reception(request, waybill.pk, queryset)
@@ -531,7 +531,7 @@ def deserialize(request, form_class=WaybillScanForm):
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
             if request.GET.get("receipt",""):
-                return redirect('waybill_reception_scanned', scanned_code=data )
+                return redirect("".join([reverse('waybill_reception_scanned'), "?scanned_code=", data]))
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Incorrect Data !!!! Ensure a valid barcode information is pasted'))
@@ -549,17 +549,20 @@ barcode_qr.authentication = False
 
 def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
-    if not request.user.has_perm("ets.stockitem_api_full_access"):
+    if not request.user.is_superuser:
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    good_quality = ( value for key, value in ets.models.StockItem.QUALITY_CHOICE if key == ets.models.StockItem.GOOD_QUALITY ).next()
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name,
-                       extra_context={ "good_quality": good_quality })
+                       extra_context={ "good_quality": ets.models.StockItem.get_good_quality() })
 
-def table_stock_items(request, param_name):
+def table_stock_items(request, warehouse_pk=None, param_name=None):
     """Ajax view that returns list of stock items for using in datatables"""
-    warehouse_pk = request.GET.get(param_name)
+
+    if not warehouse_pk:
+        warehouse_pk = request.GET.get(param_name)
+
     warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)
+        
     column_index_map = {
         0: 'commodity__name',
         1: 'project_number',
@@ -588,6 +591,36 @@ def table_stock_items(request, param_name):
         item.quantity_gross,
     ])
 
+def table_warehouses(request, queryset=ets.models.Warehouse):
+    """Ajax view that returns list of warehouses for using in datatables"""
+
+    column_index_map = {
+        0: 'code',
+        1: 'name',
+        2: 'location__name',
+        3: 'organization__name',
+        4: 'compas__code',
+        5: 'compas_text',
+        6: 'valid_warehouse',
+        7: 'start_date',
+        8: 'end_date',
+    }
+
+    redirect_url = get_api_url(request, column_index_map, "api_warehouses")
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.code),
+        fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.name),
+        item.location.name,
+        item.organization.name,
+        item.compas.code,
+        item.compas_text,
+        'Yes' if item.valid_warehouse else 'No',
+        date_filter(item.start_date).upper(),
+        date_filter(item.end_date).upper(),
+    ])
 
 @person_required
 @warehouse_related
@@ -787,3 +820,4 @@ def installation_data(request, template_name="stock/warehouse_list.html", form_c
     
     return object_list(request, queryset.order_by("compas", "name"), extra_context = { "form" : form },
                        paginate_by=settings.PAGINATION_DEFAULT_PAGINATION, template_name=template_name)
+

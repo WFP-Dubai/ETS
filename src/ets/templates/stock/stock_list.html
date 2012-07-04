@@ -4,10 +4,10 @@
 {% block title %}{% trans "Dispatched Commodity" %}{% endblock %}
 
 {% block content %}
-<h3>{% trans "Stock List" %}</h3>
-{% for wh in object_list %}
-<p>{% trans "Location" %}: <strong>{{ wh.location.name }}</strong>, {% trans "Warehouse" %}: <strong>{{ wh.name }} ({{ wh.pk }})</strong></p>
-<table cellpadding="0" cellspacing="0" border="0" class="stocklist display" id='{{ wh.pk }}'>
+<a href='{% url warehouses_list %}'>{% trans "Back to list of warehouses" %}</a>
+<h3>{% trans "Stock List of" %} {{ object.name }}</h3>
+
+<table cellpadding="0" cellspacing="0" border="0" class="stocklist display">
   <thead>
     <tr>
       <th>{% trans "Commodity" %}</th>
@@ -30,22 +30,17 @@
   <a class="excel" href="#">{% trans "Excel" %}</a>
 </div>
 
-{% if not forloop.last %}<div class="sep"></div>{% endif %}
-{% endfor %}
-
-{% paginate %}
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
 <script type="text/javascript">
   $(document).ready(function() {
-    $('.stocklist').each(function() { 
-      var oTable = $(this).dataTable({
+    var oTable = $('.stocklist').dataTable({
         "aaSorting": [[ 4, "desc" ]],
         "bProcessing": true,
         "bServerSide": true,
-        "sAjaxSource": "{% url table_stock_items param_name='wh_id' %}?wh_id="+$(this).attr("id"),
+        "sAjaxSource": "{% url table_stock_items warehouse_pk=object.pk %}",
         "aoColumnDefs": [
           { "bSearchable": false, "aTargets": [ 1, 2, 3, 4, 5, 6, 7, 8 ] }
         ],
@@ -57,12 +52,11 @@
             nRow.className +=' row-negative-units';
           }
           return nRow;
-        },
-      });
-      $(this).parent().next(".export_links").find("a").click( function(){
-         getDataFromTable(oTable, $(this).attr("class"));
-         return false;
-      });
+        }
+    });
+    $(".export_links a").click( function(){
+       getDataFromTable(oTable, $(this).attr("class"));
+       return false;
     });
   });
 </script>

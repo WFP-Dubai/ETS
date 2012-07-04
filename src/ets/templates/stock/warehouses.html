@@ -1,0 +1,53 @@
+{% extends "base_template.html" %}
+{% load i18n pagination_tags %}
+
+{% block title %}{% trans "Warehouses" %}{% endblock %}
+
+{% block content %}
+<h3>{% trans "Warehouses" %}</h3>
+
+<table cellpadding="0" cellspacing="0" border="0" class="display" id="warehouses_table">
+  <thead>
+    <tr>
+      <th>{% trans "Code" %}</th>
+      <th>{% trans "Warehouse Title" %}</th>
+      <th>{% trans "Location" %}</th>
+      <th>{% trans "Organization" %}</th>
+      <th>{% trans "Compas" %}</th>
+      <th>{% trans "Compas (text)" %}</th>
+      <th>{% trans "Valid"%}</th>
+      <th>{% trans "Start Date"%}</th>
+      <th>{% trans "End Date"%}</th>
+    </tr>
+  </thead>
+
+  <tbody>
+  </tbody>
+</table>
+<div class="export_links">
+  <span>{% trans "Export as" %}</span>
+  <a class="excel" href="#">{% trans "Excel" %}</a>
+</div>
+
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+  $(document).ready(function() {
+    var oTable = $('#warehouses_table').dataTable({
+        "aaSorting": [[ 4, "desc" ]],
+        "bProcessing": true,
+        "bServerSide": true,
+        "sAjaxSource": "{% url table_warehouses %}",
+        "aoColumnDefs": [
+          { "bSearchable": false, "aTargets": [ 6 ] }
+        ]
+    });
+    $(".export_links a").click( function(){
+      getDataFromTable(oTable, $(this).attr("class"));
+      return false;
+    });
+  });
+</script>
+{% endblock script %}

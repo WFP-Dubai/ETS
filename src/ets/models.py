@@ -16,6 +16,7 @@ from django.db import transaction
 from django.core.files.base import ContentFile
 from django.db.models.aggregates import Max
 from django.core.cache import cache
+from django.db.models.aggregates import Count
 
 from sorl.thumbnail.fields import ImageField
 from autoslug.fields import AutoSlugField
@@ -215,6 +216,12 @@ class Warehouse(models.Model):
         """Returns active warehouses"""
         return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+
+    @classmethod
+    def get_active_non_empty_warehouses(cls):
+        """Returns active non empty warehouses"""
+        return cls.get_active_warehouses().annotate(stock_count=Count('stock_items'))\
+                                          .filter(stock_count__gt=0).order_by('location', 'pk')
     
     @classmethod
     def get_warehouses(cls, location, organization=None):
@@ -226,7 +233,7 @@ class Warehouse(models.Model):
             return queryset.filter(organization=organization)
         
         return queryset
-            
+
     #===================================================================================================================
     # @classmethod
     # def filter_by_user(cls, user):
@@ -445,6 +452,10 @@ class StockItem( models.Model ):
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
         return  "%.3f (MT)" % (self.get_order_item(order_pk).tonnes_left())
+
+    @classmethod
+    def get_good_quality(cls):
+        return ( value for key, value in cls.QUALITY_CHOICE if key == cls.GOOD_QUALITY ).next()
 
     
 class LossDamageType(models.Model):
@@ -1001,8 +1012,8 @@ class Waybill( ld_models.Model ):
     @classmethod
     def decompress(cls, data):
         wb_serialized = decompress_json(data)
+
         if wb_serialized:
-            
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):
                 #Save object if it does not exist

@@ -290,8 +290,8 @@ class ReadStockItemsHandler(BaseHandler):
 
         if request.GET.has_key('sSearch'):
             stock_items = get_datatables_filtering(request, stock_items)
-        elif not request.user.has_perm("ets.stockitem_api_full_access"):
-            stock_items = stock_items.filter(warehouse__persons__pk=request.user.pk)
+        elif not request.user.is_superuser:
+            stock_items = stock_items.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
 
         if warehouse: 
             stock_items = stock_items.filter(warehouse__pk=warehouse)
@@ -299,7 +299,7 @@ class ReadStockItemsHandler(BaseHandler):
         return stock_items
 
 
-class ReadCSVWarehouseHandler(BaseHandler):
+class ReadWarehouseHandler(BaseHandler):
     """Warehouse short information with code, name and location"""
     allowed_methods = ('GET',)
     model = ets.models.Warehouse
@@ -307,14 +307,16 @@ class ReadCSVWarehouseHandler(BaseHandler):
         'code', 'name', ('location', ('name', 'country')),
     )
     
-    def read(self, request):
+    def read(self, request, format=""):
         """country, location. warehouse information"""
-        
+
         warehouses = self.model.objects.all()
-        
-        if not request.user.has_perm("ets.warehouse_api_full_access"):
-            warehouses = self.model.objects.filter(persons__pk=request.user.pk)
-        
+
+        if request.GET.has_key('sSearch'):
+            warehouses = get_datatables_filtering(request, self.model.get_active_non_empty_warehouses())
+        elif not request.user.is_superuser:
+            warehouses = warehouses.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
+
         return warehouses
     
 
