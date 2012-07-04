@@ -863,10 +863,10 @@ class Waybill( ld_models.Model ):
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
         if self.pk:
-            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.png" % self.pk, self.barcode_qr(), save=False)
         super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
         if not self.barcode:
-            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.png" % self.pk, self.barcode_qr(), save=False)
             super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
     def clean(self):
