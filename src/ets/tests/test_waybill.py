@@ -472,14 +472,14 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Test receipt get request
         self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('deserialize'), data={'data': data, 'receipt': 'Receipt Waybill'})
-        self.assertRedirects(response, "".join([reverse('waybill_reception_scanned'), '?scanned_code=', data])) 
+        self.assertRedirects(response, "%s?scanned_code=%s" % (reverse('waybill_reception_scanned'), data)) 
 
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""
         
         self.client.login(username='foreigner', password='recepient')
         scanned_code = self.reception_waybill.compress()
-        response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code,})
+        response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code})
         self.assertEqual(response.status_code, 200)
         
         # form_data = {
@@ -507,12 +507,12 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #     'receipt_remarks': 'test remarks',
         #     'destination': 'OE7X001',
         # }
+        # form_data.update({'scanned_code': scanned_code})
         
-        # response = self.client.post(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}), 
-        #                             data=form_data)
-        # Everything should be fine
-        #self.assertRedirects(response, self.reception_waybill.get_absolute_url())
-        #self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
+        # response = self.client.post(reverse('waybill_reception_scanned'), data=form_data)
+        # #Everything should be fine
+        # self.assertRedirects(response, self.reception_waybill.get_absolute_url())
+        # self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
         
         scanned_code = "-123143"
         response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code,})

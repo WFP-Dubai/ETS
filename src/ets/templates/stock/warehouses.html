@@ -5,6 +5,7 @@
 
 {% block content %}
 <h3>{% trans "Warehouses" %}</h3>
+<p><a href="http://github.com/downloads/Arpaso/ETS/ETS-0.0.2.exe">{% trans "Download ETS installer" %}</a></p>
 
 <table cellpadding="0" cellspacing="0" border="0" class="display" id="warehouses_table">
   <thead>
@@ -15,9 +16,7 @@
       <th>{% trans "Organization" %}</th>
       <th>{% trans "Compas" %}</th>
       <th>{% trans "Compas (text)" %}</th>
-      <th>{% trans "Valid"%}</th>
-      <th>{% trans "Start Date"%}</th>
-      <th>{% trans "End Date"%}</th>
+      <th>{% trans "Init Data" %}</th>
     </tr>
   </thead>
 
@@ -26,7 +25,7 @@
 </table>
 <div class="export_links">
   <span>{% trans "Export as" %}</span>
-  <a class="excel" href="#">{% trans "Excel" %}</a>
+  <a class="excel" href="#">{% trans "XLS" %}</a>
 </div>
 
 {% endblock %}
@@ -41,7 +40,7 @@
         "bServerSide": true,
         "sAjaxSource": "{% url table_warehouses %}",
         "aoColumnDefs": [
-          { "bSearchable": false, "aTargets": [ 6 ] }
+          { "bSearchable": false, "bSortable": false, "aTargets": [ 6 ] }
         ]
     });
     $(".export_links a").click( function(){

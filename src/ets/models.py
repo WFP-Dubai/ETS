@@ -453,10 +453,6 @@ class StockItem( models.Model ):
         """Retrieves stock items for current order item through warehouse"""
         return  "%.3f (MT)" % (self.get_order_item(order_pk).tonnes_left())
 
-    @classmethod
-    def get_good_quality(cls):
-        return ( value for key, value in cls.QUALITY_CHOICE if key == cls.GOOD_QUALITY ).next()
-
     
 class LossDamageType(models.Model):
     """

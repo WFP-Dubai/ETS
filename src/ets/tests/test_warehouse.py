@@ -50,16 +50,3 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 1)
 
-    def test_installation_page(self):
-        response = self.client.get(reverse('installation_data'))
-        self.assertEqual(response.status_code, 302)
-        
-        self.client.login(username='admin', password='admin')
-        response = self.client.get(reverse('installation_data'))
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 3)
-
-        response = self.client.get(reverse('installation_data'), data={'q': "mehti",})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 1)
-

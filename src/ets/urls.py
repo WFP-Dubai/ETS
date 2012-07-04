@@ -181,7 +181,7 @@ urlpatterns = patterns("ets.views",
         "queryset": ets.models.Warehouse.get_active_warehouses(),
         "template_name": 'stock/stock_list.html',
         "extra_context": {
-            "good_quality": ets.models.StockItem.get_good_quality(),
+            "good_quality": ets.models.StockItem.GOOD_QUALITY,
     }}, 'stock_list'),
     ( r'^datatables/warehouses/$', 'table_warehouses', {
         'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),
@@ -223,7 +223,6 @@ urlpatterns = patterns("ets.views",
     ( r'^export/compas/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^export/warehouse/(?P<data_type>data)/(?P<warehouse>[-\w]+)/$', 'export_compas_file', {}, 'export_warehouse_file' ),
     ( r'^export/warehouse/(?P<warehouse>[-\w]+)/$', 'export_compas_file', {}, 'export_warehouse_file' ),
-    ( r'^installation_data/$', 'installation_data', {}, 'installation_data' ),
     
 )
 
