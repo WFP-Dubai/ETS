@@ -514,6 +514,13 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         # Everything should be fine
         self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
+
+        waybill_pk = self.reception_waybill.pk
+        models.Model.delete(self.reception_waybill)
+        self.assertFalse(ets.models.Waybill.objects.filter(pk=waybill_pk).exists())
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
+        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'waybill_pk': waybill_pk}))
+        self.assertTrue(ets.models.Waybill.objects.filter(pk=waybill_pk).exists())
         
         data = "-123143"
         response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
