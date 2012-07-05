@@ -38,7 +38,7 @@ class WarehouseTestCase(TestCaseMixin, TestCase):
         self.client.login(username='admin', password='admin')
         response = self.client.get(reverse('view_stock'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['object_list'].count(), 2)
+        self.assertEqual(response.context['object_list'].count(), 3)
         
         self.client.login(username='dispatcher', password='dispatcher')
         response = self.client.get(reverse('view_stock'))

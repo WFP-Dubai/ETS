@@ -74,12 +74,9 @@ urlpatterns = patterns("ets.views",
         }
     }, "waybill_reception_list" ),
 
-    ( r'^waybill/scanned_receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception_scanned", {
-        'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
+    ( r'^waybill/(?P<scanned_code>[-+=/\w]+)/scanned_receive/$', "waybill_reception_scanned", {
+        'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False,
                                                       receipt_signed_date__isnull=True)
-    }, "waybill_reception_scanned"),
-    ( r'^waybill/scanned_receive/$', "waybill_reception_scanned", {
-        'queryset': ets.models.Waybill.objects.none()
     }, "waybill_reception_scanned"),
 
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
@@ -187,12 +184,12 @@ urlpatterns = patterns("ets.views",
             "good_quality": ets.models.StockItem.GOOD_QUALITY_LABEL,
     }}, 'stock_list'),
     ( r'^datatables/warehouses/$', 'table_warehouses', {
-        'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),
+        'queryset': ets.models.Warehouse.get_active_warehouses(),
     }, 'table_warehouses' ),
     ( r'^datatables/stock/param/(?P<param_name>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
     ( r'^datatables/stock/(?P<warehouse_pk>[-\w]+)/$', 'table_stock_items', {}, 'table_stock_items' ),
     ( r'^stock/$', 'stock_items', {
-        'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),
+        'queryset': ets.models.Warehouse.get_active_warehouses(),
         'template_name': 'stock/stocklist.html',
     }, 'view_stock' ),
 

@@ -313,7 +313,7 @@ class ReadWarehouseHandler(BaseHandler):
         warehouses = self.model.objects.all()
 
         if request.GET.has_key('sSearch'):
-            warehouses = get_datatables_filtering(request, self.model.get_active_non_empty_warehouses())
+            warehouses = get_datatables_filtering(request, self.model.get_active_warehouses())
         elif not request.user.is_superuser:
             warehouses = warehouses.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
 

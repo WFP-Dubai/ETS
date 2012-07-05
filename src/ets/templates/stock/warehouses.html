@@ -35,7 +35,7 @@
 <script type="text/javascript">
   $(document).ready(function() {
     var oTable = $('#warehouses_table').dataTable({
-        "aaSorting": [[ 4, "desc" ]],
+        "aaSorting": [[ 2, "asc" ]],
         "bProcessing": true,
         "bServerSide": true,
         "sAjaxSource": "{% url table_warehouses %}",

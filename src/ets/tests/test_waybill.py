@@ -473,23 +473,16 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Test receipt get request
         self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('deserialize'), data={'data': data, 'receipt': 'Receipt Waybill'})
-        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'waybill_pk': self.reception_waybill.pk}))
+        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
 
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""
         
         self.client.login(username='foreigner', password='recepient')
-        scanned_code = self.reception_waybill.compress()
-        response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code})
-        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'waybill_pk': self.reception_waybill.pk}))
-
-        waybill_pk = self.reception_waybill.pk
-        models.Model.delete(self.reception_waybill)
-        self.assertFalse(ets.models.Waybill.objects.filter(pk=waybill_pk).exists())
-        response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code})
-        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'waybill_pk': waybill_pk}))
-        self.assertTrue(ets.models.Waybill.objects.filter(pk=waybill_pk).exists())
-
+        data = self.reception_waybill.compress()
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
+        self.assertEqual(response.status_code, 200)
+        
         form_data = {
             'item-TOTAL_FORMS': 1,
             'item-INITIAL_FORMS': 1,
@@ -516,17 +509,15 @@ class WaybillTestCase(TestCaseMixin, TestCase):
             'destination': 'OE7X001',
         }
         
-        response = self.client.post(reverse('waybill_reception_scanned', kwargs={'waybill_pk': waybill_pk}), data=form_data)
-        #Everything should be fine
-        way = ets.models.Waybill.objects.get(pk='ISBX00311A')
-        self.assertRedirects(response, way.get_absolute_url())
+        response = self.client.post(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}),
+                                    data=form_data)
+        # Everything should be fine
+        self.assertRedirects(response, self.reception_waybill.get_absolute_url())
         self.assertEqual(ets.models.Waybill.objects.get(pk="ISBX00311A").receipt_remarks, 'test remarks')
         
-        scanned_code = "-123143"
-        response = self.client.get(reverse('waybill_reception_scanned'), data={'scanned_code': scanned_code,})
+        data = "-123143"
+        response = self.client.get(reverse('waybill_reception_scanned', kwargs={'scanned_code': data,}))
         self.assertEqual(response.status_code, 404)
-
-        
     
     def test_waybill_errors(self):
         """ets.views.waybill_errors"""

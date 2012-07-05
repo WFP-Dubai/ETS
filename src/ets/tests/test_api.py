@@ -228,7 +228,7 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['code'], "ISBX002")
-        self.assertEqual(len(list(dict_reader)), 1)
+        self.assertEqual(len(list(dict_reader)), 2)
 
         # Warehouses in excel
         response = self.client.get("?".join([reverse("api_warehouses", kwargs={'format': 'excel'}), params.urlencode()]))

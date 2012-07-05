@@ -218,12 +218,6 @@ class Warehouse(models.Model):
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
 
     @classmethod
-    def get_active_non_empty_warehouses(cls):
-        """Returns active non empty warehouses"""
-        return cls.get_active_warehouses().annotate(stock_count=Count('stock_items'))\
-                                          .filter(stock_count__gt=0).order_by('location', 'pk')
-    
-    @classmethod
     def get_warehouses(cls, location, organization=None):
         """Returns warehouses related to location or organization"""
         queryset = cls.get_active_warehouses().filter(location=location)
