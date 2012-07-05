@@ -1,2 +1,2 @@
 Docs in Docs folder
-.. __Index: ./docs/index.rst
+https://github.com/WFP-Dubai/ETS/tree/master/docs
