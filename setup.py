@@ -39,7 +39,6 @@ install_requires = [
         'html5lib',
         'pypdf',
         'pisa',
-        'sorl-thumbnail', # thumbnail creation tool
         #'pygraphviz',
         'django-ajax-selects', # jQuery-powered auto-complete fields for ForeignKey and ManyToMany fields
         'django-clear-cache',

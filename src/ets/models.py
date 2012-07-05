@@ -3,7 +3,8 @@ import decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
+import random
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,10 +15,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
-from django.db.models.aggregates import Max
 from django.core.cache import cache
 
-from sorl.thumbnail.fields import ImageField
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models
@@ -837,9 +836,9 @@ class Waybill( ld_models.Model ):
     receipt_validated = models.BooleanField(_("eWaybill Receipt Validated"), default=False, db_index=True) #waybillReceiptValidated
     receipt_sent_compas = models.DateTimeField(_("eWaybill Reciept Sent to Compas"), blank=True, null=True, db_index=True)
     
-    barcode = ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
+    barcode = models.ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
                        blank=True, null=True,
-                       max_length=255,)
+                       max_length=255, editable=False)
     
     objects = ld_models.managers.LogicalDeletedManager()
     
@@ -859,6 +858,10 @@ class Waybill( ld_models.Model ):
     @models.permalink
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
+    
+    def get_barcode(self):
+        """Returns full barcode url and prevents cache"""
+        return "%s%s?hash=%s" % (settings.MEDIA_URL, self.barcode, random.random())
     
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
@@ -1025,8 +1028,6 @@ class Waybill( ld_models.Model ):
                                      )#.resize((400, 400))
         image.save(file_out, 'GIF')
         file_out.reset()
-        
-        #name = "%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date)
         
         return ContentFile(file_out.read())
     
