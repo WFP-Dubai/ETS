@@ -1028,9 +1028,9 @@ class Waybill( ld_models.Model ):
         
         return ContentFile(file_out.read())
     
-    def get_barcode(self):
+    def get_nocached_barcode(self):
         """Returns full barcode url and prevents cache"""
-        return "%s%s?hash=%s" % (settings.MEDIA_URL, self.barcode, random.random())
+        return "%s?hash=%s" % (self.barcode.url, random.random())
     
     @classmethod
     def dispatches(cls, user):
