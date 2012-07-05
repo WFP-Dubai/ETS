@@ -39,7 +39,7 @@ SERVE_STATIC = True
 
 SERVE_STATIC = True
 
-#DEFAULT_FILE_STORAGE = 'ets.storage.RewriteFileSystemStorage'
+DEFAULT_FILE_STORAGE = 'ets.storage.RewriteFileSystemStorage'
 
 STATICFILES_FINDERS = (
   "django.contrib.staticfiles.finders.FileSystemFinder",
@@ -105,7 +105,6 @@ INSTALLED_APPS = (
     'compressor',
     'google_analytics',
     'pagination',
-    'sorl.thumbnail',
     'clear_cache'
 )
 
@@ -191,11 +190,6 @@ DJANGO_BUILTIN_TAGS = (
     'native_tags.templatetags.native',
 )
 NATIVE_TAGS = ()
-
-THUMBNAIL_UPSCALE = True
-THUMBNAIL_QUALITY = 100
-THUMBNAIL_DEBUG = True
-THUMBNAIL_FORMAT = 'PNG'
 
 #Loading details settings
 LOADING_LINES = 5
