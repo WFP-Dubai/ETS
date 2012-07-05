@@ -1022,7 +1022,7 @@ class Waybill( ld_models.Model ):
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
                                      errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
-                                     ).resize((200, 200))
+                                     ).resize((400, 400))
         image.save(file_out, 'GIF')
         file_out.reset()
         
