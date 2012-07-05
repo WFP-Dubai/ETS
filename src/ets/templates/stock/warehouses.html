@@ -11,11 +11,10 @@
   <thead>
     <tr>
       <th>{% trans "Code" %}</th>
-      <th>{% trans "Warehouse Title" %}</th>
+      <th>{% trans "Title" %}</th>
       <th>{% trans "Location" %}</th>
       <th>{% trans "Organization" %}</th>
       <th>{% trans "Compas" %}</th>
-      <th>{% trans "Compas (text)" %}</th>
       <th>{% trans "Init Data" %}</th>
     </tr>
   </thead>
@@ -40,7 +39,7 @@
         "bServerSide": true,
         "sAjaxSource": "{% url table_warehouses %}",
         "aoColumnDefs": [
-          { "bSearchable": false, "bSortable": false, "aTargets": [ 6 ] }
+          { "bSearchable": false, "bSortable": false, "aTargets": [ 5 ] }
         ]
     });
     $(".export_links a").click( function(){
