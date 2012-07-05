@@ -57,9 +57,7 @@
 			</table>
 		</td>
 		<td class="thumb" style="width:200px;">
-			{% thumbnail object.barcode '400x400' as im %}
-			<img class="barcode" alt="barcode" src="{{ im.url }}" width="200" height="200"/>
-			{% endthumbnail %}
+          <img class="barcode" alt="barcode" src="{{ MEDIA_URL }}{{ object.barcode }}" width="200" height="200"/>
 		</td>
 	</tr>
 </table>
