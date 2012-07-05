@@ -863,10 +863,10 @@ class Waybill( ld_models.Model ):
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
         if self.pk:
-            self.barcode.save("%s.png" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
         super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
         if not self.barcode:
-            self.barcode.save("%s.png" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
             super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
     def clean(self):
@@ -1022,8 +1022,8 @@ class Waybill( ld_models.Model ):
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
                                      errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
-                                     ).resize((400, 400))
-        image.save(file_out, 'PNG')
+                                     ).resize((200, 200))
+        image.save(file_out, 'GIF')
         file_out.reset()
         
         #name = "%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date)
