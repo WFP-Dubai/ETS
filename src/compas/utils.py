@@ -1,4 +1,5 @@
 
+from django.conf import settings
 from django.db import connections
 from django.core.exceptions import ValidationError
 from django.utils.encoding import force_unicode
@@ -27,32 +28,33 @@ def reduce_compas_errors(error_messages):
     
     return errors
 
-try:
+def call_db_procedure(name, parameters, using):
+    
+    connection = connections[using]
+    
+    if connection.vendor != 'oracle':
+        return
+    
     import cx_Oracle
+    cursor = connection.cursor()
     
-    def call_db_procedure(name, parameters, using):
-        cursor = connections[using].cursor()
-        
-        cursor.execute("Set role epic_all identified by writeon;")
-        
-        Response_Message = cursor.var(cx_Oracle.STRING, 2000).var
-        Response_Code = cursor.var(cx_Oracle.STRING, 1).var
-        cursor.callproc( name, (Response_Message, Response_Code)+parameters)
-        
-        if Response_Code.getvalue() != 'S':
-            errors = reduce_compas_errors(Response_Message.getvalue())
+    cursor.execute("Set role epic_all identified by writeon;")
+    
+    Response_Message = cursor.var(cx_Oracle.STRING, 2000).var
+    Response_Code = cursor.var(cx_Oracle.STRING, 1).var
+    cursor.callproc( name, (Response_Message, Response_Code)+parameters)
+    
+    if Response_Code.getvalue() != 'S':
+        errors = reduce_compas_errors(Response_Message.getvalue())
 
-            raise ValidationError(errors, code=Response_Code.getvalue())
-    
-    def get_version(using):
-        cursor = connections[using].cursor()
-        return cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
-    
-except ImportError:
-    
-    def call_db_procedure(name, parameters, using):
-        pass
+        raise ValidationError(errors, code=Response_Code.getvalue())
 
-
-    def get_version(using):
+def get_version(using):
+    connection = connections[using]
+    
+    if connection.vendor != 'oracle':
         return '1.3'
+    
+    import cx_Oracle
+    cursor = connection.cursor()
+    return cursor.callfunc("ets_compas.get_version", cx_Oracle.STRING)
