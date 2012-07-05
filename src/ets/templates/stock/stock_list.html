@@ -6,11 +6,11 @@
 {% block content %}
 <a href='{% url warehouses_list %}'>{% trans "Back to list of warehouses" %}</a>
 <h3>{% trans "Stock List of" %} {{ object.name }} ({{ object.pk }})</h3>
+<p><a href='{% url export_warehouse_file data_type="data" warehouse=object.code %}'>{% trans "Download Initial Data" %}</a></p>
 <p>
   {% trans "Location" %}: <strong>{{ object.location.name }}</strong>, 
   {% trans "Organization" %}: <strong>{{ object.organization.name }}</strong>, 
   {% trans "COMPASS" %}: <strong>{% if object.compas %}{{ object.compas }}{% else %}{{ object.compas_text }}{% endif %}</strong>,
-  <a href='{% url export_warehouse_file data_type="data" warehouse=object.code %}'>{% trans "Download Initial Data" %}</a>
 </p>
 
 <table cellpadding="0" cellspacing="0" border="0" class="stocklist display">
