@@ -184,7 +184,7 @@ urlpatterns = patterns("ets.views",
         "queryset": ets.models.Warehouse.get_active_warehouses(),
         "template_name": 'stock/stock_list.html',
         "extra_context": {
-            "good_quality": ets.models.StockItem.GOOD_QUALITY,
+            "good_quality": ets.models.StockItem.GOOD_QUALITY_LABEL,
     }}, 'stock_list'),
     ( r'^datatables/warehouses/$', 'table_warehouses', {
         'queryset': ets.models.Warehouse.get_active_non_empty_warehouses(),

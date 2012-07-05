@@ -378,9 +378,10 @@ class StockItem( models.Model ):
     """
     
     GOOD_QUALITY = 'G'
+    GOOD_QUALITY_LABEL = _("Good")
     
     QUALITY_CHOICE = (
-        (GOOD_QUALITY, u'Good'), 
+        (GOOD_QUALITY, GOOD_QUALITY_LABEL), 
         ('D', u'Damaged'), 
         ('S', u'Spoiled'), 
         ('U', u'Unavailable'),
@@ -452,7 +453,7 @@ class StockItem( models.Model ):
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
         return  "%.3f (MT)" % (self.get_order_item(order_pk).tonnes_left())
-
+        
     
 class LossDamageType(models.Model):
     """

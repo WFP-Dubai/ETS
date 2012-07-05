@@ -558,7 +558,7 @@ def stock_items(request, template_name, queryset):
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name,
-                       extra_context={ "good_quality": ets.models.StockItem.GOOD_QUALITY })
+                       extra_context={ "good_quality": ets.models.StockItem.GOOD_QUALITY_LABEL })
 
 def table_stock_items(request, warehouse_pk=None, param_name=None):
     """Ajax view that returns list of stock items for using in datatables"""
