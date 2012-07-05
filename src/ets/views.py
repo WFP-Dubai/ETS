@@ -597,9 +597,8 @@ def table_warehouses(request, queryset=ets.models.Warehouse):
         1: 'name',
         2: 'location__name',
         3: 'organization__name',
-        4: 'compas__code',
-        5: 'compas_text',
-        6: 'code'
+        4: 'compas_text',
+        5: 'code'
     }
 
     redirect_url = get_api_url(request, column_index_map, "api_warehouses")
@@ -608,10 +607,9 @@ def table_warehouses(request, queryset=ets.models.Warehouse):
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.code),
-        fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.name),
+        item.name,
         item.location.name,
         item.organization and item.organization.name or '',
-        item.compas and item.compas.code or '',
         item.compas_text,
         fill_link(reverse('export_warehouse_file', kwargs={ 'data_type': "data", 'warehouse': item.code }), _('download')),
     ])
