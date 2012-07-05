@@ -11,7 +11,11 @@ from django.template import RequestContext
 def render_to_pdf(request, template_name, context, file_name):
     """Renders template with context to HTML, than to PDF"""
 
-    context_dict = {"STATIC_URL": settings.STATIC_URL}
+    context_dict = {
+        "STATIC_URL": settings.STATIC_URL,
+        "MEDIA_URL": settings.MEDIA_URL, 
+        "is_pdf": True
+    }
     context_dict.update(context)
 
     html = render_to_string(template_name, context_dict, RequestContext(request))
