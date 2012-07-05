@@ -536,7 +536,7 @@ def deserialize(request, form_class=WaybillScanForm):
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
             if request.GET.get("receipt",""):
-                return redirect("%s?scanned_code=%s" % (reverse('waybill_reception_scanned'), data))
+                return redirect('waybill_reception_scanned', waybill_pk=waybill.pk)
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Incorrect Data !!!! Ensure a valid barcode information is pasted'))

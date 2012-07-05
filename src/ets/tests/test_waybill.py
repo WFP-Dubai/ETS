@@ -473,7 +473,7 @@ class WaybillTestCase(TestCaseMixin, TestCase):
         #Test receipt get request
         self.client.login(username='recepient', password='recepient')
         response = self.client.get(reverse('deserialize'), data={'data': data, 'receipt': 'Receipt Waybill'})
-        self.assertRedirects(response, "%s?scanned_code=%s" % (reverse('waybill_reception_scanned'), data)) 
+        self.assertRedirects(response, reverse('waybill_reception_scanned', kwargs={'waybill_pk': self.reception_waybill.pk}))
 
     def test_waybill_reception_scanned(self):
         """ets.views.waybill_reception_scanned"""
