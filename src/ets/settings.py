@@ -39,7 +39,7 @@ SERVE_STATIC = True
 
 SERVE_STATIC = True
 
-DEFAULT_FILE_STORAGE = 'ets.storage.RewriteFileSystemStorage'
+#DEFAULT_FILE_STORAGE = 'ets.storage.RewriteFileSystemStorage'
 
 STATICFILES_FINDERS = (
   "django.contrib.staticfiles.finders.FileSystemFinder",
