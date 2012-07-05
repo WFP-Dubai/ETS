@@ -105,7 +105,6 @@ INSTALLED_APPS = (
     'compressor',
     'google_analytics',
     'pagination',
-    'sorl.thumbnail',
     'clear_cache'
 )
 
@@ -191,11 +190,6 @@ DJANGO_BUILTIN_TAGS = (
     'native_tags.templatetags.native',
 )
 NATIVE_TAGS = ()
-
-THUMBNAIL_UPSCALE = True
-THUMBNAIL_QUALITY = 98
-THUMBNAIL_DEBUG = True
-THUMBNAIL_FORMAT = 'JPEG'
 
 #Loading details settings
 LOADING_LINES = 5

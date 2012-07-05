@@ -3,7 +3,9 @@ import decimal, cStringIO, pyqrcode
 #from urllib import urlencode
 from itertools import chain
 from functools import wraps
-from datetime import datetime, date, timedelta
+from datetime import datetime, date
+import random
+from PIL import Image
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -14,11 +16,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
-from django.db.models.aggregates import Max
 from django.core.cache import cache
 from django.db.models.aggregates import Count
 
-from sorl.thumbnail.fields import ImageField
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
 import logicaldelete.models as ld_models
@@ -844,9 +844,9 @@ class Waybill( ld_models.Model ):
     receipt_validated = models.BooleanField(_("eWaybill Receipt Validated"), default=False, db_index=True) #waybillReceiptValidated
     receipt_sent_compas = models.DateTimeField(_("eWaybill Reciept Sent to Compas"), blank=True, null=True, db_index=True)
     
-    barcode = ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
+    barcode = models.ImageField(_("Image"), upload_to=lambda instance, file_name: instance.default_update_to(file_name),
                        blank=True, null=True,
-                       max_length=255,)
+                       max_length=255, editable=False)
     
     objects = ld_models.managers.LogicalDeletedManager()
     
@@ -870,10 +870,10 @@ class Waybill( ld_models.Model ):
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
         if self.pk:
-            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
         super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
         if not self.barcode:
-            self.barcode.save("%s.jpg" % self.pk, self.barcode_qr(), save=False)
+            self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
             super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
     def clean(self):
@@ -1028,14 +1028,16 @@ class Waybill( ld_models.Model ):
         file_out = cStringIO.StringIO()
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
-                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L)
-        image.save(file_out, 'PNG')
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
+                                     ).resize((460, 460), Image.CUBIC)
+        image.save(file_out, 'GIF')
         file_out.reset()
-        
-        #name = "%s-%s-%s.jpeg" % (self.pk, self.transport_dispach_signed_date, self.receipt_signed_date)
         
         return ContentFile(file_out.read())
     
+    def get_nocached_barcode(self):
+        """Returns full barcode url and prevents cache"""
+        return "%s?hash=%s" % (self.barcode.url, random.random())
     
     @classmethod
     def dispatches(cls, user):
