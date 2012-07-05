@@ -611,7 +611,7 @@ def table_warehouses(request, queryset=ets.models.Warehouse):
         fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.name),
         item.location.name,
         item.organization and item.organization.name or '',
-        item.compas.code,
+        item.compas and item.compas.code or '',
         item.compas_text,
         fill_link(reverse('export_warehouse_file', kwargs={ 'data_type': "data", 'warehouse': item.code }), _('download')),
     ])
