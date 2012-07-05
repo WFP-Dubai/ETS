@@ -171,29 +171,23 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         self.assertEqual(len(list(dict_reader)), 7)
         
-        #Test user with special permissions
-        user = User.objects.get(username="admin")
-        user.is_superuser = False
-        user.save()
-        
-        user.user_permissions.add(Permission.objects.get(codename="stockitem_api_full_access"))
-        
-        response = self.client.get(reverse("api_stock_items"))
-        result = StringIO.StringIO(response.content)
-        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
-        self.assertEqual(len(list(dict_reader)), 7)
-    
     def test_warehouses(self):
         
         # All stock items
         response = self.client.get(reverse("api_warehouses"))
         self.assertContains(response, "ISBX002", status_code=200)
         self.assertEqual(response["Content-Type"], "application/csv")
+        
         # Stock items for one warehouse
         result = StringIO.StringIO(response.content)
         dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
         item = dict_reader.next()
         self.assertEqual(item['code'], "ISBX002")
+        
+        #Test returned excel file
+        response = self.client.get(reverse("api_warehouses", kwargs={"format": 'excel'}))
+        self.assertContains(response, "ISBX002", status_code=200)
+        self.assertEqual(response["Content-Type"], "application/excel")
         
     def test_table_stock_items(self):
         # All stock items
@@ -215,6 +209,29 @@ class ApiServerTestCase(TestCaseMixin, TestCase):
 
         # Stock items in excel
         response = self.client.get("?".join([reverse("api_stock_items", kwargs={'format': 'excel', "warehouse": warehouse.pk}), params.urlencode()]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/excel")
+
+    def test_table_warehouses(self):
+        self.client.login(username="admin", password="admin")
+        # All warehouses
+        params = QueryDict('', mutable=True)
+        _params = {
+            'sSearch': "",
+            'sortable': "start_date"
+        }
+        params.update(_params)
+        response = self.client.get("?".join([reverse("api_warehouses"), params.urlencode()]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "application/csv")
+        result = StringIO.StringIO(response.content)
+        dict_reader = csv.DictReader(result, dialect=csv.excel_tab)
+        item = dict_reader.next()
+        self.assertEqual(item['code'], "ISBX002")
+        self.assertEqual(len(list(dict_reader)), 2)
+
+        # Warehouses in excel
+        response = self.client.get("?".join([reverse("api_warehouses", kwargs={'format': 'excel'}), params.urlencode()]))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], "application/excel")
 

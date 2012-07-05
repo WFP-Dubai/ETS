@@ -415,8 +415,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'formset': loading_formset,
         'waybill': waybill,
     })
-
-
+   
 @person_required
 def waybill_reception_scanned(request, scanned_code, queryset):
     """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
@@ -425,7 +424,6 @@ def waybill_reception_scanned(request, scanned_code, queryset):
     if not waybill:
         raise Http404
     return waybill_reception(request, waybill.pk, queryset)
-
 
 @dispatcher_required
 @dispatch_view
@@ -531,7 +529,7 @@ def deserialize(request, form_class=WaybillScanForm):
         waybill = ets.models.Waybill.decompress(data)
         if waybill:
             if request.GET.get("receipt",""):
-                return redirect('waybill_reception_scanned', scanned_code=data )
+                return redirect('waybill_reception_scanned', scanned_code=data)
             return waybill_detail(request, waybill)
 
     messages.error(request, _('Incorrect Data !!!! Ensure a valid barcode information is pasted'))
@@ -549,17 +547,20 @@ barcode_qr.authentication = False
 
 def stock_items(request, template_name, queryset):
     """Listing of stock items splitted by warehouses."""
-    if not request.user.has_perm("ets.stockitem_api_full_access"):
+    if not request.user.is_superuser:
         queryset = queryset.filter(Q(persons__pk=request.user.pk) | Q(compas__officers=request.user))
-    good_quality = ( value for key, value in ets.models.StockItem.QUALITY_CHOICE if key == ets.models.StockItem.GOOD_QUALITY ).next()
     
     return object_list(request, queryset, paginate_by=5, template_name=template_name,
-                       extra_context={ "good_quality": good_quality })
+                       extra_context={ "good_quality": ets.models.StockItem.GOOD_QUALITY_LABEL })
 
-def table_stock_items(request, param_name):
+def table_stock_items(request, warehouse_pk=None, param_name=None):
     """Ajax view that returns list of stock items for using in datatables"""
-    warehouse_pk = request.GET.get(param_name)
+
+    if not warehouse_pk:
+        warehouse_pk = request.GET.get(param_name)
+
     warehouse = get_object_or_404(ets.models.Warehouse, pk=warehouse_pk)
+        
     column_index_map = {
         0: 'commodity__name',
         1: 'project_number',
@@ -588,6 +589,32 @@ def table_stock_items(request, param_name):
         item.quantity_gross,
     ])
 
+def table_warehouses(request, queryset=ets.models.Warehouse):
+    """Ajax view that returns list of warehouses for using in datatables"""
+
+    column_index_map = {
+        0: 'code',
+        1: 'name',
+        2: 'location__name',
+        3: 'organization__name',
+        4: 'compas__code',
+        5: 'compas_text',
+        6: 'code'
+    }
+
+    redirect_url = get_api_url(request, column_index_map, "api_warehouses")
+    if redirect_url:
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+
+    return get_datatables_records(request, queryset, column_index_map, lambda item: [
+        fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.code),
+        fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.name),
+        item.location.name,
+        item.organization.name,
+        item.compas.code,
+        item.compas_text,
+        fill_link(reverse('export_warehouse_file', kwargs={ 'data_type': "data", 'warehouse': item.code }), _('download')),
+    ])
 
 @person_required
 @warehouse_related
@@ -769,21 +796,3 @@ class ImportData(FormView):
                              _('File has been imported successfully. Totally saved objects --> %s' % total))
         
         return self.get(self.request)
-
-@officer_required
-def installation_data(request, template_name="stock/warehouse_list.html", form_class=WaybillSearchForm):
-    """Allows download installation file and initial COMPAS data"""
-    form = form_class(request.GET or None)
-    compas_stations = request.user.compases.all().values_list('code')
-    
-    queryset = ets.models.Warehouse.get_active_warehouses().order_by("compas__code", "code")
-    
-    if not request.user.is_superuser:
-        queryset.filter(compas__in=compas_stations)
-
-    if form.is_valid():
-        search_string = form.cleaned_data['q']
-        queryset = queryset.filter(Q(pk__icontains=search_string) | Q(name__icontains=search_string) | Q(location__name__icontains=search_string))
-    
-    return object_list(request, queryset.order_by("compas", "name"), extra_context = { "form" : form },
-                       paginate_by=settings.PAGINATION_DEFAULT_PAGINATION, template_name=template_name)

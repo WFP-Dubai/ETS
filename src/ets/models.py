@@ -17,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.core.cache import cache
+from django.db.models.aggregates import Count
 
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
@@ -215,7 +216,7 @@ class Warehouse(models.Model):
         """Returns active warehouses"""
         return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
                       .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
-    
+
     @classmethod
     def get_warehouses(cls, location, organization=None):
         """Returns warehouses related to location or organization"""
@@ -226,7 +227,7 @@ class Warehouse(models.Model):
             return queryset.filter(organization=organization)
         
         return queryset
-            
+
     #===================================================================================================================
     # @classmethod
     # def filter_by_user(cls, user):
@@ -371,9 +372,10 @@ class StockItem( models.Model ):
     """
     
     GOOD_QUALITY = 'G'
+    GOOD_QUALITY_LABEL = _("Good")
     
     QUALITY_CHOICE = (
-        (GOOD_QUALITY, u'Good'), 
+        (GOOD_QUALITY, GOOD_QUALITY_LABEL), 
         ('D', u'Damaged'), 
         ('S', u'Spoiled'), 
         ('U', u'Unavailable'),
@@ -445,7 +447,7 @@ class StockItem( models.Model ):
     def get_order_quantity(self, order_pk):
         """Retrieves stock items for current order item through warehouse"""
         return  "%.3f (MT)" % (self.get_order_item(order_pk).tonnes_left())
-
+        
     
 class LossDamageType(models.Model):
     """
@@ -1001,8 +1003,8 @@ class Waybill( ld_models.Model ):
     @classmethod
     def decompress(cls, data):
         wb_serialized = decompress_json(data)
+
         if wb_serialized:
-            
             waybill = None
             for obj in serializers.deserialize("json", wb_serialized, parse_float=decimal.Decimal):
                 #Save object if it does not exist
