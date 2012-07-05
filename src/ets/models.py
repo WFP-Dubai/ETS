@@ -5,6 +5,7 @@ from itertools import chain
 from functools import wraps
 from datetime import datetime, date
 import random
+from PIL import Image
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -859,10 +860,6 @@ class Waybill( ld_models.Model ):
     def get_absolute_url(self):
         return ('waybill_view', (), {'waybill_pk': self.pk})
     
-    def get_barcode(self):
-        """Returns full barcode url and prevents cache"""
-        return "%s%s?hash=%s" % (settings.MEDIA_URL, self.barcode, random.random())
-    
     def save(self, force_insert=False, force_update=False, using=None):
         self.date_modified = datetime.now()
         if self.pk:
@@ -1025,12 +1022,15 @@ class Waybill( ld_models.Model ):
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
                                      errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
-                                     )#.resize((400, 400))
+                                     ).resize((910, 910), Image.BILINEAR)
         image.save(file_out, 'GIF')
         file_out.reset()
         
         return ContentFile(file_out.read())
     
+    def get_barcode(self):
+        """Returns full barcode url and prevents cache"""
+        return "%s%s?hash=%s" % (settings.MEDIA_URL, self.barcode, random.random())
     
     @classmethod
     def dispatches(cls, user):
