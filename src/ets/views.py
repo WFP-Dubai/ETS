@@ -418,13 +418,18 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
 
 
 @person_required
-def waybill_reception_scanned(request, queryset):
+def waybill_reception_scanned(request, queryset, waybill_pk=None):
     """Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill"""
-    scanned_code = request.GET.get('scanned_code', '')
-    waybill = ets.models.Waybill.decompress(scanned_code)
-    if not waybill:
-        raise Http404
+    if waybill_pk:
+        waybill = ets.models.Waybill.objects.get(pk=waybill_pk)
+    else:
+        scanned_code = request.GET.get('scanned_code', '')
+        waybill = ets.models.Waybill.decompress(scanned_code)
+        if not waybill:
+            raise Http404
+        return redirect('waybill_reception_scanned', waybill_pk=waybill.pk)
     return waybill_reception(request, waybill.pk, queryset)
+    
 
 
 @dispatcher_required

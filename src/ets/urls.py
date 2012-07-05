@@ -74,9 +74,12 @@ urlpatterns = patterns("ets.views",
         }
     }, "waybill_reception_list" ),
 
-    ( r'^waybill/scanned_receive/$', "waybill_reception_scanned", {
+    ( r'^waybill/scanned_receive/(?P<waybill_pk>[-\w]+)/$', "waybill_reception_scanned", {
         'queryset': ets.models.Waybill.objects.filter(transport_dispach_signed_date__isnull=False, 
                                                       receipt_signed_date__isnull=True)
+    }, "waybill_reception_scanned"),
+    ( r'^waybill/scanned_receive/$', "waybill_reception_scanned", {
+        'queryset': ets.models.Waybill.objects.none()
     }, "waybill_reception_scanned"),
 
     ( r'^waybill/(?P<waybill_pk>[-\w]+)/$', 'waybill_view', {
