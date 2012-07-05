@@ -1021,8 +1021,8 @@ class Waybill( ld_models.Model ):
         file_out = cStringIO.StringIO()
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
-                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L)
-        image.resize((400, 400))
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
+                                     ).resize((400, 400))
         image.save(file_out, 'PNG')
         file_out.reset()
         
