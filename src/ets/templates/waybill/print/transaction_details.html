@@ -57,7 +57,10 @@
 			</table>
 		</td>
 		<td class="thumb" style="width:200px;">
-		  <img class="barcode" alt="barcode" src="{{ object.get_barcode }}" width="200" height="200"/>
+		  <img class="barcode" alt="barcode" 
+            width="200" height="200"
+            src="{% if is_pdf %}{{ object.barcode.url }}{% else %}{{ object.get_nocached_barcode }}{% endif %}"
+          />
 		</td>
 	</tr>
 </table>
