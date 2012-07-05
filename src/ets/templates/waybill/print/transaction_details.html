@@ -1,4 +1,4 @@
-{% load extra_tags thumbnail cache i18n %}
+{% load extra_tags cache i18n %}
 <table id="general_wrapper">
 	<thead>
 		<tr>
@@ -57,7 +57,10 @@
 			</table>
 		</td>
 		<td class="thumb" style="width:200px;">
-		  <img class="barcode" alt="barcode" src="{{ MEDIA_URL }}{{ object.barcode }}" width="200" height="200"/>
+		  <img class="barcode" alt="barcode" 
+            width="200" height="200"
+            src="{% if is_pdf %}{{ object.barcode.url }}{% else %}{{ object.get_nocached_barcode }}{% endif %}"
+          />
 		</td>
 	</tr>
 </table>
