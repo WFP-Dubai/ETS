@@ -1,6 +1,6 @@
 ### -*- coding: utf-8 -*- ####################################################
 
-import base64, pylzma, py7zlib
+import base64, pylzma, py7zlib, zlib
 
 COMPRESS_MAPPING = (
     ('"_order":', '"_o":'),
@@ -128,15 +128,14 @@ def compress_json(data):
     """Replaces all long field names with short ones, than compresses it with zlib and base64"""
     for full_field, cut_field in COMPRESS_MAPPING:
         data = data.replace(full_field, cut_field)
-    
-    return base64.b64encode( pylzma.compress( data ) )
+
+    return base64.urlsafe_b64encode( pylzma.compress( data ) )
 
 
 def decompress_json(data):
     """Replaces all short abbreviations with real field names"""
-    
     try:
-        data = pylzma.decompress( base64.b64decode( data ) )
+        data = pylzma.decompress( base64.urlsafe_b64decode( str(data) ) )
     except (py7zlib.ArchiveError, TypeError):
         return
     else:

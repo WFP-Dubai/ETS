@@ -12,7 +12,7 @@ from piston.resource import Resource
 from piston.doc import documentation_view
 from piston.authentication import HttpBasicAuthentication
 
-from ets.api.handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadCSVWarehouseHandler
+from ets.api.handlers import ReadLoadingDetailHandler, ReadStockItemsHandler, ReadWarehouseHandler
 from ets.api.handlers import ReadOrdersHandler, ReadOrderItemsHandler, ReadWaybillHandler
 
 
@@ -48,6 +48,7 @@ CSV_WH_HEADERS = {'Content-Disposition': 'attachment; filename=warehouses-%s.csv
 EXCEL_WAYBILLS_HEADERS = {'Content-Disposition': 'attachment; filename=waybills-%s.xls' % datetime.date.today() }
 EXCEL_ORDERS_HEADERS = {'Content-Disposition': 'attachment; filename=orders-%s.xls' % datetime.date.today() }
 EXCEL_STOCK_ITEMS_HEADERS = {'Content-Disposition': 'attachment; filename=stock-items-%s.xls' % datetime.date.today() }
+EXCEL_WH_HEADERS = {'Content-Disposition': 'attachment; filename=warehouses-%s.xls' % datetime.date.today() }
 
 FORMAT_CSV = {'emitter_format': 'csv'}
 FORMAT_EXCEL = {'emitter_format': 'excel'}
@@ -71,13 +72,13 @@ stock_items_resource_basic = ExpandedResource(ReadStockItemsHandler,
                                               authentication=authentication, 
                                               headers=CSV_STOCK_ITEMS_HEADERS) 
 
-warehouses_resource = login_required(expand_response(Resource(ReadCSVWarehouseHandler), CSV_WH_HEADERS))
+warehouses_resource = login_required(expand_response(Resource(ReadWarehouseHandler), CSV_WH_HEADERS))
 
 
 waybills_resource_excel = login_required(expand_response(Resource(ReadWaybillHandler), EXCEL_WAYBILLS_HEADERS))
 orders_resource_excel = login_required(expand_response(Resource(ReadOrdersHandler), EXCEL_ORDERS_HEADERS))
 stock_items_resource_excel = login_required(expand_response(Resource(ReadStockItemsHandler), EXCEL_STOCK_ITEMS_HEADERS))
-
+warehouses_resource_excel = login_required(expand_response(Resource(ReadWarehouseHandler), EXCEL_WH_HEADERS))
 
 urlpatterns = patterns('',
 
@@ -176,6 +177,7 @@ urlpatterns = patterns('',
     (r'^stock_items/basic/$', stock_items_resource_basic, FORMAT_CSV, "api_stock_items_basic_auth"),
     
     #Warehouses
+    (r'^warehouses/(?P<format>excel)/$', warehouses_resource_excel, FORMAT_EXCEL, "api_warehouses"),
     (r'^warehouses/$', warehouses_resource, FORMAT_CSV, "api_warehouses"),
     
     (r'^docs/$', documentation_view),

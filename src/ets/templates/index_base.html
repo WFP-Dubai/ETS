@@ -38,7 +38,6 @@
   <li><a href="{% url compas_waybill_receipt %}">{% trans "View Received eWaybills Submitted to COMPAS" %}</a></li>
 
   <!-- <li><a href="{# url synchronization #}">{% trans "Synchronization with offline instances" %}</a></li> -->
-  <li><a href="{% url installation_data %}">{% trans "Download Offliner" %}</a></li>
 </ul>  
 {% endofficer_only %}
 
@@ -64,7 +63,7 @@
 {% endif %}
 
 <ul>
-  <li><a href="{% url view_stock %}">{% trans "View Stock Items" %}</a></li>
+  <li><a href="{% url warehouses_list %}">{% trans "Warehouses" %}</a></li>
   <li><a href="{% url select_report %}">{% trans "Generate Reports in CSV Format" %}</a></li>
 </ul>
   
