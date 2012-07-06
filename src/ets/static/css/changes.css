@@ -137,3 +137,7 @@ dl.warehouse-list dd {
   height:35px;
   width:35px;
 }
+
+.dataTables_processing { 
+  color: black;
+}
