@@ -607,7 +607,7 @@ def get_compas_data(compas=None, warehouse=None):
     if compas is not None:
         compas_stations = ets_models.Compas.objects.filter(pk=compas)
 
-    if warehouse:
+    if warehouse and warehouse.compas:
         compas_stations = compas_stations.filter(pk=warehouse.compas.pk)
 
     warehouses = ets_models.Warehouse.objects.filter(Q(end_date__gt=date.today) | Q(end_date__isnull=True), 

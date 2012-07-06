@@ -172,9 +172,9 @@ urlpatterns = patterns('',
     (r'^stock_items/(?P<format>excel)/$', stock_items_resource_excel, FORMAT_EXCEL, "api_stock_items"),
     
     # For StockItems CSV API
-    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     (r'^stock_items/basic/$', stock_items_resource_basic, FORMAT_CSV, "api_stock_items_basic_auth"),
+    (r'^stock_items/(?P<warehouse>[-\w]+)/$', stock_items_resource, FORMAT_CSV, "api_stock_items"),
     
     #Warehouses
     (r'^warehouses/(?P<format>excel)/$', warehouses_resource_excel, FORMAT_EXCEL, "api_warehouses"),
