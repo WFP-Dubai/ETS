@@ -117,10 +117,10 @@ $(document).ready(function() {
               if (confirm('{% trans "Confirm validation?" %}')) {
                   data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
                   $.post($(this).attr("href"), data, function(message){
+                      oTableTop.fnDraw();
+                      oTableBottom.fnDraw();
                       alert(message, "success");
                   });
-                  oTableTop.fnDraw();
-                  oTableBottom.fnDraw();
               };
               validated_tr = $(this).closest('tr');
               validated_tr.loadIndicator();
