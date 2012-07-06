@@ -73,12 +73,16 @@ $(document).ready(function() {
       "aoColumnDefs": [
           { "bSearchable": false, "bSortable": false, "bVisible": false, "aTargets": [ 7, 8 ] }
       ],
+      "fnPreDrawCallback": function( oSettings ) {
+          $(this).addClass('ajax-loading');
+      },
       "fnDrawCallback": function( oSettings ) {
           if (oSettings.aoData.length > 0) {
               $(".submit-form").show();
           } else {
               $(".submit-form").hide();
           };
+          $(this).removeClass('ajax-loading');
       }
   });
   var oTableTop = $("#toplist").dataTable({
@@ -93,6 +97,9 @@ $(document).ready(function() {
               nRow.className +=' red';
           };
           return nRow;
+      },
+      "fnPreDrawCallback": function( oSettings ) {
+          $(this).addClass('ajax-loading');
       },
       "fnDrawCallback": function( oSettings ) {
           $(".error-link").click(function(){
@@ -110,12 +117,15 @@ $(document).ready(function() {
           $('.validate-link').click(function(){
               if (confirm('{% trans "Confirm validation?" %}')) {
                   data = {'csrfmiddlewaretoken': '{{ csrf_token }}'};
-                  $.post($(this).attr("href"), data);
+                  $.post($(this).attr("href"), data, function(message){
+                      alert(message, "success");
+                  });
                   oTableTop.fnDraw();
                   oTableBottom.fnDraw();
               };
               return false;
           }); 
+          $(this).removeClass('ajax-loading');
       }
   });
   $("#error_list").overlay({
