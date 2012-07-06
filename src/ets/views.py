@@ -485,14 +485,13 @@ def validate_dispatch(request, waybill_pk, queryset):
     waybill.save()
     
     create_logentry(request, waybill, LOGENTRY_VALIDATE_DISPATCH)
-    
-    messages.add_message(request, messages.INFO, 
-                        _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
-                            'waybill': waybill.pk,
-                        })
-    if request.is_ajax():
-        return HttpResponse("")
 
+    message = _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 'waybill': waybill.pk }
+
+    if request.is_ajax():
+        return HttpResponse(message)
+
+    messages.add_message(request, messages.INFO, message)
     return redirect('dispatch_validates')
 
 
@@ -507,14 +506,13 @@ def validate_receipt(request, waybill_pk, queryset):
     waybill.save()
     
     create_logentry(request, waybill, LOGENTRY_VALIDATE_RECEIVE)
-    
-    messages.add_message(request, messages.INFO, 
-                        _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 
-                            'waybill': waybill.pk,
-                        })
-    if request.is_ajax():
-        return HttpResponse("")
 
+    message = _('eWaybill %(waybill)s has been validated. It will be sent in few minutes.') % { 'waybill': waybill.pk }
+    
+    if request.is_ajax():
+        return HttpResponse(message)
+
+    messages.add_message(request, messages.INFO, message)
     return redirect('receipt_validates')
 
 
