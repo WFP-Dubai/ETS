@@ -121,9 +121,9 @@ $(document).ready(function() {
                       oTableBottom.fnDraw();
                       alert(message, "success");
                   });
+                  validated_tr = $(this).closest('tr');
+                  validated_tr.loadIndicator();
               };
-              validated_tr = $(this).closest('tr');
-              validated_tr.loadIndicator();
               return false;
           }); 
       }
