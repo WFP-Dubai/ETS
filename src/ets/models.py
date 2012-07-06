@@ -1090,11 +1090,11 @@ class LoadingDetail(models.Model):
     
     number_of_units = models.IntegerField(_("Number of Units"), db_index=True)
     
-    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3)
-    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3)
+    unit_weight_net = models.DecimalField(_("Unit weight net"), max_digits=12, decimal_places=3, default=0)
+    unit_weight_gross = models.DecimalField(_("Unit weight gross"), max_digits=12, decimal_places=3, default=0)
     
-    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=5)
-    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=5)
+    total_weight_net = models.DecimalField(_("Total weight net"), max_digits=12, decimal_places=5, default=0)
+    total_weight_gross = models.DecimalField(_("Total weight gross"), max_digits=12, decimal_places=5, default=0)
     
     total_weight_net_received = models.DecimalField(_("Total weight net received"), 
                                                     max_digits=12, decimal_places=3, default=0)
