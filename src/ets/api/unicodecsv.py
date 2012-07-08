@@ -29,7 +29,7 @@ class UnicodeWriter(object):
         self.writer.writerow([unicode(s).encode("utf-16") for s in row])
         # Fetch UTF-8 output from the queue ...
         data = self.queue.getvalue()
-        data = data.decode("utf-16")
+        data = data.decode("utf-8")
         # ... and reencode it into the target encoding
         data = data.encode(self.encoding)
         # write to the target stream
