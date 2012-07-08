@@ -290,7 +290,7 @@ class ReadStockItemsHandler(BaseHandler):
 
         if request.GET.has_key('sSearch'):
             stock_items = get_datatables_filtering(request, stock_items)
-        elif not request.user.is_superuser:
+        elif not request.user.is_superuser and not request.user.has_perm("ets.loadingetail_api_full_access"):
             stock_items = stock_items.filter(Q(warehouse__persons__pk=request.user.pk) | Q(warehouse__compas__officers=request.user))
 
         if warehouse: 
