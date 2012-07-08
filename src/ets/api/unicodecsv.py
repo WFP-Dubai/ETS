@@ -26,7 +26,7 @@ class UnicodeWriter(object):
     
     def writerow(self, row):
         # Modified from original: now using unicode(s) to deal with e.g. ints
-        self.writer.writerow([unicode(s).encode("utf-16") for s in row])
+        self.writer.writerow([unicode(s).encode("utf-8") for s in row])
         # Fetch UTF-8 output from the queue ...
         data = self.queue.getvalue()
         data = data.decode("utf-8")
