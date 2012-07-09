@@ -59,14 +59,13 @@ class ReadWaybillHandler(BaseHandler):
         'receipt_validated', 'receipt_sent_compas',
     )
 
-    def read(self, request, slug="", warehouse="", destination="", filtering=None, format=""):
+    def read(self, request, slug="", warehouse="", destination="", filtering=None, **kwargs):
         """Return waybills in CSV"""
         waybills = self.model.objects.all()
 
         if filtering:
             officer_required = ets.models.Compas.objects.filter(officers=request.user).exists()
 
-            # 1 variant
             filter_choice = {
                 'dispatches': lambda user: self.model.dispatches(user),
                 'receptions': lambda user: self.model.receptions(user),
@@ -80,26 +79,6 @@ class ReadWaybillHandler(BaseHandler):
             }
             waybills = filter_choice[filtering](request.user)
 
-            # 2 variant
-            # if filtering == 'dispatches':
-            #     waybills = self.model.dispatches(request.user)
-            # elif filtering == 'receptions':
-            #     waybills = self.model.receptions(request.user)
-            # elif filtering == 'user_related':
-            #     waybills = waybill_user_related_filter(waybills, request.user)
-            # elif filtering == 'compas_receipt':
-            #     waybills = waybill_officer_related_filter(waybills.filter(receipt_sent_compas__isnull=False), request.user)
-            # elif filtering == 'compas_dispatch':
-            #     waybills = waybill_officer_related_filter(waybills.filter(sent_compas__isnull=False), request.user)
-            # elif filtering == 'validate_receipt' and officer_required:
-            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=False)
-            # elif filtering == 'validate_dispatch' and officer_required:
-            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=False)
-            # elif filtering == 'dispatch_validated' and officer_required:
-            #     waybills = waybills.filter(**get_dispatch_compas_filters(request.user)).filter(validated=True)
-            # elif filtering == 'receipt_validated' and officer_required:
-            #     waybills = waybills.filter(**get_receipt_compas_filters(request.user)).filter(receipt_validated=True)
-                
         elif not request.user.has_perm("ets.waybill_api_full_access"):
             waybills = waybills.filter(order__warehouse__persons__pk=request.user.pk)
 
@@ -165,7 +144,7 @@ class ReadLoadingDetailHandler(BaseHandler):
         'overloaded_units', 'over_offload_units',
     )
     
-    def read(self, request, waybill="", warehouse="", destination=""):
+    def read(self, request, waybill="", warehouse="", destination="", **kwargs):
         """Return loading details for waybills in CSV"""
         load_details = self.model.objects.all()
         
@@ -199,7 +178,7 @@ class ReadOrdersHandler(BaseHandler):
         ('location', ('code', 'name')),
     )
         
-    def read(self, request, code="", warehouse="", destination="", consignee="", format=""):
+    def read(self, request, code="", warehouse="", destination="", consignee="", **kwargs):
         """Return orders in CSV"""
 
         orders = self.model.objects.all()
@@ -244,7 +223,7 @@ class ReadOrderItemsHandler(BaseHandler):
         'number_of_units', 'lti_id',
     )
               
-    def read(self, request, order="", warehouse="", destination="", consignee=""):
+    def read(self, request, order="", warehouse="", destination="", consignee="", **kwargs):
         """Return order items in CSV"""
         order_items = self.model.objects.all()
         
@@ -283,7 +262,7 @@ class ReadStockItemsHandler(BaseHandler):
       'is_bulk', 'si_record_id', 'origin_id', 'allocation_code',
     )
         
-    def read(self, request, warehouse="", format=""):
+    def read(self, request, warehouse="", **kwargs):
         """Finds all sent waybills to provided destination"""
 
         stock_items = self.model.objects.all()
@@ -307,7 +286,7 @@ class ReadWarehouseHandler(BaseHandler):
         'code', 'name', ('location', ('name', 'country')),
     )
     
-    def read(self, request, format=""):
+    def read(self, request, **kwargs):
         """country, location. warehouse information"""
 
         warehouses = self.model.objects.all()
@@ -351,7 +330,6 @@ class CSVEmitter(Emitter):
         
         field_names = list(get_flattened_field_names(self.fields))
         header = dict(zip(field_names, field_names))
-        
         dict_writer = unicodecsv.UnicodeDictWriter(result, field_names, dialect=csv.excel_tab)
         dict_writer.writerow(header)
         dict_writer.writerows(get_flattened_data(self.construct()))
