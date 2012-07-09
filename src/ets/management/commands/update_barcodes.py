@@ -13,6 +13,9 @@ class Command(BaseCommand):
         
         total = 0
         for waybill in Waybill.objects.all():
-            waybill.save()
+            try:
+                waybill.save()
+            except:
+                pass
             if verbosity > 1:
                 print "%s\t%s" % (total, waybill.pk)
