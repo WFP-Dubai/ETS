@@ -618,15 +618,10 @@ class OrderItem(models.Model):
     
     
     @staticmethod
-    def sum_number( queryset ):
-        return queryset.aggregate(units_count=Sum('number_of_units'))['units_count'] or 0
+    def sum_number(queryset, field_name='number_of_units'):
+        return queryset.aggregate(field_sum=Sum(field_name))['field_sum'] or 0
         
 
-    @staticmethod
-    def sum_number_mt( queryset ):
-        return queryset.aggregate(units_count_mt=Sum('total_weight_net'))['units_count_mt'] or 0
-    
-    
     def get_similar_dispatches(self):
         """Returns all loading details with such item within any orders"""
         return LoadingDetail.objects.filter(waybill__transport_dispach_signed_date__isnull=False, 
@@ -646,11 +641,11 @@ class OrderItem(models.Model):
 
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
-        return self.sum_number_mt(self.stock_items())
+        return self.sum_number(self.stock_items(), 'quantity_net')
 
     def get_dispatched_not_yet_counted_of_stock(self):
         """Calculates available stocks"""
-        return self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+        return self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True), 'total_weight_net')
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
@@ -662,7 +657,7 @@ class OrderItem(models.Model):
 
     def tonnes_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
-        return self.total_weight_net - self.sum_number_mt(self.get_order_dispatches())
+        return self.total_weight_net - self.sum_number(self.get_order_dispatches(), 'total_weight_net')
     
 
 def waybill_slug_populate(waybill):
@@ -1171,7 +1166,8 @@ class LoadingDetail(models.Model):
 #            if order_item.items_left() < self.number_of_units and not self.overloaded_units:
 #                raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
             
-            available_stocks = order_item.get_available_stocks_mt() - order_item.get_dispatched_not_yet_counted_of_stock()
+            #available_stocks = order_item.get_available_stocks_mt() - order_item.get_dispatched_not_yet_counted_of_stock()
+            available_stocks = order_item.tonnes_left()
             if available_stocks < self.total_weight_net and not self.overloaded_units:
                 raise ValidationError(_("Overloaded for %.3f tons") % (self.total_weight_net - available_stocks))
             
