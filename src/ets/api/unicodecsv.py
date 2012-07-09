@@ -17,7 +17,7 @@ class UnicodeWriter(object):
     ])
     fp.close()
     """
-    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-16", **kwds):
+    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-8", **kwds):
         # Redirect output to a queue
         self.queue = StringIO.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
@@ -64,7 +64,7 @@ class UnicodeDictWriter(UnicodeWriter):
     """
     
     def __init__(self, f, fields, dialect=csv.excel_tab,
-            encoding="utf-16", **kwds):
+            encoding="utf-8", **kwds):
         super(UnicodeDictWriter, self).__init__(f, dialect, encoding, **kwds)
         self.fields = fields
     

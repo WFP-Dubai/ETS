@@ -8,7 +8,6 @@ from django.utils.datastructures import SortedDict
 from django.http import HttpResponseRedirect
 from django.forms import MediaDefiningClass
 from django.template.response import TemplateResponse
-from django.utils.translation import ugettext
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.admin.models import LogEntry
@@ -95,15 +94,25 @@ class CompasLoggerInline(admin.TabularInline):
     model = ets.models.CompasLogger
     extra = 0
     max_num = 5
+    can_delete = False
     readonly_fields = ('action', 'compas', 'waybill', 'when_attempted', 'status', 'message')
+    
+class ImportLoggerInline(admin.TabularInline):
+    model = ets.models.ImportLogger
+    extra = 0
+    max_num = 10
+    can_delete = False
+    readonly_fields = ('compas', 'when_attempted', 'status', 'message')
 
 class WaybillInline(admin.TabularInline):
     model = ets.models.Waybill
+    can_delete = False
     extra = 0
 
 class LoadingDetailsInline(admin.TabularInline):
     model = ets.models.LoadingDetail
     extra = 0
+    can_delete = False
     raw_id_fields = ('waybill', 'stock_item')
     
 
@@ -235,7 +244,7 @@ class CompasAdmin(logicaldelete.admin.ModelAdmin):
     
     list_display = ('pk', 'is_base', 'read_only', 'active')
     search_fields = list_display
-    list_filter = ('is_base', 'read_only',)
+    list_filter = ('is_base', 'read_only', 'import_logs__when_attempted', 'import_logs__status')
     readonly_fields = ('date_created', 'date_modified')
     filter_horizontal = ('officers',)
     fieldsets = (
@@ -244,6 +253,7 @@ class CompasAdmin(logicaldelete.admin.ModelAdmin):
         (_('Dates'), {'fields': ('date_created', 'date_modified', 'date_removed',)}),
     )
     actions = None
+    inlines = (ImportLoggerInline, CompasLoggerInline)
 
 admin.site.register( ets.models.Compas, CompasAdmin )
 
@@ -362,17 +372,6 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     list_filter = ('when_attempted', 'status', 'action', 'compas')
 
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
-
-
-class ImportLoggerAdmin(admin.ModelAdmin):
-    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
-    
-    list_display = ('pk', 'link_to_compas', 'when_attempted', 'status', 'message')
-    search_fields = ('compas__pk', 'message')
-    date_hierarchy = 'when_attempted'
-    list_filter = ('when_attempted', 'status', 'compas')
-
-admin.site.register(ets.models.ImportLogger, ImportLoggerAdmin)
 
 
 class LoggedUserAdmin(UserAdmin):

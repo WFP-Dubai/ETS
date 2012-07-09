@@ -34,6 +34,6 @@ class OrderTestCase(TestCaseMixin, TestCase):
         self.assertEqual(self.order.percentage, 0)
         call_command('order_percentage')
         self.order = ets.models.Order.objects.get(pk='THEIRORDER')
-        self.assertEqual(self.order.percentage, 100)
+        self.assertEqual(self.order.percentage, 4)
 
 
