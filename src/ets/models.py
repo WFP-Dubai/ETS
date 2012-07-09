@@ -5,7 +5,6 @@ from itertools import chain
 from functools import wraps
 from datetime import datetime, date
 import random
-from PIL import Image
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -17,7 +16,6 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.core.files.base import ContentFile
 from django.core.cache import cache
-from django.db.models.aggregates import Count
 
 from autoslug.fields import AutoSlugField
 from autoslug.settings import slugify
@@ -430,9 +428,6 @@ class StockItem( models.Model ):
         """Returns coi code from origin identifier"""
         return self.origin_id[7:]
     
-    def calculate_total_net(self):    
-        return self.quantity_net
-    
     def calculate_total_gross(self):
         return self.quantity_gross
 
@@ -548,22 +543,12 @@ class Order(models.Model):
     def get_stock_items(self):
         """Retrieves stock items for current order through warehouse"""
         try:
-            stockItem = chain(*(item.get_stock_items().values_list('pk', flat=True) for item in self.items.all()))
+            stockItem = chain(*(item.stock_items().values_list('pk', flat=True) for item in self.items.all()))
         except:
             return StockItem.objects.filter(pk = 0)
-        return StockItem.objects.filter(pk__in=stockItem)
+        else:
+            return StockItem.objects.filter(pk__in=stockItem)
         
-        
-    
-        #=======================================================================
-        # return StockItem.objects.filter(warehouse__orders=self,
-        #                                project_number=F('warehouse__orders__items__project_number'),
-        #                                si_code=F('warehouse__orders__items__si_code'), 
-        #                                commodity=F('warehouse__orders__items__commodity'),
-        #                                unit_weight_net=F('warehouse__orders__items__unit_weight_net'),
-        #                                ).order_by('-warehouse__orders__items__number_of_units')
-        #=======================================================================
-    
     def get_percent_executed(self):
         """Returns percent of execution"""
         return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
@@ -631,15 +616,6 @@ class OrderItem(models.Model):
                         commodity=self.commodity,
                         ).order_by('-number_of_units')
     
-    def get_stock_items(self):
-        """Retrieves stock items for current order item through warehouse"""
-        #=======================================================================
-        # if self.unit_weight_net:
-        #    return self.stock_items().filter(unit_weight_net__range=(self.unit_weight_net-ACCURACY, self.unit_weight_net+ACCURACY))
-        # else:
-        #=======================================================================
-        return self.stock_items().all()
-        
     
     @staticmethod
     def sum_number( queryset ):
@@ -648,8 +624,7 @@ class OrderItem(models.Model):
 
     @staticmethod
     def sum_number_mt( queryset ):
-    	units = queryset.aggregate(units_count_mt=Sum('total_weight_net'))['units_count_mt'] or 0
-        return units
+        return queryset.aggregate(units_count_mt=Sum('total_weight_net'))['units_count_mt'] or 0
     
     
     def get_similar_dispatches(self):
@@ -667,26 +642,15 @@ class OrderItem(models.Model):
     def get_available_stocks(self):
         """Calculates available stocks"""
         return self.sum_number(self.stock_items()) \
-                - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
+             - self.sum_number(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
 
     def get_available_stocks_mt(self):
         """Calculates available stocks"""
-        current_total_stock = 0
-        mystockitems = self.stock_items()
-        for i in mystockitems:
-            current_total_stock += i.calculate_total_net()
-        
-        
-        return current_total_stock
+        return self.sum_number_mt(self.stock_items())
 
     def get_dispatched_not_yet_counted_of_stock(self):
         """Calculates available stocks"""
-        mystockitems = self.stock_items()
-        un_stock =  self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
-        
-        return un_stock
-
-
+        return self.sum_number_mt(self.get_similar_dispatches().filter(waybill__sent_compas__isnull=True))
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
@@ -1207,8 +1171,9 @@ class LoadingDetail(models.Model):
 #            if order_item.items_left() < self.number_of_units and not self.overloaded_units:
 #                raise ValidationError(_("Overloaded for %.3f units") % (self.number_of_units - order_item.items_left(),))
             
-            if order_item.total_weight_net < self.total_weight_net and not self.overloaded_units:
-                raise ValidationError(_("Overloaded for %.3f tons") % (self.total_weight_net - order_item.total_weight_net))
+            available_stocks = order_item.get_available_stocks_mt() - order_item.get_dispatched_not_yet_counted_of_stock()
+            if available_stocks < self.total_weight_net and not self.overloaded_units:
+                raise ValidationError(_("Overloaded for %.3f tons") % (self.total_weight_net - available_stocks))
             
             if self.overloaded_units and not self.waybill.dispatch_remarks:
                 raise ValidationError(_("Since you set 'overloaded' flag 'Dispatch Remarks' field becomes required."))
