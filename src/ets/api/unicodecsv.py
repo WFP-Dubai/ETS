@@ -17,7 +17,7 @@ class UnicodeWriter(object):
     ])
     fp.close()
     """
-    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-8", **kwds):
+    def __init__(self, f, dialect=csv.excel_tab, encoding="utf-16", **kwds):
         # Redirect output to a queue
         self.queue = StringIO.StringIO()
         self.writer = csv.writer(self.queue, dialect=dialect, **kwds)
@@ -26,10 +26,10 @@ class UnicodeWriter(object):
     
     def writerow(self, row):
         # Modified from original: now using unicode(s) to deal with e.g. ints
-        self.writer.writerow([unicode(s).encode("utf-8") for s in row])
+        self.writer.writerow([unicode(s).encode(self.encoding) for s in row])
         # Fetch UTF-8 output from the queue ...
         data = self.queue.getvalue()
-        data = data.decode("utf-8")
+        data = data.decode(self.encoding)
         # ... and reencode it into the target encoding
         data = data.encode(self.encoding)
         # write to the target stream
@@ -63,8 +63,7 @@ class UnicodeDictWriter(UnicodeWriter):
     Initially derived from http://docs.python.org/lib/csv-examples.html
     """
     
-    def __init__(self, f, fields, dialect=csv.excel_tab,
-            encoding="utf-8", **kwds):
+    def __init__(self, f, fields, dialect=csv.excel_tab, encoding="utf-16", **kwds):
         super(UnicodeDictWriter, self).__init__(f, dialect, encoding, **kwds)
         self.fields = fields
     
