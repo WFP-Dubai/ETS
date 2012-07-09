@@ -551,7 +551,7 @@ class Order(models.Model):
         
     def get_percent_executed(self):
         """Returns percent of execution"""
-        return sum(item.get_percent_executed() for item in self.items.all()) / self.items.all().count()
+        return sum(item.get_percent_executed() for item in self.items.all()) / self.items.count()
     
     def has_waybill_creation_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and self.warehouse.persons.filter(pk=user.pk).exists()
@@ -649,7 +649,7 @@ class OrderItem(models.Model):
         
     def get_percent_executed(self):
         """Calculates percent for executed"""
-        return self.number_of_units and round(100 * self.sum_number(self.get_order_dispatches()) / self.number_of_units)
+        return self.total_weight_net and round(100 * self.sum_number(self.get_order_dispatches(), 'total_weight_net') / self.total_weight_net) or 0
         
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
