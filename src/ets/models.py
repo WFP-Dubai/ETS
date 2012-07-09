@@ -653,11 +653,11 @@ class OrderItem(models.Model):
         
     def items_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
-        return self.number_of_units - self.sum_number(self.get_order_dispatches())
+        return max(0, self.number_of_units - self.sum_number(self.get_order_dispatches()))
 
     def tonnes_left( self ):
         """Calculates number of such items supposed to be delivered in this order"""
-        return self.total_weight_net - self.sum_number(self.get_order_dispatches(), 'total_weight_net')
+        return max(0, self.total_weight_net - self.sum_number(self.get_order_dispatches(), 'total_weight_net'))
     
 
 def waybill_slug_populate(waybill):
