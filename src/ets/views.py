@@ -190,7 +190,7 @@ def table_waybills(request, queryset=ets.models.Waybill.objects.all(), filtering
     params = { 'filtering': filtering } if filtering else None
     redirect_url = get_api_url(request, column_index_map, "api_waybills", params, request_params )
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.order.pk),
@@ -255,7 +255,7 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
     params = { 'filtering': filtering } if filtering else None
     redirect_url = get_api_url(request, column_index_map, "api_waybills", params)
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.order.pk),
@@ -284,7 +284,7 @@ def table_compas_waybills(request, queryset=ets.models.Waybill.objects.all(), fi
     params = { 'filtering': filtering } if filtering else None
     redirect_url = get_api_url(request, column_index_map, "api_waybills", params)
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
     
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.order.get_absolute_url(), item.order.pk),
@@ -573,7 +573,7 @@ def table_stock_items(request, warehouse_pk=None, param_name=None):
 
     redirect_url = get_api_url(request, column_index_map, "api_stock_items", { 'warehouse': warehouse.pk })
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, warehouse.stock_items.all(), column_index_map, lambda item: [
         unicode(item.commodity),
@@ -601,7 +601,7 @@ def table_warehouses(request, queryset=ets.models.Warehouse):
 
     redirect_url = get_api_url(request, column_index_map, "api_warehouses")
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(reverse('stock_list', kwargs={ 'object_id': item.code }), item.code),
@@ -634,7 +634,7 @@ def table_orders(request, queryset):
 
     redirect_url = get_api_url(request, column_index_map, "api_orders")
     if redirect_url:
-        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), mimetype='application/javascript')
+        return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
         fill_link(item.get_absolute_url(), item.code),

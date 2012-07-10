@@ -85,16 +85,6 @@ class ReadWaybillHandler(BaseHandler):
         if request.GET.has_key('sSearch'):
             waybills = get_datatables_filtering(request, waybills)
 
-        filter_arg = {}
-        if warehouse: 
-            filter_arg['order__warehouse__pk'] = warehouse
-        if destination:
-            filter_arg['destination__pk'] = destination
-        if slug:
-            filter_arg['slug'] = slug
-        if filter_arg:
-            waybills = waybills.filter(**filter_arg)
-
         return waybills
         
         
@@ -145,22 +135,12 @@ class ReadLoadingDetailHandler(BaseHandler):
     )
     
     def read(self, request, waybill="", warehouse="", destination="", **kwargs):
-        """Return loading details for waybills in CSV"""
+        """Return loading details for waybills"""
         load_details = self.model.objects.all()
         
         if not request.user.has_perm("ets.loadingetail_api_full_access"):
             load_details = load_details.filter(Q(waybill__order__warehouse__persons__pk=request.user.pk) 
                                                | Q(waybill__destination__persons__pk=request.user.pk))
-        
-        filter_arg = {}
-        if warehouse: 
-            filter_arg['waybill__order__warehouse__pk'] = warehouse
-        if destination:
-            filter_arg['waybill__destination__pk'] = destination
-        if waybill:
-            filter_arg['waybill'] = waybill
-        if filter_arg:
-            load_details = load_details.filter(**filter_arg)            
         
         return load_details
 
@@ -179,7 +159,7 @@ class ReadOrdersHandler(BaseHandler):
     )
         
     def read(self, request, code="", warehouse="", destination="", consignee="", **kwargs):
-        """Return orders in CSV"""
+        """Return orders"""
 
         orders = self.model.objects.all()
         orders = orders.filter(**filter_for_orders())
@@ -189,18 +169,6 @@ class ReadOrdersHandler(BaseHandler):
 
         if request.GET.has_key('sSearch'):
             orders = get_datatables_filtering(request, orders)
-        
-        filter_arg = {}
-        if warehouse: 
-            filter_arg['warehouse__pk'] = warehouse
-        if destination:
-            filter_arg['consignee__warehouses__pk'] = destination
-        if consignee:
-            filter_arg['consignee__pk'] = consignee
-        if code:
-            filter_arg['code'] = code
-        if filter_arg:
-            orders = orders.filter(**filter_arg)
         
         return orders
             
@@ -224,24 +192,13 @@ class ReadOrderItemsHandler(BaseHandler):
     )
               
     def read(self, request, order="", warehouse="", destination="", consignee="", **kwargs):
-        """Return order items in CSV"""
-        order_items = self.model.objects.all()
+        """Return order items"""
+        order_items = self.model.objects.all().distinct()
+        
+        order_items = order_items.filter(**dict([("order__%s" % key, value) for key, value in filter_for_orders().items()]))
         
         if not request.user.has_perm("ets.orderitem_api_full_access"):
             order_items = order_items.filter(order__warehouse__persons__pk=request.user.pk)
-        
-        filter_arg = {}
-        
-        if warehouse: 
-            filter_arg['order__warehouse__pk'] = warehouse
-        if destination:
-            filter_arg['order__consignee__warehouses__pk'] = destination
-        if consignee:
-            filter_arg['order__consignee__pk'] = consignee
-        if order:
-            filter_arg['order'] = order
-        if filter_arg:
-            order_items = order_items.filter(**filter_arg)            
         
         return order_items
         
@@ -324,14 +281,14 @@ def get_flattened_dict(data):
 
 class CSVEmitter(Emitter):
     """Emitter that returns CSV file"""
+    
     def render(self, request):
-
         result = StringIO.StringIO()
         
-        field_names = list(get_flattened_field_names(self.fields))
-        header = dict(zip(field_names, field_names))
+        field_names = tuple(get_flattened_field_names(self.fields))
+        
         dict_writer = unicodecsv.UnicodeDictWriter(result, field_names, dialect=csv.excel_tab)
-        dict_writer.writerow(header)
+        dict_writer.writerow(dict(zip(field_names, field_names)))
         dict_writer.writerows(get_flattened_data(self.construct()))
         
         return result.getvalue()
