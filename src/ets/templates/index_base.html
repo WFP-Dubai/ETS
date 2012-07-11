@@ -37,6 +37,10 @@
   <li><a href="{% url compas_waybill %}">{% trans "View Dispatched eWaybills Submitted to COMPAS" %}</a></li>
   <li><a href="{% url compas_waybill_receipt %}">{% trans "View Received eWaybills Submitted to COMPAS" %}</a></li>
 </ul>  
+
+<ul>
+  <li><a href="{% url import_file %}">{% trans "Import Data from Offliner" %}</a></li>
+</ul> 
 {% endofficer_only %}
 
 <ul>

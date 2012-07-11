@@ -216,7 +216,7 @@ urlpatterns = patterns("ets.views",
         'queryset': ets.models.Compas.objects.all(),
     }, "handle_sync_compas"),
                        
-    ( r'^import_data/$', ImportData.as_view(), {}, "import_file" ),
+    ( r'^import_data/$', officer_required(ImportData.as_view()), {}, "import_file" ),
     ( r'^export/compas/(?P<data_type>data)/(?P<compas>[-\w]+)/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^export/compas/(?P<data_type>data)/$', 'export_compas_file', {}, 'export_compas_file' ),
     ( r'^export/compas/(?P<compas>[-\w]+)/$', 'export_compas_file', {}, 'export_compas_file' ),
