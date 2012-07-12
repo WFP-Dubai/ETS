@@ -9,6 +9,7 @@ ets/settings/local.py
 src/ets/settings/local.py
 src/ets/static/css/local.css
 src/ets/local_settings.py
+
 #Eclipse's specific
 .project
 .pydevproject

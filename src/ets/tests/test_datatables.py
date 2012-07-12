@@ -24,14 +24,14 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("table_stock_items", kwargs={"param_name": "wh_id"} ), data={'wh_id': warehouse.pk,})
         result = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], warehouse.stock_items.count())
 
     def test_table_orders(self):
         # Orders related to user
         response = self.client.get(reverse("table_orders"))
         self.assertContains(response, 'OURLITORDER', status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         result = json.loads(response.content)
         self.assertEqual(result["iTotalRecords"], 1)
 
@@ -40,7 +40,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'user_related'}))
         result = json.loads(response.content)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], ets.models.Waybill.objects.count())
 
     def test_table_dispatch_waybills(self):
@@ -48,7 +48,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'dispatches'}))
         result = json.loads(response.content)
         self.assertContains(response, 'ISBX00211A', status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], ets.models.Waybill.dispatches(self.user).count())
 
     def test_table_reception_waybills(self):
@@ -59,7 +59,7 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("table_waybills", kwargs={ 'filtering': 'receptions'}))
         result = json.loads(response.content)
         self.assertContains(response, 'ISBX00311A', status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], ets.models.Waybill.receptions(self.user).count())
 
     def test_table_validate_dispatch_waybills(self):
@@ -70,14 +70,14 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'validate_dispatch'}))
         result = json.loads(response.content)
         self.assertContains(response, waybill_pk, status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], 2)
         waybill.validated=True
         waybill.save()
         response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'dispatch_validated'}))
         result = json.loads(response.content)
         self.assertContains(response, waybill_pk, status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], 1)
         
     def test_table_validate_receipt_waybills(self):
@@ -91,12 +91,12 @@ class DatatablesTestCase(TestCaseMixin, TestCase):
         result = json.loads(response.content)
         self.assertContains(response, waybill_pk, status_code=200)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], 1)
         waybill.receipt_validated=True
         waybill.save()
         response = self.client.get(reverse("table_validate_waybill", kwargs={ 'filtering': 'receipt_validated'}))
         result = json.loads(response.content)
         self.assertContains(response, waybill_pk, status_code=200)
-        self.assertEqual(response["Content-Type"], "application/javascript")
+        self.assertEqual(response["Content-Type"], "application/json; charset=utf-8")
         self.assertEqual(result["iTotalRecords"], 1)

@@ -117,7 +117,7 @@ def get_datatables_records(request, querySet, columnIndexNameMap, aa_data=None, 
         'sColumns':sColumns
     }
     
-    response =  HttpResponse(simplejson.dumps(response_dict), mimetype='application/javascript')
+    response =  HttpResponse(simplejson.dumps(response_dict), content_type="application/json; charset=utf-8")
 
     #prevent from caching datatables result
     add_never_cache_headers(response)

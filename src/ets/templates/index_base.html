@@ -36,9 +36,11 @@
 <ul>
   <li><a href="{% url compas_waybill %}">{% trans "View Dispatched eWaybills Submitted to COMPAS" %}</a></li>
   <li><a href="{% url compas_waybill_receipt %}">{% trans "View Received eWaybills Submitted to COMPAS" %}</a></li>
-
-  <!-- <li><a href="{# url synchronization #}">{% trans "Synchronization with offline instances" %}</a></li> -->
 </ul>  
+
+<ul>
+  <li><a href="{% url import_file %}">{% trans "Import Data from Offliner" %}</a></li>
+</ul> 
 {% endofficer_only %}
 
 <ul>
@@ -64,7 +66,7 @@
 
 <ul>
   <li><a href="{% url warehouses_list %}">{% trans "Warehouses" %}</a></li>
-  <li><a href="{% url select_report %}">{% trans "Generate Reports in CSV Format" %}</a></li>
+  <li><a href="{% url select_report %}">{% trans "Generate Reports" %}</a></li>
 </ul>
   
 {% endblock %}

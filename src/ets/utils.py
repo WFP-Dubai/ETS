@@ -347,9 +347,6 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
     try:
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
-
-
-
             CONTAINER_NUMBER = waybill.container_one_number
 
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -485,13 +482,7 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
 
     try:
         with transaction.commit_on_success(using=compas) as tr:
-            
-            #Check COMPAS version. We support only old versions lower than 1.3
-            if get_version(using=compas) > '1.3':
-                raise ValidationError(_("Inappropriate version of COMPAS. Please, contact your administrator."))
-            
             CURR_CODE = waybill.pk[len(compas):]
-
             ## Check if dispatch_master is there...
             if not compas_models.DispatchMaster.objects.using(compas) \
                                 .filter(code__contains=waybill.pk, destination_code=waybill.destination.pk) \
@@ -499,7 +490,6 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                 #Push dispatched waybill to COMPAS station 
                 if not send_dispatched(waybill, compas) and not send_dispatched(waybill, waybill.destination.compas):
                     raise ValidationError(_("The Dispatch %s is not available in the COMPAS Station %s") % ( waybill.pk, compas))
-                
                 
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -510,26 +500,54 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                 if special_case:
                     CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
                     code_letter = u'B'
+                
+                if get_version(using=compas) < '1.4':
+                    call_db_procedure('write_waybill.receipt', (
+                        CURR_CODE, 
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
+    
+                        loading.number_units_good and u'%.3f' % loading.number_units_good or None,
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
+                        loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause or None, 
+                        loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
+    
+                        loading.stock_item.origin_id, 
+                        loading.stock_item.commodity.category.pk,
+                        loading.stock_item.commodity.pk, 
+                        loading.stock_item.package.pk, 
+                        loading.stock_item.allocation_code, 
+                        loading.stock_item.quality
+                    ), compas)
+                    
+                else:
+                    #version 1.4 should have additional fields
+                    call_db_procedure('write_waybill.receipt', (
+                        CURR_CODE, 
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
+    
+                        loading.number_units_good and u'%.3f' % loading.number_units_good or None,
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
+                        loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause or None, 
+                        loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
+                        
+                        ## add fields
+    
+                        loading.stock_item.origin_id, 
+                        loading.stock_item.commodity.category.pk,
+                        loading.stock_item.commodity.pk, 
+                        loading.stock_item.package.pk, 
+                        loading.stock_item.allocation_code, 
+                        loading.stock_item.quality
+                    ), compas)
+                
 
-                call_db_procedure('write_waybill.receipt', (
-                    CURR_CODE, 
-                    waybill.receipt_person.compas.pk, 
-                    waybill.receipt_person.code, 
-                    waybill.arrival_date.strftime("%Y%m%d"),
 
-                    loading.number_units_good and u'%.3f' % loading.number_units_good or None,
-                    loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
-                    loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
-                    loading.units_lost_reason and loading.units_lost_reason.cause or None, 
-                    loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
-
-                    loading.stock_item.origin_id, 
-                    loading.stock_item.commodity.category.pk,
-                    loading.stock_item.commodity.pk, 
-                    loading.stock_item.package.pk, 
-                    loading.stock_item.allocation_code, 
-                    loading.stock_item.quality
-                ), compas)
 
     except Exception, err:
         message = hasattr(err, 'messages') and u"\n".join(err.messages) or unicode(err)
@@ -587,9 +605,9 @@ def import_file(f):
     for obj in serializers.deserialize("json", data, parse_float=decimal.Decimal):
         if "LogEntry" == obj.object._meta.object_name:
             if not LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(ets_models.Waybill).pk,
-                                                   action_time=obj.object.action_time,
-                                                   user=obj.object.user,
-                                                   object_id=obj.object.object_id).exists():
+                                           action_time=obj.object.action_time,
+                                           user=obj.object.user,
+                                           object_id=obj.object.object_id).exists():
                 obj.object.pk = None
                 models.Model.save_base(obj.object, raw=True, force_insert=True)
         else:    
@@ -726,7 +744,6 @@ def get_api_url(request, column_index_map, url_name, url_params=None, request_pa
     """Returns url with datatables filters"""
     data_format = request.GET.get('data_format', '')
     if data_format:
-        _url_params = url_params or {}
         params = QueryDict('', mutable=True)
         searchable_columns = get_searchable_columns(request, column_index_map, len(column_index_map))
         sortable_columns = get_sorted_columns(request, column_index_map)
@@ -734,9 +751,7 @@ def get_api_url(request, column_index_map, url_name, url_params=None, request_pa
         params.update({ 'sSearch': request.GET.get('sSearch', '').encode('utf-8') })
         params.setlist('sortable', list(set(sortable_columns)))
         params.setlist('searchable', list(set(searchable_columns)))
-        if data_format == 'excel':
-            _url_params.update({'format': data_format})
-        redirect_url = "?".join([reverse(url_name, kwargs=_url_params), params.urlencode()])
+        redirect_url = "?".join([reverse(url_name, kwargs=url_params), params.urlencode()])
         return redirect_url
 
 def get_datatables_filtering(request, queryset):
