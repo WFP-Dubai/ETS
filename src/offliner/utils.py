@@ -13,8 +13,8 @@ from ets.models import Waybill
 def compress_waybills(queryset, start_date, end_date):
     #Append log entry
 
-    data = (
-        chain(waybill, waybill.loading_details.all(),
+    data = chain.from_iterable(
+        chain([waybill], waybill.loading_details.all(),
             LogEntry.objects.filter(content_type__id=ContentType.objects.get_for_model(Waybill).pk,
                                     object_id = waybill.pk,
                                     action_time__range=(start_date, end_date+timedelta(1))))
