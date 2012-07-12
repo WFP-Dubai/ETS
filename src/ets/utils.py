@@ -347,9 +347,6 @@ def send_dispatched(waybill, compas=None, cache_prefix='send_dispatched'):
     try:
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
-
-
-
             CONTAINER_NUMBER = waybill.container_one_number
 
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -485,13 +482,7 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
 
     try:
         with transaction.commit_on_success(using=compas) as tr:
-            
-            #Check COMPAS version. We support only old versions lower than 1.3
-            if get_version(using=compas) > '1.3':
-                raise ValidationError(_("Inappropriate version of COMPAS. Please, contact your administrator."))
-            
             CURR_CODE = waybill.pk[len(compas):]
-
             ## Check if dispatch_master is there...
             if not compas_models.DispatchMaster.objects.using(compas) \
                                 .filter(code__contains=waybill.pk, destination_code=waybill.destination.pk) \
@@ -499,7 +490,6 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                 #Push dispatched waybill to COMPAS station 
                 if not send_dispatched(waybill, compas) and not send_dispatched(waybill, waybill.destination.compas):
                     raise ValidationError(_("The Dispatch %s is not available in the COMPAS Station %s") % ( waybill.pk, compas))
-                
                 
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
@@ -510,26 +500,54 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                 if special_case:
                     CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
                     code_letter = u'B'
+                
+                if get_version(using=compas) < '1.4':
+                    call_db_procedure('write_waybill.receipt', (
+                        CURR_CODE, 
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
+    
+                        loading.number_units_good and u'%.3f' % loading.number_units_good or None,
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
+                        loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause or None, 
+                        loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
+    
+                        loading.stock_item.origin_id, 
+                        loading.stock_item.commodity.category.pk,
+                        loading.stock_item.commodity.pk, 
+                        loading.stock_item.package.pk, 
+                        loading.stock_item.allocation_code, 
+                        loading.stock_item.quality
+                    ), compas)
+                    
+                else:
+                    #version 1.4 should have additional fields
+                    call_db_procedure('write_waybill.receipt', (
+                        CURR_CODE, 
+                        waybill.receipt_person.compas.pk, 
+                        waybill.receipt_person.code, 
+                        waybill.arrival_date.strftime("%Y%m%d"),
+    
+                        loading.number_units_good and u'%.3f' % loading.number_units_good or None,
+                        loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
+                        loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
+                        loading.units_lost_reason and loading.units_lost_reason.cause or None, 
+                        loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
+                        
+                        ## add fields
+    
+                        loading.stock_item.origin_id, 
+                        loading.stock_item.commodity.category.pk,
+                        loading.stock_item.commodity.pk, 
+                        loading.stock_item.package.pk, 
+                        loading.stock_item.allocation_code, 
+                        loading.stock_item.quality
+                    ), compas)
+                
 
-                call_db_procedure('write_waybill.receipt', (
-                    CURR_CODE, 
-                    waybill.receipt_person.compas.pk, 
-                    waybill.receipt_person.code, 
-                    waybill.arrival_date.strftime("%Y%m%d"),
 
-                    loading.number_units_good and u'%.3f' % loading.number_units_good or None,
-                    loading.units_damaged_reason and loading.units_damaged_reason.cause or None, 
-                    loading.number_units_damaged and u'%.3f' % loading.number_units_damaged or None, 
-                    loading.units_lost_reason and loading.units_lost_reason.cause or None, 
-                    loading.number_units_lost and u'%.3f' % loading.number_units_lost or None, 
-
-                    loading.stock_item.origin_id, 
-                    loading.stock_item.commodity.category.pk,
-                    loading.stock_item.commodity.pk, 
-                    loading.stock_item.package.pk, 
-                    loading.stock_item.allocation_code, 
-                    loading.stock_item.quality
-                ), compas)
 
     except Exception, err:
         message = hasattr(err, 'messages') and u"\n".join(err.messages) or unicode(err)
