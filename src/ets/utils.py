@@ -583,7 +583,7 @@ def get_compases(user):
     """Returns user's related compases"""
     queryset = ets_models.Compas.objects.all()
     if not user.is_superuser:
-        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id))
+        queryset = queryset.filter(Q(warehouses__persons__pk=user.id) | Q(officers__pk=user.id)).distinct()
         
     return queryset
 
