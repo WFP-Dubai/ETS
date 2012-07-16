@@ -253,7 +253,7 @@ class CompasAdmin(logicaldelete.admin.ModelAdmin):
         (_('Dates'), {'fields': ('date_created', 'date_modified', 'date_removed',)}),
     )
     actions = None
-    inlines = (ImportLoggerInline, CompasLoggerInline)
+    #inlines = (ImportLoggerInline, CompasLoggerInline)
 
 admin.site.register( ets.models.Compas, CompasAdmin )
 
@@ -372,7 +372,7 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     list_filter = ('when_attempted', 'status', 'action', 'compas')
 
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
-
+admin.site.register( ets.models.ImportLogger)
 
 class LoggedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PersonInline,]
