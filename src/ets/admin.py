@@ -361,6 +361,14 @@ class PersonAdmin(UserAdmin):
     
 admin.site.register(ets.models.Person, PersonAdmin)
 
+class ImportLoggerAdmin(admin.ModelAdmin):
+    __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
+    
+    list_display = ('pk', 'compas','when_attempted','status','message')
+    search_fields = ('compas__pk',)
+    date_hierarchy = 'when_attempted'
+    list_filter = ('when_attempted', 'status',  'compas')
+
 
 class CompasLoggerAdmin(admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
@@ -372,7 +380,7 @@ class CompasLoggerAdmin(admin.ModelAdmin):
     list_filter = ('when_attempted', 'status', 'action', 'compas')
 
 admin.site.register(ets.models.CompasLogger, CompasLoggerAdmin)
-admin.site.register( ets.models.ImportLogger)
+admin.site.register( ets.models.ImportLogger, ImportLoggerAdmin)
 
 class LoggedUserAdmin(UserAdmin):
     inlines = UserAdmin.inlines + [PersonInline,]
