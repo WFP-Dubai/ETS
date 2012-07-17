@@ -364,8 +364,9 @@ admin.site.register(ets.models.Person, PersonAdmin)
 class ImportLoggerAdmin(admin.ModelAdmin):
     __metaclass__ = ModelAdminWithForeignKeyLinksMetaclass
     
-    list_display = ('pk', 'compas','when_attempted','status','message')
+    list_display = ('pk', 'link_to_compas','when_attempted','status','message')
     search_fields = ('compas__pk',)
+    #raw_id_fields = ('compas',)
     date_hierarchy = 'when_attempted'
     list_filter = ('when_attempted', 'status',  'compas')
 
