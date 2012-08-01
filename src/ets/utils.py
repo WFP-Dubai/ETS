@@ -553,7 +553,7 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                         loading.stock_item.commodity.pk, 
                         loading.stock_item.package.pk, 
                         loading.stock_item.allocation_code, 
-                        loading.stock_item.quality
+                        loading.stock_item.quality,
 
                         ## New Fields
                         p_good_net,#(number_units_good * unit_weight_net) in varchar2 default null,   --> new parameter for received net qty
