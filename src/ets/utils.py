@@ -494,8 +494,18 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
             code_letter = u'A'
-
+            p_receiving_location = waybill.destination.location.pk
+            p_receiving_wh      = waybill.destination.pk #
             for loading in waybill.loading_details.all():
+                #fix when fields available
+                p_good_net          =loading.number_units_good * loading.unit_weight_net
+                p_good_gross        =loading.number_units_good * loading.unit_weight_gross
+                p_damage_net        =loading.number_units_damaged * loading.unit_weight_net 
+                p_damage_gross      =loading.number_units_damaged * loading.unit_weight_gross
+                p_loss_net          =loading.number_units_lost * loading.unit_weight_net
+                p_loss_gross        =loading.number_units_lost * loading.unit_weight_gross     
+
+           
 
                 if special_case:
                     CURR_CODE = u"%s%s" % (code_letter, waybill.pk)
@@ -544,6 +554,17 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
                         loading.stock_item.package.pk, 
                         loading.stock_item.allocation_code, 
                         loading.stock_item.quality
+
+                        ## New Fields
+                        p_good_net,#(number_units_good * unit_weight_net) in varchar2 default null,   --> new parameter for received net qty
+                        p_good_gross,# (number_units_good * unit_weight_gross) in varchar2 default null, --> new parameter for received gross qty
+                        p_damage_net,# (number_units_damaged * unit_weight_net )in varchar2 default null,   --> new parameter for received damage net qty
+                        p_damage_gross,# in varchar2 default null, --> new parameter for received damage gross qty
+                        p_loss_net,# in varchar2 default null,   --> new parameter for received loss net qty
+                        p_loss_gross,# in varchar2 default null, --> new parameter for received loss gross qty
+                        p_receiving_location,# in varchar2 default null, -->        new parameter for diverted delivery
+                        p_receiving_wh,# in varchar2 default null --> new parameter for diverted delivery     
+                        
                     ), compas)
                 
 
