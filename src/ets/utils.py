@@ -501,12 +501,12 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
             p_receiving_wh      = waybill.destination.pk #
             for loading in waybill.loading_details.all():
                 #fix when fields available
-                p_good_net          = u'%.3f' % (loading.number_units_good * loading.unit_weight_net)
-                p_good_gross        =u'%.3f' % (loading.number_units_good * loading.unit_weight_gross)
-                p_damage_net        =u'%.3f' % (loading.number_units_damaged * loading.unit_weight_net) 
-                p_damage_gross      =u'%.3f' % (loading.number_units_damaged * loading.unit_weight_gross)
-                p_loss_net          =u'%.3f' % (loading.number_units_lost * loading.unit_weight_net)
-                p_loss_gross        =u'%.3f' % (loading.number_units_lost * loading.unit_weight_gross)     
+                p_good_net          =loading.number_units_good and u'%.3f' % (loading.number_units_good * loading.unit_weight_net) or None
+                p_good_gross        =loading.number_units_good and u'%.3f' % (loading.number_units_good * loading.unit_weight_gross) or None
+                p_damage_net        =loading.number_units_damaged and u'%.3f' % (loading.number_units_damaged * loading.unit_weight_net) or None
+                p_damage_gross      =loading.number_units_damaged and u'%.3f' % (loading.number_units_damaged * loading.unit_weight_gross) or None
+                p_loss_net          =loading.number_units_lost and u'%.3f' % (loading.number_units_lost * loading.unit_weight_net) or None
+                p_loss_gross        =loading.number_units_lost and u'%.3f' % (loading.number_units_lost * loading.unit_weight_gross) or None 
 
            
 
