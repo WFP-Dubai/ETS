@@ -15,7 +15,6 @@ fi
 echo $$ > $PIDFILE
 
 #Submit waybills to COMPAS
-./bin/instance order_percentage 2>&1
 ./bin/instance submit_waybills 2>&1
-
+./bin/instance order_percentage 2>&1
 rm -f $PIDFILE
