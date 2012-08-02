@@ -484,7 +484,8 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
         with transaction.commit_on_success(using=compas) as tr:
             CURR_CODE = waybill.pk[len(compas):]
             ## Check if dispatch_master is there...
-            if bool(compas_models.DispatchMaster.objects.filter(code=CURR_CODE).using(compas)):
+            CURR_CODE_FULL = u'%s%sP'%( compas ,CURR_CODE)
+            if bool(compas_models.DispatchMaster.objects.filter(code=CURR_CODE_FULL).using(compas)):
                 IsValid = True
             else:
                 message = "The Dispatch %s is not available in the COMPAS Station %s"%( waybill.pk, compas)
