@@ -854,7 +854,7 @@ class Waybill( ld_models.Model ):
             raise ValidationError(_("Cargo finished Discharge before Starting?"))
 
         if self.transaction_type not in [self.DELIVERY, self.DISTIBRUTION] and not self.destination:
-            raise ValidationError(_("Chose Destination Warehouse or another Transaction Type"))
+            raise ValidationError(_("Choose Destination Warehouse or another Transaction Type"))
     
     def dispatch_sign(self):
         """Signs the waybill as ready to be sent."""
