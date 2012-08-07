@@ -478,7 +478,7 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
     cache.set(cache_key, True)
     
     if not compas:
-        compas = waybill.destination.compas.pk
+        compas = waybill.receipt_warehouse.compas.pk
 
     try:
         with transaction.commit_on_success(using=compas) as tr:
@@ -497,8 +497,8 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
             ## check if containers = 2 & lines = 2
             special_case = waybill.loading_details.count() == 2 and waybill.container_two_number
             code_letter = u'A'
-            p_receiving_location = waybill.destination.location.pk
-            p_receiving_wh      = waybill.destination.pk #
+            p_receiving_location = waybill.receipt_warehouse.location.pk
+            p_receiving_wh      = waybill.receipt_warehouse.pk #
             for loading in waybill.loading_details.all():
                 #fix when fields available
                 p_good_net          =loading.total_weight_net_received and u'%.3f' % (loading.total_weight_net_received) or None
