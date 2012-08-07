@@ -501,14 +501,12 @@ def send_received(waybill, compas=None, cache_prefix='send_received'):
             p_receiving_wh      = waybill.destination.pk #
             for loading in waybill.loading_details.all():
                 #fix when fields available
-                p_good_net          =loading.number_units_good and u'%.3f' % (loading.number_units_good * loading.unit_weight_net/1000) or None
-                p_good_gross        =loading.number_units_good and u'%.3f' % (loading.number_units_good * loading.unit_weight_gross/1000) or None
+                p_good_net          =loading.total_weight_net_received and u'%.3f' % (loading.total_weight_net_received) or None
+                p_good_gross        =loading.total_weight_gross_received and u'%.3f' % (loading.total_weight_gross_received) or None
                 p_damage_net        =loading.number_units_damaged and u'%.3f' % (loading.number_units_damaged * loading.unit_weight_net/1000) or None
                 p_damage_gross      =loading.number_units_damaged and u'%.3f' % (loading.number_units_damaged * loading.unit_weight_gross/1000) or None
                 p_loss_net          =loading.number_units_lost and u'%.3f' % (loading.number_units_lost * loading.unit_weight_net/1000) or None
                 p_loss_gross        =loading.number_units_lost and u'%.3f' % (loading.number_units_lost * loading.unit_weight_gross/1000) or None 
-
-           
 
                 if special_case:
                     CURR_CODE = u"%s%s" % (code_letter, waybill.pk)

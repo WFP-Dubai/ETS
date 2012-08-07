@@ -745,7 +745,7 @@ class Waybill( ld_models.Model ):
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
     destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), blank=True, null=True, related_name="receipt_waybills")
-    
+    receipt_warehouse = models.ForeignKey(Warehouse, verbose_name=_("Receiption Warehouse"), blank=True, null=True, related_name="receipt_waybills2")
     #Dates
     loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
     dispatch_date = models.DateField( _("Dispatch Date"), default=datetime.now, db_index=True) #dateOfDispatch
@@ -1069,6 +1069,18 @@ class LoadingDetail(models.Model):
     number_units_damaged = models.DecimalField(_("Units (Damaged)"), default=0, 
                                                max_digits=12, decimal_places=3 ) #numberUnitsDamaged
     
+    #Net Delivered items
+    received_net_lost = models.DecimalField(_("Net (Lost)"), default=0, 
+                                            max_digits=12, decimal_places=3 ) #numberUnitsLost
+    received_net_damaged = models.DecimalField(_("Net (Damaged)"), default=0, 
+                                               max_digits=12, decimal_places=3 ) #numberUnitsDamaged
+
+    #Gross Delivered items
+    received_gross_lost = models.DecimalField(_("Gross (Lost)"), default=0, 
+                                         max_digits=12, decimal_places=3 ) #numberUnitsLost
+    received_gross_damaged = models.DecimalField(_("Gross (Damaged)"), default=0, 
+                                               max_digits=12, decimal_places=3 ) #numberUnitsDamaged
+    
     #Reasons
     units_lost_reason = models.ForeignKey( LossDamageType, verbose_name=_("Lost Reason"), 
                                            related_name='lost_reason', #LD_LostReason 
@@ -1104,27 +1116,45 @@ class LoadingDetail(models.Model):
     
     def calculate_net_received_good( self ):
         """Returns weight net for good units"""
-        return ( self.number_units_good * self.unit_weight_net ) / 1000
+        if self.total_weight_net_received:
+            return self.total_weight_net_received
+        else:
+            return ( self.number_units_good * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_good( self ):
         """Returns weight gross for good units"""
-        return ( self.number_units_good * self.unit_weight_gross ) / 1000
+        if self.total_weight_net_received:
+            return self.total_weight_gross_received
+        else:
+            return ( self.number_units_good * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_damaged( self ):
         """Returns weight net for damaged units"""
-        return ( self.number_units_damaged * self.unit_weight_net ) / 1000
+        if self.received_net_damaged:
+            return self.received_net_damaged
+        else:
+            return ( self.number_units_damaged * self.unit_weight_net ) / 1000
 
     def calculate_gross_received_damaged( self ):
         """Returns weight gross for damaged units"""
-        return ( self.number_units_damaged * self.unit_weight_gross ) / 1000
+        if self.received_gross_damaged:
+            return self.received_gross_damaged
+        else:
+            return ( self.number_units_damaged * self.unit_weight_gross ) / 1000
 
     def calculate_net_received_lost( self ):
         """Returns weight net for lost units"""
-        return ( self.number_units_lost * self.unit_weight_net ) / 1000
+        if self.received_net_lost:
+            return self.received_net_lost
+        else:
+            return ( self.number_units_lost * self.unit_weight_gross ) / 1000
 
     def calculate_gross_received_lost( self ):
         """Returns weight gross for good units"""
-        return ( self.number_units_lost * self.unit_weight_gross ) / 1000
+        if self.received_gross_lost:
+            return self.received_gross_lost
+        else:
+            return ( self.number_units_lost * self.unit_weight_gross ) / 1000
     
     def calculate_total_received_units( self ):
         """Returns total count of received units"""
@@ -1133,6 +1163,7 @@ class LoadingDetail(models.Model):
 
     def calculate_total_received_net( self ):
         """Returns total weight net for received units"""
+        
         return ( self.calculate_net_received_good() + self.calculate_net_received_damaged()).quantize(decimal.Decimal('.001'), rounding=decimal.ROUND_HALF_UP)
 
     def calculate_total_received_gross( self ):
