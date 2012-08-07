@@ -696,6 +696,7 @@ class Waybill( ld_models.Model ):
         - **end_discharge_date** --date of discharging end
         - **distance** -- distance covered in km
         - **transport_dispach_signed_date** -- date of confirmation of dispatch
+        - **receipt_warehouse** -- receipt warehouse
         - **receipt_signed_date** -- date of confirmation of receipt
         - **validated** -- validation of dispatch eWaybill
         - **sent_compas** -- date of sending dispatch eWaybill to Compas
@@ -871,14 +872,14 @@ class Waybill( ld_models.Model ):
             #Create virtual stock item
             for item in self.loading_details.all():
                 filters = {
-                    'warehouse': self.destination,
+                    'warehouse': self.receipt_warehouse,
                     'project_number': item.stock_item.project_number,
                     'si_code': item.stock_item.si_code, 
                     'commodity': item.stock_item.commodity,
                 }
                 if not StockItem.objects.filter(**filters).exists():
                     filters.update({
-                        'external_ident': "%s%s" % (self.destination, item.stock_item.pk),
+                        'external_ident': "%s%s" % (self.receipt_warehouse, item.stock_item.pk),
                         'quality': item.stock_item.quality,
                         'package': item.stock_item.package,
                         'number_of_units': item.number_of_units,
@@ -940,6 +941,11 @@ class Waybill( ld_models.Model ):
             objects.update((
                 self.destination, self.destination.location,
                 self.destination.organization, self.destination.compas,
+            ))
+        if self.receipt_warehouse:
+            objects.update((
+                self.receipt_warehouse, self.receipt_warehouse.location,
+                self.receipt_warehouse.organization, self.receipt_warehouse.compas,
             ))
         
         #Loading details

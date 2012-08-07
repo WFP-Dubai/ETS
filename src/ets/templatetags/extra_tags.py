@@ -70,7 +70,7 @@ def validate_dispatch(waybill, user, link_text=_("Validate dispatch")):
 def validate_receipt(waybill, user, link_text=_("Validate receipt")):
     queryset = Waybill.objects.filter(receipt_sent_compas__isnull=True, transport_dispach_signed_date__isnull=False) \
                               .filter(receipt_signed_date__isnull=False) \
-                              .filter(destination__compas__officers=user) \
+                              .filter(receipt_warehouse__compas__officers=user) \
                               .filter(receipt_validated=False)
 
     return { 

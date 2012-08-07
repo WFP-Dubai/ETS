@@ -130,7 +130,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
                                        'container_one_remarks_dispatch', 'container_one_remarks_reciept')}),
         (_('Container 2'), {'fields': ('container_two_number', 'container_two_seal_number', 
                                        'container_two_remarks_dispatch', 'container_two_remarks_reciept')}),
-        (_("Receipt"), {'fields': ('arrival_date', 'start_discharge_date', 
+        (_("Receipt"), {'fields': ('receipt_warehouse', 'arrival_date', 'start_discharge_date', 
                                    'end_discharge_date', 'receipt_signed_date', 
                                    'receipt_person', 'distance', 'receipt_remarks',)}),
         (_("COMPAS"), {'fields': ('validated', 'sent_compas', 'receipt_validated', 'receipt_sent_compas')}),
@@ -142,7 +142,7 @@ class WaybillAdmin(logicaldelete.admin.ModelAdmin):
     readonly_fields = ('order','date_created', 'date_modified')
     date_hierarchy = 'date_created'
     list_filter = ('date_created',)
-    raw_id_fields = ('destination','dispatcher_person',)
+    raw_id_fields = ('destination', 'receipt_warehouse', 'dispatcher_person',)
     search_fields = ('slug', 'order__pk',)
     inlines = (LoadingDetailsInline, CompasLoggerInline)
     

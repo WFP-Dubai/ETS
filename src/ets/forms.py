@@ -156,7 +156,7 @@ class WaybillRecieptForm( forms.ModelForm ):
     class Meta:
         model = ets_models.Waybill
         fields = (
-            'destination',
+            'receipt_warehouse',
             'receipt_remarks',
             'arrival_date',
             'start_discharge_date',
@@ -168,14 +168,14 @@ class WaybillRecieptForm( forms.ModelForm ):
         widgets = {
             'receipt_remarks': forms.Textarea(attrs={'rows': "3"}),
             'distance': forms.TextInput(attrs={'size': 5, 'class': 'number'}),
-            'destination': forms.Select(attrs={'class': 'warehouse-selector'})
+            'receipt_warehouse': forms.Select(attrs={'class': 'warehouse-selector'})
         }
     
     helper = FormHelper()
     
     # create the layout object
     helper.add_layout(Layout(
-        Fieldset(ugettext('Destination'), 'receipt_remarks', Row('destination', 'distance')),
+        Fieldset(ugettext('Destination'), 'receipt_remarks', Row('receipt_warehouse', 'distance')),
         Fieldset(ugettext('Dates'), Row('arrival_date', 'start_discharge_date', 'end_discharge_date')),
         Fieldset(ugettext('Containers'), 
                  Row('container_one_remarks_reciept', 'container_two_remarks_reciept'),),

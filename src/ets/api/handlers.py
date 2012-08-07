@@ -45,6 +45,7 @@ class ReadWaybillHandler(BaseHandler):
         'transaction_type', 'transport_type',
         'dispatch_remarks', 
         ('dispatcher_person', ('code', 'title', 'username')),
+        'receipt_warehouse',
         ('receipt_person', ('code', 'title', 'username')),
         'receipt_remarks', 'transport_sub_contractor',
         'transport_driver_name', 'transport_driver_licence',
