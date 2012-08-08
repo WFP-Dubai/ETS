@@ -7,7 +7,8 @@
 </thead>
 <tbody>
 	<tr>
-		<td class="w50"><p>28. {% trans "Receiving Location and Warehouse" %}: </p> {%if object.arrival_date|date|upper|length != 0%}{{ object.receipt_warehouse.location.name }}/{{ object.receipt_warehouse.name}} {%endif%}</td>
+		<td class="w50"><p>28. {% trans "Receiving Location and Warehouse" %}: </p> 
+		{%if object.arrival_date|date|upper|length != 0%}{%if object.receipt_warehouse%}{{ object.receipt_warehouse.location.name }}/{{ object.receipt_warehouse.name}}{%else%}{{ object.order.location.name }}/{{object.destination.name}} {%endif%} {%endif%}</td>
 		<td class="w50"><p>32. {% trans "Arrival Date" %}: </p> {{ object.arrival_date|date|upper }}</td>
 	</tr>
 	<tr>
