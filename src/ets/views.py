@@ -396,7 +396,7 @@ def waybill_reception(request, waybill_pk, queryset, form_class=WaybillRecieptFo
         'arrival_date': today,
         'start_discharge_date': today,
         'end_discharge_date': today,
-        'receipt_warehouse': waybill.destination,
+        'receipt_warehouse': waybill.receipt_warehouse or waybill.destination,
     }, instance=waybill)
     
     form.fields['receipt_warehouse'].queryset = request.user.person.warehouses.all().exclude(pk=waybill.order.warehouse.pk)
