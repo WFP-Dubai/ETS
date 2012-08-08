@@ -45,7 +45,7 @@
 				</tr>
 				<tr>
 					<td>
-						<p>4. {% trans "Destination Warehouse" %}: </p> {{ object.destination.name }}
+						<p>4. {% trans "Destination Warehouse" %}: </p>{%if object.receipt_warehouse and object.destination.name != object.receipt_warehouse.name%}<strike> {{ object.destination.name }}</strike> {{object.receipt_warehouse.name}}{%else%}{{ object.destination.name }}{%endif%}
 					</td>
 					<td>
 						<p>8. {% trans "LTI No." %}: </p> {{ object.order.pk }}
