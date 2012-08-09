@@ -746,7 +746,7 @@ class Waybill( ld_models.Model ):
     order = models.ForeignKey(Order, verbose_name=_("Order"), related_name="waybills")
     
     destination = models.ForeignKey(Warehouse, verbose_name=_("Destination Warehouse"), blank=True, null=True, related_name="receipt_waybills")
-    receipt_warehouse = models.ForeignKey(Warehouse, verbose_name=_("Receiption Warehouse"), blank=True, null=True, related_name="receipt_waybills2")
+    receipt_warehouse = models.ForeignKey(Warehouse, verbose_name=_("Receiving Warehouse"), blank=True, null=True, related_name="receipt_waybills2")
     #Dates
     loading_date = models.DateField(_("Loading Date"), default=datetime.now, db_index=True) #dateOfLoading
     dispatch_date = models.DateField( _("Dispatch Date"), default=datetime.now, db_index=True) #dateOfDispatch
