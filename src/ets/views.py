@@ -258,7 +258,7 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
-        fill_link(item.get_absolute_url(), item.order.pk),
+        fill_link(item.order.get_absolute_url(), item.order.pk),
         fill_link(item.get_absolute_url(), item.pk),
         item.order.warehouse.name,
         item.order.consignee.name,
