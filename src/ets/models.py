@@ -1181,8 +1181,11 @@ class LoadingDetail(models.Model):
     
     def is_received(self):
         """Checks for receipt completion of item"""
-        return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost
-    
+        # fix over_offload_units miss
+        if self.over_offload_units:
+            return self.number_of_units <= self.number_units_good + self.number_units_damaged + self.number_units_lost
+        else:
+            return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost        
     
     def clean(self):
         """Validates LoadingDetail instance."""
