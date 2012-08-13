@@ -258,8 +258,8 @@ class Person(User):
         - **organization** -- foreign key to related organization
         - **location**
         - **warehouses** -- many-to-many relation to warehouses
-        - **dispatch** -- can person to dispatch waybills
-        - **receive** -- can person to receive waybills
+        - **dispatch** -- can person dispatch waybills
+        - **receive** -- can person receive waybills
         - **updated** -- update date
     """
     
@@ -1032,6 +1032,12 @@ class Waybill( ld_models.Model ):
     
     def has_dispatch_permission(self, user):
         return (not hasattr(user, 'person') or user.person.dispatch) and Waybill.dispatches(user).filter(pk=self.pk).exists()
+
+    def has_delete_permission(self, user):
+        is_dispatcher = self.dispatcher_person.username == user.username
+        is_compas_here = self.order.warehouse.compas.officers.filter(username=user).exists()
+        can_delete = is_dispatcher or is_compas_here
+        return (not hasattr(user, 'person') or can_delete) and Waybill.dispatches(user).filter(pk=self.pk).exists()
     
 
 class LoadingDetail(models.Model):
