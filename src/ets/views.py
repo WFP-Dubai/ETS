@@ -258,7 +258,7 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
         return HttpResponse(simplejson.dumps({'redirect_url': redirect_url}), content_type="application/json; charset=utf-8")
 
     return get_datatables_records(request, queryset, column_index_map, lambda item: [
-        fill_link(item.get_absolute_url(), item.order.pk),
+        fill_link(item.order.get_absolute_url(), item.order.pk),
         fill_link(item.get_absolute_url(), item.pk),
         item.order.warehouse.name,
         item.order.consignee.name,
@@ -266,7 +266,7 @@ def table_validate_waybills(request, queryset=ets.models.Waybill.objects.all(), 
         item.transport_dispach_signed_date and date_filter(item.transport_dispach_signed_date).upper() or _("Pending"),
         item.receipt_signed_date and date_filter(item.receipt_signed_date).upper() or _("Pending"),
         fill_link(reverse(url, kwargs={'waybill_pk': item.pk}), _("Validate"), "validate-link"),
-        fill_link(reverse("waybill_errors", kwargs={'waybill_pk': item.pk, "logger_action": logger_action}), _("Show errors"), "error-link") if item.compass_loggers.exists() else "",
+        fill_link(reverse("waybill_errors", kwargs={'waybill_pk': item.pk, "logger_action": logger_action}), _("Show errors"), "error-link") if item.compass_loggers.filter(action=logger_action).exists() else "",
     ])
     
 @waybill_officer_related
