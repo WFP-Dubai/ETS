@@ -212,8 +212,16 @@ class Warehouse(models.Model):
     @classmethod
     def get_active_warehouses(cls):
         """Returns active warehouses"""
-        return cls.objects.filter(start_date__lte=date.today).filter(valid_warehouse=True)\
-                      .filter(models.Q(end_date__gt=date.today) | models.Q(end_date__isnull=True))
+        return cls.objects.filter(valid_warehouse=True).filter(compas__in=Compas.objects.all()).filter(start_date__lte=date.today).filter(end_date__isnull=True)
+
+    @classmethod
+    def get_active_warehouses_with_stock(cls):
+        """Returns active warehouses"""
+        whws = StockItem.objects.filter(number_of_units__gt =0).values_list('warehouse').order_by('warehouse').distinct('warehouse')
+        wh = cls.objects.filter(valid_warehouse=True).filter(compas__in=Compas.objects.all()).filter(start_date__lte=date.today).filter(end_date__isnull=True).filter(code__in=whws)
+        
+        return wh
+
 
     @classmethod
     def get_warehouses(cls, location, organization=None):
@@ -1181,12 +1189,11 @@ class LoadingDetail(models.Model):
     
     def is_received(self):
         """Checks for receipt completion of item"""
-        # fix over_offload_units miss
         if self.over_offload_units:
             return self.number_of_units <= self.number_units_good + self.number_units_damaged + self.number_units_lost
         else:
-            return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost        
-    
+            return self.number_of_units == self.number_units_good + self.number_units_damaged + self.number_units_lost 
+                
     def clean(self):
         """Validates LoadingDetail instance."""
         super(LoadingDetail, self).clean()
