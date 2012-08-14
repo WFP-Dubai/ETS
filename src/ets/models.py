@@ -839,6 +839,9 @@ class Waybill( ld_models.Model ):
             self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
             super(Waybill, self).save(force_insert=force_insert, force_update=force_update, using=using)
 
+    def regenerate_bc(self):
+            self.barcode.save("%s.gif" % self.pk, self.barcode_qr(), save=False)
+        
     def clean(self):
         """Validates Waybill instance. Checks different dates"""
         if self.loading_date > self.dispatch_date:
@@ -996,8 +999,8 @@ class Waybill( ld_models.Model ):
         file_out = cStringIO.StringIO()
         
         image = pyqrcode.MakeQRImage(self.compress(), minTypeNumber=40,
-                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L
-                                     ).resize((445, 445))
+                                     errorCorrectLevel=pyqrcode.QRErrorCorrectLevel.L,
+                                      block_in_pixels=1)
         image.save(file_out, 'GIF')
         file_out.reset()
         

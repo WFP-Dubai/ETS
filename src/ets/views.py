@@ -540,7 +540,7 @@ def barcode_qr( request, waybill_pk, queryset=ets.models.Waybill.objects.all() )
     waybill = get_object_or_404(queryset, pk = waybill_pk)
     
     barcode = waybill.barcode_qr()
-    return HttpResponse(barcode.read(), content_type="image/jpeg")
+    return HttpResponse(barcode.read(), content_type="image/gif")
 barcode_qr.authentication = False
 
 
