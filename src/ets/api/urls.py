@@ -36,7 +36,7 @@ def expand_response(view, headers):
     return wrapper
 
 def create_file_header(name, ext):
-    return {'Content-Disposition': 'attachment; filename=%s-%s.%s' % (name, datetime.date.today(), ext) }
+    return {'Content-Disposition': 'attachment; filename=%s.%s' % (name, ext) }
 
 
 FORMAT_CSV = {'emitter_format': 'csv'}
