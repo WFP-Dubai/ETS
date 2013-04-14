@@ -1,0 +1,19 @@
+<map id="inheritancee5d7bc0163" name="inheritancee5d7bc0163">
+<area shape="rect" id="node4" href="#ets.models.Waybill" title="ets.models.Waybill" alt="" coords="612,30,759,58"/>
+<area shape="rect" id="node31" href="#ets.models.Compas" title="ets.models.Compas" alt="" coords="608,81,763,109"/>
+<area shape="rect" id="node6" href="#ets.models.Organization" title="ets.models.Organization" alt="" coords="345,106,532,134"/>
+<area shape="rect" id="node8" href="#ets.models.StockItem" title="ets.models.StockItem" alt="" coords="353,157,524,185"/>
+<area shape="rect" id="node10" href="#ets.models.ImportLogger" title="ets.models.ImportLogger" alt="" coords="343,207,535,235"/>
+<area shape="rect" id="node12" href="#ets.models.LoadingDetail" title="ets.models.LoadingDetail" alt="" coords="343,258,535,286"/>
+<area shape="rect" id="node14" href="#ets.models.OrderItem" title="ets.models.OrderItem" alt="" coords="353,309,524,337"/>
+<area shape="rect" id="node16" href="#ets.models.Package" title="ets.models.Package" alt="" coords="360,359,517,387"/>
+<area shape="rect" id="node20" href="#ets.models.CompasLogger" title="ets.models.CompasLogger" alt="" coords="339,461,539,489"/>
+<area shape="rect" id="node23" href="#ets.models.Location" title="ets.models.Location" alt="" coords="360,511,517,539"/>
+<area shape="rect" id="node25" href="#ets.models.LossDamageType" title="ets.models.LossDamageType" alt="" coords="329,562,548,590"/>
+<area shape="rect" id="node27" href="#ets.models.Order" title="ets.models.Order" alt="" coords="369,613,508,641"/>
+<area shape="rect" id="node35" href="#ets.models.CommodityCategory" title="ets.models.CommodityCategory" alt="" coords="317,663,560,691"/>
+<area shape="rect" id="node37" href="#ets.models.Warehouse" title="ets.models.Warehouse" alt="" coords="351,714,527,742"/>
+<area shape="rect" id="node39" href="#ets.models.LastAttempt" title="ets.models.LastAttempt" alt="" coords="344,765,533,793"/>
+<area shape="rect" id="node41" href="#ets.models.Commodity" title="ets.models.Commodity" alt="" coords="349,815,528,843"/>
+<area shape="rect" id="node29" href="#ets.models.Person" title="ets.models.Person" alt="" coords="612,410,759,438"/>
+</map>

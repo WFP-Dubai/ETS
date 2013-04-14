@@ -1,0 +1,8 @@
+<map id="inheritanceeb1add79ea" name="inheritanceeb1add79ea">
+<area shape="rect" id="node1" href="#compas.models.Partner" title="compas.models.Partner" alt="" coords="301,5,483,33"/>
+<area shape="rect" id="node4" href="#compas.models.EpicStock" title="compas.models.EpicStock" alt="" coords="295,55,489,83"/>
+<area shape="rect" id="node6" href="#compas.models.LtiOriginal" title="compas.models.LtiOriginal" alt="" coords="293,106,491,134"/>
+<area shape="rect" id="node8" href="#compas.models.CompasPerson" title="compas.models.CompasPerson" alt="" coords="277,157,507,185"/>
+<area shape="rect" id="node10" href="#compas.models.Place" title="compas.models.Place" alt="" coords="309,207,475,235"/>
+<area shape="rect" id="node12" href="#compas.models.DispatchMaster" title="compas.models.DispatchMaster" alt="" coords="273,258,511,286"/>
+</map>

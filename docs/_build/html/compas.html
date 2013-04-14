@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>COMPAS &mdash; Electronic transaction system 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Electronic transaction system 0.1 documentation" href="index.html" />
+    <link rel="next" title="ETS" href="ets.html" />
+    <link rel="prev" title="Buildout" href="buildout.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ets.html" title="ETS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="buildout.html" title="Buildout"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="compas">
+<span id="id1"></span><h1>COMPAS<a class="headerlink" href="#compas" title="Permalink to this headline">¶</a></h1>
+<p>This application handles COMPAS database access.</p>
+<div class="section" id="module-compas.models">
+<span id="models"></span><h2>Models<a class="headerlink" href="#module-compas.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="compas.models.CompasPerson">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">CompasPerson</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.CompasPerson" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compas CompasPerson. We import them directly from compas Oracle using database view</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="compas.models.DispatchMaster">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">DispatchMaster</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.DispatchMaster" title="Permalink to this definition">¶</a></dt>
+<dd><p>DispatchMaster(code, document_code, dispatch_date, origin_type, origin_location_code)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="compas.models.EpicStock">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">EpicStock</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.EpicStock" title="Permalink to this definition">¶</a></dt>
+<dd><p>COMPAS stock. We retrieve it from Oracle database view.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="compas.models.LtiOriginal">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">LtiOriginal</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.LtiOriginal" title="Permalink to this definition">¶</a></dt>
+<dd><p>LTIs for office</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="compas.models.Partner">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">Partner</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.Partner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Partner organization</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="compas.models.Place">
+<em class="property">class </em><tt class="descclassname">compas.models.</tt><tt class="descname">Place</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#compas.models.Place" title="Permalink to this definition">¶</a></dt>
+<dd><p>Location model.
+Model based on compas Views &amp; Tables</p>
+</dd></dl>
+
+<div class="section" id="inheritance-diagrams">
+<h3>Inheritance diagrams<a class="headerlink" href="#inheritance-diagrams" title="Permalink to this headline">¶</a></h3>
+<p class="graphviz">
+<img src="_images/inheritance-b7b9e7ddf091adfa37995d478d40507bf2db53e3.png" alt="Inheritance diagram of compas.models" usemap="#inheritanceeb1add79ea" class="inheritance"/>
+<map id="inheritanceeb1add79ea" name="inheritanceeb1add79ea">
+<area shape="rect" id="node1" href="#compas.models.Partner" title="compas.models.Partner" alt="" coords="301,5,483,33"/>
+<area shape="rect" id="node4" href="#compas.models.EpicStock" title="compas.models.EpicStock" alt="" coords="295,55,489,83"/>
+<area shape="rect" id="node6" href="#compas.models.LtiOriginal" title="compas.models.LtiOriginal" alt="" coords="293,106,491,134"/>
+<area shape="rect" id="node8" href="#compas.models.CompasPerson" title="compas.models.CompasPerson" alt="" coords="277,157,507,185"/>
+<area shape="rect" id="node10" href="#compas.models.Place" title="compas.models.Place" alt="" coords="309,207,475,235"/>
+<area shape="rect" id="node12" href="#compas.models.DispatchMaster" title="compas.models.DispatchMaster" alt="" coords="273,258,511,286"/>
+</map>
+</p>
+</div>
+</div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-compas.management.commands.test_compas">
+<span id="test-compas-station-connection"></span><span id="test-compas"></span><h3>Test compas station connection<a class="headerlink" href="#module-compas.management.commands.test_compas" title="Permalink to this headline">¶</a></h3>
+</div>
+</div>
+<div class="section" id="module-ets.utils">
+<span id="utils"></span><h2>Utils<a class="headerlink" href="#module-ets.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="ets.utils.compas_importer">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">compas_importer</tt><big>(</big><em>func=None</em>, <em>log_success=False</em><big>)</big><a class="headerlink" href="#ets.utils.compas_importer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.data_to_file_response">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">data_to_file_response</tt><big>(</big><em>data</em>, <em>file_name</em><big>)</big><a class="headerlink" href="#ets.utils.data_to_file_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates response with provided data and inserts Content-Disposition header with file name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.fetch_resources">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">fetch_resources</tt><big>(</big><em>uri</em>, <em>rel</em><big>)</big><a class="headerlink" href="#ets.utils.fetch_resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback to allow pisa/reportlab to retrieve Images,Stylesheets, etc.
+<cite>uri</cite> is the href attribute from the html link element.
+<cite>rel</cite> gives a relative path, but it&#8217;s not used here.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.get_compas_data">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">get_compas_data</tt><big>(</big><em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.get_compas_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches all COMPAS-imported data, serializes and compresses them</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.history_list">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">history_list</tt><big>(</big><em>log_queryset</em>, <em>model</em>, <em>exclude=()</em><big>)</big><a class="headerlink" href="#ets.utils.history_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to generate history of actions at some objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_file">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_file</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#ets.utils.import_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads file, decompresses serialized data,deserializes it and saves objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_order">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_order</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports all LTIs from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_partners">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_partners</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports organizations from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_persons">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_persons</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_persons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports persons from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_places">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_places</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports warehouses with locations from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_reasons">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_reasons</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_reasons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports all possible loss/damage reasons</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_stock">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_stock</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_stock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports stock items or updates quantity</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.render_to_pdf">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">render_to_pdf</tt><big>(</big><em>request</em>, <em>template_name</em>, <em>context</em>, <em>file_name</em><big>)</big><a class="headerlink" href="#ets.utils.render_to_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders template with context to HTML, than to PDF</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.send_dispatched">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">send_dispatched</tt><big>(</big><em>waybill</em>, <em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.send_dispatched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits dispatched and validated waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.send_received">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">send_received</tt><big>(</big><em>waybill</em>, <em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.send_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits received and validated waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.update_compas">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">update_compas</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.update_compas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to run whole import process. If no fails Success ImportLogger is created.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.update_compas_info">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">update_compas_info</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.update_compas_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to run special import process. If no fails Success ImportLogger is created.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">COMPAS</a><ul>
+<li><a class="reference internal" href="#module-compas.models">Models</a><ul>
+<li><a class="reference internal" href="#inheritance-diagrams">Inheritance diagrams</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#commands">Commands</a><ul>
+<li><a class="reference internal" href="#module-compas.management.commands.test_compas">Test compas station connection</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-ets.utils">Utils</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="buildout.html"
+                        title="previous chapter">Buildout</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="ets.html"
+                        title="next chapter">ETS</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/compas.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="ets.html" title="ETS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="buildout.html" title="Buildout"
+             >previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, EPIC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

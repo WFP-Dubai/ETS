@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Buildout &mdash; Electronic transaction system 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Electronic transaction system 0.1 documentation" href="index.html" />
+    <link rel="next" title="COMPAS" href="compas.html" />
+    <link rel="prev" title="Package structure" href="package.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compas.html" title="COMPAS"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="package.html" title="Package structure"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="buildout">
+<span id="id1"></span><h1>Buildout<a class="headerlink" href="#buildout" title="Permalink to this headline">¶</a></h1>
+<p>Buildout is a Python-based build system for creating, assembling and deploying applications from multiple parts, some of which may be non-Python-based. It lets you create a buildout configuration and reproduce the same software later.
+(<a class="reference external" href="http://www.buildout.org/">http://www.buildout.org/</a>)</p>
+<p>We have four configurations for different purposes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#base-configuration"><em>base.cfg</em></a></li>
+<li><a class="reference internal" href="#default-configuration"><em>buildout.cfg</em></a></li>
+<li><a class="reference internal" href="#production-configuration"><em>production.cfg</em></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="base-configuration">
+<span id="id2"></span><h2>Base configuration<a class="headerlink" href="#base-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This is a base configuration, which contains all dependencies from different repositories, script generators.</p>
+<p>Contents:</p>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#mr-developer"><em>Mr. Developer extension</em></a></li>
+<li><a class="reference internal" href="#base-interpreter"><em>Python interpreter</em></a></li>
+<li><a class="reference internal" href="#base-sphinx"><em>Sphinx configuration</em></a></li>
+<li><a class="reference internal" href="#base-cmds"><em>Shell commands</em></a></li>
+</ul>
+</div></blockquote>
+<p>Code from repository is not stable, so we use it on our own risk.</p>
+<div class="section" id="mr-developer-extension">
+<span id="mr-developer"></span><h3>Mr. Developer extension<a class="headerlink" href="#mr-developer-extension" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>sources-dir = parts
+auto-checkout =
+    django-audit-log
+    django-mailer
+    django-logicaldelete
+    pyqrcode
+    django-google-analytics
+    django-ajax-selects
+    
+</pre>
+</div>
+<p>Where recipe determines buildout recipe, which fetches code from repository, then builds package, installs dependencies.</p>
+</div>
+<div class="section" id="python-interpreter">
+<span id="base-interpreter"></span><h3>Python interpreter<a class="headerlink" href="#python-interpreter" title="Permalink to this headline">¶</a></h3>
+<p>This part is used for collecting all dependencies and creating proper PYTHONPATH.</p>
+<div class="highlight-python"><pre>[interpreter]
+recipe = zc.recipe.egg
+eggs =  
+    ${buildout:eggs}
+interpreter = python
+scripts = python
+</pre>
+</div>
+</div>
+<div class="section" id="django-recipes">
+<span id="django-recipe"></span><h3>Django recipes<a class="headerlink" href="#django-recipes" title="Permalink to this headline">¶</a></h3>
+<p>We use special buildout recipe to fetch django and create <cite>manage</cite> and <cite>wsgi</cite> scripts.</p>
+<p>There are two parts with different <cite>settings</cite>.</p>
+<div class="highlight-python"><pre>[instance]
+recipe        = djangoprojectrecipe
+python        = interpreter
+eggs          = ${interpreter:eggs}
+#projectegg    = ets
+settings      = ets.settings
+wsgi          = true
+#test          = ets
+
+</pre>
+</div>
+<p>This part downloads django 1.3, uses dependencies from <a class="reference internal" href="#base-interpreter"><em>Python interpreter</em></a>, creates script <cite>instance</cite>, which acts like usual <cite>manage</cite>.
+It creates a script <cite>instance.wsgi</cite>.</p>
+</div>
+<div class="section" id="sphinx">
+<span id="base-sphinx"></span><h3>Sphinx<a class="headerlink" href="#sphinx" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>[sphinx]
+recipe = collective.recipe.sphinxbuilder
+interpreter = export DJANGO_SETTINGS_MODULE=ets.dev_settings; ${buildout:directory}/bin/python
+script-name = make-docs
+source = ${buildout:directory}/docs
+build = ${buildout:directory}/docs/_build
+outputs = 
+      html
+
+</pre>
+</div>
+<p>Use script <cite>make-docs</cite> to create or update documentation.
+Built docs will be stored in <cite>docs/_build</cite> folder.</p>
+</div>
+<div class="section" id="shell-commands">
+<span id="base-cmds"></span><h3>Shell commands<a class="headerlink" href="#shell-commands" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>    # Create DB relations and migrate them
+    ./bin/instance syncdb --noinput --migrate --database=default
+    ./bin/instance loaddata groups --database=default    
+    ./bin/instance loaddata permissions --database=default
+    
+    #Collect static files
+    ./bin/instance collectstatic --noinput --link    
+</pre>
+</div>
+</div>
+</div>
+<div class="section" id="development-configuration">
+<span id="default-configuration"></span><h2>Development configuration<a class="headerlink" href="#development-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This configuration file used in development.</p>
+<p>To inherit <a class="reference internal" href="#default-configuration"><em>Development configuration</em></a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">buildout</span><span class="p">]</span>
+<span class="n">extends</span> <span class="o">=</span> <span class="n">base</span><span class="o">.</span><span class="n">cfg</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="pydev-configuration">
+<span id="id3"></span><h2>PyDev configuration<a class="headerlink" href="#pydev-configuration" title="Permalink to this headline">¶</a></h2>
+<p>If you use <a class="reference external" href="http://www.eclipse.org">Eclipse IDE</a>, this configuration will be useful for you. It contains special recipe:</p>
+<div class="highlight-python"><pre>parts = ${buildout:base-parts}
+        pydev
+
+[pydev]
+recipe = pb.recipes.pydev
+eggs = ${buildout:eggs}
+</pre>
+</div>
+<p>This part registers all eggs and extra paths in eclipse project.</p>
+</div>
+<div class="section" id="production-configuration">
+<span id="id4"></span><h2>Production configuration<a class="headerlink" href="#production-configuration" title="Permalink to this headline">¶</a></h2>
+<p>This configurations sets up production environment.</p>
+<p>Couple of thing we do:</p>
+<blockquote>
+<div><ul class="simple">
+<li>append egg psycopg2</li>
+<li>do check new versions of eggs</li>
+<li>do not unzip eggs</li>
+<li>install redis</li>
+<li>create wsgi script</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Buildout</a><ul>
+<li><a class="reference internal" href="#base-configuration">Base configuration</a><ul>
+<li><a class="reference internal" href="#mr-developer-extension">Mr. Developer extension</a></li>
+<li><a class="reference internal" href="#python-interpreter">Python interpreter</a></li>
+<li><a class="reference internal" href="#django-recipes">Django recipes</a></li>
+<li><a class="reference internal" href="#sphinx">Sphinx</a></li>
+<li><a class="reference internal" href="#shell-commands">Shell commands</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#development-configuration">Development configuration</a></li>
+<li><a class="reference internal" href="#pydev-configuration">PyDev configuration</a></li>
+<li><a class="reference internal" href="#production-configuration">Production configuration</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="package.html"
+                        title="previous chapter">Package structure</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="compas.html"
+                        title="next chapter">COMPAS</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/buildout.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compas.html" title="COMPAS"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="package.html" title="Package structure"
+             >previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, EPIC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

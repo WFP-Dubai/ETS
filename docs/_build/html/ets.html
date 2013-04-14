@@ -1,0 +1,952 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>ETS &mdash; Electronic transaction system 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Electronic transaction system 0.1 documentation" href="index.html" />
+    <link rel="prev" title="COMPAS" href="compas.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compas.html" title="COMPAS"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="ets">
+<span id="id1"></span><h1>ETS<a class="headerlink" href="#ets" title="Permalink to this headline">¶</a></h1>
+<p>Central application in the system.</p>
+<div class="section" id="module-ets.models">
+<span id="models"></span><span id="ets-models"></span><h2>Models<a class="headerlink" href="#module-ets.models" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ets.models.Commodity">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Commodity</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Commodity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commodity model</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.CommodityCategory">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">CommodityCategory</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.CommodityCategory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Commodity category</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Compas">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Compas</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Compas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compas station</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.CompasLogger">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">CompasLogger</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.CompasLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>CompasLogger(id, action, compas_id, waybill_id, when_attempted, status, message)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.ImportLogger">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">ImportLogger</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.ImportLogger" title="Permalink to this definition">¶</a></dt>
+<dd><p>ImportLogger(id, compas_id, when_attempted, status, message)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.LastAttempt">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">LastAttempt</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.LastAttempt" title="Permalink to this definition">¶</a></dt>
+<dd><p>LastAttempt(id, compas_id, attempt_date, status)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.LoadingDetail">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">LoadingDetail</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.LoadingDetail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loading details related to dispatch waybill</p>
+<dl class="method">
+<dt id="ets.models.LoadingDetail.get_order_item">
+<tt class="descname">get_order_item</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.LoadingDetail.get_order_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order item through warehouse</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Location">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Location</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Location" title="Permalink to this definition">¶</a></dt>
+<dd><p>Location model. City or region</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.LossDamageType">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">LossDamageType</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.LossDamageType" title="Permalink to this definition">¶</a></dt>
+<dd><p>LossDamageType(slug, type, category_id, cause)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Order">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Order</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delivery order</p>
+<dl class="method">
+<dt id="ets.models.Order.get_stock_items">
+<tt class="descname">get_stock_items</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Order.get_stock_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order through warehouse</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.OrderItem">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">OrderItem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.OrderItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order item with commodity and counters</p>
+<dl class="method">
+<dt id="ets.models.OrderItem.get_available_stocks">
+<tt class="descname">get_available_stocks</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_available_stocks" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates available stocks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_available_stocks_mt">
+<tt class="descname">get_available_stocks_mt</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_available_stocks_mt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates available stocks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_dispatched_not_yet_counted_of_stock">
+<tt class="descname">get_dispatched_not_yet_counted_of_stock</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_dispatched_not_yet_counted_of_stock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates available stocks</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_order_dispatches">
+<tt class="descname">get_order_dispatches</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_order_dispatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns dispatches of current order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_percent_executed">
+<tt class="descname">get_percent_executed</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_percent_executed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates percent for executed</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_similar_dispatches">
+<tt class="descname">get_similar_dispatches</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_similar_dispatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all loading details with such item within any orders</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.get_stock_items">
+<tt class="descname">get_stock_items</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.get_stock_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order item through warehouse</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.items_left">
+<tt class="descname">items_left</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.items_left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates number of such items supposed to be delivered in this order</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.stock_items">
+<tt class="descname">stock_items</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.stock_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order item through warehouse</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.OrderItem.tonnes_left">
+<tt class="descname">tonnes_left</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.OrderItem.tonnes_left" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates number of such items supposed to be delivered in this order</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Organization">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Organization</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Organization" title="Permalink to this definition">¶</a></dt>
+<dd><p>Organization model</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Package">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Package</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Package" title="Permalink to this definition">¶</a></dt>
+<dd><p>Packaging model</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Person">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Person</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Person" title="Permalink to this definition">¶</a></dt>
+<dd><p>Person model</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.StockItem">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">StockItem</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.StockItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accessible stocks</p>
+<dl class="method">
+<dt id="ets.models.StockItem.get_order_item">
+<tt class="descname">get_order_item</tt><big>(</big><em>order_pk</em><big>)</big><a class="headerlink" href="#ets.models.StockItem.get_order_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order item through warehouse</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.StockItem.get_order_quantity">
+<tt class="descname">get_order_quantity</tt><big>(</big><em>order_pk</em><big>)</big><a class="headerlink" href="#ets.models.StockItem.get_order_quantity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieves stock items for current order item through warehouse</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Warehouse">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Warehouse</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Warehouse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Warehouse. dispatch or recipient.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.models.Waybill">
+<em class="property">class </em><tt class="descclassname">ets.models.</tt><tt class="descname">Waybill</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.models.Waybill" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base waybill abstract class</p>
+<dl class="method">
+<dt id="ets.models.Waybill.barcode_qr">
+<tt class="descname">barcode_qr</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.barcode_qr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bar code generator. This view uses &#8216;pyqrcode&#8217; for back-end. It returns image file in response.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.Waybill.clean">
+<tt class="descname">clean</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates Waybill instance. Checks different dates</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.Waybill.compress">
+<tt class="descname">compress</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.compress" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method compress the Waybill using zipBase64 algorithm.</p>
+<p>&#64;param self: the Waybill instance
+&#64;return: a string containing the compressed representation of the Waybill with items</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.Waybill.dispatch_sign">
+<tt class="descname">dispatch_sign</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.dispatch_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs the waybill as ready to be sent.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ets.models.Waybill.dispatches">
+<em class="property">classmethod </em><tt class="descname">dispatches</tt><big>(</big><em>user</em><big>)</big><a class="headerlink" href="#ets.models.Waybill.dispatches" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all loaded but not signed waybills, and related to user</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.Waybill.receipt_sign">
+<tt class="descname">receipt_sign</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.receipt_sign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs the receipt waybill as ready to be sent.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="ets.models.Waybill.receptions">
+<em class="property">classmethod </em><tt class="descname">receptions</tt><big>(</big><em>user</em><big>)</big><a class="headerlink" href="#ets.models.Waybill.receptions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns all waybills, that can be received, and related to user</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.models.Waybill.serialize">
+<tt class="descname">serialize</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.models.Waybill.serialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>This method serializes the Waybill with related LoadingDetails, LtiOriginals and EpicStocks.</p>
+<p>&#64;param self: the Waybill instance
+&#64;return the serialized json data.</p>
+</dd></dl>
+
+</dd></dl>
+
+<div class="section" id="inheritance-diagrams">
+<h3>Inheritance diagrams<a class="headerlink" href="#inheritance-diagrams" title="Permalink to this headline">¶</a></h3>
+<p class="graphviz">
+<img src="_images/inheritance-28bb308e4f06708d7eada2fdbee02e111b665cdb.png" alt="Inheritance diagram of ets.models" usemap="#inheritancee5d7bc0163" class="inheritance"/>
+<map id="inheritancee5d7bc0163" name="inheritancee5d7bc0163">
+<area shape="rect" id="node4" href="#ets.models.Waybill" title="ets.models.Waybill" alt="" coords="612,30,759,58"/>
+<area shape="rect" id="node31" href="#ets.models.Compas" title="ets.models.Compas" alt="" coords="608,81,763,109"/>
+<area shape="rect" id="node6" href="#ets.models.Organization" title="ets.models.Organization" alt="" coords="345,106,532,134"/>
+<area shape="rect" id="node8" href="#ets.models.StockItem" title="ets.models.StockItem" alt="" coords="353,157,524,185"/>
+<area shape="rect" id="node10" href="#ets.models.ImportLogger" title="ets.models.ImportLogger" alt="" coords="343,207,535,235"/>
+<area shape="rect" id="node12" href="#ets.models.LoadingDetail" title="ets.models.LoadingDetail" alt="" coords="343,258,535,286"/>
+<area shape="rect" id="node14" href="#ets.models.OrderItem" title="ets.models.OrderItem" alt="" coords="353,309,524,337"/>
+<area shape="rect" id="node16" href="#ets.models.Package" title="ets.models.Package" alt="" coords="360,359,517,387"/>
+<area shape="rect" id="node20" href="#ets.models.CompasLogger" title="ets.models.CompasLogger" alt="" coords="339,461,539,489"/>
+<area shape="rect" id="node23" href="#ets.models.Location" title="ets.models.Location" alt="" coords="360,511,517,539"/>
+<area shape="rect" id="node25" href="#ets.models.LossDamageType" title="ets.models.LossDamageType" alt="" coords="329,562,548,590"/>
+<area shape="rect" id="node27" href="#ets.models.Order" title="ets.models.Order" alt="" coords="369,613,508,641"/>
+<area shape="rect" id="node35" href="#ets.models.CommodityCategory" title="ets.models.CommodityCategory" alt="" coords="317,663,560,691"/>
+<area shape="rect" id="node37" href="#ets.models.Warehouse" title="ets.models.Warehouse" alt="" coords="351,714,527,742"/>
+<area shape="rect" id="node39" href="#ets.models.LastAttempt" title="ets.models.LastAttempt" alt="" coords="344,765,533,793"/>
+<area shape="rect" id="node41" href="#ets.models.Commodity" title="ets.models.Commodity" alt="" coords="349,815,528,843"/>
+<area shape="rect" id="node29" href="#ets.models.Person" title="ets.models.Person" alt="" coords="612,410,759,438"/>
+</map>
+</p>
+</div>
+</div>
+<div class="section" id="module-ets.views">
+<span id="views"></span><span id="ets-views"></span><h2>Views<a class="headerlink" href="#module-ets.views" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ets.views.ImportData">
+<em class="property">class </em><tt class="descclassname">ets.views.</tt><tt class="descname">ImportData</tt><big>(</big><em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.ImportData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports file with compressed data, i.e. all datas from compas or eveb waybills</p>
+<dl class="attribute">
+<dt id="ets.views.ImportData.form_class">
+<tt class="descname">form_class</tt><a class="headerlink" href="#ets.views.ImportData.form_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">ImportDataForm</span></tt></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.barcode_qr">
+<tt class="descclassname">ets.views.</tt><tt class="descname">barcode_qr</tt><big>(</big><em>request, waybill_pk, queryset=[&lt;Waybill: ISBX00211A&gt;, &lt;Waybill: ISBX00311A&gt;, &lt;Waybill: ISBX00312A&gt;]</em><big>)</big><a class="headerlink" href="#ets.views.barcode_qr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bar code generator. This view uses &#8216;pyqrcode&#8217; for back-end. It returns image file in response.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.deserialize">
+<tt class="descclassname">ets.views.</tt><tt class="descname">deserialize</tt><big>(</big><em>request</em>, <em>form_class=&lt;class 'ets.forms.WaybillScanForm'&gt;</em><big>)</big><a class="headerlink" href="#ets.views.deserialize" title="Permalink to this definition">¶</a></dt>
+<dd><p>View that accepts POST request with serialized and compress data. 
+And, decompress it, finds a waybill and redirects to waybill details.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.dispatch_validates">
+<tt class="descclassname">ets.views.</tt><tt class="descname">dispatch_validates</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.dispatch_validates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listing of dispatch waybills. 
+Firstly officer validates a waybill, then he can push it to COMPAS. 
+Otherwise system does it every 2 minutes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.dispatched_in_compas">
+<tt class="descclassname">ets.views.</tt><tt class="descname">dispatched_in_compas</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#ets.views.dispatched_in_compas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="ets.views.export_compas_file">
+<tt class="descclassname">ets.views.</tt><tt class="descname">export_compas_file</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#ets.views.export_compas_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a file with all COMPAS data in response</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.get_stock_data">
+<tt class="descclassname">ets.views.</tt><tt class="descname">get_stock_data</tt><big>(</big><em>request</em>, <em>order_pk</em>, <em>queryset</em><big>)</big><a class="headerlink" href="#ets.views.get_stock_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility ajax view that returns stock item information to fill dispatch form.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.handle_sync_compas">
+<tt class="descclassname">ets.views.</tt><tt class="descname">handle_sync_compas</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.handle_sync_compas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Executes COMPAS import for specific station.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.receipt_validates">
+<tt class="descclassname">ets.views.</tt><tt class="descname">receipt_validates</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.receipt_validates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listing of receipt waybills. 
+Firstly officer validates a waybill, then he can push it to COMPAS. 
+Otherwise system does it every 2 minutes.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.send_dispatched_view">
+<tt class="descclassname">ets.views.</tt><tt class="descname">send_dispatched_view</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.send_dispatched_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits dispatch waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.send_received_view">
+<tt class="descclassname">ets.views.</tt><tt class="descname">send_received_view</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.send_received_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits received waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.stock_items">
+<tt class="descclassname">ets.views.</tt><tt class="descname">stock_items</tt><big>(</big><em>request</em>, <em>template_name</em>, <em>queryset</em><big>)</big><a class="headerlink" href="#ets.views.stock_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Listing of stock items splitted by warehouses.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.sync_compas">
+<tt class="descclassname">ets.views.</tt><tt class="descname">sync_compas</tt><big>(</big><em>request</em>, <em>queryset</em>, <em>template_name='sync/sync_compas.html'</em><big>)</big><a class="headerlink" href="#ets.views.sync_compas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Landing page, that shows all COMPAS stations with possibility to import one-by-one.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.validate_dispatch">
+<tt class="descclassname">ets.views.</tt><tt class="descname">validate_dispatch</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.validate_dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets dispatch &#8216;validated&#8217; flag. It allows system to submit this waybill to COMPAS.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.validate_receipt">
+<tt class="descclassname">ets.views.</tt><tt class="descname">validate_receipt</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.validate_receipt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets receipt &#8216;validated&#8217; flag. It allows system to submit this waybill to COMPAS.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_create">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_create</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a Waybill</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_delete">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_delete</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes specific waybill</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_detail">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_detail</tt><big>(</big><em>request</em>, <em>waybill</em>, <em>template='waybill/detail.html'</em>, <em>extra_context=None</em><big>)</big><a class="headerlink" href="#ets.views.waybill_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>utility that shows waybill&#8217;s details</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_dispatch_edit">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_dispatch_edit</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_dispatch_edit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Updates not signed dispatching waybill</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_finalize_dispatch">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_finalize_dispatch</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_finalize_dispatch" title="Permalink to this definition">¶</a></dt>
+<dd><p>called when user pushes Print Original on dispatch
+Redirects to order details</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_finalize_receipt">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_finalize_receipt</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_finalize_receipt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Signs reception</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_list">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_list</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shows waybill listing</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_pdf">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_pdf</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates PDF version of waybill</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_reception">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_reception</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_reception" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill reception view</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_reception_scanned">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_reception_scanned</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_reception_scanned" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special view that accepts scanned data^ deserialized and redirect to waybill_receiption of that waybill</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_search">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_search</tt><big>(</big><em>request, form_class=&lt;class 'ets.forms.WaybillSearchForm'&gt;, queryset=[&lt;Waybill: ISBX00211A&gt;, &lt;Waybill: ISBX00311A&gt;, &lt;Waybill: ISBX00312A&gt;], template='waybill/list2.html'</em><big>)</big><a class="headerlink" href="#ets.views.waybill_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill search view. Simply a wrapper on waybill_list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.views.waybill_view">
+<tt class="descclassname">ets.views.</tt><tt class="descname">waybill_view</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.views.waybill_view" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill details view</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ets.forms">
+<span id="forms"></span><h2>Forms<a class="headerlink" href="#module-ets.forms" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ets.forms.BaseLoadingDetailFormSet">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">BaseLoadingDetailFormSet</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>instance=None</em>, <em>save_as_new=False</em>, <em>prefix=None</em>, <em>queryset=None</em><big>)</big><a class="headerlink" href="#ets.forms.BaseLoadingDetailFormSet" title="Permalink to this definition">¶</a></dt>
+<dd><p>FormSet base model. We use this formset in dispatch page.</p>
+<dl class="method">
+<dt id="ets.forms.BaseLoadingDetailFormSet.clean">
+<tt class="descname">clean</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.forms.BaseLoadingDetailFormSet.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates number of waybill items. System requires at least one line.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.DispatchWaybillForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">DispatchWaybillForm</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.util.ErrorList'&gt;</em>, <em>label_suffix=':'</em>, <em>empty_permitted=False</em>, <em>instance=None</em><big>)</big><a class="headerlink" href="#ets.forms.DispatchWaybillForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dispatch waybill form.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.ImportDataForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">ImportDataForm</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.util.ErrorList'&gt;</em>, <em>label_suffix=':'</em>, <em>empty_permitted=False</em><big>)</big><a class="headerlink" href="#ets.forms.ImportDataForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Form that accepts file to import datas.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.LoadingDetailDispatchForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">LoadingDetailDispatchForm</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.util.ErrorList'&gt;</em>, <em>label_suffix=':'</em>, <em>empty_permitted=False</em>, <em>instance=None</em><big>)</big><a class="headerlink" href="#ets.forms.LoadingDetailDispatchForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>LoadingDetails model form to use in dispatch page.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.LoadingDetailReceiptForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">LoadingDetailReceiptForm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.forms.LoadingDetailReceiptForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Model form for loading details on receipt page.</p>
+<dl class="method">
+<dt id="ets.forms.LoadingDetailReceiptForm.clean">
+<tt class="descname">clean</tt><big>(</big><big>)</big><a class="headerlink" href="#ets.forms.LoadingDetailReceiptForm.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validates entered values, i.e. quantities</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.PersonChangeForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">PersonChangeForm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.forms.PersonChangeForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Person model form</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.StrippedTextInput">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">StrippedTextInput</tt><big>(</big><em>attrs=None</em><big>)</big><a class="headerlink" href="#ets.forms.StrippedTextInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special form input to strip spaces.</p>
+<dl class="method">
+<dt id="ets.forms.StrippedTextInput.value_from_datadict">
+<tt class="descname">value_from_datadict</tt><big>(</big><em>data</em>, <em>files</em>, <em>name</em><big>)</big><a class="headerlink" href="#ets.forms.StrippedTextInput.value_from_datadict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a dictionary of data and this widget&#8217;s name, returns the value
+of this widget. Returns None if it&#8217;s not provided.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.WaybillRecieptForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">WaybillRecieptForm</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="headerlink" href="#ets.forms.WaybillRecieptForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill receipt form.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.WaybillScanForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">WaybillScanForm</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.util.ErrorList'&gt;</em>, <em>label_suffix=':'</em>, <em>empty_permitted=False</em><big>)</big><a class="headerlink" href="#ets.forms.WaybillScanForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill scan form with one input</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.forms.WaybillSearchForm">
+<em class="property">class </em><tt class="descclassname">ets.forms.</tt><tt class="descname">WaybillSearchForm</tt><big>(</big><em>data=None</em>, <em>files=None</em>, <em>auto_id='id_%s'</em>, <em>prefix=None</em>, <em>initial=None</em>, <em>error_class=&lt;class 'django.forms.util.ErrorList'&gt;</em>, <em>label_suffix=':'</em>, <em>empty_permitted=False</em><big>)</big><a class="headerlink" href="#ets.forms.WaybillSearchForm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search form with only one field: query set</p>
+</dd></dl>
+
+</div>
+<div class="section" id="commands">
+<h2>Commands<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-ets.management.commands.syncdb">
+<span id="special-syncdb"></span><span id="syncdb"></span><h3>Special Syncdb<a class="headerlink" href="#module-ets.management.commands.syncdb" title="Permalink to this headline">¶</a></h3>
+<p>Overridden syncdb command</p>
+<dl class="class">
+<dt id="ets.management.commands.syncdb.Command">
+<em class="property">class </em><tt class="descclassname">ets.management.commands.syncdb.</tt><tt class="descname">Command</tt><a class="headerlink" href="#ets.management.commands.syncdb.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special version of South&#8217; syncdb command to make it work with our compas stations.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ets.management.commands.sync_compas">
+<span id="import-data-from-compas"></span><span id="sync-compas"></span><h3>Import data from COMPAS<a class="headerlink" href="#module-ets.management.commands.sync_compas" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="ets.management.commands.sync_compas.Command">
+<em class="property">class </em><tt class="descclassname">ets.management.commands.sync_compas.</tt><tt class="descname">Command</tt><a class="headerlink" href="#ets.management.commands.sync_compas.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Import data from COMPAS stations. 
+Accepts following arguments:</p>
+<blockquote>
+<div>&#8211;compas &#8211; COMPAS station identifier (i.e. ISBX002 for example)</div></blockquote>
+<dl class="method">
+<dt id="ets.management.commands.sync_compas.Command.synchronize">
+<tt class="descname">synchronize</tt><big>(</big><em>compas</em><big>)</big><a class="headerlink" href="#ets.management.commands.sync_compas.Command.synchronize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exact method to proceed synchronization</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-ets.management.commands.submit_waybills">
+<span id="submit-created-waybills-back-to-compas"></span><span id="submit-waybills"></span><h3>Submit created waybills back to COMPAS<a class="headerlink" href="#module-ets.management.commands.submit_waybills" title="Permalink to this headline">¶</a></h3>
+<dl class="class">
+<dt id="ets.management.commands.submit_waybills.Command">
+<em class="property">class </em><tt class="descclassname">ets.management.commands.submit_waybills.</tt><tt class="descname">Command</tt><a class="headerlink" href="#ets.management.commands.submit_waybills.Command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits waybills to COMPAS. Both dispatch and receipt. Afterwards imports stock items to update quantity. 
+Accepts following arguments:</p>
+<blockquote>
+<div>&#8211;compas &#8211; COMPAS station identifier (i.e. ISBX002 for example)</div></blockquote>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-ets.middleware">
+<span id="middleware"></span><h2>Middleware<a class="headerlink" href="#module-ets.middleware" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="ets.middleware.RequiredAuthenticationMiddleware">
+<em class="property">class </em><tt class="descclassname">ets.middleware.</tt><tt class="descname">RequiredAuthenticationMiddleware</tt><a class="headerlink" href="#ets.middleware.RequiredAuthenticationMiddleware" title="Permalink to this definition">¶</a></dt>
+<dd><p>Middleware that forces every user to be authenticated. Otherwise returns login form.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-ets.utils">
+<span id="utils"></span><span id="ets-utils"></span><h2>Utils<a class="headerlink" href="#module-ets.utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="ets.utils.compas_importer">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">compas_importer</tt><big>(</big><em>func=None</em>, <em>log_success=False</em><big>)</big><a class="headerlink" href="#ets.utils.compas_importer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Decorator to wrap method that imports data from COMPAS. In case of error Importlogger object is created.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.data_to_file_response">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">data_to_file_response</tt><big>(</big><em>data</em>, <em>file_name</em><big>)</big><a class="headerlink" href="#ets.utils.data_to_file_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates response with provided data and inserts Content-Disposition header with file name.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.fetch_resources">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">fetch_resources</tt><big>(</big><em>uri</em>, <em>rel</em><big>)</big><a class="headerlink" href="#ets.utils.fetch_resources" title="Permalink to this definition">¶</a></dt>
+<dd><p>Callback to allow pisa/reportlab to retrieve Images,Stylesheets, etc.
+<cite>uri</cite> is the href attribute from the html link element.
+<cite>rel</cite> gives a relative path, but it&#8217;s not used here.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.get_compas_data">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">get_compas_data</tt><big>(</big><em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.get_compas_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fetches all COMPAS-imported data, serializes and compresses them</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.history_list">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">history_list</tt><big>(</big><em>log_queryset</em>, <em>model</em>, <em>exclude=()</em><big>)</big><a class="headerlink" href="#ets.utils.history_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to generate history of actions at some objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_file">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_file</tt><big>(</big><em>f</em><big>)</big><a class="headerlink" href="#ets.utils.import_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads file, decompresses serialized data,deserializes it and saves objects</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_order">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_order</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_order" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports all LTIs from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_partners">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_partners</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_partners" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports organizations from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_persons">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_persons</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_persons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports persons from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_places">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_places</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_places" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports warehouses with locations from COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_reasons">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_reasons</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_reasons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports all possible loss/damage reasons</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.import_stock">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">import_stock</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.import_stock" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports stock items or updates quantity</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.render_to_pdf">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">render_to_pdf</tt><big>(</big><em>request</em>, <em>template_name</em>, <em>context</em>, <em>file_name</em><big>)</big><a class="headerlink" href="#ets.utils.render_to_pdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renders template with context to HTML, than to PDF</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.send_dispatched">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">send_dispatched</tt><big>(</big><em>waybill</em>, <em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.send_dispatched" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits dispatched and validated waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.send_received">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">send_received</tt><big>(</big><em>waybill</em>, <em>compas=None</em><big>)</big><a class="headerlink" href="#ets.utils.send_received" title="Permalink to this definition">¶</a></dt>
+<dd><p>Submits received and validated waybills to COMPAS</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.update_compas">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">update_compas</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.update_compas" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to run whole import process. If no fails Success ImportLogger is created.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.utils.update_compas_info">
+<tt class="descclassname">ets.utils.</tt><tt class="descname">update_compas_info</tt><big>(</big><em>using</em><big>)</big><a class="headerlink" href="#ets.utils.update_compas_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Utility to run special import process. If no fails Success ImportLogger is created.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="settings">
+<h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>URL_PREFIX</strong> &#8211; site prefix,</li>
+</ul>
+</div>
+<div class="section" id="reports">
+<h2>Reports<a class="headerlink" href="#reports" title="Permalink to this headline">¶</a></h2>
+<p>Piston is used for handling reports. We have a bunch of different handlers. And special emitter to create CSV.</p>
+<span class="target" id="module-ets.api.handlers"></span><dl class="class">
+<dt id="ets.api.handlers.CSVEmitter">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">CSVEmitter</tt><big>(</big><em>payload</em>, <em>typemapper</em>, <em>handler</em>, <em>fields=()</em>, <em>anonymous=True</em><big>)</big><a class="headerlink" href="#ets.api.handlers.CSVEmitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Emitter that returns CSV file</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadCSVWarehouseHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadCSVWarehouseHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadCSVWarehouseHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Warehouse short information with code, name and location</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadCSVWarehouseHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadCSVWarehouseHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Warehouse</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadCSVWarehouseHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadCSVWarehouseHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>country, location. warehouse information</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadLoadingDetailHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadLoadingDetailHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadLoadingDetailHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill details with loading details flattened</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadLoadingDetailHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadLoadingDetailHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">LoadingDetail</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadLoadingDetailHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em>, <em>waybill=''</em>, <em>warehouse=''</em>, <em>destination=''</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadLoadingDetailHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return loading details for waybills in CSV</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadOrderItemsHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadOrderItemsHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadOrderItemsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order details with commodity items flattened</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadOrderItemsHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadOrderItemsHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">OrderItem</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadOrderItemsHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em>, <em>order=''</em>, <em>warehouse=''</em>, <em>destination=''</em>, <em>consignee=''</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadOrderItemsHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return order items in CSV</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadOrdersHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadOrdersHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadOrdersHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Order details without items</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadOrdersHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadOrdersHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Order</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadOrdersHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em>, <em>code=''</em>, <em>warehouse=''</em>, <em>destination=''</em>, <em>consignee=''</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadOrdersHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return orders in CSV</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadStockItemsHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadStockItemsHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadStockItemsHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stock items</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadStockItemsHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadStockItemsHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">StockItem</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadStockItemsHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em>, <em>warehouse=''</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadStockItemsHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds all sent waybills to provided destination</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="ets.api.handlers.ReadWaybillHandler">
+<em class="property">class </em><tt class="descclassname">ets.api.handlers.</tt><tt class="descname">ReadWaybillHandler</tt><a class="headerlink" href="#ets.api.handlers.ReadWaybillHandler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Waybill details without loading details</p>
+<dl class="attribute">
+<dt id="ets.api.handlers.ReadWaybillHandler.model">
+<tt class="descname">model</tt><a class="headerlink" href="#ets.api.handlers.ReadWaybillHandler.model" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <tt class="xref py py-class docutils literal"><span class="pre">Waybill</span></tt></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="ets.api.handlers.ReadWaybillHandler.read">
+<tt class="descname">read</tt><big>(</big><em>request</em>, <em>slug=''</em>, <em>warehouse=''</em>, <em>destination=''</em><big>)</big><a class="headerlink" href="#ets.api.handlers.ReadWaybillHandler.read" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return waybills in CSV</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.api.handlers.get_flattened_field_names">
+<tt class="descclassname">ets.api.handlers.</tt><tt class="descname">get_flattened_field_names</tt><big>(</big><em>fields</em><big>)</big><a class="headerlink" href="#ets.api.handlers.get_flattened_field_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator to convert intermodel relations waybill__order__pk to getitem waybill.order.pk</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="ets.api.handlers.get_titles">
+<tt class="descclassname">ets.api.handlers.</tt><tt class="descname">get_titles</tt><big>(</big><em>model</em><big>)</big><a class="headerlink" href="#ets.api.handlers.get_titles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts titles from model fields</p>
+</dd></dl>
+
+<p>Every handler has at least one mapping line in urls.py.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">ETS</a><ul>
+<li><a class="reference internal" href="#module-ets.models">Models</a><ul>
+<li><a class="reference internal" href="#inheritance-diagrams">Inheritance diagrams</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-ets.views">Views</a></li>
+<li><a class="reference internal" href="#module-ets.forms">Forms</a></li>
+<li><a class="reference internal" href="#commands">Commands</a><ul>
+<li><a class="reference internal" href="#module-ets.management.commands.syncdb">Special Syncdb</a></li>
+<li><a class="reference internal" href="#module-ets.management.commands.sync_compas">Import data from COMPAS</a></li>
+<li><a class="reference internal" href="#module-ets.management.commands.submit_waybills">Submit created waybills back to COMPAS</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-ets.middleware">Middleware</a></li>
+<li><a class="reference internal" href="#module-ets.utils">Utils</a></li>
+<li><a class="reference internal" href="#settings">Settings</a></li>
+<li><a class="reference internal" href="#reports">Reports</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="compas.html"
+                        title="previous chapter">COMPAS</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/ets.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="compas.html" title="COMPAS"
+             >previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, EPIC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

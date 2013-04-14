@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Installation procedure &mdash; Electronic transaction system 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Electronic transaction system 0.1 documentation" href="index.html" />
+    <link rel="next" title="Package structure" href="package.html" />
+    <link rel="prev" title="Welcome to Afisha’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="package.html" title="Package structure"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Afisha’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="installation-procedure">
+<h1>Installation procedure<a class="headerlink" href="#installation-procedure" title="Permalink to this headline">¶</a></h1>
+<p>Here is a quick and dirty guide, that will help you to install system in different cases.</p>
+<div class="section" id="dependencies">
+<span id="id1"></span><h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
+<p>Following names of package are called so in debian package system:</p>
+<div class="highlight-python"><pre>sudo apt-get install python git-core python-dev python-setuptools gettext libpq-dev libjpeg-dev libfreetype6-dev zlib1g-dev subversion python-svn graphviz libgraphviz-dev build-essential
+sudo easy_install -U zc.buildout</pre>
+</div>
+</div>
+<div class="section" id="local-environment">
+<span id="development-environment"></span><h2>Local environment<a class="headerlink" href="#local-environment" title="Permalink to this headline">¶</a></h2>
+<p>Change directory to project&#8217;s root.</p>
+<div class="section" id="build-project">
+<h3>Build project<a class="headerlink" href="#build-project" title="Permalink to this headline">¶</a></h3>
+<p>Build project using buildout and run it:</p>
+<div class="highlight-python"><pre>python ./bootstrap.py; ./bin/buildout; ./bin/instance runserver</pre>
+</div>
+<p>If you user Pydev, change last command as follows:</p>
+<div class="highlight-python"><pre>./bin/instance runserver -c ./pydev.cfg</pre>
+</div>
+</div>
+<div class="section" id="test-environment">
+<h3>Test environment<a class="headerlink" href="#test-environment" title="Permalink to this headline">¶</a></h3>
+<p>Go to <a class="reference external" href="http://localhost:8000/admin/">http://localhost:8000/admin/</a></p>
+<ul>
+<li><p class="first">Default Admin account</p>
+<p>username/e-mail: admin</p>
+<p>password: admin</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="production-server">
+<span id="id2"></span><h2>Production server<a class="headerlink" href="#production-server" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="production-dependencies">
+<h3>Production dependencies<a class="headerlink" href="#production-dependencies" title="Permalink to this headline">¶</a></h3>
+<p>Following names of package are called so in debian package system:</p>
+<div class="highlight-python"><pre>sudo apt-get install libpq-dev libaio-dev redis-server</pre>
+</div>
+</div>
+<div class="section" id="postgresql">
+<h3>PostgreSQL<a class="headerlink" href="#postgresql" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div>sudo apt-get install postgresql</div></blockquote>
+<p>Create database in Postgres:</p>
+<div class="highlight-python"><pre>sudo su - postgres
+createuser -dSRP ets
+createdb ets -O ets</pre>
+</div>
+</div>
+<div class="section" id="nginx">
+<h3>Nginx<a class="headerlink" href="#nginx" title="Permalink to this headline">¶</a></h3>
+<p>Following names of package are called so in debian package system:</p>
+<div class="highlight-python"><pre>sudo apt-get install nginx</pre>
+</div>
+<p>/etc/nginx/sites-available/ETS:</p>
+<div class="highlight-python"><pre>server {
+  listen &lt;REAL_IP&gt;:80;
+  server_name ubuntu;
+
+  access_log /var/log/nginx/ETS_access.log;
+  error_log /var/log/nginx/ETS_error.log;
+
+  location /doc/ {
+      alias /opt/ETS/docs/_build/html/;
+      index index.html;
+      expires 5d;
+      autoindex on;
+      auth_basic "Restricted Area";
+      auth_basic_user_file /etc/nginx/htpasswd;
+  }
+
+  location /static/ {
+    alias /opt/ETS/static/;
+    expires 5d;
+  }
+
+  location /media/ {
+    alias /opt/ETS/media/;
+    expires 5d;
+  }
+
+  location / {
+    proxy_pass    http://127.0.0.1:80/;
+    include       /etc/nginx/proxy.conf;
+  }
+
+}</pre>
+</div>
+<p>Create password file:</p>
+<div class="highlight-python"><pre>sudo echo "&lt;user&gt; &lt;password&gt;" &gt; /etc/nginx/htpasswd</pre>
+</div>
+<p>/etc/nginx/proxy.conf:</p>
+<div class="highlight-python"><pre>proxy_redirect              off;
+proxy_set_header            Host $host;
+proxy_set_header            X-Real-IP $remote_addr;
+proxy_set_header            X-Forwarded-For $proxy_add_x_forwarded_for;
+client_max_body_size        10m;
+client_body_buffer_size     128k;
+proxy_connect_timeout       90;
+proxy_send_timeout          90;
+proxy_read_timeout          90;
+proxy_buffer_size           4k;
+proxy_buffers               4 32k;
+proxy_busy_buffers_size     64k;
+proxy_temp_file_write_size  64k;</pre>
+</div>
+</div>
+<div class="section" id="apache">
+<h3>Apache<a class="headerlink" href="#apache" title="Permalink to this headline">¶</a></h3>
+<p>Following names of package are called so in debian package system:</p>
+<div class="highlight-python"><pre>sudo apt-get install libapache2-mod-wsgi</pre>
+</div>
+<p>/etc/apache2/ports.conf:</p>
+<div class="highlight-python"><pre>NameVirtualHost 127.0.0.1:80
+Listen 127.0.0.1:80
+
+&lt;IfModule mod_ssl.c&gt;
+  Listen 443
+&lt;/IfModule&gt;
+
+&lt;IfModule mod_gnutls.c&gt;
+  Listen 443
+&lt;/IfModule&gt;</pre>
+</div>
+<p>/etc/apache2/sites-available/main:</p>
+<div class="highlight-python"><pre>&lt;VirtualHost 127.0.0.1:80&gt;
+  ServerAdmin admin@ubuntu
+
+  &lt;Directory /opt/ETS/parts&gt;
+    Order deny,allow
+    Allow from all
+  &lt;/Directory&gt;
+  &lt;Directory /opt/ETS/src&gt;
+    Order deny,allow
+    Allow from all
+  &lt;/Directory&gt;
+
+  WSGIScriptAlias / /opt/ETS/bin/instance.wsgi
+  WSGIDaemonProcess main user=www-data group=www-data threads=25
+  WSGIProcessGroup main
+  WSGIPassAuthorization on
+
+  LogLevel debug
+  ErrorLog ${APACHE_LOG_DIR}/error.log
+  CustomLog ${APACHE_LOG_DIR}/access.log combined
+&lt;/VirtualHost&gt;</pre>
+</div>
+</div>
+<div class="section" id="ssh-key">
+<h3>SSH KEY<a class="headerlink" href="#ssh-key" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>sudo su
+cd ~/.ssh
+ssh-keygen -t rsa -C "&lt;your e-mail&gt;"
+cat ./id_rsa.pub and copy and paste this key to your github account</pre>
+</div>
+</div>
+<div class="section" id="download-project-from-github">
+<h3>Download project from GitHub<a class="headerlink" href="#download-project-from-github" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>cd /opt/
+sudo git clone git@github.com:WFP-Dubai/ETS.git</pre>
+</div>
+</div>
+<div class="section" id="setting-of-database">
+<h3>Setting of Database<a class="headerlink" href="#setting-of-database" title="Permalink to this headline">¶</a></h3>
+<p>/opt/ETS/src/ets/local_settings.py:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">DEFAULT_DATABASE</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s">&#39;NAME&#39;</span><span class="p">:</span> <span class="s">&#39;ets&#39;</span><span class="p">,</span>
+      <span class="s">&#39;ENGINE&#39;</span><span class="p">:</span> <span class="s">&#39;django.db.backends.postgresql_psycopg2&#39;</span><span class="p">,</span>
+      <span class="s">&#39;HOST&#39;</span><span class="p">:</span> <span class="s">&#39;127.0.0.1&#39;</span><span class="p">,</span>
+      <span class="s">&#39;USER&#39;</span><span class="p">:</span> <span class="s">&#39;&lt;database name&gt;&#39;</span><span class="p">,</span>
+      <span class="s">&#39;PASSWORD&#39;</span><span class="p">:</span> <span class="s">&#39;&lt;database password&gt;&#39;</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="oracle-client">
+<h3>Oracle client<a class="headerlink" href="#oracle-client" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="ubuntu-64">
+<h4>Ubuntu 64<a class="headerlink" href="#ubuntu-64" title="Permalink to this headline">¶</a></h4>
+<p>Installation of packeges:</p>
+<div class="highlight-python"><pre>cd /opt/ETS/oracle/
+sudo dpkg -i *.deb
+sudo -i pip install cx-Oracle</pre>
+</div>
+<p>Set environment variables:</p>
+<div class="highlight-python"><pre>sudo touch /etc/ld.so.conf.d/ora-inst-cl-11.2.0.2.conf
+sudo echo "/usr/lib/oracle/11.2/client/lib" &gt; /etc/ld.so.conf.d/ora-inst-cl-11.2.0.2.conf</pre>
+</div>
+<p>Add to /etc/bash.bashrc:</p>
+<div class="highlight-python"><pre># oracle env
+export ORACLE_BASE=/usr/lib/oracle
+export ORACLE_HOME=$ORACLE_BASE/11.2/client64
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib
+export PATH=$ORACLE_HOME/bin:$PATH
+export PATH=$ORACLE_HOME/lib:$PATH</pre>
+</div>
+</div>
+<div class="section" id="ubuntu-32">
+<h4>Ubuntu 32<a class="headerlink" href="#ubuntu-32" title="Permalink to this headline">¶</a></h4>
+<p>Follow instructions: <a class="reference external" href="http://boyombo.blogspot.com/2011/07/setting-up-cxoracle-on-ubuntu-1104.html">http://boyombo.blogspot.com/2011/07/setting-up-cxoracle-on-ubuntu-1104.html</a></p>
+</div>
+<div class="section" id="mac-os-x">
+<h4>Mac OS X<a class="headerlink" href="#mac-os-x" title="Permalink to this headline">¶</a></h4>
+<ol class="arabic">
+<li><p class="first">Download following packages:</p>
+<div class="highlight-python"><pre>http://download.oracle.com/otn/mac/instantclient/10204/instantclient-basic-10.2.0.4.0-macosx-x64.zip
+http://download.oracle.com/otn/mac/instantclient/10204/instantclient-jdbc-10.2.0.4.0-macosx-x64.zip
+http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sqlplus-10.2.0.4.0-macosx-x64.zip
+http://download.oracle.com/otn/mac/instantclient/10204/instantclient-sdk-10.2.0.4.0-macosx-x64.zip</pre>
+</div>
+</li>
+<li><p class="first">Unzip the packages into a single directory such as &#8220;instantclient&#8221;.</p>
+</li>
+<li><p class="first">Set the library loading path in your environment to the directory in Step 2 (&#8220;instantclient&#8221;).</p>
+</li>
+<li><p class="first">Create symlink for the library:</p>
+<div class="highlight-python"><pre>cd &lt;instantclient&gt;
+ln -s libclntsh.dylib.10.1 libclntsh.dylib</pre>
+</div>
+</li>
+</ol>
+<ol class="arabic" start="4">
+<li><p class="first">Set environment variables:</p>
+<div class="highlight-python"><pre>echo "export PATH=&lt;instantclient directory&gt;:$PATH" &gt;&gt; ~/.profile
+echo "export DYLD_LIBRARY_PATH=&lt;instantclient directory&gt;:$DYLD_LIBRARY_PATH" &gt;&gt; ~/.profile</pre>
+</div>
+</li>
+<li><p class="first">Restart terminal and start your application.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>Build project<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>Build project using buildout and run it:</p>
+<div class="highlight-python"><pre>sudo python bootstrap.py
+sudo ./bin/buildout -c production.cfg
+sudo chown -R www-dada:www-data /opt/ETS
+sudo ./bin/instance createsuperuser</pre>
+</div>
+</div>
+</div>
+<div class="section" id="offliner-on-windows-xp">
+<h2>Offliner on Windows XP<a class="headerlink" href="#offliner-on-windows-xp" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="python">
+<h4>Python<a class="headerlink" href="#python" title="Permalink to this headline">¶</a></h4>
+<p>Installation links:</p>
+<p><a class="reference external" href="http://www.python.org/download/">http://www.python.org/download/</a>
+<a class="reference external" href="http://www.python.org/ftp/python/2.7.2/python-2.7.2.msi">http://www.python.org/ftp/python/2.7.2/python-2.7.2.msi</a></p>
+<p>Post install:</p>
+<p>Add Python binary(&#8220;C:Python27&#8221; and &#8220;C:Python27Scripts&#8221;) on the system PATH</p>
+</div>
+<div class="section" id="mingw">
+<h4>MinGW<a class="headerlink" href="#mingw" title="Permalink to this headline">¶</a></h4>
+<p>Installation links:</p>
+<p><a class="reference external" href="http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/">http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/</a>
+<a class="reference external" href="http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110802/mingw-get-inst-20110802.exe/download">http://sourceforge.net/projects/mingw/files/Automated%20MinGW%20Installer/mingw-get-inst/mingw-get-inst-20110802/mingw-get-inst-20110802.exe/download</a></p>
+<p>Post install:</p>
+<p>Make sure to copy &#8220;cc1.exe&#8221; and &#8220;collect2.exe&#8221; from the &#8220;C:MinGWlibexecgccmingw323.4.5&#8221; folder to the &#8220;C:MinGWbin&#8221; folder.
+Now put the install location&#8217;s bin subfolder (for example &#8220;C:MinGWbin&#8221;) in your system PATH in the same way you put Python in it.
+Create a file called &#8216;distutils.cfg&#8217; in &#8220;C:Python26Libdistutils&#8221;.
+[build]
+compiler=mingw32</p>
+</div>
+<div class="section" id="pil">
+<h4>PIL<a class="headerlink" href="#pil" title="Permalink to this headline">¶</a></h4>
+<p>You must have istalled Python before</p>
+<p>Installation links:</p>
+<p><a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a>
+<a class="reference external" href="http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe">http://effbot.org/downloads/PIL-1.1.7.win32-py2.7.exe</a></p>
+</div>
+<div class="section" id="git">
+<h4>Git<a class="headerlink" href="#git" title="Permalink to this headline">¶</a></h4>
+<p>Installation links:</p>
+<p><a class="reference external" href="http://code.google.com/p/msysgit/downloads/list">http://code.google.com/p/msysgit/downloads/list</a>
+<a class="reference external" href="http://msysgit.googlecode.com/files/Git-1.7.4-preview20110204.exe">http://msysgit.googlecode.com/files/Git-1.7.4-preview20110204.exe</a></p>
+</div>
+<div class="section" id="subversion">
+<h4>Subversion<a class="headerlink" href="#subversion" title="Permalink to this headline">¶</a></h4>
+<p>Installation links:
+(it&#8217;s require registration)</p>
+<p><a class="reference external" href="http://www.collab.net/downloads/subversion/">http://www.collab.net/downloads/subversion/</a></p>
+</div>
+</div>
+<div class="section" id="building-exe">
+<h3>Building EXE<a class="headerlink" href="#building-exe" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="install-nsis">
+<h4>Install NSIS<a class="headerlink" href="#install-nsis" title="Permalink to this headline">¶</a></h4>
+<dl class="docutils">
+<dt>Run command::</dt>
+<dd>apt-get install nsis</dd>
+</dl>
+<p>Go to directory ETS/installation</p>
+<p>AccessControl.dll, AccessControlW.dll - for access rights on files
+copy to nsis folder - Plugins (/usr/share/nsis/Include/)</p>
+<p>WriteEnvStr.nsh - additional function for writing variables to system PATH
+copy to nsis folder - Include (/usr/share/nsis/Plugins/)</p>
+<p>Open ets_admin.nsi or ets_users.nsi and check variable &#8220;pkgdir&#8221; (path for exe-files and ETS):
+/home/werty/django_apps/ETS/windows/</p>
+<p>For making package for users you must make package for admins (makensis ets_admin.nsi) or to use prepared exe.
+This package will install only dependencies for compiling main program. You can check its in requirment section before.</p>
+</div>
+<div class="section" id="compiling-ets-folder-on-windows">
+<h4>Compiling ETS-folder on Windows:<a class="headerlink" href="#compiling-ets-folder-on-windows" title="Permalink to this headline">¶</a></h4>
+<ul>
+<li><p class="first">Install exe-file on Windows</p>
+</li>
+<li><p class="first">Check internet connection</p>
+</li>
+<li><p class="first">Go to directory ETS</p>
+</li>
+<li><p class="first">Run this commands in console:</p>
+<div class="highlight-python"><pre>git clone http://github.com/WFP-Dubai/ETS.git
+python bootstrap.py
+bin\buildout -c windows.cfg</pre>
+</div>
+</li>
+</ul>
+<p>Copy sub-directory ETS to &#8220;pkgdir&#8221;
+You can clean this directory(without .pyo, .pyc, windows):</p>
+<div class="highlight-python"><pre>rm -r ETS/windows
+find ETS/ -type f -name "*.pyo" -delete
+find ETS/ -type f -name "*.pyc" -delete</pre>
+</div>
+<p>Build exe for users:</p>
+<div class="highlight-python"><pre>makensis ets_users.nsi</pre>
+</div>
+<p>You can use result exe-file for installation on user&#8217;s computers.
+You must put initial.json to directory with exe-file.
+It will load fixtures (start data for user)</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Installation procedure</a><ul>
+<li><a class="reference internal" href="#dependencies">Dependencies</a></li>
+<li><a class="reference internal" href="#local-environment">Local environment</a><ul>
+<li><a class="reference internal" href="#build-project">Build project</a></li>
+<li><a class="reference internal" href="#test-environment">Test environment</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#production-server">Production server</a><ul>
+<li><a class="reference internal" href="#production-dependencies">Production dependencies</a></li>
+<li><a class="reference internal" href="#postgresql">PostgreSQL</a></li>
+<li><a class="reference internal" href="#nginx">Nginx</a></li>
+<li><a class="reference internal" href="#apache">Apache</a></li>
+<li><a class="reference internal" href="#ssh-key">SSH KEY</a></li>
+<li><a class="reference internal" href="#download-project-from-github">Download project from GitHub</a></li>
+<li><a class="reference internal" href="#setting-of-database">Setting of Database</a></li>
+<li><a class="reference internal" href="#oracle-client">Oracle client</a><ul>
+<li><a class="reference internal" href="#ubuntu-64">Ubuntu 64</a></li>
+<li><a class="reference internal" href="#ubuntu-32">Ubuntu 32</a></li>
+<li><a class="reference internal" href="#mac-os-x">Mac OS X</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id3">Build project</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#offliner-on-windows-xp">Offliner on Windows XP</a><ul>
+<li><a class="reference internal" href="#requirements">Requirements</a><ul>
+<li><a class="reference internal" href="#python">Python</a></li>
+<li><a class="reference internal" href="#mingw">MinGW</a></li>
+<li><a class="reference internal" href="#pil">PIL</a></li>
+<li><a class="reference internal" href="#git">Git</a></li>
+<li><a class="reference internal" href="#subversion">Subversion</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#building-exe">Building EXE</a><ul>
+<li><a class="reference internal" href="#install-nsis">Install NSIS</a></li>
+<li><a class="reference internal" href="#compiling-ets-folder-on-windows">Compiling ETS-folder on Windows:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Afisha&#8217;s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="package.html"
+                        title="next chapter">Package structure</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/install.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="package.html" title="Package structure"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Afisha’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Electronic transaction system 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2011, EPIC.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
