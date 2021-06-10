@@ -14,7 +14,7 @@ def read(fname):
 #Dependencies - python eggs
 install_requires = [
         'setuptools',
-        'Django==1.3.3',
+        'Django==2.2.24',
         #'httplib2',
         'south',
         'django-rosetta',
